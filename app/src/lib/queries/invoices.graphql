@@ -1,0 +1,29 @@
+mutation CreateAuctionInvoice($orgID: UUID1!, $lotID: UUID1!) {
+  createAuctionLotInvoice(orgID: $orgID, lotID: $lotID) {
+    invoiceID
+    status
+    items {
+      units
+      unitPrice
+      taxes
+      totalPrice
+    }
+  }
+}
+
+mutation CreateBuyNowInvoice(
+  $input: PurchaseMarketplaceBuyNowLotInput!
+) {
+  purchaseMarketplaceBuyNowLot(input: $input) {
+    invoice {
+      invoiceID
+      status
+      items {
+        units
+        unitPrice
+        taxes
+        totalPrice
+      }
+    }
+  }
+}

@@ -1,0 +1,106 @@
+import { BillingInfo } from "../../forms/BillingInfoForm";
+
+const PLAID_OAUTH_FLOW_INFO_KEY = "PLAID_OAUTH_FLOW_INFO";
+const PLAID_OAUTH_FLOW_RECEIVED_REDIRECT_URI_KEY = "PLAID_OAUTH_FLOW_RECEIVED_REDIRECT_URI_KEY";
+const PLAID_OAUTH_STATE_USED_KEY = "PLAID_OAUTH_STATE_USED_KEY";
+const PLAID_OAUTH_FLOW_URL_SEARCH = "?oauth_state_id=";
+
+export interface PlaidInfo {
+  // TODO: Do we need to store product info?
+  url: string;
+  linkToken: string;
+  selectedBillingInfo: string | BillingInfo;
+}
+
+export function persistPlaidInfo(info: PlaidInfo) {
+  if (!process.browser) return;
+
+  try {
+    localStorage.setItem(PLAID_OAUTH_FLOW_INFO_KEY, JSON.stringify(info));
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+export function persistPlaidReceivedRedirectUri(receivedRedirectUri: string) {
+  localStorage.setItem(PLAID_OAUTH_FLOW_RECEIVED_REDIRECT_URI_KEY, receivedRedirectUri);
+}
+
+export function persistPlaidOAuthStateUsed(used = true) {
+  localStorage.setItem(PLAID_OAUTH_STATE_USED_KEY, `${ used }`);
+}
+
+export function clearPlaidInfo() {
+  if (process.browser) {
+    localStorage.removeItem(PLAID_OAUTH_FLOW_INFO_KEY);
+    localStorage.removeItem(PLAID_OAUTH_FLOW_RECEIVED_REDIRECT_URI_KEY);
+    localStorage.removeItem(PLAID_OAUTH_STATE_USED_KEY);
+  }
+
+  return FALLBACK_PLAID_OAUTH_FLOW_STATE;
+}
+
+export interface PlaidOAuthFlowState extends PlaidInfo {
+  receivedRedirectUri?: string;
+  continueOAuthFlow: boolean;
+  savedStateUsed: boolean;
+}
+
+const FALLBACK_PLAID_OAUTH_FLOW_STATE: PlaidOAuthFlowState = {
+  url: "",
+  linkToken: "",
+  selectedBillingInfo: "",
+  continueOAuthFlow: false,
+  savedStateUsed: false,
+};
+
+export function getPlaidOAuthFlowState(): PlaidOAuthFlowState {
+  if (!process.browser) {
+    return FALLBACK_PLAID_OAUTH_FLOW_STATE;
+  }
+
+  let savedPlaidInfo: Partial<PlaidInfo> = {};
+  let savedReceivedRedirectUri = "";
+  let savedStateUsed = false;
+
+  try {
+    savedPlaidInfo = JSON.parse(localStorage.getItem(PLAID_OAUTH_FLOW_INFO_KEY) || "{}") || {};
+    savedReceivedRedirectUri = localStorage.getItem(PLAID_OAUTH_FLOW_RECEIVED_REDIRECT_URI_KEY) || "";
+    savedStateUsed = localStorage.getItem(PLAID_OAUTH_STATE_USED_KEY) === "true" || false;
+  } catch (err) {
+    console.log(err);
+  }
+
+  const {
+    url = "",
+    linkToken = "",
+    selectedBillingInfo = ""
+  } = savedPlaidInfo || {};
+
+  const receivedRedirectUri = savedReceivedRedirectUri || (window.location.search.startsWith(PLAID_OAUTH_FLOW_URL_SEARCH) ? window.location.href : undefined);
+  // const receivedRedirectUri = savedReceivedRedirectUri || window.location.href || "";
+
+  const continueOAuthFlow = !!(url && linkToken && selectedBillingInfo && receivedRedirectUri);
+
+  if (continueOAuthFlow && savedStateUsed) return clearPlaidInfo();
+
+  return {
+    // The URL of the page where we initially opened the modal:
+    url,
+
+    // The Link token from the first Link initialization:
+    linkToken,
+
+    // The billing info selected / entered before starting the Plaid OAuth flow:
+    selectedBillingInfo,
+
+    // The redirect URI with an OAuth state ID parameter:
+    receivedRedirectUri,
+
+    // Whether we need to continue the previous OAuth flow:
+    continueOAuthFlow,
+
+    // Wether we already tried to resume the previous OAuth flow:
+    savedStateUsed,
+  };
+}

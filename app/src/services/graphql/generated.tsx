@@ -1,0 +1,1833 @@
+import { gql } from '@apollo/client';
+import * as Apollo from '@apollo/client';
+export type Maybe<T> = T | null;
+export type InputMaybe<T> = Maybe<T>;
+export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
+export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
+export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
+const defaultOptions = {} as const;
+/** All built-in and custom scalars, mapped to their actual values */
+export type Scalars = {
+  ID: string;
+  String: string;
+  Boolean: boolean;
+  Int: number;
+  Float: number;
+  BigInt: any;
+  EthAddress: any;
+  Time: any;
+  UUID: any;
+  UUID1: any;
+  Upload: any;
+};
+
+export type AchBankAddressOutput = {
+  __typename?: 'ACHBankAddressOutput';
+  address1: Scalars['String'];
+  address2: Scalars['String'];
+  bankName: Scalars['String'];
+  city: Scalars['String'];
+  country: Scalars['String'];
+  district: Scalars['String'];
+};
+
+export type AchBillingDetails = {
+  address1?: InputMaybe<Scalars['String']>;
+  address2?: InputMaybe<Scalars['String']>;
+  city?: InputMaybe<Scalars['String']>;
+  country?: InputMaybe<Scalars['String']>;
+  district?: InputMaybe<Scalars['String']>;
+  name: Scalars['String'];
+  postalCode?: InputMaybe<Scalars['String']>;
+};
+
+export type AchBillingDetailsOutput = {
+  __typename?: 'ACHBillingDetailsOutput';
+  address1: Scalars['String'];
+  address2: Scalars['String'];
+  city: Scalars['String'];
+  country: Scalars['String'];
+  district: Scalars['String'];
+  name: Scalars['String'];
+  postalCode: Scalars['String'];
+};
+
+export type AchData = {
+  accountId: Scalars['String'];
+  billingDetails: AchBillingDetails;
+  metadata: AchMetadata;
+  publicToken: Scalars['String'];
+};
+
+export type AchMetadata = {
+  email: Scalars['String'];
+  phoneNumber?: InputMaybe<Scalars['String']>;
+};
+
+export type AchMetadataOutput = {
+  __typename?: 'ACHMetadataOutput';
+  email: Scalars['String'];
+  phoneNumber: Scalars['String'];
+};
+
+export type AchPaymentMethodOutput = {
+  __typename?: 'ACHPaymentMethodOutput';
+  accountNumber: Scalars['String'];
+  bankAddress?: Maybe<AchBankAddressOutput>;
+  billingDetails?: Maybe<AchBillingDetailsOutput>;
+  id: Scalars['UUID1'];
+  metadata?: Maybe<AchMetadataOutput>;
+  status: Scalars['String'];
+  type: PaymentType;
+};
+
+export type AchPaymentMethodPrepareStatementOutput = {
+  __typename?: 'ACHPaymentMethodPrepareStatementOutput';
+  linkToken: Scalars['String'];
+};
+
+export type Asset = {
+  __typename?: 'Asset';
+  currentVersion: AssetVersion;
+  id: Scalars['UUID1'];
+  versions?: Maybe<Array<AssetVersion>>;
+};
+
+export type AssetFilter = {
+  organizationID?: InputMaybe<Scalars['UUID1']>;
+};
+
+export type AssetVersion = {
+  __typename?: 'AssetVersion';
+  arweaveTx?: Maybe<Scalars['String']>;
+  asset: Asset;
+  assetID: Scalars['UUID1'];
+  cdnUrl?: Maybe<Scalars['String']>;
+  description?: Maybe<Scalars['String']>;
+  id: Scalars['UUID1'];
+  isCurrent: Scalars['Boolean'];
+  name: Scalars['String'];
+  slug: Scalars['String'];
+};
+
+export enum AuctionBidOrder {
+  Asc = 'ASC',
+  Desc = 'DESC'
+}
+
+export enum AuctionLotStatus {
+  Active = 'Active',
+  Completed = 'Completed',
+  Hidden = 'Hidden',
+  Preview = 'Preview'
+}
+
+export type BidFilterInput = {
+  marketplaceAuctionLotId?: InputMaybe<Scalars['UUID']>;
+  order?: InputMaybe<AuctionBidOrder>;
+  userId?: InputMaybe<Scalars['UUID']>;
+};
+
+export enum CollectionType {
+  Auction = 'Auction',
+  Tk2 = 'TK2'
+}
+
+export enum ContractType {
+  Erc721Creator = 'ERC721Creator',
+  Erc1155Creator = 'ERC1155Creator',
+  GenerativeContract = 'GenerativeContract',
+  ZoraContract = 'ZoraContract'
+}
+
+export type CreateMarketplaceBuyNowLotInput = {
+  collectionId: Scalars['UUID1'];
+  collectionItemName: Scalars['String'];
+  endDate: Scalars['Time'];
+  marketplaceTokenId: Scalars['UUID1'];
+  sortNumber: Scalars['Int'];
+  startDate: Scalars['Time'];
+  totalUnits: Scalars['Int'];
+  unitPrice: Scalars['Float'];
+};
+
+export type CreditCardBillingDetails = {
+  address1: Scalars['String'];
+  address2?: InputMaybe<Scalars['String']>;
+  city: Scalars['String'];
+  country: Scalars['String'];
+  district?: InputMaybe<Scalars['String']>;
+  name: Scalars['String'];
+  postalCode: Scalars['String'];
+};
+
+export type CreditCardBillingDetailsOutput = {
+  __typename?: 'CreditCardBillingDetailsOutput';
+  address1: Scalars['String'];
+  address2: Scalars['String'];
+  city: Scalars['String'];
+  country: Scalars['String'];
+  district: Scalars['String'];
+  name: Scalars['String'];
+  postalCode: Scalars['String'];
+};
+
+export type CreditCardData = {
+  billingDetails?: InputMaybe<CreditCardBillingDetails>;
+  encryptedData: Scalars['String'];
+  expirationMonth: Scalars['Int'];
+  expirationYear: Scalars['Int'];
+  keyID: Scalars['String'];
+  metadata?: InputMaybe<CreditCardMetadata>;
+};
+
+export type CreditCardMetadata = {
+  email: Scalars['String'];
+  phoneNumber?: InputMaybe<Scalars['String']>;
+};
+
+export type CreditCardMetadataOutput = {
+  __typename?: 'CreditCardMetadataOutput';
+  email: Scalars['String'];
+  phoneNumber: Scalars['String'];
+};
+
+export type CreditCardPaymentMethodOutput = {
+  __typename?: 'CreditCardPaymentMethodOutput';
+  billingDetails?: Maybe<CreditCardBillingDetailsOutput>;
+  id: Scalars['UUID1'];
+  last4Digit: Scalars['String'];
+  metadata?: Maybe<CreditCardMetadataOutput>;
+  network: Scalars['String'];
+  status: Scalars['String'];
+  type: PaymentType;
+};
+
+export type CurrentUser = {
+  __typename?: 'CurrentUser';
+  activeBids: Array<MarketplaceAuctionBid>;
+  apiKeys?: Maybe<Array<Maybe<UserApiKeyResponse>>>;
+  favoriteItems?: Maybe<Array<MarketplaceCollectionItem>>;
+  id: Scalars['UUID'];
+  user: User;
+  userOrgs: Array<UserOrganization>;
+  wallets?: Maybe<Array<Wallet>>;
+  wonBids: Array<MarketplaceAuctionBid>;
+};
+
+
+export type CurrentUserActiveBidsArgs = {
+  orgId: Scalars['UUID'];
+};
+
+
+export type CurrentUserUserOrgsArgs = {
+  filter?: InputMaybe<UserOrgFilter>;
+};
+
+
+export type CurrentUserWonBidsArgs = {
+  orgId: Scalars['UUID'];
+};
+
+export type DeployContractInput = {
+  contractType: ContractType;
+  nftName: Scalars['String'];
+  nftSymbol: Scalars['String'];
+  organizationId: Scalars['UUID1'];
+  walletId: Scalars['UUID1'];
+};
+
+export type InvoiceDetails = {
+  __typename?: 'InvoiceDetails';
+  externalUserID: Scalars['String'];
+  internalUserID: Scalars['String'];
+  invoiceCreatedAt: Scalars['Time'];
+  invoiceID: Scalars['UUID1'];
+  items: Array<Maybe<ItemInvoiceDetail>>;
+  status: InvoiceStatus;
+};
+
+export enum InvoiceStatus {
+  Canceled = 'Canceled',
+  Draft = 'Draft',
+  Paid = 'Paid',
+  Pending = 'Pending'
+}
+
+export type ItemInvoiceDetail = {
+  __typename?: 'ItemInvoiceDetail';
+  buyersPremium: Scalars['Float'];
+  collectionItemID: Scalars['UUID1'];
+  collectionItemTitle: Scalars['String'];
+  collectionTitle: Scalars['String'];
+  overheadPremium: Scalars['Float'];
+  saleDate: Scalars['Time'];
+  salesTaxRate: Scalars['Float'];
+  taxes: Scalars['Float'];
+  totalPrice: Scalars['Float'];
+  unitPrice: Scalars['Float'];
+  units: Scalars['Int'];
+};
+
+export enum KycStatus {
+  Level1 = 'Level1',
+  Level2 = 'Level2',
+  None = 'None',
+  Pending = 'Pending'
+}
+
+export enum MarketCollectionStatus {
+  Active = 'Active',
+  Archived = 'Archived',
+  Inactive = 'Inactive'
+}
+
+export type Marketplace = {
+  __typename?: 'Marketplace';
+  collections?: Maybe<Array<MarketplaceCollection>>;
+  id: Scalars['UUID'];
+  name: Scalars['String'];
+  organizationID: Scalars['String'];
+  theme?: Maybe<Scalars['String']>;
+  tokens?: Maybe<Array<MarketplaceToken>>;
+};
+
+export type MarketplaceAuctionBid = {
+  __typename?: 'MarketplaceAuctionBid';
+  amount: Scalars['Float'];
+  buyersPremium: Scalars['Float'];
+  createdAt: Scalars['Time'];
+  currentBid: Scalars['Float'];
+  finalPrice: Scalars['Float'];
+  id: Scalars['UUID'];
+  isCurrent: Scalars['Boolean'];
+  isMine: Scalars['Boolean'];
+  marketplaceAuctionLot: MarketplaceAuctionLot;
+  marketplaceAuctionLotId: Scalars['UUID1'];
+  marketplaceUser?: Maybe<MarketplaceUser>;
+  maximumBid?: Maybe<Scalars['Float']>;
+  nextBidIncrement: Scalars['Float'];
+  overheadPremium: Scalars['Float'];
+  userId: Scalars['UUID'];
+  userOrganization: UserOrganization;
+};
+
+export type MarketplaceAuctionBidInput = {
+  amount: Scalars['Float'];
+  marketplaceAuctionLotId: Scalars['UUID'];
+};
+
+export type MarketplaceAuctionDefaultConfig = {
+  __typename?: 'MarketplaceAuctionDefaultConfig';
+  collectionId: Scalars['UUID'];
+  endDate: Scalars['Time'];
+  id: Scalars['UUID'];
+  minIncrement: Scalars['Float'];
+  reservePrice?: Maybe<Scalars['Float']>;
+  startDate: Scalars['Time'];
+};
+
+export type MarketplaceAuctionFeeStructure = {
+  __typename?: 'MarketplaceAuctionFeeStructure';
+  buyersPremiumRate: Array<MarketplaceAuctionFeeStructureItem>;
+  overheadPremiumRate: Array<MarketplaceAuctionFeeStructureItem>;
+};
+
+export type MarketplaceAuctionFeeStructureItem = {
+  __typename?: 'MarketplaceAuctionFeeStructureItem';
+  from: Scalars['Float'];
+  rate: Scalars['Float'];
+  to?: Maybe<Scalars['Float']>;
+};
+
+export type MarketplaceAuctionLot = {
+  __typename?: 'MarketplaceAuctionLot';
+  bids: Array<MarketplaceAuctionBid>;
+  currentBid?: Maybe<MarketplaceAuctionBid>;
+  defaultConfig: MarketplaceAuctionDefaultConfig;
+  endDate: Scalars['Time'];
+  feeStructure: MarketplaceAuctionFeeStructure;
+  id: Scalars['UUID'];
+  lotNumber?: Maybe<Scalars['Int']>;
+  marketplaceCollectionItem?: Maybe<MarketplaceCollectionItem>;
+  marketplaceCollectionItemId: Scalars['UUID1'];
+  myBid?: Maybe<MarketplaceAuctionBid>;
+  previewDate?: Maybe<Scalars['Time']>;
+  reserveMet: Scalars['Boolean'];
+  reservePrice?: Maybe<Scalars['Float']>;
+  startDate: Scalars['Time'];
+  startingBid?: Maybe<Scalars['Float']>;
+  status: AuctionLotStatus;
+};
+
+
+export type MarketplaceAuctionLotBidsArgs = {
+  filter?: InputMaybe<BidFilterInput>;
+};
+
+
+export type MarketplaceAuctionLotDefaultConfigArgs = {
+  collectionId: Scalars['UUID'];
+};
+
+export type MarketplaceAuctionLotInput = {
+  collectionId: Scalars['UUID'];
+  collectionItemName: Scalars['String'];
+  endDate: Scalars['Time'];
+  lotNumber?: InputMaybe<Scalars['Int']>;
+  marketplaceTokenId: Scalars['UUID'];
+  reservePrice?: InputMaybe<Scalars['Float']>;
+  saleType: MarketplaceSaleType;
+  startDate: Scalars['Time'];
+  startingBid?: InputMaybe<Scalars['Float']>;
+};
+
+export type MarketplaceAuctionLotUpdateInput = {
+  endDate?: InputMaybe<Scalars['Time']>;
+  lotNumber?: InputMaybe<Scalars['Int']>;
+  reservePrice?: InputMaybe<Scalars['Float']>;
+  startDate?: InputMaybe<Scalars['Time']>;
+  startingBid?: InputMaybe<Scalars['Float']>;
+  status?: InputMaybe<AuctionLotStatus>;
+};
+
+export type MarketplaceBuyNowOutput = {
+  __typename?: 'MarketplaceBuyNowOutput';
+  endDate: Scalars['Time'];
+  id: Scalars['UUID'];
+  invoice?: Maybe<InvoiceDetails>;
+  marketplaceCollectionItem?: Maybe<MarketplaceCollectionItem>;
+  sortNumber: Scalars['Int'];
+  startDate: Scalars['Time'];
+  totalAvailableUnits: Scalars['Int'];
+  totalUnits: Scalars['Int'];
+  unitPrice: Scalars['Float'];
+};
+
+export type MarketplaceCollection = {
+  __typename?: 'MarketplaceCollection';
+  collectionType: CollectionType;
+  description: Scalars['String'];
+  endDate?: Maybe<Scalars['Time']>;
+  id: Scalars['UUID1'];
+  items?: Maybe<Array<MarketplaceCollectionItem>>;
+  marketplaceID: Scalars['UUID1'];
+  name: Scalars['String'];
+  slug: Scalars['String'];
+  startDate?: Maybe<Scalars['Time']>;
+  status: MarketCollectionStatus;
+};
+
+
+export type MarketplaceCollectionItemsArgs = {
+  limit?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+};
+
+export type MarketplaceCollectionCreateInput = {
+  description: Scalars['String'];
+  endDate?: InputMaybe<Scalars['Time']>;
+  name: Scalars['String'];
+  startDate?: InputMaybe<Scalars['Time']>;
+  status?: InputMaybe<MarketCollectionStatus>;
+};
+
+export type MarketplaceCollectionItem = {
+  __typename?: 'MarketplaceCollectionItem';
+  collectionId: Scalars['UUID'];
+  details: MarketplaceCollectionItemDetails;
+  id: Scalars['UUID'];
+  /** @deprecated Use `details` property instead */
+  lot: MarketplaceAuctionLot;
+  marketplaceTokenId: Scalars['UUID'];
+  name: Scalars['String'];
+  saleType: MarketplaceSaleType;
+  slug: Scalars['String'];
+};
+
+export type MarketplaceCollectionItemDetails = MarketplaceAuctionLot | MarketplaceBuyNowOutput;
+
+export type MarketplaceCollectionUpdateInput = {
+  description?: InputMaybe<Scalars['String']>;
+  endDate?: InputMaybe<Scalars['Time']>;
+  name?: InputMaybe<Scalars['String']>;
+  slug?: InputMaybe<Scalars['String']>;
+  startDate?: InputMaybe<Scalars['Time']>;
+  status?: InputMaybe<MarketCollectionStatus>;
+};
+
+export enum MarketplaceSaleType {
+  Auction = 'Auction',
+  BuyNow = 'BuyNow'
+}
+
+export type MarketplaceToken = {
+  __typename?: 'MarketplaceToken';
+  id: Scalars['UUID'];
+  marketplaceID: Scalars['UUID'];
+  nftContractAddress: Scalars['String'];
+  nftTokenID?: Maybe<Scalars['UUID']>;
+  onChainTokenID: Scalars['Int'];
+};
+
+export type MarketplaceUser = {
+  __typename?: 'MarketplaceUser';
+  avatar?: Maybe<Scalars['String']>;
+  id: Scalars['UUID'];
+  username?: Maybe<Scalars['String']>;
+};
+
+export type Mutation = {
+  __typename?: 'Mutation';
+  /**
+   * Add an existing lot to User favorite lots list.
+   *     If lot is already exists, then do nothing.
+   *     If provided lot is invalid or not exists, then error message will be returned.
+   */
+  addCollectionItemToUserFavorites: Scalars['Boolean'];
+  addExistingTokenToCollection: Scalars['String'];
+  addOrganization: Organization;
+  addTokensToCollection: Scalars['String'];
+  /** Cancels invoice by ID, can be called by org admin */
+  cancelInvoice: Scalars['Boolean'];
+  /** Cancels payment by ID, can be called by org admin */
+  cancelPayment: Scalars['Boolean'];
+  /** Creates invoice for given Lot, can be called by org admin */
+  createAuctionLotInvoice: InvoiceDetails;
+  createMarketplaceAuctionBid: MarketplaceAuctionBid;
+  createMarketplaceAuctionLot: MarketplaceAuctionLot;
+  createMarketplaceBuyNowLot: MarketplaceBuyNowOutput;
+  createMarketplaceCollection: MarketplaceCollection;
+  createOrgByUser: UserOrganization;
+  /** Creates a multisig with organization as parent type */
+  createOrgMultisig: Scalars['String'];
+  /** Creates payment for given Invoice */
+  createPayment: Payment;
+  /** Creates new Payment method based on input data. */
+  createPaymentMethod: PaymentMethodOutput;
+  createTokenDraft: Scalars['String'];
+  /** Create a new API key for given User and Organization. */
+  createUserAPIKey?: Maybe<UserApiKeyResponse>;
+  /** Creates a multisig with user as parent type */
+  createUserMultisig: Scalars['String'];
+  deleteAsset: Scalars['String'];
+  /**
+   * Delete an existing lot from User favorite lots list.
+   *     If lot has been already deleted, then do nothing.
+   *     If provided lot is invalid or not exists, then error message will be returned.
+   */
+  deleteCollectionItemFromUserFavorites: Scalars['Boolean'];
+  /** Deletes existing Payment method by Payment ID. */
+  deletePaymentMethod: Scalars['Boolean'];
+  deleteToken: Scalars['String'];
+  /** Delete an existing API key. */
+  deleteUserAPIKey: Scalars['Boolean'];
+  finishDeployment: Scalars['Boolean'];
+  importExternalTokenToCollection: Scalars['String'];
+  loginWithSignature: Organization;
+  marketplaceUpdateTheme: Marketplace;
+  mintGenerativeToken: Scalars['String'];
+  mintTokens: Scalars['String'];
+  nftContractAddAdmin: Scalars['String'];
+  nftDeployContract: NftContract;
+  orgCreateMarketplace: Marketplace;
+  ping: Scalars['String'];
+  purchaseMarketplaceBuyNowLot: MarketplaceBuyNowOutput;
+  revealGenerativeToken: Scalars['String'];
+  setJwtIssuerDomain: Organization;
+  transferToken: Scalars['String'];
+  updateContractGeneBaseURI: Scalars['String'];
+  updateMarketplaceAuctionLot: MarketplaceAuctionLot;
+  updateMarketplaceCollection: MarketplaceCollection;
+  /** Update name of multisig wallet */
+  updateMultisigName: Scalars['Boolean'];
+  /** Update existing Payment method based on input data. */
+  updatePaymentMethod: Scalars['Boolean'];
+  updateTokenDraft: Scalars['String'];
+  updateUserOrgRole: UserOrganization;
+  updateUserOrgSettings: UserOrganization;
+  uploadArweaveAsset: Scalars['String'];
+  uploadArweaveMetadata: Scalars['String'];
+  uploadAsset: Scalars['String'];
+};
+
+
+export type MutationAddCollectionItemToUserFavoritesArgs = {
+  collectionItemId: Scalars['UUID1'];
+};
+
+
+export type MutationAddExistingTokenToCollectionArgs = {
+  marketplaceId: Scalars['UUID1'];
+  tokenId: Scalars['UUID1'];
+};
+
+
+export type MutationAddOrganizationArgs = {
+  handle: Scalars['String'];
+  name: Scalars['String'];
+};
+
+
+export type MutationAddTokensToCollectionArgs = {
+  marketplaceId: Scalars['UUID1'];
+  tokenIds: Array<Scalars['UUID1']>;
+};
+
+
+export type MutationCancelInvoiceArgs = {
+  invoiceID: Scalars['UUID1'];
+  orgID?: InputMaybe<Scalars['UUID1']>;
+};
+
+
+export type MutationCancelPaymentArgs = {
+  orgID: Scalars['UUID1'];
+  paymentID: Scalars['UUID1'];
+};
+
+
+export type MutationCreateAuctionLotInvoiceArgs = {
+  lotID: Scalars['UUID1'];
+  orgID: Scalars['UUID1'];
+};
+
+
+export type MutationCreateMarketplaceAuctionBidArgs = {
+  marketplaceAuctionBid: MarketplaceAuctionBidInput;
+};
+
+
+export type MutationCreateMarketplaceAuctionLotArgs = {
+  marketplaceAuctionLot: MarketplaceAuctionLotInput;
+};
+
+
+export type MutationCreateMarketplaceBuyNowLotArgs = {
+  input: CreateMarketplaceBuyNowLotInput;
+};
+
+
+export type MutationCreateMarketplaceCollectionArgs = {
+  data: MarketplaceCollectionCreateInput;
+  marketplaceID: Scalars['String'];
+};
+
+
+export type MutationCreateOrgByUserArgs = {
+  handle: Scalars['String'];
+  name: Scalars['String'];
+};
+
+
+export type MutationCreateOrgMultisigArgs = {
+  chainId: Scalars['Int'];
+  name: Scalars['String'];
+  orgId: Scalars['UUID1'];
+};
+
+
+export type MutationCreatePaymentArgs = {
+  invoiceID: Scalars['UUID1'];
+  paymentMethodID: Scalars['UUID1'];
+};
+
+
+export type MutationCreatePaymentMethodArgs = {
+  input: PaymentMethodCreateInput;
+  orgID: Scalars['UUID1'];
+};
+
+
+export type MutationCreateTokenDraftArgs = {
+  contractId: Scalars['UUID'];
+  tokens: Array<TokenDraft>;
+};
+
+
+export type MutationCreateUserApiKeyArgs = {
+  orgId: Scalars['UUID1'];
+};
+
+
+export type MutationCreateUserMultisigArgs = {
+  chainId: Scalars['Int'];
+  name: Scalars['String'];
+};
+
+
+export type MutationDeleteAssetArgs = {
+  assetId: Scalars['UUID1'];
+};
+
+
+export type MutationDeleteCollectionItemFromUserFavoritesArgs = {
+  collectionItemId: Scalars['UUID1'];
+};
+
+
+export type MutationDeletePaymentMethodArgs = {
+  orgID: Scalars['UUID1'];
+  paymentMethodID: Scalars['UUID1'];
+};
+
+
+export type MutationDeleteTokenArgs = {
+  tokenId: Scalars['UUID1'];
+};
+
+
+export type MutationDeleteUserApiKeyArgs = {
+  keyId: Scalars['UUID1'];
+};
+
+
+export type MutationFinishDeploymentArgs = {
+  transactionInput: TransactionInput;
+};
+
+
+export type MutationImportExternalTokenToCollectionArgs = {
+  contractAddress: Scalars['String'];
+  marketplaceId: Scalars['UUID1'];
+  onChainId: Scalars['Int'];
+};
+
+
+export type MutationLoginWithSignatureArgs = {
+  request: SigninRequest;
+};
+
+
+export type MutationMarketplaceUpdateThemeArgs = {
+  id: Scalars['String'];
+  theme: Scalars['String'];
+};
+
+
+export type MutationMintGenerativeTokenArgs = {
+  contractId: Scalars['UUID'];
+  orgId: Scalars['UUID'];
+};
+
+
+export type MutationMintTokensArgs = {
+  tokenIds: Array<Scalars['UUID1']>;
+};
+
+
+export type MutationNftContractAddAdminArgs = {
+  address: Scalars['String'];
+  nftContractId: Scalars['UUID1'];
+};
+
+
+export type MutationNftDeployContractArgs = {
+  input: DeployContractInput;
+};
+
+
+export type MutationOrgCreateMarketplaceArgs = {
+  name: Scalars['String'];
+  orgId: Scalars['UUID'];
+};
+
+
+export type MutationPurchaseMarketplaceBuyNowLotArgs = {
+  input: PurchaseMarketplaceBuyNowLotInput;
+};
+
+
+export type MutationRevealGenerativeTokenArgs = {
+  contractId: Scalars['UUID'];
+  orgId: Scalars['UUID'];
+};
+
+
+export type MutationSetJwtIssuerDomainArgs = {
+  domain: Scalars['String'];
+  orgId: Scalars['UUID'];
+};
+
+
+export type MutationTransferTokenArgs = {
+  contractAddress: Scalars['String'];
+  tokenOnChainId: Scalars['Int'];
+  transferTo: Scalars['String'];
+  walletId: Scalars['UUID1'];
+};
+
+
+export type MutationUpdateContractGeneBaseUriArgs = {
+  contractId: Scalars['UUID'];
+  orgId: Scalars['UUID'];
+};
+
+
+export type MutationUpdateMarketplaceAuctionLotArgs = {
+  data: MarketplaceAuctionLotUpdateInput;
+  marketplaceAuctionLotId: Scalars['UUID'];
+};
+
+
+export type MutationUpdateMarketplaceCollectionArgs = {
+  data: MarketplaceCollectionUpdateInput;
+  id: Scalars['UUID1'];
+};
+
+
+export type MutationUpdateMultisigNameArgs = {
+  newName: Scalars['String'];
+  walletID: Scalars['UUID1'];
+};
+
+
+export type MutationUpdatePaymentMethodArgs = {
+  input: PaymentMethodUpdateInput;
+  orgID: Scalars['UUID1'];
+  paymentMethodID: Scalars['UUID1'];
+};
+
+
+export type MutationUpdateTokenDraftArgs = {
+  token: TokenDraft;
+};
+
+
+export type MutationUpdateUserOrgRoleArgs = {
+  orgID: Scalars['UUID'];
+  role: Scalars['String'];
+  userID: Scalars['UUID'];
+};
+
+
+export type MutationUpdateUserOrgSettingsArgs = {
+  params: SettingsInput;
+};
+
+
+export type MutationUploadArweaveAssetArgs = {
+  assetVersionId: Scalars['UUID1'];
+};
+
+
+export type MutationUploadArweaveMetadataArgs = {
+  tokenId: Scalars['UUID1'];
+};
+
+
+export type MutationUploadAssetArgs = {
+  file: Scalars['Upload'];
+  name: Scalars['String'];
+  orgId: Scalars['UUID1'];
+};
+
+export type NftContract = {
+  __typename?: 'NFTContract';
+  activationTxHash: Scalars['String'];
+  admins: Array<Scalars['String']>;
+  arweavePathManifest?: Maybe<Scalars['String']>;
+  contractAddress: Scalars['EthAddress'];
+  deploymentTxHash?: Maybe<Scalars['String']>;
+  id: Scalars['UUID1'];
+  marketplaceAddress: Scalars['EthAddress'];
+  mediaTxHash?: Maybe<Scalars['String']>;
+  nftContractType: NftContractType;
+  nftTokens?: Maybe<Array<NftToken>>;
+  transferOwnershipHash?: Maybe<Scalars['String']>;
+  wallet: Wallet;
+};
+
+export type NftContractType = {
+  __typename?: 'NFTContractType';
+  id: Scalars['UUID1'];
+  name: Scalars['String'];
+};
+
+export type NftMetadata = {
+  __typename?: 'NFTMetadata';
+  copyright?: Maybe<Scalars['String']>;
+  description?: Maybe<Scalars['String']>;
+  externalUrl?: Maybe<Scalars['String']>;
+  image?: Maybe<Scalars['String']>;
+  name?: Maybe<Scalars['String']>;
+};
+
+export type NftToken = {
+  __typename?: 'NFTToken';
+  asset?: Maybe<Asset>;
+  assetId?: Maybe<Scalars['UUID1']>;
+  deployed: Scalars['Boolean'];
+  ethereumTxId?: Maybe<Scalars['String']>;
+  id: Scalars['UUID1'];
+  metadataArweaveTxId?: Maybe<Scalars['String']>;
+  metadataArweaveTxLink?: Maybe<Scalars['String']>;
+  metadataJSON?: Maybe<Scalars['String']>;
+  name?: Maybe<Scalars['String']>;
+  nftContract: NftContract;
+  nftContractID: Scalars['UUID1'];
+  onChainId?: Maybe<Scalars['Int']>;
+  royaltyBasisPoints?: Maybe<Scalars['Int']>;
+};
+
+export type Network = {
+  __typename?: 'Network';
+  chainID: Scalars['Int'];
+  id: Scalars['UUID1'];
+  name: Scalars['String'];
+  openSeaProxyAddress: Scalars['String'];
+  rpcURL: Scalars['String'];
+  safeFactoryAddress: Scalars['String'];
+  safeFallbackHandler: Scalars['String'];
+  safeMasterContractAddress: Scalars['String'];
+  wethAddress: Scalars['String'];
+};
+
+export type Notification = {
+  __typename?: 'Notification';
+  time?: Maybe<Scalars['String']>;
+};
+
+export type Organization = {
+  __typename?: 'Organization';
+  assets?: Maybe<Array<Asset>>;
+  handle: Scalars['String'];
+  id: Scalars['String'];
+  jwtIssuerDomain?: Maybe<Scalars['String']>;
+  marketplaces: Array<Marketplace>;
+  members: Array<User>;
+  name: Scalars['String'];
+  nftContracts?: Maybe<Array<NftContract>>;
+  wallets?: Maybe<Array<Wallet>>;
+};
+
+
+export type OrganizationAssetsArgs = {
+  filter?: InputMaybe<AssetFilter>;
+};
+
+export type Payment = {
+  __typename?: 'Payment';
+  circlePaymentID: Scalars['String'];
+  id: Scalars['UUID1'];
+  invoiceID: Scalars['UUID1'];
+  paymentMethodID: Scalars['UUID1'];
+  status: PaymentStatus;
+  userID: Scalars['UUID1'];
+};
+
+export type PaymentMethodCreateInput = {
+  achData?: InputMaybe<AchData>;
+  creditCardData?: InputMaybe<CreditCardData>;
+  paymentType: PaymentType;
+  wireData?: InputMaybe<WireData>;
+};
+
+export type PaymentMethodOutput = AchPaymentMethodOutput | CreditCardPaymentMethodOutput | WirePaymentMethodOutput;
+
+export type PaymentMethodPrepareStatementOutput = AchPaymentMethodPrepareStatementOutput;
+
+export type PaymentMethodUpdateInput = {
+  achData?: InputMaybe<AchData>;
+  creditCardData?: InputMaybe<CreditCardData>;
+  paymentType: PaymentType;
+};
+
+export type PaymentPublicKey = {
+  __typename?: 'PaymentPublicKey';
+  keyID: Scalars['String'];
+  publicKey: Scalars['String'];
+};
+
+export enum PaymentStatus {
+  ActionRequired = 'action_required',
+  Confirmed = 'confirmed',
+  Failed = 'failed',
+  Paid = 'paid',
+  Pending = 'pending'
+}
+
+export enum PaymentType {
+  Ach = 'ACH',
+  CreditCard = 'CreditCard',
+  Wire = 'Wire'
+}
+
+export type PurchaseMarketplaceBuyNowLotInput = {
+  itemCount: Scalars['Int'];
+  marketplaceBuyNowLotID: Scalars['UUID1'];
+};
+
+export type Query = {
+  __typename?: 'Query';
+  collection?: Maybe<MarketplaceCollection>;
+  collectionBySlug?: Maybe<MarketplaceCollection>;
+  collectionItemById?: Maybe<MarketplaceCollectionItem>;
+  /** Retrieves invoice details by ID, currently used by customers microservice  */
+  getInvoiceDetails: InvoiceDetails;
+  /** Retrieves invoice list for given user, can be called by org admin */
+  getInvoicesByUserID: Array<Maybe<InvoiceDetails>>;
+  getMarketplaceAuctionLot: MarketplaceAuctionLot;
+  /** Retrieves invoices user owns */
+  getMyInvoices: Array<Maybe<InvoiceDetails>>;
+  /** Retrieves payments user owns */
+  getMyPayments: Array<Maybe<Payment>>;
+  /** Returns Payment method list in scope of current Organization. */
+  getPaymentMethodList: Array<PaymentMethodOutput>;
+  /** Returns Public Key for further Payment data encryption. */
+  getPaymentPublicKey: PaymentPublicKey;
+  /** Retrieves payment list for given user, can be called by org admin */
+  getPaymentsByUserID: Array<Maybe<Payment>>;
+  marketplace: Marketplace;
+  me?: Maybe<CurrentUser>;
+  network: Network;
+  nftContract: NftContract;
+  nftToken: NftToken;
+  orgUsernameAvailable: Scalars['Boolean'];
+  organization: Organization;
+  organizationByID: Organization;
+  ping: Scalars['String'];
+  /** Prepare requested Payment method for further use */
+  preparePaymentMethod?: Maybe<PaymentMethodPrepareStatementOutput>;
+  serverTime: Scalars['Time'];
+  wallet: Wallet;
+};
+
+
+export type QueryCollectionArgs = {
+  id: Scalars['String'];
+};
+
+
+export type QueryCollectionBySlugArgs = {
+  marketplaceID: Scalars['UUID1'];
+  slug: Scalars['String'];
+};
+
+
+export type QueryCollectionItemByIdArgs = {
+  id: Scalars['UUID1'];
+};
+
+
+export type QueryGetInvoiceDetailsArgs = {
+  invoiceID: Scalars['UUID1'];
+  orgID?: InputMaybe<Scalars['UUID1']>;
+};
+
+
+export type QueryGetInvoicesByUserIdArgs = {
+  orgID: Scalars['UUID1'];
+  userID: Scalars['UUID1'];
+};
+
+
+export type QueryGetMarketplaceAuctionLotArgs = {
+  marketplaceAuctionLotId: Scalars['UUID'];
+};
+
+
+export type QueryGetPaymentMethodListArgs = {
+  orgID: Scalars['UUID1'];
+};
+
+
+export type QueryGetPaymentsByUserIdArgs = {
+  orgID: Scalars['UUID1'];
+  userID: Scalars['UUID1'];
+};
+
+
+export type QueryMarketplaceArgs = {
+  id: Scalars['UUID'];
+};
+
+
+export type QueryNetworkArgs = {
+  id: Scalars['UUID1'];
+};
+
+
+export type QueryNftContractArgs = {
+  id: Scalars['UUID1'];
+};
+
+
+export type QueryNftTokenArgs = {
+  id: Scalars['UUID1'];
+};
+
+
+export type QueryOrgUsernameAvailableArgs = {
+  organizationID: Scalars['String'];
+  username: Scalars['String'];
+};
+
+
+export type QueryOrganizationArgs = {
+  handle: Scalars['String'];
+};
+
+
+export type QueryOrganizationByIdArgs = {
+  id: Scalars['String'];
+};
+
+
+export type QueryPreparePaymentMethodArgs = {
+  paymentMethodType: PaymentType;
+};
+
+
+export type QueryWalletArgs = {
+  id: Scalars['UUID1'];
+};
+
+export enum Role {
+  Admin = 'admin',
+  User = 'user'
+}
+
+export type SettingsInput = {
+  avatar?: InputMaybe<Scalars['String']>;
+  settingsJson?: InputMaybe<Scalars['String']>;
+  userOrgId: Scalars['String'];
+  username?: InputMaybe<Scalars['String']>;
+};
+
+export type SigninRequest = {
+  challenge: Scalars['String'];
+  signature: Scalars['String'];
+  signer: Scalars['String'];
+};
+
+export type SigninResponse = {
+  __typename?: 'SigninResponse';
+  me: CurrentUser;
+  refreshToken: Scalars['String'];
+  token: Scalars['String'];
+};
+
+export type Subscription = {
+  __typename?: 'Subscription';
+  auctionLotUpdated: MarketplaceAuctionLot;
+  bidFeed: MarketplaceAuctionBid;
+  /**  Returns a MarketplaceAuctionLot on subscribe and whenever a new bid is placed  */
+  getMarketplaceAuctionLot: MarketplaceAuctionLot;
+  /**  Subscribes to lots and bids updates within given marketplace collection   */
+  marketplaceCollectionLotsUpdates: MarketplaceAuctionLot;
+  timeNotifier: Notification;
+};
+
+
+export type SubscriptionAuctionLotUpdatedArgs = {
+  marketplaceAuctionLotId: Scalars['UUID'];
+};
+
+
+export type SubscriptionBidFeedArgs = {
+  marketplaceAuctionLotId: Scalars['UUID'];
+};
+
+
+export type SubscriptionGetMarketplaceAuctionLotArgs = {
+  marketplaceAuctionLotId: Scalars['UUID1'];
+};
+
+
+export type SubscriptionMarketplaceCollectionLotsUpdatesArgs = {
+  collectionId: Scalars['UUID1'];
+};
+
+export type TokenDraft = {
+  assetId?: InputMaybe<Scalars['UUID1']>;
+  copyright?: InputMaybe<Scalars['String']>;
+  description?: InputMaybe<Scalars['String']>;
+  metadataJSON?: InputMaybe<Scalars['String']>;
+  name?: InputMaybe<Scalars['String']>;
+  royaltyBasisPoints?: InputMaybe<Scalars['Int']>;
+  tokenId?: InputMaybe<Scalars['UUID1']>;
+};
+
+export type TransactionInput = {
+  blockHash: Scalars['String'];
+  cumulativeGasUsed: Scalars['Int'];
+  gasUsed: Scalars['Int'];
+  id: Scalars['UUID1'];
+  invoiceItemId: Scalars['UUID1'];
+  transactionType: TransactionType;
+  txIndex: Scalars['Int'];
+  txStatus: TransactionStatus;
+};
+
+export enum TransactionStatus {
+  Completed = 'Completed',
+  Failed = 'Failed',
+  Pending = 'Pending'
+}
+
+export enum TransactionType {
+  DeployMultisig = 'DeployMultisig',
+  TransferToken = 'TransferToken'
+}
+
+export type User = {
+  __typename?: 'User';
+  email?: Maybe<Scalars['String']>;
+  id: Scalars['UUID'];
+  name?: Maybe<Scalars['String']>;
+  username: Scalars['String'];
+};
+
+export type UserApiKeyResponse = {
+  __typename?: 'UserAPIKeyResponse';
+  createdAt?: Maybe<Scalars['Time']>;
+  id?: Maybe<Scalars['UUID1']>;
+  key?: Maybe<Scalars['String']>;
+  updatedAt?: Maybe<Scalars['Time']>;
+};
+
+export type UserOrgFilter = {
+  orgId: Scalars['UUID'];
+};
+
+export type UserOrganization = {
+  __typename?: 'UserOrganization';
+  avatar?: Maybe<Scalars['String']>;
+  bidAllowed: Scalars['Boolean'];
+  externalUserId: Scalars['String'];
+  id: Scalars['UUID'];
+  kycStatus: KycStatus;
+  organization: Organization;
+  organizationId: Scalars['UUID'];
+  role: Scalars['String'];
+  settings?: Maybe<Scalars['String']>;
+  user: User;
+  userId: Scalars['UUID'];
+  username?: Maybe<Scalars['String']>;
+};
+
+export type Wallet = {
+  __typename?: 'Wallet';
+  address?: Maybe<Scalars['EthAddress']>;
+  deploymentTxHash?: Maybe<Scalars['String']>;
+  gnosisSafeURL?: Maybe<Scalars['String']>;
+  id: Scalars['UUID1'];
+  name: Scalars['String'];
+  network: Network;
+  networkId: Scalars['UUID1'];
+  parentID: Scalars['UUID1'];
+  parentType: Scalars['String'];
+  tokens?: Maybe<Array<WalletToken>>;
+};
+
+export enum WalletParentType {
+  Organization = 'organization',
+  User = 'user'
+}
+
+export type WalletToken = {
+  __typename?: 'WalletToken';
+  /** token's contract address */
+  contractAddress: Scalars['String'];
+  /** token id in contract */
+  id: Scalars['String'];
+  /** token URI for metadata */
+  tokenURI: Scalars['String'];
+  /** txHash of latest token transfer */
+  transferHash: Scalars['String'];
+};
+
+export enum WalletTxType {
+  MojitoHotWallet = 'MojitoHotWallet',
+  Multisig = 'Multisig'
+}
+
+export type WireBankAddress = {
+  address1?: InputMaybe<Scalars['String']>;
+  address2?: InputMaybe<Scalars['String']>;
+  bankName?: InputMaybe<Scalars['String']>;
+  city?: InputMaybe<Scalars['String']>;
+  country: Scalars['String'];
+  district?: InputMaybe<Scalars['String']>;
+};
+
+export type WireBankAddressOutput = {
+  __typename?: 'WireBankAddressOutput';
+  address1: Scalars['String'];
+  address2: Scalars['String'];
+  bankName: Scalars['String'];
+  city: Scalars['String'];
+  country: Scalars['String'];
+  district: Scalars['String'];
+};
+
+export type WireBillingDetails = {
+  address1: Scalars['String'];
+  address2?: InputMaybe<Scalars['String']>;
+  city: Scalars['String'];
+  country: Scalars['String'];
+  district?: InputMaybe<Scalars['String']>;
+  name: Scalars['String'];
+  postalCode: Scalars['String'];
+};
+
+export type WireBillingDetailsOutput = {
+  __typename?: 'WireBillingDetailsOutput';
+  address1: Scalars['String'];
+  address2: Scalars['String'];
+  city: Scalars['String'];
+  country: Scalars['String'];
+  district: Scalars['String'];
+  name: Scalars['String'];
+  postalCode: Scalars['String'];
+};
+
+export type WireData = {
+  accountNumber: Scalars['String'];
+  bankAddress: WireBankAddress;
+  billingDetails: WireBillingDetails;
+  routingNumber: Scalars['String'];
+};
+
+export type WirePaymentMethodOutput = {
+  __typename?: 'WirePaymentMethodOutput';
+  bankAddress?: Maybe<WireBankAddressOutput>;
+  billingDetails?: Maybe<WireBillingDetailsOutput>;
+  description: Scalars['String'];
+  id: Scalars['UUID1'];
+  status: Scalars['String'];
+  type: PaymentType;
+};
+
+export type MeQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type MeQuery = { __typename?: 'Query', me?: { __typename?: 'CurrentUser', id: any, user: { __typename?: 'User', id: any, username: string, name?: string | null | undefined, email?: string | null | undefined }, userOrgs: Array<{ __typename?: 'UserOrganization', organization: { __typename?: 'Organization', id: string, name: string } }> } | null | undefined };
+
+export type CreatePaymentMutationVariables = Exact<{
+  paymentMethodID: Scalars['UUID1'];
+  invoiceID: Scalars['UUID1'];
+}>;
+
+
+export type CreatePaymentMutation = { __typename?: 'Mutation', createPayment: { __typename?: 'Payment', id: any, invoiceID: any, circlePaymentID: string, status: PaymentStatus, userID: any } };
+
+export type CreateAuctionInvoiceMutationVariables = Exact<{
+  orgID: Scalars['UUID1'];
+  lotID: Scalars['UUID1'];
+}>;
+
+
+export type CreateAuctionInvoiceMutation = { __typename?: 'Mutation', createAuctionLotInvoice: { __typename?: 'InvoiceDetails', invoiceID: any, status: InvoiceStatus, items: Array<{ __typename?: 'ItemInvoiceDetail', units: number, unitPrice: number, taxes: number, totalPrice: number } | null | undefined> } };
+
+export type CreateBuyNowInvoiceMutationVariables = Exact<{
+  input: PurchaseMarketplaceBuyNowLotInput;
+}>;
+
+
+export type CreateBuyNowInvoiceMutation = { __typename?: 'Mutation', purchaseMarketplaceBuyNowLot: { __typename?: 'MarketplaceBuyNowOutput', invoice?: { __typename?: 'InvoiceDetails', invoiceID: any, status: InvoiceStatus, items: Array<{ __typename?: 'ItemInvoiceDetail', units: number, unitPrice: number, taxes: number, totalPrice: number } | null | undefined> } | null | undefined } };
+
+export type PaymentKeyQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type PaymentKeyQuery = { __typename?: 'Query', getPaymentPublicKey: { __typename?: 'PaymentPublicKey', keyID: string, publicKey: string } };
+
+export type GetPaymentMethodListQueryVariables = Exact<{
+  orgID: Scalars['UUID1'];
+}>;
+
+
+export type GetPaymentMethodListQuery = { __typename?: 'Query', getPaymentMethodList: Array<{ __typename?: 'ACHPaymentMethodOutput', id: any, type: PaymentType, status: string, accountNumber: string, metadata?: { __typename?: 'ACHMetadataOutput', email: string, phoneNumber: string } | null | undefined, billingDetails?: { __typename?: 'ACHBillingDetailsOutput', name: string, city: string, country: string, address1: string, address2: string, district: string, postalCode: string } | null | undefined, bankAddress?: { __typename?: 'ACHBankAddressOutput', bankName: string } | null | undefined } | { __typename?: 'CreditCardPaymentMethodOutput', id: any, type: PaymentType, status: string, network: string, last4Digit: string, metadata?: { __typename?: 'CreditCardMetadataOutput', email: string, phoneNumber: string } | null | undefined, billingDetails?: { __typename?: 'CreditCardBillingDetailsOutput', name: string, city: string, country: string, address1: string, address2: string, district: string, postalCode: string } | null | undefined } | { __typename?: 'WirePaymentMethodOutput' }> };
+
+export type CreatePaymentMethodMutationVariables = Exact<{
+  orgID: Scalars['UUID1'];
+  input: PaymentMethodCreateInput;
+}>;
+
+
+export type CreatePaymentMethodMutation = { __typename?: 'Mutation', createPaymentMethod: { __typename?: 'ACHPaymentMethodOutput', id: any } | { __typename?: 'CreditCardPaymentMethodOutput', id: any } | { __typename?: 'WirePaymentMethodOutput', id: any } };
+
+export type DeletePaymentMethodMutationVariables = Exact<{
+  paymentMethodID: Scalars['UUID1'];
+  orgID: Scalars['UUID1'];
+}>;
+
+
+export type DeletePaymentMethodMutation = { __typename?: 'Mutation', deletePaymentMethod: boolean };
+
+export type PreparePaymentMethodQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type PreparePaymentMethodQuery = { __typename?: 'Query', preparePaymentMethod?: { __typename?: 'ACHPaymentMethodPrepareStatementOutput', linkToken: string } | null | undefined };
+
+export type DashboardQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type DashboardQuery = { __typename?: 'Query', me?: { __typename?: 'CurrentUser', user: { __typename?: 'User', id: any, username: string, email?: string | null | undefined }, userOrgs: Array<{ __typename?: 'UserOrganization', id: any, role: string, bidAllowed: boolean, kycStatus: KycStatus, organization: { __typename?: 'Organization', handle: string, name: string, id: string, marketplaces: Array<{ __typename?: 'Marketplace', id: any, name: string, theme?: string | null | undefined }>, nftContracts?: Array<{ __typename?: 'NFTContract', contractAddress: any, marketplaceAddress: any, wallet: { __typename?: 'Wallet', network: { __typename?: 'Network', name: string } }, nftTokens?: Array<{ __typename?: 'NFTToken', ethereumTxId?: string | null | undefined, deployed: boolean, asset?: { __typename?: 'Asset', currentVersion: { __typename?: 'AssetVersion', description?: string | null | undefined, name: string, cdnUrl?: string | null | undefined, slug: string } } | null | undefined }> | null | undefined }> | null | undefined } }> } | null | undefined };
+
+
+export const MeDocument = gql`
+    query Me {
+  me {
+    id
+    user {
+      id
+      username
+      name
+      email
+    }
+    userOrgs {
+      organization {
+        id
+        name
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useMeQuery__
+ *
+ * To run a query within a React component, call `useMeQuery` and pass it any options that fit your needs.
+ * When your component renders, `useMeQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useMeQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useMeQuery(baseOptions?: Apollo.QueryHookOptions<MeQuery, MeQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<MeQuery, MeQueryVariables>(MeDocument, options);
+      }
+export function useMeLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<MeQuery, MeQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<MeQuery, MeQueryVariables>(MeDocument, options);
+        }
+export type MeQueryHookResult = ReturnType<typeof useMeQuery>;
+export type MeLazyQueryHookResult = ReturnType<typeof useMeLazyQuery>;
+export type MeQueryResult = Apollo.QueryResult<MeQuery, MeQueryVariables>;
+export const CreatePaymentDocument = gql`
+    mutation CreatePayment($paymentMethodID: UUID1!, $invoiceID: UUID1!) {
+  createPayment(paymentMethodID: $paymentMethodID, invoiceID: $invoiceID) {
+    id
+    invoiceID
+    circlePaymentID
+    status
+    userID
+  }
+}
+    `;
+export type CreatePaymentMutationFn = Apollo.MutationFunction<CreatePaymentMutation, CreatePaymentMutationVariables>;
+
+/**
+ * __useCreatePaymentMutation__
+ *
+ * To run a mutation, you first call `useCreatePaymentMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreatePaymentMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createPaymentMutation, { data, loading, error }] = useCreatePaymentMutation({
+ *   variables: {
+ *      paymentMethodID: // value for 'paymentMethodID'
+ *      invoiceID: // value for 'invoiceID'
+ *   },
+ * });
+ */
+export function useCreatePaymentMutation(baseOptions?: Apollo.MutationHookOptions<CreatePaymentMutation, CreatePaymentMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreatePaymentMutation, CreatePaymentMutationVariables>(CreatePaymentDocument, options);
+      }
+export type CreatePaymentMutationHookResult = ReturnType<typeof useCreatePaymentMutation>;
+export type CreatePaymentMutationResult = Apollo.MutationResult<CreatePaymentMutation>;
+export type CreatePaymentMutationOptions = Apollo.BaseMutationOptions<CreatePaymentMutation, CreatePaymentMutationVariables>;
+export const CreateAuctionInvoiceDocument = gql`
+    mutation CreateAuctionInvoice($orgID: UUID1!, $lotID: UUID1!) {
+  createAuctionLotInvoice(orgID: $orgID, lotID: $lotID) {
+    invoiceID
+    status
+    items {
+      units
+      unitPrice
+      taxes
+      totalPrice
+    }
+  }
+}
+    `;
+export type CreateAuctionInvoiceMutationFn = Apollo.MutationFunction<CreateAuctionInvoiceMutation, CreateAuctionInvoiceMutationVariables>;
+
+/**
+ * __useCreateAuctionInvoiceMutation__
+ *
+ * To run a mutation, you first call `useCreateAuctionInvoiceMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateAuctionInvoiceMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createAuctionInvoiceMutation, { data, loading, error }] = useCreateAuctionInvoiceMutation({
+ *   variables: {
+ *      orgID: // value for 'orgID'
+ *      lotID: // value for 'lotID'
+ *   },
+ * });
+ */
+export function useCreateAuctionInvoiceMutation(baseOptions?: Apollo.MutationHookOptions<CreateAuctionInvoiceMutation, CreateAuctionInvoiceMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateAuctionInvoiceMutation, CreateAuctionInvoiceMutationVariables>(CreateAuctionInvoiceDocument, options);
+      }
+export type CreateAuctionInvoiceMutationHookResult = ReturnType<typeof useCreateAuctionInvoiceMutation>;
+export type CreateAuctionInvoiceMutationResult = Apollo.MutationResult<CreateAuctionInvoiceMutation>;
+export type CreateAuctionInvoiceMutationOptions = Apollo.BaseMutationOptions<CreateAuctionInvoiceMutation, CreateAuctionInvoiceMutationVariables>;
+export const CreateBuyNowInvoiceDocument = gql`
+    mutation CreateBuyNowInvoice($input: PurchaseMarketplaceBuyNowLotInput!) {
+  purchaseMarketplaceBuyNowLot(input: $input) {
+    invoice {
+      invoiceID
+      status
+      items {
+        units
+        unitPrice
+        taxes
+        totalPrice
+      }
+    }
+  }
+}
+    `;
+export type CreateBuyNowInvoiceMutationFn = Apollo.MutationFunction<CreateBuyNowInvoiceMutation, CreateBuyNowInvoiceMutationVariables>;
+
+/**
+ * __useCreateBuyNowInvoiceMutation__
+ *
+ * To run a mutation, you first call `useCreateBuyNowInvoiceMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateBuyNowInvoiceMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createBuyNowInvoiceMutation, { data, loading, error }] = useCreateBuyNowInvoiceMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCreateBuyNowInvoiceMutation(baseOptions?: Apollo.MutationHookOptions<CreateBuyNowInvoiceMutation, CreateBuyNowInvoiceMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateBuyNowInvoiceMutation, CreateBuyNowInvoiceMutationVariables>(CreateBuyNowInvoiceDocument, options);
+      }
+export type CreateBuyNowInvoiceMutationHookResult = ReturnType<typeof useCreateBuyNowInvoiceMutation>;
+export type CreateBuyNowInvoiceMutationResult = Apollo.MutationResult<CreateBuyNowInvoiceMutation>;
+export type CreateBuyNowInvoiceMutationOptions = Apollo.BaseMutationOptions<CreateBuyNowInvoiceMutation, CreateBuyNowInvoiceMutationVariables>;
+export const PaymentKeyDocument = gql`
+    query PaymentKey {
+  getPaymentPublicKey {
+    keyID
+    publicKey
+  }
+}
+    `;
+
+/**
+ * __usePaymentKeyQuery__
+ *
+ * To run a query within a React component, call `usePaymentKeyQuery` and pass it any options that fit your needs.
+ * When your component renders, `usePaymentKeyQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = usePaymentKeyQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function usePaymentKeyQuery(baseOptions?: Apollo.QueryHookOptions<PaymentKeyQuery, PaymentKeyQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<PaymentKeyQuery, PaymentKeyQueryVariables>(PaymentKeyDocument, options);
+      }
+export function usePaymentKeyLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<PaymentKeyQuery, PaymentKeyQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<PaymentKeyQuery, PaymentKeyQueryVariables>(PaymentKeyDocument, options);
+        }
+export type PaymentKeyQueryHookResult = ReturnType<typeof usePaymentKeyQuery>;
+export type PaymentKeyLazyQueryHookResult = ReturnType<typeof usePaymentKeyLazyQuery>;
+export type PaymentKeyQueryResult = Apollo.QueryResult<PaymentKeyQuery, PaymentKeyQueryVariables>;
+export const GetPaymentMethodListDocument = gql`
+    query GetPaymentMethodList($orgID: UUID1!) {
+  getPaymentMethodList(orgID: $orgID) {
+    ... on ACHPaymentMethodOutput {
+      id
+      type
+      status
+      accountNumber
+      metadata {
+        email
+        phoneNumber
+      }
+      billingDetails {
+        name
+        city
+        country
+        address1
+        address2
+        district
+        postalCode
+      }
+      bankAddress {
+        bankName
+      }
+    }
+    ... on CreditCardPaymentMethodOutput {
+      id
+      type
+      status
+      network
+      last4Digit
+      metadata {
+        email
+        phoneNumber
+      }
+      billingDetails {
+        name
+        city
+        country
+        address1
+        address2
+        district
+        postalCode
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetPaymentMethodListQuery__
+ *
+ * To run a query within a React component, call `useGetPaymentMethodListQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetPaymentMethodListQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetPaymentMethodListQuery({
+ *   variables: {
+ *      orgID: // value for 'orgID'
+ *   },
+ * });
+ */
+export function useGetPaymentMethodListQuery(baseOptions: Apollo.QueryHookOptions<GetPaymentMethodListQuery, GetPaymentMethodListQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetPaymentMethodListQuery, GetPaymentMethodListQueryVariables>(GetPaymentMethodListDocument, options);
+      }
+export function useGetPaymentMethodListLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetPaymentMethodListQuery, GetPaymentMethodListQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetPaymentMethodListQuery, GetPaymentMethodListQueryVariables>(GetPaymentMethodListDocument, options);
+        }
+export type GetPaymentMethodListQueryHookResult = ReturnType<typeof useGetPaymentMethodListQuery>;
+export type GetPaymentMethodListLazyQueryHookResult = ReturnType<typeof useGetPaymentMethodListLazyQuery>;
+export type GetPaymentMethodListQueryResult = Apollo.QueryResult<GetPaymentMethodListQuery, GetPaymentMethodListQueryVariables>;
+export const CreatePaymentMethodDocument = gql`
+    mutation CreatePaymentMethod($orgID: UUID1!, $input: PaymentMethodCreateInput!) {
+  createPaymentMethod(orgID: $orgID, input: $input) {
+    ... on ACHPaymentMethodOutput {
+      id
+    }
+    ... on CreditCardPaymentMethodOutput {
+      id
+    }
+    ... on WirePaymentMethodOutput {
+      id
+    }
+  }
+}
+    `;
+export type CreatePaymentMethodMutationFn = Apollo.MutationFunction<CreatePaymentMethodMutation, CreatePaymentMethodMutationVariables>;
+
+/**
+ * __useCreatePaymentMethodMutation__
+ *
+ * To run a mutation, you first call `useCreatePaymentMethodMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreatePaymentMethodMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createPaymentMethodMutation, { data, loading, error }] = useCreatePaymentMethodMutation({
+ *   variables: {
+ *      orgID: // value for 'orgID'
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCreatePaymentMethodMutation(baseOptions?: Apollo.MutationHookOptions<CreatePaymentMethodMutation, CreatePaymentMethodMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreatePaymentMethodMutation, CreatePaymentMethodMutationVariables>(CreatePaymentMethodDocument, options);
+      }
+export type CreatePaymentMethodMutationHookResult = ReturnType<typeof useCreatePaymentMethodMutation>;
+export type CreatePaymentMethodMutationResult = Apollo.MutationResult<CreatePaymentMethodMutation>;
+export type CreatePaymentMethodMutationOptions = Apollo.BaseMutationOptions<CreatePaymentMethodMutation, CreatePaymentMethodMutationVariables>;
+export const DeletePaymentMethodDocument = gql`
+    mutation DeletePaymentMethod($paymentMethodID: UUID1!, $orgID: UUID1!) {
+  deletePaymentMethod(paymentMethodID: $paymentMethodID, orgID: $orgID)
+}
+    `;
+export type DeletePaymentMethodMutationFn = Apollo.MutationFunction<DeletePaymentMethodMutation, DeletePaymentMethodMutationVariables>;
+
+/**
+ * __useDeletePaymentMethodMutation__
+ *
+ * To run a mutation, you first call `useDeletePaymentMethodMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeletePaymentMethodMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deletePaymentMethodMutation, { data, loading, error }] = useDeletePaymentMethodMutation({
+ *   variables: {
+ *      paymentMethodID: // value for 'paymentMethodID'
+ *      orgID: // value for 'orgID'
+ *   },
+ * });
+ */
+export function useDeletePaymentMethodMutation(baseOptions?: Apollo.MutationHookOptions<DeletePaymentMethodMutation, DeletePaymentMethodMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DeletePaymentMethodMutation, DeletePaymentMethodMutationVariables>(DeletePaymentMethodDocument, options);
+      }
+export type DeletePaymentMethodMutationHookResult = ReturnType<typeof useDeletePaymentMethodMutation>;
+export type DeletePaymentMethodMutationResult = Apollo.MutationResult<DeletePaymentMethodMutation>;
+export type DeletePaymentMethodMutationOptions = Apollo.BaseMutationOptions<DeletePaymentMethodMutation, DeletePaymentMethodMutationVariables>;
+export const PreparePaymentMethodDocument = gql`
+    query PreparePaymentMethod {
+  preparePaymentMethod(paymentMethodType: ACH) {
+    ... on ACHPaymentMethodPrepareStatementOutput {
+      linkToken
+    }
+  }
+}
+    `;
+
+/**
+ * __usePreparePaymentMethodQuery__
+ *
+ * To run a query within a React component, call `usePreparePaymentMethodQuery` and pass it any options that fit your needs.
+ * When your component renders, `usePreparePaymentMethodQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = usePreparePaymentMethodQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function usePreparePaymentMethodQuery(baseOptions?: Apollo.QueryHookOptions<PreparePaymentMethodQuery, PreparePaymentMethodQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<PreparePaymentMethodQuery, PreparePaymentMethodQueryVariables>(PreparePaymentMethodDocument, options);
+      }
+export function usePreparePaymentMethodLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<PreparePaymentMethodQuery, PreparePaymentMethodQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<PreparePaymentMethodQuery, PreparePaymentMethodQueryVariables>(PreparePaymentMethodDocument, options);
+        }
+export type PreparePaymentMethodQueryHookResult = ReturnType<typeof usePreparePaymentMethodQuery>;
+export type PreparePaymentMethodLazyQueryHookResult = ReturnType<typeof usePreparePaymentMethodLazyQuery>;
+export type PreparePaymentMethodQueryResult = Apollo.QueryResult<PreparePaymentMethodQuery, PreparePaymentMethodQueryVariables>;
+export const DashboardDocument = gql`
+    query Dashboard {
+  me {
+    user {
+      id
+      username
+      email
+    }
+    userOrgs {
+      id
+      role
+      bidAllowed
+      kycStatus
+      organization {
+        handle
+        name
+        id
+        marketplaces {
+          id
+          name
+          theme
+        }
+        nftContracts {
+          contractAddress
+          marketplaceAddress
+          wallet {
+            network {
+              name
+            }
+          }
+          nftTokens {
+            ethereumTxId
+            deployed
+            asset {
+              currentVersion {
+                description
+                name
+                cdnUrl
+                slug
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useDashboardQuery__
+ *
+ * To run a query within a React component, call `useDashboardQuery` and pass it any options that fit your needs.
+ * When your component renders, `useDashboardQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useDashboardQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useDashboardQuery(baseOptions?: Apollo.QueryHookOptions<DashboardQuery, DashboardQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<DashboardQuery, DashboardQueryVariables>(DashboardDocument, options);
+      }
+export function useDashboardLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<DashboardQuery, DashboardQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<DashboardQuery, DashboardQueryVariables>(DashboardDocument, options);
+        }
+export type DashboardQueryHookResult = ReturnType<typeof useDashboardQuery>;
+export type DashboardLazyQueryHookResult = ReturnType<typeof useDashboardLazyQuery>;
+export type DashboardQueryResult = Apollo.QueryResult<DashboardQuery, DashboardQueryVariables>;

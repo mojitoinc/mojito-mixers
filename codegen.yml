@@ -1,0 +1,24 @@
+overwrite: true
+# schema: "http://localhost:8080/query"
+schema: "https://api.dev.mojito.xyz/query"
+documents: "src/**/*.graphql"
+generates:
+  app/src/lib/queries/graphqlGenerated.tsx:
+    documents:
+      - "app/src/lib/**/*.graphql"
+    plugins:
+      - "typescript"
+      - "typescript-operations"
+      - "typescript-react-apollo"
+    config:
+      withHooks: true
+  app/src/services/graphql/generated.tsx:
+    documents:
+      - "app/src/**/*.graphql"
+      - "!app/arc/lib/**/*.graphql"
+    plugins:
+      - "typescript"
+      - "typescript-operations"
+      - "typescript-react-apollo"
+    config:
+      withHooks: true

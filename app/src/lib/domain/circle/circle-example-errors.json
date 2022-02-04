@@ -1,0 +1,30 @@
+{
+  "code": 2,
+  "message": "Invalid entity.\nmetadata.phoneNumber must match \"\\+?[1-9]\\d{1,14}\" (was 619-555-1234)\nexpYear must be greater than or equal to 2020 (was 25)\nbillingAddress.country is not a valid ISO 31660-2 country code",
+  "errors": [
+      {
+          "constraints": {
+              "pattern": "\\+?[1-9]\\d{1,14}"
+          },
+          "error": "pattern_mismatch",
+          "invalidValue": "619-555-1234",
+          "location": "metadata.phoneNumber",
+          "message": "metadata.phoneNumber must match \"\\+?[1-9]\\d{1,14}\" (was 619-555-1234)"
+      },
+      {
+          "constraints": {
+              "min": 2020
+          },
+          "error": "min_value",
+          "invalidValue": 25,
+          "location": "expYear",
+          "message": "expYear must be greater than or equal to 2020 (was 25)"
+      },
+      {
+          "error": "invalid_value",
+          "invalidValue": "United States",
+          "location": "billingAddress.country",
+          "message": "billingAddress.country is not a valid ISO 31660-2 country code"
+      }
+  ]
+}

@@ -1,0 +1,136 @@
+query PaymentKey {
+  getPaymentPublicKey {
+    keyID
+    publicKey
+  }
+}
+
+query GetPaymentMethodList($orgID: UUID1!) {
+  getPaymentMethodList(orgID: $orgID) {
+    ... on ACHPaymentMethodOutput {
+      id
+      type
+      status
+      accountNumber
+      metadata {
+        email
+        phoneNumber
+      }
+      billingDetails {
+        name
+        city
+        country
+        address1
+        address2
+        district
+        postalCode
+      }
+      bankAddress {
+        bankName
+      }
+    }
+    ... on CreditCardPaymentMethodOutput {
+      id
+      type
+      status
+      network
+      last4Digit
+      metadata {
+        email
+        phoneNumber
+      }
+      billingDetails {
+        name
+        city
+        country
+        address1
+        address2
+        district
+        postalCode
+      }
+    }
+  }
+}
+
+type CreditCardPaymentMethodOutput {
+  id: UUID1!
+  type: PaymentType!
+  network: String!
+  last4Digit: String!
+}
+
+type ACHPaymentMethodOutput {
+  id: UUID1!
+  type: PaymentType!
+  accountNumber: String!
+}
+
+union PaymentMethodOutput =
+    CreditCardPaymentMethodOutput
+  | ACHPaymentMethodOutput
+
+mutation CreatePaymentMethod(
+  $orgID: UUID1!
+  $input: PaymentMethodCreateInput!
+) {
+  createPaymentMethod(orgID: $orgID, input: $input) {
+    ... on ACHPaymentMethodOutput {
+      id
+    }
+    ... on CreditCardPaymentMethodOutput {
+      id
+    }
+    ... on WirePaymentMethodOutput {
+      id
+    }
+  }
+}
+
+mutation DeletePaymentMethod(
+  $paymentMethodID: UUID1!
+  $orgID: UUID1!
+) {
+  deletePaymentMethod(paymentMethodID: $paymentMethodID, orgID: $orgID)
+}
+
+input PaymentMethodCreateInput {
+  paymentType: PaymentType!
+  creditCardData: CreditCardData
+}
+
+input CreditCardMetadata {
+  email: String!
+  phoneNumber: String
+}
+
+input CreditCardData {
+  keyID: String!
+  encryptedData: String!
+  billingDetails: CreditCardBillingDetails
+  expirationMonth: Int!
+  expirationYear: Int!
+  metadata: CreditCardMetadata
+}
+
+input CreditCardBillingDetails {
+  name: String!
+  city: String!
+  country: String!
+  address1: String!
+  address2: String
+  district: String
+  postalCode: String!
+}
+
+enum PaymentType {
+  ACH
+  CreditCard
+}
+
+query PreparePaymentMethod {
+  preparePaymentMethod(paymentMethodType: ACH) {
+    ... on ACHPaymentMethodPrepareStatementOutput {
+      linkToken
+    }
+  }
+}

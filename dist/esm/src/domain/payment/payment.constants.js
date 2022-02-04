@@ -1,0 +1,6 @@
+var CREDIT_CARD_MASK_PREFIX = "******";
+var ACH_MASK_PREFIX = "XXXXXXXXXX";
+var EXPIRATION_DATE_MASK = "XX / XXXX";
+
+export { ACH_MASK_PREFIX, CREDIT_CARD_MASK_PREFIX, EXPIRATION_DATE_MASK };
+//# sourceMappingURL=payment.constants.js.map

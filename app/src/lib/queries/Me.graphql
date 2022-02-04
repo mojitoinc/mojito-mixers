@@ -1,0 +1,17 @@
+query Me {
+  me {
+    id
+    user {
+      id
+      username
+      name
+      email
+    }
+    userOrgs {
+      organization {
+        id
+        name
+      }
+    }
+  }
+}

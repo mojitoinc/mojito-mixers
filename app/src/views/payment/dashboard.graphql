@@ -1,0 +1,46 @@
+query Dashboard {
+  me {
+    user {
+      id
+      username
+      email
+    }
+    userOrgs {
+      id
+      role
+      bidAllowed
+      kycStatus
+      organization {
+        handle
+        name
+        id
+        marketplaces {
+          id
+          name
+          theme
+        }
+        nftContracts {
+          contractAddress
+          marketplaceAddress
+          wallet {
+            network {
+              name
+            }
+          }
+          nftTokens {
+            ethereumTxId
+            deployed
+            asset {
+              currentVersion {
+                description
+                name
+                cdnUrl
+                slug
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
