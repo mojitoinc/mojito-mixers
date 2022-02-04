@@ -7,7 +7,7 @@ import { useTimeout, useInterval } from "@swyg/corre";
 import { SelectedPaymentMethod } from "../../components/payments/CheckoutModal/CheckoutModal";
 import { LotType } from "../../domain/product/product.interfaces";
 
-const DEFAULT_PURCHASING_IMAGE_SRC = "https://raw.githubusercontent.com/mojitoinc/mojito-mixers/main/app/src/lib/assets/mojito-loader.gif?token=GHSAT0AAAAAABLVZBJ4TZ7NOIXJGJS5CWG4YPT4K4Q";
+const DEFAULT_PURCHASING_IMAGE_SRC = "https://raw.githubusercontent.com/mojitoinc/mojito-mixers/main/app/src/lib/assets/mojito-loader.gif";
 
 const PURCHASING_MIN_WAIT_MS = 3000;
 

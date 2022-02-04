@@ -59,7 +59,7 @@ When testing the purchase flow, you need to make sure to:
 
   You can find them using:
 
-    - **Mojito Manager** - [Dashboard (`orngID`)](https://app.mojito.xyz/dashboard), [Collections (`lotID`)](https://app.mojito.xyz/<path-to-collection>)
+    - **Mojito Manager** - [Dashboard (`orgID`)](https://app.mojito.xyz/dashboard), [Collections (`lotID`)](https://app.mojito.xyz/<path-to-collection>)
 
     - **Mojito API** - [GraphQL Playground](https://api.dev.mojito.xyz/query)
 
@@ -117,120 +117,150 @@ Once you've built the library using `yarn dist:build`, you can install it in ano
     "@mojitoinc/mojito-mixers": "file:../mojito-mixers"
     "@mojitoinc/mojito-mixers": "git+ssh://git@github.com/mojitoinc/mojito-mixers"
 
-Usage:
+<br />
+
+
+### Usage:
 
 ```TSX
-  import { CheckoutModal, CheckoutModalThemeProvider } from "@mojitoinc/mojito-mixers";
 
-  const App: React.FC<AppProps> = () => {
-    const [open, setOpen] = useState(true);
-    const { loginWithPopup, isAuthenticated, isLoading, getIdTokenClaims } = useAuth0();
+import {
+  CheckoutModal,
+  CheckoutModalProps,
+  CheckoutModalThemeProvider,
+  continuePlaidOAuthFlow,
+} from "@mojitoinc/mojito-mixers";
 
-    const handleOpen = useCallback(() => {
-      setOpen(true);
-    }, []);
+const App: React.FC<AppProps> = () => {
+  const { profile } = useProfile();
 
-    const handleClose = useCallback(() => {
-      setOpen(false);
-    }, []);
+  const [isOpen, setIsOpen] = useState(continuePlaidOAuthFlow());
 
-    const handleError = useCallback((error: ApolloError | Error | string) => {
-      // Log to Sentry or something else.
-    }, []);
+  const { loginWithPopup, isAuthenticated, isLoading, getIdTokenClaims } = useAuth0();
 
-    const handleMarketingOptInChange = useCallback((marketingOptIn: boolean) => {
-      // Subscribe / unsubscribe
-    }, []);
+  const handleOpen = useCallback(() => {
+    setOpen(true);
+  }, []);
 
-    const handleLogin = useCallback(async () => {
-      await loginWithPopup({ prompt: "login" });
-      await getIdTokenClaims();
-    }, [loginWithPopup, getIdTokenClaims]);
+  const handleClose = useCallback(() => {
+    setOpen(false);
+  }, []);
+
+  const handleError = useCallback((error: ApolloError | Error | string) => {
+    // Log to Sentry or something else.
+  }, []);
+
+  const handleMarketingOptInChange = useCallback((marketingOptIn: boolean) => {
+    // Subscribe / unsubscribe
+  }, []);
+
+  const handleLogin = useCallback(async () => {
+    await loginWithPopup({ prompt: "login" });
+    await getIdTokenClaims();
+  }, [loginWithPopup, getIdTokenClaims]);
+  
+  const checkoutModalProps: CheckoutModalProps = {
+    // Modal:
+    open,
+    onClose: handleClose,
+
+    // Flow:
+    guestCheckoutEnabled: false,
+    productConfirmationEnabled: false,
+
+    // Personalization:
+    // These two options, `theme` and `themeOptions`, merge the provided styles with the default ones:
+    theme: YOUR_CUSTOM_THEME,
+    // themeOptions: { ... },
+    logoSrc: "https://...",
+    logoSx: { ... },
+    purchasingImageSrc: "https://...",
+    purchasingMessages: ["...", "...", "..."],
+    errorImageSrc: "https://...",
+    userFormat: "email",
+    acceptedPaymentTypes: ["CreditCard", "ACH"],
+    purchaseInstructions: "Lorem ipsum...",
+
+    // Legal:
+    consentType: "disclaimer",
+    privacyHref: "https://...",
+    termsOfUseHref: "https://...",
+
+    // Data:
+    orgID: "<ORG_ID>, usually profile.userOrgs[0].organizationId || """,
+    checkoutItem: {
+      lotID: "<LOT_IT>",
+      buyNow: "auction",
+      name: "Lorem ipsum...",
+      description: "Lorem ipsum...",
+      price: 0,
+      fee: 0,
+      imageSrc: "https://...",
+      imageBackground: "rgba(...)",
+    },
     
-    const checkoutModalProps: CheckoutModalProps = {
-      // Modal:
-      open,
-      onClose: handleClose,
+    // Authentication:
+    onLogin: handleLogin,
+    isAuthenticated,
+    isAuthenticatedLoading: isLoading,
 
-      // Flow:
-      guestCheckoutEnabled: false,
-      productConfirmationEnabled: false,
-
-      // Personalization:
-      // theme: { ... },
-      // themeOptions: { ... },
-      logoSrc: "https://...",
-      logoSx: { ... },
-      purchasingImageSrc: "https://...",
-      purchasingMessages: ["...", "...", "..."],
-      errorImageSrc: "https://...",
-      userFormat: "email",
-      acceptedPaymentTypes: ["CreditCard"],
-      purchaseInstructions: "Lorem ipsum...",
-
-      // Legal:
-      consentType: "disclaimer",
-      privacyHref: "https://...",
-      termsOfUseHref: "https://...",
-
-      // Data:
-      orgID: "<ORG_ID>",
-      checkoutItem: {
-        lotID: "<LOT_IT>",
-        name: "Lorem ipsum...",
-        description: "Lorem ipsum...",
-        price: 0,
-        fee: 0,
-        imageSrc: "https://...",
-        imageBackground: "...",
-      },
-      
-      // Authentication:
-      onLogin: handleLogin,
-      isAuthenticated,
-      isAuthenticatedLoading: isLoading,
-
-      // Other Events:
-      onError: handleError,
-      onMarketingOptInChange: handleMarketingOptInChange,
-    };
-
-    return (
-      <CheckoutModalThemeProvider theme={ YOUR_CUSTOM_THEME }>
-        <CheckoutModal { ...checkoutModalProps } />
-      </CheckoutModalThemeProvider>
-    );
+    // Other Events:
+    onError: handleError,
+    onMarketingOptInChange: handleMarketingOptInChange,
   };
+
+  return <CheckoutModal { ...checkoutModalProps } />;
+};
 ```
 
-Note we are using `CheckoutModalThemeProvider` and importing it from `@mojitoinc/mojito-mixers`. Importing MUI's
-`ThemeProvider` from your project won't work as expected and the modal will not be styled using your custom theme.
+<br />
 
-Alternatively, you can use the `theme` or `themeOptions` props instead of using the `CheckoutModalThemeProvider`.
 
-If you want to learn why, read here: https://stackoverflow.com/questions/70710518/
+### Theming 
+
+You can use the `theme` or `themeOptions` props to pass a custom theme or theme options object, both of which will get
+merged with the default theme (this hasn't been implemented yet, though).
+
+If you want to completely override the theme and make sure your custom theme doesn't get merged with the default one,
+you can use `CheckoutModalThemeProvider`. Make sure you import it from `@mojitoinc/mojito-mixers`.
+
+```TSX
+  <CheckoutModalThemeProvider theme={ YOUR_CUSTOM_THEME }>
+    <CheckoutModal { ...checkoutModalProps } />
+  </CheckoutModalThemeProvider>
+```
+
+Note that using MUI's `ThemeProvider` from your project won't work as expected and the modal will not be styled using
+your custom theme. If you want to learn why, read here: https://stackoverflow.com/questions/70710518/
+
+<br />
+
+
+### ACH payments with Plaid: 
 
 Additionally, when using Plaid for ACH payments you need to add an `/oauth` page with the following logic to be able
 to resume Plaid's OAuth flow when users are redirected back to your app:
 
+<br />
+
+
 ```TSX
 
-  const PlaidOAuthPage = () => {
-    const router = useRouter();
+const PlaidOAuthPage = () => {
+  const router = useRouter();
 
-    const { continueOAuthFlow, url } = getPlaidOAuthFlowState();
+  const { continueOAuthFlow, url } = getPlaidOAuthFlowState();
 
-    useEffect(() => {
-      if (continueOAuthFlow) {
-        persistPlaidReceivedRedirectUri(window.location.href);
-      }
+  useEffect(() => {
+    if (continueOAuthFlow) {
+      persistPlaidReceivedRedirectUri(window.location.href);
+    }
 
-      router.replace(url || "/");
-    }, [continueOAuthFlow, router, url]);
+    router.replace(url || "/");
+  }, [continueOAuthFlow, router, url]);
 
-    return null;
-  }
-
+  return null;
+}
 ```
 
 <br />
@@ -260,7 +290,7 @@ of the box, no setup required.
 
     > Repo: https://github.com/mojitoinc/mojito-mixers/blob/main/app/src/lib/assets/mojito-loader.gif (add `?raw=true` to get the CDN URL below)
 
-    > CDN URL: To be added...
+    > CDN URL: https://raw.githubusercontent.com/mojitoinc/mojito-mixers/main/app/src/lib/assets/mojito-loader.gif
 
     
 **`ErrorView`'s default image:**
