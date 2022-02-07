@@ -13,7 +13,7 @@ import { billingInfoToSavedPaymentMethodBillingInfo } from "../../domain/circle/
 import { SelectedPaymentMethod } from "../../components/payments/CheckoutModal/CheckoutModal";
 import { BoxProps, Divider } from "@mui/material";
 import { usePlaid } from "../../hooks/usePlaid";
-import { ConsentType } from "../../components/payments/CheckoutModalFooter/CheckoutModalFooter";
+import { ConsentType } from "../../components/shared/ConsentText/ConsentText";
 
 const billingInfoItemBoxProps: BoxProps = { sx: { mt: 2.5 } };
 

@@ -19,7 +19,7 @@ import { Theme, ThemeProvider, createTheme, ThemeOptions, SxProps } from "@mui/m
 import { useShakeAnimation } from "../../../utils/animationUtils";
 import { resetStepperProgress } from "../CheckoutStepper/CheckoutStepper";
 import { continuePlaidOAuthFlow, INITIAL_PLAID_OAUTH_FLOW_STATE, PlaidFlow } from "../../../hooks/usePlaid";
-import { ConsentType } from "../CheckoutModalFooter/CheckoutModalFooter";
+import { ConsentType } from "../../shared/ConsentText/ConsentText";
 
 const SELECTOR_DIALOG_SCROLLABLE = "[role=presentation]";
 
@@ -53,9 +53,9 @@ export interface CheckoutModalProps {
   purchaseInstructions: string;
 
   // Legal:
-  consentType: ConsentType;
-  privacyHref: string;
-  termsOfUseHref: string;
+  consentType?: ConsentType;
+  privacyHref?: string;
+  termsOfUseHref?: string;
 
   // Data:
   orgID: string;

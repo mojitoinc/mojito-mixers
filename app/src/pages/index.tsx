@@ -171,7 +171,7 @@ const HomePage = () => {
     purchaseInstructions: PLAYGROUND_PURCHASE_INSTRUCTIONS,
 
     // Legal:
-    consentType: "checkbox",
+    consentType: undefined,
     privacyHref: PLAYGROUND_PRIVACY_HREF,
     termsOfUseHref: PLAYGROUND_TERMS_OF_USE_HREF,
 

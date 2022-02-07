@@ -3,10 +3,11 @@ import AddIcon from '@mui/icons-material/Add';
 import { StackList } from "../StackList/StackList";
 import { SecondaryButton } from "../SecondaryButton/SecondaryButton";
 import { PaymentDetailsItem } from "../../payments/PaymentDetailsItem/Item/PaymentDetailsItem";
-import { CheckoutModalFooter, ConsentType } from "../../payments/CheckoutModalFooter/CheckoutModalFooter";
+import { CheckoutModalFooter } from "../../payments/CheckoutModalFooter/CheckoutModalFooter";
 import { SavedPaymentMethod } from "../../../domain/circle/circle.interfaces";
 import React, { useCallback } from "react";
 import { Box, CircularProgress } from "@mui/material";
+import { ConsentType } from "../ConsentText/ConsentText";
 
 export interface SavedPaymentDetailsSelectorProps {
   showLoader: boolean;

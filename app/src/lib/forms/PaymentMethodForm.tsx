@@ -6,7 +6,7 @@ import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import BookIcon from "@mui/icons-material/Book";
 import React, { useCallback, useMemo } from "react";
-import { CheckoutModalFooter, ConsentText, ConsentType, CONSENT_ERROR_MESSAGE } from "../components/payments/CheckoutModalFooter/CheckoutModalFooter";
+import { CheckoutModalFooter} from "../components/payments/CheckoutModalFooter/CheckoutModalFooter";
 import { ControlledTextField } from "../components/shared/TextField/TextField";
 import { ControlledCardNumberField } from "../components/shared/CardNumberField";
 import { ControlledCardExpiryDateField } from "../components/shared/CardExpiryDateField";
@@ -30,6 +30,7 @@ import {
 import { Typography } from "@mui/material";
 import { DisplayBox } from "../components/payments/DisplayBox/DisplayBox";
 import { ControlledCheckbox } from "../components/shared/Checkbox";
+import { ConsentText, ConsentType, CONSENT_ERROR_MESSAGE } from "../components/shared/ConsentText/ConsentText";
 
 interface PaymentTypeFormProps {
   control: Control<PaymentMethod & { consent: boolean }>;

@@ -1,6 +1,7 @@
 import { Box, Link, Typography, Divider } from "@mui/material";
-import React, { useCallback, useState, Fragment } from "react";
+import React, { useCallback, useState } from "react";
 import { Checkbox } from "../../shared/Checkbox";
+import { ConsentText, ConsentType, CONSENT_ERROR_MESSAGE } from "../../shared/ConsentText/ConsentText";
 import { PrimaryButton } from "../../shared/PrimaryButton/PrimaryButton";
 import { ICONS_BY_VARIANT, LABELS_BY_VARIANT } from "./CheckoutModalFooter.constants";
 
@@ -9,33 +10,7 @@ interface CheckoutModalFooterConsentState {
   isConsentChecked: boolean;
 }
 
-export type ConsentType = "disclaimer" | "checkbox";
 export type CheckoutModalFooterVariant = "toGuestCheckout" | "toPayment" | "toConfirmation" | "toPlaid" | "toForm" | "toMarketplace";
-
-export interface ConsentTextProps {
-  privacyHref?: string;
-  termsOfUseHref?: string;
-}
-
-export const ConsentText: React.FC<ConsentTextProps> = ({
-  privacyHref,
-  termsOfUseHref,
-}) => {
-  const linkElements = [
-    privacyHref ? <Link color="text.primary" href={ privacyHref } target="_blank">Privacy Notices</Link> : null,
-    termsOfUseHref ? <Link color="text.primary" href={ termsOfUseHref } target="_blank">Terms of Use</Link> : null,
-  ].filter(Boolean);
-
-  return (<>
-    have read, understood, and consent to the{" "}
-    { linkElements.map((linkElement, i) => {
-      return <Fragment key={ i }>{ i === linkElements.length - 1 ? "and " : "" }{ linkElement }{ " " }</Fragment>
-    }) }
-    of the sale.
-  </>);
-};
-
-export const CONSENT_ERROR_MESSAGE = "You must accept the terms and conditions of the sale.";
 
 export interface CheckoutModalFooterProps {
   variant: CheckoutModalFooterVariant;
@@ -59,7 +34,7 @@ export const CheckoutModalFooter: React.FC<CheckoutModalFooterProps> = ({
   onCloseClicked,
 }) => {
   // CONSENT:
-  const showConsent = consentType && (variant === "toConfirmation" || variant === "toPlaid");
+  const showConsent = consentType && (privacyHref || termsOfUseHref) && (variant === "toConfirmation" || variant === "toPlaid");
   const consentTextElement = showConsent ? <ConsentText privacyHref={ privacyHref } termsOfUseHref={ termsOfUseHref } /> : null;
 
   const [{
