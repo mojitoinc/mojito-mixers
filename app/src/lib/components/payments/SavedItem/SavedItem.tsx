@@ -5,6 +5,7 @@ import { SecondaryButton } from "../../shared/SecondaryButton/SecondaryButton";
 import { Chip, Stack, Tooltip } from "@mui/material";
 import React, { useCallback } from "react";
 import { ThemeColors } from "../../../domain/mui/mui.interfaces";
+import { DisplayBox } from "../DisplayBox/DisplayBox";
 
 export interface SavedItemLabels {
   active?: string;
@@ -94,22 +95,7 @@ export const SavedItem: React.FC<SavedItemProps> = ({
   }
 
   return (
-    <Box
-      { ...boxProps }
-      sx={{
-        p: 2,
-        border: 1,
-        borderRadius: "2px",
-        backgroundColor: theme => theme.palette.grey["50"],
-        borderColor: theme => theme.palette.grey["100"],
-        color: theme => theme.palette.grey["800"],
-        display: "flex",
-        flexDirection: {
-          xs: "column",
-          sm: "row"
-        },
-        ...boxProps?.sx,
-      }}>
+    <DisplayBox { ...boxProps }>
 
       { variant === "stacked" ? (
         <Box sx={{ flex: 1, pb: 2 }}>
@@ -156,6 +142,6 @@ export const SavedItem: React.FC<SavedItemProps> = ({
         </Stack>
       ) }
 
-    </Box>
+    </DisplayBox>
   );
 };

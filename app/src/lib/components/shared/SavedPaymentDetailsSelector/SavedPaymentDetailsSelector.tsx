@@ -1,12 +1,11 @@
 import { InputGroupLabel } from "../InputGroupLabel/InputGroupLabel";
 import AddIcon from '@mui/icons-material/Add';
 import { StackList } from "../StackList/StackList";
-import { useCallback } from "react";
 import { SecondaryButton } from "../SecondaryButton/SecondaryButton";
 import { PaymentDetailsItem } from "../../payments/PaymentDetailsItem/Item/PaymentDetailsItem";
-import { CheckoutModalFooter } from "../../payments/CheckoutModalFooter/CheckoutModalFooter";
+import { CheckoutModalFooter, ConsentType } from "../../payments/CheckoutModalFooter/CheckoutModalFooter";
 import { SavedPaymentMethod } from "../../../domain/circle/circle.interfaces";
-import React from "react";
+import React, { useCallback } from "react";
 import { Box, CircularProgress } from "@mui/material";
 
 export interface SavedPaymentDetailsSelectorProps {
@@ -18,6 +17,7 @@ export interface SavedPaymentDetailsSelectorProps {
   onPick: (paymentMethodId: string) => void;
   onNext: () => void;
   onClose: () => void;
+  consentType: ConsentType;
   privacyHref: string;
   termsOfUseHref: string;
 }
@@ -31,10 +31,15 @@ export const SavedPaymentDetailsSelector: React.FC<SavedPaymentDetailsSelectorPr
   onPick,
   onNext,
   onClose,
+  consentType,
   privacyHref,
   termsOfUseHref,
 }) => {
   const getPaymentMethodId = useCallback((savedPaymentMethod: SavedPaymentMethod) => savedPaymentMethod.id, []);
+
+  const handleNextClicked = useCallback((canSubmit: boolean) => {
+    if (canSubmit) onNext();
+  }, [onNext]);
 
   return (<>
     <Box sx={{ position: "relative" }}>
@@ -68,7 +73,11 @@ export const SavedPaymentDetailsSelector: React.FC<SavedPaymentDetailsSelectorPr
         itemKey={ getPaymentMethodId }
         deps={[ onDelete, onPick, selectedPaymentMethodId, showLoader]} />
 
-      <SecondaryButton onClick={ onNew } startIcon={ <AddIcon /> } sx={{ mt: 2.5 }} disabled={ showLoader }>
+      <SecondaryButton
+        onClick={ onNew }
+        startIcon={ <AddIcon /> }
+        sx={{ mt: 2.5, mb: consentType === "checkbox" ? 5 : 0 }}
+        disabled={ showLoader }>
         Add New Payment Method
       </SecondaryButton>
 
@@ -76,9 +85,10 @@ export const SavedPaymentDetailsSelector: React.FC<SavedPaymentDetailsSelectorPr
 
     <CheckoutModalFooter
       variant="toConfirmation"
+      consentType={ consentType }
       privacyHref={ privacyHref }
       termsOfUseHref={ termsOfUseHref }
-      onSubmitClicked={ onNext }
+      onSubmitClicked={ handleNextClicked }
       onCloseClicked={ onClose } />
   </>);
 }

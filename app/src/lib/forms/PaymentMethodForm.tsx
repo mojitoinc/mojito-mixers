@@ -1,12 +1,12 @@
 import { Control, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { object, string, TestContext } from "yup";
+import { boolean, object, string, TestContext } from "yup";
 import { ObjectShape } from "yup/lib/object";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import BookIcon from "@mui/icons-material/Book";
 import React, { useCallback, useMemo } from "react";
-import { CheckoutModalFooter } from "../components/payments/CheckoutModalFooter/CheckoutModalFooter";
+import { CheckoutModalFooter, ConsentText, ConsentType, CONSENT_ERROR_MESSAGE } from "../components/payments/CheckoutModalFooter/CheckoutModalFooter";
 import { ControlledTextField } from "../components/shared/TextField/TextField";
 import { ControlledCardNumberField } from "../components/shared/CardNumberField";
 import { ControlledCardExpiryDateField } from "../components/shared/CardExpiryDateField";
@@ -28,11 +28,20 @@ import {
   getCVCIsValid
 } from "../domain/payment/payment.utils";
 import { Typography } from "@mui/material";
+import { DisplayBox } from "../components/payments/DisplayBox/DisplayBox";
+import { ControlledCheckbox } from "../components/shared/Checkbox";
 
-interface PaymentMethodFormData {
-  defaultValues: PaymentMethod;
-  fields: React.FC<{ control: Control<PaymentMethod> }>;
+interface PaymentTypeFormProps {
+  control: Control<PaymentMethod & { consent: boolean }>;
+  consentType: ConsentType;
+  privacyHref?: string;
+  termsOfUseHref?: string;
+}
+
+interface PaymentTypeFormData {
+  defaultValues: (consentType: ConsentType) => PaymentMethod & { consent: boolean };
   schemaShape: ObjectShape;
+  fields: React.FC<PaymentTypeFormProps>;
 }
 
 const FIELD_LABELS = {
@@ -40,23 +49,20 @@ const FIELD_LABELS = {
   expiryDate: "Expiry Date",
   secureCode: "Secure Code",
   nameOnCard: "Name on Card",
-  accountNumber: "Account Number",
-  routingNumber: "Routing Number",
-  accountName: "Account Name"
 };
 
 const isCreditCardThenRequireSchema = requireSchemaWhenKeyIs("CreditCard");
-const isACHThenRequireSchema = requireSchemaWhenKeyIs("ACH");
 
-const PAYMENT_METHOD_FORM_DATA: Record<PaymentType, PaymentMethodFormData> = {
+const PAYMENT_TYPE_FORM_DATA: Record<PaymentType, PaymentTypeFormData> = {
   CreditCard: {
-    defaultValues: {
+    defaultValues: (consentType) => ({
       type: "CreditCard",
       cardNumber: "",
       expiryDate: "",
       secureCode: "",
-      nameOnCard: ""
-    },
+      nameOnCard: "",
+      consent: consentType === "checkbox" ? false: true,
+    }),
     schemaShape: {
       cardNumber: string()
         .label(FIELD_LABELS.cardNumber)
@@ -94,103 +100,113 @@ const PAYMENT_METHOD_FORM_DATA: Record<PaymentType, PaymentMethodFormData> = {
         }),
       nameOnCard: string()
         .label(FIELD_LABELS.nameOnCard)
-        .when("type", isCreditCardThenRequireSchema)
+        .when("type", isCreditCardThenRequireSchema),
     },
-    fields: ({ control }) => (
-      <>
-        <ControlledCardNumberField
-          name="cardNumber"
-          control={control}
-          label={FIELD_LABELS.cardNumber}
-        />
-        <Grid
-          container
-          columnSpacing={2}
-          direction={{
-            xs: "column",
-            sm: "row"
-          }}
-        >
-          <Grid item sm={6} zeroMinWidth>
-            <ControlledCardExpiryDateField
-              name="expiryDate"
-              control={control}
-              label={FIELD_LABELS.expiryDate}
-            />
-          </Grid>
-          <Grid item sm={6}>
-            <ControlledCardSecureCodeField
-              name="secureCode"
-              control={control}
-              label={FIELD_LABELS.secureCode}
-            />
-          </Grid>
+    fields: ({ control, consentType, privacyHref, termsOfUseHref }) => (<>
+      <ControlledCardNumberField
+        name="cardNumber"
+        control={control}
+        label={FIELD_LABELS.cardNumber} />
+
+      <Grid
+        container
+        columnSpacing={2}
+        direction={{
+          xs: "column",
+          sm: "row"
+        }}>
+        <Grid item sm={6} zeroMinWidth>
+          <ControlledCardExpiryDateField
+            name="expiryDate"
+            control={control}
+            label={FIELD_LABELS.expiryDate} />
         </Grid>
-        <ControlledTextField
-          name="nameOnCard"
+        <Grid item sm={6}>
+          <ControlledCardSecureCodeField
+            name="secureCode"
+            control={control}
+            label={FIELD_LABELS.secureCode} />
+        </Grid>
+      </Grid>
+
+      <ControlledTextField
+        name="nameOnCard"
+        control={control}
+        label={FIELD_LABELS.nameOnCard}
+      />
+
+      { consentType === "checkbox" && (
+        <ControlledCheckbox
+          name="consent"
           control={control}
-          label={FIELD_LABELS.nameOnCard}
-        />
-      </>
-    )
+          label={ <>I <ConsentText privacyHref={ privacyHref } termsOfUseHref={ termsOfUseHref } /></> } />
+      ) }
+    </>),
   },
   ACH: {
-    defaultValues: {
+    defaultValues: (consentType) => ({
       type: "ACH",
       accountId: "",
       publicToken: "",
-    },
-    schemaShape: {
-      /*accountNumber: number()
-        .typeError(withTypeErrorMessageFor("number"))
-        .label(FIELD_LABELS.accountNumber)
-        .when("type", isACHThenRequireSchema),
-      routingNumber: number()
-        .typeError(withTypeErrorMessageFor("number"))
-        .label(FIELD_LABELS.routingNumber)
-        .when("type", isACHThenRequireSchema),
-      accountName: string()
-        .label(FIELD_LABELS.accountName)
-        .when("type", isACHThenRequireSchema)*/
-    },
-    fields: () => (
-      <>
-        <Typography variant="body2" sx={{ mt: 1.5 }}>We use Plaid to connect to your account.</Typography>
-        { /* <ControlledTextField
-          name="accountNumber"
+      consent: consentType === "checkbox" ? false: true,
+    }),
+    schemaShape: {},
+    fields: ({ control, consentType, privacyHref, termsOfUseHref }) => (<>
+      <DisplayBox sx={{ mt: 1.5, mb: consentType === "checkbox" ? 1 : 0 }}>
+        <Typography variant="body1">
+          We use Plaid to connect to your account.
+        </Typography>
+      </DisplayBox>
+
+      { consentType === "checkbox" && (
+        <ControlledCheckbox
+          name="consent"
           control={control}
-          label={FIELD_LABELS.accountNumber}
-        />
-        <ControlledTextField
-          name="routingNumber"
-          control={control}
-          label={FIELD_LABELS.routingNumber}
-        />
-        <ControlledTextField
-          name="accountName"
-          control={control}
-          label={FIELD_LABELS.accountName}
-        /> */ }
-      </>
-    )
+          label={ <>I <ConsentText privacyHref={ privacyHref } termsOfUseHref={ termsOfUseHref } /></> } />
+      ) }
+    </>),
   },
   Wire: {
-    defaultValues: {
+    defaultValues: (consentType) => ({
       type: "Wire",
-    },
-    fields: () => (<>
-      <Typography variant="body2" sx={{ mt: 1.5, mb: 5 }}>Not supported yet.</Typography>
-    </>),
+      consent: consentType === "checkbox" ? false: true,
+    }),
     schemaShape: {},
+    fields: ({ control, consentType, privacyHref, termsOfUseHref }) => (<>
+      <DisplayBox sx={{ mt: 1.5, mb: consentType === "checkbox" ? 1 : 0 }}>
+        <Typography variant="body1">
+          Not supported yet.
+        </Typography>
+      </DisplayBox>
+
+      { consentType === "checkbox" && (
+        <ControlledCheckbox
+          name="consent"
+          control={control}
+          label={ <>I <ConsentText privacyHref={ privacyHref } termsOfUseHref={ termsOfUseHref } /></> } />
+      ) }
+    </>),
   },
   Crypto: {
-    defaultValues: {
+    defaultValues: (consentType) => ({
       type: "Crypto",
-    },
-    fields: () => (<>
-      <Typography variant="body2" sx={{ mt: 1.5, mb: 5 }}>Not supported yet.</Typography>
-    </>),
+      consent: consentType === "checkbox" ? false: true,
+    }),
     schemaShape: {},
+    fields: ({ control, consentType, privacyHref, termsOfUseHref }) => (<>
+      <DisplayBox sx={{ mt: 1.5, mb: consentType === "checkbox" ? 1 : 0 }}>
+        <Typography variant="body1">
+          Not supported yet.
+        </Typography>
+      </DisplayBox>
+
+      { consentType === "checkbox" && (
+        <ControlledCheckbox
+          name="consent"
+          control={control}
+          label={ <>I <ConsentText privacyHref={ privacyHref } termsOfUseHref={ termsOfUseHref } /></> } />
+      ) }
+    </>),
   },
 };
 
@@ -201,6 +217,7 @@ export interface PaymentMethodFormProps {
   onSaved?: () => void;
   onClose: () => void;
   onSubmit: (data: PaymentMethod) => void;
+  consentType: ConsentType;
   privacyHref: string;
   termsOfUseHref: string;
   debug?: boolean;
@@ -213,57 +230,66 @@ export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
   onSaved,
   onClose,
   onSubmit,
+  consentType,
   privacyHref,
   termsOfUseHref,
-  debug
+  debug = false
 }) => {
-  const formDefaultValues =
-    PAYMENT_METHOD_FORM_DATA[acceptedPaymentTypes[0]]?.defaultValues ||
-    PAYMENT_METHOD_FORM_DATA.CreditCard.defaultValues;
+  const defaultPaymentType = acceptedPaymentTypes[0] || "CreditCard";
+  const defaultPaymentTypeFormData = PAYMENT_TYPE_FORM_DATA[defaultPaymentType];
+  const defaultPaymentTypeDefaultValues = defaultPaymentTypeFormData.defaultValues(consentType);
 
-  const schema = useMemo(
-    () =>
-      object().shape({
-        type: string().required(),
-        ...Object.values(PAYMENT_METHOD_FORM_DATA).reduce(
-          (acc, { schemaShape }) => ({ ...acc, ...schemaShape }),
-          {}
-        )
-      }),
-    []
-  );
+  const schema = useMemo(() => {
+    return object().shape({
+      type: string().required(),
+      consent: boolean().oneOf([true], CONSENT_ERROR_MESSAGE),
+      ...Object.values(PAYMENT_TYPE_FORM_DATA).reduce((objectShape, { schemaShape }) => ({ ...objectShape, ...schemaShape }), {} as ObjectShape),
+    });
+  }, []);
 
   const {
     control,
     handleSubmit,
     watch,
     reset,
-    formState: { errors }
+    trigger,
   } = useForm({
     defaultValues: {
-      ...formDefaultValues,
-      ...parentDefaultValues
+      ...defaultPaymentTypeDefaultValues,
+      ...parentDefaultValues,
     },
+    reValidateMode: "onChange",
     resolver: yupResolver(schema)
   });
 
-  const handleSelectedPaymentMethodChange = useCallback(
-    (paymentType: PaymentType) => {
-      const defaultValues =
-        PAYMENT_METHOD_FORM_DATA[paymentType]?.defaultValues ||
-        PAYMENT_METHOD_FORM_DATA.CreditCard.defaultValues;
-
-      reset({ ...defaultValues });
-    },
-    [reset]
-  );
+  const handleSelectedPaymentMethodChange = useCallback((paymentType: PaymentType) => {
+    reset({ ...PAYMENT_TYPE_FORM_DATA[paymentType].defaultValues(consentType) });
+  }, [reset, consentType]);
 
   const selectedPaymentMethod = watch("type") as PaymentType;
-  const Fields = PAYMENT_METHOD_FORM_DATA[selectedPaymentMethod].fields;
+  const Fields = PAYMENT_TYPE_FORM_DATA[selectedPaymentMethod].fields;
   const submitForm = handleSubmit(onSubmit);
 
+  const handleFormSubmit = useCallback(async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (selectedPaymentMethod === "ACH") {
+      const isFormValid = await trigger();
+
+      if (!isFormValid) {
+        submitForm(e);
+
+        return;
+      }
+
+      onPlaidLinkClicked();
+    } else if (selectedPaymentMethod === "CreditCard") {
+      submitForm(e);
+    }
+  }, [selectedPaymentMethod, onPlaidLinkClicked, submitForm, trigger]);
+
   return (
-    <form onSubmit={submitForm}>
+    <form onSubmit={ handleFormSubmit }>
       {onSaved && (
         <Box sx={{ my: 2.5 }}>
           <SecondaryButton onClick={onSaved} startIcon={<BookIcon />}>
@@ -284,7 +310,11 @@ export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
         null
       ) }
 
-      <Fields control={ control } />
+      <Fields
+        control={ control }
+        consentType={ consentType }
+        privacyHref={ privacyHref }
+        termsOfUseHref={ termsOfUseHref } />
 
       {debug && (
         <Box component="pre" sx={{ my: 2, overflow: "scroll" }}>
@@ -292,14 +322,13 @@ export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
         </Box>
       )}
 
-      { selectedPaymentMethod === "Wire" || selectedPaymentMethod === "Crypto" ? null : (
-        <CheckoutModalFooter
-          variant={ selectedPaymentMethod === "ACH" ? "toPlaid" : "toConfirmation" }
-          privacyHref={privacyHref}
-          termsOfUseHref={termsOfUseHref}
-          onSubmitClicked={ selectedPaymentMethod === "ACH" ? onPlaidLinkClicked : submitForm }
-          onCloseClicked={onClose} />
-      ) }
+      <CheckoutModalFooter
+        variant={ selectedPaymentMethod === "ACH" ? "toPlaid" : "toConfirmation" }
+        consentType={ consentType === "checkbox" ? undefined : consentType }
+        privacyHref={ privacyHref }
+        termsOfUseHref={ termsOfUseHref }
+        submitDisabled={ selectedPaymentMethod === "Wire" || selectedPaymentMethod === "Crypto" }
+        onCloseClicked={ onClose } />
     </form>
   );
 };

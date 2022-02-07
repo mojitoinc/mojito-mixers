@@ -74,8 +74,6 @@ export const SavedBillingDetailsSelector: React.FC<SavedBillingDetailsSelectorPr
 
     <CheckoutModalFooter
       variant="toPayment"
-      privacyHref=""
-      termsOfUseHref=""
       onSubmitClicked={ onNext }
       onCloseClicked={ onClose } />
   </>);

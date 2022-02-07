@@ -1,39 +1,105 @@
 import { Box, Link, Typography, Divider } from "@mui/material";
-import React, { useCallback } from "react";
+import React, { useCallback, useState, Fragment } from "react";
+import { Checkbox } from "../../shared/Checkbox";
 import { PrimaryButton } from "../../shared/PrimaryButton/PrimaryButton";
 import { ICONS_BY_VARIANT, LABELS_BY_VARIANT } from "./CheckoutModalFooter.constants";
 
-export type ConsentType = "disclaimer" | "checkbox";
+interface CheckoutModalFooterConsentState {
+  isFormSubmitted: boolean;
+  isConsentChecked: boolean;
+}
 
+export type ConsentType = "disclaimer" | "checkbox";
 export type CheckoutModalFooterVariant = "toGuestCheckout" | "toPayment" | "toConfirmation" | "toPlaid" | "toForm" | "toMarketplace";
+
+export interface ConsentTextProps {
+  privacyHref?: string;
+  termsOfUseHref?: string;
+}
+
+export const ConsentText: React.FC<ConsentTextProps> = ({
+  privacyHref,
+  termsOfUseHref,
+}) => {
+  const linkElements = [
+    privacyHref ? <Link color="text.primary" href={ privacyHref } target="_blank">Privacy Notices</Link> : null,
+    termsOfUseHref ? <Link color="text.primary" href={ termsOfUseHref } target="_blank">Terms of Use</Link> : null,
+  ].filter(Boolean);
+
+  return (<>
+    have read, understood, and consent to the{" "}
+    { linkElements.map((linkElement, i) => {
+      return <Fragment key={ i }>{ i === linkElements.length - 1 ? "and " : "" }{ linkElement }{ " " }</Fragment>
+    }) }
+    of the sale.
+  </>);
+};
+
+export const CONSENT_ERROR_MESSAGE = "You must accept the terms and conditions of the sale.";
 
 export interface CheckoutModalFooterProps {
   variant: CheckoutModalFooterVariant;
   guestCheckoutEnabled?: boolean;
-  privacyHref: string;
-  termsOfUseHref: string;
-  onSubmitClicked: () => void;
+  consentType?: ConsentType;
+  privacyHref?: string;
+  termsOfUseHref?: string;
+  submitDisabled?: boolean;
+  onSubmitClicked?: (canSubmit: boolean) => void;
   onCloseClicked: () => void;
 }
 
 export const CheckoutModalFooter: React.FC<CheckoutModalFooterProps> = ({
   variant,
   guestCheckoutEnabled,
+  consentType,
   privacyHref,
   termsOfUseHref,
+  submitDisabled,
   onSubmitClicked,
   onCloseClicked,
 }) => {
-  const buttonLabel = LABELS_BY_VARIANT[variant];
-  const ButtonIconComponent = ICONS_BY_VARIANT[variant];
+  // CONSENT:
+  const showConsent = consentType && (variant === "toConfirmation" || variant === "toPlaid");
+  const consentTextElement = showConsent ? <ConsentText privacyHref={ privacyHref } termsOfUseHref={ termsOfUseHref } /> : null;
 
+  const [{
+    isFormSubmitted,
+    isConsentChecked,
+  }, setConsentState] = useState<CheckoutModalFooterConsentState>({
+    isFormSubmitted: false,
+    isConsentChecked: showConsent && consentType === "checkbox" ? false : true,
+  });
+
+  const showConsentError = isFormSubmitted && !isConsentChecked;
+
+  const handleConsentClicked = useCallback((_, checked: boolean) => {
+    setConsentState((prevConsentState) => ({
+      isFormSubmitted: prevConsentState.isFormSubmitted,
+      isConsentChecked: checked,
+    }));
+  }, []);
+
+
+  // PRIMARY BUTTON:
+  const primaryButtonVisible = variant !== "toGuestCheckout" || guestCheckoutEnabled;
+  const primaryButtonLabel = LABELS_BY_VARIANT[variant];
+  const PrimaryButtonIcon = ICONS_BY_VARIANT[variant];
+
+  const handleSubmitClicked = useCallback(() => {
+    setConsentState({
+      isFormSubmitted: true,
+      isConsentChecked,
+    });
+
+    if (onSubmitClicked) onSubmitClicked(isConsentChecked);
+  }, [isConsentChecked, onSubmitClicked]);
+
+  // CANCEL LINK:
   const handleCancelClicked = useCallback((e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
 
     onCloseClicked();
   }, [onCloseClicked]);
-
-  const displayPrimaryButton = variant !== "toGuestCheckout" || guestCheckoutEnabled;
 
   return (
     <Box
@@ -41,34 +107,44 @@ export const CheckoutModalFooter: React.FC<CheckoutModalFooterProps> = ({
         display: "flex",
         alignItems: "center",
         flexDirection: "column",
-        py: 5
+        pt: consentType === "checkbox" ? 0 : 5,
+        pb: 5,
       }}>
 
-      { displayPrimaryButton && (
+      { showConsent && consentType === "checkbox" && (
+        <Checkbox
+          label={ <>I { consentTextElement }</> }
+          checked={ isConsentChecked }
+          onChange={ handleConsentClicked }
+          error={ showConsentError }
+          helperText={ showConsentError ? CONSENT_ERROR_MESSAGE : undefined }
+          sx={{ alignSelf: "flex-start", mb: 5 }} />
+      ) }
+
+      { primaryButtonVisible && (
         <PrimaryButton
-          onClick={ onSubmitClicked }
-          endIcon={ ButtonIconComponent && <ButtonIconComponent /> }>
-          { buttonLabel }
+          onClick={ onSubmitClicked ? handleSubmitClicked : undefined }
+          type={ onSubmitClicked ? "button" : "submit" }
+          endIcon={ PrimaryButtonIcon && <PrimaryButtonIcon /> }
+          disabled={ submitDisabled }>
+          { primaryButtonLabel }
         </PrimaryButton>
       ) }
 
       { variant !== "toMarketplace" && (
-        <Typography sx={ displayPrimaryButton ? { pt: 2 } : undefined }>
-          { displayPrimaryButton ? "or " : null }
+        <Typography sx={ primaryButtonVisible ? { pt: 2 } : undefined }>
+          { primaryButtonVisible ? "or " : null }
           <Link sx={{ color: "text.primary" }} href="" onClick={ handleCancelClicked }>
             Cancel and Return to Marketplace
           </Link>
         </Typography>
       ) }
 
-      { variant === "toConfirmation" && (<>
+      { showConsent && consentType === "disclaimer" && (<>
         <Divider sx={{ my: 5, width: "100%" }}/>
 
         <Typography sx={{ maxWidth: "400px" }} align="center">
-          By placing an order you affirm that you have read, understood, and consent to the{" "}
-          <Link color="text.primary" href={ privacyHref } target="_blank">Privacy Notices</Link>{" "}
-          and{" "}
-          <Link color="text.primary" href={ termsOfUseHref } target="_blank">Terms of Use</Link>.
+          By placing an order you affirm that { consentTextElement }.
         </Typography>
       </>) }
 

@@ -366,6 +366,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
         onPrev={ handlePrevClicked }
         onClose={ onClose }
         acceptedPaymentTypes={ acceptedPaymentTypes }
+        consentType={ consentType }
         privacyHref={ privacyHref }
         termsOfUseHref={ termsOfUseHref } />
     );
