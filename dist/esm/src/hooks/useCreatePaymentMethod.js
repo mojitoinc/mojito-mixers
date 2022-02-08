@@ -51,7 +51,10 @@ function useCreatePaymentMethod() {
             postalCode: billingInfo.zipCode,
         };
         if (paymentInfo.type === PaymentType.CreditCard) {
-            const paymentKeyResult = yield fetchPaymentKey().catch(err => undefined);
+            const paymentKeyResult = yield fetchPaymentKey().catch((err) => {
+                console.log(err);
+                return undefined;
+            });
             const paymentKeyData = paymentKeyResult === null || paymentKeyResult === void 0 ? void 0 : paymentKeyResult.data;
             const publicKey = (_a = paymentKeyData === null || paymentKeyData === void 0 ? void 0 : paymentKeyData.getPaymentPublicKey) === null || _a === void 0 ? void 0 : _a.publicKey;
             const keyID = (_b = paymentKeyData === null || paymentKeyData === void 0 ? void 0 : paymentKeyData.getPaymentPublicKey) === null || _b === void 0 ? void 0 : _b.keyID;
