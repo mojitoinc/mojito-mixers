@@ -11,25 +11,12 @@ function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'defau
 
 var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 
-var CheckoutItemCostPurchase = function CheckoutItemCostPurchase(_a) {
-  var _b = _a.checkoutItem,
-      price = _b.price,
-      fee = _b.fee,
-      selectedPaymentMethodBillingInfo = _a.selectedPaymentMethodBillingInfo;
-  return /*#__PURE__*/React__default["default"].createElement(React__default["default"].Fragment, null, /*#__PURE__*/React__default["default"].createElement(material.Grid, {
-    container: true,
-    item: true,
-    direction: "column",
-    sx: {
-      display: "flex",
-      pb: 2
-    }
-  }, /*#__PURE__*/React__default["default"].createElement(BillingInfoFragment.BillingInfoFragment, {
-    savedPaymentMethod: selectedPaymentMethodBillingInfo
-  }), /*#__PURE__*/React__default["default"].createElement(CheckoutItemCostTotal.CheckoutItemCostTotal, {
-    price: price,
-    fee: fee
-  })), /*#__PURE__*/React__default["default"].createElement(material.Divider, null));
+const CheckoutItemCostPurchase = ({ checkoutItem: { price, fee, }, selectedPaymentMethodBillingInfo, }) => {
+    return (React__default["default"].createElement(React__default["default"].Fragment, null,
+        React__default["default"].createElement(material.Grid, { container: true, item: true, direction: "column", sx: { display: "flex", pb: 2 } },
+            React__default["default"].createElement(BillingInfoFragment.BillingInfoFragment, { savedPaymentMethod: selectedPaymentMethodBillingInfo }),
+            React__default["default"].createElement(CheckoutItemCostTotal.CheckoutItemCostTotal, { price: price, fee: fee })),
+        React__default["default"].createElement(material.Divider, null)));
 };
 
 exports.CheckoutItemCostPurchase = CheckoutItemCostPurchase;

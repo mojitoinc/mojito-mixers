@@ -2,7 +2,6 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-var tslib_es6 = require('../../node_modules/tslib/tslib.es6.js');
 var Apollo = require('@apollo/client');
 
 function _interopNamespace(e) {
@@ -25,127 +24,115 @@ function _interopNamespace(e) {
 
 var Apollo__namespace = /*#__PURE__*/_interopNamespace(Apollo);
 
-var defaultOptions = {};
+const defaultOptions = {};
 exports.AuctionBidOrder = void 0;
-
 (function (AuctionBidOrder) {
-  AuctionBidOrder["Asc"] = "ASC";
-  AuctionBidOrder["Desc"] = "DESC";
+    AuctionBidOrder["Asc"] = "ASC";
+    AuctionBidOrder["Desc"] = "DESC";
 })(exports.AuctionBidOrder || (exports.AuctionBidOrder = {}));
-
 exports.AuctionLotStatus = void 0;
-
 (function (AuctionLotStatus) {
-  AuctionLotStatus["Active"] = "Active";
-  AuctionLotStatus["Completed"] = "Completed";
-  AuctionLotStatus["Hidden"] = "Hidden";
-  AuctionLotStatus["Preview"] = "Preview";
+    AuctionLotStatus["Active"] = "Active";
+    AuctionLotStatus["Completed"] = "Completed";
+    AuctionLotStatus["Hidden"] = "Hidden";
+    AuctionLotStatus["Preview"] = "Preview";
 })(exports.AuctionLotStatus || (exports.AuctionLotStatus = {}));
-
 exports.CollectionType = void 0;
-
 (function (CollectionType) {
-  CollectionType["Auction"] = "Auction";
-  CollectionType["Tk2"] = "TK2";
+    CollectionType["Auction"] = "Auction";
+    CollectionType["Tk2"] = "TK2";
 })(exports.CollectionType || (exports.CollectionType = {}));
-
 exports.ContractType = void 0;
-
 (function (ContractType) {
-  ContractType["Erc721Creator"] = "ERC721Creator";
-  ContractType["Erc1155Creator"] = "ERC1155Creator";
-  ContractType["GenerativeContract"] = "GenerativeContract";
-  ContractType["ZoraContract"] = "ZoraContract";
+    ContractType["Erc721Creator"] = "ERC721Creator";
+    ContractType["Erc1155Creator"] = "ERC1155Creator";
+    ContractType["GenerativeContract"] = "GenerativeContract";
+    ContractType["ZoraContract"] = "ZoraContract";
 })(exports.ContractType || (exports.ContractType = {}));
-
 exports.InvoiceStatus = void 0;
-
 (function (InvoiceStatus) {
-  InvoiceStatus["Canceled"] = "Canceled";
-  InvoiceStatus["Draft"] = "Draft";
-  InvoiceStatus["Paid"] = "Paid";
-  InvoiceStatus["Pending"] = "Pending";
+    InvoiceStatus["Canceled"] = "Canceled";
+    InvoiceStatus["Draft"] = "Draft";
+    InvoiceStatus["Paid"] = "Paid";
+    InvoiceStatus["Pending"] = "Pending";
 })(exports.InvoiceStatus || (exports.InvoiceStatus = {}));
-
 exports.KycStatus = void 0;
-
 (function (KycStatus) {
-  KycStatus["Level1"] = "Level1";
-  KycStatus["Level2"] = "Level2";
-  KycStatus["None"] = "None";
-  KycStatus["Pending"] = "Pending";
+    KycStatus["Level1"] = "Level1";
+    KycStatus["Level2"] = "Level2";
+    KycStatus["None"] = "None";
+    KycStatus["Pending"] = "Pending";
 })(exports.KycStatus || (exports.KycStatus = {}));
-
 exports.MarketCollectionStatus = void 0;
-
 (function (MarketCollectionStatus) {
-  MarketCollectionStatus["Active"] = "Active";
-  MarketCollectionStatus["Archived"] = "Archived";
-  MarketCollectionStatus["Inactive"] = "Inactive";
+    MarketCollectionStatus["Active"] = "Active";
+    MarketCollectionStatus["Archived"] = "Archived";
+    MarketCollectionStatus["Inactive"] = "Inactive";
 })(exports.MarketCollectionStatus || (exports.MarketCollectionStatus = {}));
-
 exports.MarketplaceSaleType = void 0;
-
 (function (MarketplaceSaleType) {
-  MarketplaceSaleType["Auction"] = "Auction";
-  MarketplaceSaleType["BuyNow"] = "BuyNow";
+    MarketplaceSaleType["Auction"] = "Auction";
+    MarketplaceSaleType["BuyNow"] = "BuyNow";
 })(exports.MarketplaceSaleType || (exports.MarketplaceSaleType = {}));
-
 exports.PaymentStatus = void 0;
-
 (function (PaymentStatus) {
-  PaymentStatus["ActionRequired"] = "action_required";
-  PaymentStatus["Confirmed"] = "confirmed";
-  PaymentStatus["Failed"] = "failed";
-  PaymentStatus["Paid"] = "paid";
-  PaymentStatus["Pending"] = "pending";
+    PaymentStatus["ActionRequired"] = "action_required";
+    PaymentStatus["Confirmed"] = "confirmed";
+    PaymentStatus["Failed"] = "failed";
+    PaymentStatus["Paid"] = "paid";
+    PaymentStatus["Pending"] = "pending";
 })(exports.PaymentStatus || (exports.PaymentStatus = {}));
-
 exports.PaymentType = void 0;
-
 (function (PaymentType) {
-  PaymentType["Ach"] = "ACH";
-  PaymentType["CreditCard"] = "CreditCard";
-  PaymentType["Wire"] = "Wire";
+    PaymentType["Ach"] = "ACH";
+    PaymentType["CreditCard"] = "CreditCard";
+    PaymentType["Wire"] = "Wire";
 })(exports.PaymentType || (exports.PaymentType = {}));
-
 exports.Role = void 0;
-
 (function (Role) {
-  Role["Admin"] = "admin";
-  Role["User"] = "user";
+    Role["Admin"] = "admin";
+    Role["User"] = "user";
 })(exports.Role || (exports.Role = {}));
-
 exports.TransactionStatus = void 0;
-
 (function (TransactionStatus) {
-  TransactionStatus["Completed"] = "Completed";
-  TransactionStatus["Failed"] = "Failed";
-  TransactionStatus["Pending"] = "Pending";
+    TransactionStatus["Completed"] = "Completed";
+    TransactionStatus["Failed"] = "Failed";
+    TransactionStatus["Pending"] = "Pending";
 })(exports.TransactionStatus || (exports.TransactionStatus = {}));
-
 exports.TransactionType = void 0;
-
 (function (TransactionType) {
-  TransactionType["DeployMultisig"] = "DeployMultisig";
-  TransactionType["TransferToken"] = "TransferToken";
+    TransactionType["DeployMultisig"] = "DeployMultisig";
+    TransactionType["TransferToken"] = "TransferToken";
 })(exports.TransactionType || (exports.TransactionType = {}));
-
 exports.WalletParentType = void 0;
-
 (function (WalletParentType) {
-  WalletParentType["Organization"] = "organization";
-  WalletParentType["User"] = "user";
+    WalletParentType["Organization"] = "organization";
+    WalletParentType["User"] = "user";
 })(exports.WalletParentType || (exports.WalletParentType = {}));
-
 exports.WalletTxType = void 0;
-
 (function (WalletTxType) {
-  WalletTxType["MojitoHotWallet"] = "MojitoHotWallet";
-  WalletTxType["Multisig"] = "Multisig";
+    WalletTxType["MojitoHotWallet"] = "MojitoHotWallet";
+    WalletTxType["Multisig"] = "Multisig";
 })(exports.WalletTxType || (exports.WalletTxType = {}));
-
-var MeDocument = Apollo.gql(templateObject_1 || (templateObject_1 = tslib_es6.__makeTemplateObject(["\n    query Me {\n  me {\n    id\n    user {\n      id\n      username\n      name\n      email\n    }\n    userOrgs {\n      organization {\n        id\n        name\n      }\n    }\n  }\n}\n    "], ["\n    query Me {\n  me {\n    id\n    user {\n      id\n      username\n      name\n      email\n    }\n    userOrgs {\n      organization {\n        id\n        name\n      }\n    }\n  }\n}\n    "])));
+const MeDocument = Apollo.gql `
+    query Me {
+  me {
+    id
+    user {
+      id
+      username
+      name
+      email
+    }
+    userOrgs {
+      organization {
+        id
+        name
+      }
+    }
+  }
+}
+    `;
 /**
  * __useMeQuery__
  *
@@ -161,13 +148,21 @@ var MeDocument = Apollo.gql(templateObject_1 || (templateObject_1 = tslib_es6.__
  *   },
  * });
  */
-
 function useMeQuery(baseOptions) {
-  var options = tslib_es6.__assign(tslib_es6.__assign({}, defaultOptions), baseOptions);
-
-  return Apollo__namespace.useQuery(MeDocument, options);
+    const options = Object.assign(Object.assign({}, defaultOptions), baseOptions);
+    return Apollo__namespace.useQuery(MeDocument, options);
 }
-var CreatePaymentDocument = Apollo.gql(templateObject_2 || (templateObject_2 = tslib_es6.__makeTemplateObject(["\n    mutation CreatePayment($paymentMethodID: UUID1!, $invoiceID: UUID1!) {\n  createPayment(paymentMethodID: $paymentMethodID, invoiceID: $invoiceID) {\n    id\n    invoiceID\n    circlePaymentID\n    status\n    userID\n  }\n}\n    "], ["\n    mutation CreatePayment($paymentMethodID: UUID1!, $invoiceID: UUID1!) {\n  createPayment(paymentMethodID: $paymentMethodID, invoiceID: $invoiceID) {\n    id\n    invoiceID\n    circlePaymentID\n    status\n    userID\n  }\n}\n    "])));
+const CreatePaymentDocument = Apollo.gql `
+    mutation CreatePayment($paymentMethodID: UUID1!, $invoiceID: UUID1!) {
+  createPayment(paymentMethodID: $paymentMethodID, invoiceID: $invoiceID) {
+    id
+    invoiceID
+    circlePaymentID
+    status
+    userID
+  }
+}
+    `;
 /**
  * __useCreatePaymentMutation__
  *
@@ -186,13 +181,24 @@ var CreatePaymentDocument = Apollo.gql(templateObject_2 || (templateObject_2 = t
  *   },
  * });
  */
-
 function useCreatePaymentMutation(baseOptions) {
-  var options = tslib_es6.__assign(tslib_es6.__assign({}, defaultOptions), baseOptions);
-
-  return Apollo__namespace.useMutation(CreatePaymentDocument, options);
+    const options = Object.assign(Object.assign({}, defaultOptions), baseOptions);
+    return Apollo__namespace.useMutation(CreatePaymentDocument, options);
 }
-var CreateAuctionInvoiceDocument = Apollo.gql(templateObject_3 || (templateObject_3 = tslib_es6.__makeTemplateObject(["\n    mutation CreateAuctionInvoice($orgID: UUID1!, $lotID: UUID1!) {\n  createAuctionLotInvoice(orgID: $orgID, lotID: $lotID) {\n    invoiceID\n    status\n    items {\n      units\n      unitPrice\n      taxes\n      totalPrice\n    }\n  }\n}\n    "], ["\n    mutation CreateAuctionInvoice($orgID: UUID1!, $lotID: UUID1!) {\n  createAuctionLotInvoice(orgID: $orgID, lotID: $lotID) {\n    invoiceID\n    status\n    items {\n      units\n      unitPrice\n      taxes\n      totalPrice\n    }\n  }\n}\n    "])));
+const CreateAuctionInvoiceDocument = Apollo.gql `
+    mutation CreateAuctionInvoice($orgID: UUID1!, $lotID: UUID1!) {
+  createAuctionLotInvoice(orgID: $orgID, lotID: $lotID) {
+    invoiceID
+    status
+    items {
+      units
+      unitPrice
+      taxes
+      totalPrice
+    }
+  }
+}
+    `;
 /**
  * __useCreateAuctionInvoiceMutation__
  *
@@ -211,13 +217,26 @@ var CreateAuctionInvoiceDocument = Apollo.gql(templateObject_3 || (templateObjec
  *   },
  * });
  */
-
 function useCreateAuctionInvoiceMutation(baseOptions) {
-  var options = tslib_es6.__assign(tslib_es6.__assign({}, defaultOptions), baseOptions);
-
-  return Apollo__namespace.useMutation(CreateAuctionInvoiceDocument, options);
+    const options = Object.assign(Object.assign({}, defaultOptions), baseOptions);
+    return Apollo__namespace.useMutation(CreateAuctionInvoiceDocument, options);
 }
-var CreateBuyNowInvoiceDocument = Apollo.gql(templateObject_4 || (templateObject_4 = tslib_es6.__makeTemplateObject(["\n    mutation CreateBuyNowInvoice($input: PurchaseMarketplaceBuyNowLotInput!) {\n  purchaseMarketplaceBuyNowLot(input: $input) {\n    invoice {\n      invoiceID\n      status\n      items {\n        units\n        unitPrice\n        taxes\n        totalPrice\n      }\n    }\n  }\n}\n    "], ["\n    mutation CreateBuyNowInvoice($input: PurchaseMarketplaceBuyNowLotInput!) {\n  purchaseMarketplaceBuyNowLot(input: $input) {\n    invoice {\n      invoiceID\n      status\n      items {\n        units\n        unitPrice\n        taxes\n        totalPrice\n      }\n    }\n  }\n}\n    "])));
+const CreateBuyNowInvoiceDocument = Apollo.gql `
+    mutation CreateBuyNowInvoice($input: PurchaseMarketplaceBuyNowLotInput!) {
+  purchaseMarketplaceBuyNowLot(input: $input) {
+    invoice {
+      invoiceID
+      status
+      items {
+        units
+        unitPrice
+        taxes
+        totalPrice
+      }
+    }
+  }
+}
+    `;
 /**
  * __useCreateBuyNowInvoiceMutation__
  *
@@ -235,19 +254,70 @@ var CreateBuyNowInvoiceDocument = Apollo.gql(templateObject_4 || (templateObject
  *   },
  * });
  */
-
 function useCreateBuyNowInvoiceMutation(baseOptions) {
-  var options = tslib_es6.__assign(tslib_es6.__assign({}, defaultOptions), baseOptions);
-
-  return Apollo__namespace.useMutation(CreateBuyNowInvoiceDocument, options);
+    const options = Object.assign(Object.assign({}, defaultOptions), baseOptions);
+    return Apollo__namespace.useMutation(CreateBuyNowInvoiceDocument, options);
 }
-var PaymentKeyDocument = Apollo.gql(templateObject_5 || (templateObject_5 = tslib_es6.__makeTemplateObject(["\n    query PaymentKey {\n  getPaymentPublicKey {\n    keyID\n    publicKey\n  }\n}\n    "], ["\n    query PaymentKey {\n  getPaymentPublicKey {\n    keyID\n    publicKey\n  }\n}\n    "])));
+const PaymentKeyDocument = Apollo.gql `
+    query PaymentKey {
+  getPaymentPublicKey {
+    keyID
+    publicKey
+  }
+}
+    `;
 function usePaymentKeyLazyQuery(baseOptions) {
-  var options = tslib_es6.__assign(tslib_es6.__assign({}, defaultOptions), baseOptions);
-
-  return Apollo__namespace.useLazyQuery(PaymentKeyDocument, options);
+    const options = Object.assign(Object.assign({}, defaultOptions), baseOptions);
+    return Apollo__namespace.useLazyQuery(PaymentKeyDocument, options);
 }
-var GetPaymentMethodListDocument = Apollo.gql(templateObject_6 || (templateObject_6 = tslib_es6.__makeTemplateObject(["\n    query GetPaymentMethodList($orgID: UUID1!) {\n  getPaymentMethodList(orgID: $orgID) {\n    ... on ACHPaymentMethodOutput {\n      id\n      type\n      status\n      accountNumber\n      metadata {\n        email\n        phoneNumber\n      }\n      billingDetails {\n        name\n        city\n        country\n        address1\n        address2\n        district\n        postalCode\n      }\n      bankAddress {\n        bankName\n      }\n    }\n    ... on CreditCardPaymentMethodOutput {\n      id\n      type\n      status\n      network\n      last4Digit\n      metadata {\n        email\n        phoneNumber\n      }\n      billingDetails {\n        name\n        city\n        country\n        address1\n        address2\n        district\n        postalCode\n      }\n    }\n  }\n}\n    "], ["\n    query GetPaymentMethodList($orgID: UUID1!) {\n  getPaymentMethodList(orgID: $orgID) {\n    ... on ACHPaymentMethodOutput {\n      id\n      type\n      status\n      accountNumber\n      metadata {\n        email\n        phoneNumber\n      }\n      billingDetails {\n        name\n        city\n        country\n        address1\n        address2\n        district\n        postalCode\n      }\n      bankAddress {\n        bankName\n      }\n    }\n    ... on CreditCardPaymentMethodOutput {\n      id\n      type\n      status\n      network\n      last4Digit\n      metadata {\n        email\n        phoneNumber\n      }\n      billingDetails {\n        name\n        city\n        country\n        address1\n        address2\n        district\n        postalCode\n      }\n    }\n  }\n}\n    "])));
+const GetPaymentMethodListDocument = Apollo.gql `
+    query GetPaymentMethodList($orgID: UUID1!) {
+  getPaymentMethodList(orgID: $orgID) {
+    ... on ACHPaymentMethodOutput {
+      id
+      type
+      status
+      accountNumber
+      metadata {
+        email
+        phoneNumber
+      }
+      billingDetails {
+        name
+        city
+        country
+        address1
+        address2
+        district
+        postalCode
+      }
+      bankAddress {
+        bankName
+      }
+    }
+    ... on CreditCardPaymentMethodOutput {
+      id
+      type
+      status
+      network
+      last4Digit
+      metadata {
+        email
+        phoneNumber
+      }
+      billingDetails {
+        name
+        city
+        country
+        address1
+        address2
+        district
+        postalCode
+      }
+    }
+  }
+}
+    `;
 /**
  * __useGetPaymentMethodListQuery__
  *
@@ -264,13 +334,25 @@ var GetPaymentMethodListDocument = Apollo.gql(templateObject_6 || (templateObjec
  *   },
  * });
  */
-
 function useGetPaymentMethodListQuery(baseOptions) {
-  var options = tslib_es6.__assign(tslib_es6.__assign({}, defaultOptions), baseOptions);
-
-  return Apollo__namespace.useQuery(GetPaymentMethodListDocument, options);
+    const options = Object.assign(Object.assign({}, defaultOptions), baseOptions);
+    return Apollo__namespace.useQuery(GetPaymentMethodListDocument, options);
 }
-var CreatePaymentMethodDocument = Apollo.gql(templateObject_7 || (templateObject_7 = tslib_es6.__makeTemplateObject(["\n    mutation CreatePaymentMethod($orgID: UUID1!, $input: PaymentMethodCreateInput!) {\n  createPaymentMethod(orgID: $orgID, input: $input) {\n    ... on ACHPaymentMethodOutput {\n      id\n    }\n    ... on CreditCardPaymentMethodOutput {\n      id\n    }\n    ... on WirePaymentMethodOutput {\n      id\n    }\n  }\n}\n    "], ["\n    mutation CreatePaymentMethod($orgID: UUID1!, $input: PaymentMethodCreateInput!) {\n  createPaymentMethod(orgID: $orgID, input: $input) {\n    ... on ACHPaymentMethodOutput {\n      id\n    }\n    ... on CreditCardPaymentMethodOutput {\n      id\n    }\n    ... on WirePaymentMethodOutput {\n      id\n    }\n  }\n}\n    "])));
+const CreatePaymentMethodDocument = Apollo.gql `
+    mutation CreatePaymentMethod($orgID: UUID1!, $input: PaymentMethodCreateInput!) {
+  createPaymentMethod(orgID: $orgID, input: $input) {
+    ... on ACHPaymentMethodOutput {
+      id
+    }
+    ... on CreditCardPaymentMethodOutput {
+      id
+    }
+    ... on WirePaymentMethodOutput {
+      id
+    }
+  }
+}
+    `;
 /**
  * __useCreatePaymentMethodMutation__
  *
@@ -289,13 +371,15 @@ var CreatePaymentMethodDocument = Apollo.gql(templateObject_7 || (templateObject
  *   },
  * });
  */
-
 function useCreatePaymentMethodMutation(baseOptions) {
-  var options = tslib_es6.__assign(tslib_es6.__assign({}, defaultOptions), baseOptions);
-
-  return Apollo__namespace.useMutation(CreatePaymentMethodDocument, options);
+    const options = Object.assign(Object.assign({}, defaultOptions), baseOptions);
+    return Apollo__namespace.useMutation(CreatePaymentMethodDocument, options);
 }
-var DeletePaymentMethodDocument = Apollo.gql(templateObject_8 || (templateObject_8 = tslib_es6.__makeTemplateObject(["\n    mutation DeletePaymentMethod($paymentMethodID: UUID1!, $orgID: UUID1!) {\n  deletePaymentMethod(paymentMethodID: $paymentMethodID, orgID: $orgID)\n}\n    "], ["\n    mutation DeletePaymentMethod($paymentMethodID: UUID1!, $orgID: UUID1!) {\n  deletePaymentMethod(paymentMethodID: $paymentMethodID, orgID: $orgID)\n}\n    "])));
+const DeletePaymentMethodDocument = Apollo.gql `
+    mutation DeletePaymentMethod($paymentMethodID: UUID1!, $orgID: UUID1!) {
+  deletePaymentMethod(paymentMethodID: $paymentMethodID, orgID: $orgID)
+}
+    `;
 /**
  * __useDeletePaymentMethodMutation__
  *
@@ -314,13 +398,19 @@ var DeletePaymentMethodDocument = Apollo.gql(templateObject_8 || (templateObject
  *   },
  * });
  */
-
 function useDeletePaymentMethodMutation(baseOptions) {
-  var options = tslib_es6.__assign(tslib_es6.__assign({}, defaultOptions), baseOptions);
-
-  return Apollo__namespace.useMutation(DeletePaymentMethodDocument, options);
+    const options = Object.assign(Object.assign({}, defaultOptions), baseOptions);
+    return Apollo__namespace.useMutation(DeletePaymentMethodDocument, options);
 }
-var PreparePaymentMethodDocument = Apollo.gql(templateObject_9 || (templateObject_9 = tslib_es6.__makeTemplateObject(["\n    query PreparePaymentMethod {\n  preparePaymentMethod(paymentMethodType: ACH) {\n    ... on ACHPaymentMethodPrepareStatementOutput {\n      linkToken\n    }\n  }\n}\n    "], ["\n    query PreparePaymentMethod {\n  preparePaymentMethod(paymentMethodType: ACH) {\n    ... on ACHPaymentMethodPrepareStatementOutput {\n      linkToken\n    }\n  }\n}\n    "])));
+const PreparePaymentMethodDocument = Apollo.gql `
+    query PreparePaymentMethod {
+  preparePaymentMethod(paymentMethodType: ACH) {
+    ... on ACHPaymentMethodPrepareStatementOutput {
+      linkToken
+    }
+  }
+}
+    `;
 /**
  * __usePreparePaymentMethodQuery__
  *
@@ -336,13 +426,10 @@ var PreparePaymentMethodDocument = Apollo.gql(templateObject_9 || (templateObjec
  *   },
  * });
  */
-
 function usePreparePaymentMethodQuery(baseOptions) {
-  var options = tslib_es6.__assign(tslib_es6.__assign({}, defaultOptions), baseOptions);
-
-  return Apollo__namespace.useQuery(PreparePaymentMethodDocument, options);
+    const options = Object.assign(Object.assign({}, defaultOptions), baseOptions);
+    return Apollo__namespace.useQuery(PreparePaymentMethodDocument, options);
 }
-var templateObject_1, templateObject_2, templateObject_3, templateObject_4, templateObject_5, templateObject_6, templateObject_7, templateObject_8, templateObject_9;
 
 exports.CreateAuctionInvoiceDocument = CreateAuctionInvoiceDocument;
 exports.CreateBuyNowInvoiceDocument = CreateBuyNowInvoiceDocument;
