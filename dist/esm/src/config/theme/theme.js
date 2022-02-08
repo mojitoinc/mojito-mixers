@@ -5,15 +5,23 @@ import { createComponentsTheme } from './themeComponents.js';
 import createTheme from '../../../node_modules/@mui/material/styles/createTheme.js';
 
 var mojitoLightTheme = createTheme({
-    typography: createTypographyTheme(),
-    palette: createPaletteTheme({ mode: "light" }),
+  typography: createTypographyTheme(),
+  palette: createPaletteTheme({
+    mode: "light"
+  })
 });
-var MOJITO_LIGHT_THEME = createTheme(__assign(__assign({}, mojitoLightTheme), { components: createComponentsTheme(mojitoLightTheme) }));
+var MOJITO_LIGHT_THEME = createTheme(__assign(__assign({}, mojitoLightTheme), {
+  components: createComponentsTheme(mojitoLightTheme)
+}));
 var mojitoDarkTheme = createTheme({
-    typography: createTypographyTheme(),
-    palette: createPaletteTheme({ mode: "dark" }),
+  typography: createTypographyTheme(),
+  palette: createPaletteTheme({
+    mode: "dark"
+  })
 });
-var MOJITO_DARK_THEME = createTheme(__assign(__assign({}, mojitoDarkTheme), { components: createComponentsTheme(mojitoDarkTheme) }));
+var MOJITO_DARK_THEME = createTheme(__assign(__assign({}, mojitoDarkTheme), {
+  components: createComponentsTheme(mojitoDarkTheme)
+}));
 
 export { MOJITO_DARK_THEME, MOJITO_LIGHT_THEME };
 //# sourceMappingURL=theme.js.map

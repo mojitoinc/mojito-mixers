@@ -4,94 +4,124 @@ import { gql } from '@apollo/client';
 
 var defaultOptions = {};
 var AuctionBidOrder;
+
 (function (AuctionBidOrder) {
-    AuctionBidOrder["Asc"] = "ASC";
-    AuctionBidOrder["Desc"] = "DESC";
+  AuctionBidOrder["Asc"] = "ASC";
+  AuctionBidOrder["Desc"] = "DESC";
 })(AuctionBidOrder || (AuctionBidOrder = {}));
+
 var AuctionLotStatus;
+
 (function (AuctionLotStatus) {
-    AuctionLotStatus["Active"] = "Active";
-    AuctionLotStatus["Completed"] = "Completed";
-    AuctionLotStatus["Hidden"] = "Hidden";
-    AuctionLotStatus["Preview"] = "Preview";
+  AuctionLotStatus["Active"] = "Active";
+  AuctionLotStatus["Completed"] = "Completed";
+  AuctionLotStatus["Hidden"] = "Hidden";
+  AuctionLotStatus["Preview"] = "Preview";
 })(AuctionLotStatus || (AuctionLotStatus = {}));
+
 var CollectionType;
+
 (function (CollectionType) {
-    CollectionType["Auction"] = "Auction";
-    CollectionType["Tk2"] = "TK2";
+  CollectionType["Auction"] = "Auction";
+  CollectionType["Tk2"] = "TK2";
 })(CollectionType || (CollectionType = {}));
+
 var ContractType;
+
 (function (ContractType) {
-    ContractType["Erc721Creator"] = "ERC721Creator";
-    ContractType["Erc1155Creator"] = "ERC1155Creator";
-    ContractType["GenerativeContract"] = "GenerativeContract";
-    ContractType["ZoraContract"] = "ZoraContract";
+  ContractType["Erc721Creator"] = "ERC721Creator";
+  ContractType["Erc1155Creator"] = "ERC1155Creator";
+  ContractType["GenerativeContract"] = "GenerativeContract";
+  ContractType["ZoraContract"] = "ZoraContract";
 })(ContractType || (ContractType = {}));
+
 var InvoiceStatus;
+
 (function (InvoiceStatus) {
-    InvoiceStatus["Canceled"] = "Canceled";
-    InvoiceStatus["Draft"] = "Draft";
-    InvoiceStatus["Paid"] = "Paid";
-    InvoiceStatus["Pending"] = "Pending";
+  InvoiceStatus["Canceled"] = "Canceled";
+  InvoiceStatus["Draft"] = "Draft";
+  InvoiceStatus["Paid"] = "Paid";
+  InvoiceStatus["Pending"] = "Pending";
 })(InvoiceStatus || (InvoiceStatus = {}));
+
 var KycStatus;
+
 (function (KycStatus) {
-    KycStatus["Level1"] = "Level1";
-    KycStatus["Level2"] = "Level2";
-    KycStatus["None"] = "None";
-    KycStatus["Pending"] = "Pending";
+  KycStatus["Level1"] = "Level1";
+  KycStatus["Level2"] = "Level2";
+  KycStatus["None"] = "None";
+  KycStatus["Pending"] = "Pending";
 })(KycStatus || (KycStatus = {}));
+
 var MarketCollectionStatus;
+
 (function (MarketCollectionStatus) {
-    MarketCollectionStatus["Active"] = "Active";
-    MarketCollectionStatus["Archived"] = "Archived";
-    MarketCollectionStatus["Inactive"] = "Inactive";
+  MarketCollectionStatus["Active"] = "Active";
+  MarketCollectionStatus["Archived"] = "Archived";
+  MarketCollectionStatus["Inactive"] = "Inactive";
 })(MarketCollectionStatus || (MarketCollectionStatus = {}));
+
 var MarketplaceSaleType;
+
 (function (MarketplaceSaleType) {
-    MarketplaceSaleType["Auction"] = "Auction";
-    MarketplaceSaleType["BuyNow"] = "BuyNow";
+  MarketplaceSaleType["Auction"] = "Auction";
+  MarketplaceSaleType["BuyNow"] = "BuyNow";
 })(MarketplaceSaleType || (MarketplaceSaleType = {}));
+
 var PaymentStatus;
+
 (function (PaymentStatus) {
-    PaymentStatus["ActionRequired"] = "action_required";
-    PaymentStatus["Confirmed"] = "confirmed";
-    PaymentStatus["Failed"] = "failed";
-    PaymentStatus["Paid"] = "paid";
-    PaymentStatus["Pending"] = "pending";
+  PaymentStatus["ActionRequired"] = "action_required";
+  PaymentStatus["Confirmed"] = "confirmed";
+  PaymentStatus["Failed"] = "failed";
+  PaymentStatus["Paid"] = "paid";
+  PaymentStatus["Pending"] = "pending";
 })(PaymentStatus || (PaymentStatus = {}));
+
 var PaymentType;
+
 (function (PaymentType) {
-    PaymentType["Ach"] = "ACH";
-    PaymentType["CreditCard"] = "CreditCard";
-    PaymentType["Wire"] = "Wire";
+  PaymentType["Ach"] = "ACH";
+  PaymentType["CreditCard"] = "CreditCard";
+  PaymentType["Wire"] = "Wire";
 })(PaymentType || (PaymentType = {}));
+
 var Role;
+
 (function (Role) {
-    Role["Admin"] = "admin";
-    Role["User"] = "user";
+  Role["Admin"] = "admin";
+  Role["User"] = "user";
 })(Role || (Role = {}));
+
 var TransactionStatus;
+
 (function (TransactionStatus) {
-    TransactionStatus["Completed"] = "Completed";
-    TransactionStatus["Failed"] = "Failed";
-    TransactionStatus["Pending"] = "Pending";
+  TransactionStatus["Completed"] = "Completed";
+  TransactionStatus["Failed"] = "Failed";
+  TransactionStatus["Pending"] = "Pending";
 })(TransactionStatus || (TransactionStatus = {}));
+
 var TransactionType;
+
 (function (TransactionType) {
-    TransactionType["DeployMultisig"] = "DeployMultisig";
-    TransactionType["TransferToken"] = "TransferToken";
+  TransactionType["DeployMultisig"] = "DeployMultisig";
+  TransactionType["TransferToken"] = "TransferToken";
 })(TransactionType || (TransactionType = {}));
+
 var WalletParentType;
+
 (function (WalletParentType) {
-    WalletParentType["Organization"] = "organization";
-    WalletParentType["User"] = "user";
+  WalletParentType["Organization"] = "organization";
+  WalletParentType["User"] = "user";
 })(WalletParentType || (WalletParentType = {}));
+
 var WalletTxType;
+
 (function (WalletTxType) {
-    WalletTxType["MojitoHotWallet"] = "MojitoHotWallet";
-    WalletTxType["Multisig"] = "Multisig";
+  WalletTxType["MojitoHotWallet"] = "MojitoHotWallet";
+  WalletTxType["Multisig"] = "Multisig";
 })(WalletTxType || (WalletTxType = {}));
+
 var MeDocument = gql(templateObject_1 || (templateObject_1 = __makeTemplateObject(["\n    query Me {\n  me {\n    id\n    user {\n      id\n      username\n      name\n      email\n    }\n    userOrgs {\n      organization {\n        id\n        name\n      }\n    }\n  }\n}\n    "], ["\n    query Me {\n  me {\n    id\n    user {\n      id\n      username\n      name\n      email\n    }\n    userOrgs {\n      organization {\n        id\n        name\n      }\n    }\n  }\n}\n    "])));
 /**
  * __useMeQuery__
@@ -108,9 +138,11 @@ var MeDocument = gql(templateObject_1 || (templateObject_1 = __makeTemplateObjec
  *   },
  * });
  */
+
 function useMeQuery(baseOptions) {
-    var options = __assign(__assign({}, defaultOptions), baseOptions);
-    return Apollo.useQuery(MeDocument, options);
+  var options = __assign(__assign({}, defaultOptions), baseOptions);
+
+  return Apollo.useQuery(MeDocument, options);
 }
 var CreatePaymentDocument = gql(templateObject_2 || (templateObject_2 = __makeTemplateObject(["\n    mutation CreatePayment($paymentMethodID: UUID1!, $invoiceID: UUID1!) {\n  createPayment(paymentMethodID: $paymentMethodID, invoiceID: $invoiceID) {\n    id\n    invoiceID\n    circlePaymentID\n    status\n    userID\n  }\n}\n    "], ["\n    mutation CreatePayment($paymentMethodID: UUID1!, $invoiceID: UUID1!) {\n  createPayment(paymentMethodID: $paymentMethodID, invoiceID: $invoiceID) {\n    id\n    invoiceID\n    circlePaymentID\n    status\n    userID\n  }\n}\n    "])));
 /**
@@ -131,9 +163,11 @@ var CreatePaymentDocument = gql(templateObject_2 || (templateObject_2 = __makeTe
  *   },
  * });
  */
+
 function useCreatePaymentMutation(baseOptions) {
-    var options = __assign(__assign({}, defaultOptions), baseOptions);
-    return Apollo.useMutation(CreatePaymentDocument, options);
+  var options = __assign(__assign({}, defaultOptions), baseOptions);
+
+  return Apollo.useMutation(CreatePaymentDocument, options);
 }
 var CreateAuctionInvoiceDocument = gql(templateObject_3 || (templateObject_3 = __makeTemplateObject(["\n    mutation CreateAuctionInvoice($orgID: UUID1!, $lotID: UUID1!) {\n  createAuctionLotInvoice(orgID: $orgID, lotID: $lotID) {\n    invoiceID\n    status\n    items {\n      units\n      unitPrice\n      taxes\n      totalPrice\n    }\n  }\n}\n    "], ["\n    mutation CreateAuctionInvoice($orgID: UUID1!, $lotID: UUID1!) {\n  createAuctionLotInvoice(orgID: $orgID, lotID: $lotID) {\n    invoiceID\n    status\n    items {\n      units\n      unitPrice\n      taxes\n      totalPrice\n    }\n  }\n}\n    "])));
 /**
@@ -154,9 +188,11 @@ var CreateAuctionInvoiceDocument = gql(templateObject_3 || (templateObject_3 = _
  *   },
  * });
  */
+
 function useCreateAuctionInvoiceMutation(baseOptions) {
-    var options = __assign(__assign({}, defaultOptions), baseOptions);
-    return Apollo.useMutation(CreateAuctionInvoiceDocument, options);
+  var options = __assign(__assign({}, defaultOptions), baseOptions);
+
+  return Apollo.useMutation(CreateAuctionInvoiceDocument, options);
 }
 var CreateBuyNowInvoiceDocument = gql(templateObject_4 || (templateObject_4 = __makeTemplateObject(["\n    mutation CreateBuyNowInvoice($input: PurchaseMarketplaceBuyNowLotInput!) {\n  purchaseMarketplaceBuyNowLot(input: $input) {\n    invoice {\n      invoiceID\n      status\n      items {\n        units\n        unitPrice\n        taxes\n        totalPrice\n      }\n    }\n  }\n}\n    "], ["\n    mutation CreateBuyNowInvoice($input: PurchaseMarketplaceBuyNowLotInput!) {\n  purchaseMarketplaceBuyNowLot(input: $input) {\n    invoice {\n      invoiceID\n      status\n      items {\n        units\n        unitPrice\n        taxes\n        totalPrice\n      }\n    }\n  }\n}\n    "])));
 /**
@@ -176,14 +212,17 @@ var CreateBuyNowInvoiceDocument = gql(templateObject_4 || (templateObject_4 = __
  *   },
  * });
  */
+
 function useCreateBuyNowInvoiceMutation(baseOptions) {
-    var options = __assign(__assign({}, defaultOptions), baseOptions);
-    return Apollo.useMutation(CreateBuyNowInvoiceDocument, options);
+  var options = __assign(__assign({}, defaultOptions), baseOptions);
+
+  return Apollo.useMutation(CreateBuyNowInvoiceDocument, options);
 }
 var PaymentKeyDocument = gql(templateObject_5 || (templateObject_5 = __makeTemplateObject(["\n    query PaymentKey {\n  getPaymentPublicKey {\n    keyID\n    publicKey\n  }\n}\n    "], ["\n    query PaymentKey {\n  getPaymentPublicKey {\n    keyID\n    publicKey\n  }\n}\n    "])));
 function usePaymentKeyLazyQuery(baseOptions) {
-    var options = __assign(__assign({}, defaultOptions), baseOptions);
-    return Apollo.useLazyQuery(PaymentKeyDocument, options);
+  var options = __assign(__assign({}, defaultOptions), baseOptions);
+
+  return Apollo.useLazyQuery(PaymentKeyDocument, options);
 }
 var GetPaymentMethodListDocument = gql(templateObject_6 || (templateObject_6 = __makeTemplateObject(["\n    query GetPaymentMethodList($orgID: UUID1!) {\n  getPaymentMethodList(orgID: $orgID) {\n    ... on ACHPaymentMethodOutput {\n      id\n      type\n      status\n      accountNumber\n      metadata {\n        email\n        phoneNumber\n      }\n      billingDetails {\n        name\n        city\n        country\n        address1\n        address2\n        district\n        postalCode\n      }\n      bankAddress {\n        bankName\n      }\n    }\n    ... on CreditCardPaymentMethodOutput {\n      id\n      type\n      status\n      network\n      last4Digit\n      metadata {\n        email\n        phoneNumber\n      }\n      billingDetails {\n        name\n        city\n        country\n        address1\n        address2\n        district\n        postalCode\n      }\n    }\n  }\n}\n    "], ["\n    query GetPaymentMethodList($orgID: UUID1!) {\n  getPaymentMethodList(orgID: $orgID) {\n    ... on ACHPaymentMethodOutput {\n      id\n      type\n      status\n      accountNumber\n      metadata {\n        email\n        phoneNumber\n      }\n      billingDetails {\n        name\n        city\n        country\n        address1\n        address2\n        district\n        postalCode\n      }\n      bankAddress {\n        bankName\n      }\n    }\n    ... on CreditCardPaymentMethodOutput {\n      id\n      type\n      status\n      network\n      last4Digit\n      metadata {\n        email\n        phoneNumber\n      }\n      billingDetails {\n        name\n        city\n        country\n        address1\n        address2\n        district\n        postalCode\n      }\n    }\n  }\n}\n    "])));
 /**
@@ -202,9 +241,11 @@ var GetPaymentMethodListDocument = gql(templateObject_6 || (templateObject_6 = _
  *   },
  * });
  */
+
 function useGetPaymentMethodListQuery(baseOptions) {
-    var options = __assign(__assign({}, defaultOptions), baseOptions);
-    return Apollo.useQuery(GetPaymentMethodListDocument, options);
+  var options = __assign(__assign({}, defaultOptions), baseOptions);
+
+  return Apollo.useQuery(GetPaymentMethodListDocument, options);
 }
 var CreatePaymentMethodDocument = gql(templateObject_7 || (templateObject_7 = __makeTemplateObject(["\n    mutation CreatePaymentMethod($orgID: UUID1!, $input: PaymentMethodCreateInput!) {\n  createPaymentMethod(orgID: $orgID, input: $input) {\n    ... on ACHPaymentMethodOutput {\n      id\n    }\n    ... on CreditCardPaymentMethodOutput {\n      id\n    }\n    ... on WirePaymentMethodOutput {\n      id\n    }\n  }\n}\n    "], ["\n    mutation CreatePaymentMethod($orgID: UUID1!, $input: PaymentMethodCreateInput!) {\n  createPaymentMethod(orgID: $orgID, input: $input) {\n    ... on ACHPaymentMethodOutput {\n      id\n    }\n    ... on CreditCardPaymentMethodOutput {\n      id\n    }\n    ... on WirePaymentMethodOutput {\n      id\n    }\n  }\n}\n    "])));
 /**
@@ -225,9 +266,11 @@ var CreatePaymentMethodDocument = gql(templateObject_7 || (templateObject_7 = __
  *   },
  * });
  */
+
 function useCreatePaymentMethodMutation(baseOptions) {
-    var options = __assign(__assign({}, defaultOptions), baseOptions);
-    return Apollo.useMutation(CreatePaymentMethodDocument, options);
+  var options = __assign(__assign({}, defaultOptions), baseOptions);
+
+  return Apollo.useMutation(CreatePaymentMethodDocument, options);
 }
 var DeletePaymentMethodDocument = gql(templateObject_8 || (templateObject_8 = __makeTemplateObject(["\n    mutation DeletePaymentMethod($paymentMethodID: UUID1!, $orgID: UUID1!) {\n  deletePaymentMethod(paymentMethodID: $paymentMethodID, orgID: $orgID)\n}\n    "], ["\n    mutation DeletePaymentMethod($paymentMethodID: UUID1!, $orgID: UUID1!) {\n  deletePaymentMethod(paymentMethodID: $paymentMethodID, orgID: $orgID)\n}\n    "])));
 /**
@@ -248,9 +291,11 @@ var DeletePaymentMethodDocument = gql(templateObject_8 || (templateObject_8 = __
  *   },
  * });
  */
+
 function useDeletePaymentMethodMutation(baseOptions) {
-    var options = __assign(__assign({}, defaultOptions), baseOptions);
-    return Apollo.useMutation(DeletePaymentMethodDocument, options);
+  var options = __assign(__assign({}, defaultOptions), baseOptions);
+
+  return Apollo.useMutation(DeletePaymentMethodDocument, options);
 }
 var PreparePaymentMethodDocument = gql(templateObject_9 || (templateObject_9 = __makeTemplateObject(["\n    query PreparePaymentMethod {\n  preparePaymentMethod(paymentMethodType: ACH) {\n    ... on ACHPaymentMethodPrepareStatementOutput {\n      linkToken\n    }\n  }\n}\n    "], ["\n    query PreparePaymentMethod {\n  preparePaymentMethod(paymentMethodType: ACH) {\n    ... on ACHPaymentMethodPrepareStatementOutput {\n      linkToken\n    }\n  }\n}\n    "])));
 /**
@@ -268,9 +313,11 @@ var PreparePaymentMethodDocument = gql(templateObject_9 || (templateObject_9 = _
  *   },
  * });
  */
+
 function usePreparePaymentMethodQuery(baseOptions) {
-    var options = __assign(__assign({}, defaultOptions), baseOptions);
-    return Apollo.useQuery(PreparePaymentMethodDocument, options);
+  var options = __assign(__assign({}, defaultOptions), baseOptions);
+
+  return Apollo.useQuery(PreparePaymentMethodDocument, options);
 }
 var templateObject_1, templateObject_2, templateObject_3, templateObject_4, templateObject_5, templateObject_6, templateObject_7, templateObject_8, templateObject_9;
 

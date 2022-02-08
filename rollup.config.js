@@ -3,11 +3,12 @@ import commonjs from '@rollup/plugin-commonjs';
 import dts from 'rollup-plugin-dts'
 import resolve from "@rollup/plugin-node-resolve";
 import typescript from 'rollup-plugin-typescript2'
+import { babel } from '@rollup/plugin-babel';
 
 import pkg from "./package.json";
 
 // Extensions handled by babel:
-// const EXTENSIONS = [".ts", ".tsx"];
+const EXTENSIONS = [".ts", ".tsx"];
 
 // Exclude dev dependencies:
 const EXTERNAL = [
@@ -15,6 +16,7 @@ const EXTERNAL = [
   ...Object.keys(pkg.dependencies),
   ...Object.keys(pkg.peerDependencies),
   "react/jsx-runtime",
+  /@babel\/runtime/,
 
   // "@emotion/react",
   // "@emotion/styled",
@@ -73,14 +75,14 @@ export default [{
           tsconfig: "rollup.tsconfig.json",
         }),
 
-        // babel({
-        //   configFile: "./rollup.babel.json",
-        //   extensions: EXTENSIONS,  // Compile our TypeScript files
-        //   // babelHelpers: "inline",  // Place babel helper functions in the same file they were used
-        //   babelHelpers: "runtime",  // Place babel helper functions in the same file they were used
-        //   include: EXTENSIONS.map(ext => `src/**/*${ext}`),
-        //   exclude: 'node_modules/**',
-        // }),
+        babel({
+          configFile: "./rollup.babel.json",
+          extensions: EXTENSIONS,  // Compile our TypeScript files
+          // babelHelpers: "inline",  // Place babel helper functions in the same file they were used
+          babelHelpers: "runtime",  // Place babel helper functions in the same file they were used
+          include: EXTENSIONS.map(ext => `src/**/*${ext}`),
+          exclude: 'node_modules/**',
+        }),
 
         // terser(),
     ],
