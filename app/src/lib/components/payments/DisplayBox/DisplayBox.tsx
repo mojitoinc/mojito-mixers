@@ -24,3 +24,12 @@ export const DisplayBox: React.FC<BoxProps> = ({
     <Box { ...props } sx={{ ...DISPLAY_BOX_PROPS, ...sx }} />
   );
 }
+
+export const DebugBox: React.FC<BoxProps> = ({
+  sx,
+  ...props
+}) => {
+  return (
+    <DisplayBox { ...props } component="pre" sx={{ ...sx, overflow: "scroll" }} />
+  );
+}

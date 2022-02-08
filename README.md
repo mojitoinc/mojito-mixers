@@ -207,6 +207,7 @@ const App: React.FC<AppProps> = () => {
     isAuthenticatedLoading: isLoading,
 
     // Other Events:
+    debug: true,
     onError: handleError,
     onMarketingOptInChange: handleMarketingOptInChange,
   };

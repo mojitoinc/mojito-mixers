@@ -191,6 +191,7 @@ const HomePage = () => {
     isAuthenticatedLoading,
 
     // Other Events:
+    debug: true,
     onError: handleError,
     onMarketingOptInChange: handleMarketingOptInChange,
   };

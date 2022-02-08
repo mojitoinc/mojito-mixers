@@ -33,6 +33,7 @@ export interface PurchasingViewProps {
   onPurchaseError: (error: string) => void;
   onNext: () => void;
   onDialogBlocked: (blocked: boolean) => void;
+  debug?: boolean;
 }
 
 export const PurchasingView: React.FC<PurchasingViewProps> = ({
@@ -48,6 +49,7 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
   onPurchaseError,
   onNext,
   onDialogBlocked,
+  debug,
 }) => {
   let purchasingMessages = customPurchasingMessages;
 
@@ -68,6 +70,7 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
     lotType,
     savedPaymentMethods,
     selectedPaymentMethod,
+    debug,
   });
 
   useEffect(() => {

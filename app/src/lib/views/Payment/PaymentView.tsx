@@ -30,6 +30,7 @@ export interface PaymentViewProps {
   consentType: ConsentType;
   privacyHref: string;
   termsOfUseHref: string;
+  debug?: boolean;
 }
 
 export const PaymentView: React.FC<PaymentViewProps> = ({
@@ -45,6 +46,7 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
   consentType,
   privacyHref,
   termsOfUseHref,
+  debug,
 }) => {
   const {
     billingInfo: selectedBillingInfo,
@@ -145,7 +147,8 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
         onSubmit={ handleSubmit }
         consentType={ consentType }
         privacyHref={ privacyHref }
-        termsOfUseHref={ termsOfUseHref } />
+        termsOfUseHref={ termsOfUseHref }
+        debug={ debug } />
     ) }
   </>);
 };
