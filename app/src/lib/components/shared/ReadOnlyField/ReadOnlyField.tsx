@@ -1,5 +1,5 @@
 import { TextFieldProps, styled } from "@mui/material";
-import { CardNumberField } from "../CardNumberField";
+import { CardNumberField } from "../CardNumberField/CardNumberField";
 import { TextField } from "../TextField/TextField";
 import React from "react";
 

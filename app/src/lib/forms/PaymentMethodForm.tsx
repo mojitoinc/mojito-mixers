@@ -8,9 +8,9 @@ import BookIcon from "@mui/icons-material/Book";
 import React, { useCallback, useMemo } from "react";
 import { CheckoutModalFooter} from "../components/payments/CheckoutModalFooter/CheckoutModalFooter";
 import { ControlledTextField } from "../components/shared/TextField/TextField";
-import { ControlledCardNumberField } from "../components/shared/CardNumberField";
-import { ControlledCardExpiryDateField } from "../components/shared/CardExpiryDateField";
-import { ControlledCardSecureCodeField } from "../components/shared/CardSecureCodeField";
+import { ControlledCardNumberField } from "../components/shared/CardNumberField/CardNumberField";
+import { ControlledCardExpiryDateField } from "../components/shared/CardExpiryDateField/CardExpiryDateField";
+import { ControlledCardSecureCodeField } from "../components/shared/CardSecureCodeField/CardSecureCodeField";
 import { InputGroupLabel } from "../components/shared/InputGroupLabel/InputGroupLabel";
 import { SecondaryButton } from "../components/shared/SecondaryButton/SecondaryButton";
 import { PaymentMethodSelector } from "../components/shared/PaymentMethodSelector/PaymentMethodSelector";
@@ -29,7 +29,7 @@ import {
 } from "../domain/payment/payment.utils";
 import { Typography } from "@mui/material";
 import { DebugBox, DisplayBox } from "../components/payments/DisplayBox/DisplayBox";
-import { ControlledCheckbox } from "../components/shared/Checkbox";
+import { ControlledCheckbox } from "../components/shared/Checkbox/Checkbox";
 import { ConsentText, ConsentType, CONSENT_ERROR_MESSAGE } from "../components/shared/ConsentText/ConsentText";
 
 interface PaymentTypeFormProps {

@@ -1,7 +1,7 @@
 import { Theme, createTheme } from "@mui/material/styles";
-import { createTypographyTheme } from "./mojito/typography";
-import { createPaletteTheme } from "./mojito/palette";
-import { createComponentsTheme } from "./mojito/components";
+import { createTypographyTheme } from "./themeTypography";
+import { createPaletteTheme } from "./themePalette";
+import { createComponentsTheme } from "./themeComponents";
 
 const mojitoLightTheme: Theme = createTheme({
   typography: createTypographyTheme(),
