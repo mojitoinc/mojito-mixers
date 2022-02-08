@@ -1,6 +1,6 @@
 import { Box, Typography } from "@mui/material";
 import React from "react";
-import { Number } from "../../../shared/Number";
+import { Number } from "../../../shared/Number/Number";
 
 export interface CheckoutItemCostTotalProps {
   price: number;

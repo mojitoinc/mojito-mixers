@@ -1,6 +1,6 @@
 import { Box, Typography, Grid, Avatar, Divider } from "@mui/material";
 import React from "react";
-import { Number } from "../../../shared/Number";
+import { Number } from "../../../shared/Number/Number";
 import { CheckoutItemCostTotal } from "../Total/CheckoutItemCostTotal";
 import { CheckoutItem } from "../../../../domain/product/product.interfaces";
 
