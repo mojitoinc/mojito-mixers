@@ -19,10 +19,12 @@ export const ConsentText: React.FC<ConsentTextProps> = ({
     termsOfUseHref ? <Link color="text.primary" href={ termsOfUseHref } target="_blank">Terms of Use</Link> : null,
   ].filter(Boolean);
 
+  const lastLinkElementsIndex = linkElements.length - 1;
+
   return (<>
     have read, understood, and consent to the{" "}
     { linkElements.map((linkElement, i) => {
-      return <Fragment key={ i }>{ i === linkElements.length - 1 ? "and " : "" }{ linkElement }{ " " }</Fragment>
+      return <Fragment key={ i }>{ i > 0 && i === lastLinkElementsIndex ? "and " : "" }{ linkElement }{ " " }</Fragment>
     }) }
     of the sale.
   </>);
