@@ -11,7 +11,7 @@ import { BillingInfoItem } from "../../components/payments/BillingInfo/Item/Bill
 import { SavedPaymentMethod } from "../../domain/circle/circle.interfaces";
 import { billingInfoToSavedPaymentMethodBillingInfo } from "../../domain/circle/circle.utils";
 import { SelectedPaymentMethod } from "../../components/payments/CheckoutModal/CheckoutModal";
-import { BoxProps, Divider } from "@mui/material";
+import { BoxProps, Divider, Stack } from "@mui/material";
 import { usePlaid } from "../../hooks/usePlaid";
 import { ConsentType } from "../../components/shared/ConsentText/ConsentText";
 
@@ -111,41 +111,51 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
   // TODO: Handle errors properly:
   if (!selectedPaymentMethodBillingInfo) return null;
 
-  return (<>
-    <CheckoutItemCostBreakdown checkoutItem={ checkoutItem } />
+  return (
+    <Stack
+      direction={{
+        xs: "column",
+        sm: "column",
+        md: "row",
+      }}
+      spacing={8.75}
+    >
+      <Stack sx={{ display: 'flex', flex: 1 }}>
+        <CheckoutStepper progress={ 100 } />
 
-    <CheckoutStepper progress={ 100 } />
+        <BillingInfoItem
+          data={ selectedPaymentMethodBillingInfo }
+          additionalProps={{ onEdit: onPrev, disabled: isDeleting, boxProps: billingInfoItemBoxProps }} />
 
-    <BillingInfoItem
-      data={ selectedPaymentMethodBillingInfo }
-      additionalProps={{ onEdit: onPrev, disabled: isDeleting, boxProps: billingInfoItemBoxProps }} />
+        <Divider sx={{ mt: 2.5 }} />
 
-    <Divider sx={{ mt: 2.5 }} />
-
-    { showSaved ? (
-      <SavedPaymentDetailsSelector
-        showLoader={ isDeleting }
-        savedPaymentMethods={ savedPaymentMethods }
-        selectedPaymentMethodId={ typeof selectedPaymentInfo === "string" ? selectedPaymentInfo : undefined}
-        onNew={ handleShowForm }
-        onDelete={ handleSavedPaymentMethodDeleted }
-        onPick={ onPaymentInfoSelected }
-        onNext={ onNext }
-        onClose={ onClose }
-        consentType={ consentType }
-        privacyHref={ privacyHref }
-        termsOfUseHref={ termsOfUseHref } />
-    ) : (
-      <PaymentMethodForm
-        acceptedPaymentTypes={acceptedPaymentTypes}
-        defaultValues={ typeof selectedPaymentInfo === "string" ? undefined : selectedPaymentInfo }
-        onPlaidLinkClicked={ onPlaidLinkClicked }
-        onSaved={ savedPaymentMethods.length > 0 ? handleShowSaved : undefined }
-        onClose={ onClose }
-        onSubmit={ handleSubmit }
-        consentType={ consentType }
-        privacyHref={ privacyHref }
-        termsOfUseHref={ termsOfUseHref } />
-    ) }
-  </>);
+        { showSaved ? (
+          <SavedPaymentDetailsSelector
+            showLoader={ isDeleting }
+            savedPaymentMethods={ savedPaymentMethods }
+            selectedPaymentMethodId={ typeof selectedPaymentInfo === "string" ? selectedPaymentInfo : undefined}
+            onNew={ handleShowForm }
+            onDelete={ handleSavedPaymentMethodDeleted }
+            onPick={ onPaymentInfoSelected }
+            onNext={ onNext }
+            onClose={ onClose }
+            consentType={ consentType }
+            privacyHref={ privacyHref }
+            termsOfUseHref={ termsOfUseHref } />
+        ) : (
+          <PaymentMethodForm
+            acceptedPaymentTypes={acceptedPaymentTypes}
+            defaultValues={ typeof selectedPaymentInfo === "string" ? undefined : selectedPaymentInfo }
+            onPlaidLinkClicked={ onPlaidLinkClicked }
+            onSaved={ savedPaymentMethods.length > 0 ? handleShowSaved : undefined }
+            onClose={ onClose }
+            onSubmit={ handleSubmit }
+            consentType={ consentType }
+            privacyHref={ privacyHref }
+            termsOfUseHref={ termsOfUseHref } />
+        ) }
+      </Stack>
+      <CheckoutItemCostBreakdown checkoutItem={ checkoutItem } />
+    </Stack>
+  );
 };

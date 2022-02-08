@@ -1,4 +1,4 @@
-import { Box, Typography, Grid, Avatar, Divider } from "@mui/material";
+import { Box, Typography, Grid, Avatar, Divider, Stack } from "@mui/material";
 import React from "react";
 import { Number } from "../../../shared/Number";
 import { CheckoutItemCostTotal } from "../Total/CheckoutItemCostTotal";
@@ -17,53 +17,54 @@ export const CheckoutItemCostBreakdown: React.FC<CheckoutItemCostBreakdownProps>
     imageBackground,
   },
 }) => {
-  return (<>
-    <Grid
-      container
-      item
-      direction={{
-        xs: "column",
-        sm: "row"
-      }}
-      sx={{
-        display: "flex",
-        py: 5
-      }}>
+  return (
+    <Stack sx={{ display: 'flex', flex: 1 }}>
+      <Grid
+        container
+        item
+        direction="column"
+        sx={{
+          display: "flex",
+          py: 5
+        }}>
 
-      <Box sx={{ flex: 1, display: "flex" }}>
+        <Box sx={{ flex: 1, display: "flex" }}>
 
-        <Avatar
-          alt={ name }
-          src={ imageSrc }
-          variant="square"
-          sx={{
-            background: theme => imageBackground || theme.palette.grey["300"],
-            width: 80,
-            height: 80,
-            flex: "0 0 auto",
-          }} />
+          <Avatar
+            alt={ name }
+            src={ imageSrc }
+            variant="square"
+            sx={{
+              background: theme => imageBackground || theme.palette.grey["300"],
+              width: 80,
+              height: 80,
+              flex: "0 0 auto",
+            }} />
 
-        <Box sx={{ marginLeft: 2, marginTop: 0.5 }}>
-          <Typography sx={{ fontWeight: "500" }}>{name}</Typography>
+          <Box sx={{ marginLeft: 2, marginTop: 0.5 }}>
+            <Typography sx={{ fontWeight: "500" }}>{name}</Typography>
 
-          <Typography sx={{ marginTop: 2 }}>
-            <Number prefix="$" suffix=" USD">
-              {price}
-            </Number>
-          </Typography>
+            <Typography sx={{ marginTop: 2 }}>
+              <Number prefix="$" suffix=" USD">
+                {price}
+              </Number>
+            </Typography>
 
-          <Typography sx={{ marginTop: 0.5 }}>
-            <Number prefix="$" suffix=" Fee">
-              {fee}
-            </Number>
-          </Typography>
+            <Typography sx={{ marginTop: 0.5 }}>
+              <Number prefix="$" suffix=" Fee">
+                {fee}
+              </Number>
+            </Typography>
+          </Box>
         </Box>
-      </Box>
 
-      <CheckoutItemCostTotal price={ price } fee={ fee } />
+        <Divider sx={{ my: 3 }} />
 
-    </Grid>
+        <CheckoutItemCostTotal price={ price } fee={ fee } />
 
-    <Divider />
-  </>);
+      </Grid>
+
+      <Divider />
+    </Stack>
+  );
 };

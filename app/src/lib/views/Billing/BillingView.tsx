@@ -1,4 +1,6 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Stack } from "@mui/material";
+
 import { CheckoutItemCostBreakdown } from "../../components/payments/CheckoutItemCost/Breakdown/CheckoutItemCostBreakdown";
 import { CheckoutStepper } from "../../components/payments/CheckoutStepper/CheckoutStepper";
 import { SavedBillingDetailsSelector } from "../../components/shared/SavedBillingDetailsSelector/SavedBillingDetailsSelector";
@@ -7,7 +9,6 @@ import { getSavedPaymentMethodAddressIdFromBillingInfo, savedPaymentMethodToBill
 import { CheckoutItem } from "../../domain/product/product.interfaces";
 import { BillingInfo, BillingInfoForm } from "../../forms/BillingInfoForm";
 import { distinctBy } from "../../utils/arrayUtils";
-import React from "react";
 
 export interface BillingViewProps {
   checkoutItem: CheckoutItem;
@@ -82,29 +83,39 @@ export const BillingView: React.FC<BillingViewProps> = ({
     }
   }, [showSaved, savedPaymentMethods, selectedBillingInfo, onBillingInfoSelected]);
 
-  return (<>
-    <CheckoutItemCostBreakdown checkoutItem={ checkoutItem } />
+  return (
+    <Stack
+      direction={{
+        xs: "column",
+        sm: "column",
+        md: "row",
+      }}
+      spacing={8.75}
+    >
+      <Stack sx={{ display: 'flex', flex: 1 }}>
+        <CheckoutStepper progress={ 50 } />
 
-    <CheckoutStepper progress={ 50 } />
-
-    { showSaved ? (
-      <SavedBillingDetailsSelector
-        showLoader={ isDeleting }
-        savedPaymentMethods={ savedPaymentMethods }
-        selectedPaymentMethodAddressId={ typeof selectedBillingInfo === "string" ? selectedBillingInfo : undefined }
-        onNew={ handleShowForm }
-        onEdit={ handleShowForm }
-        onDelete={ handleSavedPaymentMethodDeleted }
-        onPick={ onBillingInfoSelected }
-        onNext={ onNext }
-        onClose={ onClose } />
-    ) : (
-      <BillingInfoForm
-        // variant="loggedIn"
-        defaultValues={ typeof selectedBillingInfo === "string" ? undefined : selectedBillingInfo }
-        onSaved={ savedPaymentMethods.length > 0 ? handleShowSaved : undefined }
-        onClose={ onClose }
-        onSubmit={ handleSubmit } />
-    ) }
-  </>);
+          { showSaved ? (
+            <SavedBillingDetailsSelector
+              showLoader={ isDeleting }
+              savedPaymentMethods={ savedPaymentMethods }
+              selectedPaymentMethodAddressId={ typeof selectedBillingInfo === "string" ? selectedBillingInfo : undefined }
+              onNew={ handleShowForm }
+              onEdit={ handleShowForm }
+              onDelete={ handleSavedPaymentMethodDeleted }
+              onPick={ onBillingInfoSelected }
+              onNext={ onNext }
+              onClose={ onClose } />
+          ) : (
+            <BillingInfoForm
+              // variant="loggedIn"
+              defaultValues={ typeof selectedBillingInfo === "string" ? undefined : selectedBillingInfo }
+              onSaved={ savedPaymentMethods.length > 0 ? handleShowSaved : undefined }
+              onClose={ onClose }
+              onSubmit={ handleSubmit } />
+          ) }
+      </Stack>
+      <CheckoutItemCostBreakdown checkoutItem={ checkoutItem } />
+    </Stack>
+  );
 };
