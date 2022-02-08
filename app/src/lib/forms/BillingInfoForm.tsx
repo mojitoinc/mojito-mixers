@@ -120,6 +120,7 @@ export const BillingInfoForm: React.FC<BillingInfoFormProps> = ({
       ...EMPTY_FORM_VALUES,
       ...defaultValues
     },
+    reValidateMode: "onChange",
     resolver: yupResolver(schema)
   });
 
@@ -231,11 +232,7 @@ export const BillingInfoForm: React.FC<BillingInfoFormProps> = ({
 
       <CheckoutModalFooter
         variant="toPayment"
-        privacyHref=""
-        termsOfUseHref=""
-        onSubmitClicked={submitForm}
-        onCloseClicked={onClose}
-      />
+        onCloseClicked={onClose} />
     </form>
   );
 };

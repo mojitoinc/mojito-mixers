@@ -1,13 +1,10 @@
-import { SvgIcon } from "@mui/material";
+import { FormControl, FormHelperText, SvgIcon } from "@mui/material";
 import MuiCheckbox, {
   CheckboxProps as MuiCheckboxProps
 } from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import React from "react";
-
-type CheckboxProps = MuiCheckboxProps & {
-  label: string;
-};
+import { Controller } from "react-hook-form";
 
 const CheckboxIconUnchecked = () => (
   <SvgIcon>
@@ -49,24 +46,62 @@ const CheckboxIconChecked = () => (
   </SvgIcon>
 );
 
+export interface CheckboxProps extends MuiCheckboxProps {
+  label: string | number | React.ReactElement;
+  error?: boolean;
+  helperText?: React.ReactNode;
+}
+
 export const Checkbox: React.FC<CheckboxProps> = ({
   label,
   checked,
   onChange,
+  sx,
+  error,
+  helperText,
   ...props
 }) => (
-  <FormControlLabel
-    label={label}
-    control={
-      <MuiCheckbox
-        sx={{ paddingLeft: 1.5, paddingRight: 0.5, paddingTop: 1.5 }}
-        checked={checked}
-        onChange={onChange}
-        icon={<CheckboxIconUnchecked />}
-        checkedIcon={<CheckboxIconChecked />}
-        disableRipple
-        {...props}
-      />
-    }
+  <FormControl sx={ sx } error={ error }>
+    <FormControlLabel
+      label={ label }
+      control={
+        <MuiCheckbox
+          sx={{ paddingLeft: 1.5, paddingRight: 0.5, paddingTop: 1.5 }}
+          checked={checked}
+          onChange={onChange}
+          icon={ <CheckboxIconUnchecked /> }
+          checkedIcon={ <CheckboxIconChecked /> }
+          disableRipple
+          { ...props } />
+      } />
+    { helperText && <FormHelperText>{ helperText }</FormHelperText> }
+  </FormControl>
+);
+
+export const ControlledCheckbox = ({
+  name,
+  control,
+  label,
+}) => (
+  <Controller<{ value: boolean }, "value">
+    name={name}
+    control={control}
+    render={({ field: { name, onChange, ref, value, ...field }, fieldState }) => {
+      const error = fieldState?.error;
+
+      return (
+        <Checkbox
+          id={name}
+          name={name}
+          label={label}
+          checked={value}
+          onChange={onChange}
+          inputRef={ref}
+          error={!!error}
+          helperText={error?.message}
+          {...field}
+        />
+      );
+    }}
   />
 );

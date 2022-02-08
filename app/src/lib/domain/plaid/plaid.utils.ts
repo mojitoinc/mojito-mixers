@@ -82,7 +82,7 @@ export function getPlaidOAuthFlowState(): PlaidOAuthFlowState {
 
   const continueOAuthFlow = !!(url && linkToken && selectedBillingInfo && receivedRedirectUri);
 
-  if (continueOAuthFlow && savedStateUsed) return clearPlaidInfo();
+  if ((continueOAuthFlow && savedStateUsed) || (!continueOAuthFlow && savedPlaidInfo)) return clearPlaidInfo();
 
   return {
     // The URL of the page where we initially opened the modal:

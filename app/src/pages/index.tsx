@@ -55,7 +55,7 @@ const HomePage = () => {
   const organizations = isLoading ? [] : (meData?.me?.userOrgs || []).map(userOrg => userOrg.organization);
 
   useEffect(() => {
-    console.log(continuePlaidOAuthFlow() ? "Continue Plaid OAuth Flow" : "New flow.");
+    if (continuePlaidOAuthFlow()) console.log("💾 Continue Plaid OAuth Flow...");
   }, []);
 
   useEffect(() => {
@@ -171,7 +171,7 @@ const HomePage = () => {
     purchaseInstructions: PLAYGROUND_PURCHASE_INSTRUCTIONS,
 
     // Legal:
-    consentType: "disclaimer",
+    consentType: "checkbox",
     privacyHref: PLAYGROUND_PRIVACY_HREF,
     termsOfUseHref: PLAYGROUND_TERMS_OF_USE_HREF,
 

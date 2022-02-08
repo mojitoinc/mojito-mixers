@@ -11,8 +11,9 @@ import { BillingInfoItem } from "../../components/payments/BillingInfo/Item/Bill
 import { SavedPaymentMethod } from "../../domain/circle/circle.interfaces";
 import { billingInfoToSavedPaymentMethodBillingInfo } from "../../domain/circle/circle.utils";
 import { SelectedPaymentMethod } from "../../components/payments/CheckoutModal/CheckoutModal";
-import { BoxProps } from "@mui/material";
+import { BoxProps, Divider } from "@mui/material";
 import { usePlaid } from "../../hooks/usePlaid";
+import { ConsentType } from "../../components/shared/ConsentText/ConsentText";
 
 const billingInfoItemBoxProps: BoxProps = { sx: { mt: 2.5 } };
 
@@ -26,6 +27,7 @@ export interface PaymentViewProps {
   onPrev: () => void;
   onClose: () => void;
   acceptedPaymentTypes: PaymentType[];
+  consentType: ConsentType;
   privacyHref: string;
   termsOfUseHref: string;
 }
@@ -40,6 +42,7 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
   onPrev,
   onClose,
   acceptedPaymentTypes,
+  consentType,
   privacyHref,
   termsOfUseHref,
 }) => {
@@ -117,6 +120,8 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
       data={ selectedPaymentMethodBillingInfo }
       additionalProps={{ onEdit: onPrev, disabled: isDeleting, boxProps: billingInfoItemBoxProps }} />
 
+    <Divider sx={{ mt: 2.5 }} />
+
     { showSaved ? (
       <SavedPaymentDetailsSelector
         showLoader={ isDeleting }
@@ -127,6 +132,7 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
         onPick={ onPaymentInfoSelected }
         onNext={ onNext }
         onClose={ onClose }
+        consentType={ consentType }
         privacyHref={ privacyHref }
         termsOfUseHref={ termsOfUseHref } />
     ) : (
@@ -137,6 +143,7 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
         onSaved={ savedPaymentMethods.length > 0 ? handleShowSaved : undefined }
         onClose={ onClose }
         onSubmit={ handleSubmit }
+        consentType={ consentType }
         privacyHref={ privacyHref }
         termsOfUseHref={ termsOfUseHref } />
     ) }
