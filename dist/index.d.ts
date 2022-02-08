@@ -65,9 +65,9 @@ interface CheckoutModalProps {
     acceptedPaymentTypes: PaymentType[];
     paymentLimits?: Partial<Record<PaymentType, number>>;
     purchaseInstructions: string;
-    consentType: ConsentType;
-    privacyHref: string;
-    termsOfUseHref: string;
+    consentType?: ConsentType;
+    privacyHref?: string;
+    termsOfUseHref?: string;
     orgID: string;
     invoiceID?: string;
     checkoutItem: CheckoutItem;
