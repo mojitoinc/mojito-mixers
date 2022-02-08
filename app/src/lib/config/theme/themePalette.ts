@@ -5,8 +5,10 @@ export function createPaletteTheme(paletteOptions?: PaletteOptions): PaletteOpti
     ...paletteOptions,
 
     gradients: {
-      stepper: 'linear-gradient(to right, #ffc7c7 -3%, #98df77 47%, #41ad46 100%)',
-      action: 'linear-gradient(0deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1)), linear-gradient(272.88deg, #FFC5C5 -97.9%, #98DF77 123.11%)'
+      stepper: "linear-gradient(to right, #ffc7c7 -3%, #98df77 47%, #41ad46 100%)",
+      stepperReverse: "linear-gradient(to left, #ffc7c7 -3%, #98df77 47%, #41ad46 100%)",
+      action: "linear-gradient(to right, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1)), linear-gradient(272.88deg, #FFC5C5 -97.9%, #98DF77 123.11%)",
+      actionReverse: "linear-gradient(to left, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1)), linear-gradient(272.88deg, #FFC5C5 -97.9%, #98DF77 123.11%)",
     },
     success: {
       main: "#31A136",
@@ -14,7 +16,8 @@ export function createPaletteTheme(paletteOptions?: PaletteOptions): PaletteOpti
     },
     warning: {
       main: "#D57E00",
-      light: "#F3E9DB"
+      light: "#F3E9DB",
+      dark: "#FF5E00",
     },
     error: {
       main: "#E14343",

@@ -160,6 +160,13 @@ export function createComponentsTheme(theme: Theme): ComponentsOptions {
           borderRadius: "4px",
           boxSizing: "border-box",
           fontSize: "12px",
+
+          "&.Mui-disabled": {
+            background: theme.palette.grey["50"],
+            border: "1px solid #DDDDDD",
+            cursor: "not-allowed",
+            pointerEvents: "auto",
+          },
         },
         sizeSmall: {
           minHeight: "30px",
@@ -184,11 +191,6 @@ export function createComponentsTheme(theme: Theme): ComponentsOptions {
           border: "1px solid #64C538",
           color: "#2C2A28",
           minWidth: "200px !important",
-
-          '&:disabled': {
-            background: theme.palette.grey["50"],
-            cursor: "not-allowed",
-          },
         },
         containedSecondary: {
           background: '#DDDDDD',
@@ -214,8 +216,10 @@ export function createComponentsTheme(theme: Theme): ComponentsOptions {
           background: "white",
           letterSpacing: "normal",
           padding: theme.spacing(0, 1),
-          minHeight: theme.spacing(5.5),
+          minHeight: 42,
           minWidth: theme.spacing(5.5),
+          border: 0,
+          borderRadius: 4,
 
           [theme.breakpoints.up("sm")]: {
             padding: theme.spacing(0, 2),
@@ -240,6 +244,16 @@ export function createComponentsTheme(theme: Theme): ComponentsOptions {
           }
         },
       }
+    },
+
+    MuiToggleButtonGroup: {
+      styleOverrides: {
+        root: {
+          background: theme.palette.gradients.stepperReverse,
+          padding: 1,
+          borderRadius: 5,
+        },
+      },
     },
 
     // CHIPS:
