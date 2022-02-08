@@ -119,7 +119,7 @@ export const CheckoutModalFooter: React.FC<CheckoutModalFooterProps> = ({
         <Divider sx={{ my: 5, width: "100%" }}/>
 
         <Typography sx={{ maxWidth: "400px" }} align="center">
-          By placing an order you affirm that { consentTextElement }.
+          By placing an order you affirm that you { consentTextElement }.
         </Typography>
       </>) }
 
