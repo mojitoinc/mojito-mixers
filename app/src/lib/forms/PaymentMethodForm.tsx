@@ -28,7 +28,7 @@ import {
   getCVCIsValid
 } from "../domain/payment/payment.utils";
 import { Typography } from "@mui/material";
-import { DisplayBox } from "../components/payments/DisplayBox/DisplayBox";
+import { DebugBox, DisplayBox } from "../components/payments/DisplayBox/DisplayBox";
 import { ControlledCheckbox } from "../components/shared/Checkbox";
 import { ConsentText, ConsentType, CONSENT_ERROR_MESSAGE } from "../components/shared/ConsentText/ConsentText";
 
@@ -260,7 +260,7 @@ export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
       ...parentDefaultValues,
     },
     reValidateMode: "onChange",
-    resolver: yupResolver(schema)
+    resolver: yupResolver(schema),
   });
 
   const handleSelectedPaymentMethodChange = useCallback((paymentType: PaymentType) => {
@@ -318,9 +318,9 @@ export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
         termsOfUseHref={ termsOfUseHref } />
 
       {debug && (
-        <Box component="pre" sx={{ my: 2, overflow: "scroll" }}>
+        <DebugBox sx={{ my: 2 }}>
           {JSON.stringify(watch(), null, 2)}
-        </Box>
+        </DebugBox>
       )}
 
       <CheckoutModalFooter

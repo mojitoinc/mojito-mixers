@@ -14,6 +14,7 @@ import { Box } from "@mui/material";
 import BookIcon from "@mui/icons-material/Book";
 import { EMPTY_OPTION, SelectOption } from "../components/shared/Select/Select";
 import { withRequiredErrorMessage } from "../utils/validationUtils";
+import { DebugBox } from "../components/payments/DisplayBox/DisplayBox";
 
 const FULL_NAME_FIELD = "fullName";
 const EMAIL_FIELD = "email";
@@ -121,7 +122,7 @@ export const BillingInfoForm: React.FC<BillingInfoFormProps> = ({
       ...defaultValues
     },
     reValidateMode: "onChange",
-    resolver: yupResolver(schema)
+    resolver: yupResolver(schema),
   });
 
   const selectedCountryOption: SelectOption = watch(COUNTRY_FIELD);
@@ -223,9 +224,9 @@ export const BillingInfoForm: React.FC<BillingInfoFormProps> = ({
       </Grid>
 
       {debug && (
-        <Box component="pre" sx={{ my: 2, overflow: "scroll" }}>
+        <DebugBox sx={{ my: 2 }}>
           {JSON.stringify(watch(), null, 2)}
-        </Box>
+        </DebugBox>
       )}
 
       {/* variant === "loggedIn" && <Checkbox label="Save this billing information" /> */}
