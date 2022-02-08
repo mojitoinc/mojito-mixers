@@ -4,6 +4,8 @@
     👨‍💻 Payment UI modal & playground UI to easily test it.
 </p><p align="center">
     🚀 Check it out at <a href="https://payments-staging.mojito.xyz/" target="_blank">https://payments-staging.mojito.xyz/</a>!
+</p><p align="center">
+    ⚠️ This is still in alpha, use with caution.
 </p>
 
 <br />

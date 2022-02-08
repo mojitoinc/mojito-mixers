@@ -4,6 +4,7 @@ import default_1$1 from '../../../../node_modules/@mui/icons-material/Delete.js'
 import { SecondaryButton } from '../../shared/SecondaryButton/SecondaryButton.js';
 import { Tooltip, Chip, Stack } from '@mui/material';
 import React__default, { useCallback } from 'react';
+import { DisplayBox } from '../DisplayBox/DisplayBox.js';
 import Box from '../../../../node_modules/@mui/material/Box/Box.js';
 
 var DEFAULT_SAVED_ITEM_LABELS = {
@@ -42,10 +43,7 @@ var SavedItem = function (_a) {
     else if (onPick) {
         mainControlElement = (React__default.createElement(SecondaryButton, { onClick: handleClick, disabled: disabledSelect, "data-action": "pick" }, labels.select));
     }
-    return (React__default.createElement(Box, __assign({}, boxProps, { sx: __assign({ p: 2, border: 1, borderRadius: "2px", backgroundColor: function (theme) { return theme.palette.grey["50"]; }, borderColor: function (theme) { return theme.palette.grey["100"]; }, color: function (theme) { return theme.palette.grey["800"]; }, display: "flex", flexDirection: {
-                xs: "column",
-                sm: "row"
-            } }, boxProps === null || boxProps === void 0 ? void 0 : boxProps.sx) }),
+    return (React__default.createElement(DisplayBox, __assign({}, boxProps),
         variant === "stacked" ? (React__default.createElement(Box, { sx: { flex: 1, pb: 2 } }, children)) : (React__default.createElement(Stack, { direction: "row", spacing: 2, sx: { flex: 1, pb: { xs: 2, sm: 0 }, alignItems: "center" } }, children)),
         hasControls && (React__default.createElement(Stack, { direction: variant === "stacked" ? { xs: "row", sm: "column" } : "row", spacing: 1, sx: {
                 // display: "flex",

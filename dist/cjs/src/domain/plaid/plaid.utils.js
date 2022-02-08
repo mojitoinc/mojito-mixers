@@ -57,7 +57,7 @@ function getPlaidOAuthFlowState() {
     var receivedRedirectUri = savedReceivedRedirectUri || (window.location.search.startsWith(PLAID_OAUTH_FLOW_URL_SEARCH) ? window.location.href : undefined);
     // const receivedRedirectUri = savedReceivedRedirectUri || window.location.href || "";
     var continueOAuthFlow = !!(url && linkToken && selectedBillingInfo && receivedRedirectUri);
-    if (continueOAuthFlow && savedStateUsed)
+    if ((continueOAuthFlow && savedStateUsed) || (!continueOAuthFlow && savedPlaidInfo))
         return clearPlaidInfo();
     return {
         // The URL of the page where we initially opened the modal:

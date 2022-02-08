@@ -34,10 +34,10 @@ var CheckoutModal = function (_a) {
     guestCheckoutEnabled = _a.guestCheckoutEnabled, productConfirmationEnabled = _a.productConfirmationEnabled, 
     // Personalization:
     parentTheme = _a.theme, themeOptions = _a.themeOptions, logoSrc = _a.logoSrc, logoSx = _a.logoSx, loaderImageSrc = _a.loaderImageSrc, purchasingImageSrc = _a.purchasingImageSrc, purchasingMessages = _a.purchasingMessages, errorImageSrc = _a.errorImageSrc, userFormat = _a.userFormat, acceptedPaymentTypes = _a.acceptedPaymentTypes; _a.paymentLimits; // Not implemented yet. Used to show payment limits for some payment types.
-    var purchaseInstructions = _a.purchaseInstructions; 
+    var purchaseInstructions = _a.purchaseInstructions, 
     // Legal:
-    _a.consentType; // Not implemented yet. Used to let the app control where to log errors to (e.g. Sentry).
-    var privacyHref = _a.privacyHref, termsOfUseHref = _a.termsOfUseHref, 
+    consentType = _a.consentType, // Not implemented yet. Used to let the app control where to log errors to (e.g. Sentry).
+    privacyHref = _a.privacyHref, termsOfUseHref = _a.termsOfUseHref, 
     // Data:
     orgID = _a.orgID, invoiceID = _a.invoiceID, checkoutItem = _a.checkoutItem, 
     // Authentication:
@@ -236,7 +236,7 @@ var CheckoutModal = function (_a) {
         checkoutStepElement = (React__default["default"].createElement(BillingView.BillingView, { checkoutItem: checkoutItem, savedPaymentMethods: savedPaymentMethods, selectedBillingInfo: selectedPaymentMethod.billingInfo, onBillingInfoSelected: handleBillingInfoSelected, onSavedPaymentMethodDeleted: handleSavedPaymentMethodDeleted, onNext: handleNextClicked, onClose: onClose }));
     }
     else if (checkoutStep === "payment") {
-        checkoutStepElement = (React__default["default"].createElement(PaymentView.PaymentView, { checkoutItem: checkoutItem, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethod: selectedPaymentMethod, onPaymentInfoSelected: handlePaymentInfoSelected, onSavedPaymentMethodDeleted: handleSavedPaymentMethodDeleted, onNext: handleNextClicked, onPrev: handlePrevClicked, onClose: onClose, acceptedPaymentTypes: acceptedPaymentTypes, privacyHref: privacyHref, termsOfUseHref: termsOfUseHref }));
+        checkoutStepElement = (React__default["default"].createElement(PaymentView.PaymentView, { checkoutItem: checkoutItem, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethod: selectedPaymentMethod, onPaymentInfoSelected: handlePaymentInfoSelected, onSavedPaymentMethodDeleted: handleSavedPaymentMethodDeleted, onNext: handleNextClicked, onPrev: handlePrevClicked, onClose: onClose, acceptedPaymentTypes: acceptedPaymentTypes, consentType: consentType, privacyHref: privacyHref, termsOfUseHref: termsOfUseHref }));
     }
     else if (checkoutStep === "purchasing") {
         headerVariant = 'purchasing';

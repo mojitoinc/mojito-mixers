@@ -8,6 +8,7 @@ var Delete = require('../../../../node_modules/@mui/icons-material/Delete.js');
 var SecondaryButton = require('../../shared/SecondaryButton/SecondaryButton.js');
 var material = require('@mui/material');
 var React = require('react');
+var DisplayBox = require('../DisplayBox/DisplayBox.js');
 var Box = require('../../../../node_modules/@mui/material/Box/Box.js');
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
@@ -50,10 +51,7 @@ var SavedItem = function (_a) {
     else if (onPick) {
         mainControlElement = (React__default["default"].createElement(SecondaryButton.SecondaryButton, { onClick: handleClick, disabled: disabledSelect, "data-action": "pick" }, labels.select));
     }
-    return (React__default["default"].createElement(Box["default"], tslib_es6.__assign({}, boxProps, { sx: tslib_es6.__assign({ p: 2, border: 1, borderRadius: "2px", backgroundColor: function (theme) { return theme.palette.grey["50"]; }, borderColor: function (theme) { return theme.palette.grey["100"]; }, color: function (theme) { return theme.palette.grey["800"]; }, display: "flex", flexDirection: {
-                xs: "column",
-                sm: "row"
-            } }, boxProps === null || boxProps === void 0 ? void 0 : boxProps.sx) }),
+    return (React__default["default"].createElement(DisplayBox.DisplayBox, tslib_es6.__assign({}, boxProps),
         variant === "stacked" ? (React__default["default"].createElement(Box["default"], { sx: { flex: 1, pb: 2 } }, children)) : (React__default["default"].createElement(material.Stack, { direction: "row", spacing: 2, sx: { flex: 1, pb: { xs: 2, sm: 0 }, alignItems: "center" } }, children)),
         hasControls && (React__default["default"].createElement(material.Stack, { direction: variant === "stacked" ? { xs: "row", sm: "column" } : "row", spacing: 1, sx: {
                 // display: "flex",

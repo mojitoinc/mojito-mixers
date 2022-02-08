@@ -32,7 +32,7 @@ var SavedBillingDetailsSelector = function (_a) {
                     onPick: onPick,
                 }); }, component: BillingInfoItem, itemKey: getPaymentMethodAddressId, deps: [onEdit, onDelete, onPick, selectedPaymentMethodAddressId, showLoader] }),
             React__default.createElement(SecondaryButton, { onClick: onNew, startIcon: React__default.createElement(default_1, null), sx: { mt: 2.5 }, disabled: showLoader }, "Add New Billing Info")),
-        React__default.createElement(CheckoutModalFooter, { variant: "toPayment", privacyHref: "", termsOfUseHref: "", onSubmitClicked: onNext, onCloseClicked: onClose })));
+        React__default.createElement(CheckoutModalFooter, { variant: "toPayment", onSubmitClicked: onNext, onCloseClicked: onClose })));
 };
 
 export { SavedBillingDetailsSelector };
