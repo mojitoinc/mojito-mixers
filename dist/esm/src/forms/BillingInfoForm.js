@@ -88,6 +88,7 @@ var BillingInfoForm = function (_a) {
     defaultValues = _a.defaultValues, onSaved = _a.onSaved, onClose = _a.onClose, onSubmit = _a.onSubmit, debug = _a.debug;
     var _b = useForm({
         defaultValues: __assign(__assign({}, EMPTY_FORM_VALUES), defaultValues),
+        reValidateMode: "onChange",
         resolver: o(schema)
     }), control = _b.control, handleSubmit = _b.handleSubmit, watch = _b.watch;
     var selectedCountryOption = watch(COUNTRY_FIELD);
@@ -120,7 +121,7 @@ var BillingInfoForm = function (_a) {
             React__default.createElement(Grid, { item: true, sm: 6 },
                 React__default.createElement(ControlledTextField, { name: ZIP_CODE_FIELD, control: control, label: FIELD_LABELS[ZIP_CODE_FIELD] }))),
         debug && (React__default.createElement(Box, { component: "pre", sx: { my: 2, overflow: "scroll" } }, JSON.stringify(watch(), null, 2))),
-        React__default.createElement(CheckoutModalFooter, { variant: "toPayment", privacyHref: "", termsOfUseHref: "", onSubmitClicked: submitForm, onCloseClicked: onClose })));
+        React__default.createElement(CheckoutModalFooter, { variant: "toPayment", onCloseClicked: onClose })));
 };
 
 export { BillingInfoForm };

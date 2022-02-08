@@ -1,5 +1,6 @@
 import { SavedPaymentMethod } from "../../../domain/circle/circle.interfaces";
 import React from "react";
+import { ConsentType } from "../ConsentText/ConsentText";
 export interface SavedPaymentDetailsSelectorProps {
     showLoader: boolean;
     savedPaymentMethods: SavedPaymentMethod[];
@@ -9,6 +10,7 @@ export interface SavedPaymentDetailsSelectorProps {
     onPick: (paymentMethodId: string) => void;
     onNext: () => void;
     onClose: () => void;
+    consentType: ConsentType;
     privacyHref: string;
     termsOfUseHref: string;
 }

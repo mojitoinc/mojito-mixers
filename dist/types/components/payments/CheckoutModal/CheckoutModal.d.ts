@@ -5,7 +5,7 @@ import { CheckoutItem } from "../../../domain/product/product.interfaces";
 import { BillingInfo } from "../../../forms/BillingInfoForm";
 import { ApolloError } from "@apollo/client";
 import { Theme, ThemeOptions, SxProps } from "@mui/material/styles";
-import { ConsentType } from "../CheckoutModalFooter/CheckoutModalFooter";
+import { ConsentType } from "../../shared/ConsentText/ConsentText";
 export declare type CheckoutState = "authentication" | "billing" | "payment" | "purchasing" | "confirmation";
 export interface SelectedPaymentMethod {
     billingInfo: string | BillingInfo;
@@ -28,9 +28,9 @@ export interface CheckoutModalProps {
     acceptedPaymentTypes: PaymentType[];
     paymentLimits?: Partial<Record<PaymentType, number>>;
     purchaseInstructions: string;
-    consentType: ConsentType;
-    privacyHref: string;
-    termsOfUseHref: string;
+    consentType?: ConsentType;
+    privacyHref?: string;
+    termsOfUseHref?: string;
     orgID: string;
     invoiceID?: string;
     checkoutItem: CheckoutItem;

@@ -1,0 +1,24 @@
+import { __rest, __assign } from '../../../../node_modules/tslib/tslib.es6.js';
+import { Box } from '@mui/material';
+import React__default from 'react';
+
+var DISPLAY_BOX_PROPS = {
+    p: 2,
+    border: 1,
+    borderRadius: "2px",
+    backgroundColor: function (theme) { return theme.palette.grey["50"]; },
+    borderColor: function (theme) { return theme.palette.grey["100"]; },
+    color: function (theme) { return theme.palette.grey["800"]; },
+    display: "flex",
+    flexDirection: {
+        xs: "column",
+        sm: "row"
+    },
+};
+var DisplayBox = function (_a) {
+    var sx = _a.sx, props = __rest(_a, ["sx"]);
+    return (React__default.createElement(Box, __assign({}, props, { sx: __assign(__assign({}, DISPLAY_BOX_PROPS), sx) })));
+};
+
+export { DisplayBox };
+//# sourceMappingURL=DisplayBox.js.map

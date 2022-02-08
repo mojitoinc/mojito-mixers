@@ -11,7 +11,7 @@ function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'defau
 
 var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 
-var DEFAULT_PURCHASING_IMAGE_SRC = "https://raw.githubusercontent.com/mojitoinc/mojito-mixers/main/app/src/lib/assets/mojito-loader.gif?token=GHSAT0AAAAAABLVZBJ4TZ7NOIXJGJS5CWG4YPT4K4Q";
+var DEFAULT_PURCHASING_IMAGE_SRC = "https://raw.githubusercontent.com/mojitoinc/mojito-mixers/main/app/src/lib/assets/mojito-loader.gif";
 var PURCHASING_MIN_WAIT_MS = 3000;
 var PURCHASING_MESSAGES_INTERVAL_MS = 5000;
 var PURCHASING_MESSAGES_DEFAULT = [
