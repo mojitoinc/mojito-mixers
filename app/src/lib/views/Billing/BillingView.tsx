@@ -17,6 +17,7 @@ export interface BillingViewProps {
   onSavedPaymentMethodDeleted: (savedPaymentMethodId: string) => Promise<void>;
   onNext: () => void;
   onClose: () => void;
+  debug?: boolean;
 }
 
 export const BillingView: React.FC<BillingViewProps> = ({
@@ -27,6 +28,7 @@ export const BillingView: React.FC<BillingViewProps> = ({
   onSavedPaymentMethodDeleted,
   onNext,
   onClose,
+  debug,
 }) => {
   const savedPaymentMethodAddressIdRef = useRef<string>("");
   const savedPaymentMethods = useMemo(() => distinctBy(rawSavedPaymentMethods, "addressId"), [rawSavedPaymentMethods]);
@@ -104,7 +106,8 @@ export const BillingView: React.FC<BillingViewProps> = ({
         defaultValues={ typeof selectedBillingInfo === "string" ? undefined : selectedBillingInfo }
         onSaved={ savedPaymentMethods.length > 0 ? handleShowSaved : undefined }
         onClose={ onClose }
-        onSubmit={ handleSubmit } />
+        onSubmit={ handleSubmit }
+        debug={ debug } />
     ) }
   </>);
 };

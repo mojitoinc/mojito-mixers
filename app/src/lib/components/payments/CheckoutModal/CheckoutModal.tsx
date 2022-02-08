@@ -31,6 +31,7 @@ export interface SelectedPaymentMethod {
 }
 
 export interface CheckoutModalProps {
+  // Modal:
   open: boolean;
   onClose: () => void;
 
@@ -68,6 +69,7 @@ export interface CheckoutModalProps {
   isAuthenticatedLoading?: boolean;
 
   // Other Events:
+  debug?: boolean;
   onError?: (error: ApolloError | Error | string) => void;
   onMarketingOptInChange?: (marketingOptIn: boolean) => void
 }
@@ -113,6 +115,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   isAuthenticatedLoading,
 
   // Other Events:
+  debug,
   onError, // Not implemented yet. Used to let the app control where to log errors to (e.g. Sentry).
   onMarketingOptInChange, // Not implemented yet. Used to let user subscribe / unsubscribe to marketing updates.
 }) => {
@@ -156,7 +159,6 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   }, [checkoutStep]);
 
   const resetModalState = useCallback(() => {
-
     // Make sure the progress tracker in BillingView and PaymentView is properly animated:
     resetStepperProgress();
 
@@ -352,7 +354,8 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
         onBillingInfoSelected={ handleBillingInfoSelected }
         onSavedPaymentMethodDeleted={ handleSavedPaymentMethodDeleted }
         onNext={ handleNextClicked }
-        onClose={ onClose } />
+        onClose={ onClose }
+        debug={ debug } />
     );
   } else if (checkoutStep === "payment") {
     checkoutStepElement = (
@@ -368,7 +371,8 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
         acceptedPaymentTypes={ acceptedPaymentTypes }
         consentType={ consentType }
         privacyHref={ privacyHref }
-        termsOfUseHref={ termsOfUseHref } />
+        termsOfUseHref={ termsOfUseHref }
+        debug={ debug } />
     );
   } else if (checkoutStep === "purchasing") {
     headerVariant = 'purchasing';
@@ -386,7 +390,8 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
         onPurchaseSuccess={ handlePurchaseSuccess }
         onPurchaseError={ setPaymentError }
         onNext={ handleNextClicked }
-        onDialogBlocked={ onDialogBlocked } />
+        onDialogBlocked={ onDialogBlocked }
+        debug={ debug } />
     );
   } else if (checkoutStep === "confirmation") {
     headerVariant = 'logoOnly';
