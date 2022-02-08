@@ -4,7 +4,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 var material = require('@mui/material');
 var React = require('react');
-var index = require('../../../shared/Number/index.js');
+var Number = require('../../../shared/Number/Number.js');
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
@@ -19,7 +19,7 @@ var CheckoutItemCostTotal = function (_a) {
                 color: "success.main",
                 marginTop: 2,
             } },
-            React__default["default"].createElement(index.Number, { prefix: "$" }, price + fee))));
+            React__default["default"].createElement(Number.Number, { prefix: "$" }, price + fee))));
 };
 
 exports.CheckoutItemCostTotal = CheckoutItemCostTotal;

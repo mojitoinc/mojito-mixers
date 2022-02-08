@@ -19,6 +19,10 @@ var DisplayBox = function (_a) {
     var sx = _a.sx, props = __rest(_a, ["sx"]);
     return (React__default.createElement(Box, __assign({}, props, { sx: __assign(__assign({}, DISPLAY_BOX_PROPS), sx) })));
 };
+var DebugBox = function (_a) {
+    var sx = _a.sx, props = __rest(_a, ["sx"]);
+    return (React__default.createElement(DisplayBox, __assign({}, props, { component: "pre", sx: __assign(__assign({}, sx), { overflow: "scroll" }) })));
+};
 
-export { DisplayBox };
+export { DebugBox, DisplayBox };
 //# sourceMappingURL=DisplayBox.js.map

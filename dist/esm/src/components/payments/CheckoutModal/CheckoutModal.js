@@ -33,9 +33,9 @@ var CheckoutModal = function (_a) {
     // Data:
     orgID = _a.orgID, invoiceID = _a.invoiceID, checkoutItem = _a.checkoutItem, 
     // Authentication:
-    onLogin = _a.onLogin, isAuthenticated = _a.isAuthenticated, isAuthenticatedLoading = _a.isAuthenticatedLoading; 
+    onLogin = _a.onLogin, isAuthenticated = _a.isAuthenticated, isAuthenticatedLoading = _a.isAuthenticatedLoading, 
     // Other Events:
-    _a.onError; // Not implemented yet. Used to let the app control where to log errors to (e.g. Sentry).
+    debug = _a.debug; _a.onError; // Not implemented yet. Used to let the app control where to log errors to (e.g. Sentry).
     _a.onMarketingOptInChange;
     var _c = useMeQuery({ skip: !isAuthenticated }), meData = _c.data, meLoading = _c.loading, meError = _c.error;
     var deletePaymentMethod = useDeletePaymentMethodMutation()[0];
@@ -86,6 +86,7 @@ var CheckoutModal = function (_a) {
             onClose();
     }, [checkoutStep, onClose]);
     useEffect(function () {
+        // TODO: After an error, a payment method might have been created anyway. Reload them.
         // TODO: Refetch these when coming back from error screen:
         if (meError)
             setPaymentError("User could not be loaded.");
@@ -225,14 +226,14 @@ var CheckoutModal = function (_a) {
         checkoutStepElement = (React__default.createElement(AuthenticationView, { checkoutItem: checkoutItem, isAuthenticated: isAuthenticated, guestCheckoutEnabled: guestCheckoutEnabled, onGuestClicked: handleNextClicked, onCloseClicked: onClose }));
     }
     else if (checkoutStep === "billing") {
-        checkoutStepElement = (React__default.createElement(BillingView, { checkoutItem: checkoutItem, savedPaymentMethods: savedPaymentMethods, selectedBillingInfo: selectedPaymentMethod.billingInfo, onBillingInfoSelected: handleBillingInfoSelected, onSavedPaymentMethodDeleted: handleSavedPaymentMethodDeleted, onNext: handleNextClicked, onClose: onClose }));
+        checkoutStepElement = (React__default.createElement(BillingView, { checkoutItem: checkoutItem, savedPaymentMethods: savedPaymentMethods, selectedBillingInfo: selectedPaymentMethod.billingInfo, onBillingInfoSelected: handleBillingInfoSelected, onSavedPaymentMethodDeleted: handleSavedPaymentMethodDeleted, onNext: handleNextClicked, onClose: onClose, debug: debug }));
     }
     else if (checkoutStep === "payment") {
-        checkoutStepElement = (React__default.createElement(PaymentView, { checkoutItem: checkoutItem, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethod: selectedPaymentMethod, onPaymentInfoSelected: handlePaymentInfoSelected, onSavedPaymentMethodDeleted: handleSavedPaymentMethodDeleted, onNext: handleNextClicked, onPrev: handlePrevClicked, onClose: onClose, acceptedPaymentTypes: acceptedPaymentTypes, consentType: consentType, privacyHref: privacyHref, termsOfUseHref: termsOfUseHref }));
+        checkoutStepElement = (React__default.createElement(PaymentView, { checkoutItem: checkoutItem, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethod: selectedPaymentMethod, onPaymentInfoSelected: handlePaymentInfoSelected, onSavedPaymentMethodDeleted: handleSavedPaymentMethodDeleted, onNext: handleNextClicked, onPrev: handlePrevClicked, onClose: onClose, acceptedPaymentTypes: acceptedPaymentTypes, consentType: consentType, privacyHref: privacyHref, termsOfUseHref: termsOfUseHref, debug: debug }));
     }
     else if (checkoutStep === "purchasing") {
         headerVariant = 'purchasing';
-        checkoutStepElement = (React__default.createElement(PurchasingView, { purchasingImageSrc: purchasingImageSrc, purchasingMessages: purchasingMessages, orgID: orgID, invoiceID: invoiceID, lotID: checkoutItem.lotID, lotType: checkoutItem.lotType, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethod: selectedPaymentMethod, onPurchaseSuccess: handlePurchaseSuccess, onPurchaseError: setPaymentError, onNext: handleNextClicked, onDialogBlocked: onDialogBlocked }));
+        checkoutStepElement = (React__default.createElement(PurchasingView, { purchasingImageSrc: purchasingImageSrc, purchasingMessages: purchasingMessages, orgID: orgID, invoiceID: invoiceID, lotID: checkoutItem.lotID, lotType: checkoutItem.lotType, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethod: selectedPaymentMethod, onPurchaseSuccess: handlePurchaseSuccess, onPurchaseError: setPaymentError, onNext: handleNextClicked, onDialogBlocked: onDialogBlocked, debug: debug }));
     }
     else if (checkoutStep === "confirmation") {
         headerVariant = 'logoOnly';

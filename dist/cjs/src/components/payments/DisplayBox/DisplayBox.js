@@ -27,6 +27,11 @@ var DisplayBox = function (_a) {
     var sx = _a.sx, props = tslib_es6.__rest(_a, ["sx"]);
     return (React__default["default"].createElement(material.Box, tslib_es6.__assign({}, props, { sx: tslib_es6.__assign(tslib_es6.__assign({}, DISPLAY_BOX_PROPS), sx) })));
 };
+var DebugBox = function (_a) {
+    var sx = _a.sx, props = tslib_es6.__rest(_a, ["sx"]);
+    return (React__default["default"].createElement(DisplayBox, tslib_es6.__assign({}, props, { component: "pre", sx: tslib_es6.__assign(tslib_es6.__assign({}, sx), { overflow: "scroll" }) })));
+};
 
+exports.DebugBox = DebugBox;
 exports.DisplayBox = DisplayBox;
 //# sourceMappingURL=DisplayBox.js.map

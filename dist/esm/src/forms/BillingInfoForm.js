@@ -13,6 +13,7 @@ import { Box } from '@mui/material';
 import default_1 from '../../node_modules/@mui/icons-material/Book.js';
 import { EMPTY_OPTION } from '../components/shared/Select/Select.js';
 import { withRequiredErrorMessage } from '../utils/validationUtils.js';
+import { DebugBox } from '../components/payments/DisplayBox/DisplayBox.js';
 import Grid from '../../node_modules/@mui/material/Grid/Grid.js';
 
 var _a, _b, _c;
@@ -89,7 +90,7 @@ var BillingInfoForm = function (_a) {
     var _b = useForm({
         defaultValues: __assign(__assign({}, EMPTY_FORM_VALUES), defaultValues),
         reValidateMode: "onChange",
-        resolver: o(schema)
+        resolver: o(schema),
     }), control = _b.control, handleSubmit = _b.handleSubmit, watch = _b.watch;
     var selectedCountryOption = watch(COUNTRY_FIELD);
     var selectedCountryCode = selectedCountryOption === null || selectedCountryOption === void 0 ? void 0 : selectedCountryOption.value;
@@ -120,7 +121,7 @@ var BillingInfoForm = function (_a) {
                 React__default.createElement(ControlledStateSelector, { name: STATE_FIELD, control: control, label: FIELD_LABELS[STATE_FIELD], countryCode: selectedCountryCode })),
             React__default.createElement(Grid, { item: true, sm: 6 },
                 React__default.createElement(ControlledTextField, { name: ZIP_CODE_FIELD, control: control, label: FIELD_LABELS[ZIP_CODE_FIELD] }))),
-        debug && (React__default.createElement(Box, { component: "pre", sx: { my: 2, overflow: "scroll" } }, JSON.stringify(watch(), null, 2))),
+        debug && (React__default.createElement(DebugBox, { sx: { my: 2 } }, JSON.stringify(watch(), null, 2))),
         React__default.createElement(CheckoutModalFooter, { variant: "toPayment", onCloseClicked: onClose })));
 };
 

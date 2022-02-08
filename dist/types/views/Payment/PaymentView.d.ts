@@ -17,5 +17,6 @@ export interface PaymentViewProps {
     consentType: ConsentType;
     privacyHref: string;
     termsOfUseHref: string;
+    debug?: boolean;
 }
 export declare const PaymentView: React.FC<PaymentViewProps>;

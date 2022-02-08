@@ -4,7 +4,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 var material = require('@mui/material');
 var React = require('react');
-var index = require('../../../shared/Number/index.js');
+var Number = require('../../../shared/Number/Number.js');
 var CheckoutItemCostTotal = require('../Total/CheckoutItemCostTotal.js');
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
@@ -31,9 +31,9 @@ var CheckoutItemCostBreakdown = function (_a) {
                 React__default["default"].createElement(material.Box, { sx: { marginLeft: 2, marginTop: 0.5 } },
                     React__default["default"].createElement(material.Typography, { sx: { fontWeight: "500" } }, name),
                     React__default["default"].createElement(material.Typography, { sx: { marginTop: 2 } },
-                        React__default["default"].createElement(index.Number, { prefix: "$", suffix: " USD" }, price)),
+                        React__default["default"].createElement(Number.Number, { prefix: "$", suffix: " USD" }, price)),
                     React__default["default"].createElement(material.Typography, { sx: { marginTop: 0.5 } },
-                        React__default["default"].createElement(index.Number, { prefix: "$", suffix: " Fee" }, fee)))),
+                        React__default["default"].createElement(Number.Number, { prefix: "$", suffix: " Fee" }, fee)))),
             React__default["default"].createElement(CheckoutItemCostTotal.CheckoutItemCostTotal, { price: price, fee: fee })),
         React__default["default"].createElement(material.Divider, null)));
 };

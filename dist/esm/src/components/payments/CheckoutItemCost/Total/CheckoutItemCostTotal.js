@@ -1,6 +1,6 @@
 import { Box, Typography } from '@mui/material';
 import React__default from 'react';
-import { Number } from '../../../shared/Number/index.js';
+import { Number } from '../../../shared/Number/Number.js';
 
 var CheckoutItemCostTotal = function (_a) {
     var price = _a.price, fee = _a.fee;

@@ -4,7 +4,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 var material = require('@mui/material');
 var React = require('react');
-var index = require('../../shared/Checkbox/index.js');
+var Checkbox = require('../../shared/Checkbox/Checkbox.js');
 var ConsentText = require('../../shared/ConsentText/ConsentText.js');
 var PrimaryButton = require('../../shared/PrimaryButton/PrimaryButton.js');
 var CheckoutModalFooter_constants = require('./CheckoutModalFooter.constants.js');
@@ -53,7 +53,7 @@ var CheckoutModalFooter = function (_a) {
             pt: consentType === "checkbox" ? 0 : 5,
             pb: 5,
         } },
-        showConsent && consentType === "checkbox" && (React__default["default"].createElement(index.Checkbox, { label: React__default["default"].createElement(React__default["default"].Fragment, null,
+        showConsent && consentType === "checkbox" && (React__default["default"].createElement(Checkbox.Checkbox, { label: React__default["default"].createElement(React__default["default"].Fragment, null,
                 "I ",
                 consentTextElement), checked: isConsentChecked, onChange: handleConsentClicked, error: showConsentError, helperText: showConsentError ? ConsentText.CONSENT_ERROR_MESSAGE : undefined, sx: { alignSelf: "flex-start", mb: 5 } })),
         primaryButtonVisible && (React__default["default"].createElement(PrimaryButton.PrimaryButton, { onClick: onSubmitClicked ? handleSubmitClicked : undefined, type: onSubmitClicked ? "button" : "submit", endIcon: PrimaryButtonIcon && React__default["default"].createElement(PrimaryButtonIcon, null), disabled: submitDisabled }, primaryButtonLabel)),

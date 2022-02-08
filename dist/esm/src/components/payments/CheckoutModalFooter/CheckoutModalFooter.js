@@ -1,6 +1,6 @@
 import { Box, Typography, Link, Divider } from '@mui/material';
 import React__default, { useState, useCallback } from 'react';
-import { Checkbox } from '../../shared/Checkbox/index.js';
+import { Checkbox } from '../../shared/Checkbox/Checkbox.js';
 import { ConsentText, CONSENT_ERROR_MESSAGE } from '../../shared/ConsentText/ConsentText.js';
 import { PrimaryButton } from '../../shared/PrimaryButton/PrimaryButton.js';
 import { LABELS_BY_VARIANT, ICONS_BY_VARIANT } from './CheckoutModalFooter.constants.js';

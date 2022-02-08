@@ -1,6 +1,6 @@
 import { Grid, Box, Avatar, Typography, Divider } from '@mui/material';
 import React__default from 'react';
-import { Number } from '../../../shared/Number/index.js';
+import { Number } from '../../../shared/Number/Number.js';
 import { CheckoutItemCostTotal } from '../Total/CheckoutItemCostTotal.js';
 
 var CheckoutItemCostBreakdown = function (_a) {

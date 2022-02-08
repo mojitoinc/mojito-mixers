@@ -6,17 +6,17 @@ import default_1 from '../../node_modules/@mui/icons-material/Book.js';
 import React__default, { useMemo, useCallback } from 'react';
 import { CheckoutModalFooter } from '../components/payments/CheckoutModalFooter/CheckoutModalFooter.js';
 import { ControlledTextField } from '../components/shared/TextField/TextField.js';
-import { ControlledCardNumberField } from '../components/shared/CardNumberField/index.js';
-import { ControlledCardExpiryDateField } from '../components/shared/CardExpiryDateField/index.js';
-import { ControlledCardSecureCodeField } from '../components/shared/CardSecureCodeField/index.js';
+import { ControlledCardNumberField } from '../components/shared/CardNumberField/CardNumberField.js';
+import { ControlledCardExpiryDateField } from '../components/shared/CardExpiryDateField/CardExpiryDateField.js';
+import { ControlledCardSecureCodeField } from '../components/shared/CardSecureCodeField/CardSecureCodeField.js';
 import { InputGroupLabel } from '../components/shared/InputGroupLabel/InputGroupLabel.js';
 import { SecondaryButton } from '../components/shared/SecondaryButton/SecondaryButton.js';
 import { PaymentMethodSelector } from '../components/shared/PaymentMethodSelector/PaymentMethodSelector.js';
 import { withInvalidErrorMessage, requireSchemaWhenKeyIs } from '../utils/validationUtils.js';
 import { getCardNumberIsValid, getExpiryDateIsvalid, getCVCIsValid } from '../domain/payment/payment.utils.js';
 import { Typography } from '@mui/material';
-import { DisplayBox } from '../components/payments/DisplayBox/DisplayBox.js';
-import { ControlledCheckbox } from '../components/shared/Checkbox/index.js';
+import { DisplayBox, DebugBox } from '../components/payments/DisplayBox/DisplayBox.js';
+import { ControlledCheckbox } from '../components/shared/Checkbox/Checkbox.js';
 import { ConsentText, CONSENT_ERROR_MESSAGE } from '../components/shared/ConsentText/ConsentText.js';
 import Grid from '../../node_modules/@mui/material/Grid/Grid.js';
 import Box from '../../node_modules/@mui/material/Box/Box.js';
@@ -164,7 +164,7 @@ var PaymentMethodForm = function (_a) {
     var _c = useForm({
         defaultValues: __assign(__assign({}, defaultPaymentTypeDefaultValues), parentDefaultValues),
         reValidateMode: "onChange",
-        resolver: o(schema)
+        resolver: o(schema),
     }), control = _c.control, handleSubmit = _c.handleSubmit, watch = _c.watch, reset = _c.reset, trigger = _c.trigger;
     var handleSelectedPaymentMethodChange = useCallback(function (paymentType) {
         reset(__assign({}, PAYMENT_TYPE_FORM_DATA[paymentType].defaultValues(consentType)));
@@ -204,7 +204,7 @@ var PaymentMethodForm = function (_a) {
             React__default.createElement(InputGroupLabel, { sx: { m: 0, pt: 2, pb: 1.5 } }, "Payment Method"),
             React__default.createElement(PaymentMethodSelector, { selectedPaymentMethod: selectedPaymentMethod, onPaymentMethodChange: handleSelectedPaymentMethodChange, paymentMethods: acceptedPaymentTypes }))) : (null),
         React__default.createElement(Fields, { control: control, consentType: consentType, privacyHref: privacyHref, termsOfUseHref: termsOfUseHref }),
-        debug && (React__default.createElement(Box, { component: "pre", sx: { my: 2, overflow: "scroll" } }, JSON.stringify(watch(), null, 2))),
+        debug && (React__default.createElement(DebugBox, { sx: { my: 2 } }, JSON.stringify(watch(), null, 2))),
         React__default.createElement(CheckoutModalFooter, { variant: selectedPaymentMethod === "ACH" ? "toPlaid" : "toConfirmation", consentType: consentType === "checkbox" ? undefined : consentType, privacyHref: privacyHref, termsOfUseHref: termsOfUseHref, submitDisabled: selectedPaymentMethod === "Wire" || selectedPaymentMethod === "Crypto", onCloseClicked: onClose })));
 };
 
