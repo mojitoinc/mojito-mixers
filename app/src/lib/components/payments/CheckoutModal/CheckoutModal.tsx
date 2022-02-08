@@ -411,6 +411,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
         onBackdropClick={ isDialogBlocked ? shake : undefined }
         aria-labelledby="checkout-modal-header-title"
         fullWidth
+        fullScreen
         maxWidth="sm"
         scroll="body"
         ref={ dialogRootRef }
@@ -426,6 +427,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
             px: {
               xs: 1.5,
               sm: 2.5,
+              md: 23,
             },
             pb: 0,
           }}>
