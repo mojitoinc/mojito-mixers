@@ -11,26 +11,14 @@ function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'defau
 
 var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 
-var AuthenticationView = function AuthenticationView(_a) {
-  var checkoutItem = _a.checkoutItem,
-      isAuthenticated = _a.isAuthenticated,
-      guestCheckoutEnabled = _a.guestCheckoutEnabled,
-      onGuestClicked = _a.onGuestClicked,
-      onCloseClicked = _a.onCloseClicked;
-  React.useEffect(function () {
-    // Make sure the progress tracker in BillingView and PaymentView is properly animated:
-    CheckoutStepper.resetStepperProgress();
-  }, []);
-  return /*#__PURE__*/React__default["default"].createElement(React__default["default"].Fragment, null, /*#__PURE__*/React__default["default"].createElement(CheckoutItemCostBreakdown.CheckoutItemCostBreakdown, {
-    checkoutItem: checkoutItem
-  }), /*#__PURE__*/React__default["default"].createElement(CheckoutModalFooter.CheckoutModalFooter, {
-    variant: isAuthenticated ? "toPayment" : "toGuestCheckout",
-    guestCheckoutEnabled: guestCheckoutEnabled,
-    privacyHref: "",
-    termsOfUseHref: "",
-    onSubmitClicked: onGuestClicked,
-    onCloseClicked: onCloseClicked
-  }));
+const AuthenticationView = ({ checkoutItem, isAuthenticated, guestCheckoutEnabled, onGuestClicked, onCloseClicked, }) => {
+    React.useEffect(() => {
+        // Make sure the progress tracker in BillingView and PaymentView is properly animated:
+        CheckoutStepper.resetStepperProgress();
+    }, []);
+    return (React__default["default"].createElement(React__default["default"].Fragment, null,
+        React__default["default"].createElement(CheckoutItemCostBreakdown.CheckoutItemCostBreakdown, { checkoutItem: checkoutItem }),
+        React__default["default"].createElement(CheckoutModalFooter.CheckoutModalFooter, { variant: isAuthenticated ? "toPayment" : "toGuestCheckout", guestCheckoutEnabled: guestCheckoutEnabled, privacyHref: "", termsOfUseHref: "", onSubmitClicked: onGuestClicked, onCloseClicked: onCloseClicked })));
 };
 
 exports.AuthenticationView = AuthenticationView;

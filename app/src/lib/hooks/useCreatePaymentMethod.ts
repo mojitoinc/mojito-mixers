@@ -79,7 +79,12 @@ export function useCreatePaymentMethod(): [
     };
 
     if (paymentInfo.type === PaymentType.CreditCard) {
-      const paymentKeyResult = await fetchPaymentKey().catch(err => undefined);
+      const paymentKeyResult = await fetchPaymentKey().catch((err) => {
+        console.log(err);
+
+        return undefined;
+      });
+
       const paymentKeyData = paymentKeyResult?.data;
       const publicKey = paymentKeyData?.getPaymentPublicKey?.publicKey;
       const keyID = paymentKeyData?.getPaymentPublicKey?.keyID;

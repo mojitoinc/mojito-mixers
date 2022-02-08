@@ -12,23 +12,17 @@ function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'defau
 
 var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 
-var CardExpiryDateField = function CardExpiryDateField(props) {
-  var getExpiryDateProps = reactPaymentInputs.usePaymentInputs().getExpiryDateProps;
-
-  var _a = getExpiryDateProps({
-    placeholder: props.placeholder,
-    onChange: props.onChange,
-    onBlur: props.onBlur
-  }),
-      ref = _a.ref,
-      paymentInputProps = tslib_es6.__rest(_a, ["ref"]);
-
-  var inputRef = useCallbackRef.useMergeRefs([props.inputRef, ref]);
-  return /*#__PURE__*/React__default["default"].createElement(TextField.TextField, tslib_es6.__assign({}, props, paymentInputProps, {
-    inputRef: inputRef
-  }));
+const CardExpiryDateField = (props) => {
+    const { getExpiryDateProps } = reactPaymentInputs.usePaymentInputs();
+    const _a = getExpiryDateProps({
+        placeholder: props.placeholder,
+        onChange: props.onChange,
+        onBlur: props.onBlur,
+    }), { ref } = _a, paymentInputProps = tslib_es6.__rest(_a, ["ref"]);
+    const inputRef = useCallbackRef.useMergeRefs([props.inputRef, ref]);
+    return (React__default["default"].createElement(TextField.TextField, Object.assign({}, props, paymentInputProps, { inputRef: inputRef })));
 };
-var ControlledCardExpiryDateField = TextField.controlledFieldFrom(CardExpiryDateField);
+const ControlledCardExpiryDateField = TextField.controlledFieldFrom(CardExpiryDateField);
 
 exports.CardExpiryDateField = CardExpiryDateField;
 exports.ControlledCardExpiryDateField = ControlledCardExpiryDateField;

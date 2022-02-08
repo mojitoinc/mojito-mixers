@@ -4,56 +4,29 @@ import { PurchaseConfirmationBillingDetails } from '../../components/payments/Pu
 import { PurchaseConfirmationItemDetails } from '../../components/payments/PurchaseConfirmationItemDetails/PurchaseConfirmationItemDetails.js';
 import { billingInfoToSavedPaymentMethodBillingInfo } from '../../domain/circle/circle.utils.js';
 
-var ConfirmationView = function ConfirmationView(_a) {
-  var checkoutItem = _a.checkoutItem,
-      savedPaymentMethods = _a.savedPaymentMethods,
-      selectedPaymentMethod = _a.selectedPaymentMethod,
-      paymentReferenceNumber = _a.paymentReferenceNumber,
-      purchaseInstructions = _a.purchaseInstructions,
-      onNext = _a.onNext,
-      onClose = _a.onClose;
-  var selectedBillingInfo = selectedPaymentMethod.billingInfo,
-      selectedPaymentInfo = selectedPaymentMethod.paymentInfo;
-
-  var _b = useMemo(function () {
-    if (typeof selectedPaymentInfo === "string") {
-      var paymentMethod = savedPaymentMethods.find(function (_a) {
-        var id = _a.id;
-        return id === selectedPaymentInfo;
-      });
-      return {
-        selectedPaymentMethodBillingInfo: paymentMethod,
-        selectedPaymentMethodPaymentInfo: paymentMethod
-      };
-    }
-
-    return {
-      selectedPaymentMethodBillingInfo: typeof selectedBillingInfo === "string" ? savedPaymentMethods.find(function (_a) {
-        var addressId = _a.addressId;
-        return addressId === selectedBillingInfo;
-      }) : billingInfoToSavedPaymentMethodBillingInfo(selectedBillingInfo),
-      selectedPaymentMethodPaymentInfo: selectedPaymentInfo
-    };
-  }, [savedPaymentMethods, selectedBillingInfo, selectedPaymentInfo]),
-      selectedPaymentMethodBillingInfo = _b.selectedPaymentMethodBillingInfo,
-      selectedPaymentMethodPaymentInfo = _b.selectedPaymentMethodPaymentInfo;
-
-  if (!selectedPaymentMethodBillingInfo || !selectedPaymentMethodPaymentInfo) return null;
-  return /*#__PURE__*/React__default.createElement(React__default.Fragment, null, /*#__PURE__*/React__default.createElement(PurchaseConfirmationBillingDetails, {
-    checkoutItem: checkoutItem,
-    paymentReferenceNumber: paymentReferenceNumber,
-    selectedPaymentMethodBillingInfo: selectedPaymentMethodBillingInfo,
-    selectedPaymentMethodPaymentInfo: selectedPaymentMethodPaymentInfo
-  }), /*#__PURE__*/React__default.createElement(PurchaseConfirmationItemDetails, {
-    checkoutItem: checkoutItem,
-    purchaseInstructions: purchaseInstructions
-  }), /*#__PURE__*/React__default.createElement(CheckoutModalFooter, {
-    variant: "toMarketplace",
-    privacyHref: "",
-    termsOfUseHref: "",
-    onSubmitClicked: onNext,
-    onCloseClicked: onClose
-  }));
+const ConfirmationView = ({ checkoutItem, savedPaymentMethods, selectedPaymentMethod, paymentReferenceNumber, purchaseInstructions, onNext, onClose, }) => {
+    const { billingInfo: selectedBillingInfo, paymentInfo: selectedPaymentInfo, } = selectedPaymentMethod;
+    const { selectedPaymentMethodBillingInfo, selectedPaymentMethodPaymentInfo, } = useMemo(() => {
+        if (typeof selectedPaymentInfo === "string") {
+            const paymentMethod = savedPaymentMethods.find(({ id }) => id === selectedPaymentInfo);
+            return {
+                selectedPaymentMethodBillingInfo: paymentMethod,
+                selectedPaymentMethodPaymentInfo: paymentMethod,
+            };
+        }
+        return {
+            selectedPaymentMethodBillingInfo: typeof selectedBillingInfo === "string"
+                ? savedPaymentMethods.find(({ addressId }) => addressId === selectedBillingInfo)
+                : billingInfoToSavedPaymentMethodBillingInfo(selectedBillingInfo),
+            selectedPaymentMethodPaymentInfo: selectedPaymentInfo,
+        };
+    }, [savedPaymentMethods, selectedBillingInfo, selectedPaymentInfo]);
+    if (!selectedPaymentMethodBillingInfo || !selectedPaymentMethodPaymentInfo)
+        return null;
+    return (React__default.createElement(React__default.Fragment, null,
+        React__default.createElement(PurchaseConfirmationBillingDetails, { checkoutItem: checkoutItem, paymentReferenceNumber: paymentReferenceNumber, selectedPaymentMethodBillingInfo: selectedPaymentMethodBillingInfo, selectedPaymentMethodPaymentInfo: selectedPaymentMethodPaymentInfo }),
+        React__default.createElement(PurchaseConfirmationItemDetails, { checkoutItem: checkoutItem, purchaseInstructions: purchaseInstructions }),
+        React__default.createElement(CheckoutModalFooter, { variant: "toMarketplace", privacyHref: "", termsOfUseHref: "", onSubmitClicked: onNext, onCloseClicked: onClose })));
 };
 
 export { ConfirmationView };

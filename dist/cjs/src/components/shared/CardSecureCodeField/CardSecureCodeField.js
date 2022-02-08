@@ -12,23 +12,17 @@ function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'defau
 
 var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 
-var CardSecureCodeField = function CardSecureCodeField(props) {
-  var getCVCProps = reactPaymentInputs.usePaymentInputs().getCVCProps;
-
-  var _a = getCVCProps({
-    placeholder: props.placeholder,
-    onChange: props.onChange,
-    onBlur: props.onBlur
-  }),
-      ref = _a.ref,
-      paymentInputProps = tslib_es6.__rest(_a, ["ref"]);
-
-  var inputRef = useCallbackRef.useMergeRefs([props.inputRef, ref]);
-  return /*#__PURE__*/React__default["default"].createElement(TextField.TextField, tslib_es6.__assign({}, props, paymentInputProps, {
-    inputRef: inputRef
-  }));
+const CardSecureCodeField = (props) => {
+    const { getCVCProps } = reactPaymentInputs.usePaymentInputs();
+    const _a = getCVCProps({
+        placeholder: props.placeholder,
+        onChange: props.onChange,
+        onBlur: props.onBlur,
+    }), { ref } = _a, paymentInputProps = tslib_es6.__rest(_a, ["ref"]);
+    const inputRef = useCallbackRef.useMergeRefs([props.inputRef, ref]);
+    return (React__default["default"].createElement(TextField.TextField, Object.assign({}, props, paymentInputProps, { inputRef: inputRef })));
 };
-var ControlledCardSecureCodeField = TextField.controlledFieldFrom(CardSecureCodeField);
+const ControlledCardSecureCodeField = TextField.controlledFieldFrom(CardSecureCodeField);
 
 exports.CardSecureCodeField = CardSecureCodeField;
 exports.ControlledCardSecureCodeField = ControlledCardSecureCodeField;

@@ -2,7 +2,7 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-var reactIs = {exports: {}};
+var propTypes = {exports: {}};
 
-exports.reactIs = reactIs;
+exports.propTypes = propTypes;
 //# sourceMappingURL=index.js_commonjs-module.js.map

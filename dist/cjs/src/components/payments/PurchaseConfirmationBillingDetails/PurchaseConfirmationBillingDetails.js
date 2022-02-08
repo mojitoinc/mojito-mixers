@@ -15,87 +15,30 @@ function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'defau
 
 var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 
-var PurchaseConfirmationBillingDetails = function PurchaseConfirmationBillingDetails(_a) {
-  var checkoutItem = _a.checkoutItem,
-      paymentReferenceNumber = _a.paymentReferenceNumber,
-      selectedPaymentMethodBillingInfo = _a.selectedPaymentMethodBillingInfo,
-      selectedPaymentMethodPaymentInfo = _a.selectedPaymentMethodPaymentInfo;
-
-  var _b = PurchaseConfirmationBillingDetails_utils.getFormattedPaymentMethod(selectedPaymentMethodPaymentInfo),
-      isMasked = _b.isMasked,
-      paymentType = _b.paymentType,
-      displayValue = _b.displayValue,
-      network = _b.network;
-
-  var icon = network ? /*#__PURE__*/React__default["default"].createElement(Icons.CreditCardIcon, {
-    network: network
-  }) : null;
-  return /*#__PURE__*/React__default["default"].createElement(material.Box, {
-    sx: {
-      position: "relative",
-      mb: 2
-    }
-  }, /*#__PURE__*/React__default["default"].createElement(material.Stack, {
-    spacing: 2,
-    direction: {
-      xs: "column",
-      sm: "row"
-    },
-    sx: {
-      justifyContent: "space-between",
-      alignItems: {
-        xs: "flex-start",
-        sm: "center"
-      },
-      pt: 2
-    }
-  }, /*#__PURE__*/React__default["default"].createElement(material.Typography, {
-    variant: "h5"
-  }, "Purchase Confirmation"), /*#__PURE__*/React__default["default"].createElement(material.Chip, {
-    size: "small",
-    color: "success",
-    label: /*#__PURE__*/React__default["default"].createElement(React__default["default"].Fragment, null, "Payment Processed", /*#__PURE__*/React__default["default"].createElement(Check["default"], {
-      sx: {
-        height: "24px",
-        ml: 1.5
-      }
-    }))
-  })), /*#__PURE__*/React__default["default"].createElement(material.Stack, {
-    spacing: 2,
-    direction: {
-      xs: "column",
-      sm: "row"
-    },
-    sx: {
-      justifyContent: "space-between",
-      alignItems: {
-        xs: "flex-start",
-        sm: "center"
-      },
-      pt: 1.5,
-      pb: {
-        xs: 2.5,
-        sm: 1.5
-      }
-    }
-  }, isMasked ? /*#__PURE__*/React__default["default"].createElement(ReadOnlyField.ReadOnlyField, {
-    label: PurchaseConfirmationBillingDetails_constants.PAYMENT_TYPE_LABEL[paymentType],
-    value: displayValue,
-    InputProps: icon ? {
-      endAdornment: /*#__PURE__*/React__default["default"].createElement(material.InputAdornment, {
-        position: "end"
-      }, icon)
-    } : undefined
-  }) : /*#__PURE__*/React__default["default"].createElement(ReadOnlyField.ReadOnlyCardField, {
-    label: PurchaseConfirmationBillingDetails_constants.PAYMENT_TYPE_LABEL[paymentType],
-    value: displayValue
-  }), /*#__PURE__*/React__default["default"].createElement(ReadOnlyField.ReadOnlyField, {
-    label: "Reference No.",
-    value: paymentReferenceNumber || "-"
-  })), /*#__PURE__*/React__default["default"].createElement(CheckoutItemCostPurchase.CheckoutItemCostPurchase, {
-    checkoutItem: checkoutItem,
-    selectedPaymentMethodBillingInfo: selectedPaymentMethodBillingInfo
-  }));
+const PurchaseConfirmationBillingDetails = ({ checkoutItem, paymentReferenceNumber, selectedPaymentMethodBillingInfo, selectedPaymentMethodPaymentInfo, }) => {
+    const { isMasked, paymentType, displayValue, network, } = PurchaseConfirmationBillingDetails_utils.getFormattedPaymentMethod(selectedPaymentMethodPaymentInfo);
+    const icon = network ? React__default["default"].createElement(Icons.CreditCardIcon, { network: network }) : null;
+    return (React__default["default"].createElement(material.Box, { sx: { position: "relative", mb: 2 } },
+        React__default["default"].createElement(material.Stack, { spacing: 2, direction: { xs: "column", sm: "row" }, sx: {
+                justifyContent: "space-between",
+                alignItems: { xs: "flex-start", sm: "center" },
+                pt: 2
+            } },
+            React__default["default"].createElement(material.Typography, { variant: "h5" }, "Purchase Confirmation"),
+            React__default["default"].createElement(material.Chip, { size: "small", color: "success", label: (React__default["default"].createElement(React__default["default"].Fragment, null,
+                    "Payment Processed",
+                    React__default["default"].createElement(Check["default"], { sx: { height: "24px", ml: 1.5 } }))) })),
+        React__default["default"].createElement(material.Stack, { spacing: 2, direction: { xs: "column", sm: "row" }, sx: {
+                justifyContent: "space-between",
+                alignItems: { xs: "flex-start", sm: "center" },
+                pt: 1.5,
+                pb: { xs: 2.5, sm: 1.5 }
+            } },
+            isMasked ? (React__default["default"].createElement(ReadOnlyField.ReadOnlyField, { label: PurchaseConfirmationBillingDetails_constants.PAYMENT_TYPE_LABEL[paymentType], value: displayValue, InputProps: icon ? {
+                    endAdornment: (React__default["default"].createElement(material.InputAdornment, { position: "end" }, icon)),
+                } : undefined })) : (React__default["default"].createElement(ReadOnlyField.ReadOnlyCardField, { label: PurchaseConfirmationBillingDetails_constants.PAYMENT_TYPE_LABEL[paymentType], value: displayValue })),
+            React__default["default"].createElement(ReadOnlyField.ReadOnlyField, { label: "Reference No.", value: paymentReferenceNumber || "-" })),
+        React__default["default"].createElement(CheckoutItemCostPurchase.CheckoutItemCostPurchase, { checkoutItem: checkoutItem, selectedPaymentMethodBillingInfo: selectedPaymentMethodBillingInfo })));
 };
 
 exports.PurchaseConfirmationBillingDetails = PurchaseConfirmationBillingDetails;

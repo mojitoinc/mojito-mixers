@@ -1,21 +1,17 @@
-import { __rest, __assign } from '../../../../node_modules/tslib/tslib.es6.js';
+import { __rest } from '../../../../node_modules/tslib/tslib.es6.js';
 import { Typography } from '@mui/material';
 import React__default from 'react';
 
-var InputGroupLabel = function InputGroupLabel(_a) {
-  var sx = _a.sx,
-      props = __rest(_a, ["sx"]);
-
-  return /*#__PURE__*/React__default.createElement(Typography, __assign({
-    variant: "body2",
-    sx: [function (theme) {
-      return {
-        fontWeight: 500,
-        color: theme.palette.grey["700"],
-        mt: 1.5
-      };
-    }, sx]
-  }, props));
+const InputGroupLabel = (_a) => {
+    var { sx } = _a, props = __rest(_a, ["sx"]);
+    return (React__default.createElement(Typography, Object.assign({ variant: "body2", sx: [
+            (theme) => ({
+                fontWeight: 500,
+                color: theme.palette.grey["700"],
+                mt: 1.5
+            }),
+            sx
+        ] }, props)));
 };
 
 export { InputGroupLabel };
