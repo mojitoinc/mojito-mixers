@@ -6,20 +6,20 @@ var Lock = require('../../../../node_modules/@mui/icons-material/Lock.js');
 var ChevronRight = require('../../../../node_modules/@mui/icons-material/ChevronRight.js');
 
 var LABELS_BY_VARIANT = {
-    toGuestCheckout: "Guest Check Out",
-    toPayment: "Continue to Payment",
-    toConfirmation: "Purchase",
-    toPlaid: "Purchase with Plaid",
-    toForm: "Review Payment Information",
-    toMarketplace: "Back to Marketplace",
+  toGuestCheckout: "Guest Check Out",
+  toPayment: "Continue to Payment",
+  toConfirmation: "Purchase",
+  toPlaid: "Purchase with Plaid",
+  toForm: "Review Payment Information",
+  toMarketplace: "Back to Marketplace"
 };
 var ICONS_BY_VARIANT = {
-    toGuestCheckout: null,
-    toPayment: ChevronRight["default"],
-    toConfirmation: Lock["default"],
-    toPlaid: Lock["default"],
-    toForm: null,
-    toMarketplace: null,
+  toGuestCheckout: null,
+  toPayment: ChevronRight["default"],
+  toConfirmation: Lock["default"],
+  toPlaid: Lock["default"],
+  toForm: null,
+  toMarketplace: null
 };
 
 exports.ICONS_BY_VARIANT = ICONS_BY_VARIANT;

@@ -11,9 +11,19 @@ function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'defau
 
 var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 
-var SecondaryButton = React__default["default"].forwardRef(function (props, ref) {
-    var isIcon = reactUtils.containsOnlyIcon(props.children);
-    return (React__default["default"].createElement(material.Button, tslib_es6.__assign({ variant: "contained", color: "secondary", size: "small", ref: ref, disableElevation: true }, props, { sx: isIcon ? tslib_es6.__assign(tslib_es6.__assign({}, props.sx), { p: 0 }) : props.sx })));
+var SecondaryButton = /*#__PURE__*/React__default["default"].forwardRef(function (props, ref) {
+  var isIcon = reactUtils.containsOnlyIcon(props.children);
+  return /*#__PURE__*/React__default["default"].createElement(material.Button, tslib_es6.__assign({
+    variant: "contained",
+    color: "secondary",
+    size: "small",
+    ref: ref,
+    disableElevation: true
+  }, props, {
+    sx: isIcon ? tslib_es6.__assign(tslib_es6.__assign({}, props.sx), {
+      p: 0
+    }) : props.sx
+  }));
 });
 
 exports.SecondaryButton = SecondaryButton;

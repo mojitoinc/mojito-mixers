@@ -10,7 +10,11 @@ function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'defau
 
 var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 
-var OutlinedSecondaryButton = function (props) { return (React__default["default"].createElement(material.Button, tslib_es6.__assign({ variant: "outlined" }, props))); };
+var OutlinedSecondaryButton = function OutlinedSecondaryButton(props) {
+  return /*#__PURE__*/React__default["default"].createElement(material.Button, tslib_es6.__assign({
+    variant: "outlined"
+  }, props));
+};
 
 exports.OutlinedSecondaryButton = OutlinedSecondaryButton;
 //# sourceMappingURL=OutlinedSecondaryButton.js.map

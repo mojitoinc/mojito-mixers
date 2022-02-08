@@ -12,12 +12,19 @@ function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'defau
 var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 
 var BILLING_INFO_ITEM_LABELS = {
-    select: "Use Billing Info",
+  select: "Use Billing Info"
 };
-var BillingInfoItem = function (_a) {
-    var savedPaymentMethod = _a.data, savedItemProps = _a.additionalProps;
-    return (React__default["default"].createElement(SavedItem.SavedItem, tslib_es6.__assign({ variant: "stacked", labels: BILLING_INFO_ITEM_LABELS }, savedItemProps, { id: savedPaymentMethod.addressId }),
-        React__default["default"].createElement(BillingInfoFragment.BillingInfoFragment, { savedPaymentMethod: savedPaymentMethod })));
+var BillingInfoItem = function BillingInfoItem(_a) {
+  var savedPaymentMethod = _a.data,
+      savedItemProps = _a.additionalProps;
+  return /*#__PURE__*/React__default["default"].createElement(SavedItem.SavedItem, tslib_es6.__assign({
+    variant: "stacked",
+    labels: BILLING_INFO_ITEM_LABELS
+  }, savedItemProps, {
+    id: savedPaymentMethod.addressId
+  }), /*#__PURE__*/React__default["default"].createElement(BillingInfoFragment.BillingInfoFragment, {
+    savedPaymentMethod: savedPaymentMethod
+  }));
 };
 
 exports.BillingInfoItem = BillingInfoItem;
