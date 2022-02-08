@@ -182,6 +182,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   }, [checkoutStep, onClose]);
 
   useEffect(() => {
+    // TODO: After an error, a payment method might have been created anyway. Reload them.
     // TODO: Refetch these when coming back from error screen:
     if (meError) setPaymentError("User could not be loaded.");
     if (paymentMethodsError) setPaymentError("Payment methods could not be loaded.");

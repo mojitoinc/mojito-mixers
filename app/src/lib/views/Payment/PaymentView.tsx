@@ -99,9 +99,10 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
 
   useEffect(() => {
     const selectedPaymentInfoMatch = typeof selectedPaymentInfo === "string" && savedPaymentMethods.some(({ id }) => id === selectedPaymentInfo);
+    const firstActiveSavedPaymentMethod = savedPaymentMethods.find(({ status }) => status === "complete");
 
-    if (showSaved && savedPaymentMethods.length > 0 && !selectedPaymentInfoMatch) {
-      onPaymentInfoSelected(savedPaymentMethods[0].id);
+    if (showSaved && savedPaymentMethods.length > 0 && !selectedPaymentInfoMatch && firstActiveSavedPaymentMethod) {
+      onPaymentInfoSelected(firstActiveSavedPaymentMethod.id);
     }
   }, [showSaved, onPaymentInfoSelected, savedPaymentMethods, selectedPaymentInfo]);
 
