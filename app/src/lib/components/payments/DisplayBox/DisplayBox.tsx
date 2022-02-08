@@ -1,5 +1,6 @@
 import { Theme, SxProps } from "@mui/material/styles";
 import { Box, BoxProps } from "@mui/material";
+import React from "react";
 
 const DISPLAY_BOX_PROPS: SxProps<Theme> = {
   p: 2,

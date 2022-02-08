@@ -225,9 +225,9 @@ If you want to completely override the theme and make sure your custom theme doe
 you can use `CheckoutModalThemeProvider`. Make sure you import it from `@mojitoinc/mojito-mixers`.
 
 ```TSX
-  <CheckoutModalThemeProvider theme={ YOUR_CUSTOM_THEME }>
-    <CheckoutModal { ...checkoutModalProps } />
-  </CheckoutModalThemeProvider>
+<CheckoutModalThemeProvider theme={ YOUR_CUSTOM_THEME }>
+  <CheckoutModal { ...checkoutModalProps } />
+</CheckoutModalThemeProvider>
 ```
 
 Note that using MUI's `ThemeProvider` from your project won't work as expected and the modal will not be styled using
@@ -260,7 +260,7 @@ const PlaidOAuthPage = () => {
   }, [continueOAuthFlow, router, url]);
 
   return null;
-}
+};
 ```
 
 <br />
@@ -271,6 +271,8 @@ const PlaidOAuthPage = () => {
 You will have to copy the following file into your project to avoid TypeScript errors when using custom props in MUI's theme:
 
 [`app/src/lib/config/theme/palette.d.ts`](./app/src/lib/config/theme/palette.d.ts).
+
+<br />
 
 
 ## Images
