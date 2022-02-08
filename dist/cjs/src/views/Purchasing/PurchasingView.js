@@ -21,7 +21,7 @@ var PURCHASING_MESSAGES_DEFAULT = [
     "Shaking things up!",
 ];
 var PurchasingView = function (_a) {
-    var purchasingImageSrc = _a.purchasingImageSrc, customPurchasingMessages = _a.purchasingMessages, orgID = _a.orgID, invoiceID = _a.invoiceID, lotID = _a.lotID, lotType = _a.lotType, savedPaymentMethods = _a.savedPaymentMethods, selectedPaymentMethod = _a.selectedPaymentMethod, onPurchaseSuccess = _a.onPurchaseSuccess, onPurchaseError = _a.onPurchaseError, onNext = _a.onNext, onDialogBlocked = _a.onDialogBlocked;
+    var purchasingImageSrc = _a.purchasingImageSrc, customPurchasingMessages = _a.purchasingMessages, orgID = _a.orgID, invoiceID = _a.invoiceID, lotID = _a.lotID, lotType = _a.lotType, savedPaymentMethods = _a.savedPaymentMethods, selectedPaymentMethod = _a.selectedPaymentMethod, onPurchaseSuccess = _a.onPurchaseSuccess, onPurchaseError = _a.onPurchaseError, onNext = _a.onNext, onDialogBlocked = _a.onDialogBlocked, debug = _a.debug;
     var purchasingMessages = customPurchasingMessages;
     if (purchasingMessages === false) {
         purchasingMessages = [];
@@ -39,6 +39,7 @@ var PurchasingView = function (_a) {
         lotType: lotType,
         savedPaymentMethods: savedPaymentMethods,
         selectedPaymentMethod: selectedPaymentMethod,
+        debug: debug,
     });
     React.useEffect(function () {
         var paymentStatus = paymentState.paymentStatus, paymentReferenceNumber = paymentState.paymentReferenceNumber, paymentError = paymentState.paymentError;

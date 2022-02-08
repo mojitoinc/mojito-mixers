@@ -1,6 +1,6 @@
 import { __assign } from '../../../../node_modules/tslib/tslib.es6.js';
 import { styled } from '@mui/material';
-import { CardNumberField } from '../CardNumberField/index.js';
+import { CardNumberField } from '../CardNumberField/CardNumberField.js';
 import { TextField } from '../TextField/TextField.js';
 import React__default from 'react';
 

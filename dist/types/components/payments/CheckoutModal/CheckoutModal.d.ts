@@ -37,6 +37,7 @@ export interface CheckoutModalProps {
     onLogin: () => void;
     isAuthenticated?: boolean;
     isAuthenticatedLoading?: boolean;
+    debug?: boolean;
     onError?: (error: ApolloError | Error | string) => void;
     onMarketingOptInChange?: (marketingOptIn: boolean) => void;
 }

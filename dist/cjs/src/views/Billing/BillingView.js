@@ -16,7 +16,7 @@ function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'defau
 var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 
 var BillingView = function (_a) {
-    var checkoutItem = _a.checkoutItem, rawSavedPaymentMethods = _a.savedPaymentMethods, selectedBillingInfo = _a.selectedBillingInfo, onBillingInfoSelected = _a.onBillingInfoSelected, onSavedPaymentMethodDeleted = _a.onSavedPaymentMethodDeleted, onNext = _a.onNext, onClose = _a.onClose;
+    var checkoutItem = _a.checkoutItem, rawSavedPaymentMethods = _a.savedPaymentMethods, selectedBillingInfo = _a.selectedBillingInfo, onBillingInfoSelected = _a.onBillingInfoSelected, onSavedPaymentMethodDeleted = _a.onSavedPaymentMethodDeleted, onNext = _a.onNext, onClose = _a.onClose, debug = _a.debug;
     var savedPaymentMethodAddressIdRef = React.useRef("");
     var savedPaymentMethods = React.useMemo(function () { return arrayUtils.distinctBy(rawSavedPaymentMethods, "addressId"); }, [rawSavedPaymentMethods]);
     var _b = React.useState({
@@ -84,7 +84,7 @@ var BillingView = function (_a) {
         // variant="loggedIn"
         , { 
             // variant="loggedIn"
-            defaultValues: typeof selectedBillingInfo === "string" ? undefined : selectedBillingInfo, onSaved: savedPaymentMethods.length > 0 ? handleShowSaved : undefined, onClose: onClose, onSubmit: handleSubmit }))));
+            defaultValues: typeof selectedBillingInfo === "string" ? undefined : selectedBillingInfo, onSaved: savedPaymentMethods.length > 0 ? handleShowSaved : undefined, onClose: onClose, onSubmit: handleSubmit, debug: debug }))));
 };
 
 exports.BillingView = BillingView;

@@ -17,6 +17,7 @@ var material = require('@mui/material');
 var Book = require('../../node_modules/@mui/icons-material/Book.js');
 var Select = require('../components/shared/Select/Select.js');
 var validationUtils = require('../utils/validationUtils.js');
+var DisplayBox = require('../components/payments/DisplayBox/DisplayBox.js');
 var Grid = require('../../node_modules/@mui/material/Grid/Grid.js');
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
@@ -97,7 +98,7 @@ var BillingInfoForm = function (_a) {
     var _b = reactHookForm.useForm({
         defaultValues: tslib_es6.__assign(tslib_es6.__assign({}, EMPTY_FORM_VALUES), defaultValues),
         reValidateMode: "onChange",
-        resolver: yup$1.yupResolver(schema)
+        resolver: yup$1.yupResolver(schema),
     }), control = _b.control, handleSubmit = _b.handleSubmit, watch = _b.watch;
     var selectedCountryOption = watch(COUNTRY_FIELD);
     var selectedCountryCode = selectedCountryOption === null || selectedCountryOption === void 0 ? void 0 : selectedCountryOption.value;
@@ -128,7 +129,7 @@ var BillingInfoForm = function (_a) {
                 React__default["default"].createElement(StateSelector.ControlledStateSelector, { name: STATE_FIELD, control: control, label: FIELD_LABELS[STATE_FIELD], countryCode: selectedCountryCode })),
             React__default["default"].createElement(Grid["default"], { item: true, sm: 6 },
                 React__default["default"].createElement(TextField.ControlledTextField, { name: ZIP_CODE_FIELD, control: control, label: FIELD_LABELS[ZIP_CODE_FIELD] }))),
-        debug && (React__default["default"].createElement(material.Box, { component: "pre", sx: { my: 2, overflow: "scroll" } }, JSON.stringify(watch(), null, 2))),
+        debug && (React__default["default"].createElement(DisplayBox.DebugBox, { sx: { my: 2 } }, JSON.stringify(watch(), null, 2))),
         React__default["default"].createElement(CheckoutModalFooter.CheckoutModalFooter, { variant: "toPayment", onCloseClicked: onClose })));
 };
 

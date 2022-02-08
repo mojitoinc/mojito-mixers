@@ -4,7 +4,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 var tslib_es6 = require('../../../../node_modules/tslib/tslib.es6.js');
 var material = require('@mui/material');
-var index = require('../CardNumberField/index.js');
+var CardNumberField = require('../CardNumberField/CardNumberField.js');
 var TextField = require('../TextField/TextField.js');
 var React = require('react');
 
@@ -37,7 +37,7 @@ var ReadOnlyField = material.styled(function (props) { return (React__default["d
         },
     },
 });
-var ReadOnlyCardField = material.styled(function (props) { return (React__default["default"].createElement(index.CardNumberField, tslib_es6.__assign({ variant: "standard", disabled: true }, props))); })({
+var ReadOnlyCardField = material.styled(function (props) { return (React__default["default"].createElement(CardNumberField.CardNumberField, tslib_es6.__assign({ variant: "standard", disabled: true }, props))); })({
     "& .MuiInputLabel-root": {
         "&.Mui-disabled": {
             color: "black",
