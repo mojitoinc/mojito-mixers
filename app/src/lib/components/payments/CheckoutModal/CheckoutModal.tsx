@@ -287,12 +287,17 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
   const [paymentReferenceNumber, setPaymentReferenceNumber] = useState("");
 
-  const handlePurchaseSuccess = useCallback((paymentReferenceNumber: string) => {
+  const handlePurchaseSuccess = useCallback(async (paymentReferenceNumber: string) => {
+    // After a successful purchase, a new payment method might have been created, so we reload them:
+    await refetchPaymentMethods();
+
     setPaymentReferenceNumber(paymentReferenceNumber);
-  }, []);
+
+    handleNextClicked();
+  }, [refetchPaymentMethods, handleNextClicked]);
 
   const handleReviewData = useCallback(async (): Promise<false> => {
-    // After an error, a payment method might have been created anyway, so we reload them:
+    // After an error, a new payment method might have been created anyway, so we reload them:
     await refetchPaymentMethods();
 
     // TODO: paymentError should have a source property to know where the error is coming from and handle recovery differently here:
@@ -432,7 +437,6 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
         selectedPaymentMethod={ selectedPaymentMethod }
         onPurchaseSuccess={ handlePurchaseSuccess }
         onPurchaseError={ setPaymentError }
-        onNext={ handleNextClicked }
         onDialogBlocked={ onDialogBlocked }
         debug={ debug } />
     );

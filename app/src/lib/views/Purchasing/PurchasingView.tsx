@@ -31,7 +31,6 @@ export interface PurchasingViewProps {
   selectedPaymentMethod: SelectedPaymentMethod;
   onPurchaseSuccess: (paymentReferenceNumber: string) => void;
   onPurchaseError: (error: string) => void;
-  onNext: () => void;
   onDialogBlocked: (blocked: boolean) => void;
   debug?: boolean;
 }
@@ -47,7 +46,6 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
   selectedPaymentMethod,
   onPurchaseSuccess,
   onPurchaseError,
-  onNext,
   onDialogBlocked,
   debug,
 }) => {
@@ -93,8 +91,7 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
     }
 
     onPurchaseSuccess(paymentReferenceNumber);
-    onNext();
-  }, [paymentState, hasWaited, onPurchaseError, onNext, onDialogBlocked, onPurchaseSuccess]);
+  }, [paymentState, hasWaited, onPurchaseError, onDialogBlocked, onPurchaseSuccess]);
 
   useTimeout(() => {
     setHasWaited(true);
