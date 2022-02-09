@@ -1,5 +1,6 @@
-import { Box, Link, Typography, Divider } from "@mui/material";
+import { Box, Link, Typography, Divider, CircularProgress } from "@mui/material";
 import React, { useCallback, useState } from "react";
+import { isPromise } from "../../../utils/promiseUtils";
 import { Checkbox } from "../../shared/Checkbox/Checkbox";
 import { ConsentText, ConsentType, CONSENT_ERROR_MESSAGE } from "../../shared/ConsentText/ConsentText";
 import { PrimaryButton } from "../../shared/PrimaryButton/PrimaryButton";
@@ -7,6 +8,7 @@ import { ICONS_BY_VARIANT, LABELS_BY_VARIANT } from "./CheckoutModalFooter.const
 
 interface CheckoutModalFooterConsentState {
   isFormSubmitted: boolean;
+  isFormLoading: boolean;
   isConsentChecked: boolean;
 }
 
@@ -19,7 +21,7 @@ export interface CheckoutModalFooterProps {
   privacyHref?: string;
   termsOfUseHref?: string;
   submitDisabled?: boolean;
-  onSubmitClicked?: (canSubmit: boolean) => void;
+  onSubmitClicked?: (canSubmit: boolean) => void | Promise<void | false>;
   onCloseClicked: () => void;
 }
 
@@ -39,9 +41,11 @@ export const CheckoutModalFooter: React.FC<CheckoutModalFooterProps> = ({
 
   const [{
     isFormSubmitted,
+    isFormLoading,
     isConsentChecked,
   }, setConsentState] = useState<CheckoutModalFooterConsentState>({
     isFormSubmitted: false,
+    isFormLoading: false,
     isConsentChecked: showConsent && consentType === "checkbox" ? false : true,
   });
 
@@ -50,6 +54,7 @@ export const CheckoutModalFooter: React.FC<CheckoutModalFooterProps> = ({
   const handleConsentClicked = useCallback((_, checked: boolean) => {
     setConsentState((prevConsentState) => ({
       isFormSubmitted: prevConsentState.isFormSubmitted,
+      isFormLoading: prevConsentState.isFormLoading,
       isConsentChecked: checked,
     }));
   }, []);
@@ -60,13 +65,26 @@ export const CheckoutModalFooter: React.FC<CheckoutModalFooterProps> = ({
   const primaryButtonLabel = LABELS_BY_VARIANT[variant];
   const PrimaryButtonIcon = ICONS_BY_VARIANT[variant];
 
-  const handleSubmitClicked = useCallback(() => {
+  const handleSubmitClicked = useCallback(async () => {
+    if (!onSubmitClicked) return;
+
     setConsentState({
       isFormSubmitted: true,
+      isFormLoading: true,
       isConsentChecked,
     });
 
-    if (onSubmitClicked) onSubmitClicked(isConsentChecked);
+    const promiseOrResult = onSubmitClicked(isConsentChecked);
+    const result = isPromise(promiseOrResult) ? await promiseOrResult : promiseOrResult;
+
+    // This means the parent component will make this one unmount, so there's no need to update the state anymore:
+    if (result === false) return;
+
+    setConsentState({
+      isFormSubmitted: true,
+      isFormLoading: false,
+      isConsentChecked,
+    });
   }, [isConsentChecked, onSubmitClicked]);
 
   // CANCEL LINK:
@@ -100,8 +118,8 @@ export const CheckoutModalFooter: React.FC<CheckoutModalFooterProps> = ({
         <PrimaryButton
           onClick={ onSubmitClicked ? handleSubmitClicked : undefined }
           type={ onSubmitClicked ? "button" : "submit" }
-          endIcon={ PrimaryButtonIcon && <PrimaryButtonIcon /> }
-          disabled={ submitDisabled }>
+          endIcon={ isFormLoading ? <CircularProgress color="inherit" size="1em" /> : (PrimaryButtonIcon && <PrimaryButtonIcon />) }
+          disabled={ submitDisabled || isFormLoading }>
           { primaryButtonLabel }
         </PrimaryButton>
       ) }

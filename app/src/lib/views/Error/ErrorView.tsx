@@ -7,7 +7,7 @@ import { formatSentence } from "../../utils/formatUtils";
 export interface ErrorViewProps {
   errorMessage?: string;
   errorImageSrc?: string;
-  onReviewData: () => void;
+  onReviewData: () => Promise<false>;
   onClose: () => void;
 }
 

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { SavedPaymentMethod } from "../../domain/circle/circle.interfaces";
 import { useFullPayment } from "../../hooks/useFullPayment";
 import React from "react";
@@ -31,7 +31,6 @@ export interface PurchasingViewProps {
   selectedPaymentMethod: SelectedPaymentMethod;
   onPurchaseSuccess: (paymentReferenceNumber: string) => void;
   onPurchaseError: (error: string) => void;
-  onNext: () => void;
   onDialogBlocked: (blocked: boolean) => void;
   debug?: boolean;
 }
@@ -47,7 +46,6 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
   selectedPaymentMethod,
   onPurchaseSuccess,
   onPurchaseError,
-  onNext,
   onDialogBlocked,
   debug,
 }) => {
@@ -63,7 +61,7 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
   const [purchasingMessageIndex, setPurchasingMessageIndex] = useState(0);
   const purchasingMessage = purchasingMessages[purchasingMessageIndex];
 
-  const paymentState = useFullPayment({
+  const [paymentState, fullPayment] = useFullPayment({
     orgID,
     invoiceID,
     lotID,
@@ -72,6 +70,16 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
     selectedPaymentMethod,
     debug,
   });
+
+  const calledRef = useRef(false);
+
+  useEffect(() => {
+    if (calledRef.current) return;
+
+    calledRef.current = true;
+
+    fullPayment();
+  }, [fullPayment]);
 
   useEffect(() => {
     const { paymentStatus, paymentReferenceNumber, paymentError } = paymentState;
@@ -93,8 +101,7 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
     }
 
     onPurchaseSuccess(paymentReferenceNumber);
-    onNext();
-  }, [paymentState, hasWaited, onPurchaseError, onNext, onDialogBlocked, onPurchaseSuccess]);
+  }, [paymentState, hasWaited, onPurchaseError, onDialogBlocked, onPurchaseSuccess]);
 
   useTimeout(() => {
     setHasWaited(true);
