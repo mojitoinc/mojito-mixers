@@ -51,8 +51,6 @@ export function useFullPayment({
   const [createPaymentMethod] = useCreatePaymentMethod();
   const [createAuctionInvoice] = useCreateAuctionInvoiceMutation();
   const [createBuyNowInvoice] = useCreateBuyNowInvoiceMutation();
-
-  // TODO: There's another mutation, PurchaseBuyNow, to create invoice and pay that also makes a reservation.
   const [makePayment] = useCreatePaymentMutation();
 
   async function fullPayment() {

@@ -1,6 +1,6 @@
 import { Backdrop, Box, CircularProgress, Dialog, DialogContent } from "@mui/material";
 import React, { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { savedPaymentMethodToBillingInfo, transformRawSavedPaymentMethods } from "../../../domain/circle/circle.utils";
+import { getSavedPaymentMethodAddressIdFromBillingInfo, savedPaymentMethodToBillingInfo, transformRawSavedPaymentMethods } from "../../../domain/circle/circle.utils";
 import { UserFormat } from "../../../domain/auth/authentication.interfaces";
 import { PaymentMethod, PaymentType } from "../../../domain/payment/payment.interfaces";
 import { CheckoutItem } from "../../../domain/product/product.interfaces";
@@ -14,7 +14,7 @@ import { CheckoutModalHeader, CheckoutModalHeaderVariant } from "../CheckoutModa
 import { PurchasingView } from "../../../views/Purchasing/PurchasingView";
 import { ApolloError } from "@apollo/client";
 import { ErrorView } from "../../../views/Error/ErrorView";
-import { RawSavedPaymentMethod } from "../../../domain/circle/circle.interfaces";
+import { RawSavedPaymentMethod, SavedPaymentMethod } from "../../../domain/circle/circle.interfaces";
 import { Theme, ThemeProvider, createTheme, ThemeOptions, SxProps } from "@mui/material/styles";
 import { useShakeAnimation } from "../../../utils/animationUtils";
 import { resetStepperProgress } from "../CheckoutStepper/CheckoutStepper";
@@ -178,12 +178,46 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   }, [isDialogLoading, open, resetModalState]);
 
   useEffect(() => {
+    if (savedPaymentMethods.length === 0) return;
+
+    // When reloading the saved payment methods after an error, we might have form data that matches a payment method
+    // that has just been created, so we want to update it to reference the existing one:
+
+    setSelectedPaymentMethod((prevSelectedPaymentMethod) => {
+      const { billingInfo, paymentInfo } = prevSelectedPaymentMethod;
+
+      if (typeof billingInfo === "string" && typeof paymentInfo === "string") return prevSelectedPaymentMethod;
+
+      // To find the saved payment method(s) that was/were last created:
+      const reversedSavedPaymentMethods = savedPaymentMethods.slice().reverse();
+
+      let matchingPaymentMethod: SavedPaymentMethod;
+
+      if (typeof billingInfo === "object") {
+        const addressId = getSavedPaymentMethodAddressIdFromBillingInfo(billingInfo);
+
+        matchingPaymentMethod = reversedSavedPaymentMethods.find(paymentMethod => paymentMethod.addressId === addressId);
+      }
+
+      const isBillingInfoAddressId = typeof billingInfo === "string";
+
+      return !isBillingInfoAddressId && matchingPaymentMethod ? {
+        billingInfo: matchingPaymentMethod.addressId,
+        paymentInfo: matchingPaymentMethod.id,
+      } : {
+        billingInfo,
+        paymentInfo: isBillingInfoAddressId ? reversedSavedPaymentMethods[0].id : paymentInfo,
+      };
+    });
+  }, [savedPaymentMethods]);
+
+  useEffect(() => {
     if (!checkoutStep) onClose();
   }, [checkoutStep, onClose]);
 
   useEffect(() => {
-    // TODO: After an error, a payment method might have been created anyway. Reload them.
     // TODO: Refetch these when coming back from error screen:
+
     if (meError) setPaymentError("User could not be loaded.");
     if (paymentMethodsError) setPaymentError("Payment methods could not be loaded.");
   }, [meError, paymentMethodsError, checkoutItem, invoiceID]);
@@ -257,11 +291,19 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
     setPaymentReferenceNumber(paymentReferenceNumber);
   }, []);
 
-  const handleReviewData = useCallback(() => {
+  const handleReviewData = useCallback(async (): Promise<false> => {
+    // After an error, a payment method might have been created anyway, so we reload them:
+    await refetchPaymentMethods();
+
     // TODO: paymentError should have a source property to know where the error is coming from and handle recovery differently here:
     setPaymentError("");
     setCheckoutStepIndex(2);
-  }, []);
+
+    // This function is used as a CheckoutModalFooter's onSubmitClicked, so we want that to show a loader on the submit
+    // button when clicked but do not remove it once the Promise is resolved, as we are moving to another view and
+    // CheckoutModalFooter will unmount (so doing this prevents a memory leak issue):
+    return false;
+  }, [refetchPaymentMethods]);
 
   // BLOCK DIALOG LOGIC & SHAKE ANIMATION:
 
