@@ -171,8 +171,8 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
     // modal is re-opened, we need to reset its state, taking into account if we need to resume a Plaid OAuth flow:s
     const { selectedBillingInfo, continueOAuthFlow, savedStateUsed } = INITIAL_PLAID_OAUTH_FLOW_STATE;
 
-    setCheckoutStepIndex(continueOAuthFlow && !savedStateUsed ? 3 : startAt);
     setPaymentError("");
+    setCheckoutStepIndex(continueOAuthFlow && !savedStateUsed ? 3 : startAt);
     setSelectedPaymentMethod({ billingInfo: selectedBillingInfo || "", paymentInfo: "" });
   }, [startAt]);
 
@@ -308,8 +308,8 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
     ]);
 
     // TODO: paymentError should have a source property to know where the error is coming from and handle recovery differently here:
-    setCheckoutStepIndex(2);
     setPaymentError("");
+    setCheckoutStepIndex(2);
 
     // This function is used as a CheckoutModalFooter's onSubmitClicked, so we want that to show a loader on the submit
     // button when clicked but do not remove it once the Promise is resolved, as we are moving to another view and

@@ -1,5 +1,5 @@
 import { ApolloError } from "@apollo/client";
-import { useRef, useState } from "react";
+import { useState, useCallback } from "react";
 import { SelectedPaymentMethod } from "../components/payments/CheckoutModal/CheckoutModal";
 import { SavedPaymentMethod } from "../domain/circle/circle.interfaces";
 import { parseCircleError, savedPaymentMethodToBillingInfo } from "../domain/circle/circle.utils";
@@ -36,7 +36,7 @@ export function useFullPayment({
   savedPaymentMethods,
   selectedPaymentMethod,
   debug = false,
-}: UseFullPaymentOptions): PaymentState {
+}: UseFullPaymentOptions): [PaymentState, () => Promise<void>] {
 
   const [paymentState, setPaymentState] = useState<PaymentState>({
     paymentStatus: "processing",
@@ -53,7 +53,7 @@ export function useFullPayment({
   const [createBuyNowInvoice] = useCreateBuyNowInvoiceMutation();
   const [makePayment] = useCreatePaymentMutation();
 
-  async function fullPayment() {
+  const fullPayment = useCallback(async () => {
     if (debug) console.log(`\n💵 Making payment for orgID = ${ orgID } + lotID = ${ lotID } (${ lotType })\n`);
 
     setPaymentState({
@@ -247,15 +247,7 @@ export function useFullPayment({
       paymentStatus: "processed",
       paymentReferenceNumber: circlePaymentID,
     });
-  }
+  }, [createAuctionInvoice, createBuyNowInvoice, createPaymentMethod, debug, existingInvoiceID, lotID, lotType, makePayment, orgID, savedPaymentMethods, selectedBillingInfo, selectedPaymentInfo]);
 
-  const calledRef = useRef(false);
-
-  if (!calledRef.current) {
-    calledRef.current = true;
-
-    fullPayment();
-  }
-
-  return paymentState;
+  return [paymentState, fullPayment];
 }

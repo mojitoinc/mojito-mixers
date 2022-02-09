@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { SavedPaymentMethod } from "../../domain/circle/circle.interfaces";
 import { useFullPayment } from "../../hooks/useFullPayment";
 import React from "react";
@@ -61,7 +61,7 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
   const [purchasingMessageIndex, setPurchasingMessageIndex] = useState(0);
   const purchasingMessage = purchasingMessages[purchasingMessageIndex];
 
-  const paymentState = useFullPayment({
+  const [paymentState, fullPayment] = useFullPayment({
     orgID,
     invoiceID,
     lotID,
@@ -70,6 +70,16 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
     selectedPaymentMethod,
     debug,
   });
+
+  const calledRef = useRef(false);
+
+  useEffect(() => {
+    if (calledRef.current) return;
+
+    calledRef.current = true;
+
+    fullPayment();
+  }, [fullPayment]);
 
   useEffect(() => {
     const { paymentStatus, paymentReferenceNumber, paymentError } = paymentState;
