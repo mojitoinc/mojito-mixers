@@ -85,7 +85,7 @@ export declare type AchPaymentMethodPrepareStatementOutput = {
 };
 export declare type Asset = {
     __typename?: 'Asset';
-    currentVersion: AssetVersion;
+    currentVersion?: Maybe<AssetVersion>;
     id: Scalars['UUID1'];
     versions?: Maybe<Array<AssetVersion>>;
 };
@@ -683,8 +683,10 @@ export declare type NftContract = {
     id: Scalars['UUID1'];
     marketplaceAddress: Scalars['EthAddress'];
     mediaTxHash?: Maybe<Scalars['String']>;
+    name?: Maybe<Scalars['String']>;
     nftContractType: NftContractType;
     nftTokens?: Maybe<Array<NftToken>>;
+    symbol?: Maybe<Scalars['String']>;
     transferOwnershipHash?: Maybe<Scalars['String']>;
     wallet: Wallet;
 };
@@ -729,10 +731,6 @@ export declare type Network = {
     safeMasterContractAddress: Scalars['String'];
     wethAddress: Scalars['String'];
 };
-export declare type Notification = {
-    __typename?: 'Notification';
-    time?: Maybe<Scalars['String']>;
-};
 export declare type Organization = {
     __typename?: 'Organization';
     assets?: Maybe<Array<Asset>>;
@@ -770,6 +768,15 @@ export declare type PaymentMethodUpdateInput = {
     creditCardData?: InputMaybe<CreditCardData>;
     paymentType: PaymentType;
 };
+export declare type PaymentNotification3DsMessage = {
+    __typename?: 'PaymentNotification3DSMessage';
+    redirectURL: Scalars['String'];
+};
+export declare type PaymentNotificationMessage = PaymentNotification3DsMessage;
+export declare type PaymentNotificationOutput = {
+    __typename?: 'PaymentNotificationOutput';
+    message: PaymentNotificationMessage;
+};
 export declare type PaymentPublicKey = {
     __typename?: 'PaymentPublicKey';
     keyID: Scalars['String'];
@@ -796,7 +803,7 @@ export declare type Query = {
     collection?: Maybe<MarketplaceCollection>;
     collectionBySlug?: Maybe<MarketplaceCollection>;
     collectionItemById?: Maybe<MarketplaceCollectionItem>;
-    /** Retrieves invoice details by ID, currently used by customers microservice  */
+    /** Retrieves invoice details by ID */
     getInvoiceDetails: InvoiceDetails;
     /** Retrieves invoice list for given user, can be called by org admin */
     getInvoicesByUserID: Array<Maybe<InvoiceDetails>>;
@@ -807,6 +814,8 @@ export declare type Query = {
     getMyPayments: Array<Maybe<Payment>>;
     /** Returns Payment method list in scope of current Organization. */
     getPaymentMethodList: Array<PaymentMethodOutput>;
+    /** Retrieves Payment notification */
+    getPaymentNotification: PaymentNotificationOutput;
     /** Returns Public Key for further Payment data encryption. */
     getPaymentPublicKey: PaymentPublicKey;
     /** Retrieves payment list for given user, can be called by org admin */
@@ -910,7 +919,6 @@ export declare type Subscription = {
     getMarketplaceAuctionLot: MarketplaceAuctionLot;
     /**  Subscribes to lots and bids updates within given marketplace collection   */
     marketplaceCollectionLotsUpdates: MarketplaceAuctionLot;
-    timeNotifier: Notification;
 };
 export declare type SubscriptionAuctionLotUpdatedArgs = {
     marketplaceAuctionLotId: Scalars['UUID'];
@@ -1079,8 +1087,8 @@ export declare type MeQuery = {
             __typename?: 'User';
             id: any;
             username: string;
-            name?: string | null | undefined;
-            email?: string | null | undefined;
+            name?: string | null;
+            email?: string | null;
         };
         userOrgs: Array<{
             __typename?: 'UserOrganization';
@@ -1090,7 +1098,7 @@ export declare type MeQuery = {
                 name: string;
             };
         }>;
-    } | null | undefined;
+    } | null;
 };
 export declare type CreatePaymentMutationVariables = Exact<{
     paymentMethodID: Scalars['UUID1'];
@@ -1123,7 +1131,7 @@ export declare type CreateAuctionInvoiceMutation = {
             unitPrice: number;
             taxes: number;
             totalPrice: number;
-        } | null | undefined>;
+        } | null>;
     };
 };
 export declare type CreateBuyNowInvoiceMutationVariables = Exact<{
@@ -1143,8 +1151,8 @@ export declare type CreateBuyNowInvoiceMutation = {
                 unitPrice: number;
                 taxes: number;
                 totalPrice: number;
-            } | null | undefined>;
-        } | null | undefined;
+            } | null>;
+        } | null;
     };
 };
 export declare type PaymentKeyQueryVariables = Exact<{
@@ -1173,7 +1181,7 @@ export declare type GetPaymentMethodListQuery = {
             __typename?: 'ACHMetadataOutput';
             email: string;
             phoneNumber: string;
-        } | null | undefined;
+        } | null;
         billingDetails?: {
             __typename?: 'ACHBillingDetailsOutput';
             name: string;
@@ -1183,11 +1191,11 @@ export declare type GetPaymentMethodListQuery = {
             address2: string;
             district: string;
             postalCode: string;
-        } | null | undefined;
+        } | null;
         bankAddress?: {
             __typename?: 'ACHBankAddressOutput';
             bankName: string;
-        } | null | undefined;
+        } | null;
     } | {
         __typename?: 'CreditCardPaymentMethodOutput';
         id: any;
@@ -1199,7 +1207,7 @@ export declare type GetPaymentMethodListQuery = {
             __typename?: 'CreditCardMetadataOutput';
             email: string;
             phoneNumber: string;
-        } | null | undefined;
+        } | null;
         billingDetails?: {
             __typename?: 'CreditCardBillingDetailsOutput';
             name: string;
@@ -1209,7 +1217,7 @@ export declare type GetPaymentMethodListQuery = {
             address2: string;
             district: string;
             postalCode: string;
-        } | null | undefined;
+        } | null;
     } | {
         __typename?: 'WirePaymentMethodOutput';
     }>;
@@ -1247,7 +1255,7 @@ export declare type PreparePaymentMethodQuery = {
     preparePaymentMethod?: {
         __typename?: 'ACHPaymentMethodPrepareStatementOutput';
         linkToken: string;
-    } | null | undefined;
+    } | null;
 };
 export declare const MeDocument: Apollo.DocumentNode;
 /**

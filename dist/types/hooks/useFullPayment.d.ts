@@ -16,4 +16,4 @@ export interface PaymentState {
     paymentReferenceNumber: string;
     paymentError?: string;
 }
-export declare function useFullPayment({ orgID, invoiceID: existingInvoiceID, lotID, lotType, savedPaymentMethods, selectedPaymentMethod, debug, }: UseFullPaymentOptions): PaymentState;
+export declare function useFullPayment({ orgID, invoiceID: existingInvoiceID, lotID, lotType, savedPaymentMethods, selectedPaymentMethod, debug, }: UseFullPaymentOptions): [PaymentState, () => Promise<void>];

@@ -1,5 +1,7 @@
-import { Box, Typography, Link, Divider } from '@mui/material';
+import { __awaiter } from '../../../../node_modules/tslib/tslib.es6.js';
+import { Box, CircularProgress, Typography, Link, Divider } from '@mui/material';
 import React__default, { useState, useCallback } from 'react';
+import { isPromise } from '../../../utils/promiseUtils.js';
 import { Checkbox } from '../../shared/Checkbox/Checkbox.js';
 import { ConsentText, CONSENT_ERROR_MESSAGE } from '../../shared/ConsentText/ConsentText.js';
 import { PrimaryButton } from '../../shared/PrimaryButton/PrimaryButton.js';
@@ -9,14 +11,16 @@ const CheckoutModalFooter = ({ variant, guestCheckoutEnabled, consentType, priva
     // CONSENT:
     const showConsent = consentType && (privacyHref || termsOfUseHref) && (variant === "toConfirmation" || variant === "toPlaid");
     const consentTextElement = showConsent ? React__default.createElement(ConsentText, { privacyHref: privacyHref, termsOfUseHref: termsOfUseHref }) : null;
-    const [{ isFormSubmitted, isConsentChecked, }, setConsentState] = useState({
+    const [{ isFormSubmitted, isFormLoading, isConsentChecked, }, setConsentState] = useState({
         isFormSubmitted: false,
+        isFormLoading: false,
         isConsentChecked: showConsent && consentType === "checkbox" ? false : true,
     });
     const showConsentError = isFormSubmitted && !isConsentChecked;
     const handleConsentClicked = useCallback((_, checked) => {
         setConsentState((prevConsentState) => ({
             isFormSubmitted: prevConsentState.isFormSubmitted,
+            isFormLoading: prevConsentState.isFormLoading,
             isConsentChecked: checked,
         }));
     }, []);
@@ -24,14 +28,25 @@ const CheckoutModalFooter = ({ variant, guestCheckoutEnabled, consentType, priva
     const primaryButtonVisible = variant !== "toGuestCheckout" || guestCheckoutEnabled;
     const primaryButtonLabel = LABELS_BY_VARIANT[variant];
     const PrimaryButtonIcon = ICONS_BY_VARIANT[variant];
-    const handleSubmitClicked = useCallback(() => {
+    const handleSubmitClicked = useCallback(() => __awaiter(void 0, void 0, void 0, function* () {
+        if (!onSubmitClicked)
+            return;
         setConsentState({
             isFormSubmitted: true,
+            isFormLoading: true,
             isConsentChecked,
         });
-        if (onSubmitClicked)
-            onSubmitClicked(isConsentChecked);
-    }, [isConsentChecked, onSubmitClicked]);
+        const promiseOrResult = onSubmitClicked(isConsentChecked);
+        const result = isPromise(promiseOrResult) ? yield promiseOrResult : promiseOrResult;
+        // This means the parent component will make this one unmount, so there's no need to update the state anymore:
+        if (result === false)
+            return;
+        setConsentState({
+            isFormSubmitted: true,
+            isFormLoading: false,
+            isConsentChecked,
+        });
+    }), [isConsentChecked, onSubmitClicked]);
     // CANCEL LINK:
     const handleCancelClicked = useCallback((e) => {
         e.preventDefault();
@@ -47,7 +62,7 @@ const CheckoutModalFooter = ({ variant, guestCheckoutEnabled, consentType, priva
         showConsent && consentType === "checkbox" && (React__default.createElement(Checkbox, { label: React__default.createElement(React__default.Fragment, null,
                 "I ",
                 consentTextElement), checked: isConsentChecked, onChange: handleConsentClicked, error: showConsentError, helperText: showConsentError ? CONSENT_ERROR_MESSAGE : undefined, sx: { alignSelf: "flex-start", mb: 5 } })),
-        primaryButtonVisible && (React__default.createElement(PrimaryButton, { onClick: onSubmitClicked ? handleSubmitClicked : undefined, type: onSubmitClicked ? "button" : "submit", endIcon: PrimaryButtonIcon && React__default.createElement(PrimaryButtonIcon, null), disabled: submitDisabled }, primaryButtonLabel)),
+        primaryButtonVisible && (React__default.createElement(PrimaryButton, { onClick: onSubmitClicked ? handleSubmitClicked : undefined, type: onSubmitClicked ? "button" : "submit", endIcon: isFormLoading ? React__default.createElement(CircularProgress, { color: "inherit", size: "1em" }) : (PrimaryButtonIcon && React__default.createElement(PrimaryButtonIcon, null)), disabled: submitDisabled || isFormLoading }, primaryButtonLabel)),
         variant !== "toMarketplace" && (React__default.createElement(Typography, { sx: primaryButtonVisible ? { pt: 2 } : undefined },
             primaryButtonVisible ? "or " : null,
             React__default.createElement(Link, { sx: { color: "text.primary" }, href: "", onClick: handleCancelClicked }, "Cancel and Return to Marketplace"))),

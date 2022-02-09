@@ -1,4 +1,4 @@
-import React__default, { useState, useEffect } from 'react';
+import React__default, { useState, useRef, useEffect } from 'react';
 import { useFullPayment } from '../../hooks/useFullPayment.js';
 import { Box, Typography } from '@mui/material';
 import { useTimeout, useInterval } from '@swyg/corre';
@@ -12,7 +12,7 @@ const PURCHASING_MESSAGES_DEFAULT = [
     "Adding rum, lime juice and ice.",
     "Shaking things up!",
 ];
-const PurchasingView = ({ purchasingImageSrc, purchasingMessages: customPurchasingMessages, orgID, invoiceID, lotID, lotType, savedPaymentMethods, selectedPaymentMethod, onPurchaseSuccess, onPurchaseError, onNext, onDialogBlocked, debug, }) => {
+const PurchasingView = ({ purchasingImageSrc, purchasingMessages: customPurchasingMessages, orgID, invoiceID, lotID, lotType, savedPaymentMethods, selectedPaymentMethod, onPurchaseSuccess, onPurchaseError, onDialogBlocked, debug, }) => {
     let purchasingMessages = customPurchasingMessages;
     if (purchasingMessages === false) {
         purchasingMessages = [];
@@ -23,7 +23,7 @@ const PurchasingView = ({ purchasingImageSrc, purchasingMessages: customPurchasi
     const [hasWaited, setHasWaited] = useState(false);
     const [purchasingMessageIndex, setPurchasingMessageIndex] = useState(0);
     const purchasingMessage = purchasingMessages[purchasingMessageIndex];
-    const paymentState = useFullPayment({
+    const [paymentState, fullPayment] = useFullPayment({
         orgID,
         invoiceID,
         lotID,
@@ -32,6 +32,13 @@ const PurchasingView = ({ purchasingImageSrc, purchasingMessages: customPurchasi
         selectedPaymentMethod,
         debug,
     });
+    const calledRef = useRef(false);
+    useEffect(() => {
+        if (calledRef.current)
+            return;
+        calledRef.current = true;
+        fullPayment();
+    }, [fullPayment]);
     useEffect(() => {
         const { paymentStatus, paymentReferenceNumber, paymentError } = paymentState;
         if (paymentStatus === "processing") {
@@ -46,8 +53,7 @@ const PurchasingView = ({ purchasingImageSrc, purchasingMessages: customPurchasi
             return;
         }
         onPurchaseSuccess(paymentReferenceNumber);
-        onNext();
-    }, [paymentState, hasWaited, onPurchaseError, onNext, onDialogBlocked, onPurchaseSuccess]);
+    }, [paymentState, hasWaited, onPurchaseError, onDialogBlocked, onPurchaseSuccess]);
     useTimeout(() => {
         setHasWaited(true);
     }, PURCHASING_MIN_WAIT_MS);

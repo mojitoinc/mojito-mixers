@@ -20,7 +20,7 @@ const PURCHASING_MESSAGES_DEFAULT = [
     "Adding rum, lime juice and ice.",
     "Shaking things up!",
 ];
-const PurchasingView = ({ purchasingImageSrc, purchasingMessages: customPurchasingMessages, orgID, invoiceID, lotID, lotType, savedPaymentMethods, selectedPaymentMethod, onPurchaseSuccess, onPurchaseError, onNext, onDialogBlocked, debug, }) => {
+const PurchasingView = ({ purchasingImageSrc, purchasingMessages: customPurchasingMessages, orgID, invoiceID, lotID, lotType, savedPaymentMethods, selectedPaymentMethod, onPurchaseSuccess, onPurchaseError, onDialogBlocked, debug, }) => {
     let purchasingMessages = customPurchasingMessages;
     if (purchasingMessages === false) {
         purchasingMessages = [];
@@ -31,7 +31,7 @@ const PurchasingView = ({ purchasingImageSrc, purchasingMessages: customPurchasi
     const [hasWaited, setHasWaited] = React.useState(false);
     const [purchasingMessageIndex, setPurchasingMessageIndex] = React.useState(0);
     const purchasingMessage = purchasingMessages[purchasingMessageIndex];
-    const paymentState = useFullPayment.useFullPayment({
+    const [paymentState, fullPayment] = useFullPayment.useFullPayment({
         orgID,
         invoiceID,
         lotID,
@@ -40,6 +40,13 @@ const PurchasingView = ({ purchasingImageSrc, purchasingMessages: customPurchasi
         selectedPaymentMethod,
         debug,
     });
+    const calledRef = React.useRef(false);
+    React.useEffect(() => {
+        if (calledRef.current)
+            return;
+        calledRef.current = true;
+        fullPayment();
+    }, [fullPayment]);
     React.useEffect(() => {
         const { paymentStatus, paymentReferenceNumber, paymentError } = paymentState;
         if (paymentStatus === "processing") {
@@ -54,8 +61,7 @@ const PurchasingView = ({ purchasingImageSrc, purchasingMessages: customPurchasi
             return;
         }
         onPurchaseSuccess(paymentReferenceNumber);
-        onNext();
-    }, [paymentState, hasWaited, onPurchaseError, onNext, onDialogBlocked, onPurchaseSuccess]);
+    }, [paymentState, hasWaited, onPurchaseError, onDialogBlocked, onPurchaseSuccess]);
     corre.useTimeout(() => {
         setHasWaited(true);
     }, PURCHASING_MIN_WAIT_MS);
