@@ -119,9 +119,12 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   onError, // Not implemented yet. Used to let the app control where to log errors to (e.g. Sentry).
   onMarketingOptInChange, // Not implemented yet. Used to let user subscribe / unsubscribe to marketing updates.
 }) => {
-  const { data: meData, loading: meLoading, error: meError } = useMeQuery({ skip: !isAuthenticated });
-
-  const [deletePaymentMethod] = useDeletePaymentMethodMutation();
+  const {
+    data: meData,
+    loading: meLoading,
+    error: meError,
+    refetch: meRefetch,
+  } = useMeQuery({ skip: !isAuthenticated });
 
   const {
     data: paymentMethodsData,
@@ -134,6 +137,8 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
       orgID,
     },
   });
+
+  const [deletePaymentMethod] = useDeletePaymentMethodMutation();
 
   const isDialogLoading = isAuthenticatedLoading || meLoading || paymentMethodsLoading;
   const isPlaidFlowLoading = continuePlaidOAuthFlow();
@@ -166,8 +171,8 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
     // modal is re-opened, we need to reset its state, taking into account if we need to resume a Plaid OAuth flow:s
     const { selectedBillingInfo, continueOAuthFlow, savedStateUsed } = INITIAL_PLAID_OAUTH_FLOW_STATE;
 
-    setPaymentError("");
     setCheckoutStepIndex(continueOAuthFlow && !savedStateUsed ? 3 : startAt);
+    setPaymentError("");
     setSelectedPaymentMethod({ billingInfo: selectedBillingInfo || "", paymentInfo: "" });
   }, [startAt]);
 
@@ -216,11 +221,9 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   }, [checkoutStep, onClose]);
 
   useEffect(() => {
-    // TODO: Refetch these when coming back from error screen:
-
     if (meError) setPaymentError("User could not be loaded.");
     if (paymentMethodsError) setPaymentError("Payment methods could not be loaded.");
-  }, [meError, paymentMethodsError, checkoutItem, invoiceID]);
+  }, [meError, paymentMethodsError]);
 
   const handlePrevClicked = useCallback(() => {
     setCheckoutStepIndex((prevCheckoutStepIndex) => prevCheckoutStepIndex - 1);
@@ -297,28 +300,28 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   }, [refetchPaymentMethods, handleNextClicked]);
 
   const handleReviewData = useCallback(async (): Promise<false> => {
-    // After an error, a new payment method might have been created anyway, so we reload them:
-    await refetchPaymentMethods();
+    // After an error, all data is reloaded in case the issue was caused by stale/cached data or in case a new payment
+    // method has been created despite the error:
+    await Promise.allSettled([
+      meRefetch(),
+      refetchPaymentMethods(),
+    ]);
 
     // TODO: paymentError should have a source property to know where the error is coming from and handle recovery differently here:
-    setPaymentError("");
     setCheckoutStepIndex(2);
+    setPaymentError("");
 
     // This function is used as a CheckoutModalFooter's onSubmitClicked, so we want that to show a loader on the submit
     // button when clicked but do not remove it once the Promise is resolved, as we are moving to another view and
     // CheckoutModalFooter will unmount (so doing this prevents a memory leak issue):
     return false;
-  }, [refetchPaymentMethods]);
+  }, [meRefetch, refetchPaymentMethods]);
 
   // BLOCK DIALOG LOGIC & SHAKE ANIMATION:
 
   const [shakeSx, shake] = useShakeAnimation(paperRef.current);
 
   const [isDialogBlocked, setIsDialogBlocked] = useState(false);
-
-  const onDialogBlocked = useCallback((nextIsDialogBlocked: boolean) => {
-    setIsDialogBlocked(nextIsDialogBlocked);
-  }, []);
 
   useEffect(() => {
     if (parentTheme && themeOptions) {
@@ -437,7 +440,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
         selectedPaymentMethod={ selectedPaymentMethod }
         onPurchaseSuccess={ handlePurchaseSuccess }
         onPurchaseError={ setPaymentError }
-        onDialogBlocked={ onDialogBlocked }
+        onDialogBlocked={ setIsDialogBlocked }
         debug={ debug } />
     );
   } else if (checkoutStep === "confirmation") {
