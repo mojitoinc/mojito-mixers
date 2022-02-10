@@ -26,7 +26,7 @@ export const AuthenticationView: React.FC<AuthenticationViewProps> = ({
   }, []);
 
   return (<>
-    <CheckoutItemCostBreakdown checkoutItem={ checkoutItem } />
+    <CheckoutItemCostBreakdown checkoutItems={ [checkoutItem] } />
 
     <CheckoutModalFooter
       variant={ isAuthenticated ? "toPayment" : "toGuestCheckout" }
