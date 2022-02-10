@@ -8,7 +8,7 @@ export interface CheckoutModalFooterProps {
     privacyHref?: string;
     termsOfUseHref?: string;
     submitDisabled?: boolean;
-    onSubmitClicked?: (canSubmit: boolean) => void;
+    onSubmitClicked?: (canSubmit: boolean) => void | Promise<void | false>;
     onCloseClicked: () => void;
 }
 export declare const CheckoutModalFooter: React.FC<CheckoutModalFooterProps>;
