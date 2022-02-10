@@ -88,7 +88,7 @@ export type AchPaymentMethodPrepareStatementOutput = {
 
 export type Asset = {
   __typename?: 'Asset';
-  currentVersion: AssetVersion;
+  currentVersion?: Maybe<AssetVersion>;
   id: Scalars['UUID1'];
   versions?: Maybe<Array<AssetVersion>>;
 };
@@ -833,8 +833,10 @@ export type NftContract = {
   id: Scalars['UUID1'];
   marketplaceAddress: Scalars['EthAddress'];
   mediaTxHash?: Maybe<Scalars['String']>;
+  name?: Maybe<Scalars['String']>;
   nftContractType: NftContractType;
   nftTokens?: Maybe<Array<NftToken>>;
+  symbol?: Maybe<Scalars['String']>;
   transferOwnershipHash?: Maybe<Scalars['String']>;
   wallet: Wallet;
 };
@@ -884,11 +886,6 @@ export type Network = {
   wethAddress: Scalars['String'];
 };
 
-export type Notification = {
-  __typename?: 'Notification';
-  time?: Maybe<Scalars['String']>;
-};
-
 export type Organization = {
   __typename?: 'Organization';
   assets?: Maybe<Array<Asset>>;
@@ -934,6 +931,18 @@ export type PaymentMethodUpdateInput = {
   paymentType: PaymentType;
 };
 
+export type PaymentNotification3DsMessage = {
+  __typename?: 'PaymentNotification3DSMessage';
+  redirectURL: Scalars['String'];
+};
+
+export type PaymentNotificationMessage = PaymentNotification3DsMessage;
+
+export type PaymentNotificationOutput = {
+  __typename?: 'PaymentNotificationOutput';
+  message: PaymentNotificationMessage;
+};
+
 export type PaymentPublicKey = {
   __typename?: 'PaymentPublicKey';
   keyID: Scalars['String'];
@@ -964,7 +973,7 @@ export type Query = {
   collection?: Maybe<MarketplaceCollection>;
   collectionBySlug?: Maybe<MarketplaceCollection>;
   collectionItemById?: Maybe<MarketplaceCollectionItem>;
-  /** Retrieves invoice details by ID, currently used by customers microservice  */
+  /** Retrieves invoice details by ID */
   getInvoiceDetails: InvoiceDetails;
   /** Retrieves invoice list for given user, can be called by org admin */
   getInvoicesByUserID: Array<Maybe<InvoiceDetails>>;
@@ -975,6 +984,8 @@ export type Query = {
   getMyPayments: Array<Maybe<Payment>>;
   /** Returns Payment method list in scope of current Organization. */
   getPaymentMethodList: Array<PaymentMethodOutput>;
+  /** Retrieves Payment notification */
+  getPaymentNotification: PaymentNotificationOutput;
   /** Returns Public Key for further Payment data encryption. */
   getPaymentPublicKey: PaymentPublicKey;
   /** Retrieves payment list for given user, can be called by org admin */
@@ -1117,7 +1128,6 @@ export type Subscription = {
   getMarketplaceAuctionLot: MarketplaceAuctionLot;
   /**  Subscribes to lots and bids updates within given marketplace collection   */
   marketplaceCollectionLotsUpdates: MarketplaceAuctionLot;
-  timeNotifier: Notification;
 };
 
 
@@ -1304,7 +1314,7 @@ export type WirePaymentMethodOutput = {
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MeQuery = { __typename?: 'Query', me?: { __typename?: 'CurrentUser', id: any, user: { __typename?: 'User', id: any, username: string, name?: string | null | undefined, email?: string | null | undefined }, userOrgs: Array<{ __typename?: 'UserOrganization', organization: { __typename?: 'Organization', id: string, name: string } }> } | null | undefined };
+export type MeQuery = { __typename?: 'Query', me?: { __typename?: 'CurrentUser', id: any, user: { __typename?: 'User', id: any, username: string, name?: string | null, email?: string | null }, userOrgs: Array<{ __typename?: 'UserOrganization', organization: { __typename?: 'Organization', id: string, name: string } }> } | null };
 
 export type CreatePaymentMutationVariables = Exact<{
   paymentMethodID: Scalars['UUID1'];
@@ -1320,14 +1330,14 @@ export type CreateAuctionInvoiceMutationVariables = Exact<{
 }>;
 
 
-export type CreateAuctionInvoiceMutation = { __typename?: 'Mutation', createAuctionLotInvoice: { __typename?: 'InvoiceDetails', invoiceID: any, status: InvoiceStatus, items: Array<{ __typename?: 'ItemInvoiceDetail', units: number, unitPrice: number, taxes: number, totalPrice: number } | null | undefined> } };
+export type CreateAuctionInvoiceMutation = { __typename?: 'Mutation', createAuctionLotInvoice: { __typename?: 'InvoiceDetails', invoiceID: any, status: InvoiceStatus, items: Array<{ __typename?: 'ItemInvoiceDetail', units: number, unitPrice: number, taxes: number, totalPrice: number } | null> } };
 
 export type CreateBuyNowInvoiceMutationVariables = Exact<{
   input: PurchaseMarketplaceBuyNowLotInput;
 }>;
 
 
-export type CreateBuyNowInvoiceMutation = { __typename?: 'Mutation', purchaseMarketplaceBuyNowLot: { __typename?: 'MarketplaceBuyNowOutput', invoice?: { __typename?: 'InvoiceDetails', invoiceID: any, status: InvoiceStatus, items: Array<{ __typename?: 'ItemInvoiceDetail', units: number, unitPrice: number, taxes: number, totalPrice: number } | null | undefined> } | null | undefined } };
+export type CreateBuyNowInvoiceMutation = { __typename?: 'Mutation', purchaseMarketplaceBuyNowLot: { __typename?: 'MarketplaceBuyNowOutput', invoice?: { __typename?: 'InvoiceDetails', invoiceID: any, status: InvoiceStatus, items: Array<{ __typename?: 'ItemInvoiceDetail', units: number, unitPrice: number, taxes: number, totalPrice: number } | null> } | null } };
 
 export type PaymentKeyQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -1339,7 +1349,7 @@ export type GetPaymentMethodListQueryVariables = Exact<{
 }>;
 
 
-export type GetPaymentMethodListQuery = { __typename?: 'Query', getPaymentMethodList: Array<{ __typename?: 'ACHPaymentMethodOutput', id: any, type: PaymentType, status: string, accountNumber: string, metadata?: { __typename?: 'ACHMetadataOutput', email: string, phoneNumber: string } | null | undefined, billingDetails?: { __typename?: 'ACHBillingDetailsOutput', name: string, city: string, country: string, address1: string, address2: string, district: string, postalCode: string } | null | undefined, bankAddress?: { __typename?: 'ACHBankAddressOutput', bankName: string } | null | undefined } | { __typename?: 'CreditCardPaymentMethodOutput', id: any, type: PaymentType, status: string, network: string, last4Digit: string, metadata?: { __typename?: 'CreditCardMetadataOutput', email: string, phoneNumber: string } | null | undefined, billingDetails?: { __typename?: 'CreditCardBillingDetailsOutput', name: string, city: string, country: string, address1: string, address2: string, district: string, postalCode: string } | null | undefined } | { __typename?: 'WirePaymentMethodOutput' }> };
+export type GetPaymentMethodListQuery = { __typename?: 'Query', getPaymentMethodList: Array<{ __typename?: 'ACHPaymentMethodOutput', id: any, type: PaymentType, status: string, accountNumber: string, metadata?: { __typename?: 'ACHMetadataOutput', email: string, phoneNumber: string } | null, billingDetails?: { __typename?: 'ACHBillingDetailsOutput', name: string, city: string, country: string, address1: string, address2: string, district: string, postalCode: string } | null, bankAddress?: { __typename?: 'ACHBankAddressOutput', bankName: string } | null } | { __typename?: 'CreditCardPaymentMethodOutput', id: any, type: PaymentType, status: string, network: string, last4Digit: string, metadata?: { __typename?: 'CreditCardMetadataOutput', email: string, phoneNumber: string } | null, billingDetails?: { __typename?: 'CreditCardBillingDetailsOutput', name: string, city: string, country: string, address1: string, address2: string, district: string, postalCode: string } | null } | { __typename?: 'WirePaymentMethodOutput' }> };
 
 export type CreatePaymentMethodMutationVariables = Exact<{
   orgID: Scalars['UUID1'];
@@ -1360,12 +1370,12 @@ export type DeletePaymentMethodMutation = { __typename?: 'Mutation', deletePayme
 export type PreparePaymentMethodQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type PreparePaymentMethodQuery = { __typename?: 'Query', preparePaymentMethod?: { __typename?: 'ACHPaymentMethodPrepareStatementOutput', linkToken: string } | null | undefined };
+export type PreparePaymentMethodQuery = { __typename?: 'Query', preparePaymentMethod?: { __typename?: 'ACHPaymentMethodPrepareStatementOutput', linkToken: string } | null };
 
 export type DashboardQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type DashboardQuery = { __typename?: 'Query', me?: { __typename?: 'CurrentUser', user: { __typename?: 'User', id: any, username: string, email?: string | null | undefined }, userOrgs: Array<{ __typename?: 'UserOrganization', id: any, role: string, bidAllowed: boolean, kycStatus: KycStatus, organization: { __typename?: 'Organization', handle: string, name: string, id: string, marketplaces: Array<{ __typename?: 'Marketplace', id: any, name: string, theme?: string | null | undefined }>, nftContracts?: Array<{ __typename?: 'NFTContract', contractAddress: any, marketplaceAddress: any, wallet: { __typename?: 'Wallet', network: { __typename?: 'Network', name: string } }, nftTokens?: Array<{ __typename?: 'NFTToken', ethereumTxId?: string | null | undefined, deployed: boolean, asset?: { __typename?: 'Asset', currentVersion: { __typename?: 'AssetVersion', description?: string | null | undefined, name: string, cdnUrl?: string | null | undefined, slug: string } } | null | undefined }> | null | undefined }> | null | undefined } }> } | null | undefined };
+export type DashboardQuery = { __typename?: 'Query', me?: { __typename?: 'CurrentUser', user: { __typename?: 'User', id: any, username: string, email?: string | null }, userOrgs: Array<{ __typename?: 'UserOrganization', id: any, role: string, bidAllowed: boolean, kycStatus: KycStatus, organization: { __typename?: 'Organization', handle: string, name: string, id: string, marketplaces: Array<{ __typename?: 'Marketplace', id: any, name: string, theme?: string | null }>, nftContracts?: Array<{ __typename?: 'NFTContract', contractAddress: any, marketplaceAddress: any, wallet: { __typename?: 'Wallet', network: { __typename?: 'Network', name: string } }, nftTokens?: Array<{ __typename?: 'NFTToken', ethereumTxId?: string | null, deployed: boolean, asset?: { __typename?: 'Asset', currentVersion?: { __typename?: 'AssetVersion', description?: string | null, name: string, cdnUrl?: string | null, slug: string } | null } | null }> | null }> | null } }> } | null };
 
 
 export const MeDocument = gql`

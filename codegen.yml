@@ -1,7 +1,6 @@
 overwrite: true
 # schema: "http://localhost:8080/query"
 schema: "https://api.dev.mojito.xyz/query"
-documents: "src/**/*.graphql"
 generates:
   app/src/lib/queries/graphqlGenerated.tsx:
     documents:
