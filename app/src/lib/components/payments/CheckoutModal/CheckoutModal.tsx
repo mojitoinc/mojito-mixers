@@ -17,13 +17,11 @@ import { ErrorView } from "../../../views/Error/ErrorView";
 import { RawSavedPaymentMethod, SavedPaymentMethod } from "../../../domain/circle/circle.interfaces";
 import { Theme, ThemeProvider, createTheme, ThemeOptions, SxProps } from "@mui/material/styles";
 import { useShakeAnimation } from "../../../utils/animationUtils";
-import { resetStepperProgress } from "../CheckoutStepper/CheckoutStepper";
-import { continuePlaidOAuthFlow, INITIAL_PLAID_OAUTH_FLOW_STATE, PlaidFlow } from "../../../hooks/usePlaid";
+import { continuePlaidOAuthFlow, PlaidFlow } from "../../../hooks/usePlaid";
 import { ConsentType } from "../../shared/ConsentText/ConsentText";
+import { useCheckoutModalState } from "./CheckoutModal.hooks";
 
 const SELECTOR_DIALOG_SCROLLABLE = "[role=presentation]";
-
-export type CheckoutState = "authentication" | "billing" | "payment" | "purchasing" | "confirmation";
 
 export interface SelectedPaymentMethod {
   billingInfo: string | BillingInfo;
@@ -74,7 +72,6 @@ export interface CheckoutModalProps {
   onMarketingOptInChange?: (marketingOptIn: boolean) => void
 }
 
-const CHECKOUT_STEPS: CheckoutState[] = ["authentication", "billing", "payment", "purchasing", "confirmation"];
 
 export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   // Modal:
@@ -142,19 +139,21 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
   const isDialogLoading = isAuthenticatedLoading || meLoading || paymentMethodsLoading;
   const isPlaidFlowLoading = continuePlaidOAuthFlow();
-  const startAt = !isAuthenticated || productConfirmationEnabled ? 0 : 1;
   const rawSavedPaymentMethods = paymentMethodsData?.getPaymentMethodList;
   const savedPaymentMethods = useMemo(() => transformRawSavedPaymentMethods(rawSavedPaymentMethods as RawSavedPaymentMethod[]), [rawSavedPaymentMethods]);
   const dialogRootRef = useRef<HTMLDivElement>(null);
   const paperRef = useRef<HTMLDivElement>(null);
-  const [paymentError, setPaymentError] = useState("");
-  const [checkoutStepIndex, setCheckoutStepIndex] = useState(0);
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<SelectedPaymentMethod>({
-    billingInfo: "",
-    paymentInfo: "",
-  });
 
-  const checkoutStep = CHECKOUT_STEPS[checkoutStepIndex];
+  const {
+    // CheckoutModalState:
+    checkoutStep,
+    checkoutError,
+    setCheckoutModalState,
+
+    // SelectedPaymentMethod:
+    selectedPaymentMethod,
+    setSelectedPaymentMethod,
+  } = useCheckoutModalState();
 
   useEffect(() => {
     const dialogScrollable = dialogRootRef.current?.querySelector(SELECTOR_DIALOG_SCROLLABLE);
@@ -162,19 +161,6 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
     // Scroll to top on step change:
     if (checkoutStep && dialogScrollable) dialogScrollable.scrollTop = 0;
   }, [checkoutStep]);
-
-  const resetModalState = useCallback(() => {
-    // Make sure the progress tracker in BillingView and PaymentView is properly animated:
-    resetStepperProgress();
-
-    // Once authentication has loaded, we know if we need to skip the product confirmation step or not. Also, when the
-    // modal is re-opened, we need to reset its state, taking into account if we need to resume a Plaid OAuth flow:s
-    const { selectedBillingInfo, continueOAuthFlow, savedStateUsed } = INITIAL_PLAID_OAUTH_FLOW_STATE;
-
-    setPaymentError("");
-    setCheckoutStepIndex(continueOAuthFlow && !savedStateUsed ? 3 : startAt);
-    setSelectedPaymentMethod({ billingInfo: selectedBillingInfo || "", paymentInfo: "" });
-  }, [startAt]);
 
   useEffect(() => {
     if (isDialogLoading || !open) return;
