@@ -24,180 +24,190 @@ function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'defau
 
 var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 
-var SELECTOR_DIALOG_SCROLLABLE = "[role=presentation]";
-var CHECKOUT_STEPS = ["authentication", "billing", "payment", "purchasing", "confirmation"];
-var CheckoutModal = function (_a) {
-    var _b;
-    var // Modal:
-    open = _a.open, onClose = _a.onClose, 
-    // Flow:
-    guestCheckoutEnabled = _a.guestCheckoutEnabled, productConfirmationEnabled = _a.productConfirmationEnabled, 
-    // Personalization:
-    parentTheme = _a.theme, themeOptions = _a.themeOptions, logoSrc = _a.logoSrc, logoSx = _a.logoSx, loaderImageSrc = _a.loaderImageSrc, purchasingImageSrc = _a.purchasingImageSrc, purchasingMessages = _a.purchasingMessages, errorImageSrc = _a.errorImageSrc, userFormat = _a.userFormat, acceptedPaymentTypes = _a.acceptedPaymentTypes; _a.paymentLimits; // Not implemented yet. Used to show payment limits for some payment types.
-    var purchaseInstructions = _a.purchaseInstructions, 
-    // Legal:
-    consentType = _a.consentType, // Not implemented yet. Used to let the app control where to log errors to (e.g. Sentry).
-    privacyHref = _a.privacyHref, termsOfUseHref = _a.termsOfUseHref, 
-    // Data:
-    orgID = _a.orgID, invoiceID = _a.invoiceID, checkoutItem = _a.checkoutItem, 
-    // Authentication:
-    onLogin = _a.onLogin, isAuthenticated = _a.isAuthenticated, isAuthenticatedLoading = _a.isAuthenticatedLoading; 
-    // Other Events:
-    _a.onError; // Not implemented yet. Used to let the app control where to log errors to (e.g. Sentry).
-    _a.onMarketingOptInChange;
-    var _c = graphqlGenerated.useMeQuery({ skip: !isAuthenticated }), meData = _c.data, meLoading = _c.loading, meError = _c.error;
-    var deletePaymentMethod = graphqlGenerated.useDeletePaymentMethodMutation()[0];
-    var _d = graphqlGenerated.useGetPaymentMethodListQuery({
+const SELECTOR_DIALOG_SCROLLABLE = "[role=presentation]";
+const CHECKOUT_STEPS = ["authentication", "billing", "payment", "purchasing", "confirmation"];
+const CheckoutModal = ({ 
+// Modal:
+open, onClose, 
+// Flow:
+guestCheckoutEnabled, productConfirmationEnabled, 
+// Personalization:
+theme: parentTheme, themeOptions, logoSrc, logoSx, loaderImageSrc, purchasingImageSrc, purchasingMessages, errorImageSrc, userFormat, acceptedPaymentTypes, paymentLimits, // Not implemented yet. Used to show payment limits for some payment types.
+purchaseInstructions, 
+// Legal:
+consentType, // Not implemented yet. Used to let the app control where to log errors to (e.g. Sentry).
+privacyHref, termsOfUseHref, 
+// Data:
+orgID, invoiceID, checkoutItem, 
+// Authentication:
+onLogin, isAuthenticated, isAuthenticatedLoading, 
+// Other Events:
+debug, onError, // Not implemented yet. Used to let the app control where to log errors to (e.g. Sentry).
+onMarketingOptInChange, // Not implemented yet. Used to let user subscribe / unsubscribe to marketing updates.
+ }) => {
+    var _a;
+    const { data: meData, loading: meLoading, error: meError, refetch: meRefetch, } = graphqlGenerated.useMeQuery({ skip: !isAuthenticated });
+    const { data: paymentMethodsData, loading: paymentMethodsLoading, error: paymentMethodsError, refetch: refetchPaymentMethods, } = graphqlGenerated.useGetPaymentMethodListQuery({
         skip: !isAuthenticated,
         variables: {
-            orgID: orgID,
+            orgID,
         },
-    }), paymentMethodsData = _d.data, paymentMethodsLoading = _d.loading, paymentMethodsError = _d.error, refetchPaymentMethods = _d.refetch;
-    var isDialogLoading = isAuthenticatedLoading || meLoading || paymentMethodsLoading;
-    var isPlaidFlowLoading = usePlaid.continuePlaidOAuthFlow();
-    var startAt = !isAuthenticated || productConfirmationEnabled ? 0 : 1;
-    var rawSavedPaymentMethods = paymentMethodsData === null || paymentMethodsData === void 0 ? void 0 : paymentMethodsData.getPaymentMethodList;
-    var savedPaymentMethods = React.useMemo(function () { return circle_utils.transformRawSavedPaymentMethods(rawSavedPaymentMethods); }, [rawSavedPaymentMethods]);
-    var dialogRootRef = React.useRef(null);
-    var paperRef = React.useRef(null);
-    var _e = React.useState(""), paymentError = _e[0], setPaymentError = _e[1];
-    var _f = React.useState(0), checkoutStepIndex = _f[0], setCheckoutStepIndex = _f[1];
-    var _g = React.useState({
+    });
+    const [deletePaymentMethod] = graphqlGenerated.useDeletePaymentMethodMutation();
+    const isDialogLoading = isAuthenticatedLoading || meLoading || paymentMethodsLoading;
+    const isPlaidFlowLoading = usePlaid.continuePlaidOAuthFlow();
+    const startAt = !isAuthenticated || productConfirmationEnabled ? 0 : 1;
+    const rawSavedPaymentMethods = paymentMethodsData === null || paymentMethodsData === void 0 ? void 0 : paymentMethodsData.getPaymentMethodList;
+    const savedPaymentMethods = React.useMemo(() => circle_utils.transformRawSavedPaymentMethods(rawSavedPaymentMethods), [rawSavedPaymentMethods]);
+    const dialogRootRef = React.useRef(null);
+    const paperRef = React.useRef(null);
+    const [paymentError, setPaymentError] = React.useState("");
+    const [checkoutStepIndex, setCheckoutStepIndex] = React.useState(0);
+    const [selectedPaymentMethod, setSelectedPaymentMethod] = React.useState({
         billingInfo: "",
         paymentInfo: "",
-    }), selectedPaymentMethod = _g[0], setSelectedPaymentMethod = _g[1];
-    var checkoutStep = CHECKOUT_STEPS[checkoutStepIndex];
-    React.useEffect(function () {
+    });
+    const checkoutStep = CHECKOUT_STEPS[checkoutStepIndex];
+    React.useEffect(() => {
         var _a;
-        var dialogScrollable = (_a = dialogRootRef.current) === null || _a === void 0 ? void 0 : _a.querySelector(SELECTOR_DIALOG_SCROLLABLE);
+        const dialogScrollable = (_a = dialogRootRef.current) === null || _a === void 0 ? void 0 : _a.querySelector(SELECTOR_DIALOG_SCROLLABLE);
         // Scroll to top on step change:
         if (checkoutStep && dialogScrollable)
             dialogScrollable.scrollTop = 0;
     }, [checkoutStep]);
-    var resetModalState = React.useCallback(function () {
+    const resetModalState = React.useCallback(() => {
         // Make sure the progress tracker in BillingView and PaymentView is properly animated:
         CheckoutStepper.resetStepperProgress();
         // Once authentication has loaded, we know if we need to skip the product confirmation step or not. Also, when the
         // modal is re-opened, we need to reset its state, taking into account if we need to resume a Plaid OAuth flow:s
-        var selectedBillingInfo = usePlaid.INITIAL_PLAID_OAUTH_FLOW_STATE.selectedBillingInfo, continueOAuthFlow = usePlaid.INITIAL_PLAID_OAUTH_FLOW_STATE.continueOAuthFlow, savedStateUsed = usePlaid.INITIAL_PLAID_OAUTH_FLOW_STATE.savedStateUsed;
+        const { selectedBillingInfo, continueOAuthFlow, savedStateUsed } = usePlaid.INITIAL_PLAID_OAUTH_FLOW_STATE;
         setPaymentError("");
         setCheckoutStepIndex(continueOAuthFlow && !savedStateUsed ? 3 : startAt);
         setSelectedPaymentMethod({ billingInfo: selectedBillingInfo || "", paymentInfo: "" });
     }, [startAt]);
-    React.useEffect(function () {
+    React.useEffect(() => {
         if (isDialogLoading || !open)
             return;
         resetModalState();
     }, [isDialogLoading, open, resetModalState]);
-    React.useEffect(function () {
+    React.useEffect(() => {
+        if (savedPaymentMethods.length === 0)
+            return;
+        // When reloading the saved payment methods after an error, we might have form data that matches a payment method
+        // that has just been created, so we want to update it to reference the existing one:
+        setSelectedPaymentMethod((prevSelectedPaymentMethod) => {
+            const { billingInfo, paymentInfo } = prevSelectedPaymentMethod;
+            if (typeof billingInfo === "string" && typeof paymentInfo === "string")
+                return prevSelectedPaymentMethod;
+            // To find the saved payment method(s) that was/were last created:
+            const reversedSavedPaymentMethods = savedPaymentMethods.slice().reverse();
+            let matchingPaymentMethod;
+            if (typeof billingInfo === "object") {
+                const addressId = circle_utils.getSavedPaymentMethodAddressIdFromBillingInfo(billingInfo);
+                matchingPaymentMethod = reversedSavedPaymentMethods.find(paymentMethod => paymentMethod.addressId === addressId);
+            }
+            const isBillingInfoAddressId = typeof billingInfo === "string";
+            return !isBillingInfoAddressId && matchingPaymentMethod ? {
+                billingInfo: matchingPaymentMethod.addressId,
+                paymentInfo: matchingPaymentMethod.id,
+            } : {
+                billingInfo,
+                paymentInfo: isBillingInfoAddressId ? reversedSavedPaymentMethods[0].id : paymentInfo,
+            };
+        });
+    }, [savedPaymentMethods]);
+    React.useEffect(() => {
         if (!checkoutStep)
             onClose();
     }, [checkoutStep, onClose]);
-    React.useEffect(function () {
-        // TODO: Refetch these when coming back from error screen:
+    React.useEffect(() => {
         if (meError)
             setPaymentError("User could not be loaded.");
         if (paymentMethodsError)
             setPaymentError("Payment methods could not be loaded.");
-    }, [meError, paymentMethodsError, checkoutItem, invoiceID]);
-    var handlePrevClicked = React.useCallback(function () {
-        setCheckoutStepIndex(function (prevCheckoutStepIndex) { return prevCheckoutStepIndex - 1; });
+    }, [meError, paymentMethodsError]);
+    const handlePrevClicked = React.useCallback(() => {
+        setCheckoutStepIndex((prevCheckoutStepIndex) => prevCheckoutStepIndex - 1);
     }, []);
-    var handleNextClicked = React.useCallback(function () {
-        setCheckoutStepIndex(function (prevCheckoutStepIndex) { return prevCheckoutStepIndex + 1; });
+    const handleNextClicked = React.useCallback(() => {
+        setCheckoutStepIndex(prevCheckoutStepIndex => prevCheckoutStepIndex + 1);
     }, []);
-    var handleBillingInfoSelected = React.useCallback(function (billingInfo) {
+    const handleBillingInfoSelected = React.useCallback((billingInfo) => {
         // TODO: Does paymentInfo need to be reset when coming back to billing info to fix validation errors?
-        setSelectedPaymentMethod({ billingInfo: billingInfo, paymentInfo: "" });
+        setSelectedPaymentMethod({ billingInfo, paymentInfo: "" });
     }, []);
-    var handlePaymentInfoSelected = React.useCallback(function (paymentInfo) {
-        setSelectedPaymentMethod(function (_a) {
-            var billingInfo = _a.billingInfo;
-            return ({ billingInfo: billingInfo, paymentInfo: paymentInfo });
-        });
+    const handlePaymentInfoSelected = React.useCallback((paymentInfo) => {
+        setSelectedPaymentMethod(({ billingInfo }) => ({ billingInfo, paymentInfo }));
     }, []);
-    var handleSavedPaymentMethodDeleted = React.useCallback(function (addressIdOrPaymentMethodId) { return tslib_es6.__awaiter(void 0, void 0, void 0, function () {
-        var idsToDelete, addressToDelete, addressIdToDelete_1, paymentMethodsWithSameAddress, promises;
-        return tslib_es6.__generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    idsToDelete = checkoutStep === "billing"
-                        ? savedPaymentMethods.filter(function (_a) {
-                            var addressId = _a.addressId;
-                            return addressId === addressIdOrPaymentMethodId;
-                        }).map(function (_a) {
-                            var id = _a.id;
-                            return id;
-                        })
-                        : [addressIdOrPaymentMethodId];
-                    if (idsToDelete.length === 0)
-                        return [2 /*return*/];
-                    // DELETE LOGIC:
-                    // We are in BILLING (logic handled in BillingView.tsx):
-                    // - Delete last payment method => Show form.
-                    // - Delete payment method, but there's more => Re-set selected address.
-                    // We are in PAYMENT (logic handled in PaymentView.tsx and below):
-                    // - Delete last payment method (or last payment method for the selected address) => Expand address and show form.
-                    // - Delete payment method, but there's more => Re-set selected payment.
-                    if (checkoutStep === "payment") {
-                        addressToDelete = savedPaymentMethods.find(function (_a) {
-                            var id = _a.id;
-                            return id === addressIdOrPaymentMethodId;
-                        });
-                        addressIdToDelete_1 = addressToDelete === null || addressToDelete === void 0 ? void 0 : addressToDelete.addressId;
-                        paymentMethodsWithSameAddress = savedPaymentMethods.filter(function (_a) {
-                            var addressId = _a.addressId;
-                            return addressId === addressIdToDelete_1;
-                        });
-                        if (addressToDelete && paymentMethodsWithSameAddress.length === 1) {
-                            setSelectedPaymentMethod({
-                                // The payment method that had the selected address is being deleted, so we just copy its data as an object to
-                                // re-create it with the new payment information:
-                                billingInfo: circle_utils.savedPaymentMethodToBillingInfo(addressToDelete),
-                                paymentInfo: "",
-                            });
-                        }
-                    }
-                    promises = idsToDelete.map(function (paymentMethodID) {
-                        return deletePaymentMethod({
-                            variables: {
-                                orgID: orgID,
-                                paymentMethodID: paymentMethodID,
-                            },
-                        });
-                    });
-                    return [4 /*yield*/, Promise.allSettled(promises)];
-                case 1:
-                    _a.sent();
-                    return [4 /*yield*/, refetchPaymentMethods({ orgID: orgID })];
-                case 2:
-                    _a.sent();
-                    return [2 /*return*/];
+    const handleSavedPaymentMethodDeleted = React.useCallback((addressIdOrPaymentMethodId) => tslib_es6.__awaiter(void 0, void 0, void 0, function* () {
+        const idsToDelete = checkoutStep === "billing"
+            ? savedPaymentMethods.filter(({ addressId }) => addressId === addressIdOrPaymentMethodId).map(({ id }) => id)
+            : [addressIdOrPaymentMethodId];
+        if (idsToDelete.length === 0)
+            return;
+        // DELETE LOGIC:
+        // We are in BILLING (logic handled in BillingView.tsx):
+        // - Delete last payment method => Show form.
+        // - Delete payment method, but there's more => Re-set selected address.
+        // We are in PAYMENT (logic handled in PaymentView.tsx and below):
+        // - Delete last payment method (or last payment method for the selected address) => Expand address and show form.
+        // - Delete payment method, but there's more => Re-set selected payment.
+        if (checkoutStep === "payment") {
+            const addressToDelete = savedPaymentMethods.find(({ id }) => id === addressIdOrPaymentMethodId);
+            const addressIdToDelete = addressToDelete === null || addressToDelete === void 0 ? void 0 : addressToDelete.addressId;
+            const paymentMethodsWithSameAddress = savedPaymentMethods.filter(({ addressId }) => addressId === addressIdToDelete);
+            if (addressToDelete && paymentMethodsWithSameAddress.length === 1) {
+                setSelectedPaymentMethod({
+                    // The payment method that had the selected address is being deleted, so we just copy its data as an object to
+                    // re-create it with the new payment information:
+                    billingInfo: circle_utils.savedPaymentMethodToBillingInfo(addressToDelete),
+                    paymentInfo: "",
+                });
             }
+        }
+        const promises = idsToDelete.map((paymentMethodID) => {
+            return deletePaymentMethod({
+                variables: {
+                    orgID,
+                    paymentMethodID,
+                },
+            });
         });
-    }); }, [checkoutStep, deletePaymentMethod, orgID, refetchPaymentMethods, savedPaymentMethods]);
-    var _h = React.useState(""), paymentReferenceNumber = _h[0], setPaymentReferenceNumber = _h[1];
-    var handlePurchaseSuccess = React.useCallback(function (paymentReferenceNumber) {
+        yield Promise.allSettled(promises);
+        yield refetchPaymentMethods({ orgID });
+    }), [checkoutStep, deletePaymentMethod, orgID, refetchPaymentMethods, savedPaymentMethods]);
+    const [paymentReferenceNumber, setPaymentReferenceNumber] = React.useState("");
+    const handlePurchaseSuccess = React.useCallback((paymentReferenceNumber) => tslib_es6.__awaiter(void 0, void 0, void 0, function* () {
+        // After a successful purchase, a new payment method might have been created, so we reload them:
+        yield refetchPaymentMethods();
         setPaymentReferenceNumber(paymentReferenceNumber);
-    }, []);
-    var handleReviewData = React.useCallback(function () {
+        handleNextClicked();
+    }), [refetchPaymentMethods, handleNextClicked]);
+    const handleReviewData = React.useCallback(() => tslib_es6.__awaiter(void 0, void 0, void 0, function* () {
+        // After an error, all data is reloaded in case the issue was caused by stale/cached data or in case a new payment
+        // method has been created despite the error:
+        yield Promise.allSettled([
+            meRefetch(),
+            refetchPaymentMethods(),
+        ]);
         // TODO: paymentError should have a source property to know where the error is coming from and handle recovery differently here:
         setPaymentError("");
         setCheckoutStepIndex(2);
-    }, []);
+        // This function is used as a CheckoutModalFooter's onSubmitClicked, so we want that to show a loader on the submit
+        // button when clicked but do not remove it once the Promise is resolved, as we are moving to another view and
+        // CheckoutModalFooter will unmount (so doing this prevents a memory leak issue):
+        return false;
+    }), [meRefetch, refetchPaymentMethods]);
     // BLOCK DIALOG LOGIC & SHAKE ANIMATION:
-    var _j = animationUtils.useShakeAnimation(paperRef.current), shakeSx = _j[0], shake = _j[1];
-    var _k = React.useState(false), isDialogBlocked = _k[0], setIsDialogBlocked = _k[1];
-    var onDialogBlocked = React.useCallback(function (nextIsDialogBlocked) {
-        setIsDialogBlocked(nextIsDialogBlocked);
-    }, []);
-    React.useEffect(function () {
+    const [shakeSx, shake] = animationUtils.useShakeAnimation(paperRef.current);
+    const [isDialogBlocked, setIsDialogBlocked] = React.useState(false);
+    React.useEffect(() => {
         if (parentTheme && themeOptions) {
             throw new Error("You can't use both `themeOptions` and `theme`. Please, use only one. `themeOptions` is preferred.");
         }
     }, [parentTheme, themeOptions]);
     // PLAID:
-    var handlePlaidFlowCompleted = React.useCallback(function (paymentInfo) {
+    const handlePlaidFlowCompleted = React.useCallback((paymentInfo) => {
         if (!paymentInfo) {
             resetModalState();
             return;
@@ -205,9 +215,9 @@ var CheckoutModal = function (_a) {
         handlePaymentInfoSelected(paymentInfo);
         setCheckoutStepIndex(3);
     }, [resetModalState, handlePaymentInfoSelected]);
-    var theme = React.useMemo(function () { return themeOptions ? createTheme["default"](themeOptions) : parentTheme; }, [parentTheme, themeOptions]);
-    var Wrapper = theme ? system.ThemeProvider : React.Fragment;
-    var wrapperProps = theme ? { theme: theme } : {};
+    const theme = React.useMemo(() => themeOptions ? createTheme["default"](themeOptions) : parentTheme, [parentTheme, themeOptions]);
+    const Wrapper = theme ? system.ThemeProvider : React.Fragment;
+    const wrapperProps = theme ? { theme } : {};
     if (isDialogLoading || isPlaidFlowLoading) {
         return (React__default["default"].createElement(React__default["default"].Fragment, null,
             isPlaidFlowLoading && React__default["default"].createElement(usePlaid.PlaidFlow, { onSubmit: handlePlaidFlowCompleted }),
@@ -218,8 +228,8 @@ var CheckoutModal = function (_a) {
                     mt: 5,
                 } })) : (React__default["default"].createElement(material.CircularProgress, { color: "primary" })))));
     }
-    var headerVariant = isAuthenticated ? 'loggedIn' : 'guest';
-    var checkoutStepElement = null;
+    let headerVariant = isAuthenticated ? 'loggedIn' : 'guest';
+    let checkoutStepElement = null;
     if (paymentError) {
         headerVariant = "error";
         checkoutStepElement = (React__default["default"].createElement(ErrorView.ErrorView, { errorMessage: paymentError, errorImageSrc: errorImageSrc, onReviewData: handleReviewData, onClose: onClose }));
@@ -233,20 +243,20 @@ var CheckoutModal = function (_a) {
         checkoutStepElement = (React__default["default"].createElement(AuthenticationView.AuthenticationView, { checkoutItem: checkoutItem, isAuthenticated: isAuthenticated, guestCheckoutEnabled: guestCheckoutEnabled, onGuestClicked: handleNextClicked, onCloseClicked: onClose }));
     }
     else if (checkoutStep === "billing") {
-        checkoutStepElement = (React__default["default"].createElement(BillingView.BillingView, { checkoutItem: checkoutItem, savedPaymentMethods: savedPaymentMethods, selectedBillingInfo: selectedPaymentMethod.billingInfo, onBillingInfoSelected: handleBillingInfoSelected, onSavedPaymentMethodDeleted: handleSavedPaymentMethodDeleted, onNext: handleNextClicked, onClose: onClose }));
+        checkoutStepElement = (React__default["default"].createElement(BillingView.BillingView, { checkoutItem: checkoutItem, savedPaymentMethods: savedPaymentMethods, selectedBillingInfo: selectedPaymentMethod.billingInfo, onBillingInfoSelected: handleBillingInfoSelected, onSavedPaymentMethodDeleted: handleSavedPaymentMethodDeleted, onNext: handleNextClicked, onClose: onClose, debug: debug }));
     }
     else if (checkoutStep === "payment") {
-        checkoutStepElement = (React__default["default"].createElement(PaymentView.PaymentView, { checkoutItem: checkoutItem, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethod: selectedPaymentMethod, onPaymentInfoSelected: handlePaymentInfoSelected, onSavedPaymentMethodDeleted: handleSavedPaymentMethodDeleted, onNext: handleNextClicked, onPrev: handlePrevClicked, onClose: onClose, acceptedPaymentTypes: acceptedPaymentTypes, consentType: consentType, privacyHref: privacyHref, termsOfUseHref: termsOfUseHref }));
+        checkoutStepElement = (React__default["default"].createElement(PaymentView.PaymentView, { checkoutItem: checkoutItem, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethod: selectedPaymentMethod, onPaymentInfoSelected: handlePaymentInfoSelected, onSavedPaymentMethodDeleted: handleSavedPaymentMethodDeleted, onNext: handleNextClicked, onPrev: handlePrevClicked, onClose: onClose, acceptedPaymentTypes: acceptedPaymentTypes, consentType: consentType, privacyHref: privacyHref, termsOfUseHref: termsOfUseHref, debug: debug }));
     }
     else if (checkoutStep === "purchasing") {
         headerVariant = 'purchasing';
-        checkoutStepElement = (React__default["default"].createElement(PurchasingView.PurchasingView, { purchasingImageSrc: purchasingImageSrc, purchasingMessages: purchasingMessages, orgID: orgID, invoiceID: invoiceID, lotID: checkoutItem.lotID, lotType: checkoutItem.lotType, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethod: selectedPaymentMethod, onPurchaseSuccess: handlePurchaseSuccess, onPurchaseError: setPaymentError, onNext: handleNextClicked, onDialogBlocked: onDialogBlocked }));
+        checkoutStepElement = (React__default["default"].createElement(PurchasingView.PurchasingView, { purchasingImageSrc: purchasingImageSrc, purchasingMessages: purchasingMessages, orgID: orgID, invoiceID: invoiceID, lotID: checkoutItem.lotID, lotType: checkoutItem.lotType, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethod: selectedPaymentMethod, onPurchaseSuccess: handlePurchaseSuccess, onPurchaseError: setPaymentError, onDialogBlocked: setIsDialogBlocked, debug: debug }));
     }
     else if (checkoutStep === "confirmation") {
         headerVariant = 'logoOnly';
         checkoutStepElement = (React__default["default"].createElement(ConfirmationView.ConfirmationView, { checkoutItem: checkoutItem, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethod: selectedPaymentMethod, paymentReferenceNumber: paymentReferenceNumber, purchaseInstructions: purchaseInstructions, onNext: handleNextClicked, onClose: onClose }));
     }
-    return (React__default["default"].createElement(Wrapper, tslib_es6.__assign({}, wrapperProps),
+    return (React__default["default"].createElement(Wrapper, Object.assign({}, wrapperProps),
         React__default["default"].createElement(material.Dialog, { open: isDialogBlocked ? true : open, onClose: isDialogBlocked ? undefined : onClose, onBackdropClick: isDialogBlocked ? shake : undefined, "aria-labelledby": "checkout-modal-header-title", fullWidth: true, maxWidth: "sm", scroll: "body", ref: dialogRootRef, PaperProps: { sx: shakeSx, ref: paperRef } },
             React__default["default"].createElement(material.DialogContent, { sx: {
                     overflowX: 'hidden',
@@ -260,7 +270,7 @@ var CheckoutModal = function (_a) {
                     },
                     pb: 0,
                 } },
-                React__default["default"].createElement(CheckoutModalHeader.CheckoutModalHeader, { variant: headerVariant, logoSrc: logoSrc, logoSx: logoSx, user: (_b = meData === null || meData === void 0 ? void 0 : meData.me) === null || _b === void 0 ? void 0 : _b.user, userFormat: userFormat, onLoginClicked: onLogin, onPrevClicked: handlePrevClicked }),
+                React__default["default"].createElement(CheckoutModalHeader.CheckoutModalHeader, { variant: headerVariant, logoSrc: logoSrc, logoSx: logoSx, user: (_a = meData === null || meData === void 0 ? void 0 : meData.me) === null || _a === void 0 ? void 0 : _a.user, userFormat: userFormat, onLoginClicked: onLogin, onPrevClicked: handlePrevClicked }),
                 checkoutStepElement))));
 };
 

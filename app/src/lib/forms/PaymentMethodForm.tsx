@@ -8,9 +8,9 @@ import BookIcon from "@mui/icons-material/Book";
 import React, { useCallback, useMemo } from "react";
 import { CheckoutModalFooter} from "../components/payments/CheckoutModalFooter/CheckoutModalFooter";
 import { ControlledTextField } from "../components/shared/TextField/TextField";
-import { ControlledCardNumberField } from "../components/shared/CardNumberField";
-import { ControlledCardExpiryDateField } from "../components/shared/CardExpiryDateField";
-import { ControlledCardSecureCodeField } from "../components/shared/CardSecureCodeField";
+import { ControlledCardNumberField } from "../components/shared/CardNumberField/CardNumberField";
+import { ControlledCardExpiryDateField } from "../components/shared/CardExpiryDateField/CardExpiryDateField";
+import { ControlledCardSecureCodeField } from "../components/shared/CardSecureCodeField/CardSecureCodeField";
 import { InputGroupLabel } from "../components/shared/InputGroupLabel/InputGroupLabel";
 import { SecondaryButton } from "../components/shared/SecondaryButton/SecondaryButton";
 import { PaymentMethodSelector } from "../components/shared/PaymentMethodSelector/PaymentMethodSelector";
@@ -28,8 +28,8 @@ import {
   getCVCIsValid
 } from "../domain/payment/payment.utils";
 import { Typography } from "@mui/material";
-import { DisplayBox } from "../components/payments/DisplayBox/DisplayBox";
-import { ControlledCheckbox } from "../components/shared/Checkbox";
+import { DebugBox, DisplayBox } from "../components/payments/DisplayBox/DisplayBox";
+import { ControlledCheckbox } from "../components/shared/Checkbox/Checkbox";
 import { ConsentText, ConsentType, CONSENT_ERROR_MESSAGE } from "../components/shared/ConsentText/ConsentText";
 
 interface PaymentTypeFormProps {
@@ -260,7 +260,7 @@ export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
       ...parentDefaultValues,
     },
     reValidateMode: "onChange",
-    resolver: yupResolver(schema)
+    resolver: yupResolver(schema),
   });
 
   const handleSelectedPaymentMethodChange = useCallback((paymentType: PaymentType) => {
@@ -318,9 +318,9 @@ export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
         termsOfUseHref={ termsOfUseHref } />
 
       {debug && (
-        <Box component="pre" sx={{ my: 2, overflow: "scroll" }}>
+        <DebugBox sx={{ my: 2 }}>
           {JSON.stringify(watch(), null, 2)}
-        </Box>
+        </DebugBox>
       )}
 
       <CheckoutModalFooter

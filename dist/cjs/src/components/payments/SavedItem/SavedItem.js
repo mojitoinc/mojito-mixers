@@ -2,7 +2,6 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-var tslib_es6 = require('../../../../node_modules/tslib/tslib.es6.js');
 var Edit = require('../../../../node_modules/@mui/icons-material/Edit.js');
 var Delete = require('../../../../node_modules/@mui/icons-material/Delete.js');
 var SecondaryButton = require('../../shared/SecondaryButton/SecondaryButton.js');
@@ -15,22 +14,21 @@ function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'defau
 
 var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 
-var DEFAULT_SAVED_ITEM_LABELS = {
+const DEFAULT_SAVED_ITEM_LABELS = {
     active: "Active",
     edit: "Edit Info",
     delete: "Delete",
     select: "Use Info",
 };
-var SavedItem = function (_a) {
-    var children = _a.children, id = _a.id, _b = _a.variant, variant = _b === void 0 ? "stacked" : _b, _c = _a.labels, customLabels = _c === void 0 ? {} : _c, disabled = _a.disabled, active = _a.active, status = _a.status, onEdit = _a.onEdit, onDelete = _a.onDelete, onPick = _a.onPick, boxProps = _a.boxProps;
-    var labels = tslib_es6.__assign(tslib_es6.__assign({}, DEFAULT_SAVED_ITEM_LABELS), customLabels);
-    var hasControls = active || onEdit || onDelete || onPick;
-    var handleClick = React.useCallback(function (e) {
-        var currentTarget = e.currentTarget;
-        var action = currentTarget.dataset.action;
+const SavedItem = ({ children, id, variant = "stacked", labels: customLabels = {}, disabled, active, status, onEdit, onDelete, onPick, boxProps, }) => {
+    const labels = Object.assign(Object.assign({}, DEFAULT_SAVED_ITEM_LABELS), customLabels);
+    const hasControls = active || onEdit || onDelete || onPick;
+    const handleClick = React.useCallback((e) => {
+        const { currentTarget } = e;
+        const action = currentTarget.dataset.action;
         if (!action)
             return;
-        var callback = {
+        const callback = {
             edit: onEdit,
             delete: onDelete,
             pick: onPick,
@@ -38,9 +36,9 @@ var SavedItem = function (_a) {
         if (callback)
             callback(id, e);
     }, [id, onEdit, onDelete, onPick]);
-    var disabledSelect = !!disabled;
-    var disabledOther = disabled === true;
-    var mainControlElement = null;
+    const disabledSelect = !!disabled;
+    const disabledOther = disabled === true;
+    let mainControlElement = null;
     if (status) {
         mainControlElement = (React__default["default"].createElement(material.Tooltip, { title: status.tooltip },
             React__default["default"].createElement(material.Chip, { size: "small", color: status.color, label: status.label, variant: "outlined" })));
@@ -51,7 +49,7 @@ var SavedItem = function (_a) {
     else if (onPick) {
         mainControlElement = (React__default["default"].createElement(SecondaryButton.SecondaryButton, { onClick: handleClick, disabled: disabledSelect, "data-action": "pick" }, labels.select));
     }
-    return (React__default["default"].createElement(DisplayBox.DisplayBox, tslib_es6.__assign({}, boxProps),
+    return (React__default["default"].createElement(DisplayBox.DisplayBox, Object.assign({}, boxProps),
         variant === "stacked" ? (React__default["default"].createElement(Box["default"], { sx: { flex: 1, pb: 2 } }, children)) : (React__default["default"].createElement(material.Stack, { direction: "row", spacing: 2, sx: { flex: 1, pb: { xs: 2, sm: 0 }, alignItems: "center" } }, children)),
         hasControls && (React__default["default"].createElement(material.Stack, { direction: variant === "stacked" ? { xs: "row", sm: "column" } : "row", spacing: 1, sx: {
                 // display: "flex",

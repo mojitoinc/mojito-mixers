@@ -15,64 +15,42 @@ function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'defau
 
 var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 
-var BillingView = function (_a) {
-    var checkoutItem = _a.checkoutItem, rawSavedPaymentMethods = _a.savedPaymentMethods, selectedBillingInfo = _a.selectedBillingInfo, onBillingInfoSelected = _a.onBillingInfoSelected, onSavedPaymentMethodDeleted = _a.onSavedPaymentMethodDeleted, onNext = _a.onNext, onClose = _a.onClose;
-    var savedPaymentMethodAddressIdRef = React.useRef("");
-    var savedPaymentMethods = React.useMemo(function () { return arrayUtils.distinctBy(rawSavedPaymentMethods, "addressId"); }, [rawSavedPaymentMethods]);
-    var _b = React.useState({
+const BillingView = ({ checkoutItem, savedPaymentMethods: rawSavedPaymentMethods, selectedBillingInfo, onBillingInfoSelected, onSavedPaymentMethodDeleted, onNext, onClose, debug, }) => {
+    const savedPaymentMethodAddressIdRef = React.useRef("");
+    const savedPaymentMethods = React.useMemo(() => arrayUtils.distinctBy(rawSavedPaymentMethods, "addressId"), [rawSavedPaymentMethods]);
+    const [{ isDeleting, showSaved }, setViewState] = React.useState({
         isDeleting: false,
         showSaved: savedPaymentMethods.length > 0 && typeof selectedBillingInfo === "string",
-    }), _c = _b[0], isDeleting = _c.isDeleting, showSaved = _c.showSaved, setViewState = _b[1];
-    var handleShowForm = React.useCallback(function (savedPaymentMethodAddressId) {
+    });
+    const handleShowForm = React.useCallback((savedPaymentMethodAddressId) => {
         if (savedPaymentMethodAddressId && typeof savedPaymentMethodAddressId === "string") {
             savedPaymentMethodAddressIdRef.current = savedPaymentMethodAddressId;
-            var data = savedPaymentMethods.find(function (_a) {
-                var addressId = _a.addressId;
-                return addressId === savedPaymentMethodAddressId;
-            });
+            const data = savedPaymentMethods.find(({ addressId }) => addressId === savedPaymentMethodAddressId);
             if (data)
                 onBillingInfoSelected(circle_utils.savedPaymentMethodToBillingInfo(data));
         }
         setViewState({ isDeleting: false, showSaved: false });
     }, [onBillingInfoSelected, savedPaymentMethods]);
-    var handleShowSaved = React.useCallback(function () {
-        var savedPaymentMethodAddressId = savedPaymentMethodAddressIdRef.current;
+    const handleShowSaved = React.useCallback(() => {
+        const savedPaymentMethodAddressId = savedPaymentMethodAddressIdRef.current;
         if (savedPaymentMethodAddressId)
             onBillingInfoSelected(savedPaymentMethodAddressId);
         setViewState({ isDeleting: false, showSaved: true });
     }, [onBillingInfoSelected]);
-    var handleSubmit = React.useCallback(function (data) {
-        var savedPaymentMethodAddressId = circle_utils.getSavedPaymentMethodAddressIdFromBillingInfo(data);
-        var savedPaymentMethodData = savedPaymentMethods.find(function (_a) {
-            var addressId = _a.addressId;
-            return addressId === savedPaymentMethodAddressId;
-        });
+    const handleSubmit = React.useCallback((data) => {
+        const savedPaymentMethodAddressId = circle_utils.getSavedPaymentMethodAddressIdFromBillingInfo(data);
+        const savedPaymentMethodData = savedPaymentMethods.find(({ addressId }) => addressId === savedPaymentMethodAddressId);
         onBillingInfoSelected(savedPaymentMethodData ? savedPaymentMethodAddressId : data);
         onNext();
     }, [savedPaymentMethods, onBillingInfoSelected, onNext]);
-    var handleSavedPaymentMethodDeleted = React.useCallback(function (savedPaymentMethodId) { return tslib_es6.__awaiter(void 0, void 0, void 0, function () {
-        var remainingPaymentMethods;
-        return tslib_es6.__generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    setViewState({ isDeleting: true, showSaved: true });
-                    return [4 /*yield*/, onSavedPaymentMethodDeleted(savedPaymentMethodId)];
-                case 1:
-                    _a.sent();
-                    remainingPaymentMethods = savedPaymentMethods.length - savedPaymentMethods.filter(function (_a) {
-                        var addressId = _a.addressId;
-                        return addressId === savedPaymentMethodId;
-                    }).length;
-                    setViewState({ isDeleting: false, showSaved: remainingPaymentMethods > 0 });
-                    return [2 /*return*/];
-            }
-        });
-    }); }, [onSavedPaymentMethodDeleted, savedPaymentMethods]);
-    React.useEffect(function () {
-        var selectedPaymentInfoMatch = typeof selectedBillingInfo === "string" && savedPaymentMethods.some(function (_a) {
-            var addressId = _a.addressId;
-            return addressId === selectedBillingInfo;
-        });
+    const handleSavedPaymentMethodDeleted = React.useCallback((savedPaymentMethodId) => tslib_es6.__awaiter(void 0, void 0, void 0, function* () {
+        setViewState({ isDeleting: true, showSaved: true });
+        yield onSavedPaymentMethodDeleted(savedPaymentMethodId);
+        const remainingPaymentMethods = savedPaymentMethods.length - savedPaymentMethods.filter(({ addressId }) => addressId === savedPaymentMethodId).length;
+        setViewState({ isDeleting: false, showSaved: remainingPaymentMethods > 0 });
+    }), [onSavedPaymentMethodDeleted, savedPaymentMethods]);
+    React.useEffect(() => {
+        const selectedPaymentInfoMatch = typeof selectedBillingInfo === "string" && savedPaymentMethods.some(({ addressId }) => addressId === selectedBillingInfo);
         if (showSaved && savedPaymentMethods.length > 0 && !selectedPaymentInfoMatch) {
             onBillingInfoSelected(savedPaymentMethods[0].addressId);
         }
@@ -84,7 +62,7 @@ var BillingView = function (_a) {
         // variant="loggedIn"
         , { 
             // variant="loggedIn"
-            defaultValues: typeof selectedBillingInfo === "string" ? undefined : selectedBillingInfo, onSaved: savedPaymentMethods.length > 0 ? handleShowSaved : undefined, onClose: onClose, onSubmit: handleSubmit }))));
+            defaultValues: typeof selectedBillingInfo === "string" ? undefined : selectedBillingInfo, onSaved: savedPaymentMethods.length > 0 ? handleShowSaved : undefined, onClose: onClose, onSubmit: handleSubmit, debug: debug }))));
 };
 
 exports.BillingView = BillingView;

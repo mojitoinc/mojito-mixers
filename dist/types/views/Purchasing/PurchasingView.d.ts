@@ -13,7 +13,7 @@ export interface PurchasingViewProps {
     selectedPaymentMethod: SelectedPaymentMethod;
     onPurchaseSuccess: (paymentReferenceNumber: string) => void;
     onPurchaseError: (error: string) => void;
-    onNext: () => void;
     onDialogBlocked: (blocked: boolean) => void;
+    debug?: boolean;
 }
 export declare const PurchasingView: React.FC<PurchasingViewProps>;

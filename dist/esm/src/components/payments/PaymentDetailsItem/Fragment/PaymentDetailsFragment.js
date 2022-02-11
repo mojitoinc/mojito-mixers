@@ -4,8 +4,7 @@ import React__default from 'react';
 import { CreditCardIcon } from '../../../shared/Icons/Icons.js';
 import { CREDIT_CARD_MASK_PREFIX, EXPIRATION_DATE_MASK, ACH_MASK_PREFIX } from '../../../../domain/payment/payment.constants.js';
 
-var PaymentDetailsFragment = function (_a) {
-    var savedPaymentMethod = _a.savedPaymentMethod;
+const PaymentDetailsFragment = ({ savedPaymentMethod, }) => {
     if (savedPaymentMethod.type === "CreditCard") {
         return (React__default.createElement(React__default.Fragment, null,
             React__default.createElement(CreditCardIcon, { network: savedPaymentMethod.network }),

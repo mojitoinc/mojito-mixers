@@ -181,8 +181,8 @@ const HomePage = () => {
       ...PLAYGROUND_MOCKED_LOT,
       lotID: formValues.lotID || PLAYGROUND_MOCKED_LOT.lotID,
       lotType: formValues.lotType || PLAYGROUND_MOCKED_LOT.lotType,
-      price: formValues.lotPrice || PLAYGROUND_MOCKED_LOT.price,
-      fee: formValues.lotFee || PLAYGROUND_MOCKED_LOT.fee,
+      price: parseInt(`${ formValues.lotPrice || PLAYGROUND_MOCKED_LOT.price }`, 10) || 0,
+      fee: parseInt(`${ formValues.lotFee || PLAYGROUND_MOCKED_LOT.fee }`, 10) || 0,
     },
 
     // Authentication:
@@ -191,6 +191,7 @@ const HomePage = () => {
     isAuthenticatedLoading,
 
     // Other Events:
+    debug: true,
     onError: handleError,
     onMarketingOptInChange: handleMarketingOptInChange,
   };

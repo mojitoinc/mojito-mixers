@@ -15,10 +15,9 @@ function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'defau
 
 var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 
-var PurchaseConfirmationBillingDetails = function (_a) {
-    var checkoutItem = _a.checkoutItem, paymentReferenceNumber = _a.paymentReferenceNumber, selectedPaymentMethodBillingInfo = _a.selectedPaymentMethodBillingInfo, selectedPaymentMethodPaymentInfo = _a.selectedPaymentMethodPaymentInfo;
-    var _b = PurchaseConfirmationBillingDetails_utils.getFormattedPaymentMethod(selectedPaymentMethodPaymentInfo), isMasked = _b.isMasked, paymentType = _b.paymentType, displayValue = _b.displayValue, network = _b.network;
-    var icon = network ? React__default["default"].createElement(Icons.CreditCardIcon, { network: network }) : null;
+const PurchaseConfirmationBillingDetails = ({ checkoutItem, paymentReferenceNumber, selectedPaymentMethodBillingInfo, selectedPaymentMethodPaymentInfo, }) => {
+    const { isMasked, paymentType, displayValue, network, } = PurchaseConfirmationBillingDetails_utils.getFormattedPaymentMethod(selectedPaymentMethodPaymentInfo);
+    const icon = network ? React__default["default"].createElement(Icons.CreditCardIcon, { network: network }) : null;
     return (React__default["default"].createElement(material.Box, { sx: { position: "relative", mb: 2 } },
         React__default["default"].createElement(material.Stack, { spacing: 2, direction: { xs: "column", sm: "row" }, sx: {
                 justifyContent: "space-between",

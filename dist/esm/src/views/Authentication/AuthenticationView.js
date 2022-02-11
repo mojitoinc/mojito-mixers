@@ -3,9 +3,8 @@ import { CheckoutModalFooter } from '../../components/payments/CheckoutModalFoot
 import React__default, { useEffect } from 'react';
 import { resetStepperProgress } from '../../components/payments/CheckoutStepper/CheckoutStepper.js';
 
-var AuthenticationView = function (_a) {
-    var checkoutItem = _a.checkoutItem, isAuthenticated = _a.isAuthenticated, guestCheckoutEnabled = _a.guestCheckoutEnabled, onGuestClicked = _a.onGuestClicked, onCloseClicked = _a.onCloseClicked;
-    useEffect(function () {
+const AuthenticationView = ({ checkoutItem, isAuthenticated, guestCheckoutEnabled, onGuestClicked, onCloseClicked, }) => {
+    useEffect(() => {
         // Make sure the progress tracker in BillingView and PaymentView is properly animated:
         resetStepperProgress();
     }, []);

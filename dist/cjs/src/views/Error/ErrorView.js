@@ -12,8 +12,7 @@ function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'defau
 
 var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 
-var ErrorView = function (_a) {
-    var _b = _a.errorMessage, errorMessage = _b === void 0 ? "The purchase could not be completed." : _b, errorImageSrc = _a.errorImageSrc, onReviewData = _a.onReviewData, onClose = _a.onClose;
+const ErrorView = ({ errorMessage = "The purchase could not be completed.", errorImageSrc, onReviewData, onClose, }) => {
     return (React__default["default"].createElement(React__default["default"].Fragment, null,
         React__default["default"].createElement(material.Box, { sx: { position: "relative", mt: 2 } },
             errorImageSrc ? (React__default["default"].createElement(material.Box, { component: "img", src: errorImageSrc, sx: {
@@ -32,7 +31,7 @@ var ErrorView = function (_a) {
                     justifyContent: "center",
                     alignItems: "center",
                 } },
-                React__default["default"].createElement(WarningAmber["default"], { sx: { fontSize: "40px", color: function (theme) { return theme.palette.text.primary; } } }))),
+                React__default["default"].createElement(WarningAmber["default"], { sx: { fontSize: "40px", color: theme => theme.palette.text.primary } }))),
             React__default["default"].createElement(material.Typography, { variant: "body2", sx: { textAlign: "center", mt: 1.5 } }, "Sorry, it looks like we are having some issues on our side:"),
             React__default["default"].createElement(material.Typography, { variant: "body2", sx: { textAlign: "center", mt: 1.5 } }, formatUtils.formatSentence(errorMessage)),
             React__default["default"].createElement(material.Typography, { variant: "body2", sx: { textAlign: "center", mt: 1.5 } }, "Please, review your payment information and try again.")),

@@ -1,4 +1,4 @@
-import { __awaiter, __generator } from '../../../node_modules/tslib/tslib.es6.js';
+import { __awaiter } from '../../../node_modules/tslib/tslib.es6.js';
 import React__default, { useRef, useMemo, useState, useCallback, useEffect } from 'react';
 import { CheckoutItemCostBreakdown } from '../../components/payments/CheckoutItemCost/Breakdown/CheckoutItemCostBreakdown.js';
 import { CheckoutStepper } from '../../components/payments/CheckoutStepper/CheckoutStepper.js';
@@ -7,64 +7,42 @@ import { savedPaymentMethodToBillingInfo, getSavedPaymentMethodAddressIdFromBill
 import { BillingInfoForm } from '../../forms/BillingInfoForm.js';
 import { distinctBy } from '../../utils/arrayUtils.js';
 
-var BillingView = function (_a) {
-    var checkoutItem = _a.checkoutItem, rawSavedPaymentMethods = _a.savedPaymentMethods, selectedBillingInfo = _a.selectedBillingInfo, onBillingInfoSelected = _a.onBillingInfoSelected, onSavedPaymentMethodDeleted = _a.onSavedPaymentMethodDeleted, onNext = _a.onNext, onClose = _a.onClose;
-    var savedPaymentMethodAddressIdRef = useRef("");
-    var savedPaymentMethods = useMemo(function () { return distinctBy(rawSavedPaymentMethods, "addressId"); }, [rawSavedPaymentMethods]);
-    var _b = useState({
+const BillingView = ({ checkoutItem, savedPaymentMethods: rawSavedPaymentMethods, selectedBillingInfo, onBillingInfoSelected, onSavedPaymentMethodDeleted, onNext, onClose, debug, }) => {
+    const savedPaymentMethodAddressIdRef = useRef("");
+    const savedPaymentMethods = useMemo(() => distinctBy(rawSavedPaymentMethods, "addressId"), [rawSavedPaymentMethods]);
+    const [{ isDeleting, showSaved }, setViewState] = useState({
         isDeleting: false,
         showSaved: savedPaymentMethods.length > 0 && typeof selectedBillingInfo === "string",
-    }), _c = _b[0], isDeleting = _c.isDeleting, showSaved = _c.showSaved, setViewState = _b[1];
-    var handleShowForm = useCallback(function (savedPaymentMethodAddressId) {
+    });
+    const handleShowForm = useCallback((savedPaymentMethodAddressId) => {
         if (savedPaymentMethodAddressId && typeof savedPaymentMethodAddressId === "string") {
             savedPaymentMethodAddressIdRef.current = savedPaymentMethodAddressId;
-            var data = savedPaymentMethods.find(function (_a) {
-                var addressId = _a.addressId;
-                return addressId === savedPaymentMethodAddressId;
-            });
+            const data = savedPaymentMethods.find(({ addressId }) => addressId === savedPaymentMethodAddressId);
             if (data)
                 onBillingInfoSelected(savedPaymentMethodToBillingInfo(data));
         }
         setViewState({ isDeleting: false, showSaved: false });
     }, [onBillingInfoSelected, savedPaymentMethods]);
-    var handleShowSaved = useCallback(function () {
-        var savedPaymentMethodAddressId = savedPaymentMethodAddressIdRef.current;
+    const handleShowSaved = useCallback(() => {
+        const savedPaymentMethodAddressId = savedPaymentMethodAddressIdRef.current;
         if (savedPaymentMethodAddressId)
             onBillingInfoSelected(savedPaymentMethodAddressId);
         setViewState({ isDeleting: false, showSaved: true });
     }, [onBillingInfoSelected]);
-    var handleSubmit = useCallback(function (data) {
-        var savedPaymentMethodAddressId = getSavedPaymentMethodAddressIdFromBillingInfo(data);
-        var savedPaymentMethodData = savedPaymentMethods.find(function (_a) {
-            var addressId = _a.addressId;
-            return addressId === savedPaymentMethodAddressId;
-        });
+    const handleSubmit = useCallback((data) => {
+        const savedPaymentMethodAddressId = getSavedPaymentMethodAddressIdFromBillingInfo(data);
+        const savedPaymentMethodData = savedPaymentMethods.find(({ addressId }) => addressId === savedPaymentMethodAddressId);
         onBillingInfoSelected(savedPaymentMethodData ? savedPaymentMethodAddressId : data);
         onNext();
     }, [savedPaymentMethods, onBillingInfoSelected, onNext]);
-    var handleSavedPaymentMethodDeleted = useCallback(function (savedPaymentMethodId) { return __awaiter(void 0, void 0, void 0, function () {
-        var remainingPaymentMethods;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    setViewState({ isDeleting: true, showSaved: true });
-                    return [4 /*yield*/, onSavedPaymentMethodDeleted(savedPaymentMethodId)];
-                case 1:
-                    _a.sent();
-                    remainingPaymentMethods = savedPaymentMethods.length - savedPaymentMethods.filter(function (_a) {
-                        var addressId = _a.addressId;
-                        return addressId === savedPaymentMethodId;
-                    }).length;
-                    setViewState({ isDeleting: false, showSaved: remainingPaymentMethods > 0 });
-                    return [2 /*return*/];
-            }
-        });
-    }); }, [onSavedPaymentMethodDeleted, savedPaymentMethods]);
-    useEffect(function () {
-        var selectedPaymentInfoMatch = typeof selectedBillingInfo === "string" && savedPaymentMethods.some(function (_a) {
-            var addressId = _a.addressId;
-            return addressId === selectedBillingInfo;
-        });
+    const handleSavedPaymentMethodDeleted = useCallback((savedPaymentMethodId) => __awaiter(void 0, void 0, void 0, function* () {
+        setViewState({ isDeleting: true, showSaved: true });
+        yield onSavedPaymentMethodDeleted(savedPaymentMethodId);
+        const remainingPaymentMethods = savedPaymentMethods.length - savedPaymentMethods.filter(({ addressId }) => addressId === savedPaymentMethodId).length;
+        setViewState({ isDeleting: false, showSaved: remainingPaymentMethods > 0 });
+    }), [onSavedPaymentMethodDeleted, savedPaymentMethods]);
+    useEffect(() => {
+        const selectedPaymentInfoMatch = typeof selectedBillingInfo === "string" && savedPaymentMethods.some(({ addressId }) => addressId === selectedBillingInfo);
         if (showSaved && savedPaymentMethods.length > 0 && !selectedPaymentInfoMatch) {
             onBillingInfoSelected(savedPaymentMethods[0].addressId);
         }
@@ -76,7 +54,7 @@ var BillingView = function (_a) {
         // variant="loggedIn"
         , { 
             // variant="loggedIn"
-            defaultValues: typeof selectedBillingInfo === "string" ? undefined : selectedBillingInfo, onSaved: savedPaymentMethods.length > 0 ? handleShowSaved : undefined, onClose: onClose, onSubmit: handleSubmit }))));
+            defaultValues: typeof selectedBillingInfo === "string" ? undefined : selectedBillingInfo, onSaved: savedPaymentMethods.length > 0 ? handleShowSaved : undefined, onClose: onClose, onSubmit: handleSubmit, debug: debug }))));
 };
 
 export { BillingView };

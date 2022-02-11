@@ -2,7 +2,6 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-var tslib_es6 = require('../../../../../node_modules/tslib/tslib.es6.js');
 var PaymentDetailsFragment = require('../Fragment/PaymentDetailsFragment.js');
 var SavedItem = require('../../SavedItem/SavedItem.js');
 var React = require('react');
@@ -11,28 +10,27 @@ function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'defau
 
 var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 
-var PAYMENT_METHOD_CC_ITEM_LABELS = {
+const PAYMENT_METHOD_CC_ITEM_LABELS = {
     select: "Use Card",
 };
-var PAYMENT_METHOD_ACH_ITEM_LABELS = {
+const PAYMENT_METHOD_ACH_ITEM_LABELS = {
     select: "Use Bank",
 };
-var PAYMENT_METHOD_WIRE_ITEM_LABELS = {
+const PAYMENT_METHOD_WIRE_ITEM_LABELS = {
     select: "Use Wire",
 };
-var PAYMENT_METHOD_CRYPTO_ITEM_LABELS = {
+const PAYMENT_METHOD_CRYPTO_ITEM_LABELS = {
     select: "Use Wallet",
 };
-var PAYMENT_METHOD_ITEM_LABELS = {
+const PAYMENT_METHOD_ITEM_LABELS = {
     CreditCard: PAYMENT_METHOD_CC_ITEM_LABELS,
     ACH: PAYMENT_METHOD_ACH_ITEM_LABELS,
     Wire: PAYMENT_METHOD_WIRE_ITEM_LABELS,
     Crypto: PAYMENT_METHOD_CRYPTO_ITEM_LABELS,
 };
-var PaymentDetailsItem = function (_a) {
-    var savedPaymentMethod = _a.data, savedItemProps = _a.additionalProps;
-    var disabled = savedItemProps.disabled;
-    var status;
+const PaymentDetailsItem = ({ data: savedPaymentMethod, additionalProps: savedItemProps, }) => {
+    let disabled = savedItemProps.disabled;
+    let status;
     if (savedPaymentMethod.status === "pending") {
         disabled = disabled || "selectOnly";
         status = {
@@ -49,7 +47,7 @@ var PaymentDetailsItem = function (_a) {
             color: "error",
         };
     }
-    return (React__default["default"].createElement(SavedItem.SavedItem, tslib_es6.__assign({}, savedItemProps, { variant: "row", labels: PAYMENT_METHOD_ITEM_LABELS[savedPaymentMethod.type], disabled: disabled, status: status, id: savedPaymentMethod.id }),
+    return (React__default["default"].createElement(SavedItem.SavedItem, Object.assign({}, savedItemProps, { variant: "row", labels: PAYMENT_METHOD_ITEM_LABELS[savedPaymentMethod.type], disabled: disabled, status: status, id: savedPaymentMethod.id }),
         React__default["default"].createElement(PaymentDetailsFragment.PaymentDetailsFragment, { savedPaymentMethod: savedPaymentMethod })));
 };
 

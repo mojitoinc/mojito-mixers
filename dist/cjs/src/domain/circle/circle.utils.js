@@ -6,34 +6,27 @@ var tslib_es6 = require('../../../node_modules/tslib/tslib.es6.js');
 var dataUmd = require('../../../node_modules/country-region-data/dist/data-umd.js');
 var countryCodesList = require('country-codes-list');
 
-var countryPrefixes = countryCodesList.customList('countryCode', '{countryCallingCode}');
+const countryPrefixes = countryCodesList.customList('countryCode', '{countryCallingCode}');
 function formatPhoneAsE123(phoneNumber, countryCode) {
-    var countryPrefix = countryPrefixes[countryCode] || "";
-    var parsedPhoneNumber = phoneNumber.replace(/[()-\s]/g, "");
+    const countryPrefix = countryPrefixes[countryCode] || "";
+    const parsedPhoneNumber = phoneNumber.replace(/[()-\s]/g, "");
     if (parsedPhoneNumber.startsWith("+") || parsedPhoneNumber.startsWith("00")) {
         // The user already included the country prefix, so we respect their preference:
         return parsedPhoneNumber.replace(/^00/, "+");
     }
     // Otherwise, we add it based on the country code:
-    return "+".concat(countryPrefix).concat(parsedPhoneNumber);
+    return `+${countryPrefix}${parsedPhoneNumber}`;
 }
-function transformRawSavedPaymentMethods(rawSavedPaymentMethods) {
-    if (rawSavedPaymentMethods === void 0) { rawSavedPaymentMethods = []; }
-    return rawSavedPaymentMethods.map(function (_a) {
-        var billingDetails = _a.billingDetails, metadata = _a.metadata, rest = tslib_es6.__rest(_a, ["billingDetails", "metadata"]);
+function transformRawSavedPaymentMethods(rawSavedPaymentMethods = []) {
+    return rawSavedPaymentMethods.map((_a) => {
+        var { billingDetails, metadata } = _a, rest = tslib_es6.__rest(_a, ["billingDetails", "metadata"]);
         if (!billingDetails || !metadata)
             return null;
         // Find country by short code:
-        var _b = dataUmd["default"].find(function (_a) {
-            var countryShortCode = _a.countryShortCode;
-            return countryShortCode === billingDetails.country;
-        }) || {}, _c = _b.countryName, countryName = _c === void 0 ? "" : _c, _d = _b.countryShortCode, countryCode = _d === void 0 ? "" : _d, _e = _b.regions, regions = _e === void 0 ? [] : _e;
+        const { countryName = "", countryShortCode: countryCode = "", regions = [], } = dataUmd["default"].find(({ countryShortCode }) => countryShortCode === billingDetails.country) || {};
         // Find region by short code or name (some don't have short code):
-        var _f = regions.find(function (_a) {
-            var shortCode = _a.shortCode, name = _a.name;
-            return shortCode === billingDetails.district || name === billingDetails.district;
-        }) || {}, regionName = _f.name, regionCode = _f.shortCode;
-        var savedPaymentInfoBillingInfo = {
+        const { name: regionName, shortCode: regionCode, } = regions.find(({ shortCode, name }) => shortCode === billingDetails.district || name === billingDetails.district) || {};
+        const savedPaymentInfoBillingInfo = {
             metadata: {
                 email: metadata.email,
                 phoneNumber: formatPhoneAsE123(metadata.phoneNumber || "", countryCode),
@@ -54,24 +47,22 @@ function transformRawSavedPaymentMethods(rawSavedPaymentMethods) {
                 },
             },
         };
-        var savedPaymentMethod = tslib_es6.__assign(tslib_es6.__assign(tslib_es6.__assign({}, rest), savedPaymentInfoBillingInfo), { addressId: getSavedPaymentMethodAddressId(savedPaymentInfoBillingInfo) });
+        const savedPaymentMethod = Object.assign(Object.assign(Object.assign({}, rest), savedPaymentInfoBillingInfo), { addressId: getSavedPaymentMethodAddressId(savedPaymentInfoBillingInfo) });
         return savedPaymentMethod;
     }).filter(Boolean);
 }
-function getSavedPaymentMethodAddressId(_a) {
-    var billingDetails = _a.billingDetails, metadata = _a.metadata;
+function getSavedPaymentMethodAddressId({ billingDetails, metadata }) {
     return [
         billingDetails.name,
         billingDetails.address1,
         billingDetails.address2,
         billingDetails.city,
-        "".concat(billingDetails.district.label),
+        `${billingDetails.district.label}`,
         billingDetails.postalCode,
-        "".concat(billingDetails.country.value),
+        `${billingDetails.country.value}`,
         metadata.email,
-        formatPhoneAsE123(metadata.phoneNumber, "".concat(billingDetails.country.value)),
-    ].map(function (value) {
-        if (value === void 0) { value = ""; }
+        formatPhoneAsE123(metadata.phoneNumber, `${billingDetails.country.value}`),
+    ].map((value = "") => {
         return value
             // Duplicate, leading or trailing spaces don't make a value different:
             .replace(/\s+/g, ' ').trim()
@@ -93,7 +84,7 @@ function billingInfoToSavedPaymentMethodBillingInfo(billingInfo) {
         },
         metadata: {
             email: billingInfo.email,
-            phoneNumber: formatPhoneAsE123(billingInfo.phone, "".concat(billingInfo.country.value)),
+            phoneNumber: formatPhoneAsE123(billingInfo.phone, `${billingInfo.country.value}`),
         },
     };
 }
@@ -101,7 +92,7 @@ function getSavedPaymentMethodAddressIdFromBillingInfo(billingInfo) {
     return getSavedPaymentMethodAddressId(billingInfoToSavedPaymentMethodBillingInfo(billingInfo));
 }
 function savedPaymentMethodToBillingInfo(savedPaymentMethod) {
-    var billingDetails = savedPaymentMethod.billingDetails, metadata = savedPaymentMethod.metadata;
+    const { billingDetails, metadata } = savedPaymentMethod;
     return {
         fullName: billingDetails.name,
         email: metadata.email,
@@ -126,13 +117,13 @@ function isCircleFieldErrorArray(obj) {
     return Array.isArray(obj) && obj.every(isCircleFieldError);
 }
 function parseCircleError(error) {
-    var message = error.message;
+    const { message } = error;
     if (message.includes("with body: ")) {
         try {
-            var parsedCircleError = JSON.parse(String.raw(templateObject_1 || (templateObject_1 = tslib_es6.__makeTemplateObject(["", ""], ["", ""])), message).replace(/^.+with body: /, ''));
-            var parsedCircleErrors = parsedCircleError.errors;
+            const parsedCircleError = JSON.parse(String.raw `${message}`.replace(/^.+with body: /, ''));
+            const parsedCircleErrors = parsedCircleError.errors;
             if (isCircleFieldErrorArray(parsedCircleErrors)) {
-                return parsedCircleErrors.reduce(function (errors, circleFieldError) {
+                return parsedCircleErrors.reduce((errors, circleFieldError) => {
                     // TODO: Match Circle errors to form field errors:
                     errors[circleFieldError.location] = circleFieldError.message;
                     return errors;
@@ -144,7 +135,6 @@ function parseCircleError(error) {
     }
     return "";
 }
-var templateObject_1;
 
 exports.billingInfoToSavedPaymentMethodBillingInfo = billingInfoToSavedPaymentMethodBillingInfo;
 exports.formatPhoneAsE123 = formatPhoneAsE123;

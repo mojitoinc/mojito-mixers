@@ -11,8 +11,7 @@ function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'defau
 
 var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 
-var CheckoutItemCostPurchase = function (_a) {
-    var _b = _a.checkoutItem, price = _b.price, fee = _b.fee, selectedPaymentMethodBillingInfo = _a.selectedPaymentMethodBillingInfo;
+const CheckoutItemCostPurchase = ({ checkoutItem: { price, fee, }, selectedPaymentMethodBillingInfo, }) => {
     return (React__default["default"].createElement(React__default["default"].Fragment, null,
         React__default["default"].createElement(material.Grid, { container: true, item: true, direction: "column", sx: { display: "flex", pb: 2 } },
             React__default["default"].createElement(BillingInfoFragment.BillingInfoFragment, { savedPaymentMethod: selectedPaymentMethodBillingInfo }),

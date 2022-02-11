@@ -15,9 +15,8 @@ function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'defau
 
 var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 
-var SavedBillingDetailsSelector = function (_a) {
-    var showLoader = _a.showLoader, savedPaymentMethods = _a.savedPaymentMethods, selectedPaymentMethodAddressId = _a.selectedPaymentMethodAddressId, onNew = _a.onNew, onEdit = _a.onEdit, onDelete = _a.onDelete, onPick = _a.onPick, onNext = _a.onNext, onClose = _a.onClose;
-    var getPaymentMethodAddressId = React.useCallback(function (savedPaymentMethod) { return savedPaymentMethod.addressId; }, []);
+const SavedBillingDetailsSelector = ({ showLoader, savedPaymentMethods, selectedPaymentMethodAddressId, onNew, onEdit, onDelete, onPick, onNext, onClose, }) => {
+    const getPaymentMethodAddressId = React.useCallback((savedPaymentMethod) => savedPaymentMethod.addressId, []);
     return (React__default["default"].createElement(React__default["default"].Fragment, null,
         React__default["default"].createElement(material.Box, { sx: { position: "relative" } },
             showLoader ? (React__default["default"].createElement(material.Box, { sx: {
@@ -32,13 +31,13 @@ var SavedBillingDetailsSelector = function (_a) {
                 } },
                 React__default["default"].createElement(material.CircularProgress, { color: "secondary" }))) : null,
             React__default["default"].createElement(InputGroupLabel.InputGroupLabel, { sx: { mt: 2.5, mb: 1.5 } }, "Saved Billing Info"),
-            React__default["default"].createElement(StackList.StackList, { data: savedPaymentMethods, additionalProps: function (savedPaymentMethod) { return ({
+            React__default["default"].createElement(StackList.StackList, { data: savedPaymentMethods, additionalProps: (savedPaymentMethod) => ({
                     active: savedPaymentMethod.addressId === selectedPaymentMethodAddressId,
                     disabled: showLoader,
-                    onEdit: onEdit,
-                    onDelete: onDelete,
-                    onPick: onPick,
-                }); }, component: BillingInfoItem.BillingInfoItem, itemKey: getPaymentMethodAddressId, deps: [onEdit, onDelete, onPick, selectedPaymentMethodAddressId, showLoader] }),
+                    onEdit,
+                    onDelete,
+                    onPick,
+                }), component: BillingInfoItem.BillingInfoItem, itemKey: getPaymentMethodAddressId, deps: [onEdit, onDelete, onPick, selectedPaymentMethodAddressId, showLoader] }),
             React__default["default"].createElement(SecondaryButton.SecondaryButton, { onClick: onNew, startIcon: React__default["default"].createElement(Add["default"], null), sx: { mt: 2.5 }, disabled: showLoader }, "Add New Billing Info")),
         React__default["default"].createElement(CheckoutModalFooter.CheckoutModalFooter, { variant: "toPayment", onSubmitClicked: onNext, onCloseClicked: onClose })));
 };

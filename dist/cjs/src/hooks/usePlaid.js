@@ -21,15 +21,15 @@ function continuePlaidOAuthFlow() {
 }
 function usePlaid(options) {
     var _a;
-    var selectedBillingInfo = isUsePlaidOptionsStartFlow(options) ? options.selectedBillingInfo : null;
-    var onSubmit = isUsePlaidOptionsContinueFlow(options) ? options.onSubmit : null;
-    var plaidOAuthFlowStateRef = React.useRef(exports.INITIAL_PLAID_OAUTH_FLOW_STATE);
-    var _b = plaidOAuthFlowStateRef.current || {}, savedLinkToken = _b.linkToken, receivedRedirectUri = _b.receivedRedirectUri, continueOAuthFlow = _b.continueOAuthFlow;
-    var _c = graphqlGenerated.usePreparePaymentMethodQuery({
+    const selectedBillingInfo = isUsePlaidOptionsStartFlow(options) ? options.selectedBillingInfo : null;
+    const onSubmit = isUsePlaidOptionsContinueFlow(options) ? options.onSubmit : null;
+    const plaidOAuthFlowStateRef = React.useRef(exports.INITIAL_PLAID_OAUTH_FLOW_STATE);
+    const { linkToken: savedLinkToken, receivedRedirectUri, continueOAuthFlow, } = plaidOAuthFlowStateRef.current || {};
+    const { loading: isPreparePaymentMethodLoading, error: preparePaymentMethodError, data: preparePaymentMethodData, } = graphqlGenerated.usePreparePaymentMethodQuery({
         skip: continueOAuthFlow || onSubmit !== null,
-    }), isPreparePaymentMethodLoading = _c.loading, preparePaymentMethodError = _c.error, preparePaymentMethodData = _c.data;
-    var linkToken = (continueOAuthFlow ? savedLinkToken : (_a = preparePaymentMethodData === null || preparePaymentMethodData === void 0 ? void 0 : preparePaymentMethodData.preparePaymentMethod) === null || _a === void 0 ? void 0 : _a.linkToken) || "";
-    var onSuccess = React.useCallback(function (public_token, metadata) {
+    });
+    const linkToken = (continueOAuthFlow ? savedLinkToken : (_a = preparePaymentMethodData === null || preparePaymentMethodData === void 0 ? void 0 : preparePaymentMethodData.preparePaymentMethod) === null || _a === void 0 ? void 0 : _a.linkToken) || "";
+    const onSuccess = React.useCallback((public_token, metadata) => {
         // Reset in case purchase fails and we need to try again:
         plaidOAuthFlowStateRef.current = exports.INITIAL_PLAID_OAUTH_FLOW_STATE = plaid_utils.clearPlaidInfo();
         if (!onSubmit)
@@ -41,7 +41,7 @@ function usePlaid(options) {
             publicToken: public_token,
         });
     }, [onSubmit]);
-    var onExit = React.useCallback(function (error) {
+    const onExit = React.useCallback((error) => {
         // `onExit` will be called after `onSuccess`, but we don't want to do anything in that case unless there's an error:
         if (plaidOAuthFlowStateRef.current === exports.INITIAL_PLAID_OAUTH_FLOW_STATE && !error)
             return;
@@ -52,7 +52,7 @@ function usePlaid(options) {
         // TODO: We could pass the error:
         onSubmit();
     }, [onSubmit]);
-    var onEvent = React.useCallback(function (eventName) {
+    const onEvent = React.useCallback((eventName) => {
         if (eventName !== "ERROR")
             return;
         // When an error happens in Plaid (can be simulated in the first screen of the test banks), users are given an option
@@ -60,20 +60,20 @@ function usePlaid(options) {
         // OAuth state as not used so that it is not deleted when we come back from this new attempt:
         plaid_utils.persistPlaidOAuthStateUsed(false);
     }, []);
-    var config = {
+    const config = {
         env: "sandbox",
         token: linkToken,
-        receivedRedirectUri: receivedRedirectUri,
-        onSuccess: onSuccess,
-        onExit: onExit,
-        onEvent: onEvent,
+        receivedRedirectUri,
+        onSuccess,
+        onExit,
+        onEvent,
     };
-    var _d = reactPlaidLink.usePlaidLink(config), plaidLinkOpen = _d.open, plaidLinkReady = _d.ready, plaidLinkError = _d.error;
-    React.useEffect(function () {
+    const { open: plaidLinkOpen, ready: plaidLinkReady, error: plaidLinkError, } = reactPlaidLink.usePlaidLink(config);
+    React.useEffect(() => {
         if ((preparePaymentMethodError || plaidLinkError) && onSubmit)
             onSubmit();
     }, [preparePaymentMethodError, plaidLinkError, onSubmit]);
-    React.useEffect(function () {
+    React.useEffect(() => {
         if (continueOAuthFlow && plaidLinkReady) {
             console.log("Open plaid link automatically...");
             plaidLinkOpen();
@@ -82,7 +82,7 @@ function usePlaid(options) {
             plaid_utils.persistPlaidOAuthStateUsed();
         }
     }, [continueOAuthFlow, plaidLinkReady, plaidLinkOpen]);
-    var handlePlaidLinkClicked = React.useCallback(function () {
+    const handlePlaidLinkClicked = React.useCallback(() => {
         // TODO: Handle errors properly:
         // TODO: This could be clicked before the link is ready:
         if (!plaidLinkReady || isPreparePaymentMethodLoading || !linkToken || !selectedBillingInfo)
@@ -90,16 +90,15 @@ function usePlaid(options) {
         console.log("Open plain link manually", linkToken);
         plaid_utils.persistPlaidInfo({
             url: window.location.pathname,
-            linkToken: linkToken,
-            selectedBillingInfo: selectedBillingInfo,
+            linkToken,
+            selectedBillingInfo,
         });
         plaidLinkOpen();
     }, [plaidLinkReady, isPreparePaymentMethodLoading, linkToken, selectedBillingInfo, plaidLinkOpen]);
     return handlePlaidLinkClicked;
 }
-var PlaidFlow = function (_a) {
-    var onSubmit = _a.onSubmit;
-    usePlaid({ onSubmit: onSubmit });
+const PlaidFlow = ({ onSubmit, }) => {
+    usePlaid({ onSubmit });
     return null;
 };
 

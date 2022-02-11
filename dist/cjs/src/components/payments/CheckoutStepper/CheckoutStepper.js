@@ -10,34 +10,33 @@ function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'defau
 
 var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 
-var lastProgress = 0;
+let lastProgress = 0;
 function resetStepperProgress() {
     lastProgress = 0;
 }
-var CheckoutStepper = function (_a) {
-    var currentProgress = _a.progress;
-    var _b = React.useState(lastProgress), progress = _b[0], setProgress = _b[1];
-    corre.useTimeout(function () {
+const CheckoutStepper = ({ progress: currentProgress, }) => {
+    const [progress, setProgress] = React.useState(lastProgress);
+    corre.useTimeout(() => {
         setProgress(lastProgress = currentProgress);
     }, 0, [currentProgress]);
     return (React__default["default"].createElement(material.Box, { sx: { position: "relative", mb: 1 } },
         React__default["default"].createElement(material.Stack, { spacing: 2, direction: "row", sx: { justifyContent: "space-between", alignItems: "center", pt: 2, pb: 1 } },
-            React__default["default"].createElement(material.Typography, { variant: "subtitle2", sx: { width: "100%", color: function (theme) { return theme.palette.grey[progress === 50 ? "700" : "600"]; } } }, "Billing Info"),
-            React__default["default"].createElement(material.Typography, { variant: "subtitle2", sx: { width: "100%", color: function (theme) { return theme.palette.grey[progress === 50 ? "600" : "700"]; } } }, "Payment")),
+            React__default["default"].createElement(material.Typography, { variant: "subtitle2", sx: { width: "100%", color: theme => theme.palette.grey[progress === 50 ? "700" : "600"] } }, "Billing Info"),
+            React__default["default"].createElement(material.Typography, { variant: "subtitle2", sx: { width: "100%", color: theme => theme.palette.grey[progress === 50 ? "600" : "700"] } }, "Payment")),
         React__default["default"].createElement(material.Box, { sx: {
                 position: "relative",
                 width: "100%",
                 height: 2,
-                background: function (theme) { var _a, _b; return (_b = (_a = theme.palette) === null || _a === void 0 ? void 0 : _a.gradients) === null || _b === void 0 ? void 0 : _b.stepper; },
+                background: theme => { var _a, _b; return (_b = (_a = theme.palette) === null || _a === void 0 ? void 0 : _a.gradients) === null || _b === void 0 ? void 0 : _b.stepper; },
             } },
             React__default["default"].createElement(material.Divider, { sx: {
                     borderWidth: 0,
                     borderBottomWidth: 1,
-                    background: function (theme) { return theme.palette.background.paper; },
-                    width: "".concat(100 - progress, "%"),
+                    background: theme => theme.palette.background.paper,
+                    width: `${100 - progress}%`,
                     height: 2,
                     marginLeft: "auto",
-                    transition: function (theme) { return "width ".concat(theme.transitions.duration.standard, "ms ").concat(theme.transitions.easing.easeInOut); },
+                    transition: theme => `width ${theme.transitions.duration.standard}ms ${theme.transitions.easing.easeInOut}`,
                 } }))));
 };
 

@@ -1,8 +1,9 @@
-import { terser } from 'rollup-plugin-terser';
 import commonjs from '@rollup/plugin-commonjs';
 import dts from 'rollup-plugin-dts'
 import resolve from "@rollup/plugin-node-resolve";
 import typescript from 'rollup-plugin-typescript2'
+// import { terser } from 'rollup-plugin-terser';
+// import { babel } from '@rollup/plugin-babel';
 
 import pkg from "./package.json";
 
@@ -16,6 +17,7 @@ const EXTERNAL = [
   ...Object.keys(pkg.peerDependencies),
   "react/jsx-runtime",
 
+  // /@babel\/runtime/,
   // "@emotion/react",
   // "@emotion/styled",
   // "@mui/material/styled",

@@ -4,15 +4,11 @@ import { PurchaseConfirmationBillingDetails } from '../../components/payments/Pu
 import { PurchaseConfirmationItemDetails } from '../../components/payments/PurchaseConfirmationItemDetails/PurchaseConfirmationItemDetails.js';
 import { billingInfoToSavedPaymentMethodBillingInfo } from '../../domain/circle/circle.utils.js';
 
-var ConfirmationView = function (_a) {
-    var checkoutItem = _a.checkoutItem, savedPaymentMethods = _a.savedPaymentMethods, selectedPaymentMethod = _a.selectedPaymentMethod, paymentReferenceNumber = _a.paymentReferenceNumber, purchaseInstructions = _a.purchaseInstructions, onNext = _a.onNext, onClose = _a.onClose;
-    var selectedBillingInfo = selectedPaymentMethod.billingInfo, selectedPaymentInfo = selectedPaymentMethod.paymentInfo;
-    var _b = useMemo(function () {
+const ConfirmationView = ({ checkoutItem, savedPaymentMethods, selectedPaymentMethod, paymentReferenceNumber, purchaseInstructions, onNext, onClose, }) => {
+    const { billingInfo: selectedBillingInfo, paymentInfo: selectedPaymentInfo, } = selectedPaymentMethod;
+    const { selectedPaymentMethodBillingInfo, selectedPaymentMethodPaymentInfo, } = useMemo(() => {
         if (typeof selectedPaymentInfo === "string") {
-            var paymentMethod = savedPaymentMethods.find(function (_a) {
-                var id = _a.id;
-                return id === selectedPaymentInfo;
-            });
+            const paymentMethod = savedPaymentMethods.find(({ id }) => id === selectedPaymentInfo);
             return {
                 selectedPaymentMethodBillingInfo: paymentMethod,
                 selectedPaymentMethodPaymentInfo: paymentMethod,
@@ -20,14 +16,11 @@ var ConfirmationView = function (_a) {
         }
         return {
             selectedPaymentMethodBillingInfo: typeof selectedBillingInfo === "string"
-                ? savedPaymentMethods.find(function (_a) {
-                    var addressId = _a.addressId;
-                    return addressId === selectedBillingInfo;
-                })
+                ? savedPaymentMethods.find(({ addressId }) => addressId === selectedBillingInfo)
                 : billingInfoToSavedPaymentMethodBillingInfo(selectedBillingInfo),
             selectedPaymentMethodPaymentInfo: selectedPaymentInfo,
         };
-    }, [savedPaymentMethods, selectedBillingInfo, selectedPaymentInfo]), selectedPaymentMethodBillingInfo = _b.selectedPaymentMethodBillingInfo, selectedPaymentMethodPaymentInfo = _b.selectedPaymentMethodPaymentInfo;
+    }, [savedPaymentMethods, selectedBillingInfo, selectedPaymentInfo]);
     if (!selectedPaymentMethodBillingInfo || !selectedPaymentMethodPaymentInfo)
         return null;
     return (React__default.createElement(React__default.Fragment, null,

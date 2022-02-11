@@ -1,4 +1,4 @@
-var PAYMENT_TYPE_LABEL = {
+const PAYMENT_TYPE_LABEL = {
     CreditCard: "Credit Card Payment",
     ACH: "ACH Payment",
     Wire: "Wire Payment",

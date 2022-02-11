@@ -30,6 +30,7 @@ export interface PaymentViewProps {
   consentType: ConsentType;
   privacyHref: string;
   termsOfUseHref: string;
+  debug?: boolean;
 }
 
 export const PaymentView: React.FC<PaymentViewProps> = ({
@@ -45,6 +46,7 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
   consentType,
   privacyHref,
   termsOfUseHref,
+  debug,
 }) => {
   const {
     billingInfo: selectedBillingInfo,
@@ -97,9 +99,10 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
 
   useEffect(() => {
     const selectedPaymentInfoMatch = typeof selectedPaymentInfo === "string" && savedPaymentMethods.some(({ id }) => id === selectedPaymentInfo);
+    const firstActiveSavedPaymentMethod = savedPaymentMethods.find(({ status }) => status === "complete");
 
-    if (showSaved && savedPaymentMethods.length > 0 && !selectedPaymentInfoMatch) {
-      onPaymentInfoSelected(savedPaymentMethods[0].id);
+    if (showSaved && savedPaymentMethods.length > 0 && !selectedPaymentInfoMatch && firstActiveSavedPaymentMethod) {
+      onPaymentInfoSelected(firstActiveSavedPaymentMethod.id);
     }
   }, [showSaved, onPaymentInfoSelected, savedPaymentMethods, selectedPaymentInfo]);
 
@@ -152,7 +155,8 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
             onSubmit={ handleSubmit }
             consentType={ consentType }
             privacyHref={ privacyHref }
-            termsOfUseHref={ termsOfUseHref } />
+            termsOfUseHref={ termsOfUseHref }
+            debug={ debug } />
         ) }
       </Stack>
       <CheckoutItemCostBreakdown checkoutItems={ [checkoutItem] } />

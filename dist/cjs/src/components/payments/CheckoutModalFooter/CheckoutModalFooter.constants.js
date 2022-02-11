@@ -5,7 +5,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 var Lock = require('../../../../node_modules/@mui/icons-material/Lock.js');
 var ChevronRight = require('../../../../node_modules/@mui/icons-material/ChevronRight.js');
 
-var LABELS_BY_VARIANT = {
+const LABELS_BY_VARIANT = {
     toGuestCheckout: "Guest Check Out",
     toPayment: "Continue to Payment",
     toConfirmation: "Purchase",
@@ -13,7 +13,7 @@ var LABELS_BY_VARIANT = {
     toForm: "Review Payment Information",
     toMarketplace: "Back to Marketplace",
 };
-var ICONS_BY_VARIANT = {
+const ICONS_BY_VARIANT = {
     toGuestCheckout: null,
     toPayment: ChevronRight["default"],
     toConfirmation: Lock["default"],

@@ -1,6 +1,6 @@
 import { Backdrop, Box, CircularProgress, Dialog, DialogContent } from "@mui/material";
 import React, { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { savedPaymentMethodToBillingInfo, transformRawSavedPaymentMethods } from "../../../domain/circle/circle.utils";
+import { getSavedPaymentMethodAddressIdFromBillingInfo, savedPaymentMethodToBillingInfo, transformRawSavedPaymentMethods } from "../../../domain/circle/circle.utils";
 import { UserFormat } from "../../../domain/auth/authentication.interfaces";
 import { PaymentMethod, PaymentType } from "../../../domain/payment/payment.interfaces";
 import { CheckoutItem } from "../../../domain/product/product.interfaces";
@@ -14,7 +14,7 @@ import { CheckoutModalHeader, CheckoutModalHeaderVariant } from "../CheckoutModa
 import { PurchasingView } from "../../../views/Purchasing/PurchasingView";
 import { ApolloError } from "@apollo/client";
 import { ErrorView } from "../../../views/Error/ErrorView";
-import { RawSavedPaymentMethod } from "../../../domain/circle/circle.interfaces";
+import { RawSavedPaymentMethod, SavedPaymentMethod } from "../../../domain/circle/circle.interfaces";
 import { Theme, ThemeProvider, createTheme, ThemeOptions, SxProps } from "@mui/material/styles";
 import { useShakeAnimation } from "../../../utils/animationUtils";
 import { resetStepperProgress } from "../CheckoutStepper/CheckoutStepper";
@@ -31,6 +31,7 @@ export interface SelectedPaymentMethod {
 }
 
 export interface CheckoutModalProps {
+  // Modal:
   open: boolean;
   onClose: () => void;
 
@@ -68,6 +69,7 @@ export interface CheckoutModalProps {
   isAuthenticatedLoading?: boolean;
 
   // Other Events:
+  debug?: boolean;
   onError?: (error: ApolloError | Error | string) => void;
   onMarketingOptInChange?: (marketingOptIn: boolean) => void
 }
@@ -113,12 +115,16 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   isAuthenticatedLoading,
 
   // Other Events:
+  debug,
   onError, // Not implemented yet. Used to let the app control where to log errors to (e.g. Sentry).
   onMarketingOptInChange, // Not implemented yet. Used to let user subscribe / unsubscribe to marketing updates.
 }) => {
-  const { data: meData, loading: meLoading, error: meError } = useMeQuery({ skip: !isAuthenticated });
-
-  const [deletePaymentMethod] = useDeletePaymentMethodMutation();
+  const {
+    data: meData,
+    loading: meLoading,
+    error: meError,
+    refetch: meRefetch,
+  } = useMeQuery({ skip: !isAuthenticated });
 
   const {
     data: paymentMethodsData,
@@ -131,6 +137,8 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
       orgID,
     },
   });
+
+  const [deletePaymentMethod] = useDeletePaymentMethodMutation();
 
   const isDialogLoading = isAuthenticatedLoading || meLoading || paymentMethodsLoading;
   const isPlaidFlowLoading = continuePlaidOAuthFlow();
@@ -156,7 +164,6 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   }, [checkoutStep]);
 
   const resetModalState = useCallback(() => {
-
     // Make sure the progress tracker in BillingView and PaymentView is properly animated:
     resetStepperProgress();
 
@@ -176,14 +183,47 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   }, [isDialogLoading, open, resetModalState]);
 
   useEffect(() => {
+    if (savedPaymentMethods.length === 0) return;
+
+    // When reloading the saved payment methods after an error, we might have form data that matches a payment method
+    // that has just been created, so we want to update it to reference the existing one:
+
+    setSelectedPaymentMethod((prevSelectedPaymentMethod) => {
+      const { billingInfo, paymentInfo } = prevSelectedPaymentMethod;
+
+      if (typeof billingInfo === "string" && typeof paymentInfo === "string") return prevSelectedPaymentMethod;
+
+      // To find the saved payment method(s) that was/were last created:
+      const reversedSavedPaymentMethods = savedPaymentMethods.slice().reverse();
+
+      let matchingPaymentMethod: SavedPaymentMethod;
+
+      if (typeof billingInfo === "object") {
+        const addressId = getSavedPaymentMethodAddressIdFromBillingInfo(billingInfo);
+
+        matchingPaymentMethod = reversedSavedPaymentMethods.find(paymentMethod => paymentMethod.addressId === addressId);
+      }
+
+      const isBillingInfoAddressId = typeof billingInfo === "string";
+
+      return !isBillingInfoAddressId && matchingPaymentMethod ? {
+        billingInfo: matchingPaymentMethod.addressId,
+        paymentInfo: matchingPaymentMethod.id,
+      } : {
+        billingInfo,
+        paymentInfo: isBillingInfoAddressId ? reversedSavedPaymentMethods[0].id : paymentInfo,
+      };
+    });
+  }, [savedPaymentMethods]);
+
+  useEffect(() => {
     if (!checkoutStep) onClose();
   }, [checkoutStep, onClose]);
 
   useEffect(() => {
-    // TODO: Refetch these when coming back from error screen:
     if (meError) setPaymentError("User could not be loaded.");
     if (paymentMethodsError) setPaymentError("Payment methods could not be loaded.");
-  }, [meError, paymentMethodsError, checkoutItem, invoiceID]);
+  }, [meError, paymentMethodsError]);
 
   const handlePrevClicked = useCallback(() => {
     setCheckoutStepIndex((prevCheckoutStepIndex) => prevCheckoutStepIndex - 1);
@@ -250,25 +290,38 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
   const [paymentReferenceNumber, setPaymentReferenceNumber] = useState("");
 
-  const handlePurchaseSuccess = useCallback((paymentReferenceNumber: string) => {
-    setPaymentReferenceNumber(paymentReferenceNumber);
-  }, []);
+  const handlePurchaseSuccess = useCallback(async (paymentReferenceNumber: string) => {
+    // After a successful purchase, a new payment method might have been created, so we reload them:
+    await refetchPaymentMethods();
 
-  const handleReviewData = useCallback(() => {
+    setPaymentReferenceNumber(paymentReferenceNumber);
+
+    handleNextClicked();
+  }, [refetchPaymentMethods, handleNextClicked]);
+
+  const handleReviewData = useCallback(async (): Promise<false> => {
+    // After an error, all data is reloaded in case the issue was caused by stale/cached data or in case a new payment
+    // method has been created despite the error:
+    await Promise.allSettled([
+      meRefetch(),
+      refetchPaymentMethods(),
+    ]);
+
     // TODO: paymentError should have a source property to know where the error is coming from and handle recovery differently here:
     setPaymentError("");
     setCheckoutStepIndex(2);
-  }, []);
+
+    // This function is used as a CheckoutModalFooter's onSubmitClicked, so we want that to show a loader on the submit
+    // button when clicked but do not remove it once the Promise is resolved, as we are moving to another view and
+    // CheckoutModalFooter will unmount (so doing this prevents a memory leak issue):
+    return false;
+  }, [meRefetch, refetchPaymentMethods]);
 
   // BLOCK DIALOG LOGIC & SHAKE ANIMATION:
 
   const [shakeSx, shake] = useShakeAnimation(paperRef.current);
 
   const [isDialogBlocked, setIsDialogBlocked] = useState(false);
-
-  const onDialogBlocked = useCallback((nextIsDialogBlocked: boolean) => {
-    setIsDialogBlocked(nextIsDialogBlocked);
-  }, []);
 
   useEffect(() => {
     if (parentTheme && themeOptions) {
@@ -352,7 +405,8 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
         onBillingInfoSelected={ handleBillingInfoSelected }
         onSavedPaymentMethodDeleted={ handleSavedPaymentMethodDeleted }
         onNext={ handleNextClicked }
-        onClose={ onClose } />
+        onClose={ onClose }
+        debug={ debug } />
     );
   } else if (checkoutStep === "payment") {
     checkoutStepElement = (
@@ -368,7 +422,8 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
         acceptedPaymentTypes={ acceptedPaymentTypes }
         consentType={ consentType }
         privacyHref={ privacyHref }
-        termsOfUseHref={ termsOfUseHref } />
+        termsOfUseHref={ termsOfUseHref }
+        debug={ debug } />
     );
   } else if (checkoutStep === "purchasing") {
     headerVariant = 'purchasing';
@@ -385,8 +440,8 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
         selectedPaymentMethod={ selectedPaymentMethod }
         onPurchaseSuccess={ handlePurchaseSuccess }
         onPurchaseError={ setPaymentError }
-        onNext={ handleNextClicked }
-        onDialogBlocked={ onDialogBlocked } />
+        onDialogBlocked={ setIsDialogBlocked }
+        debug={ debug } />
     );
   } else if (checkoutStep === "confirmation") {
     headerVariant = 'logoOnly';

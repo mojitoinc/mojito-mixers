@@ -1,9 +1,8 @@
 import { Box, Typography } from '@mui/material';
 import React__default from 'react';
-import { Number } from '../../../shared/Number/index.js';
+import { Number } from '../../../shared/Number/Number.js';
 
-var CheckoutItemCostTotal = function (_a) {
-    var price = _a.price, fee = _a.fee;
+const CheckoutItemCostTotal = ({ price, fee, }) => {
     return (React__default.createElement(Box, { sx: { display: "flex", flexDirection: "column", alignItems: "flex-end", mt: { xs: 3, sm: 0.5 } } },
         React__default.createElement(Typography, { sx: { fontWeight: "500" } }, "Total Amount (USD)"),
         React__default.createElement(Typography, { variant: "subtitle1", sx: {

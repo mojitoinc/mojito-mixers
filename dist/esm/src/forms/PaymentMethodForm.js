@@ -1,4 +1,4 @@
-import { __assign, __awaiter, __generator } from '../../node_modules/tslib/tslib.es6.js';
+import { __awaiter } from '../../node_modules/tslib/tslib.es6.js';
 import { useForm } from 'react-hook-form';
 import { yupResolver as o } from '../../node_modules/@hookform/resolvers/yup/dist/yup.mjs.js';
 import { string, object, boolean } from 'yup';
@@ -6,197 +6,162 @@ import default_1 from '../../node_modules/@mui/icons-material/Book.js';
 import React__default, { useMemo, useCallback } from 'react';
 import { CheckoutModalFooter } from '../components/payments/CheckoutModalFooter/CheckoutModalFooter.js';
 import { ControlledTextField } from '../components/shared/TextField/TextField.js';
-import { ControlledCardNumberField } from '../components/shared/CardNumberField/index.js';
-import { ControlledCardExpiryDateField } from '../components/shared/CardExpiryDateField/index.js';
-import { ControlledCardSecureCodeField } from '../components/shared/CardSecureCodeField/index.js';
+import { ControlledCardNumberField } from '../components/shared/CardNumberField/CardNumberField.js';
+import { ControlledCardExpiryDateField } from '../components/shared/CardExpiryDateField/CardExpiryDateField.js';
+import { ControlledCardSecureCodeField } from '../components/shared/CardSecureCodeField/CardSecureCodeField.js';
 import { InputGroupLabel } from '../components/shared/InputGroupLabel/InputGroupLabel.js';
 import { SecondaryButton } from '../components/shared/SecondaryButton/SecondaryButton.js';
 import { PaymentMethodSelector } from '../components/shared/PaymentMethodSelector/PaymentMethodSelector.js';
 import { withInvalidErrorMessage, requireSchemaWhenKeyIs } from '../utils/validationUtils.js';
 import { getCardNumberIsValid, getExpiryDateIsvalid, getCVCIsValid } from '../domain/payment/payment.utils.js';
 import { Typography } from '@mui/material';
-import { DisplayBox } from '../components/payments/DisplayBox/DisplayBox.js';
-import { ControlledCheckbox } from '../components/shared/Checkbox/index.js';
+import { DisplayBox, DebugBox } from '../components/payments/DisplayBox/DisplayBox.js';
+import { ControlledCheckbox } from '../components/shared/Checkbox/Checkbox.js';
 import { ConsentText, CONSENT_ERROR_MESSAGE } from '../components/shared/ConsentText/ConsentText.js';
 import Grid from '../../node_modules/@mui/material/Grid/Grid.js';
 import Box from '../../node_modules/@mui/material/Box/Box.js';
 
-var FIELD_LABELS = {
+const FIELD_LABELS = {
     cardNumber: "Card Number",
     expiryDate: "Expiry Date",
     secureCode: "Secure Code",
     nameOnCard: "Name on Card",
 };
-var isCreditCardThenRequireSchema = requireSchemaWhenKeyIs("CreditCard");
-var PAYMENT_TYPE_FORM_DATA = {
+const isCreditCardThenRequireSchema = requireSchemaWhenKeyIs("CreditCard");
+const PAYMENT_TYPE_FORM_DATA = {
     CreditCard: {
-        defaultValues: function (consentType) { return ({
+        defaultValues: (consentType) => ({
             type: "CreditCard",
             cardNumber: "",
             expiryDate: "",
             secureCode: "",
             nameOnCard: "",
             consent: consentType === "checkbox" ? false : true,
-        }); },
+        }),
         schemaShape: {
             cardNumber: string()
                 .label(FIELD_LABELS.cardNumber)
                 .when("type", {
                 is: "CreditCard",
-                then: function (schema) {
-                    return schema.required().test({
-                        name: "is-valid-card-number",
-                        test: getCardNumberIsValid,
-                        message: withInvalidErrorMessage
-                    });
-                }
+                then: (schema) => schema.required().test({
+                    name: "is-valid-card-number",
+                    test: getCardNumberIsValid,
+                    message: withInvalidErrorMessage
+                })
             }),
             expiryDate: string()
                 .label(FIELD_LABELS.expiryDate)
                 .when("type", {
                 is: "CreditCard",
-                then: function (schema) {
-                    return schema.required().test({
-                        name: "is-valid-expiry-date",
-                        test: getExpiryDateIsvalid,
-                        message: withInvalidErrorMessage
-                    });
-                }
+                then: (schema) => schema.required().test({
+                    name: "is-valid-expiry-date",
+                    test: getExpiryDateIsvalid,
+                    message: withInvalidErrorMessage
+                })
             }),
             secureCode: string()
                 .label(FIELD_LABELS.secureCode)
                 .when("type", {
                 is: "CreditCard",
-                then: function (schema) {
-                    return schema.required().test({
-                        name: "is-valid-cvv-or-cid-number",
-                        test: function (value, context) {
-                            return getCVCIsValid(value, context.parent.cardNumber);
-                        },
-                        message: withInvalidErrorMessage
-                    });
-                }
+                then: (schema) => schema.required().test({
+                    name: "is-valid-cvv-or-cid-number",
+                    test: (value, context) => getCVCIsValid(value, context.parent.cardNumber),
+                    message: withInvalidErrorMessage
+                })
             }),
             nameOnCard: string()
                 .label(FIELD_LABELS.nameOnCard)
                 .when("type", isCreditCardThenRequireSchema),
         },
-        fields: function (_a) {
-            var control = _a.control, consentType = _a.consentType, privacyHref = _a.privacyHref, termsOfUseHref = _a.termsOfUseHref;
-            return (React__default.createElement(React__default.Fragment, null,
-                React__default.createElement(ControlledCardNumberField, { name: "cardNumber", control: control, label: FIELD_LABELS.cardNumber }),
-                React__default.createElement(Grid, { container: true, columnSpacing: 2, direction: {
-                        xs: "column",
-                        sm: "row"
-                    } },
-                    React__default.createElement(Grid, { item: true, sm: 6, zeroMinWidth: true },
-                        React__default.createElement(ControlledCardExpiryDateField, { name: "expiryDate", control: control, label: FIELD_LABELS.expiryDate })),
-                    React__default.createElement(Grid, { item: true, sm: 6 },
-                        React__default.createElement(ControlledCardSecureCodeField, { name: "secureCode", control: control, label: FIELD_LABELS.secureCode }))),
-                React__default.createElement(ControlledTextField, { name: "nameOnCard", control: control, label: FIELD_LABELS.nameOnCard }),
-                consentType === "checkbox" && (React__default.createElement(ControlledCheckbox, { name: "consent", control: control, label: React__default.createElement(React__default.Fragment, null,
-                        "I ",
-                        React__default.createElement(ConsentText, { privacyHref: privacyHref, termsOfUseHref: termsOfUseHref })) }))));
-        },
+        fields: ({ control, consentType, privacyHref, termsOfUseHref }) => (React__default.createElement(React__default.Fragment, null,
+            React__default.createElement(ControlledCardNumberField, { name: "cardNumber", control: control, label: FIELD_LABELS.cardNumber }),
+            React__default.createElement(Grid, { container: true, columnSpacing: 2, direction: {
+                    xs: "column",
+                    sm: "row"
+                } },
+                React__default.createElement(Grid, { item: true, sm: 6, zeroMinWidth: true },
+                    React__default.createElement(ControlledCardExpiryDateField, { name: "expiryDate", control: control, label: FIELD_LABELS.expiryDate })),
+                React__default.createElement(Grid, { item: true, sm: 6 },
+                    React__default.createElement(ControlledCardSecureCodeField, { name: "secureCode", control: control, label: FIELD_LABELS.secureCode }))),
+            React__default.createElement(ControlledTextField, { name: "nameOnCard", control: control, label: FIELD_LABELS.nameOnCard }),
+            consentType === "checkbox" && (React__default.createElement(ControlledCheckbox, { name: "consent", control: control, label: React__default.createElement(React__default.Fragment, null,
+                    "I ",
+                    React__default.createElement(ConsentText, { privacyHref: privacyHref, termsOfUseHref: termsOfUseHref })) })))),
     },
     ACH: {
-        defaultValues: function (consentType) { return ({
+        defaultValues: (consentType) => ({
             type: "ACH",
             accountId: "",
             publicToken: "",
             consent: consentType === "checkbox" ? false : true,
-        }); },
+        }),
         schemaShape: {},
-        fields: function (_a) {
-            var control = _a.control, consentType = _a.consentType, privacyHref = _a.privacyHref, termsOfUseHref = _a.termsOfUseHref;
-            return (React__default.createElement(React__default.Fragment, null,
-                React__default.createElement(DisplayBox, { sx: { mt: 1.5, mb: consentType === "checkbox" ? 1 : 0 } },
-                    React__default.createElement(Typography, { variant: "body1" }, "We use Plaid to connect to your account.")),
-                consentType === "checkbox" && (React__default.createElement(ControlledCheckbox, { name: "consent", control: control, label: React__default.createElement(React__default.Fragment, null,
-                        "I ",
-                        React__default.createElement(ConsentText, { privacyHref: privacyHref, termsOfUseHref: termsOfUseHref })) }))));
-        },
+        fields: ({ control, consentType, privacyHref, termsOfUseHref }) => (React__default.createElement(React__default.Fragment, null,
+            React__default.createElement(DisplayBox, { sx: { mt: 1.5, mb: consentType === "checkbox" ? 1 : 0 } },
+                React__default.createElement(Typography, { variant: "body1" }, "We use Plaid to connect to your account.")),
+            consentType === "checkbox" && (React__default.createElement(ControlledCheckbox, { name: "consent", control: control, label: React__default.createElement(React__default.Fragment, null,
+                    "I ",
+                    React__default.createElement(ConsentText, { privacyHref: privacyHref, termsOfUseHref: termsOfUseHref })) })))),
     },
     Wire: {
-        defaultValues: function (consentType) { return ({
+        defaultValues: (consentType) => ({
             type: "Wire",
             consent: consentType === "checkbox" ? false : true,
-        }); },
+        }),
         schemaShape: {},
-        fields: function (_a) {
-            var control = _a.control, consentType = _a.consentType, privacyHref = _a.privacyHref, termsOfUseHref = _a.termsOfUseHref;
-            return (React__default.createElement(React__default.Fragment, null,
-                React__default.createElement(DisplayBox, { sx: { mt: 1.5, mb: consentType === "checkbox" ? 1 : 0 } },
-                    React__default.createElement(Typography, { variant: "body1" }, "Not supported yet.")),
-                consentType === "checkbox" && (React__default.createElement(ControlledCheckbox, { name: "consent", control: control, label: React__default.createElement(React__default.Fragment, null,
-                        "I ",
-                        React__default.createElement(ConsentText, { privacyHref: privacyHref, termsOfUseHref: termsOfUseHref })) }))));
-        },
+        fields: ({ control, consentType, privacyHref, termsOfUseHref }) => (React__default.createElement(React__default.Fragment, null,
+            React__default.createElement(DisplayBox, { sx: { mt: 1.5, mb: consentType === "checkbox" ? 1 : 0 } },
+                React__default.createElement(Typography, { variant: "body1" }, "Not supported yet.")),
+            consentType === "checkbox" && (React__default.createElement(ControlledCheckbox, { name: "consent", control: control, label: React__default.createElement(React__default.Fragment, null,
+                    "I ",
+                    React__default.createElement(ConsentText, { privacyHref: privacyHref, termsOfUseHref: termsOfUseHref })) })))),
     },
     Crypto: {
-        defaultValues: function (consentType) { return ({
+        defaultValues: (consentType) => ({
             type: "Crypto",
             consent: consentType === "checkbox" ? false : true,
-        }); },
+        }),
         schemaShape: {},
-        fields: function (_a) {
-            var control = _a.control, consentType = _a.consentType, privacyHref = _a.privacyHref, termsOfUseHref = _a.termsOfUseHref;
-            return (React__default.createElement(React__default.Fragment, null,
-                React__default.createElement(DisplayBox, { sx: { mt: 1.5, mb: consentType === "checkbox" ? 1 : 0 } },
-                    React__default.createElement(Typography, { variant: "body1" }, "Not supported yet.")),
-                consentType === "checkbox" && (React__default.createElement(ControlledCheckbox, { name: "consent", control: control, label: React__default.createElement(React__default.Fragment, null,
-                        "I ",
-                        React__default.createElement(ConsentText, { privacyHref: privacyHref, termsOfUseHref: termsOfUseHref })) }))));
-        },
+        fields: ({ control, consentType, privacyHref, termsOfUseHref }) => (React__default.createElement(React__default.Fragment, null,
+            React__default.createElement(DisplayBox, { sx: { mt: 1.5, mb: consentType === "checkbox" ? 1 : 0 } },
+                React__default.createElement(Typography, { variant: "body1" }, "Not supported yet.")),
+            consentType === "checkbox" && (React__default.createElement(ControlledCheckbox, { name: "consent", control: control, label: React__default.createElement(React__default.Fragment, null,
+                    "I ",
+                    React__default.createElement(ConsentText, { privacyHref: privacyHref, termsOfUseHref: termsOfUseHref })) })))),
     },
 };
-var PaymentMethodForm = function (_a) {
-    var acceptedPaymentTypes = _a.acceptedPaymentTypes, parentDefaultValues = _a.defaultValues, onPlaidLinkClicked = _a.onPlaidLinkClicked, onSaved = _a.onSaved, onClose = _a.onClose, onSubmit = _a.onSubmit, consentType = _a.consentType, privacyHref = _a.privacyHref, termsOfUseHref = _a.termsOfUseHref, _b = _a.debug, debug = _b === void 0 ? false : _b;
-    var defaultPaymentType = acceptedPaymentTypes[0] || "CreditCard";
-    var defaultPaymentTypeFormData = PAYMENT_TYPE_FORM_DATA[defaultPaymentType];
-    var defaultPaymentTypeDefaultValues = defaultPaymentTypeFormData.defaultValues(consentType);
-    var schema = useMemo(function () {
-        return object().shape(__assign({ type: string().required(), consent: boolean().oneOf([true], CONSENT_ERROR_MESSAGE) }, Object.values(PAYMENT_TYPE_FORM_DATA).reduce(function (objectShape, _a) {
-            var schemaShape = _a.schemaShape;
-            return (__assign(__assign({}, objectShape), schemaShape));
-        }, {})));
+const PaymentMethodForm = ({ acceptedPaymentTypes, defaultValues: parentDefaultValues, onPlaidLinkClicked, onSaved, onClose, onSubmit, consentType, privacyHref, termsOfUseHref, debug = false }) => {
+    const defaultPaymentType = acceptedPaymentTypes[0] || "CreditCard";
+    const defaultPaymentTypeFormData = PAYMENT_TYPE_FORM_DATA[defaultPaymentType];
+    const defaultPaymentTypeDefaultValues = defaultPaymentTypeFormData.defaultValues(consentType);
+    const schema = useMemo(() => {
+        return object().shape(Object.assign({ type: string().required(), consent: boolean().oneOf([true], CONSENT_ERROR_MESSAGE) }, Object.values(PAYMENT_TYPE_FORM_DATA).reduce((objectShape, { schemaShape }) => (Object.assign(Object.assign({}, objectShape), schemaShape)), {})));
     }, []);
-    var _c = useForm({
-        defaultValues: __assign(__assign({}, defaultPaymentTypeDefaultValues), parentDefaultValues),
+    const { control, handleSubmit, watch, reset, trigger, } = useForm({
+        defaultValues: Object.assign(Object.assign({}, defaultPaymentTypeDefaultValues), parentDefaultValues),
         reValidateMode: "onChange",
-        resolver: o(schema)
-    }), control = _c.control, handleSubmit = _c.handleSubmit, watch = _c.watch, reset = _c.reset, trigger = _c.trigger;
-    var handleSelectedPaymentMethodChange = useCallback(function (paymentType) {
-        reset(__assign({}, PAYMENT_TYPE_FORM_DATA[paymentType].defaultValues(consentType)));
+        resolver: o(schema),
+    });
+    const handleSelectedPaymentMethodChange = useCallback((paymentType) => {
+        reset(Object.assign({}, PAYMENT_TYPE_FORM_DATA[paymentType].defaultValues(consentType)));
     }, [reset, consentType]);
-    var selectedPaymentMethod = watch("type");
-    var Fields = PAYMENT_TYPE_FORM_DATA[selectedPaymentMethod].fields;
-    var submitForm = handleSubmit(onSubmit);
-    var handleFormSubmit = useCallback(function (e) { return __awaiter(void 0, void 0, void 0, function () {
-        var isFormValid;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    e.preventDefault();
-                    if (!(selectedPaymentMethod === "ACH")) return [3 /*break*/, 2];
-                    return [4 /*yield*/, trigger()];
-                case 1:
-                    isFormValid = _a.sent();
-                    if (!isFormValid) {
-                        submitForm(e);
-                        return [2 /*return*/];
-                    }
-                    onPlaidLinkClicked();
-                    return [3 /*break*/, 3];
-                case 2:
-                    if (selectedPaymentMethod === "CreditCard") {
-                        submitForm(e);
-                    }
-                    _a.label = 3;
-                case 3: return [2 /*return*/];
+    const selectedPaymentMethod = watch("type");
+    const Fields = PAYMENT_TYPE_FORM_DATA[selectedPaymentMethod].fields;
+    const submitForm = handleSubmit(onSubmit);
+    const handleFormSubmit = useCallback((e) => __awaiter(void 0, void 0, void 0, function* () {
+        e.preventDefault();
+        if (selectedPaymentMethod === "ACH") {
+            const isFormValid = yield trigger();
+            if (!isFormValid) {
+                submitForm(e);
+                return;
             }
-        });
-    }); }, [selectedPaymentMethod, onPlaidLinkClicked, submitForm, trigger]);
+            onPlaidLinkClicked();
+        }
+        else if (selectedPaymentMethod === "CreditCard") {
+            submitForm(e);
+        }
+    }), [selectedPaymentMethod, onPlaidLinkClicked, submitForm, trigger]);
     return (React__default.createElement("form", { onSubmit: handleFormSubmit },
         onSaved && (React__default.createElement(Box, { sx: { my: 2.5 } },
             React__default.createElement(SecondaryButton, { onClick: onSaved, startIcon: React__default.createElement(default_1, null) }, "Use Saved Payment Method"))),
@@ -204,7 +169,7 @@ var PaymentMethodForm = function (_a) {
             React__default.createElement(InputGroupLabel, { sx: { m: 0, pt: 2, pb: 1.5 } }, "Payment Method"),
             React__default.createElement(PaymentMethodSelector, { selectedPaymentMethod: selectedPaymentMethod, onPaymentMethodChange: handleSelectedPaymentMethodChange, paymentMethods: acceptedPaymentTypes }))) : (null),
         React__default.createElement(Fields, { control: control, consentType: consentType, privacyHref: privacyHref, termsOfUseHref: termsOfUseHref }),
-        debug && (React__default.createElement(Box, { component: "pre", sx: { my: 2, overflow: "scroll" } }, JSON.stringify(watch(), null, 2))),
+        debug && (React__default.createElement(DebugBox, { sx: { my: 2 } }, JSON.stringify(watch(), null, 2))),
         React__default.createElement(CheckoutModalFooter, { variant: selectedPaymentMethod === "ACH" ? "toPlaid" : "toConfirmation", consentType: consentType === "checkbox" ? undefined : consentType, privacyHref: privacyHref, termsOfUseHref: termsOfUseHref, submitDisabled: selectedPaymentMethod === "Wire" || selectedPaymentMethod === "Crypto", onCloseClicked: onClose })));
 };
 

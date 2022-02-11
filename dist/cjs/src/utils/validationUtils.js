@@ -2,18 +2,12 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-var requireSchemaWhenKeyIs = function (key) { return ({
+const requireSchemaWhenKeyIs = (key) => ({
     is: key,
-    then: function (schema) { return schema.required(withRequiredErrorMessage); }
-}); };
-var withRequiredErrorMessage = function (_a) {
-    var fieldLabel = _a.label;
-    return "".concat(fieldLabel, " is required");
-};
-var withInvalidErrorMessage = function (_a) {
-    var fieldLabel = _a.label;
-    return "".concat(fieldLabel, " is not valid");
-};
+    then: (schema) => schema.required(withRequiredErrorMessage)
+});
+const withRequiredErrorMessage = ({ label: fieldLabel }) => `${fieldLabel} is required`;
+const withInvalidErrorMessage = ({ label: fieldLabel }) => `${fieldLabel} is not valid`;
 
 exports.requireSchemaWhenKeyIs = requireSchemaWhenKeyIs;
 exports.withInvalidErrorMessage = withInvalidErrorMessage;

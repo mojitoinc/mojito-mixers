@@ -5,8 +5,8 @@ import { SecondaryButton } from "../SecondaryButton/SecondaryButton";
 import { PaymentDetailsItem } from "../../payments/PaymentDetailsItem/Item/PaymentDetailsItem";
 import { CheckoutModalFooter } from "../../payments/CheckoutModalFooter/CheckoutModalFooter";
 import { SavedPaymentMethod } from "../../../domain/circle/circle.interfaces";
-import React, { useCallback } from "react";
-import { Box, CircularProgress } from "@mui/material";
+import React, { useCallback, useState } from "react";
+import { Box, CircularProgress, Typography } from "@mui/material";
 import { ConsentType } from "../ConsentText/ConsentText";
 
 export interface SavedPaymentDetailsSelectorProps {
@@ -36,14 +36,20 @@ export const SavedPaymentDetailsSelector: React.FC<SavedPaymentDetailsSelectorPr
   privacyHref,
   termsOfUseHref,
 }) => {
-  const getPaymentMethodId = useCallback((savedPaymentMethod: SavedPaymentMethod) => savedPaymentMethod.id, []);
+  const [isFormSubmitted, setIsFormSubmitted] = useState(false);
 
   const handleNextClicked = useCallback((canSubmit: boolean) => {
-    if (canSubmit) onNext();
-  }, [onNext]);
+    if (canSubmit && selectedPaymentMethodId) {
+      onNext();
+    } else if (!selectedPaymentMethodId) {
+      setIsFormSubmitted(true);
+    }
+  }, [selectedPaymentMethodId, onNext]);
+
+  const getPaymentMethodId = useCallback((savedPaymentMethod: SavedPaymentMethod) => savedPaymentMethod.id, []);
 
   return (<>
-    <Box sx={{ position: "relative" }}>
+    <Box sx={{ position: "relative", mb: consentType === "checkbox" ? 5 : 0 }}>
 
       { showLoader ? (
         <Box sx={{
@@ -77,10 +83,16 @@ export const SavedPaymentDetailsSelector: React.FC<SavedPaymentDetailsSelectorPr
       <SecondaryButton
         onClick={ onNew }
         startIcon={ <AddIcon /> }
-        sx={{ mt: 2.5, mb: consentType === "checkbox" ? 5 : 0 }}
+        sx={{ mt: 2.5 }}
         disabled={ showLoader }>
         Add New Payment Method
       </SecondaryButton>
+
+      { isFormSubmitted && !selectedPaymentMethodId && (
+        <Typography variant="caption" component="p" sx={{ mt: 2, color: theme => theme.palette.warning.dark }}>
+          You must select a saved and approved payment method or create a new one.
+        </Typography>
+      ) }
 
     </Box>
 

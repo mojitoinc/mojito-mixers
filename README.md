@@ -207,6 +207,7 @@ const App: React.FC<AppProps> = () => {
     isAuthenticatedLoading: isLoading,
 
     // Other Events:
+    debug: true,
     onError: handleError,
     onMarketingOptInChange: handleMarketingOptInChange,
   };
@@ -272,7 +273,7 @@ const PlaidOAuthPage = () => {
 
 You will have to copy the following file into your project to avoid TypeScript errors when using custom props in MUI's theme:
 
-[`app/src/lib/config/theme/palette.d.ts`](./app/src/lib/config/theme/palette.d.ts).
+[`app/src/lib/domain/mui/mui.d.ts`](./app/src/lib/domain/mui/mui.d.ts).
 
 <br />
 

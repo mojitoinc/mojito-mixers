@@ -11,9 +11,8 @@ function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'defau
 
 var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 
-var AuthenticationView = function (_a) {
-    var checkoutItem = _a.checkoutItem, isAuthenticated = _a.isAuthenticated, guestCheckoutEnabled = _a.guestCheckoutEnabled, onGuestClicked = _a.onGuestClicked, onCloseClicked = _a.onCloseClicked;
-    React.useEffect(function () {
+const AuthenticationView = ({ checkoutItem, isAuthenticated, guestCheckoutEnabled, onGuestClicked, onCloseClicked, }) => {
+    React.useEffect(() => {
         // Make sure the progress tracker in BillingView and PaymentView is properly animated:
         CheckoutStepper.resetStepperProgress();
     }, []);

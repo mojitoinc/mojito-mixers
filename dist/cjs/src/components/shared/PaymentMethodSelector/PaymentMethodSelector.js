@@ -17,7 +17,7 @@ function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'defau
 var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 var Icon__default = /*#__PURE__*/_interopDefaultLegacy(Icon);
 
-var PAYMENT_METHOD_OPTION_PROPS = {
+const PAYMENT_METHOD_OPTION_PROPS = {
     CreditCard: {
         label: "Credit Card",
         icon: React__default["default"].createElement(CreditCard["default"], null)
@@ -35,16 +35,15 @@ var PAYMENT_METHOD_OPTION_PROPS = {
         icon: React__default["default"].createElement(Icon__default["default"], { path: js.mdiEthereum, size: "20px" })
     }
 };
-var PaymentMethodSelector = function (_a) {
-    var paymentMethods = _a.paymentMethods, selectedPaymentMethod = _a.selectedPaymentMethod, onPaymentMethodChange = _a.onPaymentMethodChange;
-    var theme = material.useTheme();
-    var wideViewport = material.useMediaQuery(theme.breakpoints.up("sm"));
-    var handleChange = React.useCallback(function (_, paymentMethod) {
+const PaymentMethodSelector = ({ paymentMethods, selectedPaymentMethod, onPaymentMethodChange }) => {
+    const theme = material.useTheme();
+    const wideViewport = material.useMediaQuery(theme.breakpoints.up("sm"));
+    const handleChange = React.useCallback((_, paymentMethod) => {
         if (paymentMethod)
             onPaymentMethodChange(paymentMethod);
     }, [onPaymentMethodChange]);
-    return (React__default["default"].createElement(ToggleButtonGroup["default"], { value: selectedPaymentMethod, exclusive: true, onChange: handleChange, "aria-label": "payment method", sx: { mb: 3.5 } }, paymentMethods.map(function (paymentMethod) {
-        var _a = PAYMENT_METHOD_OPTION_PROPS[paymentMethod], label = _a.label, icon = _a.icon;
+    return (React__default["default"].createElement(ToggleButtonGroup["default"], { value: selectedPaymentMethod, exclusive: true, onChange: handleChange, "aria-label": "payment method", sx: { mb: 3.5 } }, paymentMethods.map((paymentMethod) => {
+        const { label, icon } = PAYMENT_METHOD_OPTION_PROPS[paymentMethod];
         return wideViewport ? (React__default["default"].createElement(ToggleButton["default"], { key: paymentMethod, value: paymentMethod, "aria-label": paymentMethod },
             React__default["default"].createElement(material.Stack, { spacing: 1, direction: "row", sx: {
                     alignItems: "center"

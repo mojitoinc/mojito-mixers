@@ -1,8 +1,11 @@
 function wait(ms) {
-    return new Promise(function (resolve) {
+    return new Promise((resolve) => {
         setTimeout(resolve, ms);
     });
 }
+function isPromise(maybePromise) {
+    return maybePromise && typeof maybePromise === 'object' && typeof maybePromise.then === 'function';
+}
 
-export { wait };
+export { isPromise, wait };
 //# sourceMappingURL=promiseUtils.js.map

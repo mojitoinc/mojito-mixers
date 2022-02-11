@@ -2,7 +2,6 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-var tslib_es6 = require('../../node_modules/tslib/tslib.es6.js');
 var reactHookForm = require('react-hook-form');
 var yup$1 = require('../../node_modules/@hookform/resolvers/yup/dist/yup.mjs.js');
 var yup = require('yup');
@@ -17,91 +16,90 @@ var material = require('@mui/material');
 var Book = require('../../node_modules/@mui/icons-material/Book.js');
 var Select = require('../components/shared/Select/Select.js');
 var validationUtils = require('../utils/validationUtils.js');
+var DisplayBox = require('../components/payments/DisplayBox/DisplayBox.js');
 var Grid = require('../../node_modules/@mui/material/Grid/Grid.js');
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
 var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 
-var _a, _b, _c;
-var FULL_NAME_FIELD = "fullName";
-var EMAIL_FIELD = "email";
-var PHONE_FIELD = "phone";
-var STREET_FIELD = "street";
-var APARTMENT_FIELD = "apartment";
-var COUNTRY_FIELD = "country";
-var CITY_FIELD = "city";
-var STATE_FIELD = "state";
-var ZIP_CODE_FIELD = "zipCode";
-var FIELD_LABELS = (_a = {},
-    _a[FULL_NAME_FIELD] = "Full Name",
-    _a[EMAIL_FIELD] = "Email",
-    _a[PHONE_FIELD] = "Phone",
-    _a[STREET_FIELD] = "Street",
-    _a[APARTMENT_FIELD] = "Apartment, Suite, etc. (optional)",
-    _a[COUNTRY_FIELD] = "Country",
-    _a[CITY_FIELD] = "City",
-    _a[STATE_FIELD] = "State",
-    _a[ZIP_CODE_FIELD] = "Zip Code",
-    _a);
-var EMPTY_FORM_VALUES = (_b = {},
-    _b[FULL_NAME_FIELD] = "",
-    _b[EMAIL_FIELD] = "",
-    _b[PHONE_FIELD] = "",
-    _b[STREET_FIELD] = "",
-    _b[APARTMENT_FIELD] = "",
-    _b[COUNTRY_FIELD] = Select.EMPTY_OPTION,
-    _b[CITY_FIELD] = "",
-    _b[STATE_FIELD] = Select.EMPTY_OPTION,
-    _b[ZIP_CODE_FIELD] = "",
-    _b);
+const FULL_NAME_FIELD = "fullName";
+const EMAIL_FIELD = "email";
+const PHONE_FIELD = "phone";
+const STREET_FIELD = "street";
+const APARTMENT_FIELD = "apartment";
+const COUNTRY_FIELD = "country";
+const CITY_FIELD = "city";
+const STATE_FIELD = "state";
+const ZIP_CODE_FIELD = "zipCode";
+const FIELD_LABELS = {
+    [FULL_NAME_FIELD]: "Full Name",
+    [EMAIL_FIELD]: "Email",
+    [PHONE_FIELD]: "Phone",
+    [STREET_FIELD]: "Street",
+    [APARTMENT_FIELD]: "Apartment, Suite, etc. (optional)",
+    [COUNTRY_FIELD]: "Country",
+    [CITY_FIELD]: "City",
+    [STATE_FIELD]: "State",
+    [ZIP_CODE_FIELD]: "Zip Code"
+};
+const EMPTY_FORM_VALUES = {
+    [FULL_NAME_FIELD]: "",
+    [EMAIL_FIELD]: "",
+    [PHONE_FIELD]: "",
+    [STREET_FIELD]: "",
+    [APARTMENT_FIELD]: "",
+    [COUNTRY_FIELD]: Select.EMPTY_OPTION,
+    [CITY_FIELD]: "",
+    [STATE_FIELD]: Select.EMPTY_OPTION,
+    [ZIP_CODE_FIELD]: ""
+};
 // export type BillingInfoFormVariant = "guest" | "loggedIn";
-var schema = yup.object()
-    .shape((_c = {},
-    _c[FULL_NAME_FIELD] = yup.string()
+const schema = yup.object()
+    .shape({
+    [FULL_NAME_FIELD]: yup.string()
         .label(FIELD_LABELS[FULL_NAME_FIELD])
         .required(validationUtils.withRequiredErrorMessage),
-    _c[EMAIL_FIELD] = yup.string()
+    [EMAIL_FIELD]: yup.string()
         .label(FIELD_LABELS[EMAIL_FIELD])
         .email()
         .required(validationUtils.withRequiredErrorMessage),
-    _c[PHONE_FIELD] = yup.string()
+    [PHONE_FIELD]: yup.string()
         .label(FIELD_LABELS[PHONE_FIELD])
         .required(validationUtils.withRequiredErrorMessage),
-    _c[STREET_FIELD] = yup.string()
+    [STREET_FIELD]: yup.string()
         .label(FIELD_LABELS[STREET_FIELD])
         .required(validationUtils.withRequiredErrorMessage),
-    _c[APARTMENT_FIELD] = yup.string().label(FIELD_LABELS[APARTMENT_FIELD]),
-    _c[COUNTRY_FIELD] = yup.object().shape({
+    [APARTMENT_FIELD]: yup.string().label(FIELD_LABELS[APARTMENT_FIELD]),
+    [COUNTRY_FIELD]: yup.object().shape({
         value: yup.string()
             .label(FIELD_LABELS[COUNTRY_FIELD])
             .required(validationUtils.withRequiredErrorMessage)
     }),
-    _c[CITY_FIELD] = yup.string()
+    [CITY_FIELD]: yup.string()
         .label(FIELD_LABELS[CITY_FIELD])
         .required(validationUtils.withRequiredErrorMessage),
-    _c[STATE_FIELD] = yup.object().shape({
+    [STATE_FIELD]: yup.object().shape({
         value: yup.string()
             .label(FIELD_LABELS[STATE_FIELD])
             .required(validationUtils.withRequiredErrorMessage)
     }),
-    _c[ZIP_CODE_FIELD] = yup.string()
+    [ZIP_CODE_FIELD]: yup.string()
         .label(FIELD_LABELS[ZIP_CODE_FIELD])
-        .required(validationUtils.withRequiredErrorMessage),
-    _c))
+        .required(validationUtils.withRequiredErrorMessage)
+})
     .required();
-var BillingInfoForm = function (_a) {
-    var 
-    // variant,
-    defaultValues = _a.defaultValues, onSaved = _a.onSaved, onClose = _a.onClose, onSubmit = _a.onSubmit, debug = _a.debug;
-    var _b = reactHookForm.useForm({
-        defaultValues: tslib_es6.__assign(tslib_es6.__assign({}, EMPTY_FORM_VALUES), defaultValues),
+const BillingInfoForm = ({ 
+// variant,
+defaultValues, onSaved, onClose, onSubmit, debug }) => {
+    const { control, handleSubmit, watch } = reactHookForm.useForm({
+        defaultValues: Object.assign(Object.assign({}, EMPTY_FORM_VALUES), defaultValues),
         reValidateMode: "onChange",
-        resolver: yup$1.yupResolver(schema)
-    }), control = _b.control, handleSubmit = _b.handleSubmit, watch = _b.watch;
-    var selectedCountryOption = watch(COUNTRY_FIELD);
-    var selectedCountryCode = selectedCountryOption === null || selectedCountryOption === void 0 ? void 0 : selectedCountryOption.value;
-    var submitForm = handleSubmit(onSubmit);
+        resolver: yup$1.yupResolver(schema),
+    });
+    const selectedCountryOption = watch(COUNTRY_FIELD);
+    const selectedCountryCode = selectedCountryOption === null || selectedCountryOption === void 0 ? void 0 : selectedCountryOption.value;
+    const submitForm = handleSubmit(onSubmit);
     return (React__default["default"].createElement("form", { onSubmit: submitForm },
         onSaved && (React__default["default"].createElement(material.Box, { sx: { my: 2.5 } },
             React__default["default"].createElement(SecondaryButton.SecondaryButton, { onClick: onSaved, startIcon: React__default["default"].createElement(Book["default"], null) }, "Use Saved Billing Info"))),
@@ -128,7 +126,7 @@ var BillingInfoForm = function (_a) {
                 React__default["default"].createElement(StateSelector.ControlledStateSelector, { name: STATE_FIELD, control: control, label: FIELD_LABELS[STATE_FIELD], countryCode: selectedCountryCode })),
             React__default["default"].createElement(Grid["default"], { item: true, sm: 6 },
                 React__default["default"].createElement(TextField.ControlledTextField, { name: ZIP_CODE_FIELD, control: control, label: FIELD_LABELS[ZIP_CODE_FIELD] }))),
-        debug && (React__default["default"].createElement(material.Box, { component: "pre", sx: { my: 2, overflow: "scroll" } }, JSON.stringify(watch(), null, 2))),
+        debug && (React__default["default"].createElement(DisplayBox.DebugBox, { sx: { my: 2 } }, JSON.stringify(watch(), null, 2))),
         React__default["default"].createElement(CheckoutModalFooter.CheckoutModalFooter, { variant: "toPayment", onCloseClicked: onClose })));
 };
 

@@ -4,9 +4,9 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 var index = require('../../../node_modules/react-payment-inputs/es/images/index.js');
 
-var DEFAULT_CARD_FORMAT = /(\d{1,4})/g;
-var MONTH_REGEX = /(0[1-9]|1[0-2])/;
-var CARD_TYPES = [
+const DEFAULT_CARD_FORMAT = /(\d{1,4})/g;
+const MONTH_REGEX = /(0[1-9]|1[0-2])/;
+const CARD_TYPES = [
     {
         displayName: "Visa",
         type: "visa",
@@ -128,10 +128,9 @@ var CARD_TYPES = [
         },
     },
 ];
-var imagesMap = index["default"];
-function standaloneGetCardImageProps(network) {
-    if (network === void 0) { network = "placeholder"; }
-    var cardType = network.toLowerCase();
+const imagesMap = index["default"];
+function standaloneGetCardImageProps(network = "placeholder") {
+    const cardType = network.toLowerCase();
     // See https://github.com/medipass/react-payment-inputs/blob/master/src/usePaymentInputs.js#L452
     return {
         "aria-label": network || "Placeholder card",
@@ -143,54 +142,52 @@ function standaloneGetCardImageProps(network) {
 }
 // TODO: Remove function and use the ones exported from react-payment-inputs when PR gets merged
 // https://github.com/medipass/react-payment-inputs/pull/81
-var getCardTypeByValue = function (value) {
-    return CARD_TYPES.filter(function (cardType) { return cardType.startPattern.test(value); })[0];
-};
-var validateLuhn = function (cardNumber) {
+const getCardTypeByValue = (value) => CARD_TYPES.filter((cardType) => cardType.startPattern.test(value))[0];
+const validateLuhn = (cardNumber) => {
     return (cardNumber
         .split("")
         .reverse()
-        .map(function (digit) { return parseInt(digit, 10); })
-        .map(function (digit, idx) { return (idx % 2 ? digit * 2 : digit); })
-        .map(function (digit) { return (digit > 9 ? (digit % 10) + 1 : digit); })
-        .reduce(function (accum, digit) { return (accum += digit); }) %
+        .map((digit) => parseInt(digit, 10))
+        .map((digit, idx) => (idx % 2 ? digit * 2 : digit))
+        .map((digit) => (digit > 9 ? (digit % 10) + 1 : digit))
+        .reduce((accum, digit) => (accum += digit)) %
         10 ===
         0);
 };
-var getCardNumberIsValid = function (cardNumber) {
+const getCardNumberIsValid = (cardNumber) => {
     if (!cardNumber)
         return false;
-    var rawCardNumber = cardNumber.replace(/\s/g, "");
-    var cardType = getCardTypeByValue(rawCardNumber);
+    const rawCardNumber = cardNumber.replace(/\s/g, "");
+    const cardType = getCardTypeByValue(rawCardNumber);
     if (cardType && cardType.lengths) {
-        var doesCardNumberMatchLength = cardType.lengths.includes(rawCardNumber.length);
+        const doesCardNumberMatchLength = cardType.lengths.includes(rawCardNumber.length);
         if (doesCardNumberMatchLength) {
-            var isLuhnValid = validateLuhn(rawCardNumber);
+            const isLuhnValid = validateLuhn(rawCardNumber);
             if (isLuhnValid)
                 return true;
         }
     }
     return false;
 };
-var getExpiryDateIsvalid = function (expiryDate) {
+const getExpiryDateIsvalid = (expiryDate) => {
     if (!expiryDate)
         return false;
-    var rawExpiryDate = expiryDate.replace(" / ", "").replace("/", "");
+    const rawExpiryDate = expiryDate.replace(" / ", "").replace("/", "");
     if (rawExpiryDate.length !== 4)
         return false;
-    var month = rawExpiryDate.slice(0, 2);
-    var year = "20".concat(rawExpiryDate.slice(2, 4));
-    var monthIsOnValidRange = MONTH_REGEX.test(month);
-    var yearIsOnValidRange = parseInt(year) >= new Date().getFullYear();
-    var dateIsOnValidRange = parseInt(year) !== new Date().getFullYear() ||
+    const month = rawExpiryDate.slice(0, 2);
+    const year = `20${rawExpiryDate.slice(2, 4)}`;
+    const monthIsOnValidRange = MONTH_REGEX.test(month);
+    const yearIsOnValidRange = parseInt(year) >= new Date().getFullYear();
+    const dateIsOnValidRange = parseInt(year) !== new Date().getFullYear() ||
         parseInt(month) >= new Date().getMonth() + 1;
     return monthIsOnValidRange && yearIsOnValidRange && dateIsOnValidRange;
 };
-var getCVCIsValid = function (cvc, cardNumber) {
+const getCVCIsValid = (cvc, cardNumber) => {
     if (!cvc || cvc.length < 3)
         return false;
-    var rawCardNumber = cardNumber.replace(/\s/g, "");
-    var cardType = getCardTypeByValue(rawCardNumber);
+    const rawCardNumber = cardNumber.replace(/\s/g, "");
+    const cardType = getCardTypeByValue(rawCardNumber);
     if (cardType && cvc.length !== cardType.code.length)
         return false;
     return true;

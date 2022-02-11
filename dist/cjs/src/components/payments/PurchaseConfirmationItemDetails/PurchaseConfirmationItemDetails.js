@@ -9,11 +9,10 @@ function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'defau
 
 var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 
-var PurchaseConfirmationItemDetails = function (_a) {
-    var checkoutItem = _a.checkoutItem, purchaseInstructions = _a.purchaseInstructions;
+const PurchaseConfirmationItemDetails = ({ checkoutItem, purchaseInstructions, }) => {
     return (React__default["default"].createElement(material.Box, { sx: { position: "relative", mt: 2.5 } },
         React__default["default"].createElement(material.Box, { component: "img", src: checkoutItem.imageSrc, sx: {
-                background: function (theme) { return checkoutItem.imageBackground || theme.palette.grey["300"]; },
+                background: theme => checkoutItem.imageBackground || theme.palette.grey["300"],
                 width: "100%",
                 mb: 5,
             } }),

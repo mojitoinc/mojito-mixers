@@ -10,5 +10,6 @@ export interface BillingViewProps {
     onSavedPaymentMethodDeleted: (savedPaymentMethodId: string) => Promise<void>;
     onNext: () => void;
     onClose: () => void;
+    debug?: boolean;
 }
 export declare const BillingView: React.FC<BillingViewProps>;

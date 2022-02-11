@@ -9,18 +9,17 @@ function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'defau
 
 var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 
-var CONSENT_ERROR_MESSAGE = "You must accept the terms and conditions of the sale.";
-var ConsentText = function (_a) {
-    var privacyHref = _a.privacyHref, termsOfUseHref = _a.termsOfUseHref;
-    var linkElements = [
+const CONSENT_ERROR_MESSAGE = "You must accept the terms and conditions of the sale.";
+const ConsentText = ({ privacyHref, termsOfUseHref, }) => {
+    const linkElements = [
         privacyHref ? React__default["default"].createElement(material.Link, { color: "text.primary", href: privacyHref, target: "_blank" }, "Privacy Notices") : null,
         termsOfUseHref ? React__default["default"].createElement(material.Link, { color: "text.primary", href: termsOfUseHref, target: "_blank" }, "Terms of Use") : null,
     ].filter(Boolean);
-    var lastLinkElementsIndex = linkElements.length - 1;
+    const lastLinkElementsIndex = linkElements.length - 1;
     return (React__default["default"].createElement(React__default["default"].Fragment, null,
         "have read, understood, and consent to the",
         " ",
-        linkElements.map(function (linkElement, i) {
+        linkElements.map((linkElement, i) => {
             return React__default["default"].createElement(React.Fragment, { key: i },
                 i > 0 && i === lastLinkElementsIndex ? "and " : "",
                 linkElement,

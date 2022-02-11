@@ -12,8 +12,7 @@ function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'defau
 
 var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 
-var PaymentDetailsFragment = function (_a) {
-    var savedPaymentMethod = _a.savedPaymentMethod;
+const PaymentDetailsFragment = ({ savedPaymentMethod, }) => {
     if (savedPaymentMethod.type === "CreditCard") {
         return (React__default["default"].createElement(React__default["default"].Fragment, null,
             React__default["default"].createElement(Icons.CreditCardIcon, { network: savedPaymentMethod.network }),
