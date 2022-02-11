@@ -9,6 +9,7 @@ import { BillingInfo } from "../forms/BillingInfoForm";
 import { useCreateAuctionInvoiceMutation, useCreateBuyNowInvoiceMutation, useCreatePaymentMutation } from "../queries/graphqlGenerated";
 import { wait } from "../utils/promiseUtils";
 import { useCreatePaymentMethod } from "./useCreatePaymentMethod";
+import { useEncryptCardData } from "./useEncryptCard";
 
 const CIRCLE_MAX_EXPECTED_PAYMENT_CREATION_PROCESSING_TIME = 5000;
 
@@ -46,6 +47,7 @@ export function useFullPayment({
     paymentInfo: selectedPaymentInfo,
   } = selectedPaymentMethod;
 
+  const [encryptCardData] = useEncryptCardData();
   const [createPaymentMethod] = useCreatePaymentMethod();
   const [createAuctionInvoice] = useCreateAuctionInvoiceMutation();
   const [createBuyNowInvoice] = useCreateBuyNowInvoiceMutation();
@@ -83,6 +85,7 @@ export function useFullPayment({
     let errorMessage = "";
     let fieldErrors: Record<string, string> = {};
     let paymentMethodCreatedAt = 0;
+    const cvv = "";
 
     if (typeof selectedPaymentInfo === "string") {
       // If selectedPaymentInfo is a payment method ID, that's all we need, no need to create a new payment method:
@@ -224,6 +227,17 @@ export function useFullPayment({
       });
     }
 
+    let metadata = undefined;
+
+    if (cvv) {
+      const { keyID, encryptedCardData } = await encryptCardData({ cvv });
+
+      metadata = {
+        keyId: keyID,
+        encrypted: encryptedCardData,
+      };
+    }
+
     const paymentMethodStatusWaitTime = Math.max(CIRCLE_MAX_EXPECTED_PAYMENT_CREATION_PROCESSING_TIME - (Date.now() - paymentMethodCreatedAt), 0);
 
     if (paymentMethodStatusWaitTime) await wait(paymentMethodStatusWaitTime);
@@ -232,6 +246,7 @@ export function useFullPayment({
       variables: {
         paymentMethodID,
         invoiceID,
+        metadata,
       },
     }).catch((error: ApolloError | Error) => {
       // TODO: Cancel invoice?
@@ -263,7 +278,20 @@ export function useFullPayment({
       paymentStatus: "processed",
       paymentReferenceNumber: circlePaymentID,
     });
-  }, [checkoutItems, createAuctionInvoice, createBuyNowInvoice, createPaymentMethod, debug, existingInvoiceID, makePayment, orgID, savedPaymentMethods, selectedBillingInfo, selectedPaymentInfo]);
+  }, [
+    checkoutItems,
+    createAuctionInvoice,
+    createBuyNowInvoice,
+    createPaymentMethod,
+    debug,
+    encryptCardData,
+    existingInvoiceID,
+    makePayment,
+    orgID,
+    savedPaymentMethods,
+    selectedBillingInfo,
+    selectedPaymentInfo,
+  ]);
 
   return [paymentState, fullPayment];
 }

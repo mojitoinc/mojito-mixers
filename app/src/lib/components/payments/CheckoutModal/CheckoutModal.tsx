@@ -426,7 +426,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
         debug={ debug } />
     );
   } else if (checkoutStep === "purchasing") {
-    headerVariant = 'purchasing';
+    headerVariant = "purchasing";
 
     checkoutStepElement = (
       <PurchasingView
@@ -443,7 +443,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
         debug={ debug } />
     );
   } else if (checkoutStep === "confirmation") {
-    headerVariant = 'logoOnly';
+    headerVariant = "logoOnly";
 
     checkoutStepElement = (
       <ConfirmationView
