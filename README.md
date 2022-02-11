@@ -74,21 +74,6 @@ When testing the purchase flow, you need to make sure to:
 <br />
 
 
-- Include units in UI.
-
-- Buy multiple units of same one.
-
----
-
-- Make it possible to edit units (not supported).
-- Center loader.
-- Close modal?
-- Modal version?
-- Wide auth screen?
-- Does ESC close the modal even if blocked?
-
-
-
 ## Building this project as a library
 
 The project includes a separated Rollup build to build it as a library that can be installed and consumed by other projects.
