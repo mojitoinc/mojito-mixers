@@ -3,14 +3,16 @@ import { CheckoutItem } from "../../../domain/product/product.interfaces";
 import React from "react";
 
 export interface PurchaseConfirmationItemDetailsProps {
-  checkoutItem: CheckoutItem;
+  checkoutItems: CheckoutItem[];
   purchaseInstructions: string;
 }
 
 export const PurchaseConfirmationItemDetails: React.FC<PurchaseConfirmationItemDetailsProps> = ({
-  checkoutItem,
+  checkoutItems,
   purchaseInstructions,
 }) => {
+  const checkoutItem = checkoutItems[0];
+
   return (
     <Box sx={{ position: "relative", mt: 2.5 }}>
       <Box

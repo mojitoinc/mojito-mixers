@@ -11,14 +11,14 @@ import { getFormattedPaymentMethod } from "./PurchaseConfirmationBillingDetails.
 import CheckIcon from "@mui/icons-material/Check";
 
 export interface PurchaseConfirmationBillingDetailsProps {
-  checkoutItem: CheckoutItem;
+  checkoutItems: CheckoutItem[];
   paymentReferenceNumber: string;
   selectedPaymentMethodBillingInfo: SavedPaymentMethodBillingInfo;
   selectedPaymentMethodPaymentInfo: PaymentMethod | SavedPaymentMethod;
 }
 
 export const PurchaseConfirmationBillingDetails: React.FC<PurchaseConfirmationBillingDetailsProps> = ({
-  checkoutItem,
+  checkoutItems,
   paymentReferenceNumber,
   selectedPaymentMethodBillingInfo,
   selectedPaymentMethodPaymentInfo,
@@ -89,7 +89,7 @@ export const PurchaseConfirmationBillingDetails: React.FC<PurchaseConfirmationBi
       </Stack>
 
       <CheckoutItemCostPurchase
-        checkoutItems={ [checkoutItem] }
+        checkoutItems={ checkoutItems }
         selectedPaymentMethodBillingInfo={ selectedPaymentMethodBillingInfo } />
     </Box>
   );

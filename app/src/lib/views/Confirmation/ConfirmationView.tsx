@@ -9,7 +9,7 @@ import React from "react";
 import { SelectedPaymentMethod } from "../../components/payments/CheckoutModal/CheckoutModal";
 
 export interface ConfirmationViewProps {
-  checkoutItem: CheckoutItem;
+  checkoutItems: CheckoutItem[];
   savedPaymentMethods: SavedPaymentMethod[];
   selectedPaymentMethod: SelectedPaymentMethod;
   paymentReferenceNumber: string;
@@ -19,7 +19,7 @@ export interface ConfirmationViewProps {
 }
 
 export const ConfirmationView: React.FC<ConfirmationViewProps> = ({
-  checkoutItem,
+  checkoutItems,
   savedPaymentMethods,
   selectedPaymentMethod,
   paymentReferenceNumber,
@@ -57,13 +57,13 @@ export const ConfirmationView: React.FC<ConfirmationViewProps> = ({
 
   return (<>
     <PurchaseConfirmationBillingDetails
-      checkoutItem={ checkoutItem }
+      checkoutItems={ checkoutItems }
       paymentReferenceNumber={ paymentReferenceNumber }
       selectedPaymentMethodBillingInfo={ selectedPaymentMethodBillingInfo }
       selectedPaymentMethodPaymentInfo={ selectedPaymentMethodPaymentInfo } />
 
     <PurchaseConfirmationItemDetails
-      checkoutItem={ checkoutItem }
+      checkoutItems={ checkoutItems }
       purchaseInstructions={ purchaseInstructions } />
 
     <CheckoutModalFooter

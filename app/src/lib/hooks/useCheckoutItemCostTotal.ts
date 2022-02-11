@@ -10,7 +10,7 @@ export interface UseCheckoutItemsCostTotalResult {
 export const useCheckoutItemsCostTotal = (checkoutItems: CheckoutItem[]): UseCheckoutItemsCostTotalResult => {
   return useMemo(() => {
     return checkoutItems.reduce((result, checkoutItem) => {
-      result.total += checkoutItem.price;
+      result.total += checkoutItem.unitPrice * checkoutItem.units;
       result.fees += checkoutItem.fee;
 
       return result;

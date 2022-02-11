@@ -18,7 +18,7 @@ import { ConsentType } from "../../components/shared/ConsentText/ConsentText";
 const billingInfoItemBoxProps: BoxProps = { sx: { mt: 2.5 } };
 
 export interface PaymentViewProps {
-  checkoutItem: CheckoutItem;
+  checkoutItems: CheckoutItem[];
   savedPaymentMethods: SavedPaymentMethod[];
   selectedPaymentMethod: SelectedPaymentMethod;
   onPaymentInfoSelected: (data: string | PaymentMethod) => void;
@@ -34,7 +34,7 @@ export interface PaymentViewProps {
 }
 
 export const PaymentView: React.FC<PaymentViewProps> = ({
-  checkoutItem,
+  checkoutItems,
   savedPaymentMethods: rawSavedPaymentMethods,
   selectedPaymentMethod,
   onPaymentInfoSelected,
@@ -159,7 +159,7 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
             debug={ debug } />
         ) }
       </Stack>
-      <CheckoutItemCostBreakdown checkoutItems={ [checkoutItem] } />
+      <CheckoutItemCostBreakdown checkoutItems={ checkoutItems } />
     </Stack>
   );
 };

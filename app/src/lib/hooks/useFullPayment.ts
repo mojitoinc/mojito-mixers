@@ -4,7 +4,7 @@ import { SelectedPaymentMethod } from "../components/payments/CheckoutModal/Chec
 import { SavedPaymentMethod } from "../domain/circle/circle.interfaces";
 import { parseCircleError, savedPaymentMethodToBillingInfo } from "../domain/circle/circle.utils";
 import { PaymentStatus } from "../domain/payment/payment.interfaces";
-import { LotType } from "../domain/product/product.interfaces";
+import { CheckoutItem } from "../domain/product/product.interfaces";
 import { BillingInfo } from "../forms/BillingInfoForm";
 import { useCreateAuctionInvoiceMutation, useCreateBuyNowInvoiceMutation, useCreatePaymentMutation } from "../queries/graphqlGenerated";
 import { wait } from "../utils/promiseUtils";
@@ -15,8 +15,7 @@ const CIRCLE_MAX_EXPECTED_PAYMENT_CREATION_PROCESSING_TIME = 5000;
 export interface UseFullPaymentOptions {
   orgID: string;
   invoiceID?: string;
-  lotID: string;
-  lotType: LotType;
+  checkoutItems: CheckoutItem[];
   savedPaymentMethods: SavedPaymentMethod[];
   selectedPaymentMethod: SelectedPaymentMethod;
   debug?: boolean;
@@ -31,8 +30,7 @@ export interface PaymentState {
 export function useFullPayment({
   orgID,
   invoiceID: existingInvoiceID = "",
-  lotID,
-  lotType,
+  checkoutItems,
   savedPaymentMethods,
   selectedPaymentMethod,
   debug = false,
@@ -54,7 +52,25 @@ export function useFullPayment({
   const [makePayment] = useCreatePaymentMutation();
 
   const fullPayment = useCallback(async () => {
-    if (debug) console.log(`\n💵 Making payment for orgID = ${ orgID } + lotID = ${ lotID } (${ lotType })\n`);
+    // TODO: Quick fix. The UI can currently display multiple items with multiple units each, but will only purchase the
+    // selected amount (can be multiple units) of the first item:
+    const {
+      lotID,
+      lotType,
+      units,
+    } = checkoutItems[0];
+
+    if (debug) console.log(`\n💵 Making payment for ${ units } × ${ lotType } lot ${ lotID } (orgID = ${ orgID })...\n`);
+
+    if (checkoutItems.length === 0) {
+      setPaymentState({
+        paymentStatus: "error",
+        paymentReferenceNumber: "",
+        paymentError: "Missing lot information.",
+      });
+
+      return;
+    }
 
     setPaymentState({
       paymentStatus: "processing",
@@ -175,7 +191,7 @@ export function useFullPayment({
         const createBuyNowInvoiceResult = await createBuyNowInvoice({
           variables: {
             input: {
-              itemCount: 1,
+              itemCount: units,
               marketplaceBuyNowLotID: lotID,
             },
           },
@@ -247,7 +263,7 @@ export function useFullPayment({
       paymentStatus: "processed",
       paymentReferenceNumber: circlePaymentID,
     });
-  }, [createAuctionInvoice, createBuyNowInvoice, createPaymentMethod, debug, existingInvoiceID, lotID, lotType, makePayment, orgID, savedPaymentMethods, selectedBillingInfo, selectedPaymentInfo]);
+  }, [checkoutItems, createAuctionInvoice, createBuyNowInvoice, createPaymentMethod, debug, existingInvoiceID, makePayment, orgID, savedPaymentMethods, selectedBillingInfo, selectedPaymentInfo]);
 
   return [paymentState, fullPayment];
 }
