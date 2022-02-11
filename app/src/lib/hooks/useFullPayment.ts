@@ -52,7 +52,9 @@ export function useFullPayment({
   const [makePayment] = useCreatePaymentMutation();
 
   const fullPayment = useCallback(async () => {
-    // TODO: Quick fix. The UI can currently display multiple products but will only purchase the first one.
+    // TODO: Quick fix. The UI can currently display multiple items with multiple units each, but will only purchase the
+    // selected amount (can be multiple units) of the first item:
+
     const {
       lotID,
       lotType,
