@@ -149,11 +149,18 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
     checkoutStep,
     checkoutError,
     setCheckoutModalState,
+    resetModalState,
+    goBack,
+    goNext,
+    goTo,
+    setError,
 
     // SelectedPaymentMethod:
     selectedPaymentMethod,
     setSelectedPaymentMethod,
-  } = useCheckoutModalState();
+  } = useCheckoutModalState({
+    isAuthenticated,
+  });
 
   useEffect(() => {
     const dialogScrollable = dialogRootRef.current?.querySelector(SELECTOR_DIALOG_SCROLLABLE);
@@ -200,33 +207,25 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
         paymentInfo: isBillingInfoAddressId ? reversedSavedPaymentMethods[0].id : paymentInfo,
       };
     });
-  }, [savedPaymentMethods]);
+  }, [savedPaymentMethods, setSelectedPaymentMethod]);
 
   useEffect(() => {
     if (!checkoutStep) onClose();
   }, [checkoutStep, onClose]);
 
   useEffect(() => {
-    if (meError) setPaymentError("User could not be loaded.");
-    if (paymentMethodsError) setPaymentError("Payment methods could not be loaded.");
-  }, [meError, paymentMethodsError]);
-
-  const handlePrevClicked = useCallback(() => {
-    setCheckoutStepIndex((prevCheckoutStepIndex) => prevCheckoutStepIndex - 1);
-  }, []);
-
-  const handleNextClicked = useCallback(() => {
-    setCheckoutStepIndex(prevCheckoutStepIndex => prevCheckoutStepIndex + 1);
-  }, []);
+    if (meError) setError("User could not be loaded.");
+    if (paymentMethodsError) setError("Payment methods could not be loaded.");
+  }, [meError, paymentMethodsError, setError]);
 
   const handleBillingInfoSelected = useCallback((billingInfo: string | BillingInfo) => {
     // TODO: Does paymentInfo need to be reset when coming back to billing info to fix validation errors?
     setSelectedPaymentMethod({ billingInfo, paymentInfo: "" });
-  }, []);
+  }, [setSelectedPaymentMethod]);
 
   const handlePaymentInfoSelected = useCallback((paymentInfo: string | PaymentMethod) => {
     setSelectedPaymentMethod(({ billingInfo }) => ({ billingInfo, paymentInfo }));
-  }, []);
+  }, [setSelectedPaymentMethod]);
 
   const handleSavedPaymentMethodDeleted = useCallback(async (addressIdOrPaymentMethodId: string) => {
     const idsToDelete: string[] = checkoutStep === "billing"
@@ -272,7 +271,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
     await Promise.allSettled(promises);
 
     await refetchPaymentMethods({ orgID });
-  }, [checkoutStep, deletePaymentMethod, orgID, refetchPaymentMethods, savedPaymentMethods]);
+  }, [checkoutStep, deletePaymentMethod, orgID, refetchPaymentMethods, savedPaymentMethods, setSelectedPaymentMethod]);
 
   const [paymentReferenceNumber, setPaymentReferenceNumber] = useState("");
 
@@ -282,8 +281,8 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
     setPaymentReferenceNumber(paymentReferenceNumber);
 
-    handleNextClicked();
-  }, [refetchPaymentMethods, handleNextClicked]);
+    goNext();
+  }, [refetchPaymentMethods, goNext]);
 
   const handleReviewData = useCallback(async (): Promise<false> => {
     // After an error, all data is reloaded in case the issue was caused by stale/cached data or in case a new payment
@@ -294,14 +293,13 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
     ]);
 
     // TODO: paymentError should have a source property to know where the error is coming from and handle recovery differently here:
-    setPaymentError("");
-    setCheckoutStepIndex(2);
+    goTo("payment");
 
     // This function is used as a CheckoutModalFooter's onSubmitClicked, so we want that to show a loader on the submit
     // button when clicked but do not remove it once the Promise is resolved, as we are moving to another view and
     // CheckoutModalFooter will unmount (so doing this prevents a memory leak issue):
     return false;
-  }, [meRefetch, refetchPaymentMethods]);
+  }, [meRefetch, refetchPaymentMethods, goTo]);
 
   // BLOCK DIALOG LOGIC & SHAKE ANIMATION:
 
@@ -325,8 +323,8 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
     }
 
     handlePaymentInfoSelected(paymentInfo);
-    setCheckoutStepIndex(3);
-  }, [resetModalState, handlePaymentInfoSelected]);
+    goTo("purchasing");
+  }, [resetModalState, handlePaymentInfoSelected, goTo]);
 
   const theme = useMemo(() => themeOptions ? createTheme(themeOptions) : parentTheme, [parentTheme, themeOptions]);
   const Wrapper = theme ? ThemeProvider : Fragment;
@@ -359,12 +357,12 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   let headerVariant: CheckoutModalHeaderVariant = isAuthenticated ? 'loggedIn' : 'guest';
   let checkoutStepElement = null;
 
-  if (paymentError) {
+  if (checkoutError) {
     headerVariant = "error";
 
     checkoutStepElement = (
       <ErrorView
-        errorMessage={ paymentError }
+        errorMessage={ checkoutError.errorMessage }
         errorImageSrc={ errorImageSrc }
         onReviewData={ handleReviewData }
         onClose={ onClose } />
@@ -379,7 +377,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
         checkoutItem={ checkoutItem }
         isAuthenticated={ isAuthenticated }
         guestCheckoutEnabled={ guestCheckoutEnabled }
-        onGuestClicked={ handleNextClicked }
+        onGuestClicked={ goNext }
         onCloseClicked={ onClose } />
     );
   } else if (checkoutStep === "billing") {
@@ -390,7 +388,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
         selectedBillingInfo={ selectedPaymentMethod.billingInfo }
         onBillingInfoSelected={ handleBillingInfoSelected }
         onSavedPaymentMethodDeleted={ handleSavedPaymentMethodDeleted }
-        onNext={ handleNextClicked }
+        onNext={ goNext }
         onClose={ onClose }
         debug={ debug } />
     );
@@ -402,8 +400,8 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
         selectedPaymentMethod={ selectedPaymentMethod }
         onPaymentInfoSelected={ handlePaymentInfoSelected }
         onSavedPaymentMethodDeleted={ handleSavedPaymentMethodDeleted }
-        onNext={ handleNextClicked }
-        onPrev={ handlePrevClicked }
+        onNext={ goNext }
+        onPrev={ goBack }
         onClose={ onClose }
         acceptedPaymentTypes={ acceptedPaymentTypes }
         consentType={ consentType }
@@ -425,7 +423,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
         savedPaymentMethods={ savedPaymentMethods }
         selectedPaymentMethod={ selectedPaymentMethod }
         onPurchaseSuccess={ handlePurchaseSuccess }
-        onPurchaseError={ setPaymentError }
+        onPurchaseError={ setError }
         onDialogBlocked={ setIsDialogBlocked }
         debug={ debug } />
     );
@@ -439,7 +437,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
         selectedPaymentMethod={ selectedPaymentMethod }
         paymentReferenceNumber={ paymentReferenceNumber }
         purchaseInstructions={ purchaseInstructions }
-        onNext={ handleNextClicked }
+        onNext={ goNext }
         onClose={ onClose } />
     );
   }
@@ -478,7 +476,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
             user={ meData?.me?.user }
             userFormat={ userFormat }
             onLoginClicked={ onLogin }
-            onPrevClicked={ handlePrevClicked } />
+            onPrevClicked={ goBack } />
 
           { checkoutStepElement }
 

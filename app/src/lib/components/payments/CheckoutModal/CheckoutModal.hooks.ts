@@ -1,17 +1,24 @@
 
 import { ApolloError } from "@apollo/client";
 import { Dispatch, SetStateAction, useState, useCallback } from "react";
+import { INITIAL_PLAID_OAUTH_FLOW_STATE } from "../../../hooks/usePlaid";
+import { resetStepperProgress } from "../CheckoutStepper/CheckoutStepper";
 import { SelectedPaymentMethod } from "./CheckoutModal";
 
 export type CheckoutModalErrorAt = "loading" | "billing" | "payment" | "purchasing";
 
 export interface CheckoutModalError {
-  error: ApolloError | Error;
+  error?: ApolloError | Error;
   errorMessage: string;
-  at: CheckoutModalErrorAt;
+  at?: CheckoutModalErrorAt;
 }
 
 export type CheckoutModalStep = "authentication" | "billing" | "payment" | "purchasing" | "confirmation";
+
+export interface CheckoutModalStateOptions {
+  productConfirmationEnabled?: boolean;
+  isAuthenticated?: boolean;
+}
 
 export interface CheckoutModalState {
   checkoutStep: CheckoutModalStep;
@@ -21,6 +28,11 @@ export interface CheckoutModalState {
 export interface CheckoutModalStateReturn extends CheckoutModalState {
   // CheckoutModalState (+ inherited stuff):
   setCheckoutModalState: Dispatch<SetStateAction<CheckoutModalState>>;
+  resetModalState: () => void;
+  goBack: () => void;
+  goNext: () => void;
+  goTo: (nextCheckoutStep: CheckoutModalStep) => void;
+  setError: (nextErrorMessage: string) => void;
 
   // SelectedPaymentMethod:
   selectedPaymentMethod: SelectedPaymentMethod;
@@ -29,21 +41,23 @@ export interface CheckoutModalStateReturn extends CheckoutModalState {
 
 export const CHECKOUT_STEPS: CheckoutModalStep[] = ["authentication", "billing", "payment", "purchasing", "confirmation"];
 
-export function useCheckoutModalState(): CheckoutModalStateReturn {
+export function useCheckoutModalState({
+  productConfirmationEnabled,
+  isAuthenticated,
+}: CheckoutModalStateOptions): CheckoutModalStateReturn {
+  const startAt: CheckoutModalStep = !isAuthenticated || productConfirmationEnabled ? "authentication" : "billing";
+
   const [{
     checkoutStep,
     checkoutError,
   }, setCheckoutModalState] = useState<CheckoutModalState>({
-    checkoutStep: 0,
+    checkoutStep: startAt,
   });
 
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<SelectedPaymentMethod>({
     billingInfo: "",
     paymentInfo: "",
   });
-
-
-  const startAt = !isAuthenticated || productConfirmationEnabled ? 0 : 1;
 
   const resetModalState = useCallback(() => {
     // Make sure the progress tracker in BillingView and PaymentView is properly animated:
@@ -53,8 +67,7 @@ export function useCheckoutModalState(): CheckoutModalStateReturn {
     // modal is re-opened, we need to reset its state, taking into account if we need to resume a Plaid OAuth flow:s
     const { selectedBillingInfo, continueOAuthFlow, savedStateUsed } = INITIAL_PLAID_OAUTH_FLOW_STATE;
 
-    setPaymentError("");
-    setCheckoutStepIndex(continueOAuthFlow && !savedStateUsed ? 3 : startAt);
+    setCheckoutModalState({ checkoutStep: continueOAuthFlow && !savedStateUsed ? "purchasing" : startAt });
     setSelectedPaymentMethod({ billingInfo: selectedBillingInfo || "", paymentInfo: "" });
   }, [startAt]);
 
@@ -76,13 +89,20 @@ export function useCheckoutModalState(): CheckoutModalStateReturn {
     setCheckoutModalState((prevState) => ({ ...prevState, checkoutStep: nextCheckoutStep }));
   }, []);
 
-
+  const setError = useCallback((nextErrorMessage: string) => {
+    setCheckoutModalState((prevState) => ({ ...prevState, checkoutError: { errorMessage: nextErrorMessage } }));
+  }, []);
 
   return {
     // CheckoutModalState:
     checkoutStep,
     checkoutError,
     setCheckoutModalState,
+    resetModalState,
+    goBack,
+    goNext,
+    goTo,
+    setError,
 
     // SelectedPaymentMethod:
     selectedPaymentMethod,
