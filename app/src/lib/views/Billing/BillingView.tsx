@@ -11,7 +11,7 @@ import { BillingInfo, BillingInfoForm } from "../../forms/BillingInfoForm";
 import { distinctBy } from "../../utils/arrayUtils";
 
 export interface BillingViewProps {
-  checkoutItem: CheckoutItem;
+  checkoutItems: CheckoutItem[];
   savedPaymentMethods: SavedPaymentMethod[];
   selectedBillingInfo: string | BillingInfo;
   onBillingInfoSelected: (data: string | BillingInfo) => void;
@@ -22,7 +22,7 @@ export interface BillingViewProps {
 }
 
 export const BillingView: React.FC<BillingViewProps> = ({
-  checkoutItem,
+  checkoutItems,
   savedPaymentMethods: rawSavedPaymentMethods,
   selectedBillingInfo,
   onBillingInfoSelected,
@@ -118,7 +118,7 @@ export const BillingView: React.FC<BillingViewProps> = ({
               debug={ debug } />
           ) }
       </Stack>
-      <CheckoutItemCostBreakdown checkoutItems={ [checkoutItem] } />
+      <CheckoutItemCostBreakdown checkoutItems={ checkoutItems } />
     </Stack>
   );
 };

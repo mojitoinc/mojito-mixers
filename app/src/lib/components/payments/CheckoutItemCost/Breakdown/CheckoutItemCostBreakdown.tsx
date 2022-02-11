@@ -17,7 +17,7 @@ export const CheckoutItemCostBreakdown: React.FC<
   return (
     <Stack sx={{ display: "flex", flex: 1, py: 5 }}>
       {checkoutItems.map(
-        ({ lotID, name, price, imageSrc, imageBackground }) => (
+        ({ lotID, name, units, unitPrice, imageSrc, imageBackground }) => (
           <Grid
             key={lotID}
             container
@@ -59,9 +59,9 @@ export const CheckoutItemCostBreakdown: React.FC<
                     justifyContent: "space-between"
                   }}
                 >
-                  <Typography sx={{ marginTop: 0.5 }}>1</Typography>
+                  <Typography sx={{ marginTop: 0.5 }}>{units}</Typography>
                   <Typography sx={{ marginTop: 0.5 }}>
-                    <Number suffix=" USD">{price}</Number>
+                    <Number suffix=" USD">{unitPrice}</Number>
                   </Typography>
                 </Box>
               </Box>

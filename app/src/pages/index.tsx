@@ -18,7 +18,8 @@ const DEFAULT_FORM_VALUES: PlaygroundFormData = {
   // Lot:
   lotID: "",
   lotType: "buyNow",
-  lotPrice: 100,
+  lotUnits: 1,
+  lotUnitPrice: 100,
   lotFee: 5,
 
   // Personalization:
@@ -108,7 +109,8 @@ const HomePage = () => {
       // Lot:
       lotID: INITIAL_FORM_VALUES.lotID || DEFAULT_FORM_VALUES.lotID,
       lotType: INITIAL_FORM_VALUES.lotType || DEFAULT_FORM_VALUES.lotType,
-      lotPrice: INITIAL_FORM_VALUES.lotPrice || DEFAULT_FORM_VALUES.lotPrice,
+      lotUnits: INITIAL_FORM_VALUES.lotUnits || DEFAULT_FORM_VALUES.lotUnits,
+      lotUnitPrice: INITIAL_FORM_VALUES.lotUnitPrice || DEFAULT_FORM_VALUES.lotUnitPrice,
       lotFee: INITIAL_FORM_VALUES.lotFee || DEFAULT_FORM_VALUES.lotFee,
 
       // Personalization:
@@ -177,13 +179,14 @@ const HomePage = () => {
 
     // Data:
     orgID: (formValues.orgID === "custom" ? formValues.customOrgID : formValues.orgID) || "",
-    checkoutItem: {
+    checkoutItems: [{
       ...PLAYGROUND_MOCKED_LOT,
       lotID: formValues.lotID || PLAYGROUND_MOCKED_LOT.lotID,
       lotType: formValues.lotType || PLAYGROUND_MOCKED_LOT.lotType,
-      price: parseInt(`${ formValues.lotPrice || PLAYGROUND_MOCKED_LOT.price }`, 10) || 0,
+      units: parseInt(`${ formValues.lotUnits || PLAYGROUND_MOCKED_LOT.units }`, 10) || 1,
+      unitPrice: parseInt(`${ formValues.lotUnitPrice || PLAYGROUND_MOCKED_LOT.unitPrice }`, 10) || 0,
       fee: parseInt(`${ formValues.lotFee || PLAYGROUND_MOCKED_LOT.fee }`, 10) || 0,
-    },
+    }],
 
     // Authentication:
     onLogin: handleLogin,
@@ -285,10 +288,18 @@ const HomePage = () => {
 
             <TextField
               type="number"
-              name="lotPrice"
-              label="Lot Price"
+              name="lotUnits"
+              label="Lot Units"
               size="small"
-              value={ formValues.lotPrice }
+              value={ formValues.lotUnits }
+              onChange={ handleChange } />
+
+            <TextField
+              type="number"
+              name="lotPrice"
+              label="Lot Unit Price"
+              size="small"
+              value={ formValues.lotUnitPrice }
               onChange={ handleChange } />
 
             <TextField

@@ -61,7 +61,7 @@ export interface CheckoutModalProps {
   // Data:
   orgID: string;
   invoiceID?: string;
-  checkoutItem: CheckoutItem;
+  checkoutItems: CheckoutItem[];
 
   // Authentication:
   onLogin: () => void;
@@ -107,7 +107,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   // Data:
   orgID,
   invoiceID,
-  checkoutItem,
+  checkoutItems,
 
   // Authentication:
   onLogin,
@@ -390,7 +390,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
     checkoutStepElement = (
       <AuthenticationView
-        checkoutItem={ checkoutItem }
+        checkoutItems={ checkoutItems }
         isAuthenticated={ isAuthenticated }
         guestCheckoutEnabled={ guestCheckoutEnabled }
         onGuestClicked={ handleNextClicked }
@@ -399,7 +399,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   } else if (checkoutStep === "billing") {
     checkoutStepElement = (
       <BillingView
-        checkoutItem={ checkoutItem }
+        checkoutItems={ checkoutItems }
         savedPaymentMethods={ savedPaymentMethods }
         selectedBillingInfo={ selectedPaymentMethod.billingInfo }
         onBillingInfoSelected={ handleBillingInfoSelected }
@@ -411,7 +411,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   } else if (checkoutStep === "payment") {
     checkoutStepElement = (
       <PaymentView
-        checkoutItem={ checkoutItem }
+        checkoutItems={ checkoutItems }
         savedPaymentMethods={ savedPaymentMethods }
         selectedPaymentMethod={ selectedPaymentMethod }
         onPaymentInfoSelected={ handlePaymentInfoSelected }
@@ -434,8 +434,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
         purchasingMessages={ purchasingMessages }
         orgID={ orgID }
         invoiceID={ invoiceID }
-        lotID={ checkoutItem.lotID }
-        lotType={ checkoutItem.lotType }
+        checkoutItems={ checkoutItems }
         savedPaymentMethods={ savedPaymentMethods }
         selectedPaymentMethod={ selectedPaymentMethod }
         onPurchaseSuccess={ handlePurchaseSuccess }
@@ -448,7 +447,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
     checkoutStepElement = (
       <ConfirmationView
-        checkoutItem={ checkoutItem }
+        checkoutItems={ checkoutItems }
         savedPaymentMethods={ savedPaymentMethods }
         selectedPaymentMethod={ selectedPaymentMethod }
         paymentReferenceNumber={ paymentReferenceNumber }
