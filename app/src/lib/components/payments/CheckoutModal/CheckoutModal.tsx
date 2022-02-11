@@ -410,26 +410,24 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
         onClose={ isDialogBlocked ? undefined : onClose }
         onBackdropClick={ isDialogBlocked ? shake : undefined }
         aria-labelledby="checkout-modal-header-title"
-        fullWidth
-        fullScreen
-        maxWidth="sm"
         scroll="body"
         ref={ dialogRootRef }
-        PaperProps={ { sx: shakeSx, ref: paperRef }}>
+        PaperProps={ { sx: shakeSx, ref: paperRef }}
+        // Dialog only:
+        // fullWidth
+        // maxWidth="sm"
+        fullScreen>
 
         <DialogContent
           sx={{
             overflowX: 'hidden',
-            pt: {
-              xs: 1.5,
-              sm: 2.5,
-            },
             px: {
               xs: 1.5,
               sm: 2.5,
-              md: 23,
             },
-            pb: 0,
+            py: 2.5,
+            maxWidth: theme => theme.breakpoints.values.lg,
+            mx: "auto",
           }}>
 
           <CheckoutModalHeader
