@@ -296,7 +296,7 @@ const HomePage = () => {
 
             <TextField
               type="number"
-              name="lotPrice"
+              name="lotUnitPrice"
               label="Lot Unit Price"
               size="small"
               value={ formValues.lotUnitPrice }
