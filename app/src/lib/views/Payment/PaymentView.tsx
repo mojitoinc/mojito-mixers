@@ -155,7 +155,7 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
             termsOfUseHref={ termsOfUseHref } />
         ) }
       </Stack>
-      <CheckoutItemCostBreakdown checkoutItem={ checkoutItem } />
+      <CheckoutItemCostBreakdown checkoutItems={ [checkoutItem] } />
     </Stack>
   );
 };

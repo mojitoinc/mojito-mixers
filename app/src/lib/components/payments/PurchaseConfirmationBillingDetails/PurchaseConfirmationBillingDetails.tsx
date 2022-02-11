@@ -89,7 +89,7 @@ export const PurchaseConfirmationBillingDetails: React.FC<PurchaseConfirmationBi
       </Stack>
 
       <CheckoutItemCostPurchase
-        checkoutItem={ checkoutItem }
+        checkoutItems={ [checkoutItem] }
         selectedPaymentMethodBillingInfo={ selectedPaymentMethodBillingInfo } />
     </Box>
   );

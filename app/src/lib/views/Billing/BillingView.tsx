@@ -115,7 +115,7 @@ export const BillingView: React.FC<BillingViewProps> = ({
               onSubmit={ handleSubmit } />
           ) }
       </Stack>
-      <CheckoutItemCostBreakdown checkoutItem={ checkoutItem } />
+      <CheckoutItemCostBreakdown checkoutItems={ [checkoutItem] } />
     </Stack>
   );
 };
