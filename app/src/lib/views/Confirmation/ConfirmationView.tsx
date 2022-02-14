@@ -1,11 +1,12 @@
-import { useMemo } from "react";
+import React, { useMemo } from "react";
+import { Stack } from "@mui/material";
+
 import { CheckoutModalFooter } from "../../components/payments/CheckoutModalFooter/CheckoutModalFooter";
 import { PurchaseConfirmationBillingDetails } from "../../components/payments/PurchaseConfirmationBillingDetails/PurchaseConfirmationBillingDetails";
 import { PurchaseConfirmationItemDetails } from "../../components/payments/PurchaseConfirmationItemDetails/PurchaseConfirmationItemDetails";
 import { SavedPaymentMethod } from "../../domain/circle/circle.interfaces";
 import { billingInfoToSavedPaymentMethodBillingInfo } from "../../domain/circle/circle.utils";
 import { CheckoutItem } from "../../domain/product/product.interfaces";
-import React from "react";
 import { SelectedPaymentMethod } from "../../components/payments/CheckoutModal/CheckoutModal";
 
 export interface ConfirmationViewProps {
@@ -55,22 +56,37 @@ export const ConfirmationView: React.FC<ConfirmationViewProps> = ({
 
   if (!selectedPaymentMethodBillingInfo || !selectedPaymentMethodPaymentInfo) return null;
 
-  return (<>
-    <PurchaseConfirmationBillingDetails
-      checkoutItems={ checkoutItems }
-      paymentReferenceNumber={ paymentReferenceNumber }
-      selectedPaymentMethodBillingInfo={ selectedPaymentMethodBillingInfo }
-      selectedPaymentMethodPaymentInfo={ selectedPaymentMethodPaymentInfo } />
+  return (
+    <Stack
+      direction={{
+        xs: "column",
+        sm: "column",
+        md: "row",
+      }}
+      spacing={8.75}
+      sx={{ display: "flex" }}
+    >
+      <PurchaseConfirmationBillingDetails
+        checkoutItems={checkoutItems}
+        paymentReferenceNumber={paymentReferenceNumber}
+        selectedPaymentMethodBillingInfo={selectedPaymentMethodBillingInfo}
+        selectedPaymentMethodPaymentInfo={selectedPaymentMethodPaymentInfo}
+      />
 
-    <PurchaseConfirmationItemDetails
-      checkoutItems={ checkoutItems }
-      purchaseInstructions={ purchaseInstructions } />
+      <Stack sx={{ display: "flex", flex: 1 }}>
+        <PurchaseConfirmationItemDetails
+          checkoutItems={checkoutItems}
+          purchaseInstructions={purchaseInstructions}
+        />
 
-    <CheckoutModalFooter
-      variant="toMarketplace"
-      privacyHref=""
-      termsOfUseHref=""
-      onSubmitClicked={ onNext }
-      onCloseClicked={ onClose } />
-  </>);
+        <CheckoutModalFooter
+          variant="toMarketplace"
+          privacyHref=""
+          termsOfUseHref=""
+          onSubmitClicked={onNext}
+          onCloseClicked={onClose}
+        />
+      </Stack>
+    </Stack>
+  );
 };
