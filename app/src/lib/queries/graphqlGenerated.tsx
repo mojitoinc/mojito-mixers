@@ -277,6 +277,11 @@ export type Erc721Metadata = {
   timestamp?: Maybe<Scalars['Int']>;
 };
 
+export enum ExtensionType {
+  GenartExtension = 'GenartExtension',
+  ProvenanceExtension = 'ProvenanceExtension'
+}
+
 export type InvoiceDetails = {
   __typename?: 'InvoiceDetails';
   externalUserID: Scalars['String'];
@@ -778,7 +783,7 @@ export type MutationNftDeployContractArgs = {
 
 export type MutationOrgCreateMarketplaceArgs = {
   name: Scalars['String'];
-  orgId: Scalars['UUID'];
+  orgId?: InputMaybe<Scalars['UUID1']>;
 };
 
 
@@ -938,7 +943,7 @@ export type Organization = {
   __typename?: 'Organization';
   assets?: Maybe<Array<Asset>>;
   handle: Scalars['String'];
-  id: Scalars['String'];
+  id: Scalars['UUID1'];
   jwtIssuerDomain?: Maybe<Scalars['String']>;
   marketplaces: Array<Marketplace>;
   members: Array<User>;
@@ -1126,7 +1131,7 @@ export type QueryNftTokenArgs = {
 
 
 export type QueryOrgUsernameAvailableArgs = {
-  organizationID: Scalars['String'];
+  organizationID: Scalars['UUID1'];
   username: Scalars['String'];
 };
 
@@ -1137,7 +1142,7 @@ export type QueryOrganizationArgs = {
 
 
 export type QueryOrganizationByIdArgs = {
-  id: Scalars['String'];
+  id: Scalars['UUID1'];
 };
 
 
@@ -1296,8 +1301,9 @@ export type WalletToken = {
   __typename?: 'WalletToken';
   contractAddress: Scalars['String'];
   description?: Maybe<Scalars['String']>;
+  /** Token ID in smart contract */
+  id: Scalars['Int'];
   metadata?: Maybe<Erc721Metadata>;
-  onChainId: Scalars['Int'];
   timeLastUpdated?: Maybe<Scalars['String']>;
   title?: Maybe<Scalars['String']>;
   tokenType?: Maybe<Scalars['String']>;
@@ -1396,7 +1402,7 @@ export type WirePaymentMethodOutput = {
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MeQuery = { __typename?: 'Query', me?: { __typename?: 'CurrentUser', id: any, user: { __typename?: 'User', id: any, username: string, name?: string | null, email?: string | null }, userOrgs: Array<{ __typename?: 'UserOrganization', organization: { __typename?: 'Organization', id: string, name: string } }> } | null };
+export type MeQuery = { __typename?: 'Query', me?: { __typename?: 'CurrentUser', id: any, user: { __typename?: 'User', id: any, username: string, name?: string | null, email?: string | null }, userOrgs: Array<{ __typename?: 'UserOrganization', organization: { __typename?: 'Organization', id: any, name: string } }> } | null };
 
 export type CreatePaymentMutationVariables = Exact<{
   paymentMethodID: Scalars['UUID1'];
