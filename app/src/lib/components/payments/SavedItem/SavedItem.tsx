@@ -158,7 +158,7 @@ export const SavedItem: React.FC<SavedItemProps> = ({
 
           { mainControlElement }
 
-          <Box sx={{ mr: "auto !important", mb: "auto !important", display: { sm: "none" } }}></Box>
+          <Box sx={{ mr: "auto !important", mb: "auto !important", display: { sm: variant === "row" ? "none" : "block" } }}></Box>
 
           <Stack direction="row" spacing={ 1 } sx={{ pt: variant === "stacked" ? { xs: 0, sm: 1 } : 0 }}>
             { onEdit && (
