@@ -1404,11 +1404,14 @@ export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type MeQuery = { __typename?: 'Query', me?: { __typename?: 'CurrentUser', id: any, user: { __typename?: 'User', id: any, username: string, name?: string | null, email?: string | null }, userOrgs: Array<{ __typename?: 'UserOrganization', organization: { __typename?: 'Organization', id: any, name: string } }> } | null };
 
+/*
 export type CreatePaymentMutationVariables = Exact<{
   paymentMethodID: Scalars['UUID1'];
   invoiceID: Scalars['UUID1'];
 }>;
+*/
 
+export type CreatePaymentMutationVariables = MutationCreatePaymentArgs;
 
 export type CreatePaymentMutation = { __typename?: 'Mutation', createPayment: { __typename?: 'Payment', id: any, invoiceID: any, circlePaymentID: string, status: PaymentStatus, userID: any } };
 
@@ -1508,8 +1511,8 @@ export type MeQueryHookResult = ReturnType<typeof useMeQuery>;
 export type MeLazyQueryHookResult = ReturnType<typeof useMeLazyQuery>;
 export type MeQueryResult = Apollo.QueryResult<MeQuery, MeQueryVariables>;
 export const CreatePaymentDocument = gql`
-    mutation CreatePayment($paymentMethodID: UUID1!, $invoiceID: UUID1!) {
-  createPayment(paymentMethodID: $paymentMethodID, invoiceID: $invoiceID) {
+    mutation CreatePayment($paymentMethodID: UUID1!, $invoiceID: UUID1!, $metadata: CreatePaymentMetadataInput) {
+  createPayment(paymentMethodID: $paymentMethodID, invoiceID: $invoiceID, metadata: $metadata) {
     id
     invoiceID
     circlePaymentID
