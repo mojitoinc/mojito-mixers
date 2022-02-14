@@ -99,12 +99,16 @@ export function useCheckoutModalState({
   }, []);
 
   const goTo = useCallback((nextCheckoutStep: CheckoutModalStep) => {
+    console.log("goTo", nextCheckoutStep);
+
     setCheckoutModalState((prevState) => ({ ...prevState, checkoutStep: nextCheckoutStep }));
   }, []);
 
   const setError = useCallback((nextErrorMessage: string) => {
     setCheckoutModalState((prevState) => ({ ...prevState, checkoutError: { errorMessage: nextErrorMessage } }));
   }, []);
+
+  console.log("checkoutStep =", checkoutStep);
 
   return {
     // CheckoutModalState:

@@ -22,7 +22,7 @@ export interface CheckoutModalFooterProps {
   termsOfUseHref?: string;
   submitDisabled?: boolean;
   onSubmitClicked?: (canSubmit: boolean) => void | Promise<void | false>;
-  onCloseClicked: () => void;
+  onCloseClicked?: () => void;
 }
 
 export const CheckoutModalFooter: React.FC<CheckoutModalFooterProps> = ({
@@ -91,7 +91,7 @@ export const CheckoutModalFooter: React.FC<CheckoutModalFooterProps> = ({
   const handleCancelClicked = useCallback((e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
 
-    onCloseClicked();
+    if (onCloseClicked) onCloseClicked();
   }, [onCloseClicked]);
 
   return (
@@ -124,7 +124,7 @@ export const CheckoutModalFooter: React.FC<CheckoutModalFooterProps> = ({
         </PrimaryButton>
       ) }
 
-      { variant !== "toMarketplace" && (
+      { variant !== "toMarketplace" && onCloseClicked && (
         <Typography sx={ primaryButtonVisible ? { pt: 2 } : undefined }>
           { primaryButtonVisible ? "or " : null }
           <Link sx={{ color: "text.primary" }} href="" onClick={ handleCancelClicked }>

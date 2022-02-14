@@ -289,6 +289,9 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   }, [refetchPaymentMethods, goNext]);
 
   const handleReviewData = useCallback(async (): Promise<false> => {
+
+    console.log("RE-LOAD");
+
     // After an error, all data is reloaded in case the issue was caused by stale/cached data or in case a new payment
     // method has been created despite the error:
     await Promise.allSettled([
@@ -296,15 +299,18 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
       refetchPaymentMethods(),
     ]);
 
+    console.log("DONE");
+
     // TODO: paymentError should have a source property to know where the error is coming from and handle recovery differently here:
-    goTo("payment");
-    // setSelectedPaymentMethod((prevSelectedPaymentMethod) => ({ ...prevSelectedPaymentMethod, cvv: "" }));
+    setSelectedPaymentMethod((prevSelectedPaymentMethod) => ({ ...prevSelectedPaymentMethod, cvv: "" }));
+    setCheckoutModalState({ checkoutStep: "payment" });
+    // goTo("payment");
 
     // This function is used as a CheckoutModalFooter's onSubmitClicked, so we want that to show a loader on the submit
     // button when clicked but do not remove it once the Promise is resolved, as we are moving to another view and
     // CheckoutModalFooter will unmount (so doing this prevents a memory leak issue):
     return false;
-  }, [meRefetch, refetchPaymentMethods, goTo]);
+  }, [meRefetch, refetchPaymentMethods, setSelectedPaymentMethod, setCheckoutModalState]);
 
   // BLOCK DIALOG LOGIC & SHAKE ANIMATION:
 
@@ -442,7 +448,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
         selectedPaymentMethod={ selectedPaymentMethod }
         paymentReferenceNumber={ paymentReferenceNumber }
         purchaseInstructions={ purchaseInstructions }
-        onNext={ goNext }
+        onNext={ onClose }
         onClose={ onClose } />
     );
   }
@@ -451,8 +457,8 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
     <Wrapper { ...(wrapperProps as any) }>
       <Dialog
         open={ isDialogBlocked ? true : open }
-        onClose={ isDialogBlocked ? undefined : onClose }
-        onBackdropClick={ isDialogBlocked ? shake : undefined }
+        onClose={ isDialogBlocked ? shake : onClose }
+        // onBackdropClick={ isDialogBlocked ? shake : undefined }
         aria-labelledby="checkout-modal-header-title"
         scroll="body"
         ref={ dialogRootRef }

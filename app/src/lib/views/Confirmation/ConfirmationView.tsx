@@ -84,7 +84,6 @@ export const ConfirmationView: React.FC<ConfirmationViewProps> = ({
           privacyHref=""
           termsOfUseHref=""
           onSubmitClicked={onNext}
-          onCloseClicked={onClose}
         />
       </Stack>
     </Stack>

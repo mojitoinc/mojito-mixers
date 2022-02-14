@@ -65,29 +65,27 @@ export const PaymentMethodSelector: React.FC<PaymentMethodSelectorProps> = ({
       { paymentMethods.map((paymentMethod) => {
         const { label, icon } = PAYMENT_METHOD_OPTION_PROPS[paymentMethod];
 
-        return wideViewport ? (
+        return (
           <ToggleButton
             key={paymentMethod}
             value={paymentMethod}
             aria-label={paymentMethod}>
-            <Stack
-              spacing={1}
-              direction="row"
-              sx={{
-                alignItems: "center"
-              }}>
-              { icon }
-              <Typography sx={{ fontWeight: 500 }}>{ label }</Typography>
-            </Stack>
+            { wideViewport ? (
+              <Stack
+                spacing={1}
+                direction="row"
+                sx={{
+                  alignItems: "center"
+                }}>
+                { icon }
+                <Typography sx={{ fontWeight: 500 }}>{ label }</Typography>
+              </Stack>
+            ) : (
+              <Tooltip key={ paymentMethod } title={ label }>
+                { icon }
+              </Tooltip>
+            ) }
           </ToggleButton>
-        ) : (
-          <Tooltip key={ paymentMethod } title={ label }>
-            <ToggleButton
-              value={paymentMethod}
-              aria-label={paymentMethod}>
-              { icon }
-            </ToggleButton>
-          </Tooltip>
         );
       }) }
 
