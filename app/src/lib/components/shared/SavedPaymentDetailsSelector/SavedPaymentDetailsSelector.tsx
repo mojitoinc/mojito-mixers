@@ -5,9 +5,18 @@ import { SecondaryButton } from "../SecondaryButton/SecondaryButton";
 import { PaymentDetailsItem } from "../../payments/PaymentDetailsItem/Item/PaymentDetailsItem";
 import { CheckoutModalFooter } from "../../payments/CheckoutModalFooter/CheckoutModalFooter";
 import { SavedPaymentMethod } from "../../../domain/circle/circle.interfaces";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Box, CircularProgress, Typography } from "@mui/material";
 import { ConsentType } from "../ConsentText/ConsentText";
+
+function validateCvv(isCvvRequired: boolean, cvv: string) {
+  return !isCvvRequired || cvv.length === 3 || cvv.length === 4;
+}
+
+interface SavedPaymentDetailsSelectorState {
+  isFormSubmitted: boolean;
+  cvv: string;
+}
 
 export interface SavedPaymentDetailsSelectorProps {
   showLoader: boolean;
@@ -16,6 +25,7 @@ export interface SavedPaymentDetailsSelectorProps {
   onNew: () => void;
   onDelete: (paymentMethodId: string) => void;
   onPick: (paymentMethodId: string) => void;
+  onCvvSelected: (cvv: string) => void;
   onNext: () => void;
   onClose: () => void;
   consentType: ConsentType;
@@ -30,21 +40,50 @@ export const SavedPaymentDetailsSelector: React.FC<SavedPaymentDetailsSelectorPr
   onNew,
   onDelete,
   onPick,
+  onCvvSelected,
   onNext,
   onClose,
   consentType,
   privacyHref,
   termsOfUseHref,
 }) => {
-  const [isFormSubmitted, setIsFormSubmitted] = useState(false);
+  const isCvvRequired = useMemo(() => {
+    const selectedPaymentMethod = savedPaymentMethods.find(savedPaymentMethod => savedPaymentMethod.id === selectedPaymentMethodId);
+
+    return selectedPaymentMethod?.type === "CreditCard";
+  }, [savedPaymentMethods, selectedPaymentMethodId]);
+
+  const [{
+    isFormSubmitted,
+    cvv,
+  }, setSelectorState] = useState<SavedPaymentDetailsSelectorState>({
+    isFormSubmitted: false,
+    cvv: "",
+  });
+
+  useEffect(() => {
+    // Reset CVV if user selects a different payment method:
+    setSelectorState(({ isFormSubmitted }) => ({ isFormSubmitted, cvv: "" }));
+  }, [selectedPaymentMethodId]);
+
+  const isCvvOk = validateCvv(isCvvRequired, cvv);
 
   const handleNextClicked = useCallback((canSubmit: boolean) => {
-    if (canSubmit && selectedPaymentMethodId) {
+    if (canSubmit && selectedPaymentMethodId && isCvvOk) {
+      onCvvSelected(cvv);
       onNext();
-    } else if (!selectedPaymentMethodId) {
-      setIsFormSubmitted(true);
+
+      return;
     }
-  }, [selectedPaymentMethodId, onNext]);
+
+    setSelectorState(({ cvv }) => ({ isFormSubmitted: true, cvv }));
+  }, [selectedPaymentMethodId, cvv, isCvvOk, onCvvSelected, onNext]);
+
+  const handleCvvChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const cvv = e.currentTarget.value || "";
+
+    setSelectorState(({ isFormSubmitted }) => ({ isFormSubmitted, cvv }));
+  }, []);
 
   const getPaymentMethodId = useCallback((savedPaymentMethod: SavedPaymentMethod) => savedPaymentMethod.id, []);
 
@@ -75,10 +114,17 @@ export const SavedPaymentDetailsSelector: React.FC<SavedPaymentDetailsSelectorPr
           disabled: showLoader,
           onDelete,
           onPick,
+          onCvvChange: handleCvvChange,
         }) }
         component={ PaymentDetailsItem }
         itemKey={ getPaymentMethodId }
         deps={[ onDelete, onPick, selectedPaymentMethodId, showLoader]} />
+
+      { isFormSubmitted && !isCvvOk && (
+        <Typography variant="caption" component="p" sx={{ mt: 2, color: theme => theme.palette.warning.dark }}>
+          You must enter a valid CVV number.
+        </Typography>
+      ) }
 
       <SecondaryButton
         onClick={ onNew }

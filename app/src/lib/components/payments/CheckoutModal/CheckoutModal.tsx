@@ -28,6 +28,7 @@ export type CheckoutState = "authentication" | "billing" | "payment" | "purchasi
 export interface SelectedPaymentMethod {
   billingInfo: string | BillingInfo;
   paymentInfo: string | PaymentMethod;
+  cvv: string;
 }
 
 export interface CheckoutModalProps {
@@ -152,6 +153,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<SelectedPaymentMethod>({
     billingInfo: "",
     paymentInfo: "",
+    cvv: "",
   });
 
   const checkoutStep = CHECKOUT_STEPS[checkoutStepIndex];
@@ -173,7 +175,11 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
     setPaymentError("");
     setCheckoutStepIndex(continueOAuthFlow && !savedStateUsed ? 3 : startAt);
-    setSelectedPaymentMethod({ billingInfo: selectedBillingInfo || "", paymentInfo: "" });
+    setSelectedPaymentMethod({
+      billingInfo: selectedBillingInfo || "",
+      paymentInfo: "",
+      cvv: "",
+    });
   }, [startAt]);
 
   useEffect(() => {
@@ -191,10 +197,12 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
     setSelectedPaymentMethod((prevSelectedPaymentMethod) => {
       const { billingInfo, paymentInfo } = prevSelectedPaymentMethod;
 
-      if (typeof billingInfo === "string" && typeof paymentInfo === "string") return prevSelectedPaymentMethod;
+      if (typeof billingInfo === "string" && typeof paymentInfo === "string") return { ...prevSelectedPaymentMethod, cvv: "" };
 
       // To find the saved payment method(s) that was/were last created:
       const reversedSavedPaymentMethods = savedPaymentMethods.slice().reverse();
+
+      // TODO: This logic can probably be simplified. Just get the last saved payment method...
 
       let matchingPaymentMethod: SavedPaymentMethod;
 
@@ -204,14 +212,16 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
         matchingPaymentMethod = reversedSavedPaymentMethods.find(paymentMethod => paymentMethod.addressId === addressId);
       }
 
-      const isBillingInfoAddressId = typeof billingInfo === "string";
-
-      return !isBillingInfoAddressId && matchingPaymentMethod ? {
+      return matchingPaymentMethod ? {
+        // Both billingInfo and paymentInfo were objects (and we found a matching newly created payment method):
         billingInfo: matchingPaymentMethod.addressId,
         paymentInfo: matchingPaymentMethod.id,
+        cvv: "",
       } : {
+        // billingInfo was an addressID (or we could not find a match) and paymentInfo was an object:
         billingInfo,
-        paymentInfo: isBillingInfoAddressId ? reversedSavedPaymentMethods[0].id : paymentInfo,
+        paymentInfo: typeof billingInfo === "string" ? reversedSavedPaymentMethods[0].id : paymentInfo,
+        cvv: "",
       };
     });
   }, [savedPaymentMethods]);
@@ -235,11 +245,15 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
   const handleBillingInfoSelected = useCallback((billingInfo: string | BillingInfo) => {
     // TODO: Does paymentInfo need to be reset when coming back to billing info to fix validation errors?
-    setSelectedPaymentMethod({ billingInfo, paymentInfo: "" });
+    setSelectedPaymentMethod({ billingInfo, paymentInfo: "", cvv: "" });
   }, []);
 
   const handlePaymentInfoSelected = useCallback((paymentInfo: string | PaymentMethod) => {
-    setSelectedPaymentMethod(({ billingInfo }) => ({ billingInfo, paymentInfo }));
+    setSelectedPaymentMethod(({ billingInfo }) => ({ billingInfo, paymentInfo, cvv: "" }));
+  }, []);
+
+  const handleCvvSelected = useCallback((cvv: string) => {
+    setSelectedPaymentMethod(({ billingInfo, paymentInfo }) => ({ billingInfo, paymentInfo, cvv }));
   }, []);
 
   const handleSavedPaymentMethodDeleted = useCallback(async (addressIdOrPaymentMethodId: string) => {
@@ -270,6 +284,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
           // re-create it with the new payment information:
           billingInfo: savedPaymentMethodToBillingInfo(addressToDelete),
           paymentInfo: "",
+          cvv: "",
         });
       }
     }
@@ -308,8 +323,9 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
     ]);
 
     // TODO: paymentError should have a source property to know where the error is coming from and handle recovery differently here:
-    setPaymentError("");
     setCheckoutStepIndex(2);
+    setSelectedPaymentMethod((prevSelectedPaymentMethod) => ({ ...prevSelectedPaymentMethod, cvv: "" }));
+    setPaymentError("");
 
     // This function is used as a CheckoutModalFooter's onSubmitClicked, so we want that to show a loader on the submit
     // button when clicked but do not remove it once the Promise is resolved, as we are moving to another view and
@@ -415,6 +431,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
         savedPaymentMethods={ savedPaymentMethods }
         selectedPaymentMethod={ selectedPaymentMethod }
         onPaymentInfoSelected={ handlePaymentInfoSelected }
+        onCvvSelected={ handleCvvSelected }
         onSavedPaymentMethodDeleted={ handleSavedPaymentMethodDeleted }
         onNext={ handleNextClicked }
         onPrev={ handlePrevClicked }

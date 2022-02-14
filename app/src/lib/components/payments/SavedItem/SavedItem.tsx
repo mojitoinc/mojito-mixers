@@ -2,13 +2,43 @@ import Box, { BoxProps } from "@mui/material/Box";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { SecondaryButton } from "../../shared/SecondaryButton/SecondaryButton";
-import { Chip, Stack, Tooltip } from "@mui/material";
+import { Chip, Stack, styled, TextField, TextFieldProps, Tooltip } from "@mui/material";
 import React, { useCallback } from "react";
 import { ThemeColors } from "../../../domain/mui/mui.interfaces";
 import { DisplayBox } from "../DisplayBox/DisplayBox";
 
+export const InlineField: React.FC<TextFieldProps> = styled((props: TextFieldProps) => (
+  <TextField
+    { ...props }
+    variant="outlined"
+    margin="none"
+    InputProps={{ notched: true }}
+    InputLabelProps={{ shrink: false }} />
+))({
+  "& .MuiInputLabel-root": {
+    color: "black",
+  },
+  "& .MuiInputBase-root": {
+    backgroundColor: "#F8F8F8",
+    color: "black",
+    padding: 8,
+    height: "30px",
+    // borderRadius: "2px",
+    // marginTop: 32,
+  },
+  "& .MuiInputBase-input": {
+    color: "black",
+    WebkitTextFillColor: "black",
+    fontSize: "12px",
+    cursor: "default",
+    padding: 0,
+  },
+});
+
+
 export interface SavedItemLabels {
   active?: string;
+  cvv?: string;
   edit?: string;
   delete?: string;
   select?: string;
@@ -32,11 +62,13 @@ export interface SavedItemProps {
   onEdit?: SavedItemActionEventHandler;
   onDelete?: SavedItemActionEventHandler;
   onPick?: SavedItemActionEventHandler;
+  onCvvChange?: React.ChangeEventHandler<HTMLInputElement>;
   boxProps?: BoxProps;
 }
 
 const DEFAULT_SAVED_ITEM_LABELS: Required<SavedItemLabels> = {
   active: "Active",
+  cvv: "CVV",
   edit: "Edit Info",
   delete: "Delete",
   select: "Use Info",
@@ -53,6 +85,7 @@ export const SavedItem: React.FC<SavedItemProps> = ({
   onEdit,
   onDelete,
   onPick,
+  onCvvChange,
   boxProps,
 }) => {
   const labels = { ...DEFAULT_SAVED_ITEM_LABELS, ...customLabels };
@@ -85,7 +118,11 @@ export const SavedItem: React.FC<SavedItemProps> = ({
       </Tooltip>
     );
   } else if (active) {
-    mainControlElement = <Chip size="small" color="success" label="Active" variant="outlined" />;
+    mainControlElement = (<>
+      <Chip size="small" color="success" label="Active" variant="outlined" />
+
+      { onCvvChange && <InlineField onChange={ onCvvChange } placeholder="CVV" sx={{ width: "52px" }} /> }
+    </>);
   } else if (onPick) {
     mainControlElement = (
       <SecondaryButton onClick={ handleClick } disabled={ disabledSelect } data-action="pick">
@@ -117,14 +154,16 @@ export const SavedItem: React.FC<SavedItemProps> = ({
             //   xs: "column",
             //   sm: "column"
             // },
-            justifyContent: "space-between",
+            justifyContent: "flex-start",
             alignItems: "flex-end",
             height: "auto",
           }}>
 
           { mainControlElement }
 
-          <Stack direction="row" spacing={ 1 } sx={{ pt: variant === "stacked" ? { xs: 0, sm: 1 } : 0, mt: "auto" }}>
+          <Box sx={{ mr: "auto !important", mb: "auto !important", display: { sm: "none" } }}></Box>
+
+          <Stack direction="row" spacing={ 1 } sx={{ pt: variant === "stacked" ? { xs: 0, sm: 1 } : 0 }}>
             { onEdit && (
               <SecondaryButton onClick={ handleClick } disabled={ disabledOther } startIcon={ <EditIcon /> } data-action="edit">
                 { labels.edit }
