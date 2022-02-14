@@ -6,7 +6,7 @@ import { parseCircleError, savedPaymentMethodToBillingInfo } from "../domain/cir
 import { PaymentStatus } from "../domain/payment/payment.interfaces";
 import { CheckoutItem } from "../domain/product/product.interfaces";
 import { BillingInfo } from "../forms/BillingInfoForm";
-import { useCreateAuctionInvoiceMutation, useCreateBuyNowInvoiceMutation, useCreatePaymentMutation } from "../queries/graphqlGenerated";
+import { CreatePaymentMetadataInput, useCreateAuctionInvoiceMutation, useCreateBuyNowInvoiceMutation, useCreatePaymentMutation } from "../queries/graphqlGenerated";
 import { wait } from "../utils/promiseUtils";
 import { useCreatePaymentMethod } from "./useCreatePaymentMethod";
 import { useEncryptCardData } from "./useEncryptCard";
@@ -234,7 +234,7 @@ export function useFullPayment({
     }
 
 
-    let metadata = undefined;
+    let metadata: CreatePaymentMetadataInput | null = null;
 
     if (cvv) {
       const encryptCardDataResult = await encryptCardData({
@@ -258,12 +258,12 @@ export function useFullPayment({
       const { keyID, encryptedCardData } = encryptCardDataResult;
 
       metadata = {
-        keyId: keyID,
-        encrypted: encryptedCardData,
+        creditCardData: {
+          keyID,
+          encryptedData: encryptedCardData,
+        },
       };
     }
-
-    console.log("CVV + metadata =", cvv, metadata);
 
     const paymentMethodStatusWaitTime = Math.max(CIRCLE_MAX_EXPECTED_PAYMENT_CREATION_PROCESSING_TIME - (Date.now() - paymentMethodCreatedAt), 0);
 
