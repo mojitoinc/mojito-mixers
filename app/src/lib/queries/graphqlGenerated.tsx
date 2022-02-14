@@ -110,6 +110,23 @@ export type AssetVersion = {
   slug: Scalars['String'];
 };
 
+export type AttributeValue = AttributeValueFloat | AttributeValueInt | AttributeValueString;
+
+export type AttributeValueFloat = {
+  __typename?: 'AttributeValueFloat';
+  floatValue: Scalars['Float'];
+};
+
+export type AttributeValueInt = {
+  __typename?: 'AttributeValueInt';
+  intValue: Scalars['Int'];
+};
+
+export type AttributeValueString = {
+  __typename?: 'AttributeValueString';
+  stringValue: Scalars['String'];
+};
+
 export enum AuctionBidOrder {
   Asc = 'ASC',
   Desc = 'DESC'
@@ -149,6 +166,15 @@ export type CreateMarketplaceBuyNowLotInput = {
   startDate: Scalars['Time'];
   totalUnits: Scalars['Int'];
   unitPrice: Scalars['Float'];
+};
+
+export type CreatePaymentCreditCardMetadataInput = {
+  encryptedData: Scalars['String'];
+  keyID: Scalars['String'];
+};
+
+export type CreatePaymentMetadataInput = {
+  creditCardData: CreatePaymentCreditCardMetadataInput;
 };
 
 export type CreditCardBillingDetails = {
@@ -237,6 +263,24 @@ export type DeployContractInput = {
   organizationId: Scalars['UUID1'];
   walletId: Scalars['UUID1'];
 };
+
+export type Erc721Metadata = {
+  __typename?: 'ERC721Metadata';
+  animationURL?: Maybe<Scalars['String']>;
+  attributes?: Maybe<Array<MetadataAttributes>>;
+  backgroundColor?: Maybe<Scalars['String']>;
+  description: Scalars['String'];
+  externalURL?: Maybe<Scalars['String']>;
+  image: Scalars['String'];
+  language?: Maybe<Scalars['String']>;
+  name: Scalars['String'];
+  timestamp?: Maybe<Scalars['Int']>;
+};
+
+export enum ExtensionType {
+  GenartExtension = 'GenartExtension',
+  ProvenanceExtension = 'ProvenanceExtension'
+}
 
 export type InvoiceDetails = {
   __typename?: 'InvoiceDetails';
@@ -478,6 +522,14 @@ export type MarketplaceUser = {
   username?: Maybe<Scalars['String']>;
 };
 
+export type MetadataAttributes = {
+  __typename?: 'MetadataAttributes';
+  displayType?: Maybe<Scalars['String']>;
+  maxValue?: Maybe<Scalars['Int']>;
+  traitType: Scalars['String'];
+  value: AttributeValue;
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
   /**
@@ -630,6 +682,7 @@ export type MutationCreateOrgMultisigArgs = {
 
 export type MutationCreatePaymentArgs = {
   invoiceID: Scalars['UUID1'];
+  metadata?: InputMaybe<CreatePaymentMetadataInput>;
   paymentMethodID: Scalars['UUID1'];
 };
 
@@ -730,7 +783,7 @@ export type MutationNftDeployContractArgs = {
 
 export type MutationOrgCreateMarketplaceArgs = {
   name: Scalars['String'];
-  orgId: Scalars['UUID'];
+  orgId?: InputMaybe<Scalars['UUID1']>;
 };
 
 
@@ -890,7 +943,7 @@ export type Organization = {
   __typename?: 'Organization';
   assets?: Maybe<Array<Asset>>;
   handle: Scalars['String'];
-  id: Scalars['String'];
+  id: Scalars['UUID1'];
   jwtIssuerDomain?: Maybe<Scalars['String']>;
   marketplaces: Array<Marketplace>;
   members: Array<User>;
@@ -982,6 +1035,8 @@ export type Query = {
   getMyInvoices: Array<Maybe<InvoiceDetails>>;
   /** Retrieves payments user owns */
   getMyPayments: Array<Maybe<Payment>>;
+  /** Returns requested Payment method */
+  getPaymentMethod: PaymentMethodOutput;
   /** Returns Payment method list in scope of current Organization. */
   getPaymentMethodList: Array<PaymentMethodOutput>;
   /** Retrieves Payment notification */
@@ -1039,6 +1094,11 @@ export type QueryGetMarketplaceAuctionLotArgs = {
 };
 
 
+export type QueryGetPaymentMethodArgs = {
+  paymentMethodID: Scalars['UUID1'];
+};
+
+
 export type QueryGetPaymentMethodListArgs = {
   orgID: Scalars['UUID1'];
 };
@@ -1071,7 +1131,7 @@ export type QueryNftTokenArgs = {
 
 
 export type QueryOrgUsernameAvailableArgs = {
-  organizationID: Scalars['String'];
+  organizationID: Scalars['UUID1'];
   username: Scalars['String'];
 };
 
@@ -1082,7 +1142,7 @@ export type QueryOrganizationArgs = {
 
 
 export type QueryOrganizationByIdArgs = {
-  id: Scalars['String'];
+  id: Scalars['UUID1'];
 };
 
 
@@ -1239,14 +1299,15 @@ export enum WalletParentType {
 
 export type WalletToken = {
   __typename?: 'WalletToken';
-  /** token's contract address */
   contractAddress: Scalars['String'];
-  /** token id in contract */
-  id: Scalars['String'];
-  /** token URI for metadata */
-  tokenURI: Scalars['String'];
-  /** txHash of latest token transfer */
-  transferHash: Scalars['String'];
+  description?: Maybe<Scalars['String']>;
+  /** Token ID in smart contract */
+  id: Scalars['Int'];
+  metadata?: Maybe<Erc721Metadata>;
+  timeLastUpdated?: Maybe<Scalars['String']>;
+  title?: Maybe<Scalars['String']>;
+  tokenType?: Maybe<Scalars['String']>;
+  tokenURI?: Maybe<Scalars['String']>;
 };
 
 export enum WalletTxType {
@@ -1271,6 +1332,25 @@ export type WireBankAddressOutput = {
   city: Scalars['String'];
   country: Scalars['String'];
   district: Scalars['String'];
+};
+
+export type WireBeneficiary = {
+  __typename?: 'WireBeneficiary';
+  address1: Scalars['String'];
+  address2: Scalars['String'];
+  name: Scalars['String'];
+};
+
+export type WireBeneficiaryBank = {
+  __typename?: 'WireBeneficiaryBank';
+  accountNumber: Scalars['String'];
+  address: Scalars['String'];
+  city: Scalars['String'];
+  country: Scalars['String'];
+  name: Scalars['String'];
+  postalCode: Scalars['String'];
+  routingNumber: Scalars['String'];
+  swiftCode: Scalars['String'];
 };
 
 export type WireBillingDetails = {
@@ -1301,12 +1381,20 @@ export type WireData = {
   routingNumber: Scalars['String'];
 };
 
+export type WireInstructions = {
+  __typename?: 'WireInstructions';
+  beneficiary: WireBeneficiary;
+  beneficiaryBank: WireBeneficiaryBank;
+  trackingRef: Scalars['String'];
+};
+
 export type WirePaymentMethodOutput = {
   __typename?: 'WirePaymentMethodOutput';
   bankAddress?: Maybe<WireBankAddressOutput>;
   billingDetails?: Maybe<WireBillingDetailsOutput>;
   description: Scalars['String'];
   id: Scalars['UUID1'];
+  instructions?: Maybe<WireInstructions>;
   status: Scalars['String'];
   type: PaymentType;
 };
@@ -1314,13 +1402,16 @@ export type WirePaymentMethodOutput = {
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MeQuery = { __typename?: 'Query', me?: { __typename?: 'CurrentUser', id: any, user: { __typename?: 'User', id: any, username: string, name?: string | null, email?: string | null }, userOrgs: Array<{ __typename?: 'UserOrganization', organization: { __typename?: 'Organization', id: string, name: string } }> } | null };
+export type MeQuery = { __typename?: 'Query', me?: { __typename?: 'CurrentUser', id: any, user: { __typename?: 'User', id: any, username: string, name?: string | null, email?: string | null }, userOrgs: Array<{ __typename?: 'UserOrganization', organization: { __typename?: 'Organization', id: any, name: string } }> } | null };
 
+/*
 export type CreatePaymentMutationVariables = Exact<{
   paymentMethodID: Scalars['UUID1'];
   invoiceID: Scalars['UUID1'];
 }>;
+*/
 
+export type CreatePaymentMutationVariables = MutationCreatePaymentArgs;
 
 export type CreatePaymentMutation = { __typename?: 'Mutation', createPayment: { __typename?: 'Payment', id: any, invoiceID: any, circlePaymentID: string, status: PaymentStatus, userID: any } };
 
@@ -1420,8 +1511,8 @@ export type MeQueryHookResult = ReturnType<typeof useMeQuery>;
 export type MeLazyQueryHookResult = ReturnType<typeof useMeLazyQuery>;
 export type MeQueryResult = Apollo.QueryResult<MeQuery, MeQueryVariables>;
 export const CreatePaymentDocument = gql`
-    mutation CreatePayment($paymentMethodID: UUID1!, $invoiceID: UUID1!) {
-  createPayment(paymentMethodID: $paymentMethodID, invoiceID: $invoiceID) {
+    mutation CreatePayment($paymentMethodID: UUID1!, $invoiceID: UUID1!, $metadata: CreatePaymentMetadataInput) {
+  createPayment(paymentMethodID: $paymentMethodID, invoiceID: $invoiceID, metadata: $metadata) {
     id
     invoiceID
     circlePaymentID

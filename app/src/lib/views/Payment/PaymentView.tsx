@@ -22,6 +22,7 @@ export interface PaymentViewProps {
   savedPaymentMethods: SavedPaymentMethod[];
   selectedPaymentMethod: SelectedPaymentMethod;
   onPaymentInfoSelected: (data: string | PaymentMethod) => void;
+  onCvvSelected: (cvv: string) => void;
   onSavedPaymentMethodDeleted: (savedPaymentMethodId: string) => void;
   onNext: () => void;
   onPrev: () => void;
@@ -38,6 +39,7 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
   savedPaymentMethods: rawSavedPaymentMethods,
   selectedPaymentMethod,
   onPaymentInfoSelected,
+  onCvvSelected,
   onSavedPaymentMethodDeleted,
   onNext,
   onPrev,
@@ -136,10 +138,11 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
           <SavedPaymentDetailsSelector
             showLoader={ isDeleting }
             savedPaymentMethods={ savedPaymentMethods }
-            selectedPaymentMethodId={ typeof selectedPaymentInfo === "string" ? selectedPaymentInfo : undefined}
+            selectedPaymentMethodId={ typeof selectedPaymentInfo === "string" ? selectedPaymentInfo : undefined }
             onNew={ handleShowForm }
             onDelete={ handleSavedPaymentMethodDeleted }
             onPick={ onPaymentInfoSelected }
+            onCvvSelected={ onCvvSelected }
             onNext={ onNext }
             onClose={ onClose }
             consentType={ consentType }
