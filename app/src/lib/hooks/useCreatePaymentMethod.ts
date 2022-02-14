@@ -1,41 +1,11 @@
 import { useCallback } from "react";
-import { CreatePaymentMethodMutation, PaymentType, useCreatePaymentMethodMutation, usePaymentKeyLazyQuery, AchMetadata, CreditCardMetadata, CreditCardBillingDetails } from "../queries/graphqlGenerated";
-import { createMessage, encrypt, Key, readKeys, Message } from "openpgp";
-import atob from "atob";
-import btoa from "btoa";
+import { CreatePaymentMethodMutation, PaymentType, useCreatePaymentMethodMutation, AchMetadata, CreditCardMetadata, CreditCardBillingDetails } from "../queries/graphqlGenerated";
 import { BillingInfo } from "../forms/BillingInfoForm";
 import { FetchResult, MutationResult } from "@apollo/client";
 import { formatPhoneAsE123 } from "../domain/circle/circle.utils";
 import { PaymentMethod } from "../domain/payment/payment.interfaces";
+import { useEncryptCardData } from "./useEncryptCard";
 
-async function encryptCard(
-  key: string,
-  cardNumber: string,
-  cvv: string
-) {
-  const dataToEncrypt = {
-    number: cardNumber,
-    cvv,
-  };
-
-  const decodedPublicKey = atob(key);
-
-  const [encryptionKeys, message] = await Promise.allSettled([
-    readKeys({ armoredKeys: decodedPublicKey }),
-    createMessage({ text: JSON.stringify(dataToEncrypt) }),
-  ]).then((allSettledResults) => {
-    return allSettledResults.map((allSettledResult) => {
-      return allSettledResult.status === "fulfilled" ? allSettledResult.value : null;
-    }) as [Key[], Message<string>];
-  });
-
-  const ciphertext = await encrypt({
-    message,
-    encryptionKeys,
-  });
-
-  return btoa(ciphertext);
-}
 
 export interface ExtendedCreatePaymentMethodOptions {
   orgID: string;
@@ -47,13 +17,8 @@ export function useCreatePaymentMethod(): [
   (orgID: string, billingInfo: BillingInfo, paymentInfo: PaymentMethod) => Promise<FetchResult<CreatePaymentMethodMutation>>,
   MutationResult<CreatePaymentMethodMutation>
 ] {
-  // Changed from usePaymentKeyQuery + skit: true to usePaymentKeyLazyQuery due to https://github.com/apollographql/apollo-client/issues/9101.
-  const [fetchPaymentKey]= usePaymentKeyLazyQuery();
-
-  const [
-    createPaymentMethod,
-    createPaymentMethodResult,
-  ] = useCreatePaymentMethodMutation();
+  const [encryptCardData] = useEncryptCardData();
+  const [createPaymentMethod, createPaymentMethodResult] = useCreatePaymentMethodMutation();
 
   const extendedCreatePaymentMethod = useCallback(async (
     orgID: string,
@@ -79,23 +44,10 @@ export function useCreatePaymentMethod(): [
     };
 
     if (paymentInfo.type === PaymentType.CreditCard) {
-      const paymentKeyResult = await fetchPaymentKey().catch((err) => {
-        console.log(err);
-
-        return undefined;
+      const { keyID, encryptedCardData } = await encryptCardData({
+        number: paymentInfo.cardNumber.replace(/\s/g, ""),
+        cvv: paymentInfo.secureCode,
       });
-
-      const paymentKeyData = paymentKeyResult?.data;
-      const publicKey = paymentKeyData?.getPaymentPublicKey?.publicKey;
-      const keyID = paymentKeyData?.getPaymentPublicKey?.keyID;
-
-      if (!publicKey || !keyID) throw new Error("Missing `publicKey` or `keyID`");
-
-      const encryptedCardData = await encryptCard(
-        publicKey,
-        paymentInfo.cardNumber.replace(/\s/g, ""),
-        paymentInfo.secureCode,
-      );
 
       const [expirationMonth, expirationYearLastTwoDigits] = paymentInfo.expiryDate.split("/").map(value => parseInt(value.trim(), 10));
       const expirationYear = 2000 + expirationYearLastTwoDigits;
@@ -137,7 +89,7 @@ export function useCreatePaymentMethod(): [
     }
 
     throw new Error("Unsupported payment method.");
-  }, [fetchPaymentKey, createPaymentMethod]);
+  }, [encryptCardData, createPaymentMethod]);
 
   return [extendedCreatePaymentMethod, createPaymentMethodResult];
 }

@@ -1,32 +1,26 @@
-import { Typography, Divider, Box } from "@mui/material";
-import { CheckoutItem } from "../../../domain/product/product.interfaces";
 import React from "react";
+import { Stack, Typography } from "@mui/material";
+
+import { CheckoutItem } from "../../../domain/product/product.interfaces";
+import { CheckoutItemList } from "../CheckoutItemCost/List/CheckoutItemList";
 
 export interface PurchaseConfirmationItemDetailsProps {
-  checkoutItem: CheckoutItem;
+  checkoutItems: CheckoutItem[];
   purchaseInstructions: string;
 }
 
-export const PurchaseConfirmationItemDetails: React.FC<PurchaseConfirmationItemDetailsProps> = ({
-  checkoutItem,
-  purchaseInstructions,
-}) => {
+export const PurchaseConfirmationItemDetails: React.FC<
+  PurchaseConfirmationItemDetailsProps
+> = ({ checkoutItems, purchaseInstructions }) => {
+  const checkoutItem = checkoutItems[0];
+
   return (
-    <Box sx={{ position: "relative", mt: 2.5 }}>
-      <Box
-        component="img"
-        src={ checkoutItem.imageSrc }
-        sx={{
-          background: theme => checkoutItem.imageBackground || theme.palette.grey["300"],
-          width: "100%",
-          mb: 5,
-        }} />
-
-      <Typography>{ checkoutItem.name }</Typography>
-      <Typography sx={{ marginTop: 0.5 }}>{ checkoutItem.description }</Typography>
-      <Typography sx={{ marginTop: 0.5 }}>{ purchaseInstructions }</Typography>
-
-      <Divider sx={{ mt: 5 }} />
-    </Box>
+    <Stack sx={{ display: "flex", flex: 1, pt: 2.5 }}>
+      <Typography variant="body2">You purchased</Typography>
+      <CheckoutItemList sx={{ mt: 3 }} checkoutItems={checkoutItems} />
+      <Typography sx={{ mt: 6 }}>{checkoutItem.name}</Typography>
+      <Typography sx={{ mt: 0.5 }}>{checkoutItem.description}</Typography>
+      <Typography sx={{ mt: 0.5 }}>{purchaseInstructions}</Typography>
+    </Stack>
   );
-}
+};

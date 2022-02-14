@@ -4,19 +4,19 @@ import { SelectedPaymentMethod } from "../components/payments/CheckoutModal/Chec
 import { SavedPaymentMethod } from "../domain/circle/circle.interfaces";
 import { parseCircleError, savedPaymentMethodToBillingInfo } from "../domain/circle/circle.utils";
 import { PaymentStatus } from "../domain/payment/payment.interfaces";
-import { LotType } from "../domain/product/product.interfaces";
+import { CheckoutItem } from "../domain/product/product.interfaces";
 import { BillingInfo } from "../forms/BillingInfoForm";
-import { useCreateAuctionInvoiceMutation, useCreateBuyNowInvoiceMutation, useCreatePaymentMutation } from "../queries/graphqlGenerated";
+import { CreatePaymentMetadataInput, useCreateAuctionInvoiceMutation, useCreateBuyNowInvoiceMutation, useCreatePaymentMutation } from "../queries/graphqlGenerated";
 import { wait } from "../utils/promiseUtils";
 import { useCreatePaymentMethod } from "./useCreatePaymentMethod";
+import { useEncryptCardData } from "./useEncryptCard";
 
 const CIRCLE_MAX_EXPECTED_PAYMENT_CREATION_PROCESSING_TIME = 5000;
 
 export interface UseFullPaymentOptions {
   orgID: string;
   invoiceID?: string;
-  lotID: string;
-  lotType: LotType;
+  checkoutItems: CheckoutItem[];
   savedPaymentMethods: SavedPaymentMethod[];
   selectedPaymentMethod: SelectedPaymentMethod;
   debug?: boolean;
@@ -31,30 +31,55 @@ export interface PaymentState {
 export function useFullPayment({
   orgID,
   invoiceID: existingInvoiceID = "",
-  lotID,
-  lotType,
+  checkoutItems,
   savedPaymentMethods,
   selectedPaymentMethod,
   debug = false,
 }: UseFullPaymentOptions): [PaymentState, () => Promise<void>] {
-
   const [paymentState, setPaymentState] = useState<PaymentState>({
     paymentStatus: "processing",
     paymentReferenceNumber: "",
   });
 
-  const {
-    billingInfo: selectedBillingInfo,
-    paymentInfo: selectedPaymentInfo,
-  } = selectedPaymentMethod;
-
+  const [encryptCardData] = useEncryptCardData();
   const [createPaymentMethod] = useCreatePaymentMethod();
   const [createAuctionInvoice] = useCreateAuctionInvoiceMutation();
   const [createBuyNowInvoice] = useCreateBuyNowInvoiceMutation();
   const [makePayment] = useCreatePaymentMutation();
 
   const fullPayment = useCallback(async () => {
-    if (debug) console.log(`\n💵 Making payment for orgID = ${ orgID } + lotID = ${ lotID } (${ lotType })\n`);
+    const {
+      billingInfo: selectedBillingInfo,
+      paymentInfo: selectedPaymentInfo,
+    } = selectedPaymentMethod;
+
+    let cvv = "";
+
+    if (typeof selectedPaymentInfo === "string") {
+      cvv = selectedPaymentMethod.cvv;
+    } else if (selectedPaymentInfo.type === "CreditCard") {
+      cvv = selectedPaymentInfo.secureCode;
+    }
+
+    // TODO: Quick fix. The UI can currently display multiple items with multiple units each, but will only purchase the
+    // selected amount (can be multiple units) of the first item:
+    const {
+      lotID,
+      lotType,
+      units,
+    } = checkoutItems[0];
+
+    if (debug) console.log(`\n💵 Making payment for ${ units } × ${ lotType } lot${ units > 1 ? "s" : "" }  ${ lotID } (orgID = ${ orgID })...\n`);
+
+    if (checkoutItems.length === 0) {
+      setPaymentState({
+        paymentStatus: "error",
+        paymentReferenceNumber: "",
+        paymentError: "Missing lot information.",
+      });
+
+      return;
+    }
 
     setPaymentState({
       paymentStatus: "processing",
@@ -175,7 +200,7 @@ export function useFullPayment({
         const createBuyNowInvoiceResult = await createBuyNowInvoice({
           variables: {
             input: {
-              itemCount: 1,
+              itemCount: units,
               marketplaceBuyNowLotID: lotID,
             },
           },
@@ -208,6 +233,38 @@ export function useFullPayment({
       });
     }
 
+
+    let metadata: CreatePaymentMetadataInput | null = null;
+
+    if (cvv) {
+      const encryptCardDataResult = await encryptCardData({
+        cvv,
+      }).catch((error: ApolloError | Error) => {
+        // TODO: Cancel invoice?
+
+        if (debug) console.log("    🔴 encryptCardData error", error);
+      });
+
+      if (!encryptCardDataResult) {
+        setPaymentState({
+          paymentStatus: "error",
+          paymentReferenceNumber: "",
+          paymentError: errorMessage || "Error encrypting CVV",
+        });
+
+        return;
+      }
+
+      const { keyID, encryptedCardData } = encryptCardDataResult;
+
+      metadata = {
+        creditCardData: {
+          keyID,
+          encryptedData: encryptedCardData,
+        },
+      };
+    }
+
     const paymentMethodStatusWaitTime = Math.max(CIRCLE_MAX_EXPECTED_PAYMENT_CREATION_PROCESSING_TIME - (Date.now() - paymentMethodCreatedAt), 0);
 
     if (paymentMethodStatusWaitTime) await wait(paymentMethodStatusWaitTime);
@@ -216,6 +273,7 @@ export function useFullPayment({
       variables: {
         paymentMethodID,
         invoiceID,
+        metadata,
       },
     }).catch((error: ApolloError | Error) => {
       // TODO: Cancel invoice?
@@ -247,7 +305,19 @@ export function useFullPayment({
       paymentStatus: "processed",
       paymentReferenceNumber: circlePaymentID,
     });
-  }, [createAuctionInvoice, createBuyNowInvoice, createPaymentMethod, debug, existingInvoiceID, lotID, lotType, makePayment, orgID, savedPaymentMethods, selectedBillingInfo, selectedPaymentInfo]);
+  }, [
+    checkoutItems,
+    createAuctionInvoice,
+    createBuyNowInvoice,
+    createPaymentMethod,
+    debug,
+    encryptCardData,
+    existingInvoiceID,
+    makePayment,
+    orgID,
+    savedPaymentMethods,
+    selectedPaymentMethod,
+  ]);
 
   return [paymentState, fullPayment];
 }

@@ -11,14 +11,14 @@ import { getFormattedPaymentMethod } from "./PurchaseConfirmationBillingDetails.
 import CheckIcon from "@mui/icons-material/Check";
 
 export interface PurchaseConfirmationBillingDetailsProps {
-  checkoutItem: CheckoutItem;
+  checkoutItems: CheckoutItem[];
   paymentReferenceNumber: string;
   selectedPaymentMethodBillingInfo: SavedPaymentMethodBillingInfo;
   selectedPaymentMethodPaymentInfo: PaymentMethod | SavedPaymentMethod;
 }
 
 export const PurchaseConfirmationBillingDetails: React.FC<PurchaseConfirmationBillingDetailsProps> = ({
-  checkoutItem,
+  checkoutItems,
   paymentReferenceNumber,
   selectedPaymentMethodBillingInfo,
   selectedPaymentMethodPaymentInfo,
@@ -33,7 +33,7 @@ export const PurchaseConfirmationBillingDetails: React.FC<PurchaseConfirmationBi
   const icon: React.ReactNode = network ? <CreditCardIcon network={ network } /> : null;
 
   return (
-    <Box sx={{ position: "relative", mb: 2 }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', flex: 1, position: "relative" }}>
       <Stack
         spacing={ 2 }
         direction={ { xs: "column", sm: "row" } }
@@ -89,7 +89,7 @@ export const PurchaseConfirmationBillingDetails: React.FC<PurchaseConfirmationBi
       </Stack>
 
       <CheckoutItemCostPurchase
-        checkoutItem={ checkoutItem }
+        checkoutItems={ checkoutItems }
         selectedPaymentMethodBillingInfo={ selectedPaymentMethodBillingInfo } />
     </Box>
   );

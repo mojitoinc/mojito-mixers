@@ -17,7 +17,8 @@ export interface PlaygroundFormData {
   // Lot:
   lotID: string;
   lotType: LotType;
-  lotPrice: number;
+  lotUnits: number;
+  lotUnitPrice: number;
   lotFee: number;
 
   // Personalization:

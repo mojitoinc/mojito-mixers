@@ -23,11 +23,6 @@ import { useCheckoutModalState } from "./CheckoutModal.hooks";
 
 const SELECTOR_DIALOG_SCROLLABLE = "[role=presentation]";
 
-export interface SelectedPaymentMethod {
-  billingInfo: string | BillingInfo;
-  paymentInfo: string | PaymentMethod;
-}
-
 export interface CheckoutModalProps {
   // Modal:
   open: boolean;
@@ -59,7 +54,7 @@ export interface CheckoutModalProps {
   // Data:
   orgID: string;
   invoiceID?: string;
-  checkoutItem: CheckoutItem;
+  checkoutItems: CheckoutItem[];
 
   // Authentication:
   onLogin: () => void;
@@ -104,7 +99,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   // Data:
   orgID,
   invoiceID,
-  checkoutItem,
+  checkoutItems,
 
   // Authentication:
   onLogin,
@@ -184,10 +179,12 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
     setSelectedPaymentMethod((prevSelectedPaymentMethod) => {
       const { billingInfo, paymentInfo } = prevSelectedPaymentMethod;
 
-      if (typeof billingInfo === "string" && typeof paymentInfo === "string") return prevSelectedPaymentMethod;
+      if (typeof billingInfo === "string" && typeof paymentInfo === "string") return { ...prevSelectedPaymentMethod, cvv: "" };
 
       // To find the saved payment method(s) that was/were last created:
       const reversedSavedPaymentMethods = savedPaymentMethods.slice().reverse();
+
+      // TODO: This logic can probably be simplified. Just get the last saved payment method...
 
       let matchingPaymentMethod: SavedPaymentMethod;
 
@@ -197,14 +194,16 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
         matchingPaymentMethod = reversedSavedPaymentMethods.find(paymentMethod => paymentMethod.addressId === addressId);
       }
 
-      const isBillingInfoAddressId = typeof billingInfo === "string";
-
-      return !isBillingInfoAddressId && matchingPaymentMethod ? {
+      return matchingPaymentMethod ? {
+        // Both billingInfo and paymentInfo were objects (and we found a matching newly created payment method):
         billingInfo: matchingPaymentMethod.addressId,
         paymentInfo: matchingPaymentMethod.id,
+        cvv: "",
       } : {
+        // billingInfo was an addressID (or we could not find a match) and paymentInfo was an object:
         billingInfo,
-        paymentInfo: isBillingInfoAddressId ? reversedSavedPaymentMethods[0].id : paymentInfo,
+        paymentInfo: typeof billingInfo === "string" ? reversedSavedPaymentMethods[0].id : paymentInfo,
+        cvv: "",
       };
     });
   }, [savedPaymentMethods, setSelectedPaymentMethod]);
@@ -220,12 +219,16 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
   const handleBillingInfoSelected = useCallback((billingInfo: string | BillingInfo) => {
     // TODO: Does paymentInfo need to be reset when coming back to billing info to fix validation errors?
-    setSelectedPaymentMethod({ billingInfo, paymentInfo: "" });
+    setSelectedPaymentMethod({ billingInfo, paymentInfo: "", cvv: "" });
   }, [setSelectedPaymentMethod]);
 
   const handlePaymentInfoSelected = useCallback((paymentInfo: string | PaymentMethod) => {
-    setSelectedPaymentMethod(({ billingInfo }) => ({ billingInfo, paymentInfo }));
+    setSelectedPaymentMethod(({ billingInfo }) => ({ billingInfo, paymentInfo, cvv: "" }));
   }, [setSelectedPaymentMethod]);
+
+  const handleCvvSelected = useCallback((cvv: string) => {
+    setSelectedPaymentMethod(({ billingInfo, paymentInfo }) => ({ billingInfo, paymentInfo, cvv }));
+  }, []);
 
   const handleSavedPaymentMethodDeleted = useCallback(async (addressIdOrPaymentMethodId: string) => {
     const idsToDelete: string[] = checkoutStep === "billing"
@@ -255,6 +258,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
           // re-create it with the new payment information:
           billingInfo: savedPaymentMethodToBillingInfo(addressToDelete),
           paymentInfo: "",
+          cvv: "",
         });
       }
     }
@@ -294,6 +298,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
     // TODO: paymentError should have a source property to know where the error is coming from and handle recovery differently here:
     goTo("payment");
+    // setSelectedPaymentMethod((prevSelectedPaymentMethod) => ({ ...prevSelectedPaymentMethod, cvv: "" }));
 
     // This function is used as a CheckoutModalFooter's onSubmitClicked, so we want that to show a loader on the submit
     // button when clicked but do not remove it once the Promise is resolved, as we are moving to another view and
@@ -374,7 +379,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
     checkoutStepElement = (
       <AuthenticationView
-        checkoutItem={ checkoutItem }
+        checkoutItems={ checkoutItems }
         isAuthenticated={ isAuthenticated }
         guestCheckoutEnabled={ guestCheckoutEnabled }
         onGuestClicked={ goNext }
@@ -383,7 +388,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   } else if (checkoutStep === "billing") {
     checkoutStepElement = (
       <BillingView
-        checkoutItem={ checkoutItem }
+        checkoutItems={ checkoutItems }
         savedPaymentMethods={ savedPaymentMethods }
         selectedBillingInfo={ selectedPaymentMethod.billingInfo }
         onBillingInfoSelected={ handleBillingInfoSelected }
@@ -395,10 +400,11 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   } else if (checkoutStep === "payment") {
     checkoutStepElement = (
       <PaymentView
-        checkoutItem={ checkoutItem }
+        checkoutItems={ checkoutItems }
         savedPaymentMethods={ savedPaymentMethods }
         selectedPaymentMethod={ selectedPaymentMethod }
         onPaymentInfoSelected={ handlePaymentInfoSelected }
+        onCvvSelected={ handleCvvSelected }
         onSavedPaymentMethodDeleted={ handleSavedPaymentMethodDeleted }
         onNext={ goNext }
         onPrev={ goBack }
@@ -410,7 +416,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
         debug={ debug } />
     );
   } else if (checkoutStep === "purchasing") {
-    headerVariant = 'purchasing';
+    headerVariant = "purchasing";
 
     checkoutStepElement = (
       <PurchasingView
@@ -418,8 +424,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
         purchasingMessages={ purchasingMessages }
         orgID={ orgID }
         invoiceID={ invoiceID }
-        lotID={ checkoutItem.lotID }
-        lotType={ checkoutItem.lotType }
+        checkoutItems={ checkoutItems }
         savedPaymentMethods={ savedPaymentMethods }
         selectedPaymentMethod={ selectedPaymentMethod }
         onPurchaseSuccess={ handlePurchaseSuccess }
@@ -428,11 +433,11 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
         debug={ debug } />
     );
   } else if (checkoutStep === "confirmation") {
-    headerVariant = 'logoOnly';
+    headerVariant = "logoOnly";
 
     checkoutStepElement = (
       <ConfirmationView
-        checkoutItem={ checkoutItem }
+        checkoutItems={ checkoutItems }
         savedPaymentMethods={ savedPaymentMethods }
         selectedPaymentMethod={ selectedPaymentMethod }
         paymentReferenceNumber={ paymentReferenceNumber }
@@ -449,24 +454,24 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
         onClose={ isDialogBlocked ? undefined : onClose }
         onBackdropClick={ isDialogBlocked ? shake : undefined }
         aria-labelledby="checkout-modal-header-title"
-        fullWidth
-        maxWidth="sm"
         scroll="body"
         ref={ dialogRootRef }
-        PaperProps={ { sx: shakeSx, ref: paperRef }}>
+        PaperProps={ { sx: shakeSx, ref: paperRef }}
+        // Dialog only:
+        // fullWidth
+        // maxWidth="sm"
+        fullScreen>
 
         <DialogContent
           sx={{
             overflowX: 'hidden',
-            pt: {
-              xs: 1.5,
-              sm: 2.5,
-            },
             px: {
               xs: 1.5,
               sm: 2.5,
             },
-            pb: 0,
+            py: 2.5,
+            maxWidth: theme => theme.breakpoints.values.lg,
+            mx: "auto",
           }}>
 
           <CheckoutModalHeader

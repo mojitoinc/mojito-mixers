@@ -1,6 +1,8 @@
 
 import { ApolloError } from "@apollo/client";
 import { Dispatch, SetStateAction, useState, useCallback } from "react";
+import { PaymentMethod } from "../../../domain/payment/payment.interfaces";
+import { BillingInfo } from "../../../forms/BillingInfoForm";
 import { INITIAL_PLAID_OAUTH_FLOW_STATE } from "../../../hooks/usePlaid";
 import { resetStepperProgress } from "../CheckoutStepper/CheckoutStepper";
 import { SelectedPaymentMethod } from "./CheckoutModal";
@@ -23,6 +25,12 @@ export interface CheckoutModalStateOptions {
 export interface CheckoutModalState {
   checkoutStep: CheckoutModalStep;
   checkoutError?: CheckoutModalError;
+}
+
+export interface SelectedPaymentMethod {
+  billingInfo: string | BillingInfo;
+  paymentInfo: string | PaymentMethod;
+  cvv: string;
 }
 
 export interface CheckoutModalStateReturn extends CheckoutModalState {
@@ -57,6 +65,7 @@ export function useCheckoutModalState({
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<SelectedPaymentMethod>({
     billingInfo: "",
     paymentInfo: "",
+    cvv: "",
   });
 
   const resetModalState = useCallback(() => {
@@ -68,7 +77,12 @@ export function useCheckoutModalState({
     const { selectedBillingInfo, continueOAuthFlow, savedStateUsed } = INITIAL_PLAID_OAUTH_FLOW_STATE;
 
     setCheckoutModalState({ checkoutStep: continueOAuthFlow && !savedStateUsed ? "purchasing" : startAt });
-    setSelectedPaymentMethod({ billingInfo: selectedBillingInfo || "", paymentInfo: "" });
+
+    setSelectedPaymentMethod({
+      billingInfo: selectedBillingInfo || "",
+      paymentInfo: "",
+      cvv: "",
+    });
   }, [startAt]);
 
   const goBack = useCallback(() => {

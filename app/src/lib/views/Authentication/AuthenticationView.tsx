@@ -6,7 +6,7 @@ import React, { useEffect } from "react";
 import { resetStepperProgress } from "../../components/payments/CheckoutStepper/CheckoutStepper";
 
 export interface AuthenticationViewProps {
-  checkoutItem: CheckoutItem;
+  checkoutItems: CheckoutItem[];
   isAuthenticated?: boolean;
   guestCheckoutEnabled?: boolean;
   onGuestClicked: () => void;
@@ -14,7 +14,7 @@ export interface AuthenticationViewProps {
 }
 
 export const AuthenticationView: React.FC<AuthenticationViewProps> = ({
-  checkoutItem,
+  checkoutItems,
   isAuthenticated,
   guestCheckoutEnabled,
   onGuestClicked,
@@ -26,7 +26,7 @@ export const AuthenticationView: React.FC<AuthenticationViewProps> = ({
   }, []);
 
   return (<>
-    <CheckoutItemCostBreakdown checkoutItem={ checkoutItem } />
+    <CheckoutItemCostBreakdown checkoutItems={ checkoutItems } />
 
     <CheckoutModalFooter
       variant={ isAuthenticated ? "toPayment" : "toGuestCheckout" }

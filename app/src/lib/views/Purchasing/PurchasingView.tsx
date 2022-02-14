@@ -5,7 +5,7 @@ import React from "react";
 import { Box, Typography } from "@mui/material";
 import { useTimeout, useInterval } from "@swyg/corre";
 import { SelectedPaymentMethod } from "../../components/payments/CheckoutModal/CheckoutModal";
-import { LotType } from "../../domain/product/product.interfaces";
+import { CheckoutItem } from "../..";
 
 const DEFAULT_PURCHASING_IMAGE_SRC = "https://raw.githubusercontent.com/mojitoinc/mojito-mixers/main/app/src/lib/assets/mojito-loader.gif";
 
@@ -25,8 +25,7 @@ export interface PurchasingViewProps {
   purchasingMessages?: false | string[];
   orgID: string;
   invoiceID?: string;
-  lotID: string;
-  lotType: LotType;
+  checkoutItems: CheckoutItem[];
   savedPaymentMethods: SavedPaymentMethod[];
   selectedPaymentMethod: SelectedPaymentMethod;
   onPurchaseSuccess: (paymentReferenceNumber: string) => void;
@@ -40,8 +39,7 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
   purchasingMessages: customPurchasingMessages,
   orgID,
   invoiceID,
-  lotID,
-  lotType,
+  checkoutItems,
   savedPaymentMethods,
   selectedPaymentMethod,
   onPurchaseSuccess,
@@ -64,8 +62,7 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
   const [paymentState, fullPayment] = useFullPayment({
     orgID,
     invoiceID,
-    lotID,
-    lotType,
+    checkoutItems,
     savedPaymentMethods,
     selectedPaymentMethod,
     debug,
