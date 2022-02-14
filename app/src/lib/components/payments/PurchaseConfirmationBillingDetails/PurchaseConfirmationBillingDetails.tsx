@@ -33,7 +33,7 @@ export const PurchaseConfirmationBillingDetails: React.FC<PurchaseConfirmationBi
   const icon: React.ReactNode = network ? <CreditCardIcon network={ network } /> : null;
 
   return (
-    <Box sx={{ position: "relative", mb: 2 }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', flex: 1, position: "relative" }}>
       <Stack
         spacing={ 2 }
         direction={ { xs: "column", sm: "row" } }
