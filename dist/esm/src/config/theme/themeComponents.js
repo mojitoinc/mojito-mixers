@@ -262,6 +262,11 @@ function createComponentsTheme(theme) {
         MuiDialog: {
             styleOverrides: {
                 container: {
+                // Keep the scroll always visible in the non-full-screen version:
+                // overflowY: "scroll",
+                },
+                paperFullScreen: {
+                    // Keep the scroll always visible in the full-screen version:
                     overflowY: "scroll",
                 },
             },

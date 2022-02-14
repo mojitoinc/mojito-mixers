@@ -14,7 +14,8 @@ interface CheckoutItem {
     lotType: LotType;
     name: string;
     description: string;
-    price: number;
+    units: number;
+    unitPrice: number;
     fee: number;
     imageSrc: string;
     imageBackground: string;
@@ -70,7 +71,7 @@ interface CheckoutModalProps {
     termsOfUseHref?: string;
     orgID: string;
     invoiceID?: string;
-    checkoutItem: CheckoutItem;
+    checkoutItems: CheckoutItem[];
     onLogin: () => void;
     isAuthenticated?: boolean;
     isAuthenticatedLoading?: boolean;

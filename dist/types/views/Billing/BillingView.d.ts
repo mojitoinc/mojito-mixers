@@ -1,9 +1,9 @@
+import React from "react";
 import { SavedPaymentMethod } from "../../domain/circle/circle.interfaces";
 import { CheckoutItem } from "../../domain/product/product.interfaces";
 import { BillingInfo } from "../../forms/BillingInfoForm";
-import React from "react";
 export interface BillingViewProps {
-    checkoutItem: CheckoutItem;
+    checkoutItems: CheckoutItem[];
     savedPaymentMethods: SavedPaymentMethod[];
     selectedBillingInfo: string | BillingInfo;
     onBillingInfoSelected: (data: string | BillingInfo) => void;

@@ -1,14 +1,13 @@
 import { SavedPaymentMethod } from "../../domain/circle/circle.interfaces";
 import React from "react";
 import { SelectedPaymentMethod } from "../../components/payments/CheckoutModal/CheckoutModal";
-import { LotType } from "../../domain/product/product.interfaces";
+import { CheckoutItem } from "../..";
 export interface PurchasingViewProps {
     purchasingImageSrc?: string;
     purchasingMessages?: false | string[];
     orgID: string;
     invoiceID?: string;
-    lotID: string;
-    lotType: LotType;
+    checkoutItems: CheckoutItem[];
     savedPaymentMethods: SavedPaymentMethod[];
     selectedPaymentMethod: SelectedPaymentMethod;
     onPurchaseSuccess: (paymentReferenceNumber: string) => void;

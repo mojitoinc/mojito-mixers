@@ -49,6 +49,11 @@ exports.ContractType = void 0;
     ContractType["GenerativeContract"] = "GenerativeContract";
     ContractType["ZoraContract"] = "ZoraContract";
 })(exports.ContractType || (exports.ContractType = {}));
+exports.ExtensionType = void 0;
+(function (ExtensionType) {
+    ExtensionType["GenartExtension"] = "GenartExtension";
+    ExtensionType["ProvenanceExtension"] = "ProvenanceExtension";
+})(exports.ExtensionType || (exports.ExtensionType = {}));
 exports.InvoiceStatus = void 0;
 (function (InvoiceStatus) {
     InvoiceStatus["Canceled"] = "Canceled";
@@ -153,8 +158,8 @@ function useMeQuery(baseOptions) {
     return Apollo__namespace.useQuery(MeDocument, options);
 }
 const CreatePaymentDocument = Apollo.gql `
-    mutation CreatePayment($paymentMethodID: UUID1!, $invoiceID: UUID1!) {
-  createPayment(paymentMethodID: $paymentMethodID, invoiceID: $invoiceID) {
+    mutation CreatePayment($paymentMethodID: UUID1!, $invoiceID: UUID1!, $metadata: CreatePaymentMetadataInput) {
+  createPayment(paymentMethodID: $paymentMethodID, invoiceID: $invoiceID, metadata: $metadata) {
     id
     invoiceID
     circlePaymentID

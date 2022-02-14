@@ -15,10 +15,10 @@ function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'defau
 
 var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 
-const PurchaseConfirmationBillingDetails = ({ checkoutItem, paymentReferenceNumber, selectedPaymentMethodBillingInfo, selectedPaymentMethodPaymentInfo, }) => {
+const PurchaseConfirmationBillingDetails = ({ checkoutItems, paymentReferenceNumber, selectedPaymentMethodBillingInfo, selectedPaymentMethodPaymentInfo, }) => {
     const { isMasked, paymentType, displayValue, network, } = PurchaseConfirmationBillingDetails_utils.getFormattedPaymentMethod(selectedPaymentMethodPaymentInfo);
     const icon = network ? React__default["default"].createElement(Icons.CreditCardIcon, { network: network }) : null;
-    return (React__default["default"].createElement(material.Box, { sx: { position: "relative", mb: 2 } },
+    return (React__default["default"].createElement(material.Box, { sx: { display: 'flex', flexDirection: 'column', flex: 1, position: "relative" } },
         React__default["default"].createElement(material.Stack, { spacing: 2, direction: { xs: "column", sm: "row" }, sx: {
                 justifyContent: "space-between",
                 alignItems: { xs: "flex-start", sm: "center" },
@@ -38,7 +38,7 @@ const PurchaseConfirmationBillingDetails = ({ checkoutItem, paymentReferenceNumb
                     endAdornment: (React__default["default"].createElement(material.InputAdornment, { position: "end" }, icon)),
                 } : undefined })) : (React__default["default"].createElement(ReadOnlyField.ReadOnlyCardField, { label: PurchaseConfirmationBillingDetails_constants.PAYMENT_TYPE_LABEL[paymentType], value: displayValue })),
             React__default["default"].createElement(ReadOnlyField.ReadOnlyField, { label: "Reference No.", value: paymentReferenceNumber || "-" })),
-        React__default["default"].createElement(CheckoutItemCostPurchase.CheckoutItemCostPurchase, { checkoutItem: checkoutItem, selectedPaymentMethodBillingInfo: selectedPaymentMethodBillingInfo })));
+        React__default["default"].createElement(CheckoutItemCostPurchase.CheckoutItemCostPurchase, { checkoutItems: checkoutItems, selectedPaymentMethodBillingInfo: selectedPaymentMethodBillingInfo })));
 };
 
 exports.PurchaseConfirmationBillingDetails = PurchaseConfirmationBillingDetails;
