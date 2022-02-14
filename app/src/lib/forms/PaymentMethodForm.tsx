@@ -53,11 +53,14 @@ const FIELD_LABELS = {
   expiryDate: "Expiry Date",
   secureCode: "Secure Code",
   nameOnCard: "Name on Card",
+  accountNumber: "Account Number",
+  routingNumber: "Routing Number (ABA)",
 };
 
 const FIELD_NAMES = Object.keys(FIELD_LABELS);
 
 const isCreditCardThenRequireSchema = requireSchemaWhenKeyIs("CreditCard");
+const isWireThenRequireSchema = requireSchemaWhenKeyIs("Wire");
 
 const PAYMENT_TYPE_FORM_DATA: Record<PaymentType, PaymentTypeFormData> = {
   CreditCard: {
@@ -175,22 +178,43 @@ const PAYMENT_TYPE_FORM_DATA: Record<PaymentType, PaymentTypeFormData> = {
   Wire: {
     defaultValues: (consentType) => ({
       type: "Wire",
+      accountNumber: "",
+      routingNumber: "",
       consent: consentType === "checkbox" ? false: true,
     }),
-    schemaShape: {},
+    schemaShape: {
+      accountNumber: string()
+        .label(FIELD_LABELS.accountNumber)
+        .when("type", isWireThenRequireSchema),
+      routingNumber: string()
+        .label(FIELD_LABELS.routingNumber)
+        .when("type", isWireThenRequireSchema),
+    },
     fields: ({ control, consentType, privacyHref, termsOfUseHref }) => (<>
-      <DisplayBox sx={{ mt: 1.5, mb: consentType === "checkbox" ? 1 : 0 }}>
-        <Typography variant="body1">
-          Not supported yet.
-        </Typography>
-      </DisplayBox>
-
+      <ControlledTextField
+          name="accountNumber"
+          control={control}
+          label={FIELD_LABELS.accountNumber}
+        />
+        <ControlledTextField
+          name="routingNumber"
+          control={control}
+          label={FIELD_LABELS.routingNumber}
+        />
       { consentType === "checkbox" && (
         <ControlledCheckbox
           name="consent"
           control={control}
           label={ <>I <ConsentText privacyHref={ privacyHref } termsOfUseHref={ termsOfUseHref } /></> } />
       ) }
+      <DisplayBox sx={{ mt: 1.5 }}>
+        <Typography  variant="body1">
+          <Typography display="inline" sx={{ fontWeight: "500" }}>Third-party wire transfers cannot be accepted.</Typography> Your bank account name needs to match with the name you used to register in Sotheby’s Metaverse.
+          <Typography sx={{ mt: 2 }}>
+            Please note that wire transfers usually take <Typography display="inline" sx={{ fontWeight: "500" }}>1-3 business days</Typography> to arrive. We do not charge any deposit fee — however, your bank may charge you a wire transfer fee.
+          </Typography>
+        </Typography>
+      </DisplayBox>
     </>),
   },
   Crypto: {
@@ -294,7 +318,7 @@ export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
       }
 
       onPlaidLinkClicked();
-    } else if (selectedPaymentMethod === "CreditCard") {
+    } else if (["CreditCard", "Wire"].includes(selectedPaymentMethod)) {
       submitForm(e);
     }
   }, [selectedPaymentMethod, onPlaidLinkClicked, submitForm, trigger]);
@@ -342,7 +366,7 @@ export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
         consentType={ consentType === "checkbox" ? undefined : consentType }
         privacyHref={ privacyHref }
         termsOfUseHref={ termsOfUseHref }
-        submitDisabled={ selectedPaymentMethod === "Wire" || selectedPaymentMethod === "Crypto" }
+        submitDisabled={ selectedPaymentMethod === "Crypto" }
         onCloseClicked={ onClose } />
     </form>
   );
