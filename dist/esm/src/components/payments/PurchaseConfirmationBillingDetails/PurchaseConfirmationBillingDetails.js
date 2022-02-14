@@ -7,10 +7,10 @@ import { PAYMENT_TYPE_LABEL } from './PurchaseConfirmationBillingDetails.constan
 import { getFormattedPaymentMethod } from './PurchaseConfirmationBillingDetails.utils.js';
 import default_1 from '../../../../node_modules/@mui/icons-material/Check.js';
 
-const PurchaseConfirmationBillingDetails = ({ checkoutItem, paymentReferenceNumber, selectedPaymentMethodBillingInfo, selectedPaymentMethodPaymentInfo, }) => {
+const PurchaseConfirmationBillingDetails = ({ checkoutItems, paymentReferenceNumber, selectedPaymentMethodBillingInfo, selectedPaymentMethodPaymentInfo, }) => {
     const { isMasked, paymentType, displayValue, network, } = getFormattedPaymentMethod(selectedPaymentMethodPaymentInfo);
     const icon = network ? React__default.createElement(CreditCardIcon, { network: network }) : null;
-    return (React__default.createElement(Box, { sx: { position: "relative", mb: 2 } },
+    return (React__default.createElement(Box, { sx: { display: 'flex', flexDirection: 'column', flex: 1, position: "relative" } },
         React__default.createElement(Stack, { spacing: 2, direction: { xs: "column", sm: "row" }, sx: {
                 justifyContent: "space-between",
                 alignItems: { xs: "flex-start", sm: "center" },
@@ -30,7 +30,7 @@ const PurchaseConfirmationBillingDetails = ({ checkoutItem, paymentReferenceNumb
                     endAdornment: (React__default.createElement(InputAdornment, { position: "end" }, icon)),
                 } : undefined })) : (React__default.createElement(ReadOnlyCardField, { label: PAYMENT_TYPE_LABEL[paymentType], value: displayValue })),
             React__default.createElement(ReadOnlyField, { label: "Reference No.", value: paymentReferenceNumber || "-" })),
-        React__default.createElement(CheckoutItemCostPurchase, { checkoutItem: checkoutItem, selectedPaymentMethodBillingInfo: selectedPaymentMethodBillingInfo })));
+        React__default.createElement(CheckoutItemCostPurchase, { checkoutItems: checkoutItems, selectedPaymentMethodBillingInfo: selectedPaymentMethodBillingInfo })));
 };
 
 export { PurchaseConfirmationBillingDetails };

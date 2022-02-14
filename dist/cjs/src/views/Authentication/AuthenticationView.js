@@ -11,13 +11,13 @@ function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'defau
 
 var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 
-const AuthenticationView = ({ checkoutItem, isAuthenticated, guestCheckoutEnabled, onGuestClicked, onCloseClicked, }) => {
+const AuthenticationView = ({ checkoutItems, isAuthenticated, guestCheckoutEnabled, onGuestClicked, onCloseClicked, }) => {
     React.useEffect(() => {
         // Make sure the progress tracker in BillingView and PaymentView is properly animated:
         CheckoutStepper.resetStepperProgress();
     }, []);
     return (React__default["default"].createElement(React__default["default"].Fragment, null,
-        React__default["default"].createElement(CheckoutItemCostBreakdown.CheckoutItemCostBreakdown, { checkoutItem: checkoutItem }),
+        React__default["default"].createElement(CheckoutItemCostBreakdown.CheckoutItemCostBreakdown, { checkoutItems: checkoutItems }),
         React__default["default"].createElement(CheckoutModalFooter.CheckoutModalFooter, { variant: isAuthenticated ? "toPayment" : "toGuestCheckout", guestCheckoutEnabled: guestCheckoutEnabled, privacyHref: "", termsOfUseHref: "", onSubmitClicked: onGuestClicked, onCloseClicked: onCloseClicked })));
 };
 

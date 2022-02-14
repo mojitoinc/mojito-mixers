@@ -1,39 +1,13 @@
 import { __awaiter } from '../../node_modules/tslib/tslib.es6.js';
 import { useCallback } from 'react';
-import { usePaymentKeyLazyQuery, useCreatePaymentMethodMutation, PaymentType } from '../queries/graphqlGenerated.js';
-import { readKeys, createMessage, encrypt } from 'openpgp';
-import atob from 'atob';
-import btoa from 'btoa';
+import { useCreatePaymentMethodMutation, PaymentType } from '../queries/graphqlGenerated.js';
 import { formatPhoneAsE123 } from '../domain/circle/circle.utils.js';
+import { useEncryptCardData } from './useEncryptCard.js';
 
-function encryptCard(key, cardNumber, cvv) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const dataToEncrypt = {
-            number: cardNumber,
-            cvv,
-        };
-        const decodedPublicKey = atob(key);
-        const [encryptionKeys, message] = yield Promise.allSettled([
-            readKeys({ armoredKeys: decodedPublicKey }),
-            createMessage({ text: JSON.stringify(dataToEncrypt) }),
-        ]).then((allSettledResults) => {
-            return allSettledResults.map((allSettledResult) => {
-                return allSettledResult.status === "fulfilled" ? allSettledResult.value : null;
-            });
-        });
-        const ciphertext = yield encrypt({
-            message,
-            encryptionKeys,
-        });
-        return btoa(ciphertext);
-    });
-}
 function useCreatePaymentMethod() {
-    // Changed from usePaymentKeyQuery + skit: true to usePaymentKeyLazyQuery due to https://github.com/apollographql/apollo-client/issues/9101.
-    const [fetchPaymentKey] = usePaymentKeyLazyQuery();
-    const [createPaymentMethod, createPaymentMethodResult,] = useCreatePaymentMethodMutation();
+    const [encryptCardData] = useEncryptCardData();
+    const [createPaymentMethod, createPaymentMethodResult] = useCreatePaymentMethodMutation();
     const extendedCreatePaymentMethod = useCallback((orgID, billingInfo, paymentInfo) => __awaiter(this, void 0, void 0, function* () {
-        var _a, _b;
         if (!orgID)
             throw new Error("Missing `orgID`");
         const metadata = {
@@ -51,16 +25,10 @@ function useCreatePaymentMethod() {
             postalCode: billingInfo.zipCode,
         };
         if (paymentInfo.type === PaymentType.CreditCard) {
-            const paymentKeyResult = yield fetchPaymentKey().catch((err) => {
-                console.log(err);
-                return undefined;
+            const { keyID, encryptedCardData } = yield encryptCardData({
+                number: paymentInfo.cardNumber.replace(/\s/g, ""),
+                cvv: paymentInfo.secureCode,
             });
-            const paymentKeyData = paymentKeyResult === null || paymentKeyResult === void 0 ? void 0 : paymentKeyResult.data;
-            const publicKey = (_a = paymentKeyData === null || paymentKeyData === void 0 ? void 0 : paymentKeyData.getPaymentPublicKey) === null || _a === void 0 ? void 0 : _a.publicKey;
-            const keyID = (_b = paymentKeyData === null || paymentKeyData === void 0 ? void 0 : paymentKeyData.getPaymentPublicKey) === null || _b === void 0 ? void 0 : _b.keyID;
-            if (!publicKey || !keyID)
-                throw new Error("Missing `publicKey` or `keyID`");
-            const encryptedCardData = yield encryptCard(publicKey, paymentInfo.cardNumber.replace(/\s/g, ""), paymentInfo.secureCode);
             const [expirationMonth, expirationYearLastTwoDigits] = paymentInfo.expiryDate.split("/").map(value => parseInt(value.trim(), 10));
             const expirationYear = 2000 + expirationYearLastTwoDigits;
             return createPaymentMethod({
@@ -98,7 +66,7 @@ function useCreatePaymentMethod() {
             });
         }
         throw new Error("Unsupported payment method.");
-    }), [fetchPaymentKey, createPaymentMethod]);
+    }), [encryptCardData, createPaymentMethod]);
     return [extendedCreatePaymentMethod, createPaymentMethodResult];
 }
 

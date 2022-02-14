@@ -1,5 +1,6 @@
 import { __awaiter } from '../../../node_modules/tslib/tslib.es6.js';
 import React__default, { useRef, useMemo, useState, useCallback, useEffect } from 'react';
+import { Stack } from '@mui/material';
 import { CheckoutItemCostBreakdown } from '../../components/payments/CheckoutItemCost/Breakdown/CheckoutItemCostBreakdown.js';
 import { CheckoutStepper } from '../../components/payments/CheckoutStepper/CheckoutStepper.js';
 import { SavedBillingDetailsSelector } from '../../components/shared/SavedBillingDetailsSelector/SavedBillingDetailsSelector.js';
@@ -7,7 +8,7 @@ import { savedPaymentMethodToBillingInfo, getSavedPaymentMethodAddressIdFromBill
 import { BillingInfoForm } from '../../forms/BillingInfoForm.js';
 import { distinctBy } from '../../utils/arrayUtils.js';
 
-const BillingView = ({ checkoutItem, savedPaymentMethods: rawSavedPaymentMethods, selectedBillingInfo, onBillingInfoSelected, onSavedPaymentMethodDeleted, onNext, onClose, debug, }) => {
+const BillingView = ({ checkoutItems, savedPaymentMethods: rawSavedPaymentMethods, selectedBillingInfo, onBillingInfoSelected, onSavedPaymentMethodDeleted, onNext, onClose, debug, }) => {
     const savedPaymentMethodAddressIdRef = useRef("");
     const savedPaymentMethods = useMemo(() => distinctBy(rawSavedPaymentMethods, "addressId"), [rawSavedPaymentMethods]);
     const [{ isDeleting, showSaved }, setViewState] = useState({
@@ -47,14 +48,19 @@ const BillingView = ({ checkoutItem, savedPaymentMethods: rawSavedPaymentMethods
             onBillingInfoSelected(savedPaymentMethods[0].addressId);
         }
     }, [showSaved, savedPaymentMethods, selectedBillingInfo, onBillingInfoSelected]);
-    return (React__default.createElement(React__default.Fragment, null,
-        React__default.createElement(CheckoutItemCostBreakdown, { checkoutItem: checkoutItem }),
-        React__default.createElement(CheckoutStepper, { progress: 50 }),
-        showSaved ? (React__default.createElement(SavedBillingDetailsSelector, { showLoader: isDeleting, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethodAddressId: typeof selectedBillingInfo === "string" ? selectedBillingInfo : undefined, onNew: handleShowForm, onEdit: handleShowForm, onDelete: handleSavedPaymentMethodDeleted, onPick: onBillingInfoSelected, onNext: onNext, onClose: onClose })) : (React__default.createElement(BillingInfoForm
-        // variant="loggedIn"
-        , { 
+    return (React__default.createElement(Stack, { direction: {
+            xs: "column",
+            sm: "column",
+            md: "row",
+        }, spacing: 8.75 },
+        React__default.createElement(Stack, { sx: { display: 'flex', flex: 1 } },
+            React__default.createElement(CheckoutStepper, { progress: 50 }),
+            showSaved ? (React__default.createElement(SavedBillingDetailsSelector, { showLoader: isDeleting, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethodAddressId: typeof selectedBillingInfo === "string" ? selectedBillingInfo : undefined, onNew: handleShowForm, onEdit: handleShowForm, onDelete: handleSavedPaymentMethodDeleted, onPick: onBillingInfoSelected, onNext: onNext, onClose: onClose })) : (React__default.createElement(BillingInfoForm
             // variant="loggedIn"
-            defaultValues: typeof selectedBillingInfo === "string" ? undefined : selectedBillingInfo, onSaved: savedPaymentMethods.length > 0 ? handleShowSaved : undefined, onClose: onClose, onSubmit: handleSubmit, debug: debug }))));
+            , { 
+                // variant="loggedIn"
+                defaultValues: typeof selectedBillingInfo === "string" ? undefined : selectedBillingInfo, onSaved: savedPaymentMethods.length > 0 ? handleShowSaved : undefined, onClose: onClose, onSubmit: handleSubmit, debug: debug }))),
+        React__default.createElement(CheckoutItemCostBreakdown, { checkoutItems: checkoutItems })));
 };
 
 export { BillingView };

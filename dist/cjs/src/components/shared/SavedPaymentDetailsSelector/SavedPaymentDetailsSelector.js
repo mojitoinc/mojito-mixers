@@ -15,16 +15,35 @@ function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'defau
 
 var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 
-const SavedPaymentDetailsSelector = ({ showLoader, savedPaymentMethods, selectedPaymentMethodId, onNew, onDelete, onPick, onNext, onClose, consentType, privacyHref, termsOfUseHref, }) => {
-    const [isFormSubmitted, setIsFormSubmitted] = React.useState(false);
+function validateCvv(isCvvRequired, cvv) {
+    return !isCvvRequired || cvv.length === 3 || cvv.length === 4;
+}
+const SavedPaymentDetailsSelector = ({ showLoader, savedPaymentMethods, selectedPaymentMethodId, onNew, onDelete, onPick, onCvvSelected, onNext, onClose, consentType, privacyHref, termsOfUseHref, }) => {
+    const isCvvRequired = React.useMemo(() => {
+        const selectedPaymentMethod = savedPaymentMethods.find(savedPaymentMethod => savedPaymentMethod.id === selectedPaymentMethodId);
+        return (selectedPaymentMethod === null || selectedPaymentMethod === void 0 ? void 0 : selectedPaymentMethod.type) === "CreditCard";
+    }, [savedPaymentMethods, selectedPaymentMethodId]);
+    const [{ isFormSubmitted, cvv, }, setSelectorState] = React.useState({
+        isFormSubmitted: false,
+        cvv: "",
+    });
+    React.useEffect(() => {
+        // Reset CVV if user selects a different payment method:
+        setSelectorState(({ isFormSubmitted }) => ({ isFormSubmitted, cvv: "" }));
+    }, [selectedPaymentMethodId]);
+    const isCvvOk = validateCvv(isCvvRequired, cvv);
     const handleNextClicked = React.useCallback((canSubmit) => {
-        if (canSubmit && selectedPaymentMethodId) {
+        if (canSubmit && selectedPaymentMethodId && isCvvOk) {
+            onCvvSelected(cvv);
             onNext();
+            return;
         }
-        else if (!selectedPaymentMethodId) {
-            setIsFormSubmitted(true);
-        }
-    }, [selectedPaymentMethodId, onNext]);
+        setSelectorState(({ cvv }) => ({ isFormSubmitted: true, cvv }));
+    }, [selectedPaymentMethodId, cvv, isCvvOk, onCvvSelected, onNext]);
+    const handleCvvChange = React.useCallback((e) => {
+        const cvv = e.currentTarget.value || "";
+        setSelectorState(({ isFormSubmitted }) => ({ isFormSubmitted, cvv }));
+    }, []);
     const getPaymentMethodId = React.useCallback((savedPaymentMethod) => savedPaymentMethod.id, []);
     return (React__default["default"].createElement(React__default["default"].Fragment, null,
         React__default["default"].createElement(material.Box, { sx: { position: "relative", mb: consentType === "checkbox" ? 5 : 0 } },
@@ -45,7 +64,9 @@ const SavedPaymentDetailsSelector = ({ showLoader, savedPaymentMethods, selected
                     disabled: showLoader,
                     onDelete,
                     onPick,
+                    onCvvChange: handleCvvChange,
                 }), component: PaymentDetailsItem.PaymentDetailsItem, itemKey: getPaymentMethodId, deps: [onDelete, onPick, selectedPaymentMethodId, showLoader] }),
+            isFormSubmitted && !isCvvOk && (React__default["default"].createElement(material.Typography, { variant: "caption", component: "p", sx: { mt: 2, color: theme => theme.palette.warning.dark } }, "You must enter a valid CVV number.")),
             React__default["default"].createElement(SecondaryButton.SecondaryButton, { onClick: onNew, startIcon: React__default["default"].createElement(Add["default"], null), sx: { mt: 2.5 }, disabled: showLoader }, "Add New Payment Method"),
             isFormSubmitted && !selectedPaymentMethodId && (React__default["default"].createElement(material.Typography, { variant: "caption", component: "p", sx: { mt: 2, color: theme => theme.palette.warning.dark } }, "You must select a saved and approved payment method or create a new one."))),
         React__default["default"].createElement(CheckoutModalFooter.CheckoutModalFooter, { variant: "toConfirmation", consentType: consentType, privacyHref: privacyHref, termsOfUseHref: termsOfUseHref, onSubmitClicked: handleNextClicked, onCloseClicked: onClose })));

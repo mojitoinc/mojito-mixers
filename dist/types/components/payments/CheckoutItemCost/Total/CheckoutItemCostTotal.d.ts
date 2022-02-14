@@ -1,6 +1,8 @@
 import React from "react";
 export interface CheckoutItemCostTotalProps {
-    price: number;
-    fee: number;
+    total: number;
+    taxes: number;
+    fees: number;
+    withDetails?: boolean;
 }
 export declare const CheckoutItemCostTotal: React.FC<CheckoutItemCostTotalProps>;

@@ -5,44 +5,13 @@ Object.defineProperty(exports, '__esModule', { value: true });
 var tslib_es6 = require('../../node_modules/tslib/tslib.es6.js');
 var React = require('react');
 var graphqlGenerated = require('../queries/graphqlGenerated.js');
-var openpgp = require('openpgp');
-var atob = require('atob');
-var btoa = require('btoa');
 var circle_utils = require('../domain/circle/circle.utils.js');
+var useEncryptCard = require('./useEncryptCard.js');
 
-function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
-
-var atob__default = /*#__PURE__*/_interopDefaultLegacy(atob);
-var btoa__default = /*#__PURE__*/_interopDefaultLegacy(btoa);
-
-function encryptCard(key, cardNumber, cvv) {
-    return tslib_es6.__awaiter(this, void 0, void 0, function* () {
-        const dataToEncrypt = {
-            number: cardNumber,
-            cvv,
-        };
-        const decodedPublicKey = atob__default["default"](key);
-        const [encryptionKeys, message] = yield Promise.allSettled([
-            openpgp.readKeys({ armoredKeys: decodedPublicKey }),
-            openpgp.createMessage({ text: JSON.stringify(dataToEncrypt) }),
-        ]).then((allSettledResults) => {
-            return allSettledResults.map((allSettledResult) => {
-                return allSettledResult.status === "fulfilled" ? allSettledResult.value : null;
-            });
-        });
-        const ciphertext = yield openpgp.encrypt({
-            message,
-            encryptionKeys,
-        });
-        return btoa__default["default"](ciphertext);
-    });
-}
 function useCreatePaymentMethod() {
-    // Changed from usePaymentKeyQuery + skit: true to usePaymentKeyLazyQuery due to https://github.com/apollographql/apollo-client/issues/9101.
-    const [fetchPaymentKey] = graphqlGenerated.usePaymentKeyLazyQuery();
-    const [createPaymentMethod, createPaymentMethodResult,] = graphqlGenerated.useCreatePaymentMethodMutation();
+    const [encryptCardData] = useEncryptCard.useEncryptCardData();
+    const [createPaymentMethod, createPaymentMethodResult] = graphqlGenerated.useCreatePaymentMethodMutation();
     const extendedCreatePaymentMethod = React.useCallback((orgID, billingInfo, paymentInfo) => tslib_es6.__awaiter(this, void 0, void 0, function* () {
-        var _a, _b;
         if (!orgID)
             throw new Error("Missing `orgID`");
         const metadata = {
@@ -60,16 +29,10 @@ function useCreatePaymentMethod() {
             postalCode: billingInfo.zipCode,
         };
         if (paymentInfo.type === graphqlGenerated.PaymentType.CreditCard) {
-            const paymentKeyResult = yield fetchPaymentKey().catch((err) => {
-                console.log(err);
-                return undefined;
+            const { keyID, encryptedCardData } = yield encryptCardData({
+                number: paymentInfo.cardNumber.replace(/\s/g, ""),
+                cvv: paymentInfo.secureCode,
             });
-            const paymentKeyData = paymentKeyResult === null || paymentKeyResult === void 0 ? void 0 : paymentKeyResult.data;
-            const publicKey = (_a = paymentKeyData === null || paymentKeyData === void 0 ? void 0 : paymentKeyData.getPaymentPublicKey) === null || _a === void 0 ? void 0 : _a.publicKey;
-            const keyID = (_b = paymentKeyData === null || paymentKeyData === void 0 ? void 0 : paymentKeyData.getPaymentPublicKey) === null || _b === void 0 ? void 0 : _b.keyID;
-            if (!publicKey || !keyID)
-                throw new Error("Missing `publicKey` or `keyID`");
-            const encryptedCardData = yield encryptCard(publicKey, paymentInfo.cardNumber.replace(/\s/g, ""), paymentInfo.secureCode);
             const [expirationMonth, expirationYearLastTwoDigits] = paymentInfo.expiryDate.split("/").map(value => parseInt(value.trim(), 10));
             const expirationYear = 2000 + expirationYearLastTwoDigits;
             return createPaymentMethod({
@@ -107,7 +70,7 @@ function useCreatePaymentMethod() {
             });
         }
         throw new Error("Unsupported payment method.");
-    }), [fetchPaymentKey, createPaymentMethod]);
+    }), [encryptCardData, createPaymentMethod]);
     return [extendedCreatePaymentMethod, createPaymentMethodResult];
 }
 

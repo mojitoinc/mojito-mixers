@@ -1,7 +1,7 @@
-import { CheckoutItem } from "../../../domain/product/product.interfaces";
 import React from "react";
+import { CheckoutItem } from "../../../domain/product/product.interfaces";
 export interface PurchaseConfirmationItemDetailsProps {
-    checkoutItem: CheckoutItem;
+    checkoutItems: CheckoutItem[];
     purchaseInstructions: string;
 }
 export declare const PurchaseConfirmationItemDetails: React.FC<PurchaseConfirmationItemDetailsProps>;

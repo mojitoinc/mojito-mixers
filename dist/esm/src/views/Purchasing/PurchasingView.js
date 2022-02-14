@@ -12,7 +12,7 @@ const PURCHASING_MESSAGES_DEFAULT = [
     "Adding rum, lime juice and ice.",
     "Shaking things up!",
 ];
-const PurchasingView = ({ purchasingImageSrc, purchasingMessages: customPurchasingMessages, orgID, invoiceID, lotID, lotType, savedPaymentMethods, selectedPaymentMethod, onPurchaseSuccess, onPurchaseError, onDialogBlocked, debug, }) => {
+const PurchasingView = ({ purchasingImageSrc, purchasingMessages: customPurchasingMessages, orgID, invoiceID, checkoutItems, savedPaymentMethods, selectedPaymentMethod, onPurchaseSuccess, onPurchaseError, onDialogBlocked, debug, }) => {
     let purchasingMessages = customPurchasingMessages;
     if (purchasingMessages === false) {
         purchasingMessages = [];
@@ -26,8 +26,7 @@ const PurchasingView = ({ purchasingImageSrc, purchasingMessages: customPurchasi
     const [paymentState, fullPayment] = useFullPayment({
         orgID,
         invoiceID,
-        lotID,
-        lotType,
+        checkoutItems,
         savedPaymentMethods,
         selectedPaymentMethod,
         debug,

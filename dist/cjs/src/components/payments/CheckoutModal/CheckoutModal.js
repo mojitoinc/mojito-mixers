@@ -38,7 +38,7 @@ purchaseInstructions,
 consentType, // Not implemented yet. Used to let the app control where to log errors to (e.g. Sentry).
 privacyHref, termsOfUseHref, 
 // Data:
-orgID, invoiceID, checkoutItem, 
+orgID, invoiceID, checkoutItems, 
 // Authentication:
 onLogin, isAuthenticated, isAuthenticatedLoading, 
 // Other Events:
@@ -66,6 +66,7 @@ onMarketingOptInChange, // Not implemented yet. Used to let user subscribe / uns
     const [selectedPaymentMethod, setSelectedPaymentMethod] = React.useState({
         billingInfo: "",
         paymentInfo: "",
+        cvv: "",
     });
     const checkoutStep = CHECKOUT_STEPS[checkoutStepIndex];
     React.useEffect(() => {
@@ -83,7 +84,11 @@ onMarketingOptInChange, // Not implemented yet. Used to let user subscribe / uns
         const { selectedBillingInfo, continueOAuthFlow, savedStateUsed } = usePlaid.INITIAL_PLAID_OAUTH_FLOW_STATE;
         setPaymentError("");
         setCheckoutStepIndex(continueOAuthFlow && !savedStateUsed ? 3 : startAt);
-        setSelectedPaymentMethod({ billingInfo: selectedBillingInfo || "", paymentInfo: "" });
+        setSelectedPaymentMethod({
+            billingInfo: selectedBillingInfo || "",
+            paymentInfo: "",
+            cvv: "",
+        });
     }, [startAt]);
     React.useEffect(() => {
         if (isDialogLoading || !open)
@@ -98,21 +103,25 @@ onMarketingOptInChange, // Not implemented yet. Used to let user subscribe / uns
         setSelectedPaymentMethod((prevSelectedPaymentMethod) => {
             const { billingInfo, paymentInfo } = prevSelectedPaymentMethod;
             if (typeof billingInfo === "string" && typeof paymentInfo === "string")
-                return prevSelectedPaymentMethod;
+                return Object.assign(Object.assign({}, prevSelectedPaymentMethod), { cvv: "" });
             // To find the saved payment method(s) that was/were last created:
             const reversedSavedPaymentMethods = savedPaymentMethods.slice().reverse();
+            // TODO: This logic can probably be simplified. Just get the last saved payment method...
             let matchingPaymentMethod;
             if (typeof billingInfo === "object") {
                 const addressId = circle_utils.getSavedPaymentMethodAddressIdFromBillingInfo(billingInfo);
                 matchingPaymentMethod = reversedSavedPaymentMethods.find(paymentMethod => paymentMethod.addressId === addressId);
             }
-            const isBillingInfoAddressId = typeof billingInfo === "string";
-            return !isBillingInfoAddressId && matchingPaymentMethod ? {
+            return matchingPaymentMethod ? {
+                // Both billingInfo and paymentInfo were objects (and we found a matching newly created payment method):
                 billingInfo: matchingPaymentMethod.addressId,
                 paymentInfo: matchingPaymentMethod.id,
+                cvv: "",
             } : {
+                // billingInfo was an addressID (or we could not find a match) and paymentInfo was an object:
                 billingInfo,
-                paymentInfo: isBillingInfoAddressId ? reversedSavedPaymentMethods[0].id : paymentInfo,
+                paymentInfo: typeof billingInfo === "string" ? reversedSavedPaymentMethods[0].id : paymentInfo,
+                cvv: "",
             };
         });
     }, [savedPaymentMethods]);
@@ -134,10 +143,13 @@ onMarketingOptInChange, // Not implemented yet. Used to let user subscribe / uns
     }, []);
     const handleBillingInfoSelected = React.useCallback((billingInfo) => {
         // TODO: Does paymentInfo need to be reset when coming back to billing info to fix validation errors?
-        setSelectedPaymentMethod({ billingInfo, paymentInfo: "" });
+        setSelectedPaymentMethod({ billingInfo, paymentInfo: "", cvv: "" });
     }, []);
     const handlePaymentInfoSelected = React.useCallback((paymentInfo) => {
-        setSelectedPaymentMethod(({ billingInfo }) => ({ billingInfo, paymentInfo }));
+        setSelectedPaymentMethod(({ billingInfo }) => ({ billingInfo, paymentInfo, cvv: "" }));
+    }, []);
+    const handleCvvSelected = React.useCallback((cvv) => {
+        setSelectedPaymentMethod(({ billingInfo, paymentInfo }) => ({ billingInfo, paymentInfo, cvv }));
     }, []);
     const handleSavedPaymentMethodDeleted = React.useCallback((addressIdOrPaymentMethodId) => tslib_es6.__awaiter(void 0, void 0, void 0, function* () {
         const idsToDelete = checkoutStep === "billing"
@@ -162,6 +174,7 @@ onMarketingOptInChange, // Not implemented yet. Used to let user subscribe / uns
                     // re-create it with the new payment information:
                     billingInfo: circle_utils.savedPaymentMethodToBillingInfo(addressToDelete),
                     paymentInfo: "",
+                    cvv: "",
                 });
             }
         }
@@ -191,8 +204,9 @@ onMarketingOptInChange, // Not implemented yet. Used to let user subscribe / uns
             refetchPaymentMethods(),
         ]);
         // TODO: paymentError should have a source property to know where the error is coming from and handle recovery differently here:
-        setPaymentError("");
         setCheckoutStepIndex(2);
+        setSelectedPaymentMethod((prevSelectedPaymentMethod) => (Object.assign(Object.assign({}, prevSelectedPaymentMethod), { cvv: "" })));
+        setPaymentError("");
         // This function is used as a CheckoutModalFooter's onSubmitClicked, so we want that to show a loader on the submit
         // button when clicked but do not remove it once the Promise is resolved, as we are moving to another view and
         // CheckoutModalFooter will unmount (so doing this prevents a memory leak issue):
@@ -240,35 +254,37 @@ onMarketingOptInChange, // Not implemented yet. Used to let user subscribe / uns
     else if (checkoutStep === "authentication") {
         if (!isAuthenticated)
             headerVariant = 'anonymous';
-        checkoutStepElement = (React__default["default"].createElement(AuthenticationView.AuthenticationView, { checkoutItem: checkoutItem, isAuthenticated: isAuthenticated, guestCheckoutEnabled: guestCheckoutEnabled, onGuestClicked: handleNextClicked, onCloseClicked: onClose }));
+        checkoutStepElement = (React__default["default"].createElement(AuthenticationView.AuthenticationView, { checkoutItems: checkoutItems, isAuthenticated: isAuthenticated, guestCheckoutEnabled: guestCheckoutEnabled, onGuestClicked: handleNextClicked, onCloseClicked: onClose }));
     }
     else if (checkoutStep === "billing") {
-        checkoutStepElement = (React__default["default"].createElement(BillingView.BillingView, { checkoutItem: checkoutItem, savedPaymentMethods: savedPaymentMethods, selectedBillingInfo: selectedPaymentMethod.billingInfo, onBillingInfoSelected: handleBillingInfoSelected, onSavedPaymentMethodDeleted: handleSavedPaymentMethodDeleted, onNext: handleNextClicked, onClose: onClose, debug: debug }));
+        checkoutStepElement = (React__default["default"].createElement(BillingView.BillingView, { checkoutItems: checkoutItems, savedPaymentMethods: savedPaymentMethods, selectedBillingInfo: selectedPaymentMethod.billingInfo, onBillingInfoSelected: handleBillingInfoSelected, onSavedPaymentMethodDeleted: handleSavedPaymentMethodDeleted, onNext: handleNextClicked, onClose: onClose, debug: debug }));
     }
     else if (checkoutStep === "payment") {
-        checkoutStepElement = (React__default["default"].createElement(PaymentView.PaymentView, { checkoutItem: checkoutItem, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethod: selectedPaymentMethod, onPaymentInfoSelected: handlePaymentInfoSelected, onSavedPaymentMethodDeleted: handleSavedPaymentMethodDeleted, onNext: handleNextClicked, onPrev: handlePrevClicked, onClose: onClose, acceptedPaymentTypes: acceptedPaymentTypes, consentType: consentType, privacyHref: privacyHref, termsOfUseHref: termsOfUseHref, debug: debug }));
+        checkoutStepElement = (React__default["default"].createElement(PaymentView.PaymentView, { checkoutItems: checkoutItems, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethod: selectedPaymentMethod, onPaymentInfoSelected: handlePaymentInfoSelected, onCvvSelected: handleCvvSelected, onSavedPaymentMethodDeleted: handleSavedPaymentMethodDeleted, onNext: handleNextClicked, onPrev: handlePrevClicked, onClose: onClose, acceptedPaymentTypes: acceptedPaymentTypes, consentType: consentType, privacyHref: privacyHref, termsOfUseHref: termsOfUseHref, debug: debug }));
     }
     else if (checkoutStep === "purchasing") {
-        headerVariant = 'purchasing';
-        checkoutStepElement = (React__default["default"].createElement(PurchasingView.PurchasingView, { purchasingImageSrc: purchasingImageSrc, purchasingMessages: purchasingMessages, orgID: orgID, invoiceID: invoiceID, lotID: checkoutItem.lotID, lotType: checkoutItem.lotType, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethod: selectedPaymentMethod, onPurchaseSuccess: handlePurchaseSuccess, onPurchaseError: setPaymentError, onDialogBlocked: setIsDialogBlocked, debug: debug }));
+        headerVariant = "purchasing";
+        checkoutStepElement = (React__default["default"].createElement(PurchasingView.PurchasingView, { purchasingImageSrc: purchasingImageSrc, purchasingMessages: purchasingMessages, orgID: orgID, invoiceID: invoiceID, checkoutItems: checkoutItems, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethod: selectedPaymentMethod, onPurchaseSuccess: handlePurchaseSuccess, onPurchaseError: setPaymentError, onDialogBlocked: setIsDialogBlocked, debug: debug }));
     }
     else if (checkoutStep === "confirmation") {
-        headerVariant = 'logoOnly';
-        checkoutStepElement = (React__default["default"].createElement(ConfirmationView.ConfirmationView, { checkoutItem: checkoutItem, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethod: selectedPaymentMethod, paymentReferenceNumber: paymentReferenceNumber, purchaseInstructions: purchaseInstructions, onNext: handleNextClicked, onClose: onClose }));
+        headerVariant = "logoOnly";
+        checkoutStepElement = (React__default["default"].createElement(ConfirmationView.ConfirmationView, { checkoutItems: checkoutItems, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethod: selectedPaymentMethod, paymentReferenceNumber: paymentReferenceNumber, purchaseInstructions: purchaseInstructions, onNext: handleNextClicked, onClose: onClose }));
     }
     return (React__default["default"].createElement(Wrapper, Object.assign({}, wrapperProps),
-        React__default["default"].createElement(material.Dialog, { open: isDialogBlocked ? true : open, onClose: isDialogBlocked ? undefined : onClose, onBackdropClick: isDialogBlocked ? shake : undefined, "aria-labelledby": "checkout-modal-header-title", fullWidth: true, maxWidth: "sm", scroll: "body", ref: dialogRootRef, PaperProps: { sx: shakeSx, ref: paperRef } },
+        React__default["default"].createElement(material.Dialog, { open: isDialogBlocked ? true : open, onClose: isDialogBlocked ? undefined : onClose, onBackdropClick: isDialogBlocked ? shake : undefined, "aria-labelledby": "checkout-modal-header-title", scroll: "body", ref: dialogRootRef, PaperProps: { sx: shakeSx, ref: paperRef }, 
+            // Dialog only:
+            // fullWidth
+            // maxWidth="sm"
+            fullScreen: true },
             React__default["default"].createElement(material.DialogContent, { sx: {
                     overflowX: 'hidden',
-                    pt: {
-                        xs: 1.5,
-                        sm: 2.5,
-                    },
                     px: {
                         xs: 1.5,
                         sm: 2.5,
                     },
-                    pb: 0,
+                    py: 2.5,
+                    maxWidth: theme => theme.breakpoints.values.lg,
+                    mx: "auto",
                 } },
                 React__default["default"].createElement(CheckoutModalHeader.CheckoutModalHeader, { variant: headerVariant, logoSrc: logoSrc, logoSx: logoSx, user: (_a = meData === null || meData === void 0 ? void 0 : meData.me) === null || _a === void 0 ? void 0 : _a.user, userFormat: userFormat, onLoginClicked: onLogin, onPrevClicked: handlePrevClicked }),
                 checkoutStepElement))));

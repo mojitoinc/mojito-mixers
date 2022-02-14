@@ -26,6 +26,11 @@ var ContractType;
     ContractType["GenerativeContract"] = "GenerativeContract";
     ContractType["ZoraContract"] = "ZoraContract";
 })(ContractType || (ContractType = {}));
+var ExtensionType;
+(function (ExtensionType) {
+    ExtensionType["GenartExtension"] = "GenartExtension";
+    ExtensionType["ProvenanceExtension"] = "ProvenanceExtension";
+})(ExtensionType || (ExtensionType = {}));
 var InvoiceStatus;
 (function (InvoiceStatus) {
     InvoiceStatus["Canceled"] = "Canceled";
@@ -130,8 +135,8 @@ function useMeQuery(baseOptions) {
     return Apollo.useQuery(MeDocument, options);
 }
 const CreatePaymentDocument = gql `
-    mutation CreatePayment($paymentMethodID: UUID1!, $invoiceID: UUID1!) {
-  createPayment(paymentMethodID: $paymentMethodID, invoiceID: $invoiceID) {
+    mutation CreatePayment($paymentMethodID: UUID1!, $invoiceID: UUID1!, $metadata: CreatePaymentMetadataInput) {
+  createPayment(paymentMethodID: $paymentMethodID, invoiceID: $invoiceID, metadata: $metadata) {
     id
     invoiceID
     circlePaymentID
@@ -408,5 +413,5 @@ function usePreparePaymentMethodQuery(baseOptions) {
     return Apollo.useQuery(PreparePaymentMethodDocument, options);
 }
 
-export { AuctionBidOrder, AuctionLotStatus, CollectionType, ContractType, CreateAuctionInvoiceDocument, CreateBuyNowInvoiceDocument, CreatePaymentDocument, CreatePaymentMethodDocument, DeletePaymentMethodDocument, GetPaymentMethodListDocument, InvoiceStatus, KycStatus, MarketCollectionStatus, MarketplaceSaleType, MeDocument, PaymentKeyDocument, PaymentStatus, PaymentType, PreparePaymentMethodDocument, Role, TransactionStatus, TransactionType, WalletParentType, WalletTxType, useCreateAuctionInvoiceMutation, useCreateBuyNowInvoiceMutation, useCreatePaymentMethodMutation, useCreatePaymentMutation, useDeletePaymentMethodMutation, useGetPaymentMethodListQuery, useMeQuery, usePaymentKeyLazyQuery, usePreparePaymentMethodQuery };
+export { AuctionBidOrder, AuctionLotStatus, CollectionType, ContractType, CreateAuctionInvoiceDocument, CreateBuyNowInvoiceDocument, CreatePaymentDocument, CreatePaymentMethodDocument, DeletePaymentMethodDocument, ExtensionType, GetPaymentMethodListDocument, InvoiceStatus, KycStatus, MarketCollectionStatus, MarketplaceSaleType, MeDocument, PaymentKeyDocument, PaymentStatus, PaymentType, PreparePaymentMethodDocument, Role, TransactionStatus, TransactionType, WalletParentType, WalletTxType, useCreateAuctionInvoiceMutation, useCreateBuyNowInvoiceMutation, useCreatePaymentMethodMutation, useCreatePaymentMutation, useDeletePaymentMethodMutation, useGetPaymentMethodListQuery, useMeQuery, usePaymentKeyLazyQuery, usePreparePaymentMethodQuery };
 //# sourceMappingURL=graphqlGenerated.js.map
