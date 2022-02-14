@@ -10,10 +10,9 @@ import { DisplayBox } from "../DisplayBox/DisplayBox";
 export const InlineField: React.FC<TextFieldProps> = styled((props: TextFieldProps) => (
   <TextField
     { ...props }
-    variant="outlined"
+    variant="filled"
     margin="none"
-    InputProps={{ notched: true }}
-    InputLabelProps={{ shrink: false }} />
+    InputProps={{ disableUnderline: true }} />
 ))({
   "& .MuiInputLabel-root": {
     color: "black",
@@ -23,8 +22,6 @@ export const InlineField: React.FC<TextFieldProps> = styled((props: TextFieldPro
     color: "black",
     padding: 8,
     height: "30px",
-    // borderRadius: "2px",
-    // marginTop: 32,
   },
   "& .MuiInputBase-input": {
     color: "black",
