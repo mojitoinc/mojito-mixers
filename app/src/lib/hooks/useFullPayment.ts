@@ -1,6 +1,6 @@
 import { ApolloError } from "@apollo/client";
 import { useState, useCallback } from "react";
-import { SelectedPaymentMethod } from "../components/payments/CheckoutModal/CheckoutModal";
+import { SelectedPaymentMethod } from "../components/payments/CheckoutModal/CheckoutModal.hooks";
 import { SavedPaymentMethod } from "../domain/circle/circle.interfaces";
 import { parseCircleError, savedPaymentMethodToBillingInfo } from "../domain/circle/circle.utils";
 import { PaymentStatus } from "../domain/payment/payment.interfaces";

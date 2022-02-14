@@ -10,7 +10,7 @@ import { SavedPaymentDetailsSelector } from "../../components/shared/SavedPaymen
 import { BillingInfoItem } from "../../components/payments/BillingInfo/Item/BillingInfoItem";
 import { SavedPaymentMethod } from "../../domain/circle/circle.interfaces";
 import { billingInfoToSavedPaymentMethodBillingInfo } from "../../domain/circle/circle.utils";
-import { SelectedPaymentMethod } from "../../components/payments/CheckoutModal/CheckoutModal";
+import { SelectedPaymentMethod } from "../../components/payments/CheckoutModal/CheckoutModal.hooks";
 import { BoxProps, Divider, Stack } from "@mui/material";
 import { usePlaid } from "../../hooks/usePlaid";
 import { ConsentType } from "../../components/shared/ConsentText/ConsentText";

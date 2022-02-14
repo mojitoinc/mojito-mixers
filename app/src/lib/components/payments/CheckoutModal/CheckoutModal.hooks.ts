@@ -5,7 +5,6 @@ import { PaymentMethod } from "../../../domain/payment/payment.interfaces";
 import { BillingInfo } from "../../../forms/BillingInfoForm";
 import { INITIAL_PLAID_OAUTH_FLOW_STATE } from "../../../hooks/usePlaid";
 import { resetStepperProgress } from "../CheckoutStepper/CheckoutStepper";
-import { SelectedPaymentMethod } from "./CheckoutModal";
 
 export type CheckoutModalErrorAt = "loading" | "billing" | "payment" | "purchasing";
 

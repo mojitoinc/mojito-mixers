@@ -228,7 +228,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
   const handleCvvSelected = useCallback((cvv: string) => {
     setSelectedPaymentMethod(({ billingInfo, paymentInfo }) => ({ billingInfo, paymentInfo, cvv }));
-  }, []);
+  }, [setSelectedPaymentMethod]);
 
   const handleSavedPaymentMethodDeleted = useCallback(async (addressIdOrPaymentMethodId: string) => {
     const idsToDelete: string[] = checkoutStep === "billing"

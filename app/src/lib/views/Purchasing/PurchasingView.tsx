@@ -4,7 +4,7 @@ import { useFullPayment } from "../../hooks/useFullPayment";
 import React from "react";
 import { Box, Typography } from "@mui/material";
 import { useTimeout, useInterval } from "@swyg/corre";
-import { SelectedPaymentMethod } from "../../components/payments/CheckoutModal/CheckoutModal";
+import { SelectedPaymentMethod } from "../../components/payments/CheckoutModal/CheckoutModal.hooks";
 import { CheckoutItem } from "../..";
 
 const DEFAULT_PURCHASING_IMAGE_SRC = "https://raw.githubusercontent.com/mojitoinc/mojito-mixers/main/app/src/lib/assets/mojito-loader.gif";
