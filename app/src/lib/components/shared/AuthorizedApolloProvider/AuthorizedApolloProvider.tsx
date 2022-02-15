@@ -1,4 +1,4 @@
-import React, { PropsWithChildren } from "react";
+import React from "react";
 import {
   ApolloClient,
   ApolloProvider,
@@ -8,10 +8,14 @@ import {
 import { setContext } from "@apollo/client/link/context";
 import { useAuth0 } from "@auth0/auth0-react";
 
-export function AuthorizedApolloProvider({
+export interface AuthorizedApolloProviderProps {
+  uri: string
+}
+
+export const AuthorizedApolloProvider: React.FC<AuthorizedApolloProviderProps> = ({
   uri,
   children,
-}: PropsWithChildren<{ uri: string }>) {
+}) => {
   const { getIdTokenClaims } = useAuth0();
 
   const httpLink = createHttpLink({

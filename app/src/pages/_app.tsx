@@ -1,12 +1,12 @@
 import App from "next/app";
 import { Auth0Provider } from "@auth0/auth0-react";
-import { AuthorizedApolloProvider } from "../components/auth/AuthorizedApolloProvider";
 import { GlobalLayout } from "../components/core/GlobalLayout";
 import { config } from "../utils/config/config.constants";
 import { AppProps } from "next/app";
 import { Header } from "../components/core/Header";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import Head from "next/head";
+import { AuthorizedApolloProvider } from "../lib";
 
 const defaultTheme = createTheme();
 
