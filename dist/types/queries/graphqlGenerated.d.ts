@@ -104,6 +104,19 @@ export declare type AssetVersion = {
     name: Scalars['String'];
     slug: Scalars['String'];
 };
+export declare type AttributeValue = AttributeValueFloat | AttributeValueInt | AttributeValueString;
+export declare type AttributeValueFloat = {
+    __typename?: 'AttributeValueFloat';
+    floatValue: Scalars['Float'];
+};
+export declare type AttributeValueInt = {
+    __typename?: 'AttributeValueInt';
+    intValue: Scalars['Int'];
+};
+export declare type AttributeValueString = {
+    __typename?: 'AttributeValueString';
+    stringValue: Scalars['String'];
+};
 export declare enum AuctionBidOrder {
     Asc = "ASC",
     Desc = "DESC"
@@ -138,6 +151,13 @@ export declare type CreateMarketplaceBuyNowLotInput = {
     startDate: Scalars['Time'];
     totalUnits: Scalars['Int'];
     unitPrice: Scalars['Float'];
+};
+export declare type CreatePaymentCreditCardMetadataInput = {
+    encryptedData: Scalars['String'];
+    keyID: Scalars['String'];
+};
+export declare type CreatePaymentMetadataInput = {
+    creditCardData: CreatePaymentCreditCardMetadataInput;
 };
 export declare type CreditCardBillingDetails = {
     address1: Scalars['String'];
@@ -212,6 +232,22 @@ export declare type DeployContractInput = {
     organizationId: Scalars['UUID1'];
     walletId: Scalars['UUID1'];
 };
+export declare type Erc721Metadata = {
+    __typename?: 'ERC721Metadata';
+    animationURL?: Maybe<Scalars['String']>;
+    attributes?: Maybe<Array<MetadataAttributes>>;
+    backgroundColor?: Maybe<Scalars['String']>;
+    description: Scalars['String'];
+    externalURL?: Maybe<Scalars['String']>;
+    image: Scalars['String'];
+    language?: Maybe<Scalars['String']>;
+    name: Scalars['String'];
+    timestamp?: Maybe<Scalars['Int']>;
+};
+export declare enum ExtensionType {
+    GenartExtension = "GenartExtension",
+    ProvenanceExtension = "ProvenanceExtension"
+}
 export declare type InvoiceDetails = {
     __typename?: 'InvoiceDetails';
     externalUserID: Scalars['String'];
@@ -423,6 +459,13 @@ export declare type MarketplaceUser = {
     id: Scalars['UUID'];
     username?: Maybe<Scalars['String']>;
 };
+export declare type MetadataAttributes = {
+    __typename?: 'MetadataAttributes';
+    displayType?: Maybe<Scalars['String']>;
+    maxValue?: Maybe<Scalars['Int']>;
+    traitType: Scalars['String'];
+    value: AttributeValue;
+};
 export declare type Mutation = {
     __typename?: 'Mutation';
     /**
@@ -547,6 +590,7 @@ export declare type MutationCreateOrgMultisigArgs = {
 };
 export declare type MutationCreatePaymentArgs = {
     invoiceID: Scalars['UUID1'];
+    metadata?: InputMaybe<CreatePaymentMetadataInput>;
     paymentMethodID: Scalars['UUID1'];
 };
 export declare type MutationCreatePaymentMethodArgs = {
@@ -611,7 +655,7 @@ export declare type MutationNftDeployContractArgs = {
 };
 export declare type MutationOrgCreateMarketplaceArgs = {
     name: Scalars['String'];
-    orgId: Scalars['UUID'];
+    orgId?: InputMaybe<Scalars['UUID1']>;
 };
 export declare type MutationPurchaseMarketplaceBuyNowLotArgs = {
     input: PurchaseMarketplaceBuyNowLotInput;
@@ -735,7 +779,7 @@ export declare type Organization = {
     __typename?: 'Organization';
     assets?: Maybe<Array<Asset>>;
     handle: Scalars['String'];
-    id: Scalars['String'];
+    id: Scalars['UUID1'];
     jwtIssuerDomain?: Maybe<Scalars['String']>;
     marketplaces: Array<Marketplace>;
     members: Array<User>;
@@ -812,6 +856,8 @@ export declare type Query = {
     getMyInvoices: Array<Maybe<InvoiceDetails>>;
     /** Retrieves payments user owns */
     getMyPayments: Array<Maybe<Payment>>;
+    /** Returns requested Payment method */
+    getPaymentMethod: PaymentMethodOutput;
     /** Returns Payment method list in scope of current Organization. */
     getPaymentMethodList: Array<PaymentMethodOutput>;
     /** Retrieves Payment notification */
@@ -855,6 +901,9 @@ export declare type QueryGetInvoicesByUserIdArgs = {
 export declare type QueryGetMarketplaceAuctionLotArgs = {
     marketplaceAuctionLotId: Scalars['UUID'];
 };
+export declare type QueryGetPaymentMethodArgs = {
+    paymentMethodID: Scalars['UUID1'];
+};
 export declare type QueryGetPaymentMethodListArgs = {
     orgID: Scalars['UUID1'];
 };
@@ -875,14 +924,14 @@ export declare type QueryNftTokenArgs = {
     id: Scalars['UUID1'];
 };
 export declare type QueryOrgUsernameAvailableArgs = {
-    organizationID: Scalars['String'];
+    organizationID: Scalars['UUID1'];
     username: Scalars['String'];
 };
 export declare type QueryOrganizationArgs = {
     handle: Scalars['String'];
 };
 export declare type QueryOrganizationByIdArgs = {
-    id: Scalars['String'];
+    id: Scalars['UUID1'];
 };
 export declare type QueryPreparePaymentMethodArgs = {
     paymentMethodType: PaymentType;
@@ -1011,14 +1060,15 @@ export declare enum WalletParentType {
 }
 export declare type WalletToken = {
     __typename?: 'WalletToken';
-    /** token's contract address */
     contractAddress: Scalars['String'];
-    /** token id in contract */
-    id: Scalars['String'];
-    /** token URI for metadata */
-    tokenURI: Scalars['String'];
-    /** txHash of latest token transfer */
-    transferHash: Scalars['String'];
+    description?: Maybe<Scalars['String']>;
+    /** Token ID in smart contract */
+    id: Scalars['Int'];
+    metadata?: Maybe<Erc721Metadata>;
+    timeLastUpdated?: Maybe<Scalars['String']>;
+    title?: Maybe<Scalars['String']>;
+    tokenType?: Maybe<Scalars['String']>;
+    tokenURI?: Maybe<Scalars['String']>;
 };
 export declare enum WalletTxType {
     MojitoHotWallet = "MojitoHotWallet",
@@ -1040,6 +1090,23 @@ export declare type WireBankAddressOutput = {
     city: Scalars['String'];
     country: Scalars['String'];
     district: Scalars['String'];
+};
+export declare type WireBeneficiary = {
+    __typename?: 'WireBeneficiary';
+    address1: Scalars['String'];
+    address2: Scalars['String'];
+    name: Scalars['String'];
+};
+export declare type WireBeneficiaryBank = {
+    __typename?: 'WireBeneficiaryBank';
+    accountNumber: Scalars['String'];
+    address: Scalars['String'];
+    city: Scalars['String'];
+    country: Scalars['String'];
+    name: Scalars['String'];
+    postalCode: Scalars['String'];
+    routingNumber: Scalars['String'];
+    swiftCode: Scalars['String'];
 };
 export declare type WireBillingDetails = {
     address1: Scalars['String'];
@@ -1066,12 +1133,19 @@ export declare type WireData = {
     billingDetails: WireBillingDetails;
     routingNumber: Scalars['String'];
 };
+export declare type WireInstructions = {
+    __typename?: 'WireInstructions';
+    beneficiary: WireBeneficiary;
+    beneficiaryBank: WireBeneficiaryBank;
+    trackingRef: Scalars['String'];
+};
 export declare type WirePaymentMethodOutput = {
     __typename?: 'WirePaymentMethodOutput';
     bankAddress?: Maybe<WireBankAddressOutput>;
     billingDetails?: Maybe<WireBillingDetailsOutput>;
     description: Scalars['String'];
     id: Scalars['UUID1'];
+    instructions?: Maybe<WireInstructions>;
     status: Scalars['String'];
     type: PaymentType;
 };
@@ -1094,16 +1168,13 @@ export declare type MeQuery = {
             __typename?: 'UserOrganization';
             organization: {
                 __typename?: 'Organization';
-                id: string;
+                id: any;
                 name: string;
             };
         }>;
     } | null;
 };
-export declare type CreatePaymentMutationVariables = Exact<{
-    paymentMethodID: Scalars['UUID1'];
-    invoiceID: Scalars['UUID1'];
-}>;
+export declare type CreatePaymentMutationVariables = MutationCreatePaymentArgs;
 export declare type CreatePaymentMutation = {
     __typename?: 'Mutation';
     createPayment: {
@@ -1302,10 +1373,7 @@ export declare type CreatePaymentMutationFn = Apollo.MutationFunction<CreatePaym
  *   },
  * });
  */
-export declare function useCreatePaymentMutation(baseOptions?: Apollo.MutationHookOptions<CreatePaymentMutation, CreatePaymentMutationVariables>): Apollo.MutationTuple<CreatePaymentMutation, Exact<{
-    paymentMethodID: any;
-    invoiceID: any;
-}>, Apollo.DefaultContext, Apollo.ApolloCache<any>>;
+export declare function useCreatePaymentMutation(baseOptions?: Apollo.MutationHookOptions<CreatePaymentMutation, CreatePaymentMutationVariables>): Apollo.MutationTuple<CreatePaymentMutation, MutationCreatePaymentArgs, Apollo.DefaultContext, Apollo.ApolloCache<any>>;
 export declare type CreatePaymentMutationHookResult = ReturnType<typeof useCreatePaymentMutation>;
 export declare type CreatePaymentMutationResult = Apollo.MutationResult<CreatePaymentMutation>;
 export declare type CreatePaymentMutationOptions = Apollo.BaseMutationOptions<CreatePaymentMutation, CreatePaymentMutationVariables>;

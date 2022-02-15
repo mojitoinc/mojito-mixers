@@ -10,6 +10,7 @@ export declare type CheckoutState = "authentication" | "billing" | "payment" | "
 export interface SelectedPaymentMethod {
     billingInfo: string | BillingInfo;
     paymentInfo: string | PaymentMethod;
+    cvv: string;
 }
 export interface CheckoutModalProps {
     open: boolean;
@@ -33,7 +34,7 @@ export interface CheckoutModalProps {
     termsOfUseHref?: string;
     orgID: string;
     invoiceID?: string;
-    checkoutItem: CheckoutItem;
+    checkoutItems: CheckoutItem[];
     onLogin: () => void;
     isAuthenticated?: boolean;
     isAuthenticatedLoading?: boolean;

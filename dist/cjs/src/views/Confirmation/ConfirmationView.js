@@ -3,6 +3,7 @@
 Object.defineProperty(exports, '__esModule', { value: true });
 
 var React = require('react');
+var material = require('@mui/material');
 var CheckoutModalFooter = require('../../components/payments/CheckoutModalFooter/CheckoutModalFooter.js');
 var PurchaseConfirmationBillingDetails = require('../../components/payments/PurchaseConfirmationBillingDetails/PurchaseConfirmationBillingDetails.js');
 var PurchaseConfirmationItemDetails = require('../../components/payments/PurchaseConfirmationItemDetails/PurchaseConfirmationItemDetails.js');
@@ -12,7 +13,7 @@ function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'defau
 
 var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 
-const ConfirmationView = ({ checkoutItem, savedPaymentMethods, selectedPaymentMethod, paymentReferenceNumber, purchaseInstructions, onNext, onClose, }) => {
+const ConfirmationView = ({ checkoutItems, savedPaymentMethods, selectedPaymentMethod, paymentReferenceNumber, purchaseInstructions, onNext, onClose, }) => {
     const { billingInfo: selectedBillingInfo, paymentInfo: selectedPaymentInfo, } = selectedPaymentMethod;
     const { selectedPaymentMethodBillingInfo, selectedPaymentMethodPaymentInfo, } = React.useMemo(() => {
         if (typeof selectedPaymentInfo === "string") {
@@ -31,10 +32,15 @@ const ConfirmationView = ({ checkoutItem, savedPaymentMethods, selectedPaymentMe
     }, [savedPaymentMethods, selectedBillingInfo, selectedPaymentInfo]);
     if (!selectedPaymentMethodBillingInfo || !selectedPaymentMethodPaymentInfo)
         return null;
-    return (React__default["default"].createElement(React__default["default"].Fragment, null,
-        React__default["default"].createElement(PurchaseConfirmationBillingDetails.PurchaseConfirmationBillingDetails, { checkoutItem: checkoutItem, paymentReferenceNumber: paymentReferenceNumber, selectedPaymentMethodBillingInfo: selectedPaymentMethodBillingInfo, selectedPaymentMethodPaymentInfo: selectedPaymentMethodPaymentInfo }),
-        React__default["default"].createElement(PurchaseConfirmationItemDetails.PurchaseConfirmationItemDetails, { checkoutItem: checkoutItem, purchaseInstructions: purchaseInstructions }),
-        React__default["default"].createElement(CheckoutModalFooter.CheckoutModalFooter, { variant: "toMarketplace", privacyHref: "", termsOfUseHref: "", onSubmitClicked: onNext, onCloseClicked: onClose })));
+    return (React__default["default"].createElement(material.Stack, { direction: {
+            xs: "column",
+            sm: "column",
+            md: "row",
+        }, spacing: 8.75, sx: { display: "flex" } },
+        React__default["default"].createElement(PurchaseConfirmationBillingDetails.PurchaseConfirmationBillingDetails, { checkoutItems: checkoutItems, paymentReferenceNumber: paymentReferenceNumber, selectedPaymentMethodBillingInfo: selectedPaymentMethodBillingInfo, selectedPaymentMethodPaymentInfo: selectedPaymentMethodPaymentInfo }),
+        React__default["default"].createElement(material.Stack, { sx: { display: "flex", flex: 1 } },
+            React__default["default"].createElement(PurchaseConfirmationItemDetails.PurchaseConfirmationItemDetails, { checkoutItems: checkoutItems, purchaseInstructions: purchaseInstructions }),
+            React__default["default"].createElement(CheckoutModalFooter.CheckoutModalFooter, { variant: "toMarketplace", privacyHref: "", termsOfUseHref: "", onSubmitClicked: onNext, onCloseClicked: onClose }))));
 };
 
 exports.ConfirmationView = ConfirmationView;

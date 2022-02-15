@@ -14,7 +14,8 @@ interface CheckoutItem {
     lotType: LotType;
     name: string;
     description: string;
-    price: number;
+    units: number;
+    unitPrice: number;
     fee: number;
     imageSrc: string;
     imageBackground: string;
@@ -70,7 +71,7 @@ interface CheckoutModalProps {
     termsOfUseHref?: string;
     orgID: string;
     invoiceID?: string;
-    checkoutItem: CheckoutItem;
+    checkoutItems: CheckoutItem[];
     onLogin: () => void;
     isAuthenticated?: boolean;
     isAuthenticatedLoading?: boolean;
@@ -99,4 +100,9 @@ declare function getPlaidOAuthFlowState(): PlaidOAuthFlowState;
 declare let INITIAL_PLAID_OAUTH_FLOW_STATE: PlaidOAuthFlowState;
 declare function continuePlaidOAuthFlow(): boolean;
 
-export { CheckoutItem, CheckoutModal, CheckoutModalProps, INITIAL_PLAID_OAUTH_FLOW_STATE, MOJITO_DARK_THEME, MOJITO_LIGHT_THEME, PaymentType, UserFormat, continuePlaidOAuthFlow, getPlaidOAuthFlowState, persistPlaidReceivedRedirectUri };
+interface AuthorizedApolloProviderProps {
+    uri: string;
+}
+declare const AuthorizedApolloProvider: React.FC<AuthorizedApolloProviderProps>;
+
+export { AuthorizedApolloProvider, CheckoutItem, CheckoutModal, CheckoutModalProps, INITIAL_PLAID_OAUTH_FLOW_STATE, MOJITO_DARK_THEME, MOJITO_LIGHT_THEME, PaymentType, UserFormat, continuePlaidOAuthFlow, getPlaidOAuthFlowState, persistPlaidReceivedRedirectUri };

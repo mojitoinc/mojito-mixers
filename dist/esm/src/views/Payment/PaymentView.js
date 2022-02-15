@@ -6,11 +6,11 @@ import { PaymentMethodForm } from '../../forms/PaymentMethodForm.js';
 import { SavedPaymentDetailsSelector } from '../../components/shared/SavedPaymentDetailsSelector/SavedPaymentDetailsSelector.js';
 import { BillingInfoItem } from '../../components/payments/BillingInfo/Item/BillingInfoItem.js';
 import { billingInfoToSavedPaymentMethodBillingInfo } from '../../domain/circle/circle.utils.js';
-import { Divider } from '@mui/material';
+import { Stack, Divider } from '@mui/material';
 import { usePlaid } from '../../hooks/usePlaid.js';
 
 const billingInfoItemBoxProps = { sx: { mt: 2.5 } };
-const PaymentView = ({ checkoutItem, savedPaymentMethods: rawSavedPaymentMethods, selectedPaymentMethod, onPaymentInfoSelected, onSavedPaymentMethodDeleted, onNext, onPrev, onClose, acceptedPaymentTypes, consentType, privacyHref, termsOfUseHref, debug, }) => {
+const PaymentView = ({ checkoutItems, savedPaymentMethods: rawSavedPaymentMethods, selectedPaymentMethod, onPaymentInfoSelected, onCvvSelected, onSavedPaymentMethodDeleted, onNext, onPrev, onClose, acceptedPaymentTypes, consentType, privacyHref, termsOfUseHref, debug, }) => {
     const { billingInfo: selectedBillingInfo, paymentInfo: selectedPaymentInfo, } = selectedPaymentMethod;
     const savedPaymentMethods = useMemo(() => {
         if (typeof selectedBillingInfo !== "string")
@@ -60,12 +60,17 @@ const PaymentView = ({ checkoutItem, savedPaymentMethods: rawSavedPaymentMethods
     // TODO: Handle errors properly:
     if (!selectedPaymentMethodBillingInfo)
         return null;
-    return (React__default.createElement(React__default.Fragment, null,
-        React__default.createElement(CheckoutItemCostBreakdown, { checkoutItem: checkoutItem }),
-        React__default.createElement(CheckoutStepper, { progress: 100 }),
-        React__default.createElement(BillingInfoItem, { data: selectedPaymentMethodBillingInfo, additionalProps: { onEdit: onPrev, disabled: isDeleting, boxProps: billingInfoItemBoxProps } }),
-        React__default.createElement(Divider, { sx: { mt: 2.5 } }),
-        showSaved ? (React__default.createElement(SavedPaymentDetailsSelector, { showLoader: isDeleting, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethodId: typeof selectedPaymentInfo === "string" ? selectedPaymentInfo : undefined, onNew: handleShowForm, onDelete: handleSavedPaymentMethodDeleted, onPick: onPaymentInfoSelected, onNext: onNext, onClose: onClose, consentType: consentType, privacyHref: privacyHref, termsOfUseHref: termsOfUseHref })) : (React__default.createElement(PaymentMethodForm, { acceptedPaymentTypes: acceptedPaymentTypes, defaultValues: typeof selectedPaymentInfo === "string" ? undefined : selectedPaymentInfo, onPlaidLinkClicked: onPlaidLinkClicked, onSaved: savedPaymentMethods.length > 0 ? handleShowSaved : undefined, onClose: onClose, onSubmit: handleSubmit, consentType: consentType, privacyHref: privacyHref, termsOfUseHref: termsOfUseHref, debug: debug }))));
+    return (React__default.createElement(Stack, { direction: {
+            xs: "column",
+            sm: "column",
+            md: "row",
+        }, spacing: 8.75 },
+        React__default.createElement(Stack, { sx: { display: 'flex', flex: 1 } },
+            React__default.createElement(CheckoutStepper, { progress: 100 }),
+            React__default.createElement(BillingInfoItem, { data: selectedPaymentMethodBillingInfo, additionalProps: { onEdit: onPrev, disabled: isDeleting, boxProps: billingInfoItemBoxProps } }),
+            React__default.createElement(Divider, { sx: { mt: 2.5 } }),
+            showSaved ? (React__default.createElement(SavedPaymentDetailsSelector, { showLoader: isDeleting, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethodId: typeof selectedPaymentInfo === "string" ? selectedPaymentInfo : undefined, onNew: handleShowForm, onDelete: handleSavedPaymentMethodDeleted, onPick: onPaymentInfoSelected, onCvvSelected: onCvvSelected, onNext: onNext, onClose: onClose, consentType: consentType, privacyHref: privacyHref, termsOfUseHref: termsOfUseHref })) : (React__default.createElement(PaymentMethodForm, { acceptedPaymentTypes: acceptedPaymentTypes, defaultValues: typeof selectedPaymentInfo === "string" ? undefined : selectedPaymentInfo, onPlaidLinkClicked: onPlaidLinkClicked, onSaved: savedPaymentMethods.length > 0 ? handleShowSaved : undefined, onClose: onClose, onSubmit: handleSubmit, consentType: consentType, privacyHref: privacyHref, termsOfUseHref: termsOfUseHref, debug: debug }))),
+        React__default.createElement(CheckoutItemCostBreakdown, { checkoutItems: checkoutItems })));
 };
 
 export { PaymentView };

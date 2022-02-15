@@ -4,19 +4,38 @@ import { StackList } from '../StackList/StackList.js';
 import { SecondaryButton } from '../SecondaryButton/SecondaryButton.js';
 import { PaymentDetailsItem } from '../../payments/PaymentDetailsItem/Item/PaymentDetailsItem.js';
 import { CheckoutModalFooter } from '../../payments/CheckoutModalFooter/CheckoutModalFooter.js';
-import React__default, { useState, useCallback } from 'react';
+import React__default, { useMemo, useState, useEffect, useCallback } from 'react';
 import { Box, CircularProgress, Typography } from '@mui/material';
 
-const SavedPaymentDetailsSelector = ({ showLoader, savedPaymentMethods, selectedPaymentMethodId, onNew, onDelete, onPick, onNext, onClose, consentType, privacyHref, termsOfUseHref, }) => {
-    const [isFormSubmitted, setIsFormSubmitted] = useState(false);
+function validateCvv(isCvvRequired, cvv) {
+    return !isCvvRequired || cvv.length === 3 || cvv.length === 4;
+}
+const SavedPaymentDetailsSelector = ({ showLoader, savedPaymentMethods, selectedPaymentMethodId, onNew, onDelete, onPick, onCvvSelected, onNext, onClose, consentType, privacyHref, termsOfUseHref, }) => {
+    const isCvvRequired = useMemo(() => {
+        const selectedPaymentMethod = savedPaymentMethods.find(savedPaymentMethod => savedPaymentMethod.id === selectedPaymentMethodId);
+        return (selectedPaymentMethod === null || selectedPaymentMethod === void 0 ? void 0 : selectedPaymentMethod.type) === "CreditCard";
+    }, [savedPaymentMethods, selectedPaymentMethodId]);
+    const [{ isFormSubmitted, cvv, }, setSelectorState] = useState({
+        isFormSubmitted: false,
+        cvv: "",
+    });
+    useEffect(() => {
+        // Reset CVV if user selects a different payment method:
+        setSelectorState(({ isFormSubmitted }) => ({ isFormSubmitted, cvv: "" }));
+    }, [selectedPaymentMethodId]);
+    const isCvvOk = validateCvv(isCvvRequired, cvv);
     const handleNextClicked = useCallback((canSubmit) => {
-        if (canSubmit && selectedPaymentMethodId) {
+        if (canSubmit && selectedPaymentMethodId && isCvvOk) {
+            onCvvSelected(cvv);
             onNext();
+            return;
         }
-        else if (!selectedPaymentMethodId) {
-            setIsFormSubmitted(true);
-        }
-    }, [selectedPaymentMethodId, onNext]);
+        setSelectorState(({ cvv }) => ({ isFormSubmitted: true, cvv }));
+    }, [selectedPaymentMethodId, cvv, isCvvOk, onCvvSelected, onNext]);
+    const handleCvvChange = useCallback((e) => {
+        const cvv = e.currentTarget.value || "";
+        setSelectorState(({ isFormSubmitted }) => ({ isFormSubmitted, cvv }));
+    }, []);
     const getPaymentMethodId = useCallback((savedPaymentMethod) => savedPaymentMethod.id, []);
     return (React__default.createElement(React__default.Fragment, null,
         React__default.createElement(Box, { sx: { position: "relative", mb: consentType === "checkbox" ? 5 : 0 } },
@@ -37,7 +56,9 @@ const SavedPaymentDetailsSelector = ({ showLoader, savedPaymentMethods, selected
                     disabled: showLoader,
                     onDelete,
                     onPick,
+                    onCvvChange: handleCvvChange,
                 }), component: PaymentDetailsItem, itemKey: getPaymentMethodId, deps: [onDelete, onPick, selectedPaymentMethodId, showLoader] }),
+            isFormSubmitted && !isCvvOk && (React__default.createElement(Typography, { variant: "caption", component: "p", sx: { mt: 2, color: theme => theme.palette.warning.dark } }, "You must enter a valid CVV number.")),
             React__default.createElement(SecondaryButton, { onClick: onNew, startIcon: React__default.createElement(default_1, null), sx: { mt: 2.5 }, disabled: showLoader }, "Add New Payment Method"),
             isFormSubmitted && !selectedPaymentMethodId && (React__default.createElement(Typography, { variant: "caption", component: "p", sx: { mt: 2, color: theme => theme.palette.warning.dark } }, "You must select a saved and approved payment method or create a new one."))),
         React__default.createElement(CheckoutModalFooter, { variant: "toConfirmation", consentType: consentType, privacyHref: privacyHref, termsOfUseHref: termsOfUseHref, onSubmitClicked: handleNextClicked, onCloseClicked: onClose })));

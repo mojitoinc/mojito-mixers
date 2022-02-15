@@ -3,7 +3,7 @@ import { SavedPaymentMethod, SavedPaymentMethodBillingInfo } from "../../../doma
 import { PaymentMethod } from "../../../domain/payment/payment.interfaces";
 import { CheckoutItem } from "../../../domain/product/product.interfaces";
 export interface PurchaseConfirmationBillingDetailsProps {
-    checkoutItem: CheckoutItem;
+    checkoutItems: CheckoutItem[];
     paymentReferenceNumber: string;
     selectedPaymentMethodBillingInfo: SavedPaymentMethodBillingInfo;
     selectedPaymentMethodPaymentInfo: PaymentMethod | SavedPaymentMethod;

@@ -5,10 +5,11 @@ import { SavedPaymentMethod } from "../../domain/circle/circle.interfaces";
 import { SelectedPaymentMethod } from "../../components/payments/CheckoutModal/CheckoutModal";
 import { ConsentType } from "../../components/shared/ConsentText/ConsentText";
 export interface PaymentViewProps {
-    checkoutItem: CheckoutItem;
+    checkoutItems: CheckoutItem[];
     savedPaymentMethods: SavedPaymentMethod[];
     selectedPaymentMethod: SelectedPaymentMethod;
     onPaymentInfoSelected: (data: string | PaymentMethod) => void;
+    onCvvSelected: (cvv: string) => void;
     onSavedPaymentMethodDeleted: (savedPaymentMethodId: string) => void;
     onNext: () => void;
     onPrev: () => void;

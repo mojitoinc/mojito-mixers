@@ -1,7 +1,7 @@
 import { CheckoutItem } from "../../domain/product/product.interfaces";
 import React from "react";
 export interface AuthenticationViewProps {
-    checkoutItem: CheckoutItem;
+    checkoutItems: CheckoutItem[];
     isAuthenticated?: boolean;
     guestCheckoutEnabled?: boolean;
     onGuestClicked: () => void;

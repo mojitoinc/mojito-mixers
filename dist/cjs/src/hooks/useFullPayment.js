@@ -8,22 +8,42 @@ var circle_utils = require('../domain/circle/circle.utils.js');
 var graphqlGenerated = require('../queries/graphqlGenerated.js');
 var promiseUtils = require('../utils/promiseUtils.js');
 var useCreatePaymentMethod = require('./useCreatePaymentMethod.js');
+var useEncryptCard = require('./useEncryptCard.js');
 
 const CIRCLE_MAX_EXPECTED_PAYMENT_CREATION_PROCESSING_TIME = 5000;
-function useFullPayment({ orgID, invoiceID: existingInvoiceID = "", lotID, lotType, savedPaymentMethods, selectedPaymentMethod, debug = false, }) {
+function useFullPayment({ orgID, invoiceID: existingInvoiceID = "", checkoutItems, savedPaymentMethods, selectedPaymentMethod, debug = false, }) {
     const [paymentState, setPaymentState] = React.useState({
         paymentStatus: "processing",
         paymentReferenceNumber: "",
     });
-    const { billingInfo: selectedBillingInfo, paymentInfo: selectedPaymentInfo, } = selectedPaymentMethod;
+    const [encryptCardData] = useEncryptCard.useEncryptCardData();
     const [createPaymentMethod] = useCreatePaymentMethod.useCreatePaymentMethod();
     const [createAuctionInvoice] = graphqlGenerated.useCreateAuctionInvoiceMutation();
     const [createBuyNowInvoice] = graphqlGenerated.useCreateBuyNowInvoiceMutation();
     const [makePayment] = graphqlGenerated.useCreatePaymentMutation();
     const fullPayment = React.useCallback(() => tslib_es6.__awaiter(this, void 0, void 0, function* () {
         var _a, _b, _c, _d, _e, _f, _g, _h, _j;
+        const { billingInfo: selectedBillingInfo, paymentInfo: selectedPaymentInfo, } = selectedPaymentMethod;
+        let cvv = "";
+        if (typeof selectedPaymentInfo === "string") {
+            cvv = selectedPaymentMethod.cvv;
+        }
+        else if (selectedPaymentInfo.type === "CreditCard") {
+            cvv = selectedPaymentInfo.secureCode;
+        }
+        // TODO: Quick fix. The UI can currently display multiple items with multiple units each, but will only purchase the
+        // selected amount (can be multiple units) of the first item:
+        const { lotID, lotType, units, } = checkoutItems[0];
         if (debug)
-            console.log(`\n💵 Making payment for orgID = ${orgID} + lotID = ${lotID} (${lotType})\n`);
+            console.log(`\n💵 Making payment for ${units} × ${lotType} lot${units > 1 ? "s" : ""}  ${lotID} (orgID = ${orgID})...\n`);
+        if (checkoutItems.length === 0) {
+            setPaymentState({
+                paymentStatus: "error",
+                paymentReferenceNumber: "",
+                paymentError: "Missing lot information.",
+            });
+            return;
+        }
         setPaymentState({
             paymentStatus: "processing",
             paymentReferenceNumber: "",
@@ -124,7 +144,7 @@ function useFullPayment({ orgID, invoiceID: existingInvoiceID = "", lotID, lotTy
                 const createBuyNowInvoiceResult = yield createBuyNowInvoice({
                     variables: {
                         input: {
-                            itemCount: 1,
+                            itemCount: units,
                             marketplaceBuyNowLotID: lotID,
                         },
                     },
@@ -153,6 +173,31 @@ function useFullPayment({ orgID, invoiceID: existingInvoiceID = "", lotID, lotTy
                 invoiceID,
             });
         }
+        let metadata = null;
+        if (cvv) {
+            const encryptCardDataResult = yield encryptCardData({
+                cvv,
+            }).catch((error) => {
+                // TODO: Cancel invoice?
+                if (debug)
+                    console.log("    🔴 encryptCardData error", error);
+            });
+            if (!encryptCardDataResult) {
+                setPaymentState({
+                    paymentStatus: "error",
+                    paymentReferenceNumber: "",
+                    paymentError: errorMessage || "Error encrypting CVV",
+                });
+                return;
+            }
+            const { keyID, encryptedCardData } = encryptCardDataResult;
+            metadata = {
+                creditCardData: {
+                    keyID,
+                    encryptedData: encryptedCardData,
+                },
+            };
+        }
         const paymentMethodStatusWaitTime = Math.max(CIRCLE_MAX_EXPECTED_PAYMENT_CREATION_PROCESSING_TIME - (Date.now() - paymentMethodCreatedAt), 0);
         if (paymentMethodStatusWaitTime)
             yield promiseUtils.wait(paymentMethodStatusWaitTime);
@@ -160,6 +205,7 @@ function useFullPayment({ orgID, invoiceID: existingInvoiceID = "", lotID, lotTy
             variables: {
                 paymentMethodID,
                 invoiceID,
+                metadata,
             },
         }).catch((error) => {
             // TODO: Cancel invoice?
@@ -185,7 +231,19 @@ function useFullPayment({ orgID, invoiceID: existingInvoiceID = "", lotID, lotTy
             paymentStatus: "processed",
             paymentReferenceNumber: circlePaymentID,
         });
-    }), [createAuctionInvoice, createBuyNowInvoice, createPaymentMethod, debug, existingInvoiceID, lotID, lotType, makePayment, orgID, savedPaymentMethods, selectedBillingInfo, selectedPaymentInfo]);
+    }), [
+        checkoutItems,
+        createAuctionInvoice,
+        createBuyNowInvoice,
+        createPaymentMethod,
+        debug,
+        encryptCardData,
+        existingInvoiceID,
+        makePayment,
+        orgID,
+        savedPaymentMethods,
+        selectedPaymentMethod,
+    ]);
     return [paymentState, fullPayment];
 }
 

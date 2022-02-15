@@ -8,6 +8,7 @@ export interface SavedPaymentDetailsSelectorProps {
     onNew: () => void;
     onDelete: (paymentMethodId: string) => void;
     onPick: (paymentMethodId: string) => void;
+    onCvvSelected: (cvv: string) => void;
     onNext: () => void;
     onClose: () => void;
     consentType: ConsentType;

@@ -14,13 +14,32 @@ function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'defau
 
 var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 
+const InlineField = material.styled((props) => (React__default["default"].createElement(material.TextField, Object.assign({}, props, { variant: "filled", margin: "none", InputProps: { disableUnderline: true } }))))({
+    "& .MuiInputLabel-root": {
+        color: "black",
+    },
+    "& .MuiInputBase-root": {
+        backgroundColor: "#F8F8F8",
+        color: "black",
+        padding: 8,
+        height: "30px",
+    },
+    "& .MuiInputBase-input": {
+        color: "black",
+        WebkitTextFillColor: "black",
+        fontSize: "12px",
+        cursor: "default",
+        padding: 0,
+    },
+});
 const DEFAULT_SAVED_ITEM_LABELS = {
     active: "Active",
+    cvv: "CVV",
     edit: "Edit Info",
     delete: "Delete",
     select: "Use Info",
 };
-const SavedItem = ({ children, id, variant = "stacked", labels: customLabels = {}, disabled, active, status, onEdit, onDelete, onPick, boxProps, }) => {
+const SavedItem = ({ children, id, variant = "stacked", labels: customLabels = {}, disabled, active, status, onEdit, onDelete, onPick, onCvvChange, boxProps, }) => {
     const labels = Object.assign(Object.assign({}, DEFAULT_SAVED_ITEM_LABELS), customLabels);
     const hasControls = active || onEdit || onDelete || onPick;
     const handleClick = React.useCallback((e) => {
@@ -44,7 +63,9 @@ const SavedItem = ({ children, id, variant = "stacked", labels: customLabels = {
             React__default["default"].createElement(material.Chip, { size: "small", color: status.color, label: status.label, variant: "outlined" })));
     }
     else if (active) {
-        mainControlElement = React__default["default"].createElement(material.Chip, { size: "small", color: "success", label: "Active", variant: "outlined" });
+        mainControlElement = (React__default["default"].createElement(React__default["default"].Fragment, null,
+            React__default["default"].createElement(material.Chip, { size: "small", color: "success", label: "Active", variant: "outlined" }),
+            onCvvChange && React__default["default"].createElement(InlineField, { onChange: onCvvChange, placeholder: "CVV", sx: { width: "52px" } })));
     }
     else if (onPick) {
         mainControlElement = (React__default["default"].createElement(SecondaryButton.SecondaryButton, { onClick: handleClick, disabled: disabledSelect, "data-action": "pick" }, labels.select));
@@ -57,17 +78,19 @@ const SavedItem = ({ children, id, variant = "stacked", labels: customLabels = {
                 //   xs: "column",
                 //   sm: "column"
                 // },
-                justifyContent: "space-between",
+                justifyContent: "flex-start",
                 alignItems: "flex-end",
                 height: "auto",
             } },
             mainControlElement,
-            React__default["default"].createElement(material.Stack, { direction: "row", spacing: 1, sx: { pt: variant === "stacked" ? { xs: 0, sm: 1 } : 0, mt: "auto" } },
+            React__default["default"].createElement(Box["default"], { sx: { mr: "auto !important", mb: "auto !important", display: { sm: variant === "row" ? "none" : "block" } } }),
+            React__default["default"].createElement(material.Stack, { direction: "row", spacing: 1, sx: { pt: variant === "stacked" ? { xs: 0, sm: 1 } : 0 } },
                 onEdit && (React__default["default"].createElement(SecondaryButton.SecondaryButton, { onClick: handleClick, disabled: disabledOther, startIcon: React__default["default"].createElement(Edit["default"], null), "data-action": "edit" }, labels.edit)),
                 onDelete && (React__default["default"].createElement(material.Tooltip, { title: labels.delete },
                     React__default["default"].createElement(SecondaryButton.SecondaryButton, { onClick: handleClick, disabled: disabledOther, "data-action": "delete" },
                         React__default["default"].createElement(Delete["default"], null)))))))));
 };
 
+exports.InlineField = InlineField;
 exports.SavedItem = SavedItem;
 //# sourceMappingURL=SavedItem.js.map

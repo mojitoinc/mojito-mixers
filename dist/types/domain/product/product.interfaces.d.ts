@@ -4,7 +4,8 @@ export interface CheckoutItem {
     lotType: LotType;
     name: string;
     description: string;
-    price: number;
+    units: number;
+    unitPrice: number;
     fee: number;
     imageSrc: string;
     imageBackground: string;

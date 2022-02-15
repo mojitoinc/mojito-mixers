@@ -1,9 +1,9 @@
+import React from "react";
 import { SavedPaymentMethod } from "../../domain/circle/circle.interfaces";
 import { CheckoutItem } from "../../domain/product/product.interfaces";
-import React from "react";
 import { SelectedPaymentMethod } from "../../components/payments/CheckoutModal/CheckoutModal";
 export interface ConfirmationViewProps {
-    checkoutItem: CheckoutItem;
+    checkoutItems: CheckoutItem[];
     savedPaymentMethods: SavedPaymentMethod[];
     selectedPaymentMethod: SelectedPaymentMethod;
     paymentReferenceNumber: string;

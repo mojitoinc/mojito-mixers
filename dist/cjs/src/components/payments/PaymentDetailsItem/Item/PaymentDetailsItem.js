@@ -47,7 +47,7 @@ const PaymentDetailsItem = ({ data: savedPaymentMethod, additionalProps: savedIt
             color: "error",
         };
     }
-    return (React__default["default"].createElement(SavedItem.SavedItem, Object.assign({}, savedItemProps, { variant: "row", labels: PAYMENT_METHOD_ITEM_LABELS[savedPaymentMethod.type], disabled: disabled, status: status, id: savedPaymentMethod.id }),
+    return (React__default["default"].createElement(SavedItem.SavedItem, Object.assign({}, savedItemProps, { variant: "row", labels: PAYMENT_METHOD_ITEM_LABELS[savedPaymentMethod.type], disabled: disabled, status: status, id: savedPaymentMethod.id, onCvvChange: savedPaymentMethod.type === "CreditCard" ? savedItemProps.onCvvChange : undefined }),
         React__default["default"].createElement(PaymentDetailsFragment.PaymentDetailsFragment, { savedPaymentMethod: savedPaymentMethod })));
 };
 
