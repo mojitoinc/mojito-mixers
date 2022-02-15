@@ -6,6 +6,7 @@ var CheckoutModal = require('./components/payments/CheckoutModal/CheckoutModal.j
 var theme = require('./config/theme/theme.js');
 var plaid_utils = require('./domain/plaid/plaid.utils.js');
 var usePlaid = require('./hooks/usePlaid.js');
+var AuthorizedApolloProvider = require('./components/shared/AuthorizedApolloProvider/AuthorizedApolloProvider.js');
 var system = require('@mui/system');
 
 
@@ -20,6 +21,7 @@ Object.defineProperty(exports, 'INITIAL_PLAID_OAUTH_FLOW_STATE', {
 	get: function () { return usePlaid.INITIAL_PLAID_OAUTH_FLOW_STATE; }
 });
 exports.continuePlaidOAuthFlow = usePlaid.continuePlaidOAuthFlow;
+exports.AuthorizedApolloProvider = AuthorizedApolloProvider.AuthorizedApolloProvider;
 Object.defineProperty(exports, 'CheckoutModalThemeProvider', {
 	enumerable: true,
 	get: function () { return system.ThemeProvider; }
