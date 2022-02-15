@@ -8,7 +8,7 @@ generates:
     plugins:
       - "typescript"
       - "typescript-operations"
-      - "typescript-react-apollo"
+      - "typescript-react-query"
     config:
       withHooks: true
   app/src/services/graphql/generated.tsx:
@@ -18,6 +18,6 @@ generates:
     plugins:
       - "typescript"
       - "typescript-operations"
-      - "typescript-react-apollo"
+      - "typescript-react-query"
     config:
       withHooks: true

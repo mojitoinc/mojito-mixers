@@ -26,6 +26,7 @@
   "dependencies": {
     "@apollo/client": "^3.5.8",
     "@apollo/link-context": "^2.0.0-beta.3",
+    "@graphql-codegen/typescript-react-query": "^3.5.3",
     "@hookform/resolvers": "^2.8.8",
     "@mdi/js": "^6.5.95",
     "@mdi/react": "^1.5.0",
@@ -55,7 +56,6 @@
     "@graphql-codegen/introspection": "^2.1.1",
     "@graphql-codegen/typescript": "^2.4.3",
     "@graphql-codegen/typescript-operations": "^2.3.0",
-    "@graphql-codegen/typescript-react-apollo": "^3.2.6",
     "@mui/material": "^5.4.1",
     "@mui/system": "^5.4.1",
     "@rollup/plugin-commonjs": "^21.0.1",
