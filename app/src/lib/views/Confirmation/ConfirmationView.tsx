@@ -81,8 +81,6 @@ export const ConfirmationView: React.FC<ConfirmationViewProps> = ({
 
         <CheckoutModalFooter
           variant="toMarketplace"
-          privacyHref=""
-          termsOfUseHref=""
           onSubmitClicked={onNext}
         />
       </Stack>

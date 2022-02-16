@@ -20,6 +20,7 @@ import { useShakeAnimation } from "../../../utils/animationUtils";
 import { continuePlaidOAuthFlow, PlaidFlow } from "../../../hooks/usePlaid";
 import { ConsentType } from "../../shared/ConsentText/ConsentText";
 import { useCheckoutModalState } from "./CheckoutModal.hooks";
+import { ERROR_LOADING_PAYMENT_METHODS, ERROR_LOADING_USER } from "../../../domain/errors/errors.constants";
 
 const SELECTOR_DIALOG_SCROLLABLE = "[role=presentation]";
 
@@ -213,8 +214,8 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   }, [checkoutStep, onClose]);
 
   useEffect(() => {
-    if (meError) setError("User could not be loaded.");
-    if (paymentMethodsError) setError("Payment methods could not be loaded.");
+    if (meError) setError(ERROR_LOADING_USER(meError));
+    if (paymentMethodsError) setError(ERROR_LOADING_PAYMENT_METHODS(paymentMethodsError));
   }, [meError, paymentMethodsError, setError]);
 
   const handleBillingInfoSelected = useCallback((billingInfo: string | BillingInfo) => {
@@ -288,7 +289,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
     goNext();
   }, [refetchPaymentMethods, goNext]);
 
-  const handleReviewData = useCallback(async (): Promise<false> => {
+  const handleFixError = useCallback(async (): Promise<false> => {
 
     console.log("RE-LOAD");
 
@@ -301,16 +302,20 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
     console.log("DONE");
 
-    // TODO: paymentError should have a source property to know where the error is coming from and handle recovery differently here:
-    setSelectedPaymentMethod((prevSelectedPaymentMethod) => ({ ...prevSelectedPaymentMethod, cvv: "" }));
-    setCheckoutModalState({ checkoutStep: "payment" });
+    if (checkoutError.at !== "purchasing") {
+      // If we are redirecting users to the PurchasingView again, we keep the CVV to be able to re-try the purchase:
+      setSelectedPaymentMethod((prevSelectedPaymentMethod) => ({ ...prevSelectedPaymentMethod, cvv: "" }));
+    }
+
+    setCheckoutModalState({ checkoutStep: checkoutError.at || "billing" });
+
     // goTo("payment");
 
     // This function is used as a CheckoutModalFooter's onSubmitClicked, so we want that to show a loader on the submit
     // button when clicked but do not remove it once the Promise is resolved, as we are moving to another view and
     // CheckoutModalFooter will unmount (so doing this prevents a memory leak issue):
     return false;
-  }, [meRefetch, refetchPaymentMethods, setSelectedPaymentMethod, setCheckoutModalState]);
+  }, [meRefetch, refetchPaymentMethods, setSelectedPaymentMethod, setCheckoutModalState, checkoutError]);
 
   // BLOCK DIALOG LOGIC & SHAKE ANIMATION:
 
@@ -373,10 +378,11 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
     checkoutStepElement = (
       <ErrorView
-        errorMessage={ checkoutError.errorMessage }
+        checkoutError={ checkoutError }
         errorImageSrc={ errorImageSrc }
-        onReviewData={ handleReviewData }
-        onClose={ onClose } />
+        onFixError={ handleFixError }
+        onClose={ onClose }
+        debug={ debug } />
     );
   } else if (!checkoutStep) {
     return null;
@@ -487,7 +493,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
             user={ meData?.me?.user }
             userFormat={ userFormat }
             onLoginClicked={ onLogin }
-            onPrevClicked={ goBack } />
+            onPrevClicked={ checkoutStep === "authentication" ? onClose : goBack } />
 
           { checkoutStepElement }
 

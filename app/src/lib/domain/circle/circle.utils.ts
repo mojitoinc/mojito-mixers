@@ -147,26 +147,69 @@ export function isCircleFieldErrorArray(obj: any): obj is CircleFieldError[] {
   return Array.isArray(obj) && obj.every(isCircleFieldError);
 }
 
-export function parseCircleError(error: ApolloError | Error): string | Record<string, string> {
+export type CircleFieldErrorAt = "billing" | "payment";
+
+export interface CircleFieldErrors {
+  summary: string;
+  billing?: Record<string, string>;
+  payment?: Record<string, string>;
+  unknown?: Record<string, string>;
+  firstAt: CircleFieldErrorAt;
+}
+
+const CIRCLE_FIELD_TO_FORM_FIELD: Record<string, [CircleFieldErrorAt, string, string]> = {
+  "billingAddress.name": ["billing", "fullName", "Full Name"],
+  "billingAddress.city": ["billing", "city", "City"],
+  "billingAddress.country": ["billing", "country", "Country"],
+  "billingAddress.address1": ["billing", "street", "Street"],
+  "billingAddress.address2": ["billing", "apartment", "Apartment, Suite, etc."],
+  "billingAddress.district": ["billing", "state", "State"],
+  "billingAddress.postalCode": ["billing", "zipCode", "Zip Code"],
+
+  "metadata.email": ["billing", "email", "Email"],
+  "metadata.phoneNumber": ["billing", "phone", "Phone"],
+
+  expMonth: ["payment", "expiryDate", "Expiration Year"],
+  expYear: ["payment", "expiryDate", "Expiration Year"],
+};
+
+export function parseCircleError(error: ApolloError | Error): CircleFieldErrors | undefined {
   const { message } = error;
 
   if (message.includes("with body: ")) {
     try {
       const parsedCircleError: CircleError = JSON.parse(String.raw`${ message }`.replace(/^.+with body: /, ''));
       const parsedCircleErrors = parsedCircleError.errors;
+      const circleFieldErrors: CircleFieldErrors = {
+        summary: parsedCircleError.message.replace("Invalid entity.\n", ""),
+        billing: {},
+        payment: {},
+        unknown: {},
+        firstAt: "billing",
+      };
+
+      console.log(parsedCircleErrors);
 
       if (isCircleFieldErrorArray(parsedCircleErrors)) {
-        return parsedCircleErrors.reduce((errors, circleFieldError) => {
-          // TODO: Match Circle errors to form field errors:
-          errors[circleFieldError.location] = circleFieldError.message;
+        parsedCircleErrors.forEach(({ location, message }) => {
+          const [at, inputName, inputLabel] = CIRCLE_FIELD_TO_FORM_FIELD[location] || ["unknown", location, location];
+          const searchRegExp = new RegExp(location, "g");
 
-          return errors;
-        }, { form: parsedCircleError.message } as Record<string, string>);
+          circleFieldErrors[at][inputName] = message.replace(searchRegExp, inputLabel);
+          circleFieldErrors.summary = circleFieldErrors.summary.replace(searchRegExp, inputLabel)
+        });
       }
 
-      return parsedCircleError.message || "";
+      if (circleFieldErrors.summary) {
+        if (Object.keys(circleFieldErrors.billing).length === 0) delete circleFieldErrors.billing;
+        if (Object.keys(circleFieldErrors.payment).length === 0) delete circleFieldErrors.payment;
+        if (Object.keys(circleFieldErrors.unknown).length === 0) delete circleFieldErrors.unknown;
+
+        if (!circleFieldErrors.billing && circleFieldErrors.payment) circleFieldErrors.firstAt = "payment";
+
+        return circleFieldErrors;
+      }
+
     } catch (e) { /* ignore */ }
   }
-
-  return "";
 }

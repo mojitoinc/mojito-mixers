@@ -1,8 +1,9 @@
 import { ApolloError } from "@apollo/client";
 import { useState, useCallback } from "react";
-import { SelectedPaymentMethod } from "../components/payments/CheckoutModal/CheckoutModal.hooks";
+import { CheckoutModalError, SelectedPaymentMethod } from "../components/payments/CheckoutModal/CheckoutModal.hooks";
 import { SavedPaymentMethod } from "../domain/circle/circle.interfaces";
-import { parseCircleError, savedPaymentMethodToBillingInfo } from "../domain/circle/circle.utils";
+import { CircleFieldErrors, parseCircleError, savedPaymentMethodToBillingInfo } from "../domain/circle/circle.utils";
+import { ERROR_PURCHASE_CREATING_INVOICE, ERROR_PURCHASE_CREATING_PAYMENT_METHOD, ERROR_PURCHASE_CVV, ERROR_PURCHASE_LOADING_ITEMS, ERROR_PURCHASE_NO_ITEMS, ERROR_PURCHASE_NO_UNITS, ERROR_PURCHASE_PAYING, ERROR_PURCHASE_SELECTED_PAYMENT_METHOD } from "../domain/errors/errors.constants";
 import { PaymentStatus } from "../domain/payment/payment.interfaces";
 import { CheckoutItem } from "../domain/product/product.interfaces";
 import { BillingInfo } from "../forms/BillingInfoForm";
@@ -25,7 +26,7 @@ export interface UseFullPaymentOptions {
 export interface PaymentState {
   paymentStatus: PaymentStatus;
   paymentReferenceNumber: string;
-  paymentError?: string;
+  paymentError?: string | CheckoutModalError;
 }
 
 export function useFullPayment({
@@ -40,6 +41,14 @@ export function useFullPayment({
     paymentStatus: "processing",
     paymentReferenceNumber: "",
   });
+
+  const setError = useCallback((paymentError: string | CheckoutModalError) => {
+    setPaymentState({
+      paymentStatus: "error",
+      paymentReferenceNumber: "",
+      paymentError,
+    });
+  }, []);
 
   const [encryptCardData] = useEncryptCardData();
   const [createPaymentMethod] = useCreatePaymentMethod();
@@ -69,14 +78,26 @@ export function useFullPayment({
       units,
     } = checkoutItems[0];
 
-    if (debug) console.log(`\n💵 Making payment for ${ units } × ${ lotType } lot${ units > 1 ? "s" : "" }  ${ lotID } (orgID = ${ orgID })...\n`);
+    if (debug) {
+      console.log(checkoutItems[0]
+        ? `\n💵 Making payment for ${ units } × ${ lotType } lot${ units > 1 ? "s" : "" }  ${ lotID } (orgID = ${ orgID })...\n`
+        : `\n💵 Making payment for unknown lot (orgID = ${ orgID })...\n` );
+    }
 
     if (checkoutItems.length === 0) {
-      setPaymentState({
-        paymentStatus: "error",
-        paymentReferenceNumber: "",
-        paymentError: "Missing lot information.",
-      });
+      setError(ERROR_PURCHASE_NO_ITEMS());
+
+      return;
+    }
+
+    if (!units) {
+      setError(ERROR_PURCHASE_NO_UNITS());
+
+      return;
+    }
+
+    if (!lotID || !lotType) {
+      setError(ERROR_PURCHASE_LOADING_ITEMS());
 
       return;
     }
@@ -89,8 +110,8 @@ export function useFullPayment({
     let paymentMethodID = "";
     let invoiceID = existingInvoiceID;
     let circlePaymentID = "";
-    let errorMessage = "";
-    let fieldErrors: Record<string, string> = {};
+    let mutationError: ApolloError | Error;
+    let circleFieldErrors: CircleFieldErrors;
     let paymentMethodCreatedAt = 0;
 
     if (typeof selectedPaymentInfo === "string") {
@@ -106,11 +127,7 @@ export function useFullPayment({
         const selectedPaymentMethod = savedPaymentMethods.find(({ addressId }) => addressId === selectedBillingInfo);
 
         if (!selectedPaymentMethod) {
-          setPaymentState({
-            paymentStatus: "error",
-            paymentReferenceNumber: "",
-            paymentError: errorMessage || "Could not find the selected payment method.",
-          });
+          setError(ERROR_PURCHASE_SELECTED_PAYMENT_METHOD());
 
           return;
         }
@@ -134,12 +151,13 @@ export function useFullPayment({
         selectedBillingInfoData,
         selectedPaymentInfo,
       ).catch((error: ApolloError | Error) => {
-        const parsedCircleError = parseCircleError(error);
+        mutationError = error;
 
-        if (debug) console.log("    🔴 createPaymentMethod error", parsedCircleError, error);
+        const parsedCircleErrors = parseCircleError(error);
 
-        if (typeof parsedCircleError === "string") errorMessage = parsedCircleError;
-        else fieldErrors = parsedCircleError;
+        if (debug) console.log("    🔴 createPaymentMethod error", error, parsedCircleErrors);
+
+        if (parsedCircleErrors) circleFieldErrors = parsedCircleErrors;
       });
 
       paymentMethodCreatedAt = Date.now();
@@ -152,11 +170,11 @@ export function useFullPayment({
     }
 
     if (!paymentMethodID) {
-      setPaymentState({
-        paymentStatus: "error",
-        paymentReferenceNumber: "",
-        paymentError: errorMessage || "Error creating payment method.",
-      });
+      setError(circleFieldErrors ? {
+        error: mutationError,
+        errorMessage: circleFieldErrors.summary,
+        at: circleFieldErrors.firstAt,
+      } : ERROR_PURCHASE_CREATING_PAYMENT_METHOD(mutationError));
 
       return;
     }
@@ -188,6 +206,8 @@ export function useFullPayment({
             lotID,
           },
         }).catch((error: ApolloError | Error) => {
+          mutationError = error;
+
           if (debug) console.log("    🔴 createAuctionInvoice error", error);
         });
 
@@ -205,6 +225,8 @@ export function useFullPayment({
             },
           },
         }).catch((error: ApolloError | Error) => {
+          mutationError = error;
+
           if (debug) console.log("    🔴 createBuyNowInvoice error", error);
         });
 
@@ -217,11 +239,7 @@ export function useFullPayment({
     }
 
     if (!invoiceID) {
-      setPaymentState({
-        paymentStatus: "error",
-        paymentReferenceNumber: "",
-        paymentError: errorMessage || "Error creating invoice",
-      });
+      setError(ERROR_PURCHASE_CREATING_INVOICE(mutationError));
 
       return;
     }
@@ -240,17 +258,15 @@ export function useFullPayment({
       const encryptCardDataResult = await encryptCardData({
         cvv,
       }).catch((error: ApolloError | Error) => {
+        mutationError = error;
+
         // TODO: Cancel invoice?
 
         if (debug) console.log("    🔴 encryptCardData error", error);
       });
 
       if (!encryptCardDataResult) {
-        setPaymentState({
-          paymentStatus: "error",
-          paymentReferenceNumber: "",
-          paymentError: errorMessage || "Error encrypting CVV",
-        });
+        setError(ERROR_PURCHASE_CVV(mutationError));
 
         return;
       }
@@ -276,6 +292,8 @@ export function useFullPayment({
         metadata,
       },
     }).catch((error: ApolloError | Error) => {
+      mutationError = error;
+
       // TODO: Cancel invoice?
 
       if (debug) console.log("    🔴 makePayment error", error);
@@ -288,18 +306,12 @@ export function useFullPayment({
     }
 
     if (!circlePaymentID) {
-      setPaymentState({
-        paymentStatus: "error",
-        paymentReferenceNumber: "",
-        paymentError: errorMessage || "Error while trying to make the payment.",
-      });
+      setError(ERROR_PURCHASE_PAYING(mutationError));
 
       return;
     }
 
     // TODO: Error handling and automatic retry:
-
-    // TODO: After this, refetch payment methods... Maybe after creation?
 
     setPaymentState({
       paymentStatus: "processed",
@@ -317,6 +329,7 @@ export function useFullPayment({
     orgID,
     savedPaymentMethods,
     selectedPaymentMethod,
+    setError,
   ]);
 
   return [paymentState, fullPayment];

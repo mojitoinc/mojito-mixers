@@ -6,7 +6,7 @@ import { BillingInfo } from "../../../forms/BillingInfoForm";
 import { INITIAL_PLAID_OAUTH_FLOW_STATE } from "../../../hooks/usePlaid";
 import { resetStepperProgress } from "../CheckoutStepper/CheckoutStepper";
 
-export type CheckoutModalErrorAt = "loading" | "billing" | "payment" | "purchasing";
+export type CheckoutModalErrorAt = "authentication" | "billing" | "payment" | "purchasing";
 
 export interface CheckoutModalError {
   error?: ApolloError | Error;
@@ -39,7 +39,7 @@ export interface CheckoutModalStateReturn extends CheckoutModalState {
   goBack: () => void;
   goNext: () => void;
   goTo: (nextCheckoutStep: CheckoutModalStep) => void;
-  setError: (nextErrorMessage: string) => void;
+  setError: (nextError: string | CheckoutModalError) => void;
 
   // SelectedPaymentMethod:
   selectedPaymentMethod: SelectedPaymentMethod;
@@ -104,8 +104,11 @@ export function useCheckoutModalState({
     setCheckoutModalState((prevState) => ({ ...prevState, checkoutStep: nextCheckoutStep }));
   }, []);
 
-  const setError = useCallback((nextErrorMessage: string) => {
-    setCheckoutModalState((prevState) => ({ ...prevState, checkoutError: { errorMessage: nextErrorMessage } }));
+  const setError = useCallback((nextError: string | CheckoutModalError) => {
+    setCheckoutModalState((prevState) => ({
+      ...prevState,
+      checkoutError: typeof nextError === "string" ? { errorMessage: nextError } : nextError,
+    }));
   }, []);
 
   console.log("checkoutStep =", checkoutStep);

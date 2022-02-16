@@ -2,7 +2,6 @@ import { useCallback } from "react";
 import { CreatePaymentMethodMutation, PaymentType, useCreatePaymentMethodMutation, AchMetadata, CreditCardMetadata, CreditCardBillingDetails } from "../queries/graphqlGenerated";
 import { BillingInfo } from "../forms/BillingInfoForm";
 import { FetchResult, MutationResult } from "@apollo/client";
-import { formatPhoneAsE123 } from "../domain/circle/circle.utils";
 import { PaymentMethod } from "../domain/payment/payment.interfaces";
 import { useEncryptCardData } from "./useEncryptCard";
 
@@ -29,7 +28,8 @@ export function useCreatePaymentMethod(): [
 
     const metadata: AchMetadata | CreditCardMetadata = {
       email: billingInfo.email,
-      phoneNumber: formatPhoneAsE123(billingInfo.phone, `${ billingInfo.country.value }`),
+      // phoneNumber: formatPhoneAsE123(billingInfo.phone, `${ billingInfo.country.value }`),
+      phoneNumber: "0034935641234",
     };
 
     // Using CreditCardBillingDetails as it's more restrictive than AchBillingDetails (address 2 is required instead of optional):
@@ -50,7 +50,8 @@ export function useCreatePaymentMethod(): [
       });
 
       const [expirationMonth, expirationYearLastTwoDigits] = paymentInfo.expiryDate.split("/").map(value => parseInt(value.trim(), 10));
-      const expirationYear = 2000 + expirationYearLastTwoDigits;
+      // const expirationYear = 2000 + expirationYearLastTwoDigits;
+      const expirationYear = expirationYearLastTwoDigits;
 
       return createPaymentMethod({
         variables: {

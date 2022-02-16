@@ -3,6 +3,8 @@ import { createTypographyTheme } from "./themeTypography";
 import { createPaletteTheme } from "./themePalette";
 import { createComponentsTheme } from "./themeComponents";
 
+export const NARROW_MAX_WIDTH = 320;
+
 const mojitoLightTheme: Theme = createTheme({
   typography: createTypographyTheme(),
   palette: createPaletteTheme({ mode: "light" }),
