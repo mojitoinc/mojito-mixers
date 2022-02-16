@@ -5,8 +5,8 @@ import { HTMLRootTag } from '../../../domain/html/html.intefaces';
 // eslint-disable-next-line @typescript-eslint/ban-types
 export interface BaseItemProps<T extends {} = any, A extends {} = any> {
   index?: number;
-  id?: React.ReactText;
-  tag?: HTMLRootTag;
+  id?: string;
+  component?: HTMLRootTag;
   data: T;
   additionalProps?: A;
 }
@@ -32,7 +32,7 @@ export function StackList<T extends {} = any, A extends {} = any> ({
 }: StackListProps<T, A>) {
   const renderedList = useMemo(() => {
     return (
-      <Stack component="ol" spacing={1}>
+      <Stack component="ol" spacing={2}>
         { data.map((itemData, index) => {
           const key = `${ getItemKey(itemData, index) }`;
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -44,6 +44,7 @@ export function StackList<T extends {} = any, A extends {} = any> ({
               key={ key }
               id={ key }
               index={ index }
+              component="li"
               data={ itemData }
               additionalProps={ additionalProps } />
           );

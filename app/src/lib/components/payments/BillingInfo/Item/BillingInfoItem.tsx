@@ -14,13 +14,17 @@ export type BillingInfoItemProps = BaseItemProps<SavedPaymentMethod, SavedItemPr
 export const BillingInfoItem: React.FC<BillingInfoItemProps> = ({
   data: savedPaymentMethod,
   additionalProps: savedItemProps,
+  children,
+  index,
+  ...boxProps
 }) => {
   return (
     <SavedItem
       variant="stacked"
       labels={ BILLING_INFO_ITEM_LABELS }
       { ...savedItemProps }
-      id={ savedPaymentMethod.addressId }>
+      id={ savedPaymentMethod.addressId }
+      boxProps={ boxProps }>
       <BillingInfoFragment savedPaymentMethod={ savedPaymentMethod } />
     </SavedItem>
   );

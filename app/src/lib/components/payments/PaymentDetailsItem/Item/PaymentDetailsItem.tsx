@@ -34,6 +34,9 @@ export type PaymentDetailsItemProps = BaseItemProps<SavedPaymentMethod, SavedIte
 export const PaymentDetailsItem: React.FC<PaymentDetailsItemProps> = ({
   data: savedPaymentMethod,
   additionalProps: savedItemProps,
+  children,
+  index,
+  ...boxProps
 }) => {
   let disabled = savedItemProps.disabled;
   let status: SavedItemStatus;
@@ -64,6 +67,7 @@ export const PaymentDetailsItem: React.FC<PaymentDetailsItemProps> = ({
       disabled={ disabled }
       status={ status }
       id={ savedPaymentMethod.id }
+      boxProps={ boxProps }
       onCvvChange={ savedPaymentMethod.type === "CreditCard" ? savedItemProps.onCvvChange : undefined }>
       <PaymentDetailsFragment savedPaymentMethod={ savedPaymentMethod } />
     </SavedItem>
