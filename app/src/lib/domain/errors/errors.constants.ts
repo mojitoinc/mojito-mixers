@@ -1,7 +1,9 @@
 import { ApolloError } from "@apollo/client";
 import { CheckoutModalError, CheckoutModalErrorAt } from "../../components/payments/CheckoutModal/CheckoutModal.hooks";
 
-function createError(errorMessage: string, at: CheckoutModalErrorAt = "purchasing"): (error?: ApolloError | Error) => CheckoutModalError {
+export const DEFAULT_ERROR_AT: CheckoutModalErrorAt = "purchasing";
+
+function createError(errorMessage: string, at: CheckoutModalErrorAt = DEFAULT_ERROR_AT): (error?: ApolloError | Error) => CheckoutModalError {
   return (error?: ApolloError | Error) => ({
     error,
     errorMessage,
@@ -41,6 +43,13 @@ export const ERROR_PURCHASE_CVV = createError("Could not verify CVV.");
 export const ERROR_PURCHASE_PAYING = createError("Payment failed.");
 
 
-// TODO: Use error objects here.
-// TODO: User vs dev error messages.
-// TODO: Add field errors to error state.
+// DONE: Use error objects here.
+// DONE: Fix payment method selector styles.
+// DONE: Add field errors to error state.
+// DONE: Hook for form error logic.
+// DONE: Component for form errors.
+
+// DOING: Fix form not showing after error.
+
+// NEW PR: Wire onError callback.
+// NEW PR: User vs dev error messages.

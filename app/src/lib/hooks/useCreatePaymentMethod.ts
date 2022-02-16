@@ -4,6 +4,7 @@ import { BillingInfo } from "../forms/BillingInfoForm";
 import { FetchResult, MutationResult } from "@apollo/client";
 import { PaymentMethod } from "../domain/payment/payment.interfaces";
 import { useEncryptCardData } from "./useEncryptCard";
+import { formatPhoneAsE123 } from "../domain/circle/circle.utils";
 
 
 export interface ExtendedCreatePaymentMethodOptions {
@@ -28,8 +29,8 @@ export function useCreatePaymentMethod(): [
 
     const metadata: AchMetadata | CreditCardMetadata = {
       email: billingInfo.email,
-      // phoneNumber: formatPhoneAsE123(billingInfo.phone, `${ billingInfo.country.value }`),
-      phoneNumber: "0034935641234",
+      phoneNumber: formatPhoneAsE123(billingInfo.phone, `${ billingInfo.country.value }`),
+      // phoneNumber: "0034935641234",
     };
 
     // Using CreditCardBillingDetails as it's more restrictive than AchBillingDetails (address 2 is required instead of optional):
@@ -61,7 +62,7 @@ export function useCreatePaymentMethod(): [
             creditCardData: {
               keyID,
               encryptedData: encryptedCardData,
-              expirationMonth,
+              expirationMonth: 0,
               expirationYear,
               metadata,
               billingDetails,

@@ -31,6 +31,6 @@ export const DebugBox: React.FC<BoxProps> = ({
   ...props
 }) => {
   return (
-    <DisplayBox { ...props } component="pre" sx={{ ...sx, overflow: "scroll" }} />
+    <DisplayBox { ...props } component="pre" sx={{ ...sx, overflow: "scroll", whiteSpace: "pre-wrap" }} />
   );
 }

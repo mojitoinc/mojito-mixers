@@ -250,7 +250,8 @@ export function createComponentsTheme(theme: Theme): ComponentsOptions {
       styleOverrides: {
         root: {
           background: theme.palette.gradients.stepperReverse,
-          padding: 1,
+          backgroundOrigin: "border-box",
+          border: "1px solid transparent",
           borderRadius: 5,
         },
       },

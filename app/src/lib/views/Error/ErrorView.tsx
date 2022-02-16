@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React from "react";
 import { Box, Typography } from "@mui/material";
 import { CheckoutModalFooter } from "../../components/payments/CheckoutModalFooter/CheckoutModalFooter";
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
@@ -15,7 +15,7 @@ const ERROR_ACTION_LABELS: Record<CheckoutModalErrorAt, string> = {
 };
 
 export interface ErrorViewProps {
-  checkoutError: string | CheckoutModalError;
+  checkoutError: CheckoutModalError;
   errorImageSrc?: string;
   onFixError: () => Promise<false>;
   onClose: () => void;
@@ -23,30 +23,18 @@ export interface ErrorViewProps {
 }
 
 export const ErrorView: React.FC<ErrorViewProps> = ({
-  checkoutError,
+  checkoutError: {
+    error,
+    errorMessage,
+    at,
+  },
   errorImageSrc,
   onFixError,
   onClose,
   debug,
 }) => {
-  const {
-    error,
-    errorMessage,
-    at,
-  }: CheckoutModalError = typeof checkoutError === "string" ? {
-    error: null,
-    errorMessage: checkoutError,
-    at: "billing"
-  } : checkoutError;
-
-  const handleFixError = useCallback(() => {
-    onFixError();
-  }, [onFixError]);
-
   const stringifiedError = debug && error ? JSON.stringify(error, null, "  ") : "{}";
   const debugErrorMessage = stringifiedError === "{}" && error ? error.stack : stringifiedError;
-
-  console.log({ error, stringifiedError, debugErrorMessage });
 
   return (<>
     <Box sx={{ position: "relative" /*, mt: 2 */ }}>
@@ -79,7 +67,7 @@ export const ErrorView: React.FC<ErrorViewProps> = ({
 
       <Box sx={{ maxWidth: NARROW_MAX_WIDTH, mx: "auto" }}>
         { parseSentences(errorMessage).map((sentence) => {
-          return <Typography key={ sentence }variant="body2" sx={{ textAlign: "center", mb: 1.5 }}>{ sentence }</Typography>;
+          return <Typography key={ sentence } variant="body2" sx={{ textAlign: "center", mb: 1.5 }}>{ sentence }</Typography>;
         }) }
 
         <Typography variant="body2" sx={{ textAlign: "center", mt: 5 }}>Sorry, we are experiencing some issues. Please, review your payment information and try again. </Typography>
@@ -91,7 +79,7 @@ export const ErrorView: React.FC<ErrorViewProps> = ({
     <CheckoutModalFooter
       variant="toReview"
       buttonLabel={ ERROR_ACTION_LABELS[at] }
-      onSubmitClicked={ handleFixError }
+      onSubmitClicked={ onFixError }
       onCloseClicked={ onClose } />
   </>);
 };

@@ -24,7 +24,7 @@ export const BillingInfoItem: React.FC<BillingInfoItemProps> = ({
       labels={ BILLING_INFO_ITEM_LABELS }
       { ...savedItemProps }
       id={ savedPaymentMethod.addressId }
-      boxProps={ boxProps }>
+      boxProps={ { ...boxProps, ...savedItemProps.boxProps } }>
       <BillingInfoFragment savedPaymentMethod={ savedPaymentMethod } />
     </SavedItem>
   );

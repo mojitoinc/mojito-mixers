@@ -169,8 +169,8 @@ const CIRCLE_FIELD_TO_FORM_FIELD: Record<string, [CircleFieldErrorAt, string, st
   "metadata.email": ["billing", "email", "Email"],
   "metadata.phoneNumber": ["billing", "phone", "Phone"],
 
-  expMonth: ["payment", "expiryDate", "Expiration Year"],
-  expYear: ["payment", "expiryDate", "Expiration Year"],
+  expMonth: ["payment", "expiryDate", "Expiration Date"],
+  expYear: ["payment", "expiryDate", "Expiration Date"],
 };
 
 export function parseCircleError(error: ApolloError | Error): CircleFieldErrors | undefined {
@@ -188,14 +188,12 @@ export function parseCircleError(error: ApolloError | Error): CircleFieldErrors 
         firstAt: "billing",
       };
 
-      console.log(parsedCircleErrors);
-
       if (isCircleFieldErrorArray(parsedCircleErrors)) {
         parsedCircleErrors.forEach(({ location, message }) => {
           const [at, inputName, inputLabel] = CIRCLE_FIELD_TO_FORM_FIELD[location] || ["unknown", location, location];
           const searchRegExp = new RegExp(location, "g");
 
-          circleFieldErrors[at][inputName] = message.replace(searchRegExp, inputLabel);
+          circleFieldErrors[at][inputName] = [circleFieldErrors[at][inputName], message.replace(searchRegExp, inputLabel)].filter(Boolean).join(" / ");
           circleFieldErrors.summary = circleFieldErrors.summary.replace(searchRegExp, inputLabel)
         });
       }

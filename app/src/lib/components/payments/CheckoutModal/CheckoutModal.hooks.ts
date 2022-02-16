@@ -1,6 +1,8 @@
 
 import { ApolloError } from "@apollo/client";
 import { Dispatch, SetStateAction, useState, useCallback } from "react";
+import { CircleFieldErrors } from "../../../domain/circle/circle.utils";
+import { ERROR_PURCHASE } from "../../../domain/errors/errors.constants";
 import { PaymentMethod } from "../../../domain/payment/payment.interfaces";
 import { BillingInfo } from "../../../forms/BillingInfoForm";
 import { INITIAL_PLAID_OAUTH_FLOW_STATE } from "../../../hooks/usePlaid";
@@ -9,12 +11,13 @@ import { resetStepperProgress } from "../CheckoutStepper/CheckoutStepper";
 export type CheckoutModalErrorAt = "authentication" | "billing" | "payment" | "purchasing";
 
 export interface CheckoutModalError {
-  error?: ApolloError | Error;
-  errorMessage: string;
   at?: CheckoutModalErrorAt;
+  error?: ApolloError | Error;
+  circleFieldErrors?: CircleFieldErrors;
+  errorMessage: string;
 }
 
-export type CheckoutModalStep = "authentication" | "billing" | "payment" | "purchasing" | "confirmation";
+export type CheckoutModalStep = "authentication" | "billing" | "payment" | "purchasing" | "confirmation" | "error";
 
 export interface CheckoutModalStateOptions {
   productConfirmationEnabled?: boolean;
@@ -34,12 +37,12 @@ export interface SelectedPaymentMethod {
 
 export interface CheckoutModalStateReturn extends CheckoutModalState {
   // CheckoutModalState (+ inherited stuff):
-  setCheckoutModalState: Dispatch<SetStateAction<CheckoutModalState>>;
+  // setCheckoutModalState: Dispatch<SetStateAction<CheckoutModalState>>;
   resetModalState: () => void;
   goBack: () => void;
   goNext: () => void;
-  goTo: (nextCheckoutStep: CheckoutModalStep) => void;
-  setError: (nextError: string | CheckoutModalError) => void;
+  goTo: (checkoutStep: CheckoutModalStep, error?: null | string | CheckoutModalError) => void;
+  setError: (error: null | string | CheckoutModalError) => void;
 
   // SelectedPaymentMethod:
   selectedPaymentMethod: SelectedPaymentMethod;
@@ -86,29 +89,38 @@ export function useCheckoutModalState({
 
   const goBack = useCallback(() => {
     setCheckoutModalState(({ checkoutStep, checkoutError }) => ({
-      checkoutError,
       checkoutStep: CHECKOUT_STEPS[Math.max(CHECKOUT_STEPS.indexOf(checkoutStep) - 1, 0)],
+      checkoutError,
     }));
   }, []);
 
   const goNext = useCallback(() => {
     setCheckoutModalState(({ checkoutStep, checkoutError }) => ({
-      checkoutError,
       checkoutStep: CHECKOUT_STEPS[Math.min(CHECKOUT_STEPS.indexOf(checkoutStep) + 1, CHECKOUT_STEPS.length - 1)],
+      checkoutError,
     }));
   }, []);
 
-  const goTo = useCallback((nextCheckoutStep: CheckoutModalStep) => {
-    console.log("goTo", nextCheckoutStep);
+  const goTo = useCallback((checkoutStep: CheckoutModalStep, error?: null | string | CheckoutModalError) => {
+    console.log("goTo", checkoutStep, error);
 
-    setCheckoutModalState((prevState) => ({ ...prevState, checkoutStep: nextCheckoutStep }));
+    setCheckoutModalState((prevCheckoutModalState) => {
+      let checkoutError: CheckoutModalError | undefined;
+
+      if (error === null) checkoutError = undefined;
+      else if (!error) checkoutError = prevCheckoutModalState.checkoutError;
+      else if (typeof error === "string") checkoutError = { errorMessage: error };
+      else checkoutError = error;
+
+      return checkoutError ? { checkoutStep, checkoutError } : { checkoutStep };
+    });
   }, []);
 
-  const setError = useCallback((nextError: string | CheckoutModalError) => {
-    setCheckoutModalState((prevState) => ({
-      ...prevState,
-      checkoutError: typeof nextError === "string" ? { errorMessage: nextError } : nextError,
-    }));
+  const setError = useCallback((error: string | CheckoutModalError) => {
+    setCheckoutModalState({
+      checkoutStep: "error",
+      checkoutError: typeof error === "string" ? { errorMessage: error || ERROR_PURCHASE().errorMessage } : error,
+    });
   }, []);
 
   console.log("checkoutStep =", checkoutStep);
@@ -117,7 +129,7 @@ export function useCheckoutModalState({
     // CheckoutModalState:
     checkoutStep,
     checkoutError,
-    setCheckoutModalState,
+    // setCheckoutModalState,
     resetModalState,
     goBack,
     goNext,

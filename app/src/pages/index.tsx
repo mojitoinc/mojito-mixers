@@ -257,7 +257,7 @@ const HomePage = () => {
         </FormControl>
 
         <Typography variant="body2" sx={{ mt: 2 }}>In production, this will be required for auction lots.</Typography>
-        <Typography variant="body2" sx={{ mt: 1, fontWeight: "bold" }}>You can still let the Payment UI handle invoice creation for both auction and pay now lots in this playground app.</Typography>
+        <Typography variant="body2" sx={{ mt: 1, fontWeight: 600 }}>You can still let the Payment UI handle invoice creation for both auction and pay now lots in this playground app.</Typography>
       </Box>
 
       <Box sx={{ my: 4 }}>

@@ -171,9 +171,10 @@ export function useFullPayment({
 
     if (!paymentMethodID) {
       setError(circleFieldErrors ? {
+        at: circleFieldErrors.firstAt,
+        circleFieldErrors,
         error: mutationError,
         errorMessage: circleFieldErrors.summary,
-        at: circleFieldErrors.firstAt,
       } : ERROR_PURCHASE_CREATING_PAYMENT_METHOD(mutationError));
 
       return;

@@ -9,11 +9,13 @@ import { getSavedPaymentMethodAddressIdFromBillingInfo, savedPaymentMethodToBill
 import { CheckoutItem } from "../../domain/product/product.interfaces";
 import { BillingInfo, BillingInfoForm } from "../../forms/BillingInfoForm";
 import { distinctBy } from "../../utils/arrayUtils";
+import { CheckoutModalError } from "../../components/payments/CheckoutModal/CheckoutModal.hooks";
 
 export interface BillingViewProps {
   checkoutItems: CheckoutItem[];
   savedPaymentMethods: SavedPaymentMethod[];
   selectedBillingInfo: string | BillingInfo;
+  checkoutError?: CheckoutModalError;
   onBillingInfoSelected: (data: string | BillingInfo) => void;
   onSavedPaymentMethodDeleted: (savedPaymentMethodId: string) => Promise<void>;
   onNext: () => void;
@@ -25,6 +27,7 @@ export const BillingView: React.FC<BillingViewProps> = ({
   checkoutItems,
   savedPaymentMethods: rawSavedPaymentMethods,
   selectedBillingInfo,
+  checkoutError,
   onBillingInfoSelected,
   onSavedPaymentMethodDeleted,
   onNext,
@@ -112,6 +115,7 @@ export const BillingView: React.FC<BillingViewProps> = ({
             <BillingInfoForm
               // variant="loggedIn"
               defaultValues={ typeof selectedBillingInfo === "string" ? undefined : selectedBillingInfo }
+              checkoutError={ checkoutError }
               onSaved={ savedPaymentMethods.length > 0 ? handleShowSaved : undefined }
               onClose={ onClose }
               onSubmit={ handleSubmit }

@@ -31,6 +31,9 @@ import { Typography } from "@mui/material";
 import { DebugBox, DisplayBox } from "../components/payments/DisplayBox/DisplayBox";
 import { ControlledCheckbox } from "../components/shared/Checkbox/Checkbox";
 import { ConsentText, ConsentType, CONSENT_ERROR_MESSAGE } from "../components/shared/ConsentText/ConsentText";
+import { CheckoutModalError } from "../components/payments/CheckoutModal/CheckoutModal.hooks";
+import { FormErrorsBox } from "../components/shared/FormErrorsBox/FormErrorsBox";
+import { useFormCheckoutError } from "../hooks/useFormCheckoutError";
 
 interface PaymentTypeFormProps {
   control: Control<PaymentMethod & { consent: boolean }>;
@@ -214,6 +217,7 @@ const PAYMENT_TYPE_FORM_DATA: Record<PaymentType, PaymentTypeFormData> = {
 export interface PaymentMethodFormProps {
   acceptedPaymentTypes: PaymentType[];
   defaultValues?: PaymentMethod;
+  checkoutError?: CheckoutModalError;
   onPlaidLinkClicked: () => void;
   onSaved?: () => void;
   onClose: () => void;
@@ -227,6 +231,7 @@ export interface PaymentMethodFormProps {
 export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
   acceptedPaymentTypes,
   defaultValues: parentDefaultValues,
+  checkoutError,
   onPlaidLinkClicked,
   onSaved,
   onClose,
@@ -254,6 +259,8 @@ export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
     watch,
     reset,
     trigger,
+    setError,
+    formState,
   } = useForm({
     defaultValues: {
       ...defaultPaymentTypeDefaultValues,
@@ -270,6 +277,7 @@ export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
   const selectedPaymentMethod = watch("type") as PaymentType;
   const Fields = PAYMENT_TYPE_FORM_DATA[selectedPaymentMethod].fields;
   const submitForm = handleSubmit(onSubmit);
+  const checkoutErrorMessage = useFormCheckoutError({ formKey: "payment", checkoutError, watch, setError, deps: [selectedPaymentMethod] });
 
   const handleFormSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
@@ -317,11 +325,15 @@ export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
         privacyHref={ privacyHref }
         termsOfUseHref={ termsOfUseHref } />
 
-      {debug && (
-        <DebugBox sx={{ my: 2 }}>
-          {JSON.stringify(watch(), null, 2)}
+      { checkoutErrorMessage && <FormErrorsBox error={ checkoutErrorMessage } sx={{ mt: 5 }} /> }
+
+      { debug && (
+        <DebugBox sx={{ mt: 5 }}>
+          { JSON.stringify(watch(), null, 2) }
+          { "\n\n" }
+          { JSON.stringify(formState.errors, null, 2) }
         </DebugBox>
-      )}
+      ) }
 
       <CheckoutModalFooter
         variant={ selectedPaymentMethod === "ACH" ? "toPlaid" : "toConfirmation" }

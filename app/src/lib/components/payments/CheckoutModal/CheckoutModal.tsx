@@ -20,7 +20,7 @@ import { useShakeAnimation } from "../../../utils/animationUtils";
 import { continuePlaidOAuthFlow, PlaidFlow } from "../../../hooks/usePlaid";
 import { ConsentType } from "../../shared/ConsentText/ConsentText";
 import { useCheckoutModalState } from "./CheckoutModal.hooks";
-import { ERROR_LOADING_PAYMENT_METHODS, ERROR_LOADING_USER } from "../../../domain/errors/errors.constants";
+import { DEFAULT_ERROR_AT, ERROR_LOADING_PAYMENT_METHODS, ERROR_LOADING_USER } from "../../../domain/errors/errors.constants";
 
 const SELECTOR_DIALOG_SCROLLABLE = "[role=presentation]";
 
@@ -144,7 +144,6 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
     // CheckoutModalState:
     checkoutStep,
     checkoutError,
-    setCheckoutModalState,
     resetModalState,
     goBack,
     goNext,
@@ -307,15 +306,13 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
       setSelectedPaymentMethod((prevSelectedPaymentMethod) => ({ ...prevSelectedPaymentMethod, cvv: "" }));
     }
 
-    setCheckoutModalState({ checkoutStep: checkoutError.at || "billing" });
-
-    // goTo("payment");
+    goTo(checkoutError.at || DEFAULT_ERROR_AT, checkoutError);
 
     // This function is used as a CheckoutModalFooter's onSubmitClicked, so we want that to show a loader on the submit
     // button when clicked but do not remove it once the Promise is resolved, as we are moving to another view and
     // CheckoutModalFooter will unmount (so doing this prevents a memory leak issue):
     return false;
-  }, [meRefetch, refetchPaymentMethods, setSelectedPaymentMethod, setCheckoutModalState, checkoutError]);
+  }, [meRefetch, refetchPaymentMethods, setSelectedPaymentMethod, goTo, checkoutError]);
 
   // BLOCK DIALOG LOGIC & SHAKE ANIMATION:
 
@@ -339,6 +336,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
     }
 
     handlePaymentInfoSelected(paymentInfo);
+
     goTo("purchasing");
   }, [resetModalState, handlePaymentInfoSelected, goTo]);
 
@@ -373,7 +371,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   let headerVariant: CheckoutModalHeaderVariant = isAuthenticated ? 'loggedIn' : 'guest';
   let checkoutStepElement = null;
 
-  if (checkoutError) {
+  if (checkoutStep === "error") {
     headerVariant = "error";
 
     checkoutStepElement = (
@@ -403,6 +401,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
         checkoutItems={ checkoutItems }
         savedPaymentMethods={ savedPaymentMethods }
         selectedBillingInfo={ selectedPaymentMethod.billingInfo }
+        checkoutError={ checkoutError }
         onBillingInfoSelected={ handleBillingInfoSelected }
         onSavedPaymentMethodDeleted={ handleSavedPaymentMethodDeleted }
         onNext={ goNext }
@@ -415,6 +414,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
         checkoutItems={ checkoutItems }
         savedPaymentMethods={ savedPaymentMethods }
         selectedPaymentMethod={ selectedPaymentMethod }
+        checkoutError={ checkoutError }
         onPaymentInfoSelected={ handlePaymentInfoSelected }
         onCvvSelected={ handleCvvSelected }
         onSavedPaymentMethodDeleted={ handleSavedPaymentMethodDeleted }
