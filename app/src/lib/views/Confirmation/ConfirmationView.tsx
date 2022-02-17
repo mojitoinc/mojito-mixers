@@ -7,7 +7,7 @@ import { PurchaseConfirmationItemDetails } from "../../components/payments/Purch
 import { SavedPaymentMethod } from "../../domain/circle/circle.interfaces";
 import { billingInfoToSavedPaymentMethodBillingInfo } from "../../domain/circle/circle.utils";
 import { CheckoutItem } from "../../domain/product/product.interfaces";
-import { SelectedPaymentMethod } from "../../components/payments/CheckoutModal/CheckoutModal";
+import { SelectedPaymentMethod } from "../../components/payments/CheckoutModal/CheckoutModal.hooks";
 
 export interface ConfirmationViewProps {
   checkoutItems: CheckoutItem[];
@@ -81,10 +81,7 @@ export const ConfirmationView: React.FC<ConfirmationViewProps> = ({
 
         <CheckoutModalFooter
           variant="toMarketplace"
-          privacyHref=""
-          termsOfUseHref=""
           onSubmitClicked={onNext}
-          onCloseClicked={onClose}
         />
       </Stack>
     </Stack>

@@ -8,7 +8,7 @@ export const LABELS_BY_VARIANT: Record<CheckoutModalFooterVariant, string> = {
   toPayment: "Continue to Payment",
   toConfirmation: "Purchase",
   toPlaid: "Purchase with Plaid",
-  toForm: "Review Payment Information",
+  toReview: "Review Information",
   toMarketplace: "Back to Marketplace",
 };
 
@@ -17,6 +17,6 @@ export const ICONS_BY_VARIANT: Record<CheckoutModalFooterVariant, typeof SvgIcon
   toPayment: ChevronRightIcon,
   toConfirmation: LockIcon,
   toPlaid: LockIcon,
-  toForm: null,
+  toReview: null,
   toMarketplace: null,
 };

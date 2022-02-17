@@ -10,7 +10,7 @@ export const InputGroupLabel: React.FC<TypographyProps> = ({
     variant="body2"
     sx={[
       (theme: Theme) => ({
-        fontWeight: 500,
+        fontWeight: "bold",
         color: theme.palette.grey["700"],
         mt: 1.5
       }),

@@ -2,9 +2,9 @@ import { useCallback } from "react";
 import { CreatePaymentMethodMutation, PaymentType, useCreatePaymentMethodMutation, AchMetadata, CreditCardMetadata, CreditCardBillingDetails } from "../queries/graphqlGenerated";
 import { BillingInfo } from "../forms/BillingInfoForm";
 import { FetchResult, MutationResult } from "@apollo/client";
-import { formatPhoneAsE123 } from "../domain/circle/circle.utils";
 import { PaymentMethod } from "../domain/payment/payment.interfaces";
 import { useEncryptCardData } from "./useEncryptCard";
+import { formatPhoneAsE123 } from "../domain/circle/circle.utils";
 
 
 export interface ExtendedCreatePaymentMethodOptions {

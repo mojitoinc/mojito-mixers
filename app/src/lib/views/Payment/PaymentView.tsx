@@ -10,10 +10,11 @@ import { SavedPaymentDetailsSelector } from "../../components/shared/SavedPaymen
 import { BillingInfoItem } from "../../components/payments/BillingInfo/Item/BillingInfoItem";
 import { SavedPaymentMethod } from "../../domain/circle/circle.interfaces";
 import { billingInfoToSavedPaymentMethodBillingInfo } from "../../domain/circle/circle.utils";
-import { SelectedPaymentMethod } from "../../components/payments/CheckoutModal/CheckoutModal";
+import { CheckoutModalError, SelectedPaymentMethod } from "../../components/payments/CheckoutModal/CheckoutModal.hooks";
 import { BoxProps, Divider, Stack } from "@mui/material";
 import { usePlaid } from "../../hooks/usePlaid";
 import { ConsentType } from "../../components/shared/ConsentText/ConsentText";
+import { checkNeedsGenericErrorMessage } from "../../hooks/useFormCheckoutError";
 
 const billingInfoItemBoxProps: BoxProps = { sx: { mt: 2.5 } };
 
@@ -21,6 +22,7 @@ export interface PaymentViewProps {
   checkoutItems: CheckoutItem[];
   savedPaymentMethods: SavedPaymentMethod[];
   selectedPaymentMethod: SelectedPaymentMethod;
+  checkoutError?: CheckoutModalError;
   onPaymentInfoSelected: (data: string | PaymentMethod) => void;
   onCvvSelected: (cvv: string) => void;
   onSavedPaymentMethodDeleted: (savedPaymentMethodId: string) => void;
@@ -38,6 +40,7 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
   checkoutItems,
   savedPaymentMethods: rawSavedPaymentMethods,
   selectedPaymentMethod,
+  checkoutError,
   onPaymentInfoSelected,
   onCvvSelected,
   onSavedPaymentMethodDeleted,
@@ -69,7 +72,7 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
 
   const [{ isDeleting, showSaved }, setViewState] = useState({
     isDeleting: false,
-    showSaved: savedPaymentMethods.length > 0 && typeof selectedBillingInfo === "string",
+    showSaved: savedPaymentMethods.length > 0 && typeof selectedBillingInfo === "string" && !checkNeedsGenericErrorMessage("payment", checkoutError),
   });
 
   const handleShowForm = useCallback(() => {
@@ -103,10 +106,10 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
     const selectedPaymentInfoMatch = typeof selectedPaymentInfo === "string" && savedPaymentMethods.some(({ id }) => id === selectedPaymentInfo);
     const firstActiveSavedPaymentMethod = savedPaymentMethods.find(({ status }) => status === "complete");
 
-    if (showSaved && savedPaymentMethods.length > 0 && !selectedPaymentInfoMatch && firstActiveSavedPaymentMethod) {
+    if (showSaved && !selectedPaymentInfoMatch && firstActiveSavedPaymentMethod /* && savedPaymentMethods.length > 0 && !checkoutError */) {
       onPaymentInfoSelected(firstActiveSavedPaymentMethod.id);
     }
-  }, [showSaved, onPaymentInfoSelected, savedPaymentMethods, selectedPaymentInfo]);
+  }, [showSaved, onPaymentInfoSelected, savedPaymentMethods, selectedPaymentInfo/*, checkoutError*/]);
 
   // PLAIN LINKS:
   const onPlaidLinkClicked = usePlaid({
@@ -152,6 +155,7 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
           <PaymentMethodForm
             acceptedPaymentTypes={acceptedPaymentTypes}
             defaultValues={ typeof selectedPaymentInfo === "string" ? undefined : selectedPaymentInfo }
+            checkoutError={ checkoutError }
             onPlaidLinkClicked={ onPlaidLinkClicked }
             onSaved={ savedPaymentMethods.length > 0 ? handleShowSaved : undefined }
             onClose={ onClose }

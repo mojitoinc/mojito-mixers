@@ -17,19 +17,12 @@ import { ErrorView } from "../../../views/Error/ErrorView";
 import { RawSavedPaymentMethod, SavedPaymentMethod } from "../../../domain/circle/circle.interfaces";
 import { Theme, ThemeProvider, createTheme, ThemeOptions, SxProps } from "@mui/material/styles";
 import { useShakeAnimation } from "../../../utils/animationUtils";
-import { resetStepperProgress } from "../CheckoutStepper/CheckoutStepper";
-import { continuePlaidOAuthFlow, INITIAL_PLAID_OAUTH_FLOW_STATE, PlaidFlow } from "../../../hooks/usePlaid";
+import { continuePlaidOAuthFlow, PlaidFlow } from "../../../hooks/usePlaid";
 import { ConsentType } from "../../shared/ConsentText/ConsentText";
+import { useCheckoutModalState } from "./CheckoutModal.hooks";
+import { DEFAULT_ERROR_AT, ERROR_LOADING_PAYMENT_METHODS, ERROR_LOADING_USER } from "../../../domain/errors/errors.constants";
 
 const SELECTOR_DIALOG_SCROLLABLE = "[role=presentation]";
-
-export type CheckoutState = "authentication" | "billing" | "payment" | "purchasing" | "confirmation";
-
-export interface SelectedPaymentMethod {
-  billingInfo: string | BillingInfo;
-  paymentInfo: string | PaymentMethod;
-  cvv: string;
-}
 
 export interface CheckoutModalProps {
   // Modal:
@@ -75,7 +68,6 @@ export interface CheckoutModalProps {
   onMarketingOptInChange?: (marketingOptIn: boolean) => void
 }
 
-const CHECKOUT_STEPS: CheckoutState[] = ["authentication", "billing", "payment", "purchasing", "confirmation"];
 
 export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   // Modal:
@@ -143,20 +135,27 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
   const isDialogLoading = isAuthenticatedLoading || meLoading || paymentMethodsLoading;
   const isPlaidFlowLoading = continuePlaidOAuthFlow();
-  const startAt = !isAuthenticated || productConfirmationEnabled ? 0 : 1;
   const rawSavedPaymentMethods = paymentMethodsData?.getPaymentMethodList;
   const savedPaymentMethods = useMemo(() => transformRawSavedPaymentMethods(rawSavedPaymentMethods as RawSavedPaymentMethod[]), [rawSavedPaymentMethods]);
   const dialogRootRef = useRef<HTMLDivElement>(null);
   const paperRef = useRef<HTMLDivElement>(null);
-  const [paymentError, setPaymentError] = useState("");
-  const [checkoutStepIndex, setCheckoutStepIndex] = useState(0);
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<SelectedPaymentMethod>({
-    billingInfo: "",
-    paymentInfo: "",
-    cvv: "",
-  });
 
-  const checkoutStep = CHECKOUT_STEPS[checkoutStepIndex];
+  const {
+    // CheckoutModalState:
+    checkoutStep,
+    checkoutError,
+    resetModalState,
+    goBack,
+    goNext,
+    goTo,
+    setError,
+
+    // SelectedPaymentMethod:
+    selectedPaymentMethod,
+    setSelectedPaymentMethod,
+  } = useCheckoutModalState({
+    isAuthenticated,
+  });
 
   useEffect(() => {
     const dialogScrollable = dialogRootRef.current?.querySelector(SELECTOR_DIALOG_SCROLLABLE);
@@ -164,23 +163,6 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
     // Scroll to top on step change:
     if (checkoutStep && dialogScrollable) dialogScrollable.scrollTop = 0;
   }, [checkoutStep]);
-
-  const resetModalState = useCallback(() => {
-    // Make sure the progress tracker in BillingView and PaymentView is properly animated:
-    resetStepperProgress();
-
-    // Once authentication has loaded, we know if we need to skip the product confirmation step or not. Also, when the
-    // modal is re-opened, we need to reset its state, taking into account if we need to resume a Plaid OAuth flow:s
-    const { selectedBillingInfo, continueOAuthFlow, savedStateUsed } = INITIAL_PLAID_OAUTH_FLOW_STATE;
-
-    setPaymentError("");
-    setCheckoutStepIndex(continueOAuthFlow && !savedStateUsed ? 3 : startAt);
-    setSelectedPaymentMethod({
-      billingInfo: selectedBillingInfo || "",
-      paymentInfo: "",
-      cvv: "",
-    });
-  }, [startAt]);
 
   useEffect(() => {
     if (isDialogLoading || !open) return;
@@ -224,37 +206,31 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
         cvv: "",
       };
     });
-  }, [savedPaymentMethods]);
+  }, [savedPaymentMethods, setSelectedPaymentMethod]);
 
   useEffect(() => {
     if (!checkoutStep) onClose();
   }, [checkoutStep, onClose]);
 
   useEffect(() => {
-    if (meError) setPaymentError("User could not be loaded.");
-    if (paymentMethodsError) setPaymentError("Payment methods could not be loaded.");
-  }, [meError, paymentMethodsError]);
-
-  const handlePrevClicked = useCallback(() => {
-    setCheckoutStepIndex((prevCheckoutStepIndex) => prevCheckoutStepIndex - 1);
-  }, []);
-
-  const handleNextClicked = useCallback(() => {
-    setCheckoutStepIndex(prevCheckoutStepIndex => prevCheckoutStepIndex + 1);
-  }, []);
+    if (meError) setError(ERROR_LOADING_USER(meError));
+    if (paymentMethodsError) setError(ERROR_LOADING_PAYMENT_METHODS(paymentMethodsError));
+  }, [meError, paymentMethodsError, setError]);
 
   const handleBillingInfoSelected = useCallback((billingInfo: string | BillingInfo) => {
-    // TODO: Does paymentInfo need to be reset when coming back to billing info to fix validation errors?
-    setSelectedPaymentMethod({ billingInfo, paymentInfo: "", cvv: "" });
-  }, []);
+    // If we go back to the billing info step to fix some validation errors or change some data, we preserve the data
+    // in the payment info step (form) as long as it was not a saved payment method. In that case, the saved payment
+    // method doesn't belong to the now updated billing info anymore, so we do reset it:
+    setSelectedPaymentMethod(({ paymentInfo }) => ({ billingInfo, paymentInfo: typeof paymentInfo === "object" ? paymentInfo : "", cvv: "" }));
+  }, [setSelectedPaymentMethod]);
 
   const handlePaymentInfoSelected = useCallback((paymentInfo: string | PaymentMethod) => {
     setSelectedPaymentMethod(({ billingInfo }) => ({ billingInfo, paymentInfo, cvv: "" }));
-  }, []);
+  }, [setSelectedPaymentMethod]);
 
   const handleCvvSelected = useCallback((cvv: string) => {
     setSelectedPaymentMethod(({ billingInfo, paymentInfo }) => ({ billingInfo, paymentInfo, cvv }));
-  }, []);
+  }, [setSelectedPaymentMethod]);
 
   const handleSavedPaymentMethodDeleted = useCallback(async (addressIdOrPaymentMethodId: string) => {
     const idsToDelete: string[] = checkoutStep === "billing"
@@ -301,7 +277,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
     await Promise.allSettled(promises);
 
     await refetchPaymentMethods({ orgID });
-  }, [checkoutStep, deletePaymentMethod, orgID, refetchPaymentMethods, savedPaymentMethods]);
+  }, [checkoutStep, deletePaymentMethod, orgID, refetchPaymentMethods, savedPaymentMethods, setSelectedPaymentMethod]);
 
   const [paymentReferenceNumber, setPaymentReferenceNumber] = useState("");
 
@@ -311,10 +287,10 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
     setPaymentReferenceNumber(paymentReferenceNumber);
 
-    handleNextClicked();
-  }, [refetchPaymentMethods, handleNextClicked]);
+    goNext();
+  }, [refetchPaymentMethods, goNext]);
 
-  const handleReviewData = useCallback(async (): Promise<false> => {
+  const handleFixError = useCallback(async (): Promise<false> => {
     // After an error, all data is reloaded in case the issue was caused by stale/cached data or in case a new payment
     // method has been created despite the error:
     await Promise.allSettled([
@@ -322,16 +298,18 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
       refetchPaymentMethods(),
     ]);
 
-    // TODO: paymentError should have a source property to know where the error is coming from and handle recovery differently here:
-    setCheckoutStepIndex(2);
-    setSelectedPaymentMethod((prevSelectedPaymentMethod) => ({ ...prevSelectedPaymentMethod, cvv: "" }));
-    setPaymentError("");
+    if (checkoutError.at !== "purchasing") {
+      // If we are redirecting users to the PurchasingView again, we keep the CVV to be able to re-try the purchase:
+      setSelectedPaymentMethod((prevSelectedPaymentMethod) => ({ ...prevSelectedPaymentMethod, cvv: "" }));
+    }
+
+    goTo(checkoutError.at || DEFAULT_ERROR_AT, checkoutError);
 
     // This function is used as a CheckoutModalFooter's onSubmitClicked, so we want that to show a loader on the submit
     // button when clicked but do not remove it once the Promise is resolved, as we are moving to another view and
     // CheckoutModalFooter will unmount (so doing this prevents a memory leak issue):
     return false;
-  }, [meRefetch, refetchPaymentMethods]);
+  }, [meRefetch, refetchPaymentMethods, setSelectedPaymentMethod, goTo, checkoutError]);
 
   // BLOCK DIALOG LOGIC & SHAKE ANIMATION:
 
@@ -355,8 +333,9 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
     }
 
     handlePaymentInfoSelected(paymentInfo);
-    setCheckoutStepIndex(3);
-  }, [resetModalState, handlePaymentInfoSelected]);
+
+    goTo("purchasing");
+  }, [resetModalState, handlePaymentInfoSelected, goTo]);
 
   const theme = useMemo(() => themeOptions ? createTheme(themeOptions) : parentTheme, [parentTheme, themeOptions]);
   const Wrapper = theme ? ThemeProvider : Fragment;
@@ -389,15 +368,16 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   let headerVariant: CheckoutModalHeaderVariant = isAuthenticated ? 'loggedIn' : 'guest';
   let checkoutStepElement = null;
 
-  if (paymentError) {
+  if (checkoutStep === "error") {
     headerVariant = "error";
 
     checkoutStepElement = (
       <ErrorView
-        errorMessage={ paymentError }
+        checkoutError={ checkoutError }
         errorImageSrc={ errorImageSrc }
-        onReviewData={ handleReviewData }
-        onClose={ onClose } />
+        onFixError={ handleFixError }
+        onClose={ onClose }
+        debug={ debug } />
     );
   } else if (!checkoutStep) {
     return null;
@@ -409,7 +389,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
         checkoutItems={ checkoutItems }
         isAuthenticated={ isAuthenticated }
         guestCheckoutEnabled={ guestCheckoutEnabled }
-        onGuestClicked={ handleNextClicked }
+        onGuestClicked={ goNext }
         onCloseClicked={ onClose } />
     );
   } else if (checkoutStep === "billing") {
@@ -418,9 +398,10 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
         checkoutItems={ checkoutItems }
         savedPaymentMethods={ savedPaymentMethods }
         selectedBillingInfo={ selectedPaymentMethod.billingInfo }
+        checkoutError={ checkoutError }
         onBillingInfoSelected={ handleBillingInfoSelected }
         onSavedPaymentMethodDeleted={ handleSavedPaymentMethodDeleted }
-        onNext={ handleNextClicked }
+        onNext={ goNext }
         onClose={ onClose }
         debug={ debug } />
     );
@@ -430,11 +411,12 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
         checkoutItems={ checkoutItems }
         savedPaymentMethods={ savedPaymentMethods }
         selectedPaymentMethod={ selectedPaymentMethod }
+        checkoutError={ checkoutError }
         onPaymentInfoSelected={ handlePaymentInfoSelected }
         onCvvSelected={ handleCvvSelected }
         onSavedPaymentMethodDeleted={ handleSavedPaymentMethodDeleted }
-        onNext={ handleNextClicked }
-        onPrev={ handlePrevClicked }
+        onNext={ goNext }
+        onPrev={ goBack }
         onClose={ onClose }
         acceptedPaymentTypes={ acceptedPaymentTypes }
         consentType={ consentType }
@@ -455,7 +437,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
         savedPaymentMethods={ savedPaymentMethods }
         selectedPaymentMethod={ selectedPaymentMethod }
         onPurchaseSuccess={ handlePurchaseSuccess }
-        onPurchaseError={ setPaymentError }
+        onPurchaseError={ setError }
         onDialogBlocked={ setIsDialogBlocked }
         debug={ debug } />
     );
@@ -469,7 +451,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
         selectedPaymentMethod={ selectedPaymentMethod }
         paymentReferenceNumber={ paymentReferenceNumber }
         purchaseInstructions={ purchaseInstructions }
-        onNext={ handleNextClicked }
+        onNext={ onClose }
         onClose={ onClose } />
     );
   }
@@ -478,8 +460,8 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
     <Wrapper { ...(wrapperProps as any) }>
       <Dialog
         open={ isDialogBlocked ? true : open }
-        onClose={ isDialogBlocked ? undefined : onClose }
-        onBackdropClick={ isDialogBlocked ? shake : undefined }
+        onClose={ isDialogBlocked ? shake : onClose }
+        // onBackdropClick={ isDialogBlocked ? shake : undefined }
         aria-labelledby="checkout-modal-header-title"
         scroll="body"
         ref={ dialogRootRef }
@@ -508,7 +490,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
             user={ meData?.me?.user }
             userFormat={ userFormat }
             onLoginClicked={ onLogin }
-            onPrevClicked={ handlePrevClicked } />
+            onPrevClicked={ checkoutStep === "authentication" ? onClose : goBack } />
 
           { checkoutStepElement }
 

@@ -15,6 +15,9 @@ import BookIcon from "@mui/icons-material/Book";
 import { EMPTY_OPTION, SelectOption } from "../components/shared/Select/Select";
 import { withRequiredErrorMessage } from "../utils/validationUtils";
 import { DebugBox } from "../components/payments/DisplayBox/DisplayBox";
+import { CheckoutModalError } from "../components/payments/CheckoutModal/CheckoutModal.hooks";
+import { useFormCheckoutError } from "../hooks/useFormCheckoutError";
+import { FormErrorsBox } from "../components/shared/FormErrorsBox/FormErrorsBox";
 
 const FULL_NAME_FIELD = "fullName";
 const EMAIL_FIELD = "email";
@@ -49,6 +52,8 @@ const FIELD_LABELS = {
   [STATE_FIELD]: "State",
   [ZIP_CODE_FIELD]: "Zip Code"
 };
+
+const FIELD_NAMES = Object.keys(FIELD_LABELS);
 
 const EMPTY_FORM_VALUES: BillingInfo = {
   [FULL_NAME_FIELD]: "",
@@ -102,6 +107,7 @@ const schema = object()
 export interface BillingInfoFormProps {
   // variant: BillingInfoFormVariant;
   defaultValues?: BillingInfo;
+  checkoutError?: CheckoutModalError;
   onSaved?: () => void;
   onClose: () => void;
   onSubmit: (data: BillingInfo) => void;
@@ -111,12 +117,19 @@ export interface BillingInfoFormProps {
 export const BillingInfoForm: React.FC<BillingInfoFormProps> = ({
   // variant,
   defaultValues,
+  checkoutError,
   onSaved,
   onClose,
   onSubmit,
   debug
 }) => {
-  const { control, handleSubmit, watch } = useForm<BillingInfo>({
+  const {
+    control,
+    handleSubmit,
+    watch,
+    setError,
+    formState,
+  } = useForm<BillingInfo>({
     defaultValues: {
       ...EMPTY_FORM_VALUES,
       ...defaultValues
@@ -128,6 +141,7 @@ export const BillingInfoForm: React.FC<BillingInfoFormProps> = ({
   const selectedCountryOption: SelectOption = watch(COUNTRY_FIELD);
   const selectedCountryCode = selectedCountryOption?.value;
   const submitForm = handleSubmit(onSubmit);
+  const checkoutErrorMessage = useFormCheckoutError({ formKey: "billing", checkoutError, fields: FIELD_NAMES, setError });
 
   return (
     <form onSubmit={submitForm}>
@@ -223,11 +237,15 @@ export const BillingInfoForm: React.FC<BillingInfoFormProps> = ({
         </Grid>
       </Grid>
 
-      {debug && (
-        <DebugBox sx={{ my: 2 }}>
-          {JSON.stringify(watch(), null, 2)}
+      { checkoutErrorMessage && <FormErrorsBox error={ checkoutErrorMessage } sx={{ mt: 5 }} /> }
+
+      { debug && (
+        <DebugBox sx={{ mt: 5 }}>
+          { JSON.stringify(watch(), null, 2) }
+          { "\n\n" }
+          { JSON.stringify(formState.errors, null, 2) }
         </DebugBox>
-      )}
+      ) }
 
       {/* variant === "loggedIn" && <Checkbox label="Save this billing information" /> */}
 

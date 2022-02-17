@@ -1,4 +1,4 @@
-import { Typography, Divider, Stack, Box, LinearProgress, linearProgressClasses } from "@mui/material";
+import { Typography, Divider, Stack, Box } from "@mui/material";
 import { useTimeout } from "@swyg/corre";
 import React, { useState } from "react";
 
@@ -22,7 +22,7 @@ export const CheckoutStepper: React.FC<CheckoutStepperProps> = ({
   }, 0, [currentProgress]);
 
   return (
-    <Box sx={{ position: "relative", mb: 1 }}>
+    <Box sx={{ position: "relative" }}>
       <Stack spacing={ 2 } direction="row" sx={{ justifyContent: "space-between", alignItems: "center", pt: 2, pb: 1 }}>
         <Typography variant="subtitle2" sx={{ width: "100%", color: theme => theme.palette.grey[progress === 50 ? "700" : "600"] }} >
           Billing Info

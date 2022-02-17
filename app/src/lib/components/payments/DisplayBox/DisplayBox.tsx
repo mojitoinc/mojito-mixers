@@ -4,6 +4,7 @@ import React from "react";
 
 const DISPLAY_BOX_PROPS: SxProps<Theme> = {
   p: 2,
+  m: 0,
   border: 1,
   borderRadius: "2px",
   backgroundColor: theme => theme.palette.grey["50"],
@@ -30,6 +31,6 @@ export const DebugBox: React.FC<BoxProps> = ({
   ...props
 }) => {
   return (
-    <DisplayBox { ...props } component="pre" sx={{ ...sx, overflow: "scroll" }} />
+    <DisplayBox { ...props } component="pre" sx={{ ...sx, overflow: "scroll", whiteSpace: "pre-wrap" }} />
   );
 }

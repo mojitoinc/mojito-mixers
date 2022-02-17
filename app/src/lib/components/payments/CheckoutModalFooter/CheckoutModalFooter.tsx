@@ -12,21 +12,23 @@ interface CheckoutModalFooterConsentState {
   isConsentChecked: boolean;
 }
 
-export type CheckoutModalFooterVariant = "toGuestCheckout" | "toPayment" | "toConfirmation" | "toPlaid" | "toForm" | "toMarketplace";
+export type CheckoutModalFooterVariant = "toGuestCheckout" | "toPayment" | "toConfirmation" | "toPlaid" | "toReview" | "toMarketplace";
 
 export interface CheckoutModalFooterProps {
   variant: CheckoutModalFooterVariant;
+  buttonLabel?: string;
   guestCheckoutEnabled?: boolean;
   consentType?: ConsentType;
   privacyHref?: string;
   termsOfUseHref?: string;
   submitDisabled?: boolean;
   onSubmitClicked?: (canSubmit: boolean) => void | Promise<void | false>;
-  onCloseClicked: () => void;
+  onCloseClicked?: () => void;
 }
 
 export const CheckoutModalFooter: React.FC<CheckoutModalFooterProps> = ({
   variant,
+  buttonLabel,
   guestCheckoutEnabled,
   consentType,
   privacyHref,
@@ -62,7 +64,7 @@ export const CheckoutModalFooter: React.FC<CheckoutModalFooterProps> = ({
 
   // PRIMARY BUTTON:
   const primaryButtonVisible = variant !== "toGuestCheckout" || guestCheckoutEnabled;
-  const primaryButtonLabel = LABELS_BY_VARIANT[variant];
+  const primaryButtonLabel = buttonLabel || LABELS_BY_VARIANT[variant];
   const PrimaryButtonIcon = ICONS_BY_VARIANT[variant];
 
   const handleSubmitClicked = useCallback(async () => {
@@ -91,7 +93,7 @@ export const CheckoutModalFooter: React.FC<CheckoutModalFooterProps> = ({
   const handleCancelClicked = useCallback((e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
 
-    onCloseClicked();
+    if (onCloseClicked) onCloseClicked();
   }, [onCloseClicked]);
 
   return (
@@ -124,7 +126,7 @@ export const CheckoutModalFooter: React.FC<CheckoutModalFooterProps> = ({
         </PrimaryButton>
       ) }
 
-      { variant !== "toMarketplace" && (
+      { variant !== "toMarketplace" && onCloseClicked && (
         <Typography sx={ primaryButtonVisible ? { pt: 2 } : undefined }>
           { primaryButtonVisible ? "or " : null }
           <Link sx={{ color: "text.primary" }} href="" onClick={ handleCancelClicked }>

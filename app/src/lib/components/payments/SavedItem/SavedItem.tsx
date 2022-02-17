@@ -22,6 +22,7 @@ export const InlineField: React.FC<TextFieldProps> = styled((props: TextFieldPro
     color: "black",
     padding: 8,
     height: "30px",
+    background: "white",
   },
   "& .MuiInputBase-input": {
     color: "black",

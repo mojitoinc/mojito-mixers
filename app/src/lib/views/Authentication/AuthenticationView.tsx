@@ -31,8 +31,6 @@ export const AuthenticationView: React.FC<AuthenticationViewProps> = ({
     <CheckoutModalFooter
       variant={ isAuthenticated ? "toPayment" : "toGuestCheckout" }
       guestCheckoutEnabled={ guestCheckoutEnabled }
-      privacyHref=""
-      termsOfUseHref=""
       onSubmitClicked={ onGuestClicked }
       onCloseClicked={ onCloseClicked } />
   </>);
