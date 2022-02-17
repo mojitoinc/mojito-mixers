@@ -42,6 +42,8 @@ export function useFormCheckoutError({
       });
     }
 
+    // Only show the generic error message at the bottom of the form if we could not match any error to a specific
+    // input field:
     setGenericErrorMessage(needsGenericErrorMessage ? (checkoutError?.errorMessage || "") : "");
 
   // eslint-disable-next-line react-hooks/exhaustive-deps

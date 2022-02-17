@@ -37,7 +37,7 @@ export const ErrorView: React.FC<ErrorViewProps> = ({
   const debugErrorMessage = stringifiedError === "{}" && error ? error.stack : stringifiedError;
 
   return (<>
-    <Box sx={{ position: "relative" /*, mt: 2 */ }}>
+    <Box sx={{ position: "relative" }}>
 
       { errorImageSrc ? (
         <Box
