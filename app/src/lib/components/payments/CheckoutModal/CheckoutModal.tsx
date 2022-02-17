@@ -218,8 +218,10 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   }, [meError, paymentMethodsError, setError]);
 
   const handleBillingInfoSelected = useCallback((billingInfo: string | BillingInfo) => {
-    // TODO: Does paymentInfo need to be reset when coming back to billing info to fix validation errors?
-    setSelectedPaymentMethod({ billingInfo, paymentInfo: "", cvv: "" });
+    // If we go back to the billing info step to fix some validation errors or change some data, we preserve the data
+    // in the payment info step (form) as long as it was not a saved payment method. In that case, the saved payment
+    // method doesn't belong to the now updated billing info anymore, so we do reset it:
+    setSelectedPaymentMethod(({ paymentInfo }) => ({ billingInfo, paymentInfo: typeof paymentInfo === "object" ? paymentInfo : "", cvv: "" }));
   }, [setSelectedPaymentMethod]);
 
   const handlePaymentInfoSelected = useCallback((paymentInfo: string | PaymentMethod) => {
