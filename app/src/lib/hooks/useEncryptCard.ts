@@ -21,11 +21,7 @@ export function useEncryptCardData(): [
   const [fetchPaymentKey, fetchPaymentKeyResult] = usePaymentKeyLazyQuery();
 
   const encryptCardData = useCallback(async (encryptCardDataOptions: EncryptCardDataOptions) => {
-    const paymentKeyResult = await fetchPaymentKey().catch((err) => {
-      console.log(err);
-
-      return undefined;
-    });
+    const paymentKeyResult = await fetchPaymentKey();
 
     const paymentKeyData = paymentKeyResult?.data;
     const publicKey = paymentKeyData?.getPaymentPublicKey?.publicKey;

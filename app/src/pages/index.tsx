@@ -1,8 +1,7 @@
-import { ApolloError } from "@apollo/client";
 import { useAuth0 } from "@auth0/auth0-react";
 import { Container, Typography, Box, Stack, Button, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio, FormHelperText, TextField, Switch, Select, MenuItem, InputLabel, FormGroup, Checkbox } from "@mui/material";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { CheckoutModal, CheckoutModalProps, continuePlaidOAuthFlow, PaymentType } from "../lib";
+import { CheckoutModal, CheckoutModalError, CheckoutModalProps, continuePlaidOAuthFlow, PaymentType } from "../lib";
 import { useMeQuery } from "../services/graphql/generated";
 import { PLAYGROUND_PARAGRAPHS_ARRAY, PLAYGROUND_AUTH_PRESET, PLAYGROUND_NO_AUTH_PRESET, PLAYGROUND_PRIVACY_HREF, PLAYGROUND_PURCHASE_INSTRUCTIONS, PLAYGROUND_TERMS_OF_USE_HREF, PLAYGROUND_USER_FORMAT, PLAYGROUND_PURCHASING_IMAGE_SRC, PLAYGROUND_ERROR_IMAGE_SRC, PLAYGROUND_THEMES, PLAYGROUND_LOGOS_SRC, PLAYGROUND_LOGOS_SX, PLAYGROUND_MOCKED_LOT, PLAYGROUND_LOADER_IMAGE_SRC } from "../utils/playground/playground.constants";
 import { PlaygroundFormData } from "../utils/playground/playground.interfaces";
@@ -71,16 +70,17 @@ const HomePage = () => {
   }, [isAuthenticated, isLoading, meData]);
 
   const handleOpen = useCallback(() => {
-    // TODO: Pass a prop to indicate the user started adding info.
     setOpen(true);
   }, []);
 
   const handleClose = useCallback(() => {
+    // TODO: Pass a prop to indicate the user started adding info.
     setOpen(false);
   }, []);
 
-  const handleError = useCallback((error: ApolloError | Error | string) => {
-    console.log(error);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const handleError = useCallback((error: CheckoutModalError) => {
+    // console.log(error);
   }, []);
 
   const handleMarketingOptInChange = useCallback((marketingOptIn: boolean) => {
@@ -246,22 +246,6 @@ const HomePage = () => {
 
       <Box sx={{ my: 4 }}>
         <FormControl component="fieldset">
-          <FormLabel component="legend" sx={{ mb: 1 }}>Invoice</FormLabel>
-          <TextField
-            name="invoiceID"
-            label="Invoice ID"
-            size="small"
-            value={ formValues.invoiceID }
-            onChange={ handleChange }
-            required={ formValues.lotType === "auction" } />
-        </FormControl>
-
-        <Typography variant="body2" sx={{ mt: 2 }}>In production, this will be required for auction lots.</Typography>
-        <Typography variant="body2" sx={{ mt: 1, fontWeight: 600 }}>You can still let the Payment UI handle invoice creation for both auction and pay now lots in this playground app.</Typography>
-      </Box>
-
-      <Box sx={{ my: 4 }}>
-        <FormControl component="fieldset">
           <FormLabel component="legend" sx={{ mb: 1 }}>Lot Data</FormLabel>
           <Stack spacing={ 2 }>
             <TextField
@@ -287,6 +271,14 @@ const HomePage = () => {
             </FormControl>
 
             <TextField
+              name="invoiceID"
+              label="Invoice ID"
+              size="small"
+              value={ formValues.invoiceID }
+              onChange={ handleChange }
+              required={ formValues.lotType === "auction" } />
+
+            <TextField
               type="number"
               name="lotUnits"
               label="Lot Units"
@@ -308,12 +300,14 @@ const HomePage = () => {
               label="Lot Fee"
               size="small"
               value={ formValues.lotFee }
-              onChange={ handleChange }/>
+              onChange={ handleChange } />
+
           </Stack>
         </FormControl>
 
         <Typography variant="body2" sx={{ mt: 2 }}>The Lot ID field can be left empty, but you won't be able to complete the purchase.</Typography>
         <Typography variant="body2" sx={{ mt: 1 }}>If you want to complete the purchase, make sure the lot also belongs to the organization referenced by the Org ID above.</Typography>
+        <Typography variant="body2" sx={{ mt: 1 }}>The Payment UI handles invoice creation for both auction and buy now lots in this playground app, but will only do it for buy now lots in production.</Typography>
       </Box>
 
       <Box sx={{ my: 4 }}>

@@ -4,6 +4,7 @@ import countryRegionData from "country-region-data/dist/data-umd";
 import { customList } from "country-codes-list";
 import { ApolloError } from "@apollo/client";
 import { formatSentence } from "../../utils/formatUtils";
+import { BUILT_IN_ERRORS } from "../errors/errors.constants";
 
 const countryPrefixes = customList('countryCode', '{countryCallingCode}') as Record<string, string>;
 
@@ -175,7 +176,11 @@ const CIRCLE_FIELD_TO_FORM_FIELD: Record<string, [CircleFieldErrorAt, string, st
 };
 
 export function parseCircleError(error: ApolloError | Error): CircleFieldErrors | undefined {
-  const { message } = error;
+  const { name, message } = error;
+
+  // If there's any code error like "TypeError: Cannot read properties of undefined", we don't want to show that to
+  // users, so we just return undefined here to fall back to the default `ERROR_PURCHASE_CREATING_PAYMENT_METHOD` error.
+  if (BUILT_IN_ERRORS.includes(name) || !message) return undefined;
 
   if (message.includes("with body: ")) {
     try {
@@ -212,12 +217,11 @@ export function parseCircleError(error: ApolloError | Error): CircleFieldErrors 
 
         return circleFieldErrors;
       }
-
     } catch (e) { /* ignore */ }
   }
 
-  return message ? {
+  return {
     summary: message,
     firstAt: "billing",
-  } : undefined;
+  };
 }
