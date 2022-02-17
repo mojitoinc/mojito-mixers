@@ -60,9 +60,10 @@ const HomePage = () => {
 
   useEffect(() => {
     if (isLoading ||
-    firstTimeRef.current === false ||
-    (INITIAL_FORM_VALUES.lotType === "auction" && !INITIAL_FORM_VALUES.invoiceID) ||
-    (INITIAL_FORM_VALUES.orgID === "custom" && !INITIAL_FORM_VALUES.customOrgID)) return;
+      firstTimeRef.current === false ||
+      (INITIAL_FORM_VALUES.lotType === "auction" && !INITIAL_FORM_VALUES.invoiceID) ||
+      (INITIAL_FORM_VALUES.orgID === "custom" && !INITIAL_FORM_VALUES.customOrgID)
+    ) return;
 
     firstTimeRef.current = false;
 
@@ -145,6 +146,7 @@ const HomePage = () => {
   };
 
   const testPreset = (isAuthenticated ? PLAYGROUND_AUTH_PRESET[formValues.authPresets] : PLAYGROUND_NO_AUTH_PRESET[formValues.notAuthPreset]) || {};
+  const lotType = formValues.lotType || PLAYGROUND_MOCKED_LOT.lotType;
 
   const checkoutModalProps: CheckoutModalProps = {
     // Modal:
@@ -179,13 +181,14 @@ const HomePage = () => {
 
     // Data:
     orgID: (formValues.orgID === "custom" ? formValues.customOrgID : formValues.orgID) || "",
+    invoiceID: (lotType === "auction" && formValues.invoiceID) || "",
     checkoutItems: [{
       ...PLAYGROUND_MOCKED_LOT,
       lotID: formValues.lotID || PLAYGROUND_MOCKED_LOT.lotID,
-      lotType: formValues.lotType || PLAYGROUND_MOCKED_LOT.lotType,
-      units: parseInt(`${ formValues.lotUnits || PLAYGROUND_MOCKED_LOT.units }`, 10) || 1,
+      lotType,
+      units: lotType === "auction" ? 1 : (parseInt(`${ formValues.lotUnits || PLAYGROUND_MOCKED_LOT.units }`, 10) || 1),
       unitPrice: parseInt(`${ formValues.lotUnitPrice || PLAYGROUND_MOCKED_LOT.unitPrice }`, 10) || 0,
-      fee: parseInt(`${ formValues.lotFee || PLAYGROUND_MOCKED_LOT.fee }`, 10) || 0,
+      fee: lotType === "buyNow" ? 0 : (parseInt(`${ formValues.lotFee || PLAYGROUND_MOCKED_LOT.fee }`, 10) || 0),
     }],
 
     // Authentication:
@@ -210,34 +213,35 @@ const HomePage = () => {
       <Box sx={{ my: 4 }}>
         <FormControl component="fieldset">
           <FormLabel component="legend">Organization</FormLabel>
-            <RadioGroup
-              name="orgID"
-              value={ formValues.orgID }
-              onChange={ handleChange }>
 
-              { organizations.map((organization) => (
-                <FormControlLabel
-                  key={ organization.id }
-                  value={ organization.id }
-                  control={<Radio />}
-                  label={ organization.name } />
-              )) }
+          <RadioGroup
+            name="orgID"
+            value={ formValues.orgID }
+            onChange={ handleChange }>
 
+            { organizations.map((organization) => (
               <FormControlLabel
-                value="custom"
+                key={ organization.id }
+                value={ organization.id }
                 control={<Radio />}
-                sx={{ mt: 1 }}
-                label={
-                  <TextField
-                    name="customOrgID"
-                    label="Custom Org ID"
-                    size="small"
-                    value={ formValues.customOrgID }
-                    onChange={ handleChange }
-                    disabled={ formValues.orgID !== "custom" } />
-                } />
+                label={ organization.name } />
+            )) }
 
-            </RadioGroup>
+            <FormControlLabel
+              value="custom"
+              control={<Radio />}
+              sx={{ mt: 1 }}
+              label={
+                <TextField
+                  name="customOrgID"
+                  label="Custom Org ID"
+                  size="small"
+                  value={ formValues.customOrgID }
+                  onChange={ handleChange }
+                  disabled={ formValues.orgID !== "custom" } />
+              } />
+
+          </RadioGroup>
         </FormControl>
 
         <Typography variant="body2" sx={{ mt: 2 }}>If left empty, the modal will fail to load your saved payment methods and at making a purchase.</Typography>
@@ -246,7 +250,8 @@ const HomePage = () => {
 
       <Box sx={{ my: 4 }}>
         <FormControl component="fieldset">
-          <FormLabel component="legend" sx={{ mb: 1 }}>Lot Data</FormLabel>
+          <FormLabel component="legend" sx={{ mb: 2 }}>Lot Data</FormLabel>
+
           <Stack spacing={ 2 }>
             <TextField
               name="lotID"
@@ -271,22 +276,6 @@ const HomePage = () => {
             </FormControl>
 
             <TextField
-              name="invoiceID"
-              label="Invoice ID"
-              size="small"
-              value={ formValues.invoiceID }
-              onChange={ handleChange }
-              required={ formValues.lotType === "auction" } />
-
-            <TextField
-              type="number"
-              name="lotUnits"
-              label="Lot Units"
-              size="small"
-              value={ formValues.lotUnits }
-              onChange={ handleChange } />
-
-            <TextField
               type="number"
               name="lotUnitPrice"
               label="Lot Unit Price"
@@ -294,13 +283,31 @@ const HomePage = () => {
               value={ formValues.lotUnitPrice }
               onChange={ handleChange } />
 
-            <TextField
-              type="number"
-              name="lotFee"
-              label="Lot Fee"
-              size="small"
-              value={ formValues.lotFee }
-              onChange={ handleChange } />
+            { formValues.lotType === "buyNow" ? (
+              <TextField
+                type="number"
+                name="lotUnits"
+                label="Lot Units"
+                size="small"
+                value={ formValues.lotUnits }
+                onChange={ handleChange } />
+            ) : (<>
+              <TextField
+                type="number"
+                name="lotFee"
+                label="Lot Fee"
+                size="small"
+                value={ formValues.lotFee }
+                onChange={ handleChange } />
+
+              <TextField
+                name="invoiceID"
+                label="Invoice ID"
+                size="small"
+                value={ formValues.invoiceID }
+                onChange={ handleChange }
+                required />
+            </>) }
 
           </Stack>
         </FormControl>
