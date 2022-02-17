@@ -37,7 +37,6 @@ export interface SelectedPaymentMethod {
 
 export interface CheckoutModalStateReturn extends CheckoutModalState {
   // CheckoutModalState (+ inherited stuff):
-  // setCheckoutModalState: Dispatch<SetStateAction<CheckoutModalState>>;
   resetModalState: () => void;
   goBack: () => void;
   goNext: () => void;
@@ -102,8 +101,6 @@ export function useCheckoutModalState({
   }, []);
 
   const goTo = useCallback((checkoutStep: CheckoutModalStep, error?: null | string | CheckoutModalError) => {
-    console.log("goTo", checkoutStep, error);
-
     setCheckoutModalState((prevCheckoutModalState) => {
       let checkoutError: CheckoutModalError | undefined;
 
@@ -123,13 +120,10 @@ export function useCheckoutModalState({
     });
   }, []);
 
-  console.log("checkoutStep =", checkoutStep);
-
   return {
     // CheckoutModalState:
     checkoutStep,
     checkoutError,
-    // setCheckoutModalState,
     resetModalState,
     goBack,
     goNext,

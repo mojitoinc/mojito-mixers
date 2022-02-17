@@ -19,11 +19,6 @@
 
 <br />
 
-TODO:
-
-- CVV field error orange.
-- Checkbox field error orange.
-
 
 ## Working on the project
 

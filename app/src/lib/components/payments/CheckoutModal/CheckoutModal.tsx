@@ -289,17 +289,12 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   }, [refetchPaymentMethods, goNext]);
 
   const handleFixError = useCallback(async (): Promise<false> => {
-
-    console.log("RE-LOAD");
-
     // After an error, all data is reloaded in case the issue was caused by stale/cached data or in case a new payment
     // method has been created despite the error:
     await Promise.allSettled([
       meRefetch(),
       refetchPaymentMethods(),
     ]);
-
-    console.log("DONE");
 
     if (checkoutError.at !== "purchasing") {
       // If we are redirecting users to the PurchasingView again, we keep the CVV to be able to re-try the purchase:

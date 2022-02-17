@@ -3,6 +3,7 @@ import { CircleError, CircleFieldError, RawSavedPaymentMethod, SavedPaymentMetho
 import countryRegionData from "country-region-data/dist/data-umd";
 import { customList } from "country-codes-list";
 import { ApolloError } from "@apollo/client";
+import { formatSentence } from "../../utils/formatUtils";
 
 const countryPrefixes = customList('countryCode', '{countryCallingCode}') as Record<string, string>;
 
@@ -169,8 +170,8 @@ const CIRCLE_FIELD_TO_FORM_FIELD: Record<string, [CircleFieldErrorAt, string, st
   "metadata.email": ["billing", "email", "Email"],
   "metadata.phoneNumber": ["billing", "phone", "Phone"],
 
-  expMonth: ["payment", "expiryDate", "Expiration Date"],
-  expYear: ["payment", "expiryDate", "Expiration Date"],
+  expMonth: ["payment", "expiryDate", "Expiration Date's month"],
+  expYear: ["payment", "expiryDate", "Expiration Date's year"],
 };
 
 export function parseCircleError(error: ApolloError | Error): CircleFieldErrors | undefined {
@@ -193,8 +194,12 @@ export function parseCircleError(error: ApolloError | Error): CircleFieldErrors 
           const [at, inputName, inputLabel] = CIRCLE_FIELD_TO_FORM_FIELD[location] || ["unknown", location, location];
           const searchRegExp = new RegExp(location, "g");
 
-          circleFieldErrors[at][inputName] = [circleFieldErrors[at][inputName], message.replace(searchRegExp, inputLabel)].filter(Boolean).join(" / ");
-          circleFieldErrors.summary = circleFieldErrors.summary.replace(searchRegExp, inputLabel)
+          circleFieldErrors[at][inputName] = [
+            circleFieldErrors[at][inputName],
+            formatSentence(message.replace(searchRegExp, inputLabel).replace(" (was )", "")),
+          ].filter(Boolean).join(" / ");
+
+          circleFieldErrors.summary = circleFieldErrors.summary.replace(searchRegExp, inputLabel).replace(" (was )", "");
         });
       }
 
@@ -210,4 +215,9 @@ export function parseCircleError(error: ApolloError | Error): CircleFieldErrors 
 
     } catch (e) { /* ignore */ }
   }
+
+  return message ? {
+    summary: message,
+    firstAt: "billing",
+  } : undefined;
 }

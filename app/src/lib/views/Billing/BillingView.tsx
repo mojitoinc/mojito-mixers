@@ -10,6 +10,7 @@ import { CheckoutItem } from "../../domain/product/product.interfaces";
 import { BillingInfo, BillingInfoForm } from "../../forms/BillingInfoForm";
 import { distinctBy } from "../../utils/arrayUtils";
 import { CheckoutModalError } from "../../components/payments/CheckoutModal/CheckoutModal.hooks";
+import { checkNeedsGenericErrorMessage } from "../../hooks/useFormCheckoutError";
 
 export interface BillingViewProps {
   checkoutItems: CheckoutItem[];
@@ -39,7 +40,7 @@ export const BillingView: React.FC<BillingViewProps> = ({
 
   const [{ isDeleting, showSaved }, setViewState] = useState({
     isDeleting: false,
-    showSaved: savedPaymentMethods.length > 0 && typeof selectedBillingInfo === "string",
+    showSaved: savedPaymentMethods.length > 0 && typeof selectedBillingInfo === "string" && !checkNeedsGenericErrorMessage("billing", checkoutError),
   });
 
   const handleShowForm = useCallback((savedPaymentMethodAddressId?: string) => {
@@ -83,10 +84,10 @@ export const BillingView: React.FC<BillingViewProps> = ({
   useEffect(() => {
     const selectedPaymentInfoMatch = typeof selectedBillingInfo === "string" && savedPaymentMethods.some(({ addressId }) => addressId === selectedBillingInfo);
 
-    if (showSaved && savedPaymentMethods.length > 0 && !selectedPaymentInfoMatch) {
+    if (showSaved && !selectedPaymentInfoMatch /* && savedPaymentMethods.length > 0 && !checkoutError */) {
       onBillingInfoSelected(savedPaymentMethods[0].addressId);
     }
-  }, [showSaved, savedPaymentMethods, selectedBillingInfo, onBillingInfoSelected]);
+  }, [showSaved, savedPaymentMethods, selectedBillingInfo, onBillingInfoSelected/*, checkoutError*/]);
 
   return (
     <Stack

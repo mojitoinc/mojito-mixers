@@ -14,6 +14,7 @@ import { CheckoutModalError, SelectedPaymentMethod } from "../../components/paym
 import { BoxProps, Divider, Stack } from "@mui/material";
 import { usePlaid } from "../../hooks/usePlaid";
 import { ConsentType } from "../../components/shared/ConsentText/ConsentText";
+import { checkNeedsGenericErrorMessage } from "../../hooks/useFormCheckoutError";
 
 const billingInfoItemBoxProps: BoxProps = { sx: { mt: 2.5 } };
 
@@ -71,7 +72,7 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
 
   const [{ isDeleting, showSaved }, setViewState] = useState({
     isDeleting: false,
-    showSaved: savedPaymentMethods.length > 0 && typeof selectedBillingInfo === "string",
+    showSaved: savedPaymentMethods.length > 0 && typeof selectedBillingInfo === "string" && !checkNeedsGenericErrorMessage("payment", checkoutError),
   });
 
   const handleShowForm = useCallback(() => {
@@ -105,10 +106,10 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
     const selectedPaymentInfoMatch = typeof selectedPaymentInfo === "string" && savedPaymentMethods.some(({ id }) => id === selectedPaymentInfo);
     const firstActiveSavedPaymentMethod = savedPaymentMethods.find(({ status }) => status === "complete");
 
-    if (showSaved && savedPaymentMethods.length > 0 && !selectedPaymentInfoMatch && firstActiveSavedPaymentMethod) {
+    if (showSaved && !selectedPaymentInfoMatch && firstActiveSavedPaymentMethod /* && savedPaymentMethods.length > 0 && !checkoutError */) {
       onPaymentInfoSelected(firstActiveSavedPaymentMethod.id);
     }
-  }, [showSaved, onPaymentInfoSelected, savedPaymentMethods, selectedPaymentInfo]);
+  }, [showSaved, onPaymentInfoSelected, savedPaymentMethods, selectedPaymentInfo/*, checkoutError*/]);
 
   // PLAIN LINKS:
   const onPlaidLinkClicked = usePlaid({

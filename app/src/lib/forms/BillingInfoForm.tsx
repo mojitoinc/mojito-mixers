@@ -53,6 +53,8 @@ const FIELD_LABELS = {
   [ZIP_CODE_FIELD]: "Zip Code"
 };
 
+const FIELD_NAMES = Object.keys(FIELD_LABELS);
+
 const EMPTY_FORM_VALUES: BillingInfo = {
   [FULL_NAME_FIELD]: "",
   [EMAIL_FIELD]: "",
@@ -139,7 +141,7 @@ export const BillingInfoForm: React.FC<BillingInfoFormProps> = ({
   const selectedCountryOption: SelectOption = watch(COUNTRY_FIELD);
   const selectedCountryCode = selectedCountryOption?.value;
   const submitForm = handleSubmit(onSubmit);
-  const checkoutErrorMessage = useFormCheckoutError({ formKey: "billing", checkoutError, watch, setError });
+  const checkoutErrorMessage = useFormCheckoutError({ formKey: "billing", checkoutError, fields: FIELD_NAMES, setError });
 
   return (
     <form onSubmit={submitForm}>
@@ -238,7 +240,7 @@ export const BillingInfoForm: React.FC<BillingInfoFormProps> = ({
       { checkoutErrorMessage && <FormErrorsBox error={ checkoutErrorMessage } sx={{ mt: 5 }} /> }
 
       { debug && (
-        <DebugBox sx={{ my: 2 }}>
+        <DebugBox sx={{ mt: 5 }}>
           { JSON.stringify(watch(), null, 2) }
           { "\n\n" }
           { JSON.stringify(formState.errors, null, 2) }

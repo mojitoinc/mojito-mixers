@@ -76,7 +76,8 @@ export const ControlledCountrySelector = ({
     name={name}
     control={control}
     render={({ field: { name, onChange, ref, ...field }, fieldState }) => {
-      const error = (fieldState?.error as any)?.value as FieldError;
+      const error = fieldState?.error;
+      const fieldError = error ? (error.hasOwnProperty("message") ? error.message : (error as unknown as { value: FieldError }).value?.message) || "" : "";
 
       return (
         <CountrySelector
@@ -86,8 +87,8 @@ export const ControlledCountrySelector = ({
           onSelectCountry={onChange}
           fullWidth
           inputRef={ref}
-          error={!!error}
-          helperText={error?.message}
+          error={!!fieldError}
+          helperText={fieldError}
           {...field}
         />
       );

@@ -55,6 +55,8 @@ const FIELD_LABELS = {
   nameOnCard: "Name on Card",
 };
 
+const FIELD_NAMES = Object.keys(FIELD_LABELS);
+
 const isCreditCardThenRequireSchema = requireSchemaWhenKeyIs("CreditCard");
 
 const PAYMENT_TYPE_FORM_DATA: Record<PaymentType, PaymentTypeFormData> = {
@@ -277,7 +279,7 @@ export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
   const selectedPaymentMethod = watch("type") as PaymentType;
   const Fields = PAYMENT_TYPE_FORM_DATA[selectedPaymentMethod].fields;
   const submitForm = handleSubmit(onSubmit);
-  const checkoutErrorMessage = useFormCheckoutError({ formKey: "payment", checkoutError, watch, setError, deps: [selectedPaymentMethod] });
+  const checkoutErrorMessage = useFormCheckoutError({ formKey: "payment", checkoutError, fields: FIELD_NAMES, setError, deps: [selectedPaymentMethod] });
 
   const handleFormSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();

@@ -34,22 +34,10 @@ export const ERROR_PURCHASE_LOADING_ITEMS = createError("Purchase items could no
 
 export const ERROR_PURCHASE_SELECTED_PAYMENT_METHOD = createError("Could not find the selected payment method.", "payment");
 
-export const ERROR_PURCHASE_CREATING_PAYMENT_METHOD = createError("Payment method could not be saved.", "payment");
+export const ERROR_PURCHASE_CREATING_PAYMENT_METHOD = createError("Payment method could not be saved.", "billing");
 
 export const ERROR_PURCHASE_CREATING_INVOICE = createError("Invoice could not be created.");
 
 export const ERROR_PURCHASE_CVV = createError("Could not verify CVV.");
 
 export const ERROR_PURCHASE_PAYING = createError("Payment failed.");
-
-
-// DONE: Use error objects here.
-// DONE: Fix payment method selector styles.
-// DONE: Add field errors to error state.
-// DONE: Hook for form error logic.
-// DONE: Component for form errors.
-
-// DOING: Fix form not showing after error.
-
-// NEW PR: Wire onError callback.
-// NEW PR: User vs dev error messages.

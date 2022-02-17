@@ -1,42 +1,51 @@
 import { useEffect, useState } from "react";
-import { UseFormWatch, UseFormSetError } from "react-hook-form";
+import { UseFormSetError } from "react-hook-form";
 import { CheckoutModalError } from "../components/payments/CheckoutModal/CheckoutModal.hooks";
 import { CircleFieldErrorAt } from "../domain/circle/circle.utils";
 
 export interface UseFormCheckoutErrorOptions {
   formKey: CircleFieldErrorAt;
-  checkoutError: CheckoutModalError;
-  watch: UseFormWatch<any>;
+  checkoutError?: CheckoutModalError;
+  fields: string[];
   setError: UseFormSetError<any>;
   deps?: React.DependencyList;
+}
+
+export function checkNeedsGenericErrorMessage(formKey: CircleFieldErrorAt, checkoutError?: CheckoutModalError) {
+  return checkoutError && checkoutError.circleFieldErrors && (
+    (formKey === "billing" && !checkoutError.circleFieldErrors.payment) ||
+    (formKey === "payment" && !checkoutError.circleFieldErrors.billing)
+  );
 }
 
 export function useFormCheckoutError({
   formKey,
   checkoutError,
-  watch,
+  fields,
   setError,
-  deps,
+  deps = [],
 }: UseFormCheckoutErrorOptions): string {
   const [genericErrorMessage, setGenericErrorMessage] = useState("");
 
   useEffect(() => {
-    let needsGenericErrorMessage = !!checkoutError;
+    let needsGenericErrorMessage = checkNeedsGenericErrorMessage(formKey, checkoutError);
 
-    const availableInputs = Object.keys(watch());
+    const fieldErrors: Record<string, string> = checkoutError?.circleFieldErrors?.[formKey] || {};
 
-    Object.entries(checkoutError?.circleFieldErrors?.[formKey] || {}).forEach(([inputName, message]) => {
-      if (!availableInputs.includes(inputName)) return;
+    if (fieldErrors) {
+      Object.entries(fieldErrors).forEach(([inputName, message]) => {
+        if (!fields.includes(inputName)) return;
 
-      needsGenericErrorMessage = false;
+        needsGenericErrorMessage = false;
 
-      setError(inputName as Parameters<typeof setError>[0], { type: "manual", message });
-    });
+        setError(inputName as Parameters<typeof setError>[0], { type: "manual", message });
+      });
+    }
 
-    setGenericErrorMessage(needsGenericErrorMessage ? checkoutError.errorMessage : "");
+    setGenericErrorMessage(needsGenericErrorMessage ? (checkoutError?.errorMessage || "") : "");
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [checkoutError, formKey, watch, setError, ...deps]);
+  }, [formKey, checkoutError, fields, setError, ...deps]);
 
   return genericErrorMessage;
 }

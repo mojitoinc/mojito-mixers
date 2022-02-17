@@ -30,7 +30,6 @@ export function useCreatePaymentMethod(): [
     const metadata: AchMetadata | CreditCardMetadata = {
       email: billingInfo.email,
       phoneNumber: formatPhoneAsE123(billingInfo.phone, `${ billingInfo.country.value }`),
-      // phoneNumber: "0034935641234",
     };
 
     // Using CreditCardBillingDetails as it's more restrictive than AchBillingDetails (address 2 is required instead of optional):
@@ -51,8 +50,7 @@ export function useCreatePaymentMethod(): [
       });
 
       const [expirationMonth, expirationYearLastTwoDigits] = paymentInfo.expiryDate.split("/").map(value => parseInt(value.trim(), 10));
-      // const expirationYear = 2000 + expirationYearLastTwoDigits;
-      const expirationYear = expirationYearLastTwoDigits;
+      const expirationYear = 2000 + expirationYearLastTwoDigits;
 
       return createPaymentMethod({
         variables: {
@@ -62,7 +60,7 @@ export function useCreatePaymentMethod(): [
             creditCardData: {
               keyID,
               encryptedData: encryptedCardData,
-              expirationMonth: 0,
+              expirationMonth,
               expirationYear,
               metadata,
               billingDetails,
