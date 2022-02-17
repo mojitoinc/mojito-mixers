@@ -1,6 +1,8 @@
 import { ApolloError } from "@apollo/client";
 import { CheckoutModalError, CheckoutModalErrorAt } from "../../components/payments/CheckoutModal/CheckoutModal.hooks";
 
+export const BUILT_IN_ERRORS = ["EvalError", "RangeError", "ReferenceError", "SyntaxError", "TypeError", "URIError", "AggregateError", "InternalError"];
+
 export const DEFAULT_ERROR_AT: CheckoutModalErrorAt = "purchasing";
 
 function createError(errorMessage: string, at: CheckoutModalErrorAt = DEFAULT_ERROR_AT): (error?: ApolloError | Error) => CheckoutModalError {

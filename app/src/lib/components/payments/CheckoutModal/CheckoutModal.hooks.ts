@@ -22,6 +22,7 @@ export type CheckoutModalStep = "authentication" | "billing" | "payment" | "purc
 export interface CheckoutModalStateOptions {
   productConfirmationEnabled?: boolean;
   isAuthenticated?: boolean;
+  onError?: (error: CheckoutModalError) => void;
 }
 
 export interface CheckoutModalState {
@@ -53,6 +54,7 @@ export const CHECKOUT_STEPS: CheckoutModalStep[] = ["authentication", "billing",
 export function useCheckoutModalState({
   productConfirmationEnabled,
   isAuthenticated,
+  onError,
 }: CheckoutModalStateOptions): CheckoutModalStateReturn {
   const startAt: CheckoutModalStep = !isAuthenticated || productConfirmationEnabled ? "authentication" : "billing";
 
@@ -114,11 +116,15 @@ export function useCheckoutModalState({
   }, []);
 
   const setError = useCallback((error: string | CheckoutModalError) => {
+    const nextCheckoutError: CheckoutModalError = typeof error === "string" ? { errorMessage: error || ERROR_PURCHASE().errorMessage } : error;
+
+    if (onError) onError(nextCheckoutError);
+
     setCheckoutModalState({
       checkoutStep: "error",
-      checkoutError: typeof error === "string" ? { errorMessage: error || ERROR_PURCHASE().errorMessage } : error,
+      checkoutError: nextCheckoutError,
     });
-  }, []);
+  }, [onError]);
 
   return {
     // CheckoutModalState:

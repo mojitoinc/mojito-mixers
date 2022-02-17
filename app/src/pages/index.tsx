@@ -1,8 +1,7 @@
-import { ApolloError } from "@apollo/client";
 import { useAuth0 } from "@auth0/auth0-react";
 import { Container, Typography, Box, Stack, Button, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio, FormHelperText, TextField, Switch, Select, MenuItem, InputLabel, FormGroup, Checkbox } from "@mui/material";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { CheckoutModal, CheckoutModalProps, continuePlaidOAuthFlow, PaymentType } from "../lib";
+import { CheckoutModal, CheckoutModalError, CheckoutModalProps, continuePlaidOAuthFlow, PaymentType } from "../lib";
 import { useMeQuery } from "../services/graphql/generated";
 import { PLAYGROUND_PARAGRAPHS_ARRAY, PLAYGROUND_AUTH_PRESET, PLAYGROUND_NO_AUTH_PRESET, PLAYGROUND_PRIVACY_HREF, PLAYGROUND_PURCHASE_INSTRUCTIONS, PLAYGROUND_TERMS_OF_USE_HREF, PLAYGROUND_USER_FORMAT, PLAYGROUND_PURCHASING_IMAGE_SRC, PLAYGROUND_ERROR_IMAGE_SRC, PLAYGROUND_THEMES, PLAYGROUND_LOGOS_SRC, PLAYGROUND_LOGOS_SX, PLAYGROUND_MOCKED_LOT, PLAYGROUND_LOADER_IMAGE_SRC } from "../utils/playground/playground.constants";
 import { PlaygroundFormData } from "../utils/playground/playground.interfaces";
@@ -61,9 +60,10 @@ const HomePage = () => {
 
   useEffect(() => {
     if (isLoading ||
-    firstTimeRef.current === false ||
-    (INITIAL_FORM_VALUES.lotType === "auction" && !INITIAL_FORM_VALUES.invoiceID) ||
-    (INITIAL_FORM_VALUES.orgID === "custom" && !INITIAL_FORM_VALUES.customOrgID)) return;
+      firstTimeRef.current === false ||
+      (INITIAL_FORM_VALUES.lotType === "auction" && !INITIAL_FORM_VALUES.invoiceID) ||
+      (INITIAL_FORM_VALUES.orgID === "custom" && !INITIAL_FORM_VALUES.customOrgID)
+    ) return;
 
     firstTimeRef.current = false;
 
@@ -71,16 +71,17 @@ const HomePage = () => {
   }, [isAuthenticated, isLoading, meData]);
 
   const handleOpen = useCallback(() => {
-    // TODO: Pass a prop to indicate the user started adding info.
     setOpen(true);
   }, []);
 
   const handleClose = useCallback(() => {
+    // TODO: Pass a prop to indicate the user started adding info.
     setOpen(false);
   }, []);
 
-  const handleError = useCallback((error: ApolloError | Error | string) => {
-    console.log(error);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const handleError = useCallback((error: CheckoutModalError) => {
+    // console.log(error);
   }, []);
 
   const handleMarketingOptInChange = useCallback((marketingOptIn: boolean) => {
@@ -145,6 +146,7 @@ const HomePage = () => {
   };
 
   const testPreset = (isAuthenticated ? PLAYGROUND_AUTH_PRESET[formValues.authPresets] : PLAYGROUND_NO_AUTH_PRESET[formValues.notAuthPreset]) || {};
+  const lotType = formValues.lotType || PLAYGROUND_MOCKED_LOT.lotType;
 
   const checkoutModalProps: CheckoutModalProps = {
     // Modal:
@@ -179,13 +181,14 @@ const HomePage = () => {
 
     // Data:
     orgID: (formValues.orgID === "custom" ? formValues.customOrgID : formValues.orgID) || "",
+    invoiceID: (lotType === "auction" && formValues.invoiceID) || "",
     checkoutItems: [{
       ...PLAYGROUND_MOCKED_LOT,
       lotID: formValues.lotID || PLAYGROUND_MOCKED_LOT.lotID,
-      lotType: formValues.lotType || PLAYGROUND_MOCKED_LOT.lotType,
-      units: parseInt(`${ formValues.lotUnits || PLAYGROUND_MOCKED_LOT.units }`, 10) || 1,
+      lotType,
+      units: lotType === "auction" ? 1 : (parseInt(`${ formValues.lotUnits || PLAYGROUND_MOCKED_LOT.units }`, 10) || 1),
       unitPrice: parseInt(`${ formValues.lotUnitPrice || PLAYGROUND_MOCKED_LOT.unitPrice }`, 10) || 0,
-      fee: parseInt(`${ formValues.lotFee || PLAYGROUND_MOCKED_LOT.fee }`, 10) || 0,
+      fee: lotType === "buyNow" ? 0 : (parseInt(`${ formValues.lotFee || PLAYGROUND_MOCKED_LOT.fee }`, 10) || 0),
     }],
 
     // Authentication:
@@ -210,34 +213,35 @@ const HomePage = () => {
       <Box sx={{ my: 4 }}>
         <FormControl component="fieldset">
           <FormLabel component="legend">Organization</FormLabel>
-            <RadioGroup
-              name="orgID"
-              value={ formValues.orgID }
-              onChange={ handleChange }>
 
-              { organizations.map((organization) => (
-                <FormControlLabel
-                  key={ organization.id }
-                  value={ organization.id }
-                  control={<Radio />}
-                  label={ organization.name } />
-              )) }
+          <RadioGroup
+            name="orgID"
+            value={ formValues.orgID }
+            onChange={ handleChange }>
 
+            { organizations.map((organization) => (
               <FormControlLabel
-                value="custom"
+                key={ organization.id }
+                value={ organization.id }
                 control={<Radio />}
-                sx={{ mt: 1 }}
-                label={
-                  <TextField
-                    name="customOrgID"
-                    label="Custom Org ID"
-                    size="small"
-                    value={ formValues.customOrgID }
-                    onChange={ handleChange }
-                    disabled={ formValues.orgID !== "custom" } />
-                } />
+                label={ organization.name } />
+            )) }
 
-            </RadioGroup>
+            <FormControlLabel
+              value="custom"
+              control={<Radio />}
+              sx={{ mt: 1 }}
+              label={
+                <TextField
+                  name="customOrgID"
+                  label="Custom Org ID"
+                  size="small"
+                  value={ formValues.customOrgID }
+                  onChange={ handleChange }
+                  disabled={ formValues.orgID !== "custom" } />
+              } />
+
+          </RadioGroup>
         </FormControl>
 
         <Typography variant="body2" sx={{ mt: 2 }}>If left empty, the modal will fail to load your saved payment methods and at making a purchase.</Typography>
@@ -246,23 +250,8 @@ const HomePage = () => {
 
       <Box sx={{ my: 4 }}>
         <FormControl component="fieldset">
-          <FormLabel component="legend" sx={{ mb: 1 }}>Invoice</FormLabel>
-          <TextField
-            name="invoiceID"
-            label="Invoice ID"
-            size="small"
-            value={ formValues.invoiceID }
-            onChange={ handleChange }
-            required={ formValues.lotType === "auction" } />
-        </FormControl>
+          <FormLabel component="legend" sx={{ mb: 2 }}>Lot Data</FormLabel>
 
-        <Typography variant="body2" sx={{ mt: 2 }}>In production, this will be required for auction lots.</Typography>
-        <Typography variant="body2" sx={{ mt: 1, fontWeight: 600 }}>You can still let the Payment UI handle invoice creation for both auction and pay now lots in this playground app.</Typography>
-      </Box>
-
-      <Box sx={{ my: 4 }}>
-        <FormControl component="fieldset">
-          <FormLabel component="legend" sx={{ mb: 1 }}>Lot Data</FormLabel>
           <Stack spacing={ 2 }>
             <TextField
               name="lotID"
@@ -288,32 +277,44 @@ const HomePage = () => {
 
             <TextField
               type="number"
-              name="lotUnits"
-              label="Lot Units"
-              size="small"
-              value={ formValues.lotUnits }
-              onChange={ handleChange } />
-
-            <TextField
-              type="number"
               name="lotUnitPrice"
               label="Lot Unit Price"
               size="small"
               value={ formValues.lotUnitPrice }
               onChange={ handleChange } />
 
-            <TextField
-              type="number"
-              name="lotFee"
-              label="Lot Fee"
-              size="small"
-              value={ formValues.lotFee }
-              onChange={ handleChange }/>
+            { formValues.lotType === "buyNow" ? (
+              <TextField
+                type="number"
+                name="lotUnits"
+                label="Lot Units"
+                size="small"
+                value={ formValues.lotUnits }
+                onChange={ handleChange } />
+            ) : (<>
+              <TextField
+                type="number"
+                name="lotFee"
+                label="Lot Fee"
+                size="small"
+                value={ formValues.lotFee }
+                onChange={ handleChange } />
+
+              <TextField
+                name="invoiceID"
+                label="Invoice ID"
+                size="small"
+                value={ formValues.invoiceID }
+                onChange={ handleChange }
+                required />
+            </>) }
+
           </Stack>
         </FormControl>
 
         <Typography variant="body2" sx={{ mt: 2 }}>The Lot ID field can be left empty, but you won't be able to complete the purchase.</Typography>
         <Typography variant="body2" sx={{ mt: 1 }}>If you want to complete the purchase, make sure the lot also belongs to the organization referenced by the Org ID above.</Typography>
+        <Typography variant="body2" sx={{ mt: 1 }}>The Payment UI handles invoice creation for both auction and buy now lots in this playground app, but will only do it for buy now lots in production.</Typography>
       </Box>
 
       <Box sx={{ my: 4 }}>

@@ -12,14 +12,13 @@ import { ConfirmationView } from "../../../views/Confirmation/ConfirmationView";
 import { PaymentView } from "../../../views/Payment/PaymentView";
 import { CheckoutModalHeader, CheckoutModalHeaderVariant } from "../CheckoutModalHeader/CheckoutModalHeader";
 import { PurchasingView } from "../../../views/Purchasing/PurchasingView";
-import { ApolloError } from "@apollo/client";
 import { ErrorView } from "../../../views/Error/ErrorView";
 import { RawSavedPaymentMethod, SavedPaymentMethod } from "../../../domain/circle/circle.interfaces";
 import { Theme, ThemeProvider, createTheme, ThemeOptions, SxProps } from "@mui/material/styles";
 import { useShakeAnimation } from "../../../utils/animationUtils";
 import { continuePlaidOAuthFlow, PlaidFlow } from "../../../hooks/usePlaid";
 import { ConsentType } from "../../shared/ConsentText/ConsentText";
-import { useCheckoutModalState } from "./CheckoutModal.hooks";
+import { CheckoutModalError, useCheckoutModalState } from "./CheckoutModal.hooks";
 import { DEFAULT_ERROR_AT, ERROR_LOADING_PAYMENT_METHODS, ERROR_LOADING_USER } from "../../../domain/errors/errors.constants";
 
 const SELECTOR_DIALOG_SCROLLABLE = "[role=presentation]";
@@ -64,7 +63,7 @@ export interface CheckoutModalProps {
 
   // Other Events:
   debug?: boolean;
-  onError?: (error: ApolloError | Error | string) => void;
+  onError?: (error: CheckoutModalError) => void;
   onMarketingOptInChange?: (marketingOptIn: boolean) => void
 }
 
@@ -109,7 +108,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
   // Other Events:
   debug,
-  onError, // Not implemented yet. Used to let the app control where to log errors to (e.g. Sentry).
+  onError,
   onMarketingOptInChange, // Not implemented yet. Used to let user subscribe / unsubscribe to marketing updates.
 }) => {
   const {
@@ -154,7 +153,9 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
     selectedPaymentMethod,
     setSelectedPaymentMethod,
   } = useCheckoutModalState({
+    productConfirmationEnabled,
     isAuthenticated,
+    onError,
   });
 
   useEffect(() => {
@@ -207,10 +208,6 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
       };
     });
   }, [savedPaymentMethods, setSelectedPaymentMethod]);
-
-  useEffect(() => {
-    if (!checkoutStep) onClose();
-  }, [checkoutStep, onClose]);
 
   useEffect(() => {
     if (meError) setError(ERROR_LOADING_USER(meError));
