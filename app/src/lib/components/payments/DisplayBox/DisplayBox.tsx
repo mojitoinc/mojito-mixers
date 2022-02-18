@@ -1,12 +1,13 @@
 import { Theme, SxProps } from "@mui/material/styles";
 import { Box, BoxProps } from "@mui/material";
 import React from "react";
+import { SM_BORDER_RADIUS } from "../../../config/theme/theme";
 
 const DISPLAY_BOX_PROPS: SxProps<Theme> = {
   p: 2,
   m: 0,
   border: 1,
-  borderRadius: "2px",
+  borderRadius: SM_BORDER_RADIUS,
   backgroundColor: theme => theme.palette.grey["50"],
   borderColor: theme => theme.palette.grey["100"],
   color: theme => theme.palette.grey["800"],

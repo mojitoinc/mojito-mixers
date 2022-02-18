@@ -1,5 +1,6 @@
 import { Theme } from "@mui/material/styles";
 import { Components as ComponentsOptions } from "@mui/material/styles/components";
+import { BORDER_THICKNESS, MD_BORDER_RADIUS, SM_BORDER_RADIUS } from "./theme";
 
 /*
 declare module "@mui/material/TextField" {
@@ -75,7 +76,7 @@ export function createComponentsTheme({ typography, palette, spacing, breakpoint
       styleOverrides: {
         root: {
           height: "60px",
-          borderRadius: "2px",
+          borderRadius: SM_BORDER_RADIUS,
 
           "&.Mui-disabled::before": {
             border: 0,
@@ -94,7 +95,7 @@ export function createComponentsTheme({ typography, palette, spacing, breakpoint
     MuiFilledInput: {
       styleOverrides: {
         root: {
-          border: `1px solid ${ palette.grey[200] }`,
+          border: `${ BORDER_THICKNESS }px solid ${ palette.grey[200] }`,
           background: palette.background.default,
 
           "&:hover": {
@@ -142,7 +143,7 @@ export function createComponentsTheme({ typography, palette, spacing, breakpoint
               color: palette.text.primary,
               padding: 8,
               height: "40px",
-              borderRadius: "2px",
+              borderRadius: SM_BORDER_RADIUS,
               marginTop: 32,
             },
           },
@@ -167,13 +168,13 @@ export function createComponentsTheme({ typography, palette, spacing, breakpoint
       },
       styleOverrides: {
         root: {
-          borderRadius: "4px",
+          borderRadius: MD_BORDER_RADIUS,
           boxSizing: "border-box",
           fontSize: "12px",
 
           "&.Mui-disabled": {
             background: palette.grey["50"],
-            border: `1px solid ${ palette.grey[100] }`,
+            border: `${ BORDER_THICKNESS }px solid ${ palette.grey[100] }`,
             cursor: "not-allowed",
             pointerEvents: "auto",
           },
@@ -198,7 +199,7 @@ export function createComponentsTheme({ typography, palette, spacing, breakpoint
         },
         containedPrimary: {
           background: palette.gradients.action,
-          border: `1px solid ${ palette.primary.main }`,
+          border: `${ BORDER_THICKNESS }px solid ${ palette.primary.main }`,
           color: palette.text.primary,
           minWidth: "200px !important",
         },
@@ -229,7 +230,7 @@ export function createComponentsTheme({ typography, palette, spacing, breakpoint
           minHeight: 42,
           minWidth: spacing(5.5),
           border: 0,
-          borderRadius: 4,
+          borderRadius: MD_BORDER_RADIUS,
 
           [breakpoints.up("sm")]: {
             padding: spacing(0, 2),
@@ -261,8 +262,8 @@ export function createComponentsTheme({ typography, palette, spacing, breakpoint
         root: {
           background: palette.gradients.stepperReverse,
           backgroundOrigin: "border-box",
-          border: "1px solid transparent",
-          borderRadius: 5,
+          border: `${ BORDER_THICKNESS }px solid transparent`,
+          borderRadius: MD_BORDER_RADIUS + BORDER_THICKNESS,
         },
       },
     },
@@ -278,7 +279,7 @@ export function createComponentsTheme({ typography, palette, spacing, breakpoint
 
         sizeSmall: {
           height: "30px",
-          borderRadius: 4,
+          borderRadius: MD_BORDER_RADIUS,
           fontSize: 12,
           fontWeight: 500,
         },
