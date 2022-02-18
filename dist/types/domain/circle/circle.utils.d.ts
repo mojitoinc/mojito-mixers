@@ -9,4 +9,12 @@ export declare function getSavedPaymentMethodAddressIdFromBillingInfo(billingInf
 export declare function savedPaymentMethodToBillingInfo(savedPaymentMethod: SavedPaymentMethod): BillingInfo;
 export declare function isCircleFieldError(obj: any): obj is CircleFieldError;
 export declare function isCircleFieldErrorArray(obj: any): obj is CircleFieldError[];
-export declare function parseCircleError(error: ApolloError | Error): string | Record<string, string>;
+export declare type CircleFieldErrorAt = "billing" | "payment";
+export interface CircleFieldErrors {
+    summary: string;
+    billing?: Record<string, string>;
+    payment?: Record<string, string>;
+    unknown?: Record<string, string>;
+    firstAt: CircleFieldErrorAt;
+}
+export declare function parseCircleError(error: ApolloError | Error): CircleFieldErrors | undefined;

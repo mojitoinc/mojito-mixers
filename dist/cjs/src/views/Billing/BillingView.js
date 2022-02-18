@@ -11,17 +11,18 @@ var SavedBillingDetailsSelector = require('../../components/shared/SavedBillingD
 var circle_utils = require('../../domain/circle/circle.utils.js');
 var BillingInfoForm = require('../../forms/BillingInfoForm.js');
 var arrayUtils = require('../../utils/arrayUtils.js');
+var useFormCheckoutError = require('../../hooks/useFormCheckoutError.js');
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
 var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 
-const BillingView = ({ checkoutItems, savedPaymentMethods: rawSavedPaymentMethods, selectedBillingInfo, onBillingInfoSelected, onSavedPaymentMethodDeleted, onNext, onClose, debug, }) => {
+const BillingView = ({ checkoutItems, savedPaymentMethods: rawSavedPaymentMethods, selectedBillingInfo, checkoutError, onBillingInfoSelected, onSavedPaymentMethodDeleted, onNext, onClose, debug, }) => {
     const savedPaymentMethodAddressIdRef = React.useRef("");
     const savedPaymentMethods = React.useMemo(() => arrayUtils.distinctBy(rawSavedPaymentMethods, "addressId"), [rawSavedPaymentMethods]);
     const [{ isDeleting, showSaved }, setViewState] = React.useState({
         isDeleting: false,
-        showSaved: savedPaymentMethods.length > 0 && typeof selectedBillingInfo === "string",
+        showSaved: savedPaymentMethods.length > 0 && typeof selectedBillingInfo === "string" && !useFormCheckoutError.checkNeedsGenericErrorMessage("billing", checkoutError),
     });
     const handleShowForm = React.useCallback((savedPaymentMethodAddressId) => {
         if (savedPaymentMethodAddressId && typeof savedPaymentMethodAddressId === "string") {
@@ -52,10 +53,10 @@ const BillingView = ({ checkoutItems, savedPaymentMethods: rawSavedPaymentMethod
     }), [onSavedPaymentMethodDeleted, savedPaymentMethods]);
     React.useEffect(() => {
         const selectedPaymentInfoMatch = typeof selectedBillingInfo === "string" && savedPaymentMethods.some(({ addressId }) => addressId === selectedBillingInfo);
-        if (showSaved && savedPaymentMethods.length > 0 && !selectedPaymentInfoMatch) {
+        if (showSaved && !selectedPaymentInfoMatch /* && savedPaymentMethods.length > 0 && !checkoutError */) {
             onBillingInfoSelected(savedPaymentMethods[0].addressId);
         }
-    }, [showSaved, savedPaymentMethods, selectedBillingInfo, onBillingInfoSelected]);
+    }, [showSaved, savedPaymentMethods, selectedBillingInfo, onBillingInfoSelected /*, checkoutError*/]);
     return (React__default["default"].createElement(material.Stack, { direction: {
             xs: "column",
             sm: "column",
@@ -67,7 +68,7 @@ const BillingView = ({ checkoutItems, savedPaymentMethods: rawSavedPaymentMethod
             // variant="loggedIn"
             , { 
                 // variant="loggedIn"
-                defaultValues: typeof selectedBillingInfo === "string" ? undefined : selectedBillingInfo, onSaved: savedPaymentMethods.length > 0 ? handleShowSaved : undefined, onClose: onClose, onSubmit: handleSubmit, debug: debug }))),
+                defaultValues: typeof selectedBillingInfo === "string" ? undefined : selectedBillingInfo, checkoutError: checkoutError, onSaved: savedPaymentMethods.length > 0 ? handleShowSaved : undefined, onClose: onClose, onSubmit: handleSubmit, debug: debug }))),
         React__default["default"].createElement(CheckoutItemCostBreakdown.CheckoutItemCostBreakdown, { checkoutItems: checkoutItems })));
 };
 

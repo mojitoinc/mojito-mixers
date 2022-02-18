@@ -2,6 +2,7 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
+var tslib_es6 = require('../../../../../node_modules/tslib/tslib.es6.js');
 var PaymentDetailsFragment = require('../Fragment/PaymentDetailsFragment.js');
 var SavedItem = require('../../SavedItem/SavedItem.js');
 var React = require('react');
@@ -28,7 +29,8 @@ const PAYMENT_METHOD_ITEM_LABELS = {
     Wire: PAYMENT_METHOD_WIRE_ITEM_LABELS,
     Crypto: PAYMENT_METHOD_CRYPTO_ITEM_LABELS,
 };
-const PaymentDetailsItem = ({ data: savedPaymentMethod, additionalProps: savedItemProps, }) => {
+const PaymentDetailsItem = (_a) => {
+    var { data: savedPaymentMethod, additionalProps: savedItemProps, children, index } = _a, boxProps = tslib_es6.__rest(_a, ["data", "additionalProps", "children", "index"]);
     let disabled = savedItemProps.disabled;
     let status;
     if (savedPaymentMethod.status === "pending") {
@@ -47,7 +49,7 @@ const PaymentDetailsItem = ({ data: savedPaymentMethod, additionalProps: savedIt
             color: "error",
         };
     }
-    return (React__default["default"].createElement(SavedItem.SavedItem, Object.assign({}, savedItemProps, { variant: "row", labels: PAYMENT_METHOD_ITEM_LABELS[savedPaymentMethod.type], disabled: disabled, status: status, id: savedPaymentMethod.id, onCvvChange: savedPaymentMethod.type === "CreditCard" ? savedItemProps.onCvvChange : undefined }),
+    return (React__default["default"].createElement(SavedItem.SavedItem, Object.assign({}, savedItemProps, { variant: "row", labels: PAYMENT_METHOD_ITEM_LABELS[savedPaymentMethod.type], disabled: disabled, status: status, id: savedPaymentMethod.id, boxProps: boxProps, cvvError: savedPaymentMethod.type === "CreditCard" ? savedItemProps.cvvError : undefined, onCvvChange: savedPaymentMethod.type === "CreditCard" ? savedItemProps.onCvvChange : undefined }),
         React__default["default"].createElement(PaymentDetailsFragment.PaymentDetailsFragment, { savedPaymentMethod: savedPaymentMethod })));
 };
 

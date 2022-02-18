@@ -7,13 +7,14 @@ import { SavedBillingDetailsSelector } from '../../components/shared/SavedBillin
 import { savedPaymentMethodToBillingInfo, getSavedPaymentMethodAddressIdFromBillingInfo } from '../../domain/circle/circle.utils.js';
 import { BillingInfoForm } from '../../forms/BillingInfoForm.js';
 import { distinctBy } from '../../utils/arrayUtils.js';
+import { checkNeedsGenericErrorMessage } from '../../hooks/useFormCheckoutError.js';
 
-const BillingView = ({ checkoutItems, savedPaymentMethods: rawSavedPaymentMethods, selectedBillingInfo, onBillingInfoSelected, onSavedPaymentMethodDeleted, onNext, onClose, debug, }) => {
+const BillingView = ({ checkoutItems, savedPaymentMethods: rawSavedPaymentMethods, selectedBillingInfo, checkoutError, onBillingInfoSelected, onSavedPaymentMethodDeleted, onNext, onClose, debug, }) => {
     const savedPaymentMethodAddressIdRef = useRef("");
     const savedPaymentMethods = useMemo(() => distinctBy(rawSavedPaymentMethods, "addressId"), [rawSavedPaymentMethods]);
     const [{ isDeleting, showSaved }, setViewState] = useState({
         isDeleting: false,
-        showSaved: savedPaymentMethods.length > 0 && typeof selectedBillingInfo === "string",
+        showSaved: savedPaymentMethods.length > 0 && typeof selectedBillingInfo === "string" && !checkNeedsGenericErrorMessage("billing", checkoutError),
     });
     const handleShowForm = useCallback((savedPaymentMethodAddressId) => {
         if (savedPaymentMethodAddressId && typeof savedPaymentMethodAddressId === "string") {
@@ -44,10 +45,10 @@ const BillingView = ({ checkoutItems, savedPaymentMethods: rawSavedPaymentMethod
     }), [onSavedPaymentMethodDeleted, savedPaymentMethods]);
     useEffect(() => {
         const selectedPaymentInfoMatch = typeof selectedBillingInfo === "string" && savedPaymentMethods.some(({ addressId }) => addressId === selectedBillingInfo);
-        if (showSaved && savedPaymentMethods.length > 0 && !selectedPaymentInfoMatch) {
+        if (showSaved && !selectedPaymentInfoMatch /* && savedPaymentMethods.length > 0 && !checkoutError */) {
             onBillingInfoSelected(savedPaymentMethods[0].addressId);
         }
-    }, [showSaved, savedPaymentMethods, selectedBillingInfo, onBillingInfoSelected]);
+    }, [showSaved, savedPaymentMethods, selectedBillingInfo, onBillingInfoSelected /*, checkoutError*/]);
     return (React__default.createElement(Stack, { direction: {
             xs: "column",
             sm: "column",
@@ -59,7 +60,7 @@ const BillingView = ({ checkoutItems, savedPaymentMethods: rawSavedPaymentMethod
             // variant="loggedIn"
             , { 
                 // variant="loggedIn"
-                defaultValues: typeof selectedBillingInfo === "string" ? undefined : selectedBillingInfo, onSaved: savedPaymentMethods.length > 0 ? handleShowSaved : undefined, onClose: onClose, onSubmit: handleSubmit, debug: debug }))),
+                defaultValues: typeof selectedBillingInfo === "string" ? undefined : selectedBillingInfo, checkoutError: checkoutError, onSaved: savedPaymentMethods.length > 0 ? handleShowSaved : undefined, onClose: onClose, onSubmit: handleSubmit, debug: debug }))),
         React__default.createElement(CheckoutItemCostBreakdown, { checkoutItems: checkoutItems })));
 };
 

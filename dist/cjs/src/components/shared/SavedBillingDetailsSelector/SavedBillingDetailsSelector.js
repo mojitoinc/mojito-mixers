@@ -10,6 +10,7 @@ var BillingInfoItem = require('../../payments/BillingInfo/Item/BillingInfoItem.j
 var SecondaryButton = require('../SecondaryButton/SecondaryButton.js');
 var CheckoutModalFooter = require('../../payments/CheckoutModalFooter/CheckoutModalFooter.js');
 var material = require('@mui/material');
+var theme = require('../../../config/theme/theme.js');
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
@@ -26,7 +27,7 @@ const SavedBillingDetailsSelector = ({ showLoader, savedPaymentMethods, selected
                     display: "flex",
                     justifyContent: "center",
                     alignItems: "center",
-                    background: "rgba(255, 255, 255, 0.75)",
+                    background: theme$1 => material.alpha(theme$1.palette.background.default, theme.OVERLAY_OPACITY),
                     zIndex: 100,
                 } },
                 React__default["default"].createElement(material.CircularProgress, { color: "secondary" }))) : null,
@@ -34,10 +35,10 @@ const SavedBillingDetailsSelector = ({ showLoader, savedPaymentMethods, selected
             React__default["default"].createElement(StackList.StackList, { data: savedPaymentMethods, additionalProps: (savedPaymentMethod) => ({
                     active: savedPaymentMethod.addressId === selectedPaymentMethodAddressId,
                     disabled: showLoader,
-                    onEdit,
                     onDelete,
                     onPick,
-                }), component: BillingInfoItem.BillingInfoItem, itemKey: getPaymentMethodAddressId, deps: [onEdit, onDelete, onPick, selectedPaymentMethodAddressId, showLoader] }),
+                    onEdit,
+                }), component: BillingInfoItem.BillingInfoItem, itemKey: getPaymentMethodAddressId, deps: [selectedPaymentMethodAddressId, showLoader, onDelete, onPick, onEdit] }),
             React__default["default"].createElement(SecondaryButton.SecondaryButton, { onClick: onNew, startIcon: React__default["default"].createElement(Add["default"], null), sx: { mt: 2.5 }, disabled: showLoader }, "Add New Billing Info")),
         React__default["default"].createElement(CheckoutModalFooter.CheckoutModalFooter, { variant: "toPayment", onSubmitClicked: onNext, onCloseClicked: onClose })));
 };

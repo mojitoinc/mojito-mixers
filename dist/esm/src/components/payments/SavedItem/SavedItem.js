@@ -1,29 +1,12 @@
 import default_1 from '../../../../node_modules/@mui/icons-material/Edit.js';
 import default_1$1 from '../../../../node_modules/@mui/icons-material/Delete.js';
 import { SecondaryButton } from '../../shared/SecondaryButton/SecondaryButton.js';
-import { styled, TextField, Tooltip, Chip, Stack } from '@mui/material';
+import { Tooltip, Chip, Stack } from '@mui/material';
 import React__default, { useCallback } from 'react';
 import { DisplayBox } from '../DisplayBox/DisplayBox.js';
+import { InlineField } from '../../shared/InlineField/InlineField.js';
 import Box from '../../../../node_modules/@mui/material/Box/Box.js';
 
-const InlineField = styled((props) => (React__default.createElement(TextField, Object.assign({}, props, { variant: "filled", margin: "none", InputProps: { disableUnderline: true } }))))({
-    "& .MuiInputLabel-root": {
-        color: "black",
-    },
-    "& .MuiInputBase-root": {
-        backgroundColor: "#F8F8F8",
-        color: "black",
-        padding: 8,
-        height: "30px",
-    },
-    "& .MuiInputBase-input": {
-        color: "black",
-        WebkitTextFillColor: "black",
-        fontSize: "12px",
-        cursor: "default",
-        padding: 0,
-    },
-});
 const DEFAULT_SAVED_ITEM_LABELS = {
     active: "Active",
     cvv: "CVV",
@@ -31,7 +14,7 @@ const DEFAULT_SAVED_ITEM_LABELS = {
     delete: "Delete",
     select: "Use Info",
 };
-const SavedItem = ({ children, id, variant = "stacked", labels: customLabels = {}, disabled, active, status, onEdit, onDelete, onPick, onCvvChange, boxProps, }) => {
+const SavedItem = ({ children, id, variant = "stacked", labels: customLabels = {}, disabled, active, status, onEdit, onDelete, onPick, cvvError, onCvvChange, boxProps, }) => {
     const labels = Object.assign(Object.assign({}, DEFAULT_SAVED_ITEM_LABELS), customLabels);
     const hasControls = active || onEdit || onDelete || onPick;
     const handleClick = useCallback((e) => {
@@ -57,7 +40,7 @@ const SavedItem = ({ children, id, variant = "stacked", labels: customLabels = {
     else if (active) {
         mainControlElement = (React__default.createElement(React__default.Fragment, null,
             React__default.createElement(Chip, { size: "small", color: "success", label: "Active", variant: "outlined" }),
-            onCvvChange && React__default.createElement(InlineField, { onChange: onCvvChange, placeholder: "CVV", sx: { width: "52px" } })));
+            onCvvChange && React__default.createElement(InlineField, { onChange: onCvvChange, placeholder: "CVV", error: cvvError, sx: { width: "52px" } })));
     }
     else if (onPick) {
         mainControlElement = (React__default.createElement(SecondaryButton, { onClick: handleClick, disabled: disabledSelect, "data-action": "pick" }, labels.select));
@@ -83,5 +66,5 @@ const SavedItem = ({ children, id, variant = "stacked", labels: customLabels = {
                         React__default.createElement(default_1$1, null)))))))));
 };
 
-export { InlineField, SavedItem };
+export { SavedItem };
 //# sourceMappingURL=SavedItem.js.map

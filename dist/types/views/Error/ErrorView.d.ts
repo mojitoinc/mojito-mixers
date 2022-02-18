@@ -1,8 +1,10 @@
 import React from "react";
+import { CheckoutModalError } from "../../components/payments/CheckoutModal/CheckoutModal.hooks";
 export interface ErrorViewProps {
-    errorMessage?: string;
+    checkoutError: CheckoutModalError;
     errorImageSrc?: string;
-    onReviewData: () => Promise<false>;
+    onFixError: () => Promise<false>;
     onClose: () => void;
+    debug?: boolean;
 }
 export declare const ErrorView: React.FC<ErrorViewProps>;
