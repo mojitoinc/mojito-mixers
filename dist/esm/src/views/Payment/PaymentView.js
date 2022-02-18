@@ -8,9 +8,10 @@ import { BillingInfoItem } from '../../components/payments/BillingInfo/Item/Bill
 import { billingInfoToSavedPaymentMethodBillingInfo } from '../../domain/circle/circle.utils.js';
 import { Stack, Divider } from '@mui/material';
 import { usePlaid } from '../../hooks/usePlaid.js';
+import { checkNeedsGenericErrorMessage } from '../../hooks/useFormCheckoutError.js';
 
 const billingInfoItemBoxProps = { sx: { mt: 2.5 } };
-const PaymentView = ({ checkoutItems, savedPaymentMethods: rawSavedPaymentMethods, selectedPaymentMethod, onPaymentInfoSelected, onCvvSelected, onSavedPaymentMethodDeleted, onNext, onPrev, onClose, acceptedPaymentTypes, consentType, privacyHref, termsOfUseHref, debug, }) => {
+const PaymentView = ({ checkoutItems, savedPaymentMethods: rawSavedPaymentMethods, selectedPaymentMethod, checkoutError, onPaymentInfoSelected, onCvvSelected, onSavedPaymentMethodDeleted, onNext, onPrev, onClose, acceptedPaymentTypes, consentType, privacyHref, termsOfUseHref, debug, }) => {
     const { billingInfo: selectedBillingInfo, paymentInfo: selectedPaymentInfo, } = selectedPaymentMethod;
     const savedPaymentMethods = useMemo(() => {
         if (typeof selectedBillingInfo !== "string")
@@ -24,7 +25,7 @@ const PaymentView = ({ checkoutItems, savedPaymentMethods: rawSavedPaymentMethod
     }, [rawSavedPaymentMethods, selectedBillingInfo]);
     const [{ isDeleting, showSaved }, setViewState] = useState({
         isDeleting: false,
-        showSaved: savedPaymentMethods.length > 0 && typeof selectedBillingInfo === "string",
+        showSaved: savedPaymentMethods.length > 0 && typeof selectedBillingInfo === "string" && !checkNeedsGenericErrorMessage("payment", checkoutError),
     });
     const handleShowForm = useCallback(() => {
         setViewState({ isDeleting: false, showSaved: false });
@@ -49,10 +50,10 @@ const PaymentView = ({ checkoutItems, savedPaymentMethods: rawSavedPaymentMethod
     useEffect(() => {
         const selectedPaymentInfoMatch = typeof selectedPaymentInfo === "string" && savedPaymentMethods.some(({ id }) => id === selectedPaymentInfo);
         const firstActiveSavedPaymentMethod = savedPaymentMethods.find(({ status }) => status === "complete");
-        if (showSaved && savedPaymentMethods.length > 0 && !selectedPaymentInfoMatch && firstActiveSavedPaymentMethod) {
+        if (showSaved && !selectedPaymentInfoMatch && firstActiveSavedPaymentMethod /* && savedPaymentMethods.length > 0 && !checkoutError */) {
             onPaymentInfoSelected(firstActiveSavedPaymentMethod.id);
         }
-    }, [showSaved, onPaymentInfoSelected, savedPaymentMethods, selectedPaymentInfo]);
+    }, [showSaved, onPaymentInfoSelected, savedPaymentMethods, selectedPaymentInfo /*, checkoutError*/]);
     // PLAIN LINKS:
     const onPlaidLinkClicked = usePlaid({
         selectedBillingInfo,
@@ -69,7 +70,7 @@ const PaymentView = ({ checkoutItems, savedPaymentMethods: rawSavedPaymentMethod
             React__default.createElement(CheckoutStepper, { progress: 100 }),
             React__default.createElement(BillingInfoItem, { data: selectedPaymentMethodBillingInfo, additionalProps: { onEdit: onPrev, disabled: isDeleting, boxProps: billingInfoItemBoxProps } }),
             React__default.createElement(Divider, { sx: { mt: 2.5 } }),
-            showSaved ? (React__default.createElement(SavedPaymentDetailsSelector, { showLoader: isDeleting, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethodId: typeof selectedPaymentInfo === "string" ? selectedPaymentInfo : undefined, onNew: handleShowForm, onDelete: handleSavedPaymentMethodDeleted, onPick: onPaymentInfoSelected, onCvvSelected: onCvvSelected, onNext: onNext, onClose: onClose, consentType: consentType, privacyHref: privacyHref, termsOfUseHref: termsOfUseHref })) : (React__default.createElement(PaymentMethodForm, { acceptedPaymentTypes: acceptedPaymentTypes, defaultValues: typeof selectedPaymentInfo === "string" ? undefined : selectedPaymentInfo, onPlaidLinkClicked: onPlaidLinkClicked, onSaved: savedPaymentMethods.length > 0 ? handleShowSaved : undefined, onClose: onClose, onSubmit: handleSubmit, consentType: consentType, privacyHref: privacyHref, termsOfUseHref: termsOfUseHref, debug: debug }))),
+            showSaved ? (React__default.createElement(SavedPaymentDetailsSelector, { showLoader: isDeleting, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethodId: typeof selectedPaymentInfo === "string" ? selectedPaymentInfo : undefined, onNew: handleShowForm, onDelete: handleSavedPaymentMethodDeleted, onPick: onPaymentInfoSelected, onCvvSelected: onCvvSelected, onNext: onNext, onClose: onClose, consentType: consentType, privacyHref: privacyHref, termsOfUseHref: termsOfUseHref })) : (React__default.createElement(PaymentMethodForm, { acceptedPaymentTypes: acceptedPaymentTypes, defaultValues: typeof selectedPaymentInfo === "string" ? undefined : selectedPaymentInfo, checkoutError: checkoutError, onPlaidLinkClicked: onPlaidLinkClicked, onSaved: savedPaymentMethods.length > 0 ? handleShowSaved : undefined, onClose: onClose, onSubmit: handleSubmit, consentType: consentType, privacyHref: privacyHref, termsOfUseHref: termsOfUseHref, debug: debug }))),
         React__default.createElement(CheckoutItemCostBreakdown, { checkoutItems: checkoutItems })));
 };
 

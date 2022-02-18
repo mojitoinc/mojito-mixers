@@ -1,17 +1,10 @@
 import React from "react";
 import { UserFormat } from "../../../domain/auth/authentication.interfaces";
-import { PaymentMethod, PaymentType } from "../../../domain/payment/payment.interfaces";
+import { PaymentType } from "../../../domain/payment/payment.interfaces";
 import { CheckoutItem } from "../../../domain/product/product.interfaces";
-import { BillingInfo } from "../../../forms/BillingInfoForm";
-import { ApolloError } from "@apollo/client";
 import { Theme, ThemeOptions, SxProps } from "@mui/material/styles";
 import { ConsentType } from "../../shared/ConsentText/ConsentText";
-export declare type CheckoutState = "authentication" | "billing" | "payment" | "purchasing" | "confirmation";
-export interface SelectedPaymentMethod {
-    billingInfo: string | BillingInfo;
-    paymentInfo: string | PaymentMethod;
-    cvv: string;
-}
+import { CheckoutModalError } from "./CheckoutModal.hooks";
 export interface CheckoutModalProps {
     open: boolean;
     onClose: () => void;
@@ -39,7 +32,7 @@ export interface CheckoutModalProps {
     isAuthenticated?: boolean;
     isAuthenticatedLoading?: boolean;
     debug?: boolean;
-    onError?: (error: ApolloError | Error | string) => void;
+    onError?: (error: CheckoutModalError) => void;
     onMarketingOptInChange?: (marketingOptIn: boolean) => void;
 }
 export declare const CheckoutModal: React.FC<CheckoutModalProps>;

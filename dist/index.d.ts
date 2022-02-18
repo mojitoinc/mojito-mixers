@@ -1,8 +1,8 @@
 /// <reference types="react" />
 import React from 'react';
-import { ApolloError } from '@apollo/client';
 import { Theme, ThemeOptions, SxProps } from '@mui/material/styles';
 export { Theme as CheckoutModalTheme, ThemeOptions as CheckoutModalThemeOptions, ThemeProvider as CheckoutModalThemeProvider } from '@mui/material/styles';
+import { ApolloError } from '@apollo/client';
 
 declare type UserFormat = "username" | "email" | "name";
 
@@ -20,6 +20,8 @@ interface CheckoutItem {
     imageSrc: string;
     imageBackground: string;
 }
+
+declare type ConsentType = "disclaimer" | "checkbox";
 
 interface SelectOption {
     value: string | number;
@@ -47,7 +49,22 @@ declare type BillingInfo = {
     [ZIP_CODE_FIELD]: string;
 };
 
-declare type ConsentType = "disclaimer" | "checkbox";
+declare type CircleFieldErrorAt = "billing" | "payment";
+interface CircleFieldErrors {
+    summary: string;
+    billing?: Record<string, string>;
+    payment?: Record<string, string>;
+    unknown?: Record<string, string>;
+    firstAt: CircleFieldErrorAt;
+}
+
+declare type CheckoutModalErrorAt = "authentication" | "billing" | "payment" | "purchasing";
+interface CheckoutModalError {
+    at?: CheckoutModalErrorAt;
+    error?: ApolloError | Error;
+    circleFieldErrors?: CircleFieldErrors;
+    errorMessage: string;
+}
 
 interface CheckoutModalProps {
     open: boolean;
@@ -76,7 +93,7 @@ interface CheckoutModalProps {
     isAuthenticated?: boolean;
     isAuthenticatedLoading?: boolean;
     debug?: boolean;
-    onError?: (error: ApolloError | Error | string) => void;
+    onError?: (error: CheckoutModalError) => void;
     onMarketingOptInChange?: (marketingOptIn: boolean) => void;
 }
 declare const CheckoutModal: React.FC<CheckoutModalProps>;
@@ -105,4 +122,4 @@ interface AuthorizedApolloProviderProps {
 }
 declare const AuthorizedApolloProvider: React.FC<AuthorizedApolloProviderProps>;
 
-export { AuthorizedApolloProvider, CheckoutItem, CheckoutModal, CheckoutModalProps, INITIAL_PLAID_OAUTH_FLOW_STATE, MOJITO_DARK_THEME, MOJITO_LIGHT_THEME, PaymentType, UserFormat, continuePlaidOAuthFlow, getPlaidOAuthFlowState, persistPlaidReceivedRedirectUri };
+export { AuthorizedApolloProvider, CheckoutItem, CheckoutModal, CheckoutModalError, CheckoutModalErrorAt, CheckoutModalProps, CircleFieldErrorAt, CircleFieldErrors, INITIAL_PLAID_OAUTH_FLOW_STATE, MOJITO_DARK_THEME, MOJITO_LIGHT_THEME, PaymentType, UserFormat, continuePlaidOAuthFlow, getPlaidOAuthFlowState, persistPlaidReceivedRedirectUri };

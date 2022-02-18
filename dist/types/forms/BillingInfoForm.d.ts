@@ -1,5 +1,6 @@
 import React from "react";
 import { SelectOption } from "../components/shared/Select/Select";
+import { CheckoutModalError } from "../components/payments/CheckoutModal/CheckoutModal.hooks";
 declare const FULL_NAME_FIELD = "fullName";
 declare const EMAIL_FIELD = "email";
 declare const PHONE_FIELD = "phone";
@@ -22,6 +23,7 @@ export declare type BillingInfo = {
 };
 export interface BillingInfoFormProps {
     defaultValues?: BillingInfo;
+    checkoutError?: CheckoutModalError;
     onSaved?: () => void;
     onClose: () => void;
     onSubmit: (data: BillingInfo) => void;

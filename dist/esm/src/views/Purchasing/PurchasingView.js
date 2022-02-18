@@ -2,6 +2,8 @@ import React__default, { useState, useRef, useEffect } from 'react';
 import { useFullPayment } from '../../hooks/useFullPayment.js';
 import { Box, Typography } from '@mui/material';
 import { useTimeout, useInterval } from '@swyg/corre';
+import { ERROR_PURCHASE } from '../../domain/errors/errors.constants.js';
+import { XS_MOBILE_MAX_WIDTH } from '../../config/theme/theme.js';
 
 const DEFAULT_PURCHASING_IMAGE_SRC = "https://raw.githubusercontent.com/mojitoinc/mojito-mixers/main/app/src/lib/assets/mojito-loader.gif";
 const PURCHASING_MIN_WAIT_MS = 3000;
@@ -48,7 +50,7 @@ const PurchasingView = ({ purchasingImageSrc, purchasingMessages: customPurchasi
             return;
         onDialogBlocked(false);
         if (paymentStatus === "error" || paymentError) {
-            onPurchaseError(paymentError);
+            onPurchaseError(paymentError || ERROR_PURCHASE());
             return;
         }
         onPurchaseSuccess(paymentReferenceNumber);
@@ -67,8 +69,9 @@ const PurchasingView = ({ purchasingImageSrc, purchasingMessages: customPurchasi
                 mt: 5,
             } }),
         purchasingMessage ? React__default.createElement(Typography, { variant: "body2", sx: { textAlign: "center", mt: 1.5 } }, purchasingMessage) : null,
-        React__default.createElement(Typography, { variant: "body2", sx: { textAlign: "center", mt: 5, mb: 1.5 } }, "Hang tight! We are currently processing your payment."),
-        React__default.createElement(Typography, { variant: "body2", sx: { textAlign: "center", mt: 1.5, mb: 5 } }, "Please, don't close or reload the page...")));
+        React__default.createElement(Box, { sx: { maxWidth: XS_MOBILE_MAX_WIDTH, mx: "auto" } },
+            React__default.createElement(Typography, { variant: "body2", sx: { textAlign: "center", mt: 5, mb: 1.5 } }, "Hang tight! We are currently processing your payment."),
+            React__default.createElement(Typography, { variant: "body2", sx: { textAlign: "center", mt: 1.5, mb: 5 } }, "Please, don't close or reload the page..."))));
 };
 
 export { PurchasingView };

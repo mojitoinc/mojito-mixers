@@ -1,8 +1,8 @@
 import { __awaiter } from '../../node_modules/tslib/tslib.es6.js';
 import { useCallback } from 'react';
 import { useCreatePaymentMethodMutation, PaymentType } from '../queries/graphqlGenerated.js';
-import { formatPhoneAsE123 } from '../domain/circle/circle.utils.js';
 import { useEncryptCardData } from './useEncryptCard.js';
+import { formatPhoneAsE123 } from '../domain/circle/circle.utils.js';
 
 function useCreatePaymentMethod() {
     const [encryptCardData] = useEncryptCardData();

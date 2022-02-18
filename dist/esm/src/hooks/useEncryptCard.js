@@ -8,10 +8,7 @@ function useEncryptCardData() {
     const [fetchPaymentKey, fetchPaymentKeyResult] = usePaymentKeyLazyQuery();
     const encryptCardData$1 = useCallback((encryptCardDataOptions) => __awaiter(this, void 0, void 0, function* () {
         var _a, _b;
-        const paymentKeyResult = yield fetchPaymentKey().catch((err) => {
-            console.log(err);
-            return undefined;
-        });
+        const paymentKeyResult = yield fetchPaymentKey();
         const paymentKeyData = paymentKeyResult === null || paymentKeyResult === void 0 ? void 0 : paymentKeyResult.data;
         const publicKey = (_a = paymentKeyData === null || paymentKeyData === void 0 ? void 0 : paymentKeyData.getPaymentPublicKey) === null || _a === void 0 ? void 0 : _a.publicKey;
         const keyID = (_b = paymentKeyData === null || paymentKeyData === void 0 ? void 0 : paymentKeyData.getPaymentPublicKey) === null || _b === void 0 ? void 0 : _b.keyID;

@@ -2,8 +2,8 @@ import React from 'react';
 import { HTMLRootTag } from '../../../domain/html/html.intefaces';
 export interface BaseItemProps<T extends {} = any, A extends {} = any> {
     index?: number;
-    id?: React.ReactText;
-    tag?: HTMLRootTag;
+    id?: string;
+    component?: HTMLRootTag;
     data: T;
     additionalProps?: A;
 }

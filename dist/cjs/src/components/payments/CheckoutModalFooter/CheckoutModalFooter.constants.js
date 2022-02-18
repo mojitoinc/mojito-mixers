@@ -10,7 +10,7 @@ const LABELS_BY_VARIANT = {
     toPayment: "Continue to Payment",
     toConfirmation: "Purchase",
     toPlaid: "Purchase with Plaid",
-    toForm: "Review Payment Information",
+    toReview: "Review Information",
     toMarketplace: "Back to Marketplace",
 };
 const ICONS_BY_VARIANT = {
@@ -18,7 +18,7 @@ const ICONS_BY_VARIANT = {
     toPayment: ChevronRight["default"],
     toConfirmation: Lock["default"],
     toPlaid: Lock["default"],
-    toForm: null,
+    toReview: null,
     toMarketplace: null,
 };
 

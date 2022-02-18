@@ -19,7 +19,7 @@ const CheckoutStepper = ({ progress: currentProgress, }) => {
     corre.useTimeout(() => {
         setProgress(lastProgress = currentProgress);
     }, 0, [currentProgress]);
-    return (React__default["default"].createElement(material.Box, { sx: { position: "relative", mb: 1 } },
+    return (React__default["default"].createElement(material.Box, { sx: { position: "relative" } },
         React__default["default"].createElement(material.Stack, { spacing: 2, direction: "row", sx: { justifyContent: "space-between", alignItems: "center", pt: 2, pb: 1 } },
             React__default["default"].createElement(material.Typography, { variant: "subtitle2", sx: { width: "100%", color: theme => theme.palette.grey[progress === 50 ? "700" : "600"] } }, "Billing Info"),
             React__default["default"].createElement(material.Typography, { variant: "subtitle2", sx: { width: "100%", color: theme => theme.palette.grey[progress === 50 ? "600" : "700"] } }, "Payment")),

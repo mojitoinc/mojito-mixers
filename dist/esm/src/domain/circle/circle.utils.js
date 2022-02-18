@@ -1,6 +1,8 @@
 import { __rest } from '../../../node_modules/tslib/tslib.es6.js';
 import countryRegionData from '../../../node_modules/country-region-data/dist/data-umd.js';
 import { customList } from 'country-codes-list';
+import { formatSentence } from '../../utils/formatUtils.js';
+import { BUILT_IN_ERRORS } from '../errors/errors.constants.js';
 
 const countryPrefixes = customList('countryCode', '{countryCallingCode}');
 function formatPhoneAsE123(phoneNumber, countryCode) {
@@ -112,24 +114,65 @@ function isCircleFieldError(obj) {
 function isCircleFieldErrorArray(obj) {
     return Array.isArray(obj) && obj.every(isCircleFieldError);
 }
+const CIRCLE_FIELD_TO_FORM_FIELD = {
+    "billingAddress.name": ["billing", "fullName", "Full Name"],
+    "billingAddress.city": ["billing", "city", "City"],
+    "billingAddress.country": ["billing", "country", "Country"],
+    "billingAddress.address1": ["billing", "street", "Street"],
+    "billingAddress.address2": ["billing", "apartment", "Apartment, Suite, etc."],
+    "billingAddress.district": ["billing", "state", "State"],
+    "billingAddress.postalCode": ["billing", "zipCode", "Zip Code"],
+    "metadata.email": ["billing", "email", "Email"],
+    "metadata.phoneNumber": ["billing", "phone", "Phone"],
+    expMonth: ["payment", "expiryDate", "Expiration Date's month"],
+    expYear: ["payment", "expiryDate", "Expiration Date's year"],
+};
 function parseCircleError(error) {
-    const { message } = error;
+    const { name, message } = error;
+    // If there's any code error like "TypeError: Cannot read properties of undefined", we don't want to show that to
+    // users, so we just return undefined here to fall back to the default `ERROR_PURCHASE_CREATING_PAYMENT_METHOD` error.
+    if (BUILT_IN_ERRORS.includes(name) || !message)
+        return undefined;
     if (message.includes("with body: ")) {
         try {
             const parsedCircleError = JSON.parse(String.raw `${message}`.replace(/^.+with body: /, ''));
             const parsedCircleErrors = parsedCircleError.errors;
+            const circleFieldErrors = {
+                summary: parsedCircleError.message.replace("Invalid entity.\n", ""),
+                billing: {},
+                payment: {},
+                unknown: {},
+                firstAt: "billing",
+            };
             if (isCircleFieldErrorArray(parsedCircleErrors)) {
-                return parsedCircleErrors.reduce((errors, circleFieldError) => {
-                    // TODO: Match Circle errors to form field errors:
-                    errors[circleFieldError.location] = circleFieldError.message;
-                    return errors;
-                }, { form: parsedCircleError.message });
+                parsedCircleErrors.forEach(({ location, message }) => {
+                    const [at, inputName, inputLabel] = CIRCLE_FIELD_TO_FORM_FIELD[location] || ["unknown", location, location];
+                    const searchRegExp = new RegExp(location, "g");
+                    circleFieldErrors[at][inputName] = [
+                        circleFieldErrors[at][inputName],
+                        formatSentence(message.replace(searchRegExp, inputLabel).replace(" (was )", "")),
+                    ].filter(Boolean).join(" / ");
+                    circleFieldErrors.summary = circleFieldErrors.summary.replace(searchRegExp, inputLabel).replace(" (was )", "");
+                });
             }
-            return parsedCircleError.message || "";
+            if (circleFieldErrors.summary) {
+                if (Object.keys(circleFieldErrors.billing).length === 0)
+                    delete circleFieldErrors.billing;
+                if (Object.keys(circleFieldErrors.payment).length === 0)
+                    delete circleFieldErrors.payment;
+                if (Object.keys(circleFieldErrors.unknown).length === 0)
+                    delete circleFieldErrors.unknown;
+                if (!circleFieldErrors.billing && circleFieldErrors.payment)
+                    circleFieldErrors.firstAt = "payment";
+                return circleFieldErrors;
+            }
         }
         catch (e) { /* ignore */ }
     }
-    return "";
+    return {
+        summary: message,
+        firstAt: "billing",
+    };
 }
 
 export { billingInfoToSavedPaymentMethodBillingInfo, formatPhoneAsE123, getSavedPaymentMethodAddressId, getSavedPaymentMethodAddressIdFromBillingInfo, isCircleFieldError, isCircleFieldErrorArray, parseCircleError, savedPaymentMethodToBillingInfo, transformRawSavedPaymentMethods };

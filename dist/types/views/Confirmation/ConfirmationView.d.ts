@@ -1,7 +1,7 @@
 import React from "react";
 import { SavedPaymentMethod } from "../../domain/circle/circle.interfaces";
 import { CheckoutItem } from "../../domain/product/product.interfaces";
-import { SelectedPaymentMethod } from "../../components/payments/CheckoutModal/CheckoutModal";
+import { SelectedPaymentMethod } from "../../components/payments/CheckoutModal/CheckoutModal.hooks";
 export interface ConfirmationViewProps {
     checkoutItems: CheckoutItem[];
     savedPaymentMethods: SavedPaymentMethod[];

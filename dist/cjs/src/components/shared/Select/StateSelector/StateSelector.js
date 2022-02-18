@@ -44,8 +44,9 @@ const StateSelector = (_a) => {
 const ControlledStateSelector = ({ name, control, label, countryCode, }) => (React__default["default"].createElement(reactHookForm.Controller, { name: name, control: control, render: (_a) => {
         var _b;
         var _c = _a.field, { name, onChange, ref } = _c, field = tslib_es6.__rest(_c, ["name", "onChange", "ref"]), { fieldState } = _a;
-        const error = (_b = fieldState === null || fieldState === void 0 ? void 0 : fieldState.error) === null || _b === void 0 ? void 0 : _b.value;
-        return (React__default["default"].createElement(StateSelector, Object.assign({ id: name, name: name, label: label, onSelectState: onChange, fullWidth: true, countryCode: countryCode, inputRef: ref, error: !!error, helperText: error === null || error === void 0 ? void 0 : error.message }, field)));
+        const error = fieldState === null || fieldState === void 0 ? void 0 : fieldState.error;
+        const fieldError = error ? (error.hasOwnProperty("message") ? error.message : (_b = error.value) === null || _b === void 0 ? void 0 : _b.message) || "" : "";
+        return (React__default["default"].createElement(StateSelector, Object.assign({ id: name, name: name, label: label, onSelectState: onChange, fullWidth: true, countryCode: countryCode, inputRef: ref, error: !!fieldError, helperText: fieldError }, field)));
     } }));
 
 exports.ControlledStateSelector = ControlledStateSelector;

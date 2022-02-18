@@ -10,6 +10,7 @@ var PaymentDetailsItem = require('../../payments/PaymentDetailsItem/Item/Payment
 var CheckoutModalFooter = require('../../payments/CheckoutModalFooter/CheckoutModalFooter.js');
 var React = require('react');
 var material = require('@mui/material');
+var theme = require('../../../config/theme/theme.js');
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
@@ -32,6 +33,7 @@ const SavedPaymentDetailsSelector = ({ showLoader, savedPaymentMethods, selected
         setSelectorState(({ isFormSubmitted }) => ({ isFormSubmitted, cvv: "" }));
     }, [selectedPaymentMethodId]);
     const isCvvOk = validateCvv(isCvvRequired, cvv);
+    const cvvError = isFormSubmitted && !isCvvOk;
     const handleNextClicked = React.useCallback((canSubmit) => {
         if (canSubmit && selectedPaymentMethodId && isCvvOk) {
             onCvvSelected(cvv);
@@ -54,7 +56,7 @@ const SavedPaymentDetailsSelector = ({ showLoader, savedPaymentMethods, selected
                     display: "flex",
                     justifyContent: "center",
                     alignItems: "center",
-                    background: "rgba(255, 255, 255, 0.75)",
+                    background: theme$1 => material.alpha(theme$1.palette.background.default, theme.OVERLAY_OPACITY),
                     zIndex: 100,
                 } },
                 React__default["default"].createElement(material.CircularProgress, { color: "secondary" }))) : null,
@@ -64,9 +66,10 @@ const SavedPaymentDetailsSelector = ({ showLoader, savedPaymentMethods, selected
                     disabled: showLoader,
                     onDelete,
                     onPick,
+                    cvvError,
                     onCvvChange: handleCvvChange,
-                }), component: PaymentDetailsItem.PaymentDetailsItem, itemKey: getPaymentMethodId, deps: [onDelete, onPick, selectedPaymentMethodId, showLoader] }),
-            isFormSubmitted && !isCvvOk && (React__default["default"].createElement(material.Typography, { variant: "caption", component: "p", sx: { mt: 2, color: theme => theme.palette.warning.dark } }, "You must enter a valid CVV number.")),
+                }), component: PaymentDetailsItem.PaymentDetailsItem, itemKey: getPaymentMethodId, deps: [selectedPaymentMethodId, showLoader, onDelete, onPick, cvvError, handleCvvChange] }),
+            cvvError && (React__default["default"].createElement(material.Typography, { variant: "caption", component: "p", sx: { mt: 2, color: theme => theme.palette.warning.dark } }, "You must enter a valid CVV number.")),
             React__default["default"].createElement(SecondaryButton.SecondaryButton, { onClick: onNew, startIcon: React__default["default"].createElement(Add["default"], null), sx: { mt: 2.5 }, disabled: showLoader }, "Add New Payment Method"),
             isFormSubmitted && !selectedPaymentMethodId && (React__default["default"].createElement(material.Typography, { variant: "caption", component: "p", sx: { mt: 2, color: theme => theme.palette.warning.dark } }, "You must select a saved and approved payment method or create a new one."))),
         React__default["default"].createElement(CheckoutModalFooter.CheckoutModalFooter, { variant: "toConfirmation", consentType: consentType, privacyHref: privacyHref, termsOfUseHref: termsOfUseHref, onSubmitClicked: handleNextClicked, onCloseClicked: onClose })));

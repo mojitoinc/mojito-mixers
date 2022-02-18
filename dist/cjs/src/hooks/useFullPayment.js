@@ -5,6 +5,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 var tslib_es6 = require('../../node_modules/tslib/tslib.es6.js');
 var React = require('react');
 var circle_utils = require('../domain/circle/circle.utils.js');
+var errors_constants = require('../domain/errors/errors.constants.js');
 var graphqlGenerated = require('../queries/graphqlGenerated.js');
 var promiseUtils = require('../utils/promiseUtils.js');
 var useCreatePaymentMethod = require('./useCreatePaymentMethod.js');
@@ -16,6 +17,13 @@ function useFullPayment({ orgID, invoiceID: existingInvoiceID = "", checkoutItem
         paymentStatus: "processing",
         paymentReferenceNumber: "",
     });
+    const setError = React.useCallback((paymentError) => {
+        setPaymentState({
+            paymentStatus: "error",
+            paymentReferenceNumber: "",
+            paymentError,
+        });
+    }, []);
     const [encryptCardData] = useEncryptCard.useEncryptCardData();
     const [createPaymentMethod] = useCreatePaymentMethod.useCreatePaymentMethod();
     const [createAuctionInvoice] = graphqlGenerated.useCreateAuctionInvoiceMutation();
@@ -34,14 +42,21 @@ function useFullPayment({ orgID, invoiceID: existingInvoiceID = "", checkoutItem
         // TODO: Quick fix. The UI can currently display multiple items with multiple units each, but will only purchase the
         // selected amount (can be multiple units) of the first item:
         const { lotID, lotType, units, } = checkoutItems[0];
-        if (debug)
-            console.log(`\n💵 Making payment for ${units} × ${lotType} lot${units > 1 ? "s" : ""}  ${lotID} (orgID = ${orgID})...\n`);
+        if (debug) {
+            console.log(checkoutItems[0]
+                ? `\n💵 Making payment for ${units} × ${lotType} lot${units > 1 ? "s" : ""}  ${lotID} (orgID = ${orgID})...\n`
+                : `\n💵 Making payment for unknown lot (orgID = ${orgID})...\n`);
+        }
         if (checkoutItems.length === 0) {
-            setPaymentState({
-                paymentStatus: "error",
-                paymentReferenceNumber: "",
-                paymentError: "Missing lot information.",
-            });
+            setError(errors_constants.ERROR_PURCHASE_NO_ITEMS());
+            return;
+        }
+        if (!units) {
+            setError(errors_constants.ERROR_PURCHASE_NO_UNITS());
+            return;
+        }
+        if (!lotID || !lotType) {
+            setError(errors_constants.ERROR_PURCHASE_LOADING_ITEMS());
             return;
         }
         setPaymentState({
@@ -51,7 +66,8 @@ function useFullPayment({ orgID, invoiceID: existingInvoiceID = "", checkoutItem
         let paymentMethodID = "";
         let invoiceID = existingInvoiceID;
         let circlePaymentID = "";
-        let errorMessage = "";
+        let mutationError;
+        let circleFieldErrors;
         let paymentMethodCreatedAt = 0;
         if (typeof selectedPaymentInfo === "string") {
             // If selectedPaymentInfo is a payment method ID, that's all we need, no need to create a new payment method:
@@ -64,11 +80,7 @@ function useFullPayment({ orgID, invoiceID: existingInvoiceID = "", checkoutItem
                 // data in savedPaymentMethods:
                 const selectedPaymentMethod = savedPaymentMethods.find(({ addressId }) => addressId === selectedBillingInfo);
                 if (!selectedPaymentMethod) {
-                    setPaymentState({
-                        paymentStatus: "error",
-                        paymentReferenceNumber: "",
-                        paymentError: errorMessage || "Could not find the selected payment method.",
-                    });
+                    setError(errors_constants.ERROR_PURCHASE_SELECTED_PAYMENT_METHOD());
                     return;
                 }
                 selectedBillingInfoData = circle_utils.savedPaymentMethodToBillingInfo(selectedPaymentMethod);
@@ -85,11 +97,12 @@ function useFullPayment({ orgID, invoiceID: existingInvoiceID = "", checkoutItem
                 });
             }
             const createPaymentMethodResult = yield createPaymentMethod(orgID, selectedBillingInfoData, selectedPaymentInfo).catch((error) => {
-                const parsedCircleError = circle_utils.parseCircleError(error);
+                mutationError = error;
+                const parsedCircleErrors = circle_utils.parseCircleError(error);
                 if (debug)
-                    console.log("    🔴 createPaymentMethod error", parsedCircleError, error);
-                if (typeof parsedCircleError === "string")
-                    errorMessage = parsedCircleError;
+                    console.log("    🔴 createPaymentMethod error", error, parsedCircleErrors);
+                if (parsedCircleErrors)
+                    circleFieldErrors = parsedCircleErrors;
             });
             paymentMethodCreatedAt = Date.now();
             if (createPaymentMethodResult && !createPaymentMethodResult.errors) {
@@ -99,11 +112,12 @@ function useFullPayment({ orgID, invoiceID: existingInvoiceID = "", checkoutItem
             }
         }
         if (!paymentMethodID) {
-            setPaymentState({
-                paymentStatus: "error",
-                paymentReferenceNumber: "",
-                paymentError: errorMessage || "Error creating payment method.",
-            });
+            setError(circleFieldErrors ? {
+                at: circleFieldErrors.firstAt,
+                circleFieldErrors,
+                error: mutationError,
+                errorMessage: circleFieldErrors.summary,
+            } : errors_constants.ERROR_PURCHASE_CREATING_PAYMENT_METHOD(mutationError));
             return;
         }
         if (debug) {
@@ -131,6 +145,7 @@ function useFullPayment({ orgID, invoiceID: existingInvoiceID = "", checkoutItem
                         lotID,
                     },
                 }).catch((error) => {
+                    mutationError = error;
                     if (debug)
                         console.log("    🔴 createAuctionInvoice error", error);
                 });
@@ -149,6 +164,7 @@ function useFullPayment({ orgID, invoiceID: existingInvoiceID = "", checkoutItem
                         },
                     },
                 }).catch((error) => {
+                    mutationError = error;
                     if (debug)
                         console.log("    🔴 createBuyNowInvoice error", error);
                 });
@@ -160,11 +176,7 @@ function useFullPayment({ orgID, invoiceID: existingInvoiceID = "", checkoutItem
             }
         }
         if (!invoiceID) {
-            setPaymentState({
-                paymentStatus: "error",
-                paymentReferenceNumber: "",
-                paymentError: errorMessage || "Error creating invoice",
-            });
+            setError(errors_constants.ERROR_PURCHASE_CREATING_INVOICE(mutationError));
             return;
         }
         if (debug) {
@@ -178,16 +190,13 @@ function useFullPayment({ orgID, invoiceID: existingInvoiceID = "", checkoutItem
             const encryptCardDataResult = yield encryptCardData({
                 cvv,
             }).catch((error) => {
+                mutationError = error;
                 // TODO: Cancel invoice?
                 if (debug)
                     console.log("    🔴 encryptCardData error", error);
             });
             if (!encryptCardDataResult) {
-                setPaymentState({
-                    paymentStatus: "error",
-                    paymentReferenceNumber: "",
-                    paymentError: errorMessage || "Error encrypting CVV",
-                });
+                setError(errors_constants.ERROR_PURCHASE_CVV(mutationError));
                 return;
             }
             const { keyID, encryptedCardData } = encryptCardDataResult;
@@ -208,6 +217,7 @@ function useFullPayment({ orgID, invoiceID: existingInvoiceID = "", checkoutItem
                 metadata,
             },
         }).catch((error) => {
+            mutationError = error;
             // TODO: Cancel invoice?
             if (debug)
                 console.log("    🔴 makePayment error", error);
@@ -218,15 +228,10 @@ function useFullPayment({ orgID, invoiceID: existingInvoiceID = "", checkoutItem
             circlePaymentID = ((_j = (_h = makePaymentResult.data) === null || _h === void 0 ? void 0 : _h.createPayment) === null || _j === void 0 ? void 0 : _j.circlePaymentID) || "";
         }
         if (!circlePaymentID) {
-            setPaymentState({
-                paymentStatus: "error",
-                paymentReferenceNumber: "",
-                paymentError: errorMessage || "Error while trying to make the payment.",
-            });
+            setError(errors_constants.ERROR_PURCHASE_PAYING(mutationError));
             return;
         }
         // TODO: Error handling and automatic retry:
-        // TODO: After this, refetch payment methods... Maybe after creation?
         setPaymentState({
             paymentStatus: "processed",
             paymentReferenceNumber: circlePaymentID,
@@ -243,6 +248,7 @@ function useFullPayment({ orgID, invoiceID: existingInvoiceID = "", checkoutItem
         orgID,
         savedPaymentMethods,
         selectedPaymentMethod,
+        setError,
     ]);
     return [paymentState, fullPayment];
 }

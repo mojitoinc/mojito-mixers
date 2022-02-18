@@ -17,6 +17,8 @@ var Book = require('../../node_modules/@mui/icons-material/Book.js');
 var Select = require('../components/shared/Select/Select.js');
 var validationUtils = require('../utils/validationUtils.js');
 var DisplayBox = require('../components/payments/DisplayBox/DisplayBox.js');
+var useFormCheckoutError = require('../hooks/useFormCheckoutError.js');
+var FormErrorsBox = require('../components/shared/FormErrorsBox/FormErrorsBox.js');
 var Grid = require('../../node_modules/@mui/material/Grid/Grid.js');
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
@@ -43,6 +45,7 @@ const FIELD_LABELS = {
     [STATE_FIELD]: "State",
     [ZIP_CODE_FIELD]: "Zip Code"
 };
+const FIELD_NAMES = Object.keys(FIELD_LABELS);
 const EMPTY_FORM_VALUES = {
     [FULL_NAME_FIELD]: "",
     [EMAIL_FIELD]: "",
@@ -91,8 +94,8 @@ const schema = yup.object()
     .required();
 const BillingInfoForm = ({ 
 // variant,
-defaultValues, onSaved, onClose, onSubmit, debug }) => {
-    const { control, handleSubmit, watch } = reactHookForm.useForm({
+defaultValues, checkoutError, onSaved, onClose, onSubmit, debug }) => {
+    const { control, handleSubmit, watch, setError, formState, } = reactHookForm.useForm({
         defaultValues: Object.assign(Object.assign({}, EMPTY_FORM_VALUES), defaultValues),
         reValidateMode: "onChange",
         resolver: yup$1.yupResolver(schema),
@@ -100,6 +103,7 @@ defaultValues, onSaved, onClose, onSubmit, debug }) => {
     const selectedCountryOption = watch(COUNTRY_FIELD);
     const selectedCountryCode = selectedCountryOption === null || selectedCountryOption === void 0 ? void 0 : selectedCountryOption.value;
     const submitForm = handleSubmit(onSubmit);
+    const checkoutErrorMessage = useFormCheckoutError.useFormCheckoutError({ formKey: "billing", checkoutError, fields: FIELD_NAMES, setError });
     return (React__default["default"].createElement("form", { onSubmit: submitForm },
         onSaved && (React__default["default"].createElement(material.Box, { sx: { my: 2.5 } },
             React__default["default"].createElement(SecondaryButton.SecondaryButton, { onClick: onSaved, startIcon: React__default["default"].createElement(Book["default"], null) }, "Use Saved Billing Info"))),
@@ -126,7 +130,11 @@ defaultValues, onSaved, onClose, onSubmit, debug }) => {
                 React__default["default"].createElement(StateSelector.ControlledStateSelector, { name: STATE_FIELD, control: control, label: FIELD_LABELS[STATE_FIELD], countryCode: selectedCountryCode })),
             React__default["default"].createElement(Grid["default"], { item: true, sm: 6 },
                 React__default["default"].createElement(TextField.ControlledTextField, { name: ZIP_CODE_FIELD, control: control, label: FIELD_LABELS[ZIP_CODE_FIELD] }))),
-        debug && (React__default["default"].createElement(DisplayBox.DebugBox, { sx: { my: 2 } }, JSON.stringify(watch(), null, 2))),
+        checkoutErrorMessage && React__default["default"].createElement(FormErrorsBox.FormErrorsBox, { error: checkoutErrorMessage, sx: { mt: 5 } }),
+        debug && (React__default["default"].createElement(DisplayBox.DebugBox, { sx: { mt: 5 } },
+            JSON.stringify(watch(), null, 2),
+            "\n\n",
+            JSON.stringify(formState.errors, null, 2))),
         React__default["default"].createElement(CheckoutModalFooter.CheckoutModalFooter, { variant: "toPayment", onCloseClicked: onClose })));
 };
 

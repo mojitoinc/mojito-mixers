@@ -5,7 +5,8 @@ import React__default, { useCallback } from 'react';
 import { BillingInfoItem } from '../../payments/BillingInfo/Item/BillingInfoItem.js';
 import { SecondaryButton } from '../SecondaryButton/SecondaryButton.js';
 import { CheckoutModalFooter } from '../../payments/CheckoutModalFooter/CheckoutModalFooter.js';
-import { Box, CircularProgress } from '@mui/material';
+import { Box, alpha, CircularProgress } from '@mui/material';
+import { OVERLAY_OPACITY } from '../../../config/theme/theme.js';
 
 const SavedBillingDetailsSelector = ({ showLoader, savedPaymentMethods, selectedPaymentMethodAddressId, onNew, onEdit, onDelete, onPick, onNext, onClose, }) => {
     const getPaymentMethodAddressId = useCallback((savedPaymentMethod) => savedPaymentMethod.addressId, []);
@@ -18,7 +19,7 @@ const SavedBillingDetailsSelector = ({ showLoader, savedPaymentMethods, selected
                     display: "flex",
                     justifyContent: "center",
                     alignItems: "center",
-                    background: "rgba(255, 255, 255, 0.75)",
+                    background: theme => alpha(theme.palette.background.default, OVERLAY_OPACITY),
                     zIndex: 100,
                 } },
                 React__default.createElement(CircularProgress, { color: "secondary" }))) : null,
@@ -26,10 +27,10 @@ const SavedBillingDetailsSelector = ({ showLoader, savedPaymentMethods, selected
             React__default.createElement(StackList, { data: savedPaymentMethods, additionalProps: (savedPaymentMethod) => ({
                     active: savedPaymentMethod.addressId === selectedPaymentMethodAddressId,
                     disabled: showLoader,
-                    onEdit,
                     onDelete,
                     onPick,
-                }), component: BillingInfoItem, itemKey: getPaymentMethodAddressId, deps: [onEdit, onDelete, onPick, selectedPaymentMethodAddressId, showLoader] }),
+                    onEdit,
+                }), component: BillingInfoItem, itemKey: getPaymentMethodAddressId, deps: [selectedPaymentMethodAddressId, showLoader, onDelete, onPick, onEdit] }),
             React__default.createElement(SecondaryButton, { onClick: onNew, startIcon: React__default.createElement(default_1, null), sx: { mt: 2.5 }, disabled: showLoader }, "Add New Billing Info")),
         React__default.createElement(CheckoutModalFooter, { variant: "toPayment", onSubmitClicked: onNext, onCloseClicked: onClose })));
 };
