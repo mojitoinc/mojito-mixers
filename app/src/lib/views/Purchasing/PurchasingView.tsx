@@ -7,7 +7,7 @@ import { useTimeout, useInterval } from "@swyg/corre";
 import { CheckoutModalError, SelectedPaymentMethod } from "../../components/payments/CheckoutModal/CheckoutModal.hooks";
 import { CheckoutItem } from "../..";
 import { ERROR_PURCHASE } from "../../domain/errors/errors.constants";
-import { NARROW_MAX_WIDTH } from "../../config/theme/theme";
+import { XS_MOBILE_MAX_WIDTH } from "../../config/theme/theme";
 
 const DEFAULT_PURCHASING_IMAGE_SRC = "https://raw.githubusercontent.com/mojitoinc/mojito-mixers/main/app/src/lib/assets/mojito-loader.gif";
 
@@ -124,7 +124,7 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
 
       { purchasingMessage ? <Typography variant="body2" sx={{ textAlign: "center", mt: 1.5 }}>{ purchasingMessage }</Typography> : null }
 
-      <Box sx={{ maxWidth: NARROW_MAX_WIDTH, mx: "auto" }}>
+      <Box sx={{ maxWidth: XS_MOBILE_MAX_WIDTH, mx: "auto" }}>
         <Typography variant="body2" sx={{ textAlign: "center", mt: 5, mb: 1.5 }}>Hang tight! We are currently processing your payment.</Typography>
         <Typography variant="body2" sx={{ textAlign: "center", mt: 1.5, mb: 5 }}>Please, don't close or reload the page...</Typography>
       </Box>

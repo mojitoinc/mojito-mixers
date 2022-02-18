@@ -1,5 +1,6 @@
 import { Box, Link, Typography, Divider, CircularProgress } from "@mui/material";
 import React, { useCallback, useState } from "react";
+import { SM_MOBILE_MAX_WIDTH } from "../../../config/theme/theme";
 import { isPromise } from "../../../utils/promiseUtils";
 import { Checkbox } from "../../shared/Checkbox/Checkbox";
 import { ConsentText, ConsentType, CONSENT_ERROR_MESSAGE } from "../../shared/ConsentText/ConsentText";
@@ -138,7 +139,7 @@ export const CheckoutModalFooter: React.FC<CheckoutModalFooterProps> = ({
       { showConsent && consentType === "disclaimer" && (<>
         <Divider sx={{ my: 5, width: "100%" }}/>
 
-        <Typography sx={{ maxWidth: "400px" }} align="center">
+        <Typography sx={{ maxWidth: SM_MOBILE_MAX_WIDTH }} align="center">
           By placing an order you affirm that you { consentTextElement }.
         </Typography>
       </>) }

@@ -5,7 +5,7 @@ import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import { parseSentences } from "../../utils/formatUtils";
 import { CheckoutModalError, CheckoutModalErrorAt } from "../../components/payments/CheckoutModal/CheckoutModal.hooks";
 import { DebugBox } from "../../components/payments/DisplayBox/DisplayBox";
-import { NARROW_MAX_WIDTH } from "../../config/theme/theme";
+import { XS_MOBILE_MAX_WIDTH } from "../../config/theme/theme";
 
 const ERROR_ACTION_LABELS: Record<CheckoutModalErrorAt, string> = {
   authentication: "Review Information",
@@ -65,7 +65,7 @@ export const ErrorView: React.FC<ErrorViewProps> = ({
         </Box>
       ) }
 
-      <Box sx={{ maxWidth: NARROW_MAX_WIDTH, mx: "auto" }}>
+      <Box sx={{ maxWidth: XS_MOBILE_MAX_WIDTH, mx: "auto" }}>
         { parseSentences(errorMessage).map((sentence) => {
           return <Typography key={ sentence } variant="body2" sx={{ textAlign: "center", mb: 1.5 }}>{ sentence }</Typography>;
         }) }

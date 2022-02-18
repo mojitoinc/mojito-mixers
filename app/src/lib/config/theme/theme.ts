@@ -3,7 +3,8 @@ import { createTypographyTheme } from "./themeTypography";
 import { createPaletteTheme } from "./themePalette";
 import { createComponentsTheme } from "./themeComponents";
 
-export const NARROW_MAX_WIDTH = 320;
+export const XS_MOBILE_MAX_WIDTH = 320;
+export const SM_MOBILE_MAX_WIDTH = 400;
 
 export const OVERLAY_OPACITY = 0.75;
 

@@ -9,7 +9,7 @@ declare module "@mui/material/TextField" {
 }
 */
 
-export function createComponentsTheme({ palette, spacing, breakpoints }: Theme): ComponentsOptions {
+export function createComponentsTheme({ typography, palette, spacing, breakpoints }: Theme): ComponentsOptions {
   return {
     // FORMS:
 
@@ -49,7 +49,7 @@ export function createComponentsTheme({ palette, spacing, breakpoints }: Theme):
     MuiInputLabel: {
       styleOverrides: {
         root: {
-          fontFamily: "IBM Plex Mono, monospace",
+          fontFamily: typography.caption.fontFamily,
           fontSize: "16px", // 12px accounting for 0.75 scale.
           lineHeight: "24px", // 18px accounting for 0.75 scale.
           fontWeight: 500,
