@@ -8,8 +8,9 @@ import { CheckoutModalError, SelectedPaymentMethod } from "../../components/publ
 import { CheckoutItem } from "../..";
 import { ERROR_PURCHASE } from "../../domain/errors/errors.constants";
 import { XS_MOBILE_MAX_WIDTH } from "../../config/theme/theme";
+import { StatusIcon } from "../../components/shared/StatusIcon/StatusIcon";
 
-const DEFAULT_PURCHASING_IMAGE_SRC = "https://raw.githubusercontent.com/mojitoinc/mojito-mixers/main/app/src/lib/assets/mojito-loader.gif";
+// TODO: Move these to theme or similar config file:
 
 const PURCHASING_MIN_WAIT_MS = 3000;
 
@@ -111,23 +112,20 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
   }, PURCHASING_MESSAGES_INTERVAL_MS);
 
   return (
-    <Box sx={{ position: "relative" }}>
-      <Box
-          component="img"
-          src={ purchasingImageSrc || DEFAULT_PURCHASING_IMAGE_SRC }
-          sx={{
-            width: 196,
-            height: 196,
-            mx: "auto",
-            mt: 5,
-          }} />
+    <Box>
+
+      <StatusIcon
+        variant="loading"
+        imgSrc={ purchasingImageSrc }
+        sx={{ mt: 5 }} />
 
       { purchasingMessage ? <Typography variant="body2" sx={{ textAlign: "center", mt: 1.5 }}>{ purchasingMessage }</Typography> : null }
 
-      <Box sx={{ maxWidth: XS_MOBILE_MAX_WIDTH, mx: "auto" }}>
-        <Typography variant="body2" sx={{ textAlign: "center", mt: 5, mb: 1.5 }}>Hang tight! We are currently processing your payment.</Typography>
-        <Typography variant="body2" sx={{ textAlign: "center", mt: 1.5, mb: 5 }}>Please, don't close or reload the page...</Typography>
+      <Box sx={{ maxWidth: XS_MOBILE_MAX_WIDTH, mx: "auto", my: 5 }}>
+        <Typography variant="body2" sx={{ textAlign: "center", mb: 1.5 }}>Hang tight! We are currently processing your payment.</Typography>
+        <Typography variant="body2" sx={{ textAlign: "center" }}>Please, don't close or reload the page...</Typography>
       </Box>
+
     </Box>
   );
 };

@@ -79,15 +79,22 @@ DONE:
 - Re-structure exported components and providers.
 - Center modal content (with prop).
 - Add Placeholder props for columns in FullScreenOverlay.
+- Create 3DS pages in Next app.
+- 3DS success and error screen designs.
+- Extract StatusIcon.
 
 
 TODO:
-- 3DS success and error screen designs (extract common component from PurchasingView and ErrorView).
-- Check modal scroll issue.
+- Improve ProviderInjector logic and add Apollo.
 - Update Purchasing page to do polling for CC payments instead of going to the confirmation one.
 - Implement persistance of state before redirecting users to 3DS and resume logic when coming back.
-- Check why loader appears below page content in marketplaces. Change z-index there? Provider was missing for the standalone CircularProgress.
+- Document 3DS flow.
 
+
+FOUND:
+- Check why loader appears below page content in marketplaces. Change z-index there? Provider was missing for the standalone CircularProgress.
+- Check modal scroll issue.
+- Next.js vulnerability.
 
 
 ## Building this project as a library

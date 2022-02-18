@@ -80,6 +80,7 @@ export function useCheckoutModalState({
     const { selectedBillingInfo, continueOAuthFlow, savedStateUsed } = INITIAL_PLAID_OAUTH_FLOW_STATE;
 
     setCheckoutModalState({ checkoutStep: continueOAuthFlow && !savedStateUsed ? "purchasing" : startAt });
+    // setCheckoutModalState({ checkoutStep: "error", checkoutError: { errorMessage: "test" } });
     // setCheckoutModalState({ checkoutStep: "purchasing" });
 
     setSelectedPaymentMethod({

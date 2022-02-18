@@ -1,8 +1,14 @@
+import { SxProps, Theme } from "@mui/material/styles";
 import React, { useCallback, useLayoutEffect } from "react";
-import { FullScreenOverlay, FullScreenOverlayNoColumnsProps } from "../../shared/FullScreenOverlay/FullScreenOverlay";
+import { ErrorView } from "../../../views/Error/ErrorView";
+import { CheckoutModalHeader } from "../../payments/CheckoutModalHeader/CheckoutModalHeader";
+import { FullScreenOverlay, FullScreenOverlayFunctionalProps } from "../../shared/FullScreenOverlay/FullScreenOverlay";
 import { ProviderInjectorProps, withProviders } from "../../shared/ProvidersInjector/ProvidersInjector";
 
-export interface PUIErrorOverlayProps extends FullScreenOverlayNoColumnsProps {
+export interface PUIErrorOverlayProps extends FullScreenOverlayFunctionalProps {
+  logoSrc?: string;
+  logoSx?: SxProps<Theme>;
+  errorImageSrc: string;
   onRedirect: (pathnameOrUrl: string) => void;
   onReview: (pathnameOrUrl: string) => void;
   onAbort: (pathnameOrUrl: string) => void;
@@ -11,34 +17,54 @@ export interface PUIErrorOverlayProps extends FullScreenOverlayNoColumnsProps {
 export type PUIErrorProps = PUIErrorOverlayProps & ProviderInjectorProps;
 
 export const PUIErrorOverlay: React.FC<PUIErrorOverlayProps> = ({
+  logoSrc,
+  logoSx,
+  errorImageSrc,
   onRedirect,
   onReview,
   onAbort,
   ...fullScreenOverlayProps
 }) => {
-  const goToError = false;
+  const purchaseError = true;
 
   useLayoutEffect(() => {
-    if (!goToError) onRedirect("/");
-  }, [goToError, onRedirect]);
+    // Users should only see this page if they completed a credit card payment and 3DS' verification went wrong.
+    // Otherwise, they are immediately redirected to homepage:
+    if (!purchaseError) onRedirect("/");
+  }, [purchaseError, onRedirect]);
 
-  const reviewData = useCallback(() => {
-    if (!goToError) return;
+  const reviewData = useCallback(async (): Promise<false> => {
+    if (!purchaseError) return;
 
+    // If there was an error, users can click the review button and go back to the Payment UI to review the data...:
     onReview("/");
-  }, [goToError, onReview]);
+
+    return false;
+  }, [purchaseError, onReview]);
 
   const toMarketplace = useCallback(() => {
-    if (!goToError) return;
+    if (!purchaseError) return;
 
+    // ...or they can just go back to the marketplace homepage:
     onAbort("/");
-  }, [goToError, onAbort]);
+  }, [purchaseError, onAbort]);
 
-  if (!goToError) return null;
+  if (!purchaseError) return null;
+
+  const headerElement = logoSrc ? (
+    <CheckoutModalHeader
+      variant="error"
+      logoSrc={ logoSrc }
+      logoSx={ logoSx } />
+  ) : null;
 
   return (
-    <FullScreenOverlay centered { ...fullScreenOverlayProps }>
-      Error.
+    <FullScreenOverlay centered header={ headerElement } { ...fullScreenOverlayProps }>
+      <ErrorView
+        checkoutError={ { errorMessage: "Error creating payment method." } }
+        errorImageSrc={ errorImageSrc }
+        onFixError={ reviewData }
+        onClose={ toMarketplace } />
     </FullScreenOverlay>
   );
 }

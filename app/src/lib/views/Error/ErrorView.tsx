@@ -1,11 +1,11 @@
 import React from "react";
 import { Box, Typography } from "@mui/material";
 import { CheckoutModalFooter } from "../../components/payments/CheckoutModalFooter/CheckoutModalFooter";
-import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import { parseSentences } from "../../utils/formatUtils";
 import { CheckoutModalError, CheckoutModalErrorAt } from "../../components/public/CheckoutOverlay/CheckoutOverlay.hooks";
 import { DebugBox } from "../../components/payments/DisplayBox/DisplayBox";
 import { XS_MOBILE_MAX_WIDTH } from "../../config/theme/theme";
+import { StatusIcon } from "../../components/shared/StatusIcon/StatusIcon";
 
 const ERROR_ACTION_LABELS: Record<CheckoutModalErrorAt, string> = {
   authentication: "Review Information",
@@ -37,33 +37,12 @@ export const ErrorView: React.FC<ErrorViewProps> = ({
   const debugErrorMessage = stringifiedError === "{}" && error ? error.stack : stringifiedError;
 
   return (<>
-    <Box sx={{ position: "relative" }}>
+    <Box>
 
-      { errorImageSrc ? (
-        <Box
-          component="img"
-          src={ errorImageSrc }
-          sx={{
-            width: 196,
-            height: 196,
-            mx: "auto",
-            mt: 2.5,
-            mb: 5,
-          }} />
-      ) : (
-        <Box sx={{
-          width: 196,
-          height: 196,
-          mx: "auto",
-          mt: 2.5,
-          mb: 2.5,
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-        }}>
-          <WarningAmberIcon sx={{ fontSize: "40px", color: theme => theme.palette.text.primary }} />
-        </Box>
-      ) }
+      <StatusIcon
+        variant="error"
+        imgSrc={ errorImageSrc }
+        sx={{ my: 5 }} />
 
       <Box sx={{ maxWidth: XS_MOBILE_MAX_WIDTH, mx: "auto" }}>
         { parseSentences(errorMessage).map((sentence) => {
@@ -81,5 +60,6 @@ export const ErrorView: React.FC<ErrorViewProps> = ({
       buttonLabel={ ERROR_ACTION_LABELS[at] }
       onSubmitClicked={ onFixError }
       onCloseClicked={ onClose } />
+
   </>);
 };

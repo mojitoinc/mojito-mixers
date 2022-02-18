@@ -7,18 +7,25 @@ const centeredSx: SxProps<Theme> = {
   display: "flex",
   flexDirection: "column",
   justifyContent: "center",
+  alignItems: "center",
 };
 
-export interface FullScreenOverlayNoColumnsProps {
-  centered?: boolean;
+export interface FullScreenOverlayFunctionalProps {
   open?: boolean;
   onClose?: () => void;
   isDialogBlocked?: boolean;
   dialogRootRef?: React.RefObject<HTMLDivElement>;
+}
+
+interface FullScreenOverlayCommonProps extends FullScreenOverlayFunctionalProps {
   header?: React.ReactElement;
 }
 
-export interface FullScreenOverlayWithColumnsProps extends FullScreenOverlayNoColumnsProps {
+export interface FullScreenOverlayNoColumnsProps extends FullScreenOverlayCommonProps {
+  centered?: boolean;
+}
+
+export interface FullScreenOverlayWithColumnsProps extends FullScreenOverlayCommonProps {
   leftColumn?: React.ReactElement;
   rightColumn?: React.ReactElement;
   children: never;
@@ -27,14 +34,13 @@ export interface FullScreenOverlayWithColumnsProps extends FullScreenOverlayNoCo
 export type FullScreenOverlayProps = FullScreenOverlayNoColumnsProps | FullScreenOverlayWithColumnsProps;
 
 export const FullScreenOverlay: React.FC<FullScreenOverlayProps> = ({
-  centered,
   open = true,
   onClose,
   isDialogBlocked,
   dialogRootRef,
   header,
   children,
-  ...columns
+  ...variantProps
 }) => {
   const paperRef = useRef<HTMLDivElement>(null);
 
@@ -69,11 +75,11 @@ export const FullScreenOverlay: React.FC<FullScreenOverlayProps> = ({
       { header }
 
       { children ? (
-        <Box sx={ centered ? centeredSx : undefined }>
+        <Box sx={ "centered" in variantProps && variantProps.centered ? centeredSx : undefined }>
           { children }
         </Box>
       ) : (
-        ("leftColumn" in columns || "rightColumn" in columns) && {
+        ("leftColumn" in variantProps || "rightColumn" in variantProps) && {
           /* Implement 2-column layout using leftColumn and rightColumn */
         }
       ) }
