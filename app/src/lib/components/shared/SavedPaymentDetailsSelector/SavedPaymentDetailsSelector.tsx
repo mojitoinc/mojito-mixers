@@ -6,8 +6,9 @@ import { PaymentDetailsItem } from "../../payments/PaymentDetailsItem/Item/Payme
 import { CheckoutModalFooter } from "../../payments/CheckoutModalFooter/CheckoutModalFooter";
 import { SavedPaymentMethod } from "../../../domain/circle/circle.interfaces";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { Box, CircularProgress, Typography } from "@mui/material";
+import { alpha, Box, CircularProgress, Typography } from "@mui/material";
 import { ConsentType } from "../ConsentText/ConsentText";
+import { OVERLAY_OPACITY } from "../../../config/theme/theme";
 
 function validateCvv(isCvvRequired: boolean, cvv: string) {
   return !isCvvRequired || cvv.length === 3 || cvv.length === 4;
@@ -67,6 +68,7 @@ export const SavedPaymentDetailsSelector: React.FC<SavedPaymentDetailsSelectorPr
   }, [selectedPaymentMethodId]);
 
   const isCvvOk = validateCvv(isCvvRequired, cvv);
+  const cvvError = isFormSubmitted && !isCvvOk;
 
   const handleNextClicked = useCallback((canSubmit: boolean) => {
     if (canSubmit && selectedPaymentMethodId && isCvvOk) {
@@ -98,7 +100,7 @@ export const SavedPaymentDetailsSelector: React.FC<SavedPaymentDetailsSelectorPr
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          background: "rgba(255, 255, 255, 0.75)",
+          background: theme => alpha(theme.palette.background.default, OVERLAY_OPACITY),
           zIndex: 100,
         }}>
           <CircularProgress color="secondary" />
@@ -114,13 +116,14 @@ export const SavedPaymentDetailsSelector: React.FC<SavedPaymentDetailsSelectorPr
           disabled: showLoader,
           onDelete,
           onPick,
+          cvvError,
           onCvvChange: handleCvvChange,
         }) }
         component={ PaymentDetailsItem }
         itemKey={ getPaymentMethodId }
-        deps={[ onDelete, onPick, selectedPaymentMethodId, showLoader]} />
+        deps={[ selectedPaymentMethodId, showLoader, onDelete, onPick, cvvError, handleCvvChange]} />
 
-      { isFormSubmitted && !isCvvOk && (
+      { cvvError && (
         <Typography variant="caption" component="p" sx={{ mt: 2, color: theme => theme.palette.warning.dark }}>
           You must enter a valid CVV number.
         </Typography>

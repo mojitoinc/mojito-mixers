@@ -2,37 +2,11 @@ import Box, { BoxProps } from "@mui/material/Box";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { SecondaryButton } from "../../shared/SecondaryButton/SecondaryButton";
-import { Chip, Stack, styled, TextField, TextFieldProps, Tooltip } from "@mui/material";
+import { Chip, Stack, Tooltip } from "@mui/material";
 import React, { useCallback } from "react";
 import { ThemeColors } from "../../../domain/mui/mui.interfaces";
 import { DisplayBox } from "../DisplayBox/DisplayBox";
-
-export const InlineField: React.FC<TextFieldProps> = styled((props: TextFieldProps) => (
-  <TextField
-    { ...props }
-    variant="filled"
-    margin="none"
-    InputProps={{ disableUnderline: true }} />
-))({
-  "& .MuiInputLabel-root": {
-    color: "black",
-  },
-  "& .MuiInputBase-root": {
-    backgroundColor: "#F8F8F8",
-    color: "black",
-    padding: 8,
-    height: "30px",
-    background: "white",
-  },
-  "& .MuiInputBase-input": {
-    color: "black",
-    WebkitTextFillColor: "black",
-    fontSize: "12px",
-    cursor: "default",
-    padding: 0,
-  },
-});
-
+import { InlineField } from "../../shared/InlineField/InlineField";
 
 export interface SavedItemLabels {
   active?: string;
@@ -60,6 +34,7 @@ export interface SavedItemProps {
   onEdit?: SavedItemActionEventHandler;
   onDelete?: SavedItemActionEventHandler;
   onPick?: SavedItemActionEventHandler;
+  cvvError?: boolean;
   onCvvChange?: React.ChangeEventHandler<HTMLInputElement>;
   boxProps?: BoxProps;
 }
@@ -83,6 +58,7 @@ export const SavedItem: React.FC<SavedItemProps> = ({
   onEdit,
   onDelete,
   onPick,
+  cvvError,
   onCvvChange,
   boxProps,
 }) => {
@@ -119,7 +95,7 @@ export const SavedItem: React.FC<SavedItemProps> = ({
     mainControlElement = (<>
       <Chip size="small" color="success" label="Active" variant="outlined" />
 
-      { onCvvChange && <InlineField onChange={ onCvvChange } placeholder="CVV" sx={{ width: "52px" }} /> }
+      { onCvvChange && <InlineField onChange={ onCvvChange } placeholder="CVV" error={ cvvError } sx={{ width: "52px" }} /> }
     </>);
   } else if (onPick) {
     mainControlElement = (

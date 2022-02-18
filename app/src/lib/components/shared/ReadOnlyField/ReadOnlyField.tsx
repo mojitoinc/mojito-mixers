@@ -2,60 +2,61 @@ import { TextFieldProps, styled } from "@mui/material";
 import { CardNumberField } from "../CardNumberField/CardNumberField";
 import { TextField } from "../TextField/TextField";
 import React from "react";
+import { SM_BORDER_RADIUS } from "../../../config/theme/theme";
 
 export const ReadOnlyField: React.FC<TextFieldProps> = styled((props) => (
   <TextField variant="standard" disabled { ...props } />
-))({
+))(({ theme: { palette } }) => ({
   "& .MuiInputLabel-root": {
     "&.Mui-disabled": {
-      color: "black",
+      color: palette.text.primary,
     },
   },
   "& .MuiInputBase-root": {
     "&.Mui-disabled": {
-      backgroundColor: "#F8F8F8",
-      color: "black",
+      background: palette.grey[50],
+      color: palette.text.primary,
       padding: 8,
       height: "40px",
-      borderRadius: "2px",
+      borderRadius: SM_BORDER_RADIUS,
       marginTop: 32,
     },
   },
   "& .MuiInputBase-input": {
     "&.Mui-disabled": {
-      color: "black",
-      WebkitTextFillColor: "black",
+      color: palette.text.primary,
+      WebkitTextFillColor: palette.text.primary,
       fontSize: "12px",
       cursor: "default",
     },
   },
-});
+}));
 
 
 export const ReadOnlyCardField: React.FC<TextFieldProps> = styled((props) => (
   <CardNumberField variant="standard" disabled { ...props } />
-))({
+))(({ theme: { palette } }) => ({
   "& .MuiInputLabel-root": {
     "&.Mui-disabled": {
-      color: "black",
+      color: palette.text.primary,
     },
   },
   "& .MuiInputBase-root": {
     "&.Mui-disabled": {
-      backgroundColor: "#F8F8F8",
-      color: "black",
+      background: palette.grey[50],
+      color: palette.text.primary,
       padding: 8,
       height: "40px",
-      borderRadius: "2px",
+      borderRadius: SM_BORDER_RADIUS,
       marginTop: 32,
     },
   },
   "& .MuiInputBase-input": {
     "&.Mui-disabled": {
-      color: "black",
-      WebkitTextFillColor: "black",
+      color: palette.text.primary,
+      WebkitTextFillColor: palette.text.primary,
       fontSize: "12px",
       cursor: "default",
     },
   },
-});
+}));

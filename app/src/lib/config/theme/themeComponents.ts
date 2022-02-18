@@ -1,15 +1,16 @@
 import { Theme } from "@mui/material/styles";
 import { Components as ComponentsOptions } from "@mui/material/styles/components";
+import { BORDER_THICKNESS, MD_BORDER_RADIUS, SM_BORDER_RADIUS } from "./theme";
 
 /*
-declare module '@mui/material/TextField' {
+declare module "@mui/material/TextField" {
   interface TextFieldPropsVariantOverrides {
     custom: true;
   }
 }
 */
 
-export function createComponentsTheme(theme: Theme): ComponentsOptions {
+export function createComponentsTheme({ typography, palette, spacing, breakpoints }: Theme): ComponentsOptions {
   return {
     // FORMS:
 
@@ -18,7 +19,7 @@ export function createComponentsTheme(theme: Theme): ComponentsOptions {
         root: {
           fontSize: "14px",
           fontWeight: 500,
-          color: "#333",
+          color: palette.grey[700],
         },
       },
     },
@@ -26,10 +27,10 @@ export function createComponentsTheme(theme: Theme): ComponentsOptions {
     MuiFormHelperText: {
       styleOverrides: {
         root: {
-          marginLeft: "0px",
+          marginLeft: 0,
 
           "&.Mui-error": {
-            color: "#FF5E00",
+            color: palette.warning.dark,
           },
         }
       }
@@ -49,19 +50,23 @@ export function createComponentsTheme(theme: Theme): ComponentsOptions {
     MuiInputLabel: {
       styleOverrides: {
         root: {
-          fontFamily: "IBM Plex Mono, monospace",
+          fontFamily: typography.caption.fontFamily,
           fontSize: "16px", // 12px accounting for 0.75 scale.
           lineHeight: "24px", // 18px accounting for 0.75 scale.
           fontWeight: 500,
-          color: "#6B6B6B",
+          color: palette.grey[500],
           marginLeft: "4px",
 
           "&.Mui-focused": {
-            color: "#6B6B6B",
+            color: palette.grey[500],
           },
 
           "&.Mui-error": {
-            color: "#FF5E00",
+            color: palette.warning.dark,
+          },
+
+          "&.Mui-error.Mui-focused": {
+            color: palette.grey[500],
           },
         },
       },
@@ -71,7 +76,7 @@ export function createComponentsTheme(theme: Theme): ComponentsOptions {
       styleOverrides: {
         root: {
           height: "60px",
-          borderRadius: "2px",
+          borderRadius: SM_BORDER_RADIUS,
 
           "&.Mui-disabled::before": {
             border: 0,
@@ -90,25 +95,31 @@ export function createComponentsTheme(theme: Theme): ComponentsOptions {
     MuiFilledInput: {
       styleOverrides: {
         root: {
-          border: "solid 1px #D9D9D9",
-          background: "white",
+          border: `${ BORDER_THICKNESS }px solid ${ palette.grey[200] }`,
+          background: palette.background.default,
 
           "&:hover": {
-            background: "white",
-          },
-
-          "&.Mui-error": {
-            borderColor: "#FF5E00",
-            background: "white",
+            background: palette.background.default,
           },
 
           "&.Mui-focused": {
-            borderColor: "#55E0FF",
-            background: "white",
+            borderColor: palette.primary.main,
+            background: palette.background.default,
+          },
+
+          "&.Mui-error": {
+            borderColor: palette.warning.dark,
+            background: palette.background.default,
           },
 
           "&.Mui-disabled": {
-            background: "white",
+            borderColor: palette.grey[100],
+            background: palette.background.default,
+          },
+
+          "&.Mui-disabled.Mui-error": {
+            borderColor: palette.warning.light,
+            background: palette.background.default,
           },
         },
       },
@@ -123,23 +134,23 @@ export function createComponentsTheme(theme: Theme): ComponentsOptions {
         styles: {
           "& .MuiInputLabel-root": {
             "&.Mui-disabled": {
-              color: "black",
+              color: palette.text.primary,
             },
           },
           "& .MuiInputBase-root": {
             "&.Mui-disabled": {
-              backgroundColor: "#F8F8F8",
-              color: "black",
+              backgroundColor: palette.grey[50],
+              color: palette.text.primary,
               padding: 8,
               height: "40px",
-              borderRadius: "2px",
+              borderRadius: SM_BORDER_RADIUS,
               marginTop: 32,
             },
           },
           "& .MuiInputBase-input": {
             "&.Mui-disabled": {
-              color: "black",
-              WebkitTextFillColor: "black",
+              color: palette.text.primary,
+              WebkitTextFillColor: palette.text.primary,
               fontSize: "12px",
               cursor: "default",
             },
@@ -157,13 +168,13 @@ export function createComponentsTheme(theme: Theme): ComponentsOptions {
       },
       styleOverrides: {
         root: {
-          borderRadius: "4px",
+          borderRadius: MD_BORDER_RADIUS,
           boxSizing: "border-box",
           fontSize: "12px",
 
           "&.Mui-disabled": {
-            background: theme.palette.grey["50"],
-            border: "1px solid #DDDDDD",
+            background: palette.grey["50"],
+            border: `${ BORDER_THICKNESS }px solid ${ palette.grey[100] }`,
             cursor: "not-allowed",
             pointerEvents: "auto",
           },
@@ -173,7 +184,7 @@ export function createComponentsTheme(theme: Theme): ComponentsOptions {
           height: "30px",
           minWidth: "30px",
 
-          '& svg': {
+          "& svg": {
             fontSize: "18px"
           }
         },
@@ -182,28 +193,28 @@ export function createComponentsTheme(theme: Theme): ComponentsOptions {
           height: "40px",
           minWidth: "40px",
 
-          '& svg': {
+          "& svg": {
             fontSize: "24px"
           }
         },
         containedPrimary: {
-          background: theme.palette.gradients.action,
-          border: "1px solid #64C538",
-          color: "#2C2A28",
+          background: palette.gradients.action,
+          border: `${ BORDER_THICKNESS }px solid ${ palette.primary.main }`,
+          color: palette.text.primary,
           minWidth: "200px !important",
         },
         containedSecondary: {
-          background: '#DDDDDD',
-          color: '#686868',
+          background: palette.grey[100],
+          color: palette.grey[600],
           // minWidth: 0,
 
-          '&:hover': {
-            background: '#DDDDDD',
+          "&:hover": {
+            background: palette.grey[100],
           },
         },
         outlined: {
-          borderColor: "rgba(0, 0, 0, .125)",
-          color: "black",
+          borderColor: palette.grey[100],
+          color: palette.text.primary,
           padding: 0,
         },
       },
@@ -212,35 +223,35 @@ export function createComponentsTheme(theme: Theme): ComponentsOptions {
     MuiToggleButton: {
       styleOverrides: {
         root: {
-          color: theme.palette.grey["400"],
-          background: "white",
+          color: palette.grey["400"],
+          background: palette.background.default,
           letterSpacing: "normal",
-          padding: theme.spacing(0, 1),
+          padding: spacing(0, 1),
           minHeight: 42,
-          minWidth: theme.spacing(5.5),
+          minWidth: spacing(5.5),
           border: 0,
-          borderRadius: 4,
+          borderRadius: MD_BORDER_RADIUS,
 
-          [theme.breakpoints.up("sm")]: {
-            padding: theme.spacing(0, 2),
-            minWidth: theme.spacing(14),
+          [breakpoints.up("sm")]: {
+            padding: spacing(0, 2),
+            minWidth: spacing(14),
           },
 
-          [theme.breakpoints.up("md")]: {
-            minWidth: theme.spacing(17),
+          [breakpoints.up("md")]: {
+            minWidth: spacing(17),
           },
 
           "&.Mui-selected": {
-            background: theme.palette.gradients.action,
-            color: theme.palette.grey["800"],
+            background: palette.gradients.action,
+            color: palette.grey["800"],
 
             "&:hover": {
-              background: theme.palette.gradients.action
+              background: palette.gradients.action
             }
           },
 
           "&:hover": {
-            background: theme.palette.grey["100"],
+            background: palette.grey["100"],
           }
         },
       }
@@ -249,10 +260,10 @@ export function createComponentsTheme(theme: Theme): ComponentsOptions {
     MuiToggleButtonGroup: {
       styleOverrides: {
         root: {
-          background: theme.palette.gradients.stepperReverse,
+          background: palette.gradients.stepperReverse,
           backgroundOrigin: "border-box",
-          border: "1px solid transparent",
-          borderRadius: 5,
+          border: `${ BORDER_THICKNESS }px solid transparent`,
+          borderRadius: MD_BORDER_RADIUS + BORDER_THICKNESS,
         },
       },
     },
@@ -268,24 +279,24 @@ export function createComponentsTheme(theme: Theme): ComponentsOptions {
 
         sizeSmall: {
           height: "30px",
-          borderRadius: 4,
+          borderRadius: MD_BORDER_RADIUS,
           fontSize: 12,
           fontWeight: 500,
         },
 
         ["colorSuccess" as any]: {
-          backgroundColor: theme.palette.success.light,
-          color: theme.palette.success.main,
+          backgroundColor: palette.success.light,
+          color: palette.success.main,
         } as any,
 
         ["colorWarning" as any]: {
-          backgroundColor: theme.palette.warning.light,
-          color: theme.palette.warning.main,
+          backgroundColor: palette.warning.light,
+          color: palette.warning.main,
         } as any,
 
         ["colorError" as any]: {
-          backgroundColor: theme.palette.error.light,
-          color: theme.palette.error.main,
+          backgroundColor: palette.error.light,
+          color: palette.error.main,
         } as any,
       },
     },
@@ -323,11 +334,11 @@ export function createComponentsTheme(theme: Theme): ComponentsOptions {
     MuiCircularProgress: {
       styleOverrides: {
         colorPrimary: {
-          color: "white",
+          color: palette.background.default,
         },
 
         colorSecondary: {
-          color: "black",
+          color: palette.text.primary,
         },
       },
     },
