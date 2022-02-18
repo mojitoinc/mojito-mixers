@@ -27,7 +27,7 @@ export function createComponentsTheme({ typography, palette, spacing, breakpoint
     MuiFormHelperText: {
       styleOverrides: {
         root: {
-          marginLeft: "0px",
+          marginLeft: 0,
 
           "&.Mui-error": {
             color: palette.warning.dark,
