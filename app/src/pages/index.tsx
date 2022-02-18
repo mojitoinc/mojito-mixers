@@ -1,7 +1,7 @@
 import { useAuth0 } from "@auth0/auth0-react";
 import { Container, Typography, Box, Stack, Button, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio, FormHelperText, TextField, Switch, Select, MenuItem, InputLabel, FormGroup, Checkbox } from "@mui/material";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { CheckoutModal, CheckoutModalError, CheckoutModalProps, continuePlaidOAuthFlow, PaymentType } from "../lib";
+import { PUICheckout, CheckoutModalError, PUICheckoutProps, continuePlaidOAuthFlow, PaymentType } from "../lib";
 import { useMeQuery } from "../services/graphql/generated";
 import { PLAYGROUND_PARAGRAPHS_ARRAY, PLAYGROUND_AUTH_PRESET, PLAYGROUND_NO_AUTH_PRESET, PLAYGROUND_PRIVACY_HREF, PLAYGROUND_PURCHASE_INSTRUCTIONS, PLAYGROUND_TERMS_OF_USE_HREF, PLAYGROUND_USER_FORMAT, PLAYGROUND_PURCHASING_IMAGE_SRC, PLAYGROUND_ERROR_IMAGE_SRC, PLAYGROUND_THEMES, PLAYGROUND_LOGOS_SRC, PLAYGROUND_LOGOS_SX, PLAYGROUND_MOCKED_LOT, PLAYGROUND_LOADER_IMAGE_SRC } from "../utils/playground/playground.constants";
 import { PlaygroundFormData } from "../utils/playground/playground.interfaces";
@@ -148,7 +148,7 @@ const HomePage = () => {
   const testPreset = (isAuthenticated ? PLAYGROUND_AUTH_PRESET[formValues.authPresets] : PLAYGROUND_NO_AUTH_PRESET[formValues.notAuthPreset]) || {};
   const lotType = formValues.lotType || PLAYGROUND_MOCKED_LOT.lotType;
 
-  const checkoutModalProps: CheckoutModalProps = {
+  const PUICheckoutProps: PUICheckoutProps = {
     // Modal:
     open,
     onClose: handleClose,
@@ -396,7 +396,7 @@ const HomePage = () => {
       </Box>
 
       <Box component="pre" sx={{ my: 4, p: 2, overflow: "scroll", border: 2, borderRadius: "4px" }}>
-        { JSON.stringify(checkoutModalProps, (key, value) => {
+        { JSON.stringify(PUICheckoutProps, (key, value) => {
           if (typeof value === "function") return value.name ? `function ${ value.name }` : "() => { ... }";
           if (key === "theme" || key === "themeOptions") return "{ ... }";
 
@@ -423,7 +423,7 @@ const HomePage = () => {
       </Box>
 
       { /* <CheckoutModalThemeProvider theme={ CUSTOM_THEME }> */ }
-        <CheckoutModal { ...checkoutModalProps } />
+        <PUICheckout { ...PUICheckoutProps } />
       { /* </CheckoutModalThemeProvider> */ }
 
     </Container>

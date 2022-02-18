@@ -9,7 +9,7 @@ import { getSavedPaymentMethodAddressIdFromBillingInfo, savedPaymentMethodToBill
 import { CheckoutItem } from "../../domain/product/product.interfaces";
 import { BillingInfo, BillingInfoForm } from "../../forms/BillingInfoForm";
 import { distinctBy } from "../../utils/arrayUtils";
-import { CheckoutModalError } from "../../components/payments/CheckoutModal/CheckoutModal.hooks";
+import { CheckoutModalError } from "../../components/public/CheckoutOverlay/CheckoutOverlay.hooks";
 import { checkNeedsGenericErrorMessage } from "../../hooks/useFormCheckoutError";
 
 export interface BillingViewProps {

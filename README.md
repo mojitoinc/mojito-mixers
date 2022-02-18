@@ -74,6 +74,9 @@ When testing the purchase flow, you need to make sure to:
 <br />
 
 
+// TODO: Loader appears below page content in marketplaces.
+
+
 ## Building this project as a library
 
 The project includes a separated Rollup build to build it as a library that can be installed and consumed by other projects.

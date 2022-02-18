@@ -6,7 +6,7 @@ import { ERROR_PURCHASE } from "../../../domain/errors/errors.constants";
 import { PaymentMethod } from "../../../domain/payment/payment.interfaces";
 import { BillingInfo } from "../../../forms/BillingInfoForm";
 import { INITIAL_PLAID_OAUTH_FLOW_STATE } from "../../../hooks/usePlaid";
-import { resetStepperProgress } from "../CheckoutStepper/CheckoutStepper";
+import { resetStepperProgress } from "../../payments/CheckoutStepper/CheckoutStepper";
 
 export type CheckoutModalErrorAt = "authentication" | "billing" | "payment" | "purchasing";
 

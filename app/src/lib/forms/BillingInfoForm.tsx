@@ -15,7 +15,7 @@ import BookIcon from "@mui/icons-material/Book";
 import { EMPTY_OPTION, SelectOption } from "../components/shared/Select/Select";
 import { withRequiredErrorMessage } from "../utils/validationUtils";
 import { DebugBox } from "../components/payments/DisplayBox/DisplayBox";
-import { CheckoutModalError } from "../components/payments/CheckoutModal/CheckoutModal.hooks";
+import { CheckoutModalError } from "../components/public/CheckoutOverlay/CheckoutOverlay.hooks";
 import { useFormCheckoutError } from "../hooks/useFormCheckoutError";
 import { FormErrorsBox } from "../components/shared/FormErrorsBox/FormErrorsBox";
 

@@ -1,5 +1,5 @@
 import { ApolloError } from "@apollo/client";
-import { CheckoutModalError, CheckoutModalErrorAt } from "../../components/payments/CheckoutModal/CheckoutModal.hooks";
+import { CheckoutModalError, CheckoutModalErrorAt } from "../../components/public/CheckoutOverlay/CheckoutOverlay.hooks";
 
 export const BUILT_IN_ERRORS = ["EvalError", "RangeError", "ReferenceError", "SyntaxError", "TypeError", "URIError", "AggregateError", "InternalError"];
 

@@ -7,7 +7,7 @@ import { PurchaseConfirmationItemDetails } from "../../components/payments/Purch
 import { SavedPaymentMethod } from "../../domain/circle/circle.interfaces";
 import { billingInfoToSavedPaymentMethodBillingInfo } from "../../domain/circle/circle.utils";
 import { CheckoutItem } from "../../domain/product/product.interfaces";
-import { SelectedPaymentMethod } from "../../components/payments/CheckoutModal/CheckoutModal.hooks";
+import { SelectedPaymentMethod } from "../../components/public/CheckoutOverlay/CheckoutOverlay.hooks";
 
 export interface ConfirmationViewProps {
   checkoutItems: CheckoutItem[];

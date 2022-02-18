@@ -4,7 +4,7 @@ import { useFullPayment } from "../../hooks/useFullPayment";
 import React from "react";
 import { Box, Typography } from "@mui/material";
 import { useTimeout, useInterval } from "@swyg/corre";
-import { CheckoutModalError, SelectedPaymentMethod } from "../../components/payments/CheckoutModal/CheckoutModal.hooks";
+import { CheckoutModalError, SelectedPaymentMethod } from "../../components/public/CheckoutOverlay/CheckoutOverlay.hooks";
 import { CheckoutItem } from "../..";
 import { ERROR_PURCHASE } from "../../domain/errors/errors.constants";
 import { XS_MOBILE_MAX_WIDTH } from "../../config/theme/theme";

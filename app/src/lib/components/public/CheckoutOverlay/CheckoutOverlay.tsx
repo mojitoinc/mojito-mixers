@@ -1,5 +1,5 @@
-import { Backdrop, Box, CircularProgress, Dialog, DialogContent } from "@mui/material";
-import React, { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Backdrop, Box, CircularProgress } from "@mui/material";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { getSavedPaymentMethodAddressIdFromBillingInfo, savedPaymentMethodToBillingInfo, transformRawSavedPaymentMethods } from "../../../domain/circle/circle.utils";
 import { UserFormat } from "../../../domain/auth/authentication.interfaces";
 import { PaymentMethod, PaymentType } from "../../../domain/payment/payment.interfaces";
@@ -10,20 +10,21 @@ import { AuthenticationView } from "../../../views/Authentication/Authentication
 import { BillingView } from "../../../views/Billing/BillingView";
 import { ConfirmationView } from "../../../views/Confirmation/ConfirmationView";
 import { PaymentView } from "../../../views/Payment/PaymentView";
-import { CheckoutModalHeader, CheckoutModalHeaderVariant } from "../CheckoutModalHeader/CheckoutModalHeader";
+import { CheckoutModalHeader, CheckoutModalHeaderVariant } from "../../payments/CheckoutModalHeader/CheckoutModalHeader";
 import { PurchasingView } from "../../../views/Purchasing/PurchasingView";
 import { ErrorView } from "../../../views/Error/ErrorView";
 import { RawSavedPaymentMethod, SavedPaymentMethod } from "../../../domain/circle/circle.interfaces";
-import { Theme, ThemeProvider, createTheme, ThemeOptions, SxProps } from "@mui/material/styles";
-import { useShakeAnimation } from "../../../utils/animationUtils";
+import { Theme, ThemeOptions, SxProps } from "@mui/material/styles";
 import { continuePlaidOAuthFlow, PlaidFlow } from "../../../hooks/usePlaid";
 import { ConsentType } from "../../shared/ConsentText/ConsentText";
-import { CheckoutModalError, useCheckoutModalState } from "./CheckoutModal.hooks";
+import { CheckoutModalError, useCheckoutModalState } from "./CheckoutOverlay.hooks";
 import { DEFAULT_ERROR_AT, ERROR_LOADING_PAYMENT_METHODS, ERROR_LOADING_USER } from "../../../domain/errors/errors.constants";
+import { FullScreenOverlay } from "../../shared/FullScreenOverlay/FullScreenOverlay";
+import { ProviderInjectorProps, withProviders } from "../../shared/ProvidersInjector/ProvidersInjector";
 
 const SELECTOR_DIALOG_SCROLLABLE = "[role=presentation]";
 
-export interface CheckoutModalProps {
+export interface PUICheckoutOverlayProps {
   // Modal:
   open: boolean;
   onClose: () => void;
@@ -67,8 +68,9 @@ export interface CheckoutModalProps {
   onMarketingOptInChange?: (marketingOptIn: boolean) => void
 }
 
+export type PUICheckoutProps = PUICheckoutOverlayProps & ProviderInjectorProps;
 
-export const CheckoutModal: React.FC<CheckoutModalProps> = ({
+export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   // Modal:
   open,
   onClose,
@@ -137,7 +139,6 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   const rawSavedPaymentMethods = paymentMethodsData?.getPaymentMethodList;
   const savedPaymentMethods = useMemo(() => transformRawSavedPaymentMethods(rawSavedPaymentMethods as RawSavedPaymentMethod[]), [rawSavedPaymentMethods]);
   const dialogRootRef = useRef<HTMLDivElement>(null);
-  const paperRef = useRef<HTMLDivElement>(null);
 
   const {
     // CheckoutModalState:
@@ -310,15 +311,8 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
   // BLOCK DIALOG LOGIC & SHAKE ANIMATION:
 
-  const [shakeSx, shake] = useShakeAnimation(paperRef.current);
-
+  // TODO: Move to hook.
   const [isDialogBlocked, setIsDialogBlocked] = useState(false);
-
-  useEffect(() => {
-    if (parentTheme && themeOptions) {
-      throw new Error("You can't use both `themeOptions` and `theme`. Please, use only one. `themeOptions` is preferred.");
-    }
-  }, [parentTheme, themeOptions]);
 
   // PLAID:
 
@@ -333,10 +327,6 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
     goTo("purchasing");
   }, [resetModalState, handlePaymentInfoSelected, goTo]);
-
-  const theme = useMemo(() => themeOptions ? createTheme(themeOptions) : parentTheme, [parentTheme, themeOptions]);
-  const Wrapper = theme ? ThemeProvider : Fragment;
-  const wrapperProps = theme ? { theme } : {};
 
   if (isDialogLoading || isPlaidFlowLoading) {
     return (<>
@@ -454,45 +444,25 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   }
 
   return (
-    <Wrapper { ...(wrapperProps as any) }>
-      <Dialog
-        open={ isDialogBlocked ? true : open }
-        onClose={ isDialogBlocked ? shake : onClose }
-        // onBackdropClick={ isDialogBlocked ? shake : undefined }
-        aria-labelledby="checkout-modal-header-title"
-        scroll="body"
-        ref={ dialogRootRef }
-        PaperProps={ { sx: shakeSx, ref: paperRef }}
-        // Dialog only:
-        // fullWidth
-        // maxWidth="sm"
-        fullScreen>
+    <FullScreenOverlay
+      open={ open }
+      onClose={ onClose }
+      isDialogBlocked={ isDialogBlocked }
+      dialogRootRef={ dialogRootRef }>
 
-        <DialogContent
-          sx={{
-            overflowX: 'hidden',
-            px: {
-              xs: 1.5,
-              sm: 2.5,
-            },
-            py: 2.5,
-            maxWidth: theme => theme.breakpoints.values.lg,
-            mx: "auto",
-          }}>
+      <CheckoutModalHeader
+        variant={ headerVariant }
+        logoSrc={ logoSrc }
+        logoSx={ logoSx }
+        user={ meData?.me?.user }
+        userFormat={ userFormat }
+        onLoginClicked={ onLogin }
+        onPrevClicked={ checkoutStep === "authentication" ? onClose : goBack } />
 
-          <CheckoutModalHeader
-            variant={ headerVariant }
-            logoSrc={ logoSrc }
-            logoSx={ logoSx }
-            user={ meData?.me?.user }
-            userFormat={ userFormat }
-            onLoginClicked={ onLogin }
-            onPrevClicked={ checkoutStep === "authentication" ? onClose : goBack } />
+      { checkoutStepElement }
 
-          { checkoutStepElement }
-
-        </DialogContent>
-      </Dialog>
-    </Wrapper>
+    </FullScreenOverlay>
   );
 }
+
+export const PUICheckout: React.FC<PUICheckoutProps> = withProviders(PUICheckoutOverlay);

@@ -31,7 +31,7 @@ import { Typography } from "@mui/material";
 import { DebugBox, DisplayBox } from "../components/payments/DisplayBox/DisplayBox";
 import { ControlledCheckbox } from "../components/shared/Checkbox/Checkbox";
 import { ConsentText, ConsentType, CONSENT_ERROR_MESSAGE } from "../components/shared/ConsentText/ConsentText";
-import { CheckoutModalError } from "../components/payments/CheckoutModal/CheckoutModal.hooks";
+import { CheckoutModalError } from "../components/public/CheckoutOverlay/CheckoutOverlay.hooks";
 import { FormErrorsBox } from "../components/shared/FormErrorsBox/FormErrorsBox";
 import { useFormCheckoutError } from "../hooks/useFormCheckoutError";
 
