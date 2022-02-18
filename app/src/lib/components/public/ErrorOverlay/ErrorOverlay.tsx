@@ -1,8 +1,8 @@
 import React, { useCallback, useLayoutEffect } from "react";
-import { FullScreenOverlay, FullScreenOverlayProps } from "../../shared/FullScreenOverlay/FullScreenOverlay";
+import { FullScreenOverlay, FullScreenOverlayNoColumnsProps } from "../../shared/FullScreenOverlay/FullScreenOverlay";
 import { ProviderInjectorProps, withProviders } from "../../shared/ProvidersInjector/ProvidersInjector";
 
-export interface PUIErrorOverlayProps extends FullScreenOverlayProps {
+export interface PUIErrorOverlayProps extends FullScreenOverlayNoColumnsProps {
   onRedirect: (pathnameOrUrl: string) => void;
   onReview: (pathnameOrUrl: string) => void;
   onAbort: (pathnameOrUrl: string) => void;
@@ -37,7 +37,7 @@ export const PUIErrorOverlay: React.FC<PUIErrorOverlayProps> = ({
   if (!goToError) return null;
 
   return (
-    <FullScreenOverlay { ...fullScreenOverlayProps }>
+    <FullScreenOverlay centered { ...fullScreenOverlayProps }>
       Error.
     </FullScreenOverlay>
   );

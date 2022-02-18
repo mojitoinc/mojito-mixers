@@ -111,7 +111,7 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
   }, PURCHASING_MESSAGES_INTERVAL_MS);
 
   return (
-    <Box sx={{ position: "relative", mt: 2 }}>
+    <Box sx={{ position: "relative" }}>
       <Box
           component="img"
           src={ purchasingImageSrc || DEFAULT_PURCHASING_IMAGE_SRC }

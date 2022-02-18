@@ -148,7 +148,7 @@ const HomePage = () => {
   const testPreset = (isAuthenticated ? PLAYGROUND_AUTH_PRESET[formValues.authPresets] : PLAYGROUND_NO_AUTH_PRESET[formValues.notAuthPreset]) || {};
   const lotType = formValues.lotType || PLAYGROUND_MOCKED_LOT.lotType;
 
-  const PUICheckoutProps: PUICheckoutProps = {
+  const checkoutProps: PUICheckoutProps = {
     // Modal:
     open,
     onClose: handleClose,
@@ -396,7 +396,7 @@ const HomePage = () => {
       </Box>
 
       <Box component="pre" sx={{ my: 4, p: 2, overflow: "scroll", border: 2, borderRadius: "4px" }}>
-        { JSON.stringify(PUICheckoutProps, (key, value) => {
+        { JSON.stringify(checkoutProps, (key, value) => {
           if (typeof value === "function") return value.name ? `function ${ value.name }` : "() => { ... }";
           if (key === "theme" || key === "themeOptions") return "{ ... }";
 
@@ -423,7 +423,7 @@ const HomePage = () => {
       </Box>
 
       { /* <CheckoutModalThemeProvider theme={ CUSTOM_THEME }> */ }
-        <PUICheckout { ...PUICheckoutProps } />
+        <PUICheckout { ...checkoutProps } />
       { /* </CheckoutModalThemeProvider> */ }
 
     </Container>

@@ -1,11 +1,11 @@
 import { useTimeout } from "@swyg/corre";
 import React, { useLayoutEffect } from "react";
-import { FullScreenOverlay, FullScreenOverlayProps } from "../../shared/FullScreenOverlay/FullScreenOverlay";
+import { FullScreenOverlay, FullScreenOverlayNoColumnsProps } from "../../shared/FullScreenOverlay/FullScreenOverlay";
 import { ProviderInjectorProps, withProviders } from "../../shared/ProvidersInjector/ProvidersInjector";
 
 const REDIRECT_DELAY_MS = 5000;
 
-export interface PUISuccessOverlayProps extends FullScreenOverlayProps {
+export interface PUISuccessOverlayProps extends FullScreenOverlayNoColumnsProps {
   onRedirect: (pathnameOrUrl: string) => void;
 }
 
@@ -28,7 +28,7 @@ export const PUISuccessOverlay: React.FC<PUISuccessOverlayProps> = ({
   if (!goToConfirmation) return null;
 
   return (
-    <FullScreenOverlay { ...fullScreenOverlayProps }>
+    <FullScreenOverlay centered { ...fullScreenOverlayProps }>
       Success.
     </FullScreenOverlay>
   );

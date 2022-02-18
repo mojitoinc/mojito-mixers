@@ -1,20 +1,40 @@
-import { Dialog, DialogContent } from "@mui/material";
+import { Box, Dialog, DialogContent, SxProps, Theme } from "@mui/material";
 import React, { useRef } from "react";
 import { useShakeAnimation } from "../../../utils/animationUtils";
 
-export interface FullScreenOverlayProps {
+const centeredSx: SxProps<Theme> = {
+  flex: 1,
+  display: "flex",
+  flexDirection: "column",
+  justifyContent: "center",
+};
+
+export interface FullScreenOverlayNoColumnsProps {
+  centered?: boolean;
   open?: boolean;
   onClose?: () => void;
   isDialogBlocked?: boolean;
   dialogRootRef?: React.RefObject<HTMLDivElement>;
+  header?: React.ReactElement;
 }
 
+export interface FullScreenOverlayWithColumnsProps extends FullScreenOverlayNoColumnsProps {
+  leftColumn?: React.ReactElement;
+  rightColumn?: React.ReactElement;
+  children: never;
+}
+
+export type FullScreenOverlayProps = FullScreenOverlayNoColumnsProps | FullScreenOverlayWithColumnsProps;
+
 export const FullScreenOverlay: React.FC<FullScreenOverlayProps> = ({
+  centered,
   open = true,
   onClose,
   isDialogBlocked,
   dialogRootRef,
+  header,
   children,
+  ...columns
 }) => {
   const paperRef = useRef<HTMLDivElement>(null);
 
@@ -46,7 +66,17 @@ export const FullScreenOverlay: React.FC<FullScreenOverlayProps> = ({
         mx: "auto",
       }}>
 
-      { children }
+      { header }
+
+      { children ? (
+        <Box sx={ centered ? centeredSx : undefined }>
+          { children }
+        </Box>
+      ) : (
+        ("leftColumn" in columns || "rightColumn" in columns) && {
+          /* Implement 2-column layout using leftColumn and rightColumn */
+        }
+      ) }
 
     </DialogContent>
   </Dialog>

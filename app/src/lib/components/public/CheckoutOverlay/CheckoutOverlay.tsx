@@ -443,25 +443,26 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     );
   }
 
+  const headerElement = (
+    <CheckoutModalHeader
+      variant={ headerVariant }
+      logoSrc={ logoSrc }
+      logoSx={ logoSx }
+      user={ meData?.me?.user }
+      userFormat={ userFormat }
+      onLoginClicked={ onLogin }
+      onPrevClicked={ checkoutStep === "authentication" ? onClose : goBack } />
+  );
+
   return (
     <FullScreenOverlay
+      centered={ checkoutStep === "purchasing" || checkoutStep === "error" }
       open={ open }
       onClose={ onClose }
       isDialogBlocked={ isDialogBlocked }
-      dialogRootRef={ dialogRootRef }>
-
-      <CheckoutModalHeader
-        variant={ headerVariant }
-        logoSrc={ logoSrc }
-        logoSx={ logoSx }
-        user={ meData?.me?.user }
-        userFormat={ userFormat }
-        onLoginClicked={ onLogin }
-        onPrevClicked={ checkoutStep === "authentication" ? onClose : goBack } />
-
-      { checkoutStepElement }
-
-    </FullScreenOverlay>
+      dialogRootRef={ dialogRootRef }
+      header={ headerElement }
+      children={ checkoutStepElement } />
   );
 }
 

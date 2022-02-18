@@ -80,7 +80,7 @@ export function useFullPayment({
 
     if (debug) {
       console.log(checkoutItems[0]
-        ? `\n💵 Making payment for ${ units } × ${ lotType } lot${ units > 1 ? "s" : "" }  ${ lotID } (orgID = ${ orgID })...\n`
+        ? `\n💵 Making payment for ${ units } × ${ lotType } lot${ units > 1 ? "s" : "" } ${ lotID } (orgID = ${ orgID })...\n`
         : `\n💵 Making payment for unknown lot (orgID = ${ orgID })...\n` );
     }
 

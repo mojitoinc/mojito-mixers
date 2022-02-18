@@ -1,4 +1,4 @@
-import { CheckoutModalProps, UserFormat, CheckoutItem, MOJITO_LIGHT_THEME, MOJITO_DARK_THEME } from "../../lib";
+import { PUICheckoutProps, UserFormat, CheckoutItem, MOJITO_LIGHT_THEME, MOJITO_DARK_THEME } from "../../lib";
 import { PlaygroundAuthPresetFieldValues, PlaygroundNoAuthPresetFieldValues, PlaygroundThemeFieldValues } from "./playground.interfaces";
 import { SxProps, Theme } from "@mui/material";
 
@@ -9,7 +9,7 @@ export const PLAYGROUND_PARAGRAPHS_ARRAY = new Array(32).fill(PLAYGROUND_LOREM_I
 
 // Flow:
 
-export const PLAYGROUND_NO_AUTH_PRESET: Record<PlaygroundNoAuthPresetFieldValues, Partial<CheckoutModalProps>> = {
+export const PLAYGROUND_NO_AUTH_PRESET: Record<PlaygroundNoAuthPresetFieldValues, Partial<PUICheckoutProps>> = {
   noAuthGuestDisabled: {
     guestCheckoutEnabled: false,
     productConfirmationEnabled: true,
@@ -20,7 +20,7 @@ export const PLAYGROUND_NO_AUTH_PRESET: Record<PlaygroundNoAuthPresetFieldValues
   },
 };
 
-export const PLAYGROUND_AUTH_PRESET: Record<PlaygroundAuthPresetFieldValues, Partial<CheckoutModalProps>> = {
+export const PLAYGROUND_AUTH_PRESET: Record<PlaygroundAuthPresetFieldValues, Partial<PUICheckoutProps>> = {
   authConfirmationDisabled: {
     guestCheckoutEnabled: false,
     productConfirmationEnabled: false,
