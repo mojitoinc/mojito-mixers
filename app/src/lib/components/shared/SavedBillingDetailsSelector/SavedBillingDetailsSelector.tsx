@@ -7,7 +7,8 @@ import { SecondaryButton } from "../SecondaryButton/SecondaryButton";
 import { CheckoutModalFooter } from "../../payments/CheckoutModalFooter/CheckoutModalFooter";
 import { SavedPaymentMethod } from "../../../domain/circle/circle.interfaces";
 import React from "react";
-import { Box, CircularProgress } from "@mui/material";
+import { alpha, Box, CircularProgress } from "@mui/material";
+import { OVERLAY_OPACITY } from "../../../config/theme/theme";
 
 export interface SavedBillingDetailsSelectorProps {
   showLoader: boolean;
@@ -45,7 +46,7 @@ export const SavedBillingDetailsSelector: React.FC<SavedBillingDetailsSelectorPr
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          background: "rgba(255, 255, 255, 0.75)",
+          background: theme => alpha(theme.palette.background.default, OVERLAY_OPACITY),
           zIndex: 100,
         }}>
           <CircularProgress color="secondary" />
@@ -59,13 +60,13 @@ export const SavedBillingDetailsSelector: React.FC<SavedBillingDetailsSelectorPr
         additionalProps={ (savedPaymentMethod) => ({
           active: savedPaymentMethod.addressId === selectedPaymentMethodAddressId,
           disabled: showLoader,
-          onEdit,
           onDelete,
           onPick,
+          onEdit,
         }) }
         component={ BillingInfoItem }
         itemKey={ getPaymentMethodAddressId }
-        deps={[ onEdit, onDelete, onPick, selectedPaymentMethodAddressId, showLoader ]} />
+        deps={[ selectedPaymentMethodAddressId, showLoader, onDelete, onPick, onEdit ]} />
 
       <SecondaryButton onClick={ onNew } startIcon={ <AddIcon /> } sx={{ mt: 2.5 }} disabled={ showLoader }>
         Add New Billing Info

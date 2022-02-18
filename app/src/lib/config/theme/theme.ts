@@ -5,6 +5,8 @@ import { createComponentsTheme } from "./themeComponents";
 
 export const NARROW_MAX_WIDTH = 320;
 
+export const OVERLAY_OPACITY = 0.75;
+
 const mojitoLightTheme: Theme = createTheme({
   typography: createTypographyTheme(),
   palette: createPaletteTheme({ mode: "light" }),

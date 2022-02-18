@@ -254,7 +254,7 @@ const PlaidOAuthPage = () => {
 
   const { continueOAuthFlow, url } = getPlaidOAuthFlowState();
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (continueOAuthFlow) {
       persistPlaidReceivedRedirectUri(window.location.href);
     }
