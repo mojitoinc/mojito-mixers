@@ -18,7 +18,7 @@ const AuthenticationView = ({ checkoutItems, isAuthenticated, guestCheckoutEnabl
     }, []);
     return (React__default["default"].createElement(React__default["default"].Fragment, null,
         React__default["default"].createElement(CheckoutItemCostBreakdown.CheckoutItemCostBreakdown, { checkoutItems: checkoutItems }),
-        React__default["default"].createElement(CheckoutModalFooter.CheckoutModalFooter, { variant: isAuthenticated ? "toPayment" : "toGuestCheckout", guestCheckoutEnabled: guestCheckoutEnabled, privacyHref: "", termsOfUseHref: "", onSubmitClicked: onGuestClicked, onCloseClicked: onCloseClicked })));
+        React__default["default"].createElement(CheckoutModalFooter.CheckoutModalFooter, { variant: isAuthenticated ? "toPayment" : "toGuestCheckout", guestCheckoutEnabled: guestCheckoutEnabled, onSubmitClicked: onGuestClicked, onCloseClicked: onCloseClicked })));
 };
 
 exports.AuthenticationView = AuthenticationView;

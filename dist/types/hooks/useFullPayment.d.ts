@@ -1,4 +1,4 @@
-import { SelectedPaymentMethod } from "../components/payments/CheckoutModal/CheckoutModal";
+import { CheckoutModalError, SelectedPaymentMethod } from "../components/payments/CheckoutModal/CheckoutModal.hooks";
 import { SavedPaymentMethod } from "../domain/circle/circle.interfaces";
 import { PaymentStatus } from "../domain/payment/payment.interfaces";
 import { CheckoutItem } from "../domain/product/product.interfaces";
@@ -13,6 +13,6 @@ export interface UseFullPaymentOptions {
 export interface PaymentState {
     paymentStatus: PaymentStatus;
     paymentReferenceNumber: string;
-    paymentError?: string;
+    paymentError?: string | CheckoutModalError;
 }
 export declare function useFullPayment({ orgID, invoiceID: existingInvoiceID, checkoutItems, savedPaymentMethods, selectedPaymentMethod, debug, }: UseFullPaymentOptions): [PaymentState, () => Promise<void>];

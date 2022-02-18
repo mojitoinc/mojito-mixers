@@ -6,6 +6,8 @@ var React = require('react');
 var useFullPayment = require('../../hooks/useFullPayment.js');
 var material = require('@mui/material');
 var corre = require('@swyg/corre');
+var errors_constants = require('../../domain/errors/errors.constants.js');
+var theme = require('../../config/theme/theme.js');
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
@@ -56,7 +58,7 @@ const PurchasingView = ({ purchasingImageSrc, purchasingMessages: customPurchasi
             return;
         onDialogBlocked(false);
         if (paymentStatus === "error" || paymentError) {
-            onPurchaseError(paymentError);
+            onPurchaseError(paymentError || errors_constants.ERROR_PURCHASE());
             return;
         }
         onPurchaseSuccess(paymentReferenceNumber);
@@ -75,8 +77,9 @@ const PurchasingView = ({ purchasingImageSrc, purchasingMessages: customPurchasi
                 mt: 5,
             } }),
         purchasingMessage ? React__default["default"].createElement(material.Typography, { variant: "body2", sx: { textAlign: "center", mt: 1.5 } }, purchasingMessage) : null,
-        React__default["default"].createElement(material.Typography, { variant: "body2", sx: { textAlign: "center", mt: 5, mb: 1.5 } }, "Hang tight! We are currently processing your payment."),
-        React__default["default"].createElement(material.Typography, { variant: "body2", sx: { textAlign: "center", mt: 1.5, mb: 5 } }, "Please, don't close or reload the page...")));
+        React__default["default"].createElement(material.Box, { sx: { maxWidth: theme.XS_MOBILE_MAX_WIDTH, mx: "auto" } },
+            React__default["default"].createElement(material.Typography, { variant: "body2", sx: { textAlign: "center", mt: 5, mb: 1.5 } }, "Hang tight! We are currently processing your payment."),
+            React__default["default"].createElement(material.Typography, { variant: "body2", sx: { textAlign: "center", mt: 1.5, mb: 5 } }, "Please, don't close or reload the page..."))));
 };
 
 exports.PurchasingView = PurchasingView;

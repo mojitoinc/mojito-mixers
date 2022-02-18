@@ -1,13 +1,14 @@
 import { __awaiter } from '../../../../node_modules/tslib/tslib.es6.js';
 import { Box, CircularProgress, Typography, Link, Divider } from '@mui/material';
 import React__default, { useState, useCallback } from 'react';
+import { SM_MOBILE_MAX_WIDTH } from '../../../config/theme/theme.js';
 import { isPromise } from '../../../utils/promiseUtils.js';
 import { Checkbox } from '../../shared/Checkbox/Checkbox.js';
 import { ConsentText, CONSENT_ERROR_MESSAGE } from '../../shared/ConsentText/ConsentText.js';
 import { PrimaryButton } from '../../shared/PrimaryButton/PrimaryButton.js';
 import { LABELS_BY_VARIANT, ICONS_BY_VARIANT } from './CheckoutModalFooter.constants.js';
 
-const CheckoutModalFooter = ({ variant, guestCheckoutEnabled, consentType, privacyHref, termsOfUseHref, submitDisabled, onSubmitClicked, onCloseClicked, }) => {
+const CheckoutModalFooter = ({ variant, buttonLabel, guestCheckoutEnabled, consentType, privacyHref, termsOfUseHref, submitDisabled, onSubmitClicked, onCloseClicked, }) => {
     // CONSENT:
     const showConsent = consentType && (privacyHref || termsOfUseHref) && (variant === "toConfirmation" || variant === "toPlaid");
     const consentTextElement = showConsent ? React__default.createElement(ConsentText, { privacyHref: privacyHref, termsOfUseHref: termsOfUseHref }) : null;
@@ -26,7 +27,7 @@ const CheckoutModalFooter = ({ variant, guestCheckoutEnabled, consentType, priva
     }, []);
     // PRIMARY BUTTON:
     const primaryButtonVisible = variant !== "toGuestCheckout" || guestCheckoutEnabled;
-    const primaryButtonLabel = LABELS_BY_VARIANT[variant];
+    const primaryButtonLabel = buttonLabel || LABELS_BY_VARIANT[variant];
     const PrimaryButtonIcon = ICONS_BY_VARIANT[variant];
     const handleSubmitClicked = useCallback(() => __awaiter(void 0, void 0, void 0, function* () {
         if (!onSubmitClicked)
@@ -50,7 +51,8 @@ const CheckoutModalFooter = ({ variant, guestCheckoutEnabled, consentType, priva
     // CANCEL LINK:
     const handleCancelClicked = useCallback((e) => {
         e.preventDefault();
-        onCloseClicked();
+        if (onCloseClicked)
+            onCloseClicked();
     }, [onCloseClicked]);
     return (React__default.createElement(Box, { sx: {
             display: "flex",
@@ -63,12 +65,12 @@ const CheckoutModalFooter = ({ variant, guestCheckoutEnabled, consentType, priva
                 "I ",
                 consentTextElement), checked: isConsentChecked, onChange: handleConsentClicked, error: showConsentError, helperText: showConsentError ? CONSENT_ERROR_MESSAGE : undefined, sx: { alignSelf: "flex-start", mb: 5 } })),
         primaryButtonVisible && (React__default.createElement(PrimaryButton, { onClick: onSubmitClicked ? handleSubmitClicked : undefined, type: onSubmitClicked ? "button" : "submit", endIcon: isFormLoading ? React__default.createElement(CircularProgress, { color: "inherit", size: "1em" }) : (PrimaryButtonIcon && React__default.createElement(PrimaryButtonIcon, null)), disabled: submitDisabled || isFormLoading }, primaryButtonLabel)),
-        variant !== "toMarketplace" && (React__default.createElement(Typography, { sx: primaryButtonVisible ? { pt: 2 } : undefined },
+        variant !== "toMarketplace" && onCloseClicked && (React__default.createElement(Typography, { sx: primaryButtonVisible ? { pt: 2 } : undefined },
             primaryButtonVisible ? "or " : null,
             React__default.createElement(Link, { sx: { color: "text.primary" }, href: "", onClick: handleCancelClicked }, "Cancel and Return to Marketplace"))),
         showConsent && consentType === "disclaimer" && (React__default.createElement(React__default.Fragment, null,
             React__default.createElement(Divider, { sx: { my: 5, width: "100%" } }),
-            React__default.createElement(Typography, { sx: { maxWidth: "400px" }, align: "center" },
+            React__default.createElement(Typography, { sx: { maxWidth: SM_MOBILE_MAX_WIDTH }, align: "center" },
                 "By placing an order you affirm that you ",
                 consentTextElement,
                 ".")))));

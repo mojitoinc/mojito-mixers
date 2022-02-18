@@ -14,7 +14,7 @@ const InputGroupLabel = (_a) => {
     var { sx } = _a, props = tslib_es6.__rest(_a, ["sx"]);
     return (React__default["default"].createElement(material.Typography, Object.assign({ variant: "body2", sx: [
             (theme) => ({
-                fontWeight: 500,
+                fontWeight: "bold",
                 color: theme.palette.grey["700"],
                 mt: 1.5
             }),

@@ -44,13 +44,11 @@ const PaymentMethodSelector = ({ paymentMethods, selectedPaymentMethod, onPaymen
     }, [onPaymentMethodChange]);
     return (React__default["default"].createElement(ToggleButtonGroup["default"], { value: selectedPaymentMethod, exclusive: true, onChange: handleChange, "aria-label": "payment method", sx: { mb: 3.5 } }, paymentMethods.map((paymentMethod) => {
         const { label, icon } = PAYMENT_METHOD_OPTION_PROPS[paymentMethod];
-        return wideViewport ? (React__default["default"].createElement(ToggleButton["default"], { key: paymentMethod, value: paymentMethod, "aria-label": paymentMethod },
-            React__default["default"].createElement(material.Stack, { spacing: 1, direction: "row", sx: {
-                    alignItems: "center"
-                } },
-                icon,
-                React__default["default"].createElement(material.Typography, { sx: { fontWeight: 500 } }, label)))) : (React__default["default"].createElement(material.Tooltip, { key: paymentMethod, title: label },
-            React__default["default"].createElement(ToggleButton["default"], { value: paymentMethod, "aria-label": paymentMethod }, icon)));
+        return (React__default["default"].createElement(ToggleButton["default"], { key: paymentMethod, value: paymentMethod, "aria-label": paymentMethod }, wideViewport ? (React__default["default"].createElement(material.Stack, { spacing: 1, direction: "row", sx: {
+                alignItems: "center"
+            } },
+            icon,
+            React__default["default"].createElement(material.Typography, { sx: { fontWeight: 500 } }, label))) : (React__default["default"].createElement(material.Tooltip, { key: paymentMethod, title: label }, icon))));
     })));
 };
 

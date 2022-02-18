@@ -5,8 +5,8 @@ Object.defineProperty(exports, '__esModule', { value: true });
 var tslib_es6 = require('../../node_modules/tslib/tslib.es6.js');
 var React = require('react');
 var graphqlGenerated = require('../queries/graphqlGenerated.js');
-var circle_utils = require('../domain/circle/circle.utils.js');
 var useEncryptCard = require('./useEncryptCard.js');
+var circle_utils = require('../domain/circle/circle.utils.js');
 
 function useCreatePaymentMethod() {
     const [encryptCardData] = useEncryptCard.useEncryptCardData();

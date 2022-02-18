@@ -32,7 +32,7 @@ const ConfirmationView = ({ checkoutItems, savedPaymentMethods, selectedPaymentM
         React__default.createElement(PurchaseConfirmationBillingDetails, { checkoutItems: checkoutItems, paymentReferenceNumber: paymentReferenceNumber, selectedPaymentMethodBillingInfo: selectedPaymentMethodBillingInfo, selectedPaymentMethodPaymentInfo: selectedPaymentMethodPaymentInfo }),
         React__default.createElement(Stack, { sx: { display: "flex", flex: 1 } },
             React__default.createElement(PurchaseConfirmationItemDetails, { checkoutItems: checkoutItems, purchaseInstructions: purchaseInstructions }),
-            React__default.createElement(CheckoutModalFooter, { variant: "toMarketplace", privacyHref: "", termsOfUseHref: "", onSubmitClicked: onNext, onCloseClicked: onClose }))));
+            React__default.createElement(CheckoutModalFooter, { variant: "toMarketplace", onSubmitClicked: onNext }))));
 };
 
 export { ConfirmationView };

@@ -22,6 +22,8 @@ var material = require('@mui/material');
 var DisplayBox = require('../components/payments/DisplayBox/DisplayBox.js');
 var Checkbox = require('../components/shared/Checkbox/Checkbox.js');
 var ConsentText = require('../components/shared/ConsentText/ConsentText.js');
+var FormErrorsBox = require('../components/shared/FormErrorsBox/FormErrorsBox.js');
+var useFormCheckoutError = require('../hooks/useFormCheckoutError.js');
 var Grid = require('../../node_modules/@mui/material/Grid/Grid.js');
 var Box = require('../../node_modules/@mui/material/Box/Box.js');
 
@@ -35,6 +37,7 @@ const FIELD_LABELS = {
     secureCode: "Secure Code",
     nameOnCard: "Name on Card",
 };
+const FIELD_NAMES = Object.keys(FIELD_LABELS);
 const isCreditCardThenRequireSchema = validationUtils.requireSchemaWhenKeyIs("CreditCard");
 const PAYMENT_TYPE_FORM_DATA = {
     CreditCard: {
@@ -138,14 +141,14 @@ const PAYMENT_TYPE_FORM_DATA = {
                     React__default["default"].createElement(ConsentText.ConsentText, { privacyHref: privacyHref, termsOfUseHref: termsOfUseHref })) })))),
     },
 };
-const PaymentMethodForm = ({ acceptedPaymentTypes, defaultValues: parentDefaultValues, onPlaidLinkClicked, onSaved, onClose, onSubmit, consentType, privacyHref, termsOfUseHref, debug = false }) => {
+const PaymentMethodForm = ({ acceptedPaymentTypes, defaultValues: parentDefaultValues, checkoutError, onPlaidLinkClicked, onSaved, onClose, onSubmit, consentType, privacyHref, termsOfUseHref, debug = false }) => {
     const defaultPaymentType = acceptedPaymentTypes[0] || "CreditCard";
     const defaultPaymentTypeFormData = PAYMENT_TYPE_FORM_DATA[defaultPaymentType];
     const defaultPaymentTypeDefaultValues = defaultPaymentTypeFormData.defaultValues(consentType);
     const schema = React.useMemo(() => {
         return yup.object().shape(Object.assign({ type: yup.string().required(), consent: yup.boolean().oneOf([true], ConsentText.CONSENT_ERROR_MESSAGE) }, Object.values(PAYMENT_TYPE_FORM_DATA).reduce((objectShape, { schemaShape }) => (Object.assign(Object.assign({}, objectShape), schemaShape)), {})));
     }, []);
-    const { control, handleSubmit, watch, reset, trigger, } = reactHookForm.useForm({
+    const { control, handleSubmit, watch, reset, trigger, setError, formState, } = reactHookForm.useForm({
         defaultValues: Object.assign(Object.assign({}, defaultPaymentTypeDefaultValues), parentDefaultValues),
         reValidateMode: "onChange",
         resolver: yup$1.yupResolver(schema),
@@ -156,6 +159,7 @@ const PaymentMethodForm = ({ acceptedPaymentTypes, defaultValues: parentDefaultV
     const selectedPaymentMethod = watch("type");
     const Fields = PAYMENT_TYPE_FORM_DATA[selectedPaymentMethod].fields;
     const submitForm = handleSubmit(onSubmit);
+    const checkoutErrorMessage = useFormCheckoutError.useFormCheckoutError({ formKey: "payment", checkoutError, fields: FIELD_NAMES, setError, deps: [selectedPaymentMethod] });
     const handleFormSubmit = React.useCallback((e) => tslib_es6.__awaiter(void 0, void 0, void 0, function* () {
         e.preventDefault();
         if (selectedPaymentMethod === "ACH") {
@@ -177,7 +181,11 @@ const PaymentMethodForm = ({ acceptedPaymentTypes, defaultValues: parentDefaultV
             React__default["default"].createElement(InputGroupLabel.InputGroupLabel, { sx: { m: 0, pt: 2, pb: 1.5 } }, "Payment Method"),
             React__default["default"].createElement(PaymentMethodSelector.PaymentMethodSelector, { selectedPaymentMethod: selectedPaymentMethod, onPaymentMethodChange: handleSelectedPaymentMethodChange, paymentMethods: acceptedPaymentTypes }))) : (null),
         React__default["default"].createElement(Fields, { control: control, consentType: consentType, privacyHref: privacyHref, termsOfUseHref: termsOfUseHref }),
-        debug && (React__default["default"].createElement(DisplayBox.DebugBox, { sx: { my: 2 } }, JSON.stringify(watch(), null, 2))),
+        checkoutErrorMessage && React__default["default"].createElement(FormErrorsBox.FormErrorsBox, { error: checkoutErrorMessage, sx: { mt: 5 } }),
+        debug && (React__default["default"].createElement(DisplayBox.DebugBox, { sx: { mt: 5 } },
+            JSON.stringify(watch(), null, 2),
+            "\n\n",
+            JSON.stringify(formState.errors, null, 2))),
         React__default["default"].createElement(CheckoutModalFooter.CheckoutModalFooter, { variant: selectedPaymentMethod === "ACH" ? "toPlaid" : "toConfirmation", consentType: consentType === "checkbox" ? undefined : consentType, privacyHref: privacyHref, termsOfUseHref: termsOfUseHref, submitDisabled: selectedPaymentMethod === "Wire" || selectedPaymentMethod === "Crypto", onCloseClicked: onClose })));
 };
 

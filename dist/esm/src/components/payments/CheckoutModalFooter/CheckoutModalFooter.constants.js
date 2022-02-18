@@ -6,7 +6,7 @@ const LABELS_BY_VARIANT = {
     toPayment: "Continue to Payment",
     toConfirmation: "Purchase",
     toPlaid: "Purchase with Plaid",
-    toForm: "Review Payment Information",
+    toReview: "Review Information",
     toMarketplace: "Back to Marketplace",
 };
 const ICONS_BY_VARIANT = {
@@ -14,7 +14,7 @@ const ICONS_BY_VARIANT = {
     toPayment: default_1,
     toConfirmation: default_1$1,
     toPlaid: default_1$1,
-    toForm: null,
+    toReview: null,
     toMarketplace: null,
 };
 
