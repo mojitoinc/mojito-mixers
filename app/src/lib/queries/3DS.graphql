@@ -1,0 +1,9 @@
+query GetPaymentNotification {
+  getPaymentNotification {
+    message {
+      ... on PaymentNotification3DSMessage {
+    		 redirectURL
+      }
+    }
+  }
+}
