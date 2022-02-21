@@ -6,6 +6,7 @@ import { useMeQuery } from "../services/graphql/generated";
 import { PLAYGROUND_PARAGRAPHS_ARRAY, PLAYGROUND_AUTH_PRESET, PLAYGROUND_NO_AUTH_PRESET, PLAYGROUND_PRIVACY_HREF, PLAYGROUND_PURCHASE_INSTRUCTIONS, PLAYGROUND_TERMS_OF_USE_HREF, PLAYGROUND_USER_FORMAT, PLAYGROUND_PURCHASING_IMAGE_SRC, PLAYGROUND_ERROR_IMAGE_SRC, PLAYGROUND_THEMES, PLAYGROUND_LOGOS_SRC, PLAYGROUND_LOGOS_SX, PLAYGROUND_MOCKED_LOT, PLAYGROUND_LOADER_IMAGE_SRC } from "../utils/playground/playground.constants";
 import { PlaygroundFormData } from "../utils/playground/playground.interfaces";
 import { config } from "../utils/config/config.constants";
+import { continueCheckout } from "../lib/components/public/CheckoutOverlay/CheckoutOverlay.utils";
 
 const DEFAULT_FORM_VALUES: PlaygroundFormData = {
   // Organization:
@@ -57,6 +58,10 @@ const HomePage = () => {
 
   useEffect(() => {
     if (continuePlaidOAuthFlow()) console.log("💾 Continue Plaid OAuth Flow...");
+  }, []);
+
+  useEffect(() => {
+    if (continueCheckout()) console.log("💾 Continue 3DS Flow...");
   }, []);
 
   useEffect(() => {

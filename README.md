@@ -83,11 +83,30 @@ DONE:
 - 3DS success and error screen designs.
 - Extract StatusIcon.
 - Improve ProviderInjector logic and add Apollo.
+- Create PlaidOverlay just like SuccessOverlay or ErrorOverlay..
+- Update PurchasingView to do polling for CC payments instead of going to the confirmation step.
+- Implement persistance of state before redirecting users to 3DS.
+- Expose invoiceID fom useFullPayment and fix persistCheckoutModalInfo call.
+- Add expiration to persisted state.
+- Implement persistance in CheckoutOverlay.utils.
+
+
+DOING:
+- Implement resume logic when coming back from 3DS' pages (merge Plaid and 3DS in a single function).
+- Load items from invoice when coming back.
+- When coming back from a 3DS error, CVV needs to be re-entered.
+- Update error handling to do take users back more often, instead of trying again with the same data.
 
 
 TODO:
-- Update Purchasing page to do polling for CC payments instead of going to the confirmation one.
-- Implement persistance of state before redirecting users to 3DS and resume logic when coming back.
+- Can createPayment return ok but 3DS return an error or just "break"?
+- Update plaid.utils with expiration and clean up function too.
+- Log lost states to Sentry?
+- Add a cleanup function that removes expired or marked as used states
+- Merge this and Plaid utils
+- Update readme with 3DS and Plaid info.
+- see if the get state function can work as cleanup.
+- Add a debug mode for the persist stuff.
 - Document 3DS flow and ProviderInjector.
 
 

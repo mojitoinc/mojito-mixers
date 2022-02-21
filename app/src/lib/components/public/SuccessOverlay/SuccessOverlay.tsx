@@ -5,12 +5,14 @@ import { SuccessView } from "../../../views/Success/SuccessView";
 import { CheckoutModalHeader } from "../../payments/CheckoutModalHeader/CheckoutModalHeader";
 import { FullScreenOverlay, FullScreenOverlayFunctionalProps } from "../../shared/FullScreenOverlay/FullScreenOverlay";
 import { ProviderInjectorProps, withProviders } from "../../shared/ProvidersInjector/ProvidersInjector";
+import { getCheckoutModalState, persistReceivedRedirectUri3DS } from "../CheckoutOverlay/CheckoutOverlay.utils";
 
 const REDIRECT_DELAY_MS = 5000;
 
 export interface PUISuccessOverlayProps extends FullScreenOverlayFunctionalProps {
   logoSrc?: string;
   logoSx?: SxProps<Theme>;
+  successImageSrc: string;
   onRedirect: (pathnameOrUrl: string) => void;
 }
 
@@ -19,24 +21,33 @@ export type PUISuccessProps = PUISuccessOverlayProps & ProviderInjectorProps;
 export const PUISuccessOverlay: React.FC<PUISuccessOverlayProps> = ({
   logoSrc,
   logoSx,
+  successImageSrc,
   onRedirect,
   ...fullScreenOverlayProps
 }) => {
-  const purchaseCompleted = true;
+  const { purchaseSuccess, url } = getCheckoutModalState();
 
   useLayoutEffect(() => {
+    if (purchaseSuccess) {
+      persistReceivedRedirectUri3DS(window.location.href);
+
+      return;
+    }
+
     // Users should only see this page if they completed a credit card payment and 3DS' verification went ok.
     // Otherwise, they are immediately redirected to homepage:
-    if (!purchaseCompleted) onRedirect("/");
-  }, [purchaseCompleted, onRedirect]);
+    onRedirect("/");
+  }, [purchaseSuccess, onRedirect]);
 
   useTimeout(() => {
+    // TODO: Redirect to localhost if staging...
+
     // If everything's ok, users see this confirmation screen for 5 seconds and then are redirected to the purchase
     // confirmation page:
-    if (purchaseCompleted) onRedirect("/");
-  }, REDIRECT_DELAY_MS, [purchaseCompleted, onRedirect]);
+    if (purchaseSuccess) onRedirect(url || "/");
+  }, REDIRECT_DELAY_MS, [purchaseSuccess, onRedirect]);
 
-  if (!purchaseCompleted) return null;
+  if (!purchaseSuccess) return null;
 
   const headerElement = logoSrc ? (
     <CheckoutModalHeader
@@ -47,7 +58,7 @@ export const PUISuccessOverlay: React.FC<PUISuccessOverlayProps> = ({
 
   return (
     <FullScreenOverlay centered header={ headerElement } { ...fullScreenOverlayProps }>
-      <SuccessView />
+      <SuccessView successImageSrc={ successImageSrc } />
     </FullScreenOverlay>
   );
 }

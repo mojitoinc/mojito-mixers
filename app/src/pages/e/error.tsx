@@ -10,26 +10,8 @@ const ErrorPage: NextPage = () => {
   const handleRedirect = useCallback((pathnameOrUrl: string) => {
     console.log(`Redirect to ${ pathnameOrUrl }...`);
 
-    /*
-    if (continueOAuthFlow) {
-      persistPlaidReceivedRedirectUri(window.location.href);
-    }
-    */
-
-    // router.replace("/");
-  }, []);
-
-  const handleReview = useCallback((pathnameOrUrl: string) => {
-    console.log(`Review ${ pathnameOrUrl }...`);
-
-    // router.replace("/");
-  }, []);
-
-  const handleAbort = useCallback((pathnameOrUrl: string) => {
-    console.log(`Back to ${ pathnameOrUrl }...`);
-
-    // router.replace("/");
-  }, []);
+    router.replace(pathnameOrUrl || "/");
+  }, [router]);
 
   return (
     <PUIError
@@ -37,9 +19,7 @@ const ErrorPage: NextPage = () => {
       logoSrc={ PLAYGROUND_LOGOS_SRC.light }
       logoSx={ PLAYGROUND_LOGOS_SX.light }
       errorImageSrc=""
-      onRedirect={ handleRedirect }
-      onReview={ handleReview }
-      onAbort={ handleAbort } />
+      onRedirect={ handleRedirect } />
   );
 }
 

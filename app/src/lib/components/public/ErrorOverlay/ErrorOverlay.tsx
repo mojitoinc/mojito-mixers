@@ -4,14 +4,13 @@ import { ErrorView } from "../../../views/Error/ErrorView";
 import { CheckoutModalHeader } from "../../payments/CheckoutModalHeader/CheckoutModalHeader";
 import { FullScreenOverlay, FullScreenOverlayFunctionalProps } from "../../shared/FullScreenOverlay/FullScreenOverlay";
 import { ProviderInjectorProps, withProviders } from "../../shared/ProvidersInjector/ProvidersInjector";
+import { clearPersistedInfo, getCheckoutModalState, persistReceivedRedirectUri3DS } from "../CheckoutOverlay/CheckoutOverlay.utils";
 
 export interface PUIErrorOverlayProps extends FullScreenOverlayFunctionalProps {
   logoSrc?: string;
   logoSx?: SxProps<Theme>;
   errorImageSrc: string;
   onRedirect: (pathnameOrUrl: string) => void;
-  onReview: (pathnameOrUrl: string) => void;
-  onAbort: (pathnameOrUrl: string) => void;
 }
 
 export type PUIErrorProps = PUIErrorOverlayProps & ProviderInjectorProps;
@@ -21,11 +20,9 @@ export const PUIErrorOverlay: React.FC<PUIErrorOverlayProps> = ({
   logoSx,
   errorImageSrc,
   onRedirect,
-  onReview,
-  onAbort,
   ...fullScreenOverlayProps
 }) => {
-  const purchaseError = true;
+  const { purchaseError, url } = getCheckoutModalState();
 
   useLayoutEffect(() => {
     // Users should only see this page if they completed a credit card payment and 3DS' verification went wrong.
@@ -36,18 +33,22 @@ export const PUIErrorOverlay: React.FC<PUIErrorOverlayProps> = ({
   const reviewData = useCallback(async (): Promise<false> => {
     if (!purchaseError) return;
 
+    persistReceivedRedirectUri3DS(window.location.href);
+
     // If there was an error, users can click the review button and go back to the Payment UI to review the data...:
-    onReview("/");
+    onRedirect(url || "/");
 
     return false;
-  }, [purchaseError, onReview]);
+  }, [purchaseError, onRedirect, url]);
 
   const toMarketplace = useCallback(() => {
     if (!purchaseError) return;
 
+    clearPersistedInfo();
+
     // ...or they can just go back to the marketplace homepage:
-    onAbort("/");
-  }, [purchaseError, onAbort]);
+    onRedirect("/");
+  }, [purchaseError, onRedirect]);
 
   if (!purchaseError) return null;
 

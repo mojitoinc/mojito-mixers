@@ -9,12 +9,16 @@ import { CheckoutItem } from "../..";
 import { ERROR_PURCHASE } from "../../domain/errors/errors.constants";
 import { XS_MOBILE_MAX_WIDTH } from "../../config/theme/theme";
 import { StatusIcon } from "../../components/shared/StatusIcon/StatusIcon";
+import { useGetPaymentNotificationQuery } from "../../queries/graphqlGenerated";
+import { persistCheckoutModalInfo } from "../../components/public/CheckoutOverlay/CheckoutOverlay.utils";
 
 // TODO: Move these to theme or similar config file:
 
 const PURCHASING_MIN_WAIT_MS = 3000;
 
 const PURCHASING_MESSAGES_INTERVAL_MS = 5000;
+
+const PAYMENT_NOTIFICATION_INTERVAL_MS = 1500;
 
 const PURCHASING_MESSAGES_DEFAULT = [
   "Muddling mint and lime.",
@@ -41,7 +45,7 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
   purchasingImageSrc,
   purchasingMessages: customPurchasingMessages,
   orgID,
-  invoiceID,
+  invoiceID: existingInvoiceID,
   checkoutItems,
   savedPaymentMethods,
   selectedPaymentMethod,
@@ -50,6 +54,20 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
   onDialogBlocked,
   debug,
 }) => {
+  const [paymentState, fullPayment] = useFullPayment({
+    orgID,
+    invoiceID: existingInvoiceID,
+    checkoutItems,
+    savedPaymentMethods,
+    selectedPaymentMethod,
+    debug,
+  });
+
+  const paymentNotificationResult = useGetPaymentNotificationQuery({
+    skip: paymentState.paymentStatus !== "processed",
+    pollInterval: PAYMENT_NOTIFICATION_INTERVAL_MS,
+  });
+
   let purchasingMessages = customPurchasingMessages;
 
   if (purchasingMessages === false) {
@@ -61,17 +79,12 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
   const [hasWaited, setHasWaited] = useState(false);
   const [purchasingMessageIndex, setPurchasingMessageIndex] = useState(0);
   const purchasingMessage = purchasingMessages[purchasingMessageIndex];
-
-  const [paymentState, fullPayment] = useFullPayment({
-    orgID,
-    invoiceID,
-    checkoutItems,
-    savedPaymentMethods,
-    selectedPaymentMethod,
-    debug,
-  });
+  const redirectURL = paymentNotificationResult.data?.getPaymentNotification?.message?.redirectURL || "";
+  const { billingInfo, paymentInfo, cvv } = selectedPaymentMethod;
+  const isCreditCardPayment = cvv || (typeof paymentInfo === "object" && paymentInfo.type === "CreditCard");
 
   const calledRef = useRef(false);
+  const processedRef = useRef(false);
 
   useEffect(() => {
     if (calledRef.current) return;
@@ -82,7 +95,7 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
   }, [fullPayment]);
 
   useEffect(() => {
-    const { paymentStatus, paymentReferenceNumber, paymentError } = paymentState;
+    const { invoiceID, paymentStatus, paymentReferenceNumber, paymentError } = paymentState;
 
     if (paymentStatus === "processing") {
       onDialogBlocked(true);
@@ -92,16 +105,46 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
 
     if (!hasWaited) return;
 
-    onDialogBlocked(false);
-
     if (paymentStatus === "error" || paymentError) {
+      onDialogBlocked(false);
       onPurchaseError(paymentError || ERROR_PURCHASE());
 
       return;
     }
 
+    if (isCreditCardPayment) {
+      if (!redirectURL || processedRef.current) return;
+
+      processedRef.current = true;
+
+      persistCheckoutModalInfo({
+        url: window.location.href,
+        invoiceID,
+        paymentReferenceNumber,
+        billingInfo,
+        paymentInfo,
+      });
+
+      console.log("Redirecting to 3DS...");
+
+      location.href = redirectURL;
+
+      return;
+    }
+
+    onDialogBlocked(false);
     onPurchaseSuccess(paymentReferenceNumber);
-  }, [paymentState, hasWaited, onPurchaseError, onDialogBlocked, onPurchaseSuccess]);
+  }, [
+    paymentState,
+    hasWaited,
+    isCreditCardPayment,
+    redirectURL,
+    billingInfo,
+    paymentInfo,
+    onPurchaseError,
+    onDialogBlocked,
+    onPurchaseSuccess,
+  ]);
 
   useTimeout(() => {
     setHasWaited(true);

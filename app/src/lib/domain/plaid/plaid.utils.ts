@@ -1,5 +1,6 @@
 import { BillingInfo } from "../../forms/BillingInfoForm";
 
+const STORAGE_EXPIRATION_MS = 1000 * 60 * 5; // 15 minutes.
 const PLAID_OAUTH_FLOW_INFO_KEY = "PLAID_OAUTH_FLOW_INFO";
 const PLAID_OAUTH_FLOW_RECEIVED_REDIRECT_URI_KEY = "PLAID_OAUTH_FLOW_RECEIVED_REDIRECT_URI_KEY";
 const PLAID_OAUTH_STATE_USED_KEY = "PLAID_OAUTH_STATE_USED_KEY";
@@ -10,34 +11,7 @@ export interface PlaidInfo {
   url: string;
   linkToken: string;
   selectedBillingInfo: string | BillingInfo;
-}
-
-export function persistPlaidInfo(info: PlaidInfo) {
-  if (!process.browser) return;
-
-  try {
-    localStorage.setItem(PLAID_OAUTH_FLOW_INFO_KEY, JSON.stringify(info));
-  } catch (err) {
-    console.log(err);
-  }
-}
-
-export function persistPlaidReceivedRedirectUri(receivedRedirectUri: string) {
-  localStorage.setItem(PLAID_OAUTH_FLOW_RECEIVED_REDIRECT_URI_KEY, receivedRedirectUri);
-}
-
-export function persistPlaidOAuthStateUsed(used = true) {
-  localStorage.setItem(PLAID_OAUTH_STATE_USED_KEY, `${ used }`);
-}
-
-export function clearPlaidInfo() {
-  if (process.browser) {
-    localStorage.removeItem(PLAID_OAUTH_FLOW_INFO_KEY);
-    localStorage.removeItem(PLAID_OAUTH_FLOW_RECEIVED_REDIRECT_URI_KEY);
-    localStorage.removeItem(PLAID_OAUTH_STATE_USED_KEY);
-  }
-
-  return FALLBACK_PLAID_OAUTH_FLOW_STATE;
+  timestamp?: number;
 }
 
 export interface PlaidOAuthFlowState extends PlaidInfo {
@@ -53,6 +27,49 @@ const FALLBACK_PLAID_OAUTH_FLOW_STATE: PlaidOAuthFlowState = {
   continueOAuthFlow: false,
   savedStateUsed: false,
 };
+
+export function persistPlaidInfo(info: PlaidInfo) {
+  if (!process.browser) return;
+
+  try {
+    localStorage.setItem(PLAID_OAUTH_FLOW_INFO_KEY, JSON.stringify({
+      ...info,
+      timestamp: info.timestamp || Date.now(),
+    }));
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+export function persistPlaidReceivedRedirectUri(receivedRedirectUri: string) {
+  localStorage.setItem(PLAID_OAUTH_FLOW_RECEIVED_REDIRECT_URI_KEY, receivedRedirectUri);
+}
+
+export function persistPlaidOAuthStateUsed(used = true) {
+  localStorage.setItem(PLAID_OAUTH_STATE_USED_KEY, `${ used }`);
+}
+
+export function clearPlaidInfo(isExpired?: boolean) {
+  console.log(`Clearing ${ isExpired ? "expired " : "" }state (3DS)...`);
+
+  if (process.browser) {
+    localStorage.removeItem(PLAID_OAUTH_FLOW_INFO_KEY);
+    localStorage.removeItem(PLAID_OAUTH_FLOW_RECEIVED_REDIRECT_URI_KEY);
+    localStorage.removeItem(PLAID_OAUTH_STATE_USED_KEY);
+  }
+
+  return FALLBACK_PLAID_OAUTH_FLOW_STATE;
+}
+
+/*
+export function persistedInfoCleanUp() {
+
+}
+*/
+
+function isExpired(timestamp?: number) {
+  return timestamp !== undefined && Date.now() - timestamp > STORAGE_EXPIRATION_MS;
+}
 
 export function getPlaidOAuthFlowState(): PlaidOAuthFlowState {
   if (!process.browser) {
@@ -74,7 +91,8 @@ export function getPlaidOAuthFlowState(): PlaidOAuthFlowState {
   const {
     url = "",
     linkToken = "",
-    selectedBillingInfo = ""
+    selectedBillingInfo = "",
+    timestamp,
   } = savedPlaidInfo || {};
 
   const receivedRedirectUri = savedReceivedRedirectUri || (window.location.search.startsWith(PLAID_OAUTH_FLOW_URL_SEARCH) ? window.location.href : undefined);
@@ -82,7 +100,9 @@ export function getPlaidOAuthFlowState(): PlaidOAuthFlowState {
 
   const continueOAuthFlow = !!(url && linkToken && selectedBillingInfo && receivedRedirectUri);
 
-  if ((continueOAuthFlow && savedStateUsed) || (!continueOAuthFlow && savedPlaidInfo)) return clearPlaidInfo();
+  if ((continueOAuthFlow && savedStateUsed) || (!continueOAuthFlow && localStorage.getItem(PLAID_OAUTH_FLOW_INFO_KEY)) || isExpired(timestamp)) {
+    return clearPlaidInfo();
+  }
 
   return {
     // The URL of the page where we initially opened the modal:

@@ -5,8 +5,8 @@ import { CircleFieldErrors } from "../../../domain/circle/circle.utils";
 import { ERROR_PURCHASE } from "../../../domain/errors/errors.constants";
 import { PaymentMethod } from "../../../domain/payment/payment.interfaces";
 import { BillingInfo } from "../../../forms/BillingInfoForm";
-import { INITIAL_PLAID_OAUTH_FLOW_STATE } from "../../../hooks/usePlaid";
 import { resetStepperProgress } from "../../payments/CheckoutStepper/CheckoutStepper";
+import { continueFlows } from "./CheckoutOverlay.utils";
 
 export type CheckoutModalErrorAt = "authentication" | "billing" | "payment" | "purchasing";
 
@@ -77,15 +77,18 @@ export function useCheckoutModalState({
 
     // Once authentication has loaded, we know if we need to skip the product confirmation step or not. Also, when the
     // modal is re-opened, we need to reset its state, taking into account if we need to resume a Plaid OAuth flow:s
-    const { selectedBillingInfo, continueOAuthFlow, savedStateUsed } = INITIAL_PLAID_OAUTH_FLOW_STATE;
+    const { checkoutStep, checkoutError, billingInfo, paymentInfo } = continueFlows();
 
-    setCheckoutModalState({ checkoutStep: continueOAuthFlow && !savedStateUsed ? "purchasing" : startAt });
+    setCheckoutModalState({
+      checkoutStep: checkoutStep || startAt,
+      checkoutError,
+    });
     // setCheckoutModalState({ checkoutStep: "error", checkoutError: { errorMessage: "test" } });
     // setCheckoutModalState({ checkoutStep: "purchasing" });
 
     setSelectedPaymentMethod({
-      billingInfo: selectedBillingInfo || "",
-      paymentInfo: "",
+      billingInfo: billingInfo || "",
+      paymentInfo: paymentInfo || "",
       cvv: "",
     });
   }, [startAt]);

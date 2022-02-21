@@ -1,22 +1,20 @@
 import { NextPage } from "next";
 import { useRouter } from "next/router";
-import { useEffect } from "react";
-import { getPlaidOAuthFlowState, persistPlaidReceivedRedirectUri } from "../lib/domain/plaid/plaid.utils";
+import { useCallback } from "react";
+import { PUIPlaidOverlay } from "../lib/components/public/PlaidOverlay/PlaidOverlay";
 
 const PlaidOAuthPage: NextPage = () => {
   const router = useRouter();
 
-  const { continueOAuthFlow, url } = getPlaidOAuthFlowState();
+  const handleRedirect = useCallback((pathnameOrUrl: string) => {
+    console.log(`Redirect to ${ pathnameOrUrl }...`);
 
-  useEffect(() => {
-    if (continueOAuthFlow) {
-      persistPlaidReceivedRedirectUri(window.location.href);
-    }
+    router.replace(pathnameOrUrl || "/");
+  }, [router]);
 
-    router.replace(url || "/");
-  }, [continueOAuthFlow, router, url]);
-
-  return null;
+  return (
+    <PUIPlaidOverlay onRedirect={ handleRedirect } />
+  );
 }
 
 export default PlaidOAuthPage;

@@ -10,20 +10,15 @@ const SuccessPage: NextPage = () => {
   const handleRedirect = useCallback((pathnameOrUrl: string) => {
     console.log(`Redirect to ${ pathnameOrUrl }...`);
 
-    /*
-    if (continueOAuthFlow) {
-      persistPlaidReceivedRedirectUri(window.location.href);
-    }
-    */
-
-    // router.replace("/");
-  }, []);
+    router.replace(pathnameOrUrl || "/");
+  }, [router]);
 
   return (
     <PUISuccess
       theme={ PLAYGROUND_THEMES.light }
       logoSrc={ PLAYGROUND_LOGOS_SRC.light }
       logoSx={ PLAYGROUND_LOGOS_SX.light }
+      successImageSrc=""
       onRedirect={ handleRedirect } />
   );
 }

@@ -24,6 +24,7 @@ export interface UseFullPaymentOptions {
 }
 
 export interface PaymentState {
+  invoiceID: string;
   paymentStatus: PaymentStatus;
   paymentReferenceNumber: string;
   paymentError?: string | CheckoutModalError;
@@ -38,12 +39,14 @@ export function useFullPayment({
   debug = false,
 }: UseFullPaymentOptions): [PaymentState, () => Promise<void>] {
   const [paymentState, setPaymentState] = useState<PaymentState>({
+    invoiceID: "",
     paymentStatus: "processing",
     paymentReferenceNumber: "",
   });
 
   const setError = useCallback((paymentError: string | CheckoutModalError) => {
     setPaymentState({
+      invoiceID: "",
       paymentStatus: "error",
       paymentReferenceNumber: "",
       paymentError,
@@ -103,6 +106,7 @@ export function useFullPayment({
     }
 
     setPaymentState({
+      invoiceID: "",
       paymentStatus: "processing",
       paymentReferenceNumber: "",
     });
@@ -190,6 +194,7 @@ export function useFullPayment({
     /*
     if (lotType === "auction" && !invoiceID) {
       setPaymentState({
+        invoiceID: "",
         paymentStatus: "error",
         paymentReferenceNumber: "",
         paymentError: "Missing auction invoice.",
@@ -253,7 +258,7 @@ export function useFullPayment({
     }
 
 
-    let metadata: CreatePaymentMetadataInput | null = null;
+    let metadata: CreatePaymentMetadataInput | undefined;
 
     if (cvv) {
       const encryptCardDataResult = await encryptCardData({
@@ -315,6 +320,7 @@ export function useFullPayment({
     // TODO: Error handling and automatic retry:
 
     setPaymentState({
+      invoiceID,
       paymentStatus: "processed",
       paymentReferenceNumber: circlePaymentID,
     });

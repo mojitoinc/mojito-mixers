@@ -43,3 +43,5 @@ export const ERROR_PURCHASE_CREATING_INVOICE = createError("Invoice could not be
 export const ERROR_PURCHASE_CVV = createError("Could not verify CVV.");
 
 export const ERROR_PURCHASE_PAYING = createError("Payment failed.");
+
+export const ERROR_PURCHASE_3DS = createError("Payment method could not be verified.", "payment");
