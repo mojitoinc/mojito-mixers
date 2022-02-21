@@ -6,17 +6,16 @@ import { AppProps } from "next/app";
 import { Header } from "../components/core/Header";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import Head from "next/head";
-import { AuthorizedApolloProvider } from "../lib";
+import { AuthorizedApolloProvider } from "../lib/components/shared/AuthorizedApolloProvider/AuthorizedApolloProvider";
 
 const defaultTheme = createTheme();
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
     <Auth0Provider
-      domain={config.AUTH0_DOMAIN}
-      clientId={config.AUTH0_CLIENTID}
-      redirectUri={config.AUTH_REDIRECT_URI}
-    >
+      domain={ config.AUTH0_DOMAIN }
+      clientId={ config.AUTH0_CLIENTID }
+      redirectUri={ config.AUTH_REDIRECT_URI }>
 
       <Head>
         <title>Mojito - Payment UI Playground</title>
@@ -24,11 +23,11 @@ function MyApp({ Component, pageProps }: AppProps) {
         <link href="/fonts/style.css" rel="stylesheet" />
       </Head>
 
-      <AuthorizedApolloProvider uri={`${config.API_HOSTNAME}/query`}>
+      <AuthorizedApolloProvider uri={ `${ config.API_HOSTNAME }/query` }>
         <ThemeProvider theme={ defaultTheme }>
           <GlobalLayout>
             <Header />
-            <Component {...pageProps} />
+            <Component { ...pageProps } />
           </GlobalLayout>
         </ThemeProvider>
       </AuthorizedApolloProvider>

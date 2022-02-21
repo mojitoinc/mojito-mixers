@@ -82,13 +82,13 @@ DONE:
 - Create 3DS pages in Next app.
 - 3DS success and error screen designs.
 - Extract StatusIcon.
+- Improve ProviderInjector logic and add Apollo.
 
 
 TODO:
-- Improve ProviderInjector logic and add Apollo.
 - Update Purchasing page to do polling for CC payments instead of going to the confirmation one.
 - Implement persistance of state before redirecting users to 3DS and resume logic when coming back.
-- Document 3DS flow.
+- Document 3DS flow and ProviderInjector.
 
 
 FOUND:
