@@ -20,6 +20,7 @@ export interface CheckoutModalError {
 export type CheckoutModalStep = "authentication" | "billing" | "payment" | "purchasing" | "confirmation" | "error";
 
 export interface CheckoutModalStateOptions {
+  invoiceID: string;
   productConfirmationEnabled?: boolean;
   isAuthenticated?: boolean;
   onError?: (error: CheckoutModalError) => void;
@@ -36,7 +37,12 @@ export interface SelectedPaymentMethod {
   cvv: string;
 }
 
-export interface CheckoutModalStateReturn extends CheckoutModalState {
+export interface PurchaseState {
+  invoiceID: string;
+  paymentReferenceNumber: string;
+}
+
+export interface CheckoutModalStateReturn extends CheckoutModalState, PurchaseState {
   // CheckoutModalState (+ inherited stuff):
   resetModalState: () => void;
   goBack: () => void;
@@ -47,11 +53,16 @@ export interface CheckoutModalStateReturn extends CheckoutModalState {
   // SelectedPaymentMethod:
   selectedPaymentMethod: SelectedPaymentMethod;
   setSelectedPaymentMethod: Dispatch<SetStateAction<SelectedPaymentMethod>>;
+
+  // PurchaseState (+ inherited stuff):
+  setInvoiceID: (invoiceID) => void;
+  setPaymentReferenceNumber: (paymentReferenceNumber) => void;
 }
 
 export const CHECKOUT_STEPS: CheckoutModalStep[] = ["authentication", "billing", "payment", "purchasing", "confirmation"];
 
 export function useCheckoutModalState({
+  invoiceID: initialInvoiceID,
   productConfirmationEnabled,
   isAuthenticated,
   onError,
@@ -71,26 +82,46 @@ export function useCheckoutModalState({
     cvv: "",
   });
 
+  const [{
+    invoiceID,
+    paymentReferenceNumber,
+  }, setPurchaseState] = useState<PurchaseState>({
+    invoiceID: initialInvoiceID,
+    paymentReferenceNumber: "",
+  });
+
   const resetModalState = useCallback(() => {
     // Make sure the progress tracker in BillingView and PaymentView is properly animated:
     resetStepperProgress();
 
     // Once authentication has loaded, we know if we need to skip the product confirmation step or not. Also, when the
     // modal is re-opened, we need to reset its state, taking into account if we need to resume a Plaid OAuth flow:s
-    const { checkoutStep, checkoutError, billingInfo, paymentInfo } = continueFlows();
+    const savedFlow = continueFlows();
+
+    // if (savedFlow.checkoutStep !== "") {
+    //   clearPersistedInfo();
+    //   clearPlaidInfo();
+    // }
 
     setCheckoutModalState({
-      checkoutStep: checkoutStep || startAt,
-      checkoutError,
+      checkoutStep: savedFlow.checkoutStep || startAt,
+      checkoutError: savedFlow.checkoutError,
     });
+
     // setCheckoutModalState({ checkoutStep: "error", checkoutError: { errorMessage: "test" } });
     // setCheckoutModalState({ checkoutStep: "purchasing" });
 
     setSelectedPaymentMethod({
-      billingInfo: billingInfo || "",
-      paymentInfo: paymentInfo || "",
+      billingInfo: savedFlow.billingInfo || "",
+      paymentInfo: savedFlow.paymentInfo || "",
       cvv: "",
     });
+
+    setPurchaseState({
+      invoiceID: savedFlow.invoiceID || "",
+      paymentReferenceNumber: savedFlow.paymentReferenceNumber || "",
+    });
+
   }, [startAt]);
 
   const goBack = useCallback(() => {
@@ -131,6 +162,15 @@ export function useCheckoutModalState({
     });
   }, [onError]);
 
+
+  const setInvoiceID = useCallback((invoiceID: string) => {
+    setPurchaseState({ invoiceID, paymentReferenceNumber: "" });
+  }, []);
+
+  const setPaymentReferenceNumber = useCallback((paymentReferenceNumber: string) => {
+    setPurchaseState(({ invoiceID }) => ({ invoiceID, paymentReferenceNumber }));
+  }, [])
+
   return {
     // CheckoutModalState:
     checkoutStep,
@@ -144,5 +184,11 @@ export function useCheckoutModalState({
     // SelectedPaymentMethod:
     selectedPaymentMethod,
     setSelectedPaymentMethod,
+
+    // PurchaseState:
+    invoiceID,
+    paymentReferenceNumber,
+    setInvoiceID,
+    setPaymentReferenceNumber,
   };
 }

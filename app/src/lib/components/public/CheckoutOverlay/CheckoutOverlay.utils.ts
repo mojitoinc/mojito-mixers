@@ -27,7 +27,7 @@ export interface CheckoutModalState3DS extends CheckoutModalInfo {
   savedStateUsed: boolean;
 }
 
-const FALLBACK_PLAID_OAUTH_FLOW_STATE: CheckoutModalState3DS = {
+const FALLBACK_MODAL_STATE: CheckoutModalState3DS = {
   url: "",
   invoiceID: "",
   paymentReferenceNumber: "",
@@ -71,7 +71,7 @@ export function clearPersistedInfo(isExpired?: boolean) {
     localStorage.removeItem(THREEDS_STATE_USED_KEY);
   }
 
-  return FALLBACK_PLAID_OAUTH_FLOW_STATE;
+  return FALLBACK_MODAL_STATE;
 }
 
 /*
@@ -86,7 +86,7 @@ function isExpired(timestamp?: number) {
 
 export function getCheckoutModalState(): CheckoutModalState3DS {
   if (!process.browser) {
-    return FALLBACK_PLAID_OAUTH_FLOW_STATE;
+    return FALLBACK_MODAL_STATE;
   }
 
   let savedPlaidInfo: Partial<CheckoutModalState3DS> = {};
@@ -146,50 +146,60 @@ export function getCheckoutModalState(): CheckoutModalState3DS {
   };
 }
 
-// if (process.browser) localStorage.setItem("THREEDS_FLOW_RECEIVED_REDIRECT_URI_KEY", "https://metaverse-staging.sothebys.com/payments/error?paymentId=408db30b-3a5b-44b1-96f1-a1e4aa8dac1e")
+if (process.browser) localStorage.setItem("THREEDS_FLOW_RECEIVED_REDIRECT_URI_KEY", "https://metaverse-staging.sothebys.com/payments/success?paymentId=408db30b-3a5b-44b1-96f1-a1e4aa8dac1e")
 
-// Load the initial checkout modal state from localStorage to initialize the ref. Note `();` will
-// automatically discard the saved data if it's invalid or expired:
-// eslint-disable-next-line prefer-const
-export let INITIAL_CHECKOUT_MODAL_STATE = getCheckoutModalState();
+export function continueCheckout(noClear = false): [boolean, CheckoutModalState3DS] {
+  const savedCheckoutModalState = getCheckoutModalState();
+  const { continue3DSFlow } = savedCheckoutModalState;
 
-export function continueCheckout() {
-  return INITIAL_CHECKOUT_MODAL_STATE.continue3DSFlow && !INITIAL_CHECKOUT_MODAL_STATE.savedStateUsed;;
+  if (continue3DSFlow) {
+    console.log("💾 Continue 3DS Flow...", savedCheckoutModalState);
+
+    if (!noClear) clearPersistedInfo();
+  }
+
+  return [continue3DSFlow, savedCheckoutModalState];
 }
 
 export interface ContinueFlowsReturn {
   checkoutStep: CheckoutModalStep | "";
   checkoutError?: CheckoutModalError;
+  invoiceID: string;
   billingInfo: string | BillingInfo;
   paymentInfo: string | PaymentMethod;
+  paymentReferenceNumber: string;
 }
 
-export function continueFlows() {
-  const continue3DSFlow = continueCheckout();
+export function continueFlows(noClear = false) {
+  const [continue3DSFlow, savedCheckoutModalState] = continueCheckout(noClear);
   const continueOAuthFlow = continuePlaidOAuthFlow();
   const continueFlowsReturn: ContinueFlowsReturn = {
     checkoutStep: "",
+    invoiceID: "",
     billingInfo: "",
     paymentInfo: "",
+    paymentReferenceNumber: "",
   };
 
   if (continue3DSFlow) {
-    if (INITIAL_CHECKOUT_MODAL_STATE.purchaseSuccess) {
+    if (savedCheckoutModalState.purchaseSuccess) {
       continueFlowsReturn.checkoutStep = "confirmation";
     } else {
       continueFlowsReturn.checkoutStep = "error";
       continueFlowsReturn.checkoutError = ERROR_PURCHASE_3DS();
     }
 
-    continueFlowsReturn.billingInfo = INITIAL_CHECKOUT_MODAL_STATE.billingInfo;
-    continueFlowsReturn.paymentInfo = INITIAL_CHECKOUT_MODAL_STATE.paymentInfo;
+    continueFlowsReturn.invoiceID = savedCheckoutModalState.invoiceID;
+    continueFlowsReturn.billingInfo = savedCheckoutModalState.billingInfo;
+    continueFlowsReturn.paymentInfo = savedCheckoutModalState.paymentInfo;
+    continueFlowsReturn.paymentReferenceNumber = savedCheckoutModalState.paymentReferenceNumber;
   } else if (continueOAuthFlow) {
+    console.log("💾 Continue Plaid OAuth Flow...", INITIAL_PLAID_OAUTH_FLOW_STATE);
+
     continueFlowsReturn.checkoutStep = "purchasing";
     continueFlowsReturn.billingInfo = INITIAL_PLAID_OAUTH_FLOW_STATE.selectedBillingInfo;
     // continueFlowsReturn.paymentInfo = INITIAL_PLAID_OAUTH_FLOW_STATE.paymentInfo;
   }
-
-  if (continue3DSFlow || continueOAuthFlow) console.log("Continue flows:", continueFlowsReturn);
 
   return continueFlowsReturn;
 }

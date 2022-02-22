@@ -5,7 +5,7 @@ import { UserFormat } from "../../../domain/auth/authentication.interfaces";
 import { PaymentMethod, PaymentType } from "../../../domain/payment/payment.interfaces";
 import { CheckoutItem } from "../../../domain/product/product.interfaces";
 import { BillingInfo } from "../../../forms/BillingInfoForm";
-import { useDeletePaymentMethodMutation, useGetPaymentMethodListQuery, useMeQuery } from "../../../queries/graphqlGenerated";
+import { useDeletePaymentMethodMutation, useGetInvoiceDetailsQuery, useGetPaymentMethodListQuery, useMeQuery } from "../../../queries/graphqlGenerated";
 import { AuthenticationView } from "../../../views/Authentication/AuthenticationView";
 import { BillingView } from "../../../views/Billing/BillingView";
 import { ConfirmationView } from "../../../views/Confirmation/ConfirmationView";
@@ -100,7 +100,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
 
   // Data:
   orgID,
-  invoiceID,
+  invoiceID: initialInvoiceID,
   checkoutItems,
 
   // Authentication:
@@ -127,9 +127,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     refetch: refetchPaymentMethods,
   } = useGetPaymentMethodListQuery({
     skip: !isAuthenticated,
-    variables: {
-      orgID,
-    },
+    variables: { orgID },
   });
 
   const [deletePaymentMethod] = useDeletePaymentMethodMutation();
@@ -153,11 +151,33 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     // SelectedPaymentMethod:
     selectedPaymentMethod,
     setSelectedPaymentMethod,
+
+    // PurchaseState:
+    invoiceID,
+    paymentReferenceNumber,
+    setInvoiceID,
+    setPaymentReferenceNumber,
   } = useCheckoutModalState({
+    invoiceID: initialInvoiceID,
     productConfirmationEnabled,
     isAuthenticated,
     onError,
   });
+
+  // TODO: InvoiceID and checkoutItems to state:
+  // TODO: Memo + transform function here:
+
+  const {
+    data: invoiceDetailsData,
+    loading: invoiceDetailsLoading,
+    error: invoiceDetailsError,
+    refetch: refetchInvoiceDetails,
+  } = useGetInvoiceDetailsQuery({
+    skip: !invoiceID,
+    variables: { orgID, invoiceID },
+  });
+
+  if (invoiceDetailsLoading || invoiceDetailsData) console.log("INVOICE...", invoiceDetailsData);
 
   useEffect(() => {
     const dialogScrollable = dialogRootRef.current?.querySelector(SELECTOR_DIALOG_SCROLLABLE);
@@ -277,16 +297,14 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     await refetchPaymentMethods({ orgID });
   }, [checkoutStep, deletePaymentMethod, orgID, refetchPaymentMethods, savedPaymentMethods, setSelectedPaymentMethod]);
 
-  const [paymentReferenceNumber, setPaymentReferenceNumber] = useState("");
-
-  const handlePurchaseSuccess = useCallback(async (paymentReferenceNumber: string) => {
+  const handlePurchaseSuccess = useCallback(async (nextPaymentReferenceNumber: string) => {
     // After a successful purchase, a new payment method might have been created, so we reload them:
     await refetchPaymentMethods();
 
-    setPaymentReferenceNumber(paymentReferenceNumber);
+    setPaymentReferenceNumber(nextPaymentReferenceNumber);
 
     goNext();
-  }, [refetchPaymentMethods, goNext]);
+  }, [refetchPaymentMethods, setPaymentReferenceNumber, goNext]);
 
   const handleFixError = useCallback(async (): Promise<false> => {
     // After an error, all data is reloaded in case the issue was caused by stale/cached data or in case a new payment

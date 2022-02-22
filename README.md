@@ -91,9 +91,11 @@ DONE:
 - Implement persistance in CheckoutOverlay.utils.
 
 
+- Load items from invoice when coming back.
+
+
 DOING:
 - Implement resume logic when coming back from 3DS' pages (merge Plaid and 3DS in a single function).
-- Load items from invoice when coming back.
 - When coming back from a 3DS error, CVV needs to be re-entered.
 - Update error handling to do take users back more often, instead of trying again with the same data.
 
@@ -108,6 +110,7 @@ TODO:
 - see if the get state function can work as cleanup.
 - Add a debug mode for the persist stuff.
 - Document 3DS flow and ProviderInjector.
+- In staging, send back redirect URL in param
 
 
 FOUND:
@@ -172,13 +175,13 @@ import {
   CheckoutModal,
   CheckoutModalProps,
   CheckoutModalThemeProvider,
-  continuePlaidOAuthFlow,
+  continueFlows,
 } from "@mojitoinc/mojito-mixers";
 
 const App: React.FC<AppProps> = () => {
   const { profile } = useProfile();
 
-  const [isOpen, setIsOpen] = useState(continuePlaidOAuthFlow());
+  const [isOpen, setIsOpen] = useState(continueFlows(true).checkoutStep !== "");
 
   const { loginWithPopup, isAuthenticated, isLoading, getIdTokenClaims } = useAuth0();
 

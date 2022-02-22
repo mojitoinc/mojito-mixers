@@ -27,3 +27,14 @@ mutation CreateBuyNowInvoice(
     }
   }
 }
+
+query GetInvoiceDetails($invoiceID: UUID1!, $orgID: UUID1!) {
+  getInvoiceDetails(invoiceID: $invoiceID, orgID: $orgID) {
+    items {
+      collectionItemID
+      collectionItemTitle
+      units
+      unitPrice
+    }
+  }
+}

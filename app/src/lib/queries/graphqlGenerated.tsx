@@ -519,6 +519,7 @@ export type MarketplaceToken = {
   __typename?: 'MarketplaceToken';
   id: Scalars['UUID'];
   marketplaceID: Scalars['UUID'];
+  name?: Maybe<Scalars['String']>;
   nftContractAddress: Scalars['String'];
   nftTokenID?: Maybe<Scalars['UUID']>;
   onChainTokenID: Scalars['Int'];
@@ -1193,9 +1194,9 @@ export type Subscription = {
   __typename?: 'Subscription';
   auctionLotUpdated: MarketplaceAuctionLot;
   bidFeed: MarketplaceAuctionBid;
-  /**  Returns a MarketplaceAuctionLot on subscribe and whenever a new bid is placed  */
+  /** Returns a MarketplaceAuctionLot on subscribe and whenever a new bid is placed */
   getMarketplaceAuctionLot: MarketplaceAuctionLot;
-  /**  Subscribes to lots and bids updates within given marketplace collection   */
+  /** Subscribes to lots and bids updates within given marketplace collection */
   marketplaceCollectionLotsUpdates: MarketplaceAuctionLot;
 };
 
@@ -1439,6 +1440,14 @@ export type CreateBuyNowInvoiceMutationVariables = Exact<{
 
 export type CreateBuyNowInvoiceMutation = { __typename?: 'Mutation', purchaseMarketplaceBuyNowLot: { __typename?: 'MarketplaceBuyNowOutput', invoice?: { __typename?: 'InvoiceDetails', invoiceID: any, status: InvoiceStatus, items: Array<{ __typename?: 'ItemInvoiceDetail', units: number, unitPrice: number, taxes: number, totalPrice: number } | null> } | null } };
 
+export type GetInvoiceDetailsQueryVariables = Exact<{
+  invoiceID: Scalars['UUID1'];
+  orgID: Scalars['UUID1'];
+}>;
+
+
+export type GetInvoiceDetailsQuery = { __typename?: 'Query', getInvoiceDetails: { __typename?: 'InvoiceDetails', items: Array<{ __typename?: 'ItemInvoiceDetail', collectionItemID: any, collectionItemTitle: string, units: number, unitPrice: number } | null> } };
+
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -1637,6 +1646,47 @@ export function useCreateBuyNowInvoiceMutation(baseOptions?: Apollo.MutationHook
 export type CreateBuyNowInvoiceMutationHookResult = ReturnType<typeof useCreateBuyNowInvoiceMutation>;
 export type CreateBuyNowInvoiceMutationResult = Apollo.MutationResult<CreateBuyNowInvoiceMutation>;
 export type CreateBuyNowInvoiceMutationOptions = Apollo.BaseMutationOptions<CreateBuyNowInvoiceMutation, CreateBuyNowInvoiceMutationVariables>;
+export const GetInvoiceDetailsDocument = gql`
+    query GetInvoiceDetails($invoiceID: UUID1!, $orgID: UUID1!) {
+  getInvoiceDetails(invoiceID: $invoiceID, orgID: $orgID) {
+    items {
+      collectionItemID
+      collectionItemTitle
+      units
+      unitPrice
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetInvoiceDetailsQuery__
+ *
+ * To run a query within a React component, call `useGetInvoiceDetailsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetInvoiceDetailsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetInvoiceDetailsQuery({
+ *   variables: {
+ *      invoiceID: // value for 'invoiceID'
+ *      orgID: // value for 'orgID'
+ *   },
+ * });
+ */
+export function useGetInvoiceDetailsQuery(baseOptions: Apollo.QueryHookOptions<GetInvoiceDetailsQuery, GetInvoiceDetailsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetInvoiceDetailsQuery, GetInvoiceDetailsQueryVariables>(GetInvoiceDetailsDocument, options);
+      }
+export function useGetInvoiceDetailsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetInvoiceDetailsQuery, GetInvoiceDetailsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetInvoiceDetailsQuery, GetInvoiceDetailsQueryVariables>(GetInvoiceDetailsDocument, options);
+        }
+export type GetInvoiceDetailsQueryHookResult = ReturnType<typeof useGetInvoiceDetailsQuery>;
+export type GetInvoiceDetailsLazyQueryHookResult = ReturnType<typeof useGetInvoiceDetailsLazyQuery>;
+export type GetInvoiceDetailsQueryResult = Apollo.QueryResult<GetInvoiceDetailsQuery, GetInvoiceDetailsQueryVariables>;
 export const MeDocument = gql`
     query Me {
   me {

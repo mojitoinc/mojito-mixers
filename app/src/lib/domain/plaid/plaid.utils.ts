@@ -50,7 +50,7 @@ export function persistPlaidOAuthStateUsed(used = true) {
 }
 
 export function clearPlaidInfo(isExpired?: boolean) {
-  console.log(`Clearing ${ isExpired ? "expired " : "" }state (3DS)...`);
+  console.log(`Clearing ${ isExpired ? "expired " : "" }state (Plaid)...`);
 
   if (process.browser) {
     localStorage.removeItem(PLAID_OAUTH_FLOW_INFO_KEY);

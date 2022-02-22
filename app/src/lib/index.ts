@@ -4,7 +4,8 @@ export { PUIError } from "./components/public/ErrorOverlay/ErrorOverlay";
 export { MOJITO_LIGHT_THEME, MOJITO_DARK_THEME } from "./config/theme/theme";
 export { ThemeProvider as CheckoutModalThemeProvider } from "@mui/material/styles";
 export { getPlaidOAuthFlowState, persistPlaidReceivedRedirectUri } from "./domain/plaid/plaid.utils";
-export { INITIAL_PLAID_OAUTH_FLOW_STATE, continuePlaidOAuthFlow } from "./hooks/usePlaid";
+export { continuePlaidOAuthFlow } from "./hooks/usePlaid";
+export { continueCheckout, continueFlows } from "./components/public/CheckoutOverlay/CheckoutOverlay.utils";
 
 export type { Theme as CheckoutModalTheme, ThemeOptions as CheckoutModalThemeOptions } from "@mui/material/styles";
 export type { PUICheckoutProps } from "./components/public/CheckoutOverlay/CheckoutOverlay";
