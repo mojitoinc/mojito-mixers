@@ -40,6 +40,7 @@ interface PaymentTypeFormProps {
   consentType: ConsentType;
   privacyHref?: string;
   termsOfUseHref?: string;
+  wirePaymentsDisclaimerText?: React.ReactNode;
 }
 
 interface PaymentTypeFormData {
@@ -190,7 +191,7 @@ const PAYMENT_TYPE_FORM_DATA: Record<PaymentType, PaymentTypeFormData> = {
         .label(FIELD_LABELS.routingNumber)
         .when("type", isWireThenRequireSchema),
     },
-    fields: ({ control, consentType, privacyHref, termsOfUseHref }) => (<>
+    fields: ({ control, consentType, privacyHref, termsOfUseHref, wirePaymentsDisclaimerText }) => (<>
       <ControlledTextField
           name="accountNumber"
           control={control}
@@ -207,14 +208,13 @@ const PAYMENT_TYPE_FORM_DATA: Record<PaymentType, PaymentTypeFormData> = {
           control={control}
           label={ <>I <ConsentText privacyHref={ privacyHref } termsOfUseHref={ termsOfUseHref } /></> } />
       ) }
-      <DisplayBox sx={{ mt: 1.5 }}>
-        <Typography  variant="body1">
-          <Typography display="inline" sx={{ fontWeight: "500" }}>Third-party wire transfers cannot be accepted.</Typography> Your bank account name needs to match with the name you used to register in Sotheby’s Metaverse.
-          <Typography sx={{ mt: 2 }}>
-            Please note that wire transfers usually take <Typography display="inline" sx={{ fontWeight: "500" }}>1-3 business days</Typography> to arrive. We do not charge any deposit fee — however, your bank may charge you a wire transfer fee.
+      {wirePaymentsDisclaimerText && (
+        <DisplayBox sx={{ mt: 1.5 }}>
+          <Typography variant="body1">
+            {wirePaymentsDisclaimerText}
           </Typography>
-        </Typography>
-      </DisplayBox>
+        </DisplayBox>
+      )}
     </>),
   },
   Crypto: {
@@ -251,6 +251,7 @@ export interface PaymentMethodFormProps {
   consentType: ConsentType;
   privacyHref: string;
   termsOfUseHref: string;
+  wirePaymentsDisclaimerText?: React.ReactNode;
   debug?: boolean;
 }
 
@@ -265,6 +266,7 @@ export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
   consentType,
   privacyHref,
   termsOfUseHref,
+  wirePaymentsDisclaimerText,
   debug = false
 }) => {
   const defaultPaymentType = acceptedPaymentTypes[0] || "CreditCard";
@@ -349,7 +351,8 @@ export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
         control={ control }
         consentType={ consentType }
         privacyHref={ privacyHref }
-        termsOfUseHref={ termsOfUseHref } />
+        termsOfUseHref={ termsOfUseHref }
+        wirePaymentsDisclaimerText={ wirePaymentsDisclaimerText } />
 
       { checkoutErrorMessage && <FormErrorsBox error={ checkoutErrorMessage } sx={{ mt: 5 }} /> }
 

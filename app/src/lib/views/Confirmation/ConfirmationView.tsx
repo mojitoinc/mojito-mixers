@@ -14,7 +14,7 @@ export interface ConfirmationViewProps {
   savedPaymentMethods: SavedPaymentMethod[];
   selectedPaymentMethod: SelectedPaymentMethod;
   paymentReferenceNumber: string;
-  purchaseInstructions: string;
+  purchaseInstructions: React.ReactNode;
   onNext: () => void;
   onClose: () => void;
 }
