@@ -20,7 +20,7 @@ export interface CheckoutModalError {
 export type CheckoutModalStep = "authentication" | "billing" | "payment" | "purchasing" | "confirmation" | "error";
 
 export interface CheckoutModalStateOptions {
-  invoiceID: string;
+  invoiceID?: string;
   productConfirmationEnabled?: boolean;
   isAuthenticated?: boolean;
   onError?: (error: CheckoutModalError) => void;
@@ -38,13 +38,13 @@ export interface SelectedPaymentMethod {
 }
 
 export interface PurchaseState {
-  invoiceID: string;
+  invoiceID: string | null;
   paymentReferenceNumber: string;
 }
 
 export interface CheckoutModalStateReturn extends CheckoutModalState, PurchaseState {
   // CheckoutModalState (+ inherited stuff):
-  resetModalState: () => void;
+  initModalState: () => void;
   goBack: () => void;
   goNext: () => void;
   goTo: (checkoutStep: CheckoutModalStep, error?: null | string | CheckoutModalError) => void;
@@ -55,14 +55,14 @@ export interface CheckoutModalStateReturn extends CheckoutModalState, PurchaseSt
   setSelectedPaymentMethod: Dispatch<SetStateAction<SelectedPaymentMethod>>;
 
   // PurchaseState (+ inherited stuff):
-  setInvoiceID: (invoiceID) => void;
-  setPaymentReferenceNumber: (paymentReferenceNumber) => void;
+  setInvoiceID: (invoiceID: string) => void;
+  setPaymentReferenceNumber: (paymentReferenceNumber: string) => void;
 }
 
 export const CHECKOUT_STEPS: CheckoutModalStep[] = ["authentication", "billing", "payment", "purchasing", "confirmation"];
 
 export function useCheckoutModalState({
-  invoiceID: initialInvoiceID,
+  invoiceID: initialInvoiceID = null,
   productConfirmationEnabled,
   isAuthenticated,
   onError,
@@ -86,17 +86,21 @@ export function useCheckoutModalState({
     invoiceID,
     paymentReferenceNumber,
   }, setPurchaseState] = useState<PurchaseState>({
-    invoiceID: initialInvoiceID,
+    invoiceID: initialInvoiceID || null,
     paymentReferenceNumber: "",
   });
 
-  const resetModalState = useCallback(() => {
+  const initModalState = useCallback(() => {
+    console.log("initModalState", startAt);
+
     // Make sure the progress tracker in BillingView and PaymentView is properly animated:
     resetStepperProgress();
 
     // Once authentication has loaded, we know if we need to skip the product confirmation step or not. Also, when the
     // modal is re-opened, we need to reset its state, taking into account if we need to resume a Plaid OAuth flow:s
     const savedFlow = continueFlows();
+
+    console.log("savedFlow =", savedFlow);
 
     // if (savedFlow.checkoutStep !== "") {
     //   clearPersistedInfo();
@@ -175,7 +179,7 @@ export function useCheckoutModalState({
     // CheckoutModalState:
     checkoutStep,
     checkoutError,
-    resetModalState,
+    initModalState,
     goBack,
     goNext,
     goTo,

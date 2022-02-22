@@ -27,6 +27,9 @@ export const PUISuccessOverlay: React.FC<PUISuccessOverlayProps> = ({
 }) => {
   const { purchaseSuccess, url } = getCheckoutModalState();
 
+  // TODO: Replace same domain from URL in case it's the same.
+  // TODO: if it's not, do not call persistReceivedRedirectUri3DS and add it to the URL instead.
+
   useLayoutEffect(() => {
     if (purchaseSuccess) {
       persistReceivedRedirectUri3DS(window.location.href);

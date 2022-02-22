@@ -89,34 +89,23 @@ DONE:
 - Expose invoiceID fom useFullPayment and fix persistCheckoutModalInfo call.
 - Add expiration to persisted state.
 - Implement persistance in CheckoutOverlay.utils.
-
-
-- Load items from invoice when coming back.
+- Load items from invoice when coming back from 3DS success or error pages.
+- When coming back from a 3DS error, CVV needs to be re-entered. Now redirecting to payment.
+- Move reservation / invoice creation logic to CheckoutOverlay and refactor / reorganize CheckoutOverlay
+  CheckoutOverlay.hooks, useFullPayment and useCreateInvoiceAndReservation.
 
 
 DOING:
-- Implement resume logic when coming back from 3DS' pages (merge Plaid and 3DS in a single function).
-- When coming back from a 3DS error, CVV needs to be re-entered.
-- Update error handling to do take users back more often, instead of trying again with the same data.
-
-
-TODO:
-- Can createPayment return ok but 3DS return an error or just "break"?
-- Update plaid.utils with expiration and clean up function too.
-- Log lost states to Sentry?
-- Add a cleanup function that removes expired or marked as used states
-- Merge this and Plaid utils
-- Update readme with 3DS and Plaid info.
-- see if the get state function can work as cleanup.
-- Add a debug mode for the persist stuff.
-- Document 3DS flow and ProviderInjector.
+- Fix Payment UI not re-initializing properly when closing and opening again.
 - In staging, send back redirect URL in param
 
 
-FOUND:
-- Check why loader appears below page content in marketplaces. Change z-index there? Provider was missing for the standalone CircularProgress.
-- Check modal scroll issue.
-- Next.js vulnerability.
+TODO:
+- Update error handling to do take users back more often, instead of trying again with the same data.
+- Add a cleanup function that removes expired or marked as used states. See if the get state function can work as cleanup.
+- Improve names on 3DS stuff.
+- Update CheckoutItem props. The one passed doesn't have price info, the one used inside does (from invoice).
+- Plaid flow will re-create invoice and will hang loading.
 
 
 ## Building this project as a library

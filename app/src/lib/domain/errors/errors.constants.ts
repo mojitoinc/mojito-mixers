@@ -16,9 +16,11 @@ function createError(errorMessage: string, at: CheckoutModalErrorAt = DEFAULT_ER
 
 // CheckoutModal:
 
-export const ERROR_LOADING_USER = createError("User could not be loaded.");
+export const ERROR_LOADING_USER = createError("User could not be loaded.", "billing");
 
-export const ERROR_LOADING_PAYMENT_METHODS = createError("Payment methods could not be loaded.");
+export const ERROR_LOADING_PAYMENT_METHODS = createError("Payment methods could not be loaded.", "billing");
+
+export const ERROR_LOADING_INVOICE = createError("Invoice could not be loaded.", "billing");
 
 
 // PurchasingView:
@@ -38,7 +40,7 @@ export const ERROR_PURCHASE_SELECTED_PAYMENT_METHOD = createError("Could not fin
 
 export const ERROR_PURCHASE_CREATING_PAYMENT_METHOD = createError("Payment method could not be saved.", "billing");
 
-export const ERROR_PURCHASE_CREATING_INVOICE = createError("Invoice could not be created.");
+export const ERROR_PURCHASE_CREATING_INVOICE = createError("Invoice could not be created.", "billing");
 
 export const ERROR_PURCHASE_CVV = createError("Could not verify CVV.");
 

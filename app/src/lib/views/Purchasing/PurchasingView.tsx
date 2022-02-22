@@ -5,7 +5,6 @@ import React from "react";
 import { Box, Typography } from "@mui/material";
 import { useTimeout, useInterval } from "@swyg/corre";
 import { CheckoutModalError, SelectedPaymentMethod } from "../../components/public/CheckoutOverlay/CheckoutOverlay.hooks";
-import { CheckoutItem } from "../..";
 import { ERROR_PURCHASE } from "../../domain/errors/errors.constants";
 import { XS_MOBILE_MAX_WIDTH } from "../../config/theme/theme";
 import { StatusIcon } from "../../components/shared/StatusIcon/StatusIcon";
@@ -32,7 +31,6 @@ export interface PurchasingViewProps {
   purchasingMessages?: false | string[];
   orgID: string;
   invoiceID?: string;
-  checkoutItems: CheckoutItem[];
   savedPaymentMethods: SavedPaymentMethod[];
   selectedPaymentMethod: SelectedPaymentMethod;
   onPurchaseSuccess: (paymentReferenceNumber: string) => void;
@@ -45,8 +43,7 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
   purchasingImageSrc,
   purchasingMessages: customPurchasingMessages,
   orgID,
-  invoiceID: existingInvoiceID,
-  checkoutItems,
+  invoiceID,
   savedPaymentMethods,
   selectedPaymentMethod,
   onPurchaseSuccess,
@@ -54,17 +51,16 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
   onDialogBlocked,
   debug,
 }) => {
-  const [paymentState, fullPayment] = useFullPayment({
+  const [fullPaymentState, fullPayment] = useFullPayment({
     orgID,
-    invoiceID: existingInvoiceID,
-    checkoutItems,
+    invoiceID,
     savedPaymentMethods,
     selectedPaymentMethod,
     debug,
   });
 
   const paymentNotificationResult = useGetPaymentNotificationQuery({
-    skip: paymentState.paymentStatus !== "processed",
+    skip: fullPaymentState.paymentStatus !== "processed",
     pollInterval: PAYMENT_NOTIFICATION_INTERVAL_MS,
   });
 
@@ -83,19 +79,19 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
   const { billingInfo, paymentInfo, cvv } = selectedPaymentMethod;
   const isCreditCardPayment = cvv || (typeof paymentInfo === "object" && paymentInfo.type === "CreditCard");
 
-  const calledRef = useRef(false);
-  const processedRef = useRef(false);
+  const fullPaymentCalledRef = useRef(false);
+  const checkoutInfoPersistedRef = useRef(false);
 
   useEffect(() => {
-    if (calledRef.current) return;
+    if (fullPaymentCalledRef.current) return;
 
-    calledRef.current = true;
+    fullPaymentCalledRef.current = true;
 
     fullPayment();
   }, [fullPayment]);
 
   useEffect(() => {
-    const { invoiceID, paymentStatus, paymentReferenceNumber, paymentError } = paymentState;
+    const { paymentStatus, paymentReferenceNumber, paymentError } = fullPaymentState;
 
     if (paymentStatus === "processing") {
       onDialogBlocked(true);
@@ -113,9 +109,9 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
     }
 
     if (isCreditCardPayment) {
-      if (!redirectURL || processedRef.current) return;
+      if (!redirectURL || checkoutInfoPersistedRef.current) return;
 
-      processedRef.current = true;
+      checkoutInfoPersistedRef.current = true;
 
       persistCheckoutModalInfo({
         url: window.location.href,
@@ -135,7 +131,7 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
     onDialogBlocked(false);
     onPurchaseSuccess(paymentReferenceNumber);
   }, [
-    paymentState,
+    fullPaymentState,
     hasWaited,
     isCreditCardPayment,
     redirectURL,
@@ -144,6 +140,7 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
     onPurchaseError,
     onDialogBlocked,
     onPurchaseSuccess,
+    invoiceID,
   ]);
 
   useTimeout(() => {
