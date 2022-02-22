@@ -15,7 +15,7 @@ export const CheckoutItemCostBreakdown: React.FC<
   const { total, fees } = useCheckoutItemsCostTotal(checkoutItems);
 
   return (
-    <Stack sx={{ display: "flex", flex: 1, py: 5 }}>
+    <Stack sx={{ display: "flex", flex: 1 }}>
       <CheckoutItemList
         checkoutItems={checkoutItems}
         withSeparators

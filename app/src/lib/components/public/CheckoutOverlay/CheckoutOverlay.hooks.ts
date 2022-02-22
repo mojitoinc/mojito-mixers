@@ -59,6 +59,10 @@ export interface CheckoutModalStateReturn extends CheckoutModalState, PurchaseSt
   // PurchaseState (+ inherited stuff):
   setInvoiceID: (invoiceID: string | null) => void;
   setPaymentReferenceNumber: (paymentReferenceNumber: string) => void;
+
+  // Wallet delivery address:
+  personalWalletDeliveryAddress: string;
+  setPersonalWalletDeliveryAddress: Dispatch<SetStateAction<string>>;
 }
 
 export const CHECKOUT_STEPS: CheckoutModalStep[] = ["authentication", "billing", "payment", "purchasing", "confirmation"];
@@ -94,6 +98,8 @@ export function useCheckoutModalState({
     paymentReferenceNumber: "",
   });
 
+  const [personalWalletDeliveryAddress, setPersonalWalletDeliveryAddress] = useState<string | null>(null);
+
   const initModalState = useCallback(() => {
     // Make sure the progress tracker in BillingView and PaymentView is properly animated:
     resetStepperProgress();
@@ -127,6 +133,7 @@ export function useCheckoutModalState({
       paymentReferenceNumber: savedFlow.paymentReferenceNumber || "",
     });
 
+    setPersonalWalletDeliveryAddress(null);
   }, [startAt]);
 
   const goBack = useCallback(() => {
@@ -207,5 +214,9 @@ export function useCheckoutModalState({
     paymentReferenceNumber,
     setInvoiceID,
     setPaymentReferenceNumber,
+
+    // Wallet delivery address:
+    personalWalletDeliveryAddress,
+    setPersonalWalletDeliveryAddress,
   };
 }

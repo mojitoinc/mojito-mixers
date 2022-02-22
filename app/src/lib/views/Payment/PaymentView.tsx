@@ -1,6 +1,6 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { CheckoutItemCostBreakdown } from "../../components/payments/CheckoutItemCost/Breakdown/CheckoutItemCostBreakdown";
+import { CheckoutDeliveryAndItemCostBreakdown } from "../../components/payments/CheckoutDeliveryAndItemCostBreakdown/CheckoutDeliveryAndItemCostBreakdown";
 import { CheckoutStepper } from "../../components/payments/CheckoutStepper/CheckoutStepper";
 import { CheckoutItem } from "../../domain/product/product.interfaces";
 import React from "react";
@@ -22,10 +22,12 @@ export interface PaymentViewProps {
   checkoutItems: CheckoutItem[];
   savedPaymentMethods: SavedPaymentMethod[];
   selectedPaymentMethod: SelectedPaymentMethod;
+  personalWalletAddressForDelivery: string;
   checkoutError?: CheckoutModalError;
   onPaymentInfoSelected: (data: string | PaymentMethod) => void;
   onCvvSelected: (cvv: string) => void;
   onSavedPaymentMethodDeleted: (savedPaymentMethodId: string) => void;
+  onPersonalWalletDeliveryAddressChange: (personalWalletAddress: string) => void;
   onNext: () => void;
   onPrev: () => void;
   onClose: () => void;
@@ -41,10 +43,12 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
   checkoutItems,
   savedPaymentMethods: rawSavedPaymentMethods,
   selectedPaymentMethod,
+  personalWalletAddressForDelivery,
   checkoutError,
   onPaymentInfoSelected,
   onCvvSelected,
   onSavedPaymentMethodDeleted,
+  onPersonalWalletDeliveryAddressChange,
   onNext,
   onPrev,
   onClose,
@@ -169,7 +173,10 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
             debug={ debug } />
         ) }
       </Stack>
-      <CheckoutItemCostBreakdown checkoutItems={ checkoutItems } />
+      <CheckoutDeliveryAndItemCostBreakdown
+        checkoutItems={ checkoutItems }
+        personalWalletAddressForDelivery={ personalWalletAddressForDelivery }
+        onPersonalWalletAddressChange={ onPersonalWalletDeliveryAddressChange } />
     </Stack>
   );
 };

@@ -1,8 +1,9 @@
+import React, { useEffect } from "react";
+import { Stack } from "@mui/material";
 
 import { CheckoutItemCostBreakdown } from "../../components/payments/CheckoutItemCost/Breakdown/CheckoutItemCostBreakdown";
 import { CheckoutModalFooter } from "../../components/payments/CheckoutModalFooter/CheckoutModalFooter";
 import { CheckoutItem } from "../../domain/product/product.interfaces";
-import React, { useEffect } from "react";
 import { resetStepperProgress } from "../../components/payments/CheckoutStepper/CheckoutStepper";
 
 export interface AuthenticationViewProps {
@@ -25,7 +26,7 @@ export const AuthenticationView: React.FC<AuthenticationViewProps> = ({
     resetStepperProgress();
   }, []);
 
-  return (<>
+  return (<Stack sx={{ mt: 5 }}>
     <CheckoutItemCostBreakdown checkoutItems={ checkoutItems } />
 
     <CheckoutModalFooter
@@ -33,5 +34,5 @@ export const AuthenticationView: React.FC<AuthenticationViewProps> = ({
       guestCheckoutEnabled={ guestCheckoutEnabled }
       onSubmitClicked={ onGuestClicked }
       onCloseClicked={ onCloseClicked } />
-  </>);
+  </Stack>);
 };

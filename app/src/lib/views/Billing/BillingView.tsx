@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Stack } from "@mui/material";
 
-import { CheckoutItemCostBreakdown } from "../../components/payments/CheckoutItemCost/Breakdown/CheckoutItemCostBreakdown";
+import { CheckoutDeliveryAndItemCostBreakdown } from "../../components/payments/CheckoutDeliveryAndItemCostBreakdown/CheckoutDeliveryAndItemCostBreakdown";
 import { CheckoutStepper } from "../../components/payments/CheckoutStepper/CheckoutStepper";
 import { SavedBillingDetailsSelector } from "../../components/shared/SavedBillingDetailsSelector/SavedBillingDetailsSelector";
 import { SavedPaymentMethod } from "../../domain/circle/circle.interfaces";
@@ -16,9 +16,11 @@ export interface BillingViewProps {
   checkoutItems: CheckoutItem[];
   savedPaymentMethods: SavedPaymentMethod[];
   selectedBillingInfo: string | BillingInfo;
+  personalWalletAddressForDelivery: string;
   checkoutError?: CheckoutModalError;
   onBillingInfoSelected: (data: string | BillingInfo) => void;
   onSavedPaymentMethodDeleted: (savedPaymentMethodId: string) => Promise<void>;
+  onPersonalWalletDeliveryAddressChange: (personalWalletAddress: string) => void;
   onNext: () => void;
   onClose: () => void;
   debug?: boolean;
@@ -28,9 +30,11 @@ export const BillingView: React.FC<BillingViewProps> = ({
   checkoutItems,
   savedPaymentMethods: rawSavedPaymentMethods,
   selectedBillingInfo,
+  personalWalletAddressForDelivery,
   checkoutError,
   onBillingInfoSelected,
   onSavedPaymentMethodDeleted,
+  onPersonalWalletDeliveryAddressChange,
   onNext,
   onClose,
   debug,
@@ -123,7 +127,10 @@ export const BillingView: React.FC<BillingViewProps> = ({
               debug={ debug } />
           ) }
       </Stack>
-      <CheckoutItemCostBreakdown checkoutItems={ checkoutItems } />
+      <CheckoutDeliveryAndItemCostBreakdown
+        checkoutItems={ checkoutItems }
+        personalWalletAddressForDelivery={ personalWalletAddressForDelivery }
+        onPersonalWalletAddressChange={ onPersonalWalletDeliveryAddressChange } />
     </Stack>
   );
 };
