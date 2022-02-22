@@ -181,7 +181,10 @@ const App: React.FC<AppProps> = () => {
     errorImageSrc: "https://...",
     userFormat: "email",
     acceptedPaymentTypes: ["CreditCard", "ACH"],
-    purchaseInstructions: "Lorem ipsum...",
+    customTexts: {
+      wirePaymentsDisclaimer: <p>Lorem ipsum...</p>,
+      purchaseInstructions: <p>Lorem ipsum...</p>
+    },
 
     // Legal:
     consentType: "disclaimer",

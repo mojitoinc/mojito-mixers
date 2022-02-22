@@ -3,8 +3,34 @@ import { Container, Typography, Box, Stack, Button, FormControl, FormLabel, Radi
 import { useCallback, useEffect, useRef, useState } from "react";
 import { CheckoutModal, CheckoutModalError, CheckoutModalProps, continuePlaidOAuthFlow, PaymentType } from "../lib";
 import { useMeQuery } from "../services/graphql/generated";
-import { PLAYGROUND_PARAGRAPHS_ARRAY, PLAYGROUND_AUTH_PRESET, PLAYGROUND_NO_AUTH_PRESET, PLAYGROUND_PRIVACY_HREF, PLAYGROUND_PURCHASE_INSTRUCTIONS, PLAYGROUND_TERMS_OF_USE_HREF, PLAYGROUND_USER_FORMAT, PLAYGROUND_PURCHASING_IMAGE_SRC, PLAYGROUND_ERROR_IMAGE_SRC, PLAYGROUND_THEMES, PLAYGROUND_LOGOS_SRC, PLAYGROUND_LOGOS_SX, PLAYGROUND_MOCKED_LOT, PLAYGROUND_LOADER_IMAGE_SRC } from "../utils/playground/playground.constants";
+import { PLAYGROUND_PARAGRAPHS_ARRAY, PLAYGROUND_AUTH_PRESET, PLAYGROUND_NO_AUTH_PRESET, PLAYGROUND_PRIVACY_HREF, PLAYGROUND_TERMS_OF_USE_HREF, PLAYGROUND_USER_FORMAT, PLAYGROUND_PURCHASING_IMAGE_SRC, PLAYGROUND_ERROR_IMAGE_SRC, PLAYGROUND_THEMES, PLAYGROUND_LOGOS_SRC, PLAYGROUND_LOGOS_SX, PLAYGROUND_MOCKED_LOT, PLAYGROUND_LOADER_IMAGE_SRC } from "../utils/playground/playground.constants";
 import { PlaygroundFormData } from "../utils/playground/playground.interfaces";
+
+export const PLAYGROUND_WIRE_PAYMENTS_DISCLAIMER = (
+  <>
+    <p>
+      <span style={{ fontWeight: "500" }}>
+        Third-party wire transfers cannot be accepted.
+      </span>{" "}
+      Your bank account name needs to match with the name you used to register
+      in Marketplace.
+    </p>
+    <br />
+    <p>
+      Please note that wire transfers usually take{" "}
+      <span style={{ fontWeight: "500" }}>1-3 business days</span> to arrive. We
+      do not charge any deposit fee — however, your bank may charge you a wire
+      transfer fee.
+    </p>
+  </>
+);
+
+export const PLAYGROUND_PURCHASE_INSTRUCTIONS = (
+  <p>
+    Purchased instructions on how to claim item / how item will be delivered can
+    be placed here...
+  </p>
+);
 
 const DEFAULT_FORM_VALUES: PlaygroundFormData = {
   // Organization:
@@ -172,7 +198,10 @@ const HomePage = () => {
       formValues.paymentWire ? "Wire" : "",
       formValues.paymentCrypto ? "Crypto" : "",
     ].filter(Boolean) as PaymentType[],
-    purchaseInstructions: PLAYGROUND_PURCHASE_INSTRUCTIONS,
+    customTexts: {
+      wirePaymentsDisclaimer: PLAYGROUND_WIRE_PAYMENTS_DISCLAIMER,
+      purchaseInstructions: PLAYGROUND_PURCHASE_INSTRUCTIONS,
+    },
 
     // Legal:
     consentType: "disclaimer",

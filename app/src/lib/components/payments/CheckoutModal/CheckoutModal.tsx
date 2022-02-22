@@ -20,6 +20,7 @@ import { continuePlaidOAuthFlow, PlaidFlow } from "../../../hooks/usePlaid";
 import { ConsentType } from "../../shared/ConsentText/ConsentText";
 import { CheckoutModalError, useCheckoutModalState } from "./CheckoutModal.hooks";
 import { DEFAULT_ERROR_AT, ERROR_LOADING_PAYMENT_METHODS, ERROR_LOADING_USER } from "../../../domain/errors/errors.constants";
+import { CustomTextsKeys } from "../../../domain/customTexts/customTexts.interfaces";
 
 const SELECTOR_DIALOG_SCROLLABLE = "[role=presentation]";
 
@@ -44,7 +45,7 @@ export interface CheckoutModalProps {
   userFormat: UserFormat;
   acceptedPaymentTypes: PaymentType[];
   paymentLimits?: Partial<Record<PaymentType, number>>;
-  purchaseInstructions: string;
+  customTexts: Record<CustomTextsKeys, React.ReactNode>,
 
   // Legal:
   consentType?: ConsentType;
@@ -89,7 +90,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   userFormat,
   acceptedPaymentTypes,
   paymentLimits, // Not implemented yet. Used to show payment limits for some payment types.
-  purchaseInstructions,
+  customTexts,
 
   // Legal:
   consentType, // Not implemented yet. Used to let the app control where to log errors to (e.g. Sentry).
@@ -419,6 +420,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
         consentType={ consentType }
         privacyHref={ privacyHref }
         termsOfUseHref={ termsOfUseHref }
+        wirePaymentsDisclaimerText={ customTexts.wirePaymentsDisclaimer }
         debug={ debug } />
     );
   } else if (checkoutStep === "purchasing") {
@@ -447,7 +449,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
         savedPaymentMethods={ savedPaymentMethods }
         selectedPaymentMethod={ selectedPaymentMethod }
         paymentReferenceNumber={ paymentReferenceNumber }
-        purchaseInstructions={ purchaseInstructions }
+        purchaseInstructions={ customTexts.purchaseInstructions }
         onNext={ onClose }
         onClose={ onClose } />
     );
