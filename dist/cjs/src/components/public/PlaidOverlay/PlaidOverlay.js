@@ -16,7 +16,7 @@ const PUIPlaidOverlay = ({ onRedirect, }) => {
     }, [continueOAuthFlow, onRedirect, url]);
     return null;
 };
-const PUIPlaid = ProvidersInjector.withProviders(PUIPlaidOverlay);
+const PUIPlaid = ProvidersInjector.withThemeProvider(PUIPlaidOverlay);
 
 exports.PUIPlaid = PUIPlaid;
 exports.PUIPlaidOverlay = PUIPlaidOverlay;

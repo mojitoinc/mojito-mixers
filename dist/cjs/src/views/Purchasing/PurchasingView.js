@@ -69,7 +69,6 @@ const PurchasingView = ({ purchasingImageSrc, purchasingMessages: customPurchasi
         if (!hasWaited)
             return;
         if (paymentStatus === "error" || paymentError) {
-            onDialogBlocked(false);
             onPurchaseError(paymentError || errors_constants.ERROR_PURCHASE());
             return;
         }
@@ -87,7 +86,6 @@ const PurchasingView = ({ purchasingImageSrc, purchasingMessages: customPurchasi
             location.href = redirectURL;
             return;
         }
-        onDialogBlocked(false);
         onPurchaseSuccess(paymentReferenceNumber);
     }, [
         fullPaymentState,

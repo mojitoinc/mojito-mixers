@@ -18,9 +18,18 @@ const centeredSx = {
     justifyContent: "center",
     alignItems: "center",
 };
+const SELECTOR_DIALOG_SCROLLABLE = "[role=presentation]";
 const FullScreenOverlay = (_a) => {
-    var { open = true, onClose, isDialogBlocked, dialogRootRef, header, children } = _a, variantProps = tslib_es6.__rest(_a, ["open", "onClose", "isDialogBlocked", "dialogRootRef", "header", "children"]);
+    var { open = true, onClose, isDialogBlocked, contentKey, header, children } = _a, variantProps = tslib_es6.__rest(_a, ["open", "onClose", "isDialogBlocked", "contentKey", "header", "children"]);
+    const dialogRootRef = React.useRef(null);
     const paperRef = React.useRef(null);
+    // Scroll to top on step change:
+    React.useEffect(() => {
+        var _a;
+        const dialogScrollable = (_a = dialogRootRef.current) === null || _a === void 0 ? void 0 : _a.querySelector(SELECTOR_DIALOG_SCROLLABLE);
+        if (contentKey && dialogScrollable)
+            dialogScrollable.scrollTop = 0;
+    }, [contentKey]);
     const [shakeSx, shake] = animationUtils.useShakeAnimation(paperRef.current);
     return (React__default["default"].createElement(material.Dialog, { open: isDialogBlocked ? true : open, onClose: isDialogBlocked ? shake : onClose, "aria-labelledby": "checkout-modal-header-title", scroll: "body", ref: dialogRootRef, PaperProps: { sx: shakeSx, ref: paperRef }, 
         // Dialog only:

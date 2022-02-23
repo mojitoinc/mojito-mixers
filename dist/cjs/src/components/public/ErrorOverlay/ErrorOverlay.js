@@ -47,7 +47,7 @@ const PUIErrorOverlay = (_a) => {
     return (React__default["default"].createElement(FullScreenOverlay.FullScreenOverlay, Object.assign({ centered: true, header: headerElement }, fullScreenOverlayProps),
         React__default["default"].createElement(ErrorView.ErrorView, { checkoutError: { errorMessage: "Error creating payment method." }, errorImageSrc: errorImageSrc, onFixError: reviewData, onClose: toMarketplace })));
 };
-const PUIError = ProvidersInjector.withProviders(PUIErrorOverlay);
+const PUIError = ProvidersInjector.withThemeProvider(PUIErrorOverlay);
 
 exports.PUIError = PUIError;
 exports.PUIErrorOverlay = PUIErrorOverlay;
