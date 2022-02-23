@@ -1,4 +1,4 @@
-var propTypes = {exports: {}};
+var reactIs = {exports: {}};
 
-export { propTypes as p };
+export { reactIs as r };
 //# sourceMappingURL=index3.js.map

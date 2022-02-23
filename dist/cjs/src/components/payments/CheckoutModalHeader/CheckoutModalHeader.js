@@ -40,12 +40,14 @@ const CheckoutModalHeader = ({ variant, title: customTitle, logoSrc, logoSx, use
             React__default["default"].createElement(material.Box, { component: "img", src: logoSrc, sx: Object.assign({ maxHeight: "32px", maxWidth: { xs: "180px", sm: "240px" } }, logoSx) })),
         React__default["default"].createElement(material.Divider, null),
         showControls ? (React__default["default"].createElement(React__default["default"].Fragment, null,
-            React__default["default"].createElement(material.Stack, { spacing: 2, direction: "row", sx: { justifyContent: "space-between", alignItems: "center", py: 2 } }, variant === "anonymous" ? (React__default["default"].createElement(React__default["default"].Fragment, null,
-                React__default["default"].createElement(material.Typography, { sx: { fontWeight: "500" } }, "Already have an account?"),
-                React__default["default"].createElement(PrimaryButton.PrimaryButton, { onClick: onLoginClicked }, "Log in"))) : (React__default["default"].createElement(React__default["default"].Fragment, null,
-                React__default["default"].createElement(OutlinedSecondaryButton.OutlinedSecondaryButton, { onClick: onPrevClicked },
-                    React__default["default"].createElement(ChevronLeft["default"], null)),
-                React__default["default"].createElement(material.Typography, { sx: { fontWeight: "500", minHeight: 40, display: "flex", alignItems: "center" } }, displayUsername)))),
+            React__default["default"].createElement(material.Stack, { spacing: 2, direction: "row", sx: { justifyContent: "space-between", alignItems: "center", py: 2 } },
+                (variant === "anonymous" && onLoginClicked) ? (React__default["default"].createElement(React__default["default"].Fragment, null,
+                    React__default["default"].createElement(material.Typography, { sx: { fontWeight: "500" } }, "Already have an account?"),
+                    React__default["default"].createElement(PrimaryButton.PrimaryButton, { onClick: onLoginClicked }, "Log in"))) : null,
+                (variant !== "anonymous" && onPrevClicked && displayUsername) ? (React__default["default"].createElement(React__default["default"].Fragment, null,
+                    React__default["default"].createElement(OutlinedSecondaryButton.OutlinedSecondaryButton, { onClick: onPrevClicked },
+                        React__default["default"].createElement(ChevronLeft["default"], null)),
+                    React__default["default"].createElement(material.Typography, { sx: { fontWeight: "500", minHeight: 40, display: "flex", alignItems: "center" } }, displayUsername))) : null),
             React__default["default"].createElement(material.Divider, null))) : null));
 };
 

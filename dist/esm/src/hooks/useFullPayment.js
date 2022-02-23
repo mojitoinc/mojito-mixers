@@ -1,14 +1,14 @@
 import { __awaiter } from '../../node_modules/tslib/tslib.es6.js';
 import { useState, useCallback } from 'react';
 import { savedPaymentMethodToBillingInfo, parseCircleError } from '../domain/circle/circle.utils.js';
-import { ERROR_PURCHASE_NO_ITEMS, ERROR_PURCHASE_NO_UNITS, ERROR_PURCHASE_LOADING_ITEMS, ERROR_PURCHASE_SELECTED_PAYMENT_METHOD, ERROR_PURCHASE_CREATING_PAYMENT_METHOD, ERROR_PURCHASE_CREATING_INVOICE, ERROR_PURCHASE_CVV, ERROR_PURCHASE_PAYING } from '../domain/errors/errors.constants.js';
-import { useCreateAuctionInvoiceMutation, useCreateBuyNowInvoiceMutation, useCreatePaymentMutation } from '../queries/graphqlGenerated.js';
+import { ERROR_PURCHASE_NO_ITEMS, ERROR_PURCHASE_SELECTED_PAYMENT_METHOD, ERROR_PURCHASE_CREATING_PAYMENT_METHOD, ERROR_PURCHASE_CVV, ERROR_PURCHASE_PAYING } from '../domain/errors/errors.constants.js';
+import { useCreatePaymentMutation } from '../queries/graphqlGenerated.js';
 import { wait } from '../utils/promiseUtils.js';
 import { useCreatePaymentMethod } from './useCreatePaymentMethod.js';
 import { useEncryptCardData } from './useEncryptCard.js';
 
 const CIRCLE_MAX_EXPECTED_PAYMENT_CREATION_PROCESSING_TIME = 5000;
-function useFullPayment({ orgID, invoiceID: existingInvoiceID = "", checkoutItems, savedPaymentMethods, selectedPaymentMethod, debug = false, }) {
+function useFullPayment({ orgID, invoiceID, savedPaymentMethods, selectedPaymentMethod, debug = false, }) {
     const [paymentState, setPaymentState] = useState({
         paymentStatus: "processing",
         paymentReferenceNumber: "",
@@ -22,11 +22,9 @@ function useFullPayment({ orgID, invoiceID: existingInvoiceID = "", checkoutItem
     }, []);
     const [encryptCardData] = useEncryptCardData();
     const [createPaymentMethod] = useCreatePaymentMethod();
-    const [createAuctionInvoice] = useCreateAuctionInvoiceMutation();
-    const [createBuyNowInvoice] = useCreateBuyNowInvoiceMutation();
     const [makePayment] = useCreatePaymentMutation();
     const fullPayment = useCallback(() => __awaiter(this, void 0, void 0, function* () {
-        var _a, _b, _c, _d, _e, _f, _g, _h, _j;
+        var _a, _b, _c, _d;
         const { billingInfo: selectedBillingInfo, paymentInfo: selectedPaymentInfo, } = selectedPaymentMethod;
         let cvv = "";
         if (typeof selectedPaymentInfo === "string") {
@@ -35,24 +33,13 @@ function useFullPayment({ orgID, invoiceID: existingInvoiceID = "", checkoutItem
         else if (selectedPaymentInfo.type === "CreditCard") {
             cvv = selectedPaymentInfo.secureCode;
         }
-        // TODO: Quick fix. The UI can currently display multiple items with multiple units each, but will only purchase the
-        // selected amount (can be multiple units) of the first item:
-        const { lotID, lotType, units, } = checkoutItems[0];
         if (debug) {
-            console.log(checkoutItems[0]
-                ? `\n💵 Making payment for ${units} × ${lotType} lot${units > 1 ? "s" : ""}  ${lotID} (orgID = ${orgID})...\n`
-                : `\n💵 Making payment for unknown lot (orgID = ${orgID})...\n`);
+            console.log(invoiceID
+                ? `\n💵 Making payment for invoice ${invoiceID} (orgID = ${orgID})...\n`
+                : `\n💵 Aborting payment for unknown invoice (orgID = ${orgID})...\n`);
         }
-        if (checkoutItems.length === 0) {
+        if (!invoiceID) {
             setError(ERROR_PURCHASE_NO_ITEMS());
-            return;
-        }
-        if (!units) {
-            setError(ERROR_PURCHASE_NO_UNITS());
-            return;
-        }
-        if (!lotID || !lotType) {
-            setError(ERROR_PURCHASE_LOADING_ITEMS());
             return;
         }
         setPaymentState({
@@ -60,7 +47,6 @@ function useFullPayment({ orgID, invoiceID: existingInvoiceID = "", checkoutItem
             paymentReferenceNumber: "",
         });
         let paymentMethodID = "";
-        let invoiceID = existingInvoiceID;
         let circlePaymentID = "";
         let mutationError;
         let circleFieldErrors;
@@ -117,71 +103,12 @@ function useFullPayment({ orgID, invoiceID: existingInvoiceID = "", checkoutItem
             return;
         }
         if (debug) {
-            console.log("  🧾 createAuctionInvoice", {
-                orgID,
-                lotID,
-            });
-        }
-        /*
-        if (lotType === "auction" && !invoiceID) {
-          setPaymentState({
-            paymentStatus: "error",
-            paymentReferenceNumber: "",
-            paymentError: "Missing auction invoice.",
-          });
-    
-          return;
-        }
-        */
-        if (!invoiceID) {
-            if (lotType === "auction") {
-                const createAuctionInvoiceResult = yield createAuctionInvoice({
-                    variables: {
-                        orgID,
-                        lotID,
-                    },
-                }).catch((error) => {
-                    mutationError = error;
-                    if (debug)
-                        console.log("    🔴 createAuctionInvoice error", error);
-                });
-                if (createAuctionInvoiceResult && !createAuctionInvoiceResult.errors) {
-                    if (debug)
-                        console.log("    🟢 createAuctionInvoice result", createAuctionInvoiceResult);
-                    invoiceID = (_d = (_c = createAuctionInvoiceResult.data) === null || _c === void 0 ? void 0 : _c.createAuctionLotInvoice) === null || _d === void 0 ? void 0 : _d.invoiceID;
-                }
-            }
-            else if (lotType === "buyNow") {
-                const createBuyNowInvoiceResult = yield createBuyNowInvoice({
-                    variables: {
-                        input: {
-                            itemCount: units,
-                            marketplaceBuyNowLotID: lotID,
-                        },
-                    },
-                }).catch((error) => {
-                    mutationError = error;
-                    if (debug)
-                        console.log("    🔴 createBuyNowInvoice error", error);
-                });
-                if (createBuyNowInvoiceResult && !createBuyNowInvoiceResult.errors) {
-                    if (debug)
-                        console.log("    🟢 createBuyNowInvoice result", createBuyNowInvoiceResult);
-                    invoiceID = (_g = (_f = (_e = createBuyNowInvoiceResult.data) === null || _e === void 0 ? void 0 : _e.purchaseMarketplaceBuyNowLot) === null || _f === void 0 ? void 0 : _f.invoice) === null || _g === void 0 ? void 0 : _g.invoiceID;
-                }
-            }
-        }
-        if (!invoiceID) {
-            setError(ERROR_PURCHASE_CREATING_INVOICE(mutationError));
-            return;
-        }
-        if (debug) {
             console.log("  💸 makePayment", {
                 paymentMethodID,
                 invoiceID,
             });
         }
-        let metadata = null;
+        let metadata;
         if (cvv) {
             const encryptCardDataResult = yield encryptCardData({
                 cvv,
@@ -221,7 +148,7 @@ function useFullPayment({ orgID, invoiceID: existingInvoiceID = "", checkoutItem
         if (makePaymentResult && !makePaymentResult.errors) {
             if (debug)
                 console.log("    🟢 makePayment result", makePaymentResult);
-            circlePaymentID = ((_j = (_h = makePaymentResult.data) === null || _h === void 0 ? void 0 : _h.createPayment) === null || _j === void 0 ? void 0 : _j.circlePaymentID) || "";
+            circlePaymentID = ((_d = (_c = makePaymentResult.data) === null || _c === void 0 ? void 0 : _c.createPayment) === null || _d === void 0 ? void 0 : _d.circlePaymentID) || "";
         }
         if (!circlePaymentID) {
             setError(ERROR_PURCHASE_PAYING(mutationError));
@@ -233,18 +160,15 @@ function useFullPayment({ orgID, invoiceID: existingInvoiceID = "", checkoutItem
             paymentReferenceNumber: circlePaymentID,
         });
     }), [
-        checkoutItems,
-        createAuctionInvoice,
-        createBuyNowInvoice,
-        createPaymentMethod,
-        debug,
-        encryptCardData,
-        existingInvoiceID,
-        makePayment,
         orgID,
+        invoiceID,
         savedPaymentMethods,
         selectedPaymentMethod,
+        debug,
         setError,
+        encryptCardData,
+        createPaymentMethod,
+        makePayment,
     ]);
     return [paymentState, fullPayment];
 }

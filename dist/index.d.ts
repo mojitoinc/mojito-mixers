@@ -2,11 +2,30 @@
 import React from 'react';
 import { Theme, ThemeOptions, SxProps } from '@mui/material/styles';
 export { Theme as CheckoutModalTheme, ThemeOptions as CheckoutModalThemeOptions, ThemeProvider as CheckoutModalThemeProvider } from '@mui/material/styles';
-import { ApolloError } from '@apollo/client';
+import { ApolloError, ApolloClient, NormalizedCacheObject } from '@apollo/client';
 
 declare type UserFormat = "username" | "email" | "name";
 
 declare type PaymentType = "CreditCard" | "ACH" | "Wire" | "Crypto";
+declare type CreditCard = {
+    type: "CreditCard";
+    cardNumber: string;
+    expiryDate: string;
+    secureCode: string;
+    nameOnCard: string;
+};
+declare type AchAccount = {
+    type: "ACH";
+    accountId: string;
+    publicToken: string;
+};
+declare type WireAccount = {
+    type: "Wire";
+};
+declare type CryptoAddress = {
+    type: "Crypto";
+};
+declare type PaymentMethod = CreditCard | AchAccount | WireAccount | CryptoAddress;
 
 declare type LotType = "auction" | "buyNow";
 interface CheckoutItem {
@@ -65,8 +84,21 @@ interface CheckoutModalError {
     circleFieldErrors?: CircleFieldErrors;
     errorMessage: string;
 }
+declare type CheckoutModalStep = "authentication" | "billing" | "payment" | "purchasing" | "confirmation" | "error";
 
-interface CheckoutModalProps {
+interface AuthorizedApolloProviderProps {
+    apolloClient?: ApolloClient<NormalizedCacheObject>;
+    uri?: string;
+}
+
+interface ProviderInjectorProps extends AuthorizedApolloProviderProps {
+    theme?: Theme;
+    themeOptions?: ThemeOptions;
+}
+
+declare type CustomTextsKeys = 'wirePaymentsDisclaimer' | 'purchaseInstructions';
+
+interface PUICheckoutOverlayProps {
     open: boolean;
     onClose: () => void;
     guestCheckoutEnabled?: boolean;
@@ -82,7 +114,7 @@ interface CheckoutModalProps {
     userFormat: UserFormat;
     acceptedPaymentTypes: PaymentType[];
     paymentLimits?: Partial<Record<PaymentType, number>>;
-    purchaseInstructions: string;
+    customTexts: Record<CustomTextsKeys, React.ReactFragment[]>;
     consentType?: ConsentType;
     privacyHref?: string;
     termsOfUseHref?: string;
@@ -96,30 +128,77 @@ interface CheckoutModalProps {
     onError?: (error: CheckoutModalError) => void;
     onMarketingOptInChange?: (marketingOptIn: boolean) => void;
 }
-declare const CheckoutModal: React.FC<CheckoutModalProps>;
+declare type PUICheckoutProps = PUICheckoutOverlayProps & ProviderInjectorProps;
+declare const PUICheckout: React.FC<PUICheckoutProps>;
+
+interface FullScreenOverlayFunctionalProps {
+    open?: boolean;
+    onClose?: () => void;
+    isDialogBlocked?: boolean;
+    dialogRootRef?: React.RefObject<HTMLDivElement>;
+}
+
+interface PUISuccessOverlayProps extends FullScreenOverlayFunctionalProps {
+    logoSrc?: string;
+    logoSx?: SxProps<Theme>;
+    successImageSrc: string;
+    onRedirect: (pathnameOrUrl: string) => void;
+}
+declare type PUISuccessProps = PUISuccessOverlayProps & ProviderInjectorProps;
+declare const PUISuccess: React.FC<PUISuccessProps>;
+
+interface PUIErrorOverlayProps extends FullScreenOverlayFunctionalProps {
+    logoSrc?: string;
+    logoSx?: SxProps<Theme>;
+    errorImageSrc: string;
+    onRedirect: (pathnameOrUrl: string) => void;
+}
+declare type PUIErrorProps = PUIErrorOverlayProps & ProviderInjectorProps;
+declare const PUIError: React.FC<PUIErrorProps>;
 
 declare const MOJITO_LIGHT_THEME: Theme;
 declare const MOJITO_DARK_THEME: Theme;
 
 interface PlaidInfo {
-    url: string;
+    url?: string;
     linkToken: string;
     selectedBillingInfo: string | BillingInfo;
+    timestamp?: number;
 }
-declare function persistPlaidReceivedRedirectUri(receivedRedirectUri: string): void;
 interface PlaidOAuthFlowState extends PlaidInfo {
     receivedRedirectUri?: string;
     continueOAuthFlow: boolean;
     savedStateUsed: boolean;
 }
+declare function persistPlaidReceivedRedirectUri(receivedRedirectUri: string): void;
 declare function getPlaidOAuthFlowState(): PlaidOAuthFlowState;
 
-declare let INITIAL_PLAID_OAUTH_FLOW_STATE: PlaidOAuthFlowState;
 declare function continuePlaidOAuthFlow(): boolean;
 
-interface AuthorizedApolloProviderProps {
-    uri: string;
+interface CheckoutModalInfo {
+    url?: string;
+    invoiceID: string;
+    paymentReferenceNumber: string;
+    billingInfo: string | BillingInfo;
+    paymentInfo: string | PaymentMethod;
+    timestamp?: number;
 }
-declare const AuthorizedApolloProvider: React.FC<AuthorizedApolloProviderProps>;
+interface CheckoutModalState3DS extends CheckoutModalInfo {
+    receivedRedirectUri?: string;
+    continue3DSFlow: boolean;
+    purchaseSuccess: boolean;
+    purchaseError: boolean;
+    savedStateUsed: boolean;
+}
+declare function continueCheckout(noClear?: boolean): [boolean, CheckoutModalState3DS];
+interface ContinueFlowsReturn {
+    checkoutStep: CheckoutModalStep | "";
+    checkoutError?: CheckoutModalError;
+    invoiceID: string;
+    billingInfo: string | BillingInfo;
+    paymentInfo: string | PaymentMethod;
+    paymentReferenceNumber: string;
+}
+declare function continueFlows(noClear?: boolean): ContinueFlowsReturn;
 
-export { AuthorizedApolloProvider, CheckoutItem, CheckoutModal, CheckoutModalError, CheckoutModalErrorAt, CheckoutModalProps, CircleFieldErrorAt, CircleFieldErrors, INITIAL_PLAID_OAUTH_FLOW_STATE, MOJITO_DARK_THEME, MOJITO_LIGHT_THEME, PaymentType, UserFormat, continuePlaidOAuthFlow, getPlaidOAuthFlowState, persistPlaidReceivedRedirectUri };
+export { CheckoutItem, CheckoutModalError, CheckoutModalErrorAt, CircleFieldErrorAt, CircleFieldErrors, MOJITO_DARK_THEME, MOJITO_LIGHT_THEME, PUICheckout, PUICheckoutProps, PUIError, PUIErrorProps, PUISuccess, PUISuccessProps, PaymentType, UserFormat, continueCheckout, continueFlows, continuePlaidOAuthFlow, getPlaidOAuthFlowState, persistPlaidReceivedRedirectUri };

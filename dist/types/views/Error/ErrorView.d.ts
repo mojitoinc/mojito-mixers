@@ -1,5 +1,5 @@
 import React from "react";
-import { CheckoutModalError } from "../../components/payments/CheckoutModal/CheckoutModal.hooks";
+import { CheckoutModalError } from "../../components/public/CheckoutOverlay/CheckoutOverlay.hooks";
 export interface ErrorViewProps {
     checkoutError: CheckoutModalError;
     errorImageSrc?: string;

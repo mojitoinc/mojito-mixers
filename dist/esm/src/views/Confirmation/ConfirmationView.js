@@ -5,7 +5,7 @@ import { PurchaseConfirmationBillingDetails } from '../../components/payments/Pu
 import { PurchaseConfirmationItemDetails } from '../../components/payments/PurchaseConfirmationItemDetails/PurchaseConfirmationItemDetails.js';
 import { billingInfoToSavedPaymentMethodBillingInfo } from '../../domain/circle/circle.utils.js';
 
-const ConfirmationView = ({ checkoutItems, savedPaymentMethods, selectedPaymentMethod, paymentReferenceNumber, purchaseInstructions, onNext, onClose, }) => {
+const ConfirmationView = ({ checkoutItems, savedPaymentMethods, selectedPaymentMethod, paymentReferenceNumber, purchaseInstructions, onNext, }) => {
     const { billingInfo: selectedBillingInfo, paymentInfo: selectedPaymentInfo, } = selectedPaymentMethod;
     const { selectedPaymentMethodBillingInfo, selectedPaymentMethodPaymentInfo, } = useMemo(() => {
         if (typeof selectedPaymentInfo === "string") {

@@ -1,3 +1,4 @@
+/// <reference types="react" />
 import { SvgIconProps, Theme } from "@mui/material";
 import { SxProps } from "@mui/system";
 export declare const CREDIT_CARD_ICON_SX: SxProps<Theme>;

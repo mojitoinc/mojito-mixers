@@ -51,6 +51,13 @@ var MarketCollectionStatus;
     MarketCollectionStatus["Archived"] = "Archived";
     MarketCollectionStatus["Inactive"] = "Inactive";
 })(MarketCollectionStatus || (MarketCollectionStatus = {}));
+var MarketplaceCollectionItemStatus;
+(function (MarketplaceCollectionItemStatus) {
+    MarketplaceCollectionItemStatus["Active"] = "Active";
+    MarketplaceCollectionItemStatus["Completed"] = "Completed";
+    MarketplaceCollectionItemStatus["Hidden"] = "Hidden";
+    MarketplaceCollectionItemStatus["Preview"] = "Preview";
+})(MarketplaceCollectionItemStatus || (MarketplaceCollectionItemStatus = {}));
 var MarketplaceSaleType;
 (function (MarketplaceSaleType) {
     MarketplaceSaleType["Auction"] = "Auction";
@@ -96,43 +103,35 @@ var WalletTxType;
     WalletTxType["MojitoHotWallet"] = "MojitoHotWallet";
     WalletTxType["Multisig"] = "Multisig";
 })(WalletTxType || (WalletTxType = {}));
-const MeDocument = gql `
-    query Me {
-  me {
-    id
-    user {
-      id
-      username
-      name
-      email
-    }
-    userOrgs {
-      organization {
-        id
-        name
+const GetPaymentNotificationDocument = gql `
+    query GetPaymentNotification {
+  getPaymentNotification {
+    message {
+      ... on PaymentNotification3DSMessage {
+        redirectURL
       }
     }
   }
 }
     `;
 /**
- * __useMeQuery__
+ * __useGetPaymentNotificationQuery__
  *
- * To run a query within a React component, call `useMeQuery` and pass it any options that fit your needs.
- * When your component renders, `useMeQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useGetPaymentNotificationQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetPaymentNotificationQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useMeQuery({
+ * const { data, loading, error } = useGetPaymentNotificationQuery({
  *   variables: {
  *   },
  * });
  */
-function useMeQuery(baseOptions) {
+function useGetPaymentNotificationQuery(baseOptions) {
     const options = Object.assign(Object.assign({}, defaultOptions), baseOptions);
-    return Apollo.useQuery(MeDocument, options);
+    return Apollo.useQuery(GetPaymentNotificationDocument, options);
 }
 const CreatePaymentDocument = gql `
     mutation CreatePayment($paymentMethodID: UUID1!, $invoiceID: UUID1!, $metadata: CreatePaymentMetadataInput) {
@@ -239,6 +238,77 @@ const CreateBuyNowInvoiceDocument = gql `
 function useCreateBuyNowInvoiceMutation(baseOptions) {
     const options = Object.assign(Object.assign({}, defaultOptions), baseOptions);
     return Apollo.useMutation(CreateBuyNowInvoiceDocument, options);
+}
+const GetInvoiceDetailsDocument = gql `
+    query GetInvoiceDetails($invoiceID: UUID1!, $orgID: UUID1!) {
+  getInvoiceDetails(invoiceID: $invoiceID, orgID: $orgID) {
+    items {
+      collectionItemID
+      collectionItemTitle
+      units
+      unitPrice
+    }
+  }
+}
+    `;
+/**
+ * __useGetInvoiceDetailsQuery__
+ *
+ * To run a query within a React component, call `useGetInvoiceDetailsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetInvoiceDetailsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetInvoiceDetailsQuery({
+ *   variables: {
+ *      invoiceID: // value for 'invoiceID'
+ *      orgID: // value for 'orgID'
+ *   },
+ * });
+ */
+function useGetInvoiceDetailsQuery(baseOptions) {
+    const options = Object.assign(Object.assign({}, defaultOptions), baseOptions);
+    return Apollo.useQuery(GetInvoiceDetailsDocument, options);
+}
+const MeDocument = gql `
+    query Me {
+  me {
+    id
+    user {
+      id
+      username
+      name
+      email
+    }
+    userOrgs {
+      organization {
+        id
+        name
+      }
+    }
+  }
+}
+    `;
+/**
+ * __useMeQuery__
+ *
+ * To run a query within a React component, call `useMeQuery` and pass it any options that fit your needs.
+ * When your component renders, `useMeQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useMeQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+function useMeQuery(baseOptions) {
+    const options = Object.assign(Object.assign({}, defaultOptions), baseOptions);
+    return Apollo.useQuery(MeDocument, options);
 }
 const PaymentKeyDocument = gql `
     query PaymentKey {
@@ -413,5 +483,5 @@ function usePreparePaymentMethodQuery(baseOptions) {
     return Apollo.useQuery(PreparePaymentMethodDocument, options);
 }
 
-export { AuctionBidOrder, AuctionLotStatus, CollectionType, ContractType, CreateAuctionInvoiceDocument, CreateBuyNowInvoiceDocument, CreatePaymentDocument, CreatePaymentMethodDocument, DeletePaymentMethodDocument, ExtensionType, GetPaymentMethodListDocument, InvoiceStatus, KycStatus, MarketCollectionStatus, MarketplaceSaleType, MeDocument, PaymentKeyDocument, PaymentStatus, PaymentType, PreparePaymentMethodDocument, Role, TransactionStatus, TransactionType, WalletParentType, WalletTxType, useCreateAuctionInvoiceMutation, useCreateBuyNowInvoiceMutation, useCreatePaymentMethodMutation, useCreatePaymentMutation, useDeletePaymentMethodMutation, useGetPaymentMethodListQuery, useMeQuery, usePaymentKeyLazyQuery, usePreparePaymentMethodQuery };
+export { AuctionBidOrder, AuctionLotStatus, CollectionType, ContractType, CreateAuctionInvoiceDocument, CreateBuyNowInvoiceDocument, CreatePaymentDocument, CreatePaymentMethodDocument, DeletePaymentMethodDocument, ExtensionType, GetInvoiceDetailsDocument, GetPaymentMethodListDocument, GetPaymentNotificationDocument, InvoiceStatus, KycStatus, MarketCollectionStatus, MarketplaceCollectionItemStatus, MarketplaceSaleType, MeDocument, PaymentKeyDocument, PaymentStatus, PaymentType, PreparePaymentMethodDocument, Role, TransactionStatus, TransactionType, WalletParentType, WalletTxType, useCreateAuctionInvoiceMutation, useCreateBuyNowInvoiceMutation, useCreatePaymentMethodMutation, useCreatePaymentMutation, useDeletePaymentMethodMutation, useGetInvoiceDetailsQuery, useGetPaymentMethodListQuery, useGetPaymentNotificationQuery, useMeQuery, usePaymentKeyLazyQuery, usePreparePaymentMethodQuery };
 //# sourceMappingURL=graphqlGenerated.js.map

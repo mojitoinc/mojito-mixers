@@ -52,7 +52,7 @@ function usePlaid(options) {
         if (eventName !== "ERROR")
             return;
         // When an error happens in Plaid (can be simulated in the first screen of the test banks), users are given an option
-        // to retry. When clicking it, an "ERROR" event will be triggered, and we ned to use this to mark the persisted Plaid
+        // to retry. When clicking it, an "ERROR" event will be triggered, and we need to use this to mark the persisted Plaid
         // OAuth state as not used so that it is not deleted when we come back from this new attempt:
         persistPlaidOAuthStateUsed(false);
     }, []);
@@ -85,7 +85,6 @@ function usePlaid(options) {
             return;
         console.log("Open plain link manually", linkToken);
         persistPlaidInfo({
-            url: window.location.pathname,
             linkToken,
             selectedBillingInfo,
         });

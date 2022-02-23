@@ -282,6 +282,15 @@ function createComponentsTheme({ typography, palette, spacing, breakpoints }) {
                 },
             },
         },
+        MuiDialogContent: {
+            styleOverrides: {
+                root: {
+                    minHeight: "100vh",
+                    display: "flex",
+                    flexDirection: "column",
+                },
+            },
+        },
         // DIALOG LOADER:
         MuiCircularProgress: {
             styleOverrides: {

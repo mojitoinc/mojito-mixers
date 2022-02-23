@@ -12,22 +12,22 @@ function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'defau
 
 var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 
-const AuthorizedApolloProvider = ({ uri, children, }) => {
+const cache = new Apollo.InMemoryCache();
+const AuthorizedApolloProvider = ({ apolloClient: parentApolloClient, uri, children, }) => {
     const { getIdTokenClaims } = auth0React.useAuth0();
-    const httpLink = Apollo.createHttpLink({
-        uri: uri,
-    });
-    const authLink = index.setContext((_, { headers }) => tslib_es6.__awaiter(void 0, void 0, void 0, function* () {
-        const token = yield getIdTokenClaims();
-        return {
-            headers: token ? Object.assign(Object.assign({}, headers), { authorization: `Bearer ${token.__raw}` }) : headers,
-        };
-    }));
-    const apolloClient = new Apollo.ApolloClient({
-        link: authLink.concat(httpLink),
-        uri: uri,
-        cache: new Apollo.InMemoryCache(),
-    });
+    const apolloClient = React.useMemo(() => {
+        if (parentApolloClient)
+            return parentApolloClient;
+        const httpLink = Apollo.createHttpLink({ uri });
+        const authLink = index.setContext((_, { headers }) => tslib_es6.__awaiter(void 0, void 0, void 0, function* () {
+            const token = yield getIdTokenClaims();
+            return {
+                headers: Object.assign(Object.assign({}, headers), { authorization: token ? `Bearer ${token.__raw}` : "" }),
+            };
+        }));
+        const link = authLink.concat(httpLink);
+        return new Apollo.ApolloClient({ uri, link, cache });
+    }, [parentApolloClient, uri, getIdTokenClaims]);
     return React__default["default"].createElement(Apollo.ApolloProvider, { client: apolloClient }, children);
 };
 
