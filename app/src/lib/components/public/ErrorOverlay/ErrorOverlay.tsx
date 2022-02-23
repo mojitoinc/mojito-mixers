@@ -1,5 +1,6 @@
 import { SxProps, Theme } from "@mui/material/styles";
 import React, { useCallback, useLayoutEffect } from "react";
+import { isUrlPathname, getUrlWithSearchParams } from "../../../domain/url/url.utils";
 import { ErrorView } from "../../../views/Error/ErrorView";
 import { CheckoutModalHeader } from "../../payments/CheckoutModalHeader/CheckoutModalHeader";
 import { FullScreenOverlay, FullScreenOverlayFunctionalProps } from "../../shared/FullScreenOverlay/FullScreenOverlay";
@@ -33,12 +34,12 @@ export const PUIErrorOverlay: React.FC<PUIErrorOverlayProps> = ({
   const reviewData = useCallback(async (): Promise<false> => {
     if (!purchaseError) return;
 
-    const isPathname = !url.startsWith("http");
+    const isPathname = isUrlPathname(url);
 
     if (isPathname) persistReceivedRedirectUri3DS(window.location.href);
 
     // If there was an error, users can click the review button and go back to the Payment UI to review the data...:
-    onRedirect(`${ url || "/" }${ isPathname ? "" : window.location.search }`);
+    onRedirect(isPathname ? url : getUrlWithSearchParams(url));
 
     return false;
   }, [purchaseError, onRedirect, url]);

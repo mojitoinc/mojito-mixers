@@ -11,5 +11,15 @@ export function urlToPathnameWhenPossible(url: string): string {
 
   const { origin } = window.location;
 
-  return url.startsWith(origin) ? url.replace(origin, "") : url;
+  return (url.startsWith(origin) ? url.replace(origin, "") : url) || "/";
+}
+
+export function isUrlPathname(url: string): boolean {
+  return !url.startsWith("http");
+}
+
+export function getUrlWithSearchParams(url: string): string {
+  if (!process.browser) return url;
+
+  return `${ url }${ window.location.search }`;
 }
