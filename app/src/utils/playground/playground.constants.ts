@@ -73,7 +73,6 @@ export const PLAYGROUND_MOCKED_LOT: CheckoutItem = {
   description: `${ PLAYGROUND_LOREM_IPSUM.slice(0, 128) }...`,
   units: 1,
   unitPrice: 100,
-  fee: 5,
   imageSrc: "https://media1.giphy.com/media/WtZruh8gE2sMbr8MK1/giphy.gif?cid=ecf05e470gehwojzpnbilvc2pyoncuugk1trztdfxb0h7xi2&rid=giphy.gif&ct=g",
   imageBackground: "orange",
 };
