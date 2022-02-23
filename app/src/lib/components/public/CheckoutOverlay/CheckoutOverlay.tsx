@@ -1,30 +1,33 @@
-import { Backdrop, Box, CircularProgress, Dialog, DialogContent } from "@mui/material";
-import React, { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Backdrop, Box, CircularProgress } from "@mui/material";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { getSavedPaymentMethodAddressIdFromBillingInfo, savedPaymentMethodToBillingInfo, transformRawSavedPaymentMethods } from "../../../domain/circle/circle.utils";
 import { UserFormat } from "../../../domain/auth/authentication.interfaces";
 import { PaymentMethod, PaymentType } from "../../../domain/payment/payment.interfaces";
 import { CheckoutItem } from "../../../domain/product/product.interfaces";
 import { BillingInfo } from "../../../forms/BillingInfoForm";
-import { useDeletePaymentMethodMutation, useGetPaymentMethodListQuery, useMeQuery } from "../../../queries/graphqlGenerated";
+import { useDeletePaymentMethodMutation, useGetInvoiceDetailsQuery, useGetPaymentMethodListQuery, useMeQuery } from "../../../queries/graphqlGenerated";
 import { AuthenticationView } from "../../../views/Authentication/AuthenticationView";
 import { BillingView } from "../../../views/Billing/BillingView";
 import { ConfirmationView } from "../../../views/Confirmation/ConfirmationView";
 import { PaymentView } from "../../../views/Payment/PaymentView";
-import { CheckoutModalHeader, CheckoutModalHeaderVariant } from "../CheckoutModalHeader/CheckoutModalHeader";
+import { CheckoutModalHeader, CheckoutModalHeaderVariant } from "../../payments/CheckoutModalHeader/CheckoutModalHeader";
 import { PurchasingView } from "../../../views/Purchasing/PurchasingView";
 import { ErrorView } from "../../../views/Error/ErrorView";
 import { RawSavedPaymentMethod, SavedPaymentMethod } from "../../../domain/circle/circle.interfaces";
-import { Theme, ThemeProvider, createTheme, ThemeOptions, SxProps } from "@mui/material/styles";
-import { useShakeAnimation } from "../../../utils/animationUtils";
+import { Theme, ThemeOptions, SxProps } from "@mui/material/styles";
 import { continuePlaidOAuthFlow, PlaidFlow } from "../../../hooks/usePlaid";
 import { ConsentType } from "../../shared/ConsentText/ConsentText";
-import { CheckoutModalError, useCheckoutModalState } from "./CheckoutModal.hooks";
-import { DEFAULT_ERROR_AT, ERROR_LOADING_PAYMENT_METHODS, ERROR_LOADING_USER } from "../../../domain/errors/errors.constants";
+import { CheckoutModalError, useCheckoutModalState } from "./CheckoutOverlay.hooks";
+import { DEFAULT_ERROR_AT, ERROR_LOADING_INVOICE, ERROR_LOADING_PAYMENT_METHODS, ERROR_LOADING_USER } from "../../../domain/errors/errors.constants";
+import { FullScreenOverlay } from "../../shared/FullScreenOverlay/FullScreenOverlay";
+import { ProviderInjectorProps, withProviders } from "../../shared/ProvidersInjector/ProvidersInjector";
+import { transformCheckoutItemsFromInvoice } from "../../../domain/product/product.utils";
+import { useCreateInvoiceAndReservation } from "../../../hooks/useCreateInvoiceAndReservation";
 import { CustomTextsKeys } from "../../../domain/customTexts/customTexts.interfaces";
 
 const SELECTOR_DIALOG_SCROLLABLE = "[role=presentation]";
 
-export interface CheckoutModalProps {
+export interface PUICheckoutOverlayProps {
   // Modal:
   open: boolean;
   onClose: () => void;
@@ -45,7 +48,7 @@ export interface CheckoutModalProps {
   userFormat: UserFormat;
   acceptedPaymentTypes: PaymentType[];
   paymentLimits?: Partial<Record<PaymentType, number>>;
-  customTexts: Record<CustomTextsKeys, React.ReactNode>,
+  customTexts: Record<CustomTextsKeys, React.ReactFragment[]>,
 
   // Legal:
   consentType?: ConsentType;
@@ -68,8 +71,9 @@ export interface CheckoutModalProps {
   onMarketingOptInChange?: (marketingOptIn: boolean) => void
 }
 
+export type PUICheckoutProps = PUICheckoutOverlayProps & ProviderInjectorProps;
 
-export const CheckoutModal: React.FC<CheckoutModalProps> = ({
+export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   // Modal:
   open,
   onClose,
@@ -99,8 +103,8 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
   // Data:
   orgID,
-  invoiceID,
-  checkoutItems,
+  invoiceID: initialInvoiceID,
+  checkoutItems: parentCheckoutItems,
 
   // Authentication:
   onLogin,
@@ -112,6 +116,8 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   onError,
   onMarketingOptInChange, // Not implemented yet. Used to let user subscribe / unsubscribe to marketing updates.
 }) => {
+  const dialogRootRef = useRef<HTMLDivElement>(null);
+
   const {
     data: meData,
     loading: meLoading,
@@ -126,25 +132,14 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
     refetch: refetchPaymentMethods,
   } = useGetPaymentMethodListQuery({
     skip: !isAuthenticated,
-    variables: {
-      orgID,
-    },
+    variables: { orgID },
   });
-
-  const [deletePaymentMethod] = useDeletePaymentMethodMutation();
-
-  const isDialogLoading = isAuthenticatedLoading || meLoading || paymentMethodsLoading;
-  const isPlaidFlowLoading = continuePlaidOAuthFlow();
-  const rawSavedPaymentMethods = paymentMethodsData?.getPaymentMethodList;
-  const savedPaymentMethods = useMemo(() => transformRawSavedPaymentMethods(rawSavedPaymentMethods as RawSavedPaymentMethod[]), [rawSavedPaymentMethods]);
-  const dialogRootRef = useRef<HTMLDivElement>(null);
-  const paperRef = useRef<HTMLDivElement>(null);
 
   const {
     // CheckoutModalState:
     checkoutStep,
     checkoutError,
-    resetModalState,
+    initModalState,
     goBack,
     goNext,
     goTo,
@@ -153,10 +148,44 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
     // SelectedPaymentMethod:
     selectedPaymentMethod,
     setSelectedPaymentMethod,
+
+    // PurchaseState:
+    invoiceID,
+    paymentReferenceNumber,
+    setInvoiceID,
+    setPaymentReferenceNumber,
   } = useCheckoutModalState({
+    invoiceID: initialInvoiceID,
     productConfirmationEnabled,
     isAuthenticated,
     onError,
+  });
+
+  const {
+    data: invoiceDetailsData,
+    loading: invoiceDetailsLoading,
+    error: invoiceDetailsError,
+    refetch: refetchInvoiceDetails,
+  } = useGetInvoiceDetailsQuery({
+    skip: !invoiceID,
+    variables: { orgID, invoiceID },
+  });
+
+  // Modal loading state:
+  const isDialogLoading = isAuthenticatedLoading || meLoading || paymentMethodsLoading;
+  const isDialogInitializing = isDialogLoading || invoiceDetailsLoading || !invoiceID;
+  const isPlaidFlowLoading = continuePlaidOAuthFlow();
+
+  // Payment methods and checkout items / invoice items transforms:
+  const rawSavedPaymentMethods = paymentMethodsData?.getPaymentMethodList;
+  const invoiceItems = invoiceDetailsData?.getInvoiceDetails.items;
+  const checkoutItems = useMemo(() => transformCheckoutItemsFromInvoice(parentCheckoutItems, invoiceItems), [parentCheckoutItems, invoiceItems]);
+  const savedPaymentMethods = useMemo(() => transformRawSavedPaymentMethods(rawSavedPaymentMethods as RawSavedPaymentMethod[]), [rawSavedPaymentMethods]);
+
+  const [createInvoiceAndReservationState, createInvoiceAndReservation] = useCreateInvoiceAndReservation({
+    orgID,
+    checkoutItems,
+    debug,
   });
 
   useEffect(() => {
@@ -169,8 +198,34 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   useEffect(() => {
     if (isDialogLoading || !open) return;
 
-    resetModalState();
-  }, [isDialogLoading, open, resetModalState]);
+    initModalState();
+  }, [isDialogLoading, open, initModalState]);
+
+  const createInvoiceAndReservationCalledRef = useRef(false);
+
+  useEffect(() => {
+    if (isDialogLoading || invoiceID === null || invoiceID || createInvoiceAndReservationCalledRef.current) return;
+
+    createInvoiceAndReservationCalledRef.current = true;
+
+    createInvoiceAndReservation();
+  }, [isDialogLoading, invoiceID, createInvoiceAndReservation]);
+
+  useEffect(() => {
+    if (createInvoiceAndReservationState.error) {
+      setError(createInvoiceAndReservationState.error);
+    } else if (createInvoiceAndReservationState.invoiceID) {
+      setInvoiceID(createInvoiceAndReservationState.invoiceID);
+    }
+  }, [createInvoiceAndReservationState, setError, setInvoiceID]);
+
+  const handleClose = useCallback(() => {
+    createInvoiceAndReservationCalledRef.current = false;
+
+    setInvoiceID(null);
+
+    onClose();
+  }, [setInvoiceID, onClose]);
 
   useEffect(() => {
     if (savedPaymentMethods.length === 0) return;
@@ -213,7 +268,8 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   useEffect(() => {
     if (meError) setError(ERROR_LOADING_USER(meError));
     if (paymentMethodsError) setError(ERROR_LOADING_PAYMENT_METHODS(paymentMethodsError));
-  }, [meError, paymentMethodsError, setError]);
+    if (invoiceDetailsError) setError(ERROR_LOADING_INVOICE(invoiceDetailsError));
+  }, [meError, paymentMethodsError, invoiceDetailsError, setError]);
 
   const handleBillingInfoSelected = useCallback((billingInfo: string | BillingInfo) => {
     // If we go back to the billing info step to fix some validation errors or change some data, we preserve the data
@@ -229,6 +285,8 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   const handleCvvSelected = useCallback((cvv: string) => {
     setSelectedPaymentMethod(({ billingInfo, paymentInfo }) => ({ billingInfo, paymentInfo, cvv }));
   }, [setSelectedPaymentMethod]);
+
+  const [deletePaymentMethod] = useDeletePaymentMethodMutation();
 
   const handleSavedPaymentMethodDeleted = useCallback(async (addressIdOrPaymentMethodId: string) => {
     const idsToDelete: string[] = checkoutStep === "billing"
@@ -277,16 +335,14 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
     await refetchPaymentMethods({ orgID });
   }, [checkoutStep, deletePaymentMethod, orgID, refetchPaymentMethods, savedPaymentMethods, setSelectedPaymentMethod]);
 
-  const [paymentReferenceNumber, setPaymentReferenceNumber] = useState("");
-
-  const handlePurchaseSuccess = useCallback(async (paymentReferenceNumber: string) => {
+  const handlePurchaseSuccess = useCallback(async (nextPaymentReferenceNumber: string) => {
     // After a successful purchase, a new payment method might have been created, so we reload them:
     await refetchPaymentMethods();
 
-    setPaymentReferenceNumber(paymentReferenceNumber);
+    setPaymentReferenceNumber(nextPaymentReferenceNumber);
 
     goNext();
-  }, [refetchPaymentMethods, goNext]);
+  }, [refetchPaymentMethods, setPaymentReferenceNumber, goNext]);
 
   const handleFixError = useCallback(async (): Promise<false> => {
     // After an error, all data is reloaded in case the issue was caused by stale/cached data or in case a new payment
@@ -294,6 +350,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
     await Promise.allSettled([
       meRefetch(),
       refetchPaymentMethods(),
+      refetchInvoiceDetails(),
     ]);
 
     if (checkoutError.at !== "purchasing") {
@@ -307,25 +364,18 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
     // button when clicked but do not remove it once the Promise is resolved, as we are moving to another view and
     // CheckoutModalFooter will unmount (so doing this prevents a memory leak issue):
     return false;
-  }, [meRefetch, refetchPaymentMethods, setSelectedPaymentMethod, goTo, checkoutError]);
+  }, [meRefetch, refetchPaymentMethods, refetchInvoiceDetails, setSelectedPaymentMethod, goTo, checkoutError]);
 
   // BLOCK DIALOG LOGIC & SHAKE ANIMATION:
 
-  const [shakeSx, shake] = useShakeAnimation(paperRef.current);
-
+  // TODO: Move to hook.
   const [isDialogBlocked, setIsDialogBlocked] = useState(false);
-
-  useEffect(() => {
-    if (parentTheme && themeOptions) {
-      throw new Error("You can't use both `themeOptions` and `theme`. Please, use only one. `themeOptions` is preferred.");
-    }
-  }, [parentTheme, themeOptions]);
 
   // PLAID:
 
   const handlePlaidFlowCompleted = useCallback((paymentInfo?: PaymentMethod) => {
     if (!paymentInfo) {
-      resetModalState();
+      initModalState();
 
       return;
     }
@@ -333,19 +383,15 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
     handlePaymentInfoSelected(paymentInfo);
 
     goTo("purchasing");
-  }, [resetModalState, handlePaymentInfoSelected, goTo]);
+  }, [initModalState, handlePaymentInfoSelected, goTo]);
 
-  const theme = useMemo(() => themeOptions ? createTheme(themeOptions) : parentTheme, [parentTheme, themeOptions]);
-  const Wrapper = theme ? ThemeProvider : Fragment;
-  const wrapperProps = theme ? { theme } : {};
-
-  if (isDialogLoading || isPlaidFlowLoading) {
+  if (isDialogInitializing || isPlaidFlowLoading) {
     return (<>
       { isPlaidFlowLoading && <PlaidFlow onSubmit={ handlePlaidFlowCompleted } /> }
 
       <Backdrop
         open={ open }
-        onClick={ onClose }>
+        onClick={ handleClose }>
         { loaderImageSrc ? (
           <Box
             component="img"
@@ -374,7 +420,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
         checkoutError={ checkoutError }
         errorImageSrc={ errorImageSrc }
         onFixError={ handleFixError }
-        onClose={ onClose }
+        onClose={ handleClose }
         debug={ debug } />
     );
   } else if (!checkoutStep) {
@@ -388,7 +434,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
         isAuthenticated={ isAuthenticated }
         guestCheckoutEnabled={ guestCheckoutEnabled }
         onGuestClicked={ goNext }
-        onCloseClicked={ onClose } />
+        onCloseClicked={ handleClose } />
     );
   } else if (checkoutStep === "billing") {
     checkoutStepElement = (
@@ -400,7 +446,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
         onBillingInfoSelected={ handleBillingInfoSelected }
         onSavedPaymentMethodDeleted={ handleSavedPaymentMethodDeleted }
         onNext={ goNext }
-        onClose={ onClose }
+        onClose={ handleClose }
         debug={ debug } />
     );
   } else if (checkoutStep === "payment") {
@@ -415,7 +461,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
         onSavedPaymentMethodDeleted={ handleSavedPaymentMethodDeleted }
         onNext={ goNext }
         onPrev={ goBack }
-        onClose={ onClose }
+        onClose={ handleClose }
         acceptedPaymentTypes={ acceptedPaymentTypes }
         consentType={ consentType }
         privacyHref={ privacyHref }
@@ -432,7 +478,6 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
         purchasingMessages={ purchasingMessages }
         orgID={ orgID }
         invoiceID={ invoiceID }
-        checkoutItems={ checkoutItems }
         savedPaymentMethods={ savedPaymentMethods }
         selectedPaymentMethod={ selectedPaymentMethod }
         onPurchaseSuccess={ handlePurchaseSuccess }
@@ -450,51 +495,31 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
         selectedPaymentMethod={ selectedPaymentMethod }
         paymentReferenceNumber={ paymentReferenceNumber }
         purchaseInstructions={ customTexts.purchaseInstructions }
-        onNext={ onClose }
-        onClose={ onClose } />
+        onNext={ handleClose } />
     );
   }
 
+  const headerElement = (
+    <CheckoutModalHeader
+      variant={ headerVariant }
+      logoSrc={ logoSrc }
+      logoSx={ logoSx }
+      user={ meData?.me?.user }
+      userFormat={ userFormat }
+      onLoginClicked={ onLogin }
+      onPrevClicked={ checkoutStep === "authentication" ? handleClose : goBack } />
+  );
+
   return (
-    <Wrapper { ...(wrapperProps as any) }>
-      <Dialog
-        open={ isDialogBlocked ? true : open }
-        onClose={ isDialogBlocked ? shake : onClose }
-        // onBackdropClick={ isDialogBlocked ? shake : undefined }
-        aria-labelledby="checkout-modal-header-title"
-        scroll="body"
-        ref={ dialogRootRef }
-        PaperProps={ { sx: shakeSx, ref: paperRef }}
-        // Dialog only:
-        // fullWidth
-        // maxWidth="sm"
-        fullScreen>
-
-        <DialogContent
-          sx={{
-            overflowX: 'hidden',
-            px: {
-              xs: 1.5,
-              sm: 2.5,
-            },
-            py: 2.5,
-            maxWidth: theme => theme.breakpoints.values.lg,
-            mx: "auto",
-          }}>
-
-          <CheckoutModalHeader
-            variant={ headerVariant }
-            logoSrc={ logoSrc }
-            logoSx={ logoSx }
-            user={ meData?.me?.user }
-            userFormat={ userFormat }
-            onLoginClicked={ onLogin }
-            onPrevClicked={ checkoutStep === "authentication" ? onClose : goBack } />
-
-          { checkoutStepElement }
-
-        </DialogContent>
-      </Dialog>
-    </Wrapper>
+    <FullScreenOverlay
+      centered={ checkoutStep === "purchasing" || checkoutStep === "error" }
+      open={ open }
+      onClose={ handleClose }
+      isDialogBlocked={ isDialogBlocked }
+      dialogRootRef={ dialogRootRef }
+      header={ headerElement }
+      children={ checkoutStepElement } />
   );
 }
+
+export const PUICheckout: React.FC<PUICheckoutProps> = withProviders(PUICheckoutOverlay);

@@ -130,13 +130,13 @@ import {
   CheckoutModal,
   CheckoutModalProps,
   CheckoutModalThemeProvider,
-  continuePlaidOAuthFlow,
+  continueFlows,
 } from "@mojitoinc/mojito-mixers";
 
 const App: React.FC<AppProps> = () => {
   const { profile } = useProfile();
 
-  const [isOpen, setIsOpen] = useState(continuePlaidOAuthFlow());
+  const [isOpen, setIsOpen] = useState(continueFlows(true).checkoutStep !== "");
 
   const { loginWithPopup, isAuthenticated, isLoading, getIdTokenClaims } = useAuth0();
 

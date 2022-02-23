@@ -36,8 +36,8 @@ export interface CheckoutModalHeaderProps {
   logoSx?: SxProps<Theme>;
   user?: User;
   userFormat?: UserFormat;
-  onLoginClicked: () => void;
-  onPrevClicked: () => void;
+  onLoginClicked?: () => void;
+  onPrevClicked?: () => void;
 }
 export const CheckoutModalHeader: React.FC<CheckoutModalHeaderProps> = ({
   variant,
@@ -72,13 +72,15 @@ export const CheckoutModalHeader: React.FC<CheckoutModalHeaderProps> = ({
 
       { showControls ? (<>
         <Stack spacing={ 2 } direction="row" sx={{ justifyContent: "space-between", alignItems: "center", py: 2 }}>
-          { variant === "anonymous" ? (<>
+          { (variant === "anonymous"  && onLoginClicked) ? (<>
               <Typography sx={{ fontWeight: "500" }}>Already have an account?</Typography>
               <PrimaryButton onClick={ onLoginClicked }>Log in</PrimaryButton>
-          </>) : (<>
+          </>) : null }
+
+          { (variant !== "anonymous" && onPrevClicked && displayUsername) ? (<>
               <OutlinedSecondaryButton onClick={ onPrevClicked }><ChevronLeftIcon /></OutlinedSecondaryButton>
               <Typography sx={{ fontWeight: "500", minHeight: 40, display: "flex", alignItems: "center" }}>{ displayUsername }</Typography>
-          </>) }
+          </>) : null }
         </Stack>
 
         <Divider />

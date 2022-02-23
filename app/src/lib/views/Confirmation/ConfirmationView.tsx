@@ -7,16 +7,15 @@ import { PurchaseConfirmationItemDetails } from "../../components/payments/Purch
 import { SavedPaymentMethod } from "../../domain/circle/circle.interfaces";
 import { billingInfoToSavedPaymentMethodBillingInfo } from "../../domain/circle/circle.utils";
 import { CheckoutItem } from "../../domain/product/product.interfaces";
-import { SelectedPaymentMethod } from "../../components/payments/CheckoutModal/CheckoutModal.hooks";
+import { SelectedPaymentMethod } from "../../components/public/CheckoutOverlay/CheckoutOverlay.hooks";
 
 export interface ConfirmationViewProps {
   checkoutItems: CheckoutItem[];
   savedPaymentMethods: SavedPaymentMethod[];
   selectedPaymentMethod: SelectedPaymentMethod;
   paymentReferenceNumber: string;
-  purchaseInstructions: React.ReactNode;
+  purchaseInstructions: React.ReactFragment[];
   onNext: () => void;
-  onClose: () => void;
 }
 
 export const ConfirmationView: React.FC<ConfirmationViewProps> = ({
@@ -26,7 +25,6 @@ export const ConfirmationView: React.FC<ConfirmationViewProps> = ({
   paymentReferenceNumber,
   purchaseInstructions,
   onNext,
-  onClose,
 }) => {
   const {
     billingInfo: selectedBillingInfo,
@@ -76,8 +74,7 @@ export const ConfirmationView: React.FC<ConfirmationViewProps> = ({
       <Stack sx={{ display: "flex", flex: 1 }}>
         <PurchaseConfirmationItemDetails
           checkoutItems={checkoutItems}
-          purchaseInstructions={purchaseInstructions}
-        />
+          purchaseInstructions={purchaseInstructions} />
 
         <CheckoutModalFooter
           variant="toMarketplace"

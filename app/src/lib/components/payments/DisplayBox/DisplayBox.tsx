@@ -7,7 +7,7 @@ const DISPLAY_BOX_PROPS: SxProps<Theme> = {
   p: 2,
   m: 0,
   border: 1,
-  borderRadius: SM_BORDER_RADIUS,
+  borderRadius: `${ SM_BORDER_RADIUS }px`,
   backgroundColor: theme => theme.palette.grey["50"],
   borderColor: theme => theme.palette.grey["100"],
   color: theme => theme.palette.grey["800"],

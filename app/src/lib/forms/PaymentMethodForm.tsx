@@ -31,7 +31,7 @@ import { Typography } from "@mui/material";
 import { DebugBox, DisplayBox } from "../components/payments/DisplayBox/DisplayBox";
 import { ControlledCheckbox } from "../components/shared/Checkbox/Checkbox";
 import { ConsentText, ConsentType, CONSENT_ERROR_MESSAGE } from "../components/shared/ConsentText/ConsentText";
-import { CheckoutModalError } from "../components/payments/CheckoutModal/CheckoutModal.hooks";
+import { CheckoutModalError } from "../components/public/CheckoutOverlay/CheckoutOverlay.hooks";
 import { FormErrorsBox } from "../components/shared/FormErrorsBox/FormErrorsBox";
 import { useFormCheckoutError } from "../hooks/useFormCheckoutError";
 
@@ -40,7 +40,7 @@ interface PaymentTypeFormProps {
   consentType: ConsentType;
   privacyHref?: string;
   termsOfUseHref?: string;
-  wirePaymentsDisclaimerText?: React.ReactNode;
+  wirePaymentsDisclaimerText?: React.ReactFragment[];
 }
 
 interface PaymentTypeFormData {
@@ -209,10 +209,10 @@ const PAYMENT_TYPE_FORM_DATA: Record<PaymentType, PaymentTypeFormData> = {
           label={ <>I <ConsentText privacyHref={ privacyHref } termsOfUseHref={ termsOfUseHref } /></> } />
       ) }
       {wirePaymentsDisclaimerText && (
-        <DisplayBox sx={{ mt: 1.5 }}>
-          <Typography variant="body1">
-            {wirePaymentsDisclaimerText}
-          </Typography>
+        <DisplayBox sx={{ mt: 1.5, flexDirection: "column" }} >
+          { wirePaymentsDisclaimerText.map((wirePaymentsDisclaimerLine, i) => {
+            return <Typography key={ i } variant="body1" sx={ i === 0 ? undefined : { mt: 1.5 } }>{ wirePaymentsDisclaimerLine }</Typography>;
+          }) }
         </DisplayBox>
       )}
     </>),
@@ -224,7 +224,7 @@ const PAYMENT_TYPE_FORM_DATA: Record<PaymentType, PaymentTypeFormData> = {
     }),
     schemaShape: {},
     fields: ({ control, consentType, privacyHref, termsOfUseHref }) => (<>
-      <DisplayBox sx={{ mt: 1.5, mb: consentType === "checkbox" ? 1 : 0 }}>
+      <DisplayBox sx={{ mt: 1.5, mb: consentType === "checkbox" ? 1 : 0, flexDirection: "column" }}>
         <Typography variant="body1">
           Not supported yet.
         </Typography>
@@ -251,7 +251,7 @@ export interface PaymentMethodFormProps {
   consentType: ConsentType;
   privacyHref: string;
   termsOfUseHref: string;
-  wirePaymentsDisclaimerText?: React.ReactNode;
+  wirePaymentsDisclaimerText?: React.ReactFragment[];
   debug?: boolean;
 }
 

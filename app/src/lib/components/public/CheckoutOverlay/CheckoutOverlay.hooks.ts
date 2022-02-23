@@ -5,8 +5,8 @@ import { CircleFieldErrors } from "../../../domain/circle/circle.utils";
 import { ERROR_PURCHASE } from "../../../domain/errors/errors.constants";
 import { PaymentMethod } from "../../../domain/payment/payment.interfaces";
 import { BillingInfo } from "../../../forms/BillingInfoForm";
-import { INITIAL_PLAID_OAUTH_FLOW_STATE } from "../../../hooks/usePlaid";
-import { resetStepperProgress } from "../CheckoutStepper/CheckoutStepper";
+import { resetStepperProgress } from "../../payments/CheckoutStepper/CheckoutStepper";
+import { continueFlows } from "./CheckoutOverlay.utils";
 
 export type CheckoutModalErrorAt = "authentication" | "billing" | "payment" | "purchasing";
 
@@ -20,6 +20,7 @@ export interface CheckoutModalError {
 export type CheckoutModalStep = "authentication" | "billing" | "payment" | "purchasing" | "confirmation" | "error";
 
 export interface CheckoutModalStateOptions {
+  invoiceID?: string;
   productConfirmationEnabled?: boolean;
   isAuthenticated?: boolean;
   onError?: (error: CheckoutModalError) => void;
@@ -36,9 +37,14 @@ export interface SelectedPaymentMethod {
   cvv: string;
 }
 
-export interface CheckoutModalStateReturn extends CheckoutModalState {
+export interface PurchaseState {
+  invoiceID: string | null;
+  paymentReferenceNumber: string;
+}
+
+export interface CheckoutModalStateReturn extends CheckoutModalState, PurchaseState {
   // CheckoutModalState (+ inherited stuff):
-  resetModalState: () => void;
+  initModalState: () => void;
   goBack: () => void;
   goNext: () => void;
   goTo: (checkoutStep: CheckoutModalStep, error?: null | string | CheckoutModalError) => void;
@@ -47,11 +53,16 @@ export interface CheckoutModalStateReturn extends CheckoutModalState {
   // SelectedPaymentMethod:
   selectedPaymentMethod: SelectedPaymentMethod;
   setSelectedPaymentMethod: Dispatch<SetStateAction<SelectedPaymentMethod>>;
+
+  // PurchaseState (+ inherited stuff):
+  setInvoiceID: (invoiceID: string) => void;
+  setPaymentReferenceNumber: (paymentReferenceNumber: string) => void;
 }
 
 export const CHECKOUT_STEPS: CheckoutModalStep[] = ["authentication", "billing", "payment", "purchasing", "confirmation"];
 
 export function useCheckoutModalState({
+  invoiceID: initialInvoiceID = null,
   productConfirmationEnabled,
   isAuthenticated,
   onError,
@@ -71,21 +82,46 @@ export function useCheckoutModalState({
     cvv: "",
   });
 
-  const resetModalState = useCallback(() => {
+  const [{
+    invoiceID,
+    paymentReferenceNumber,
+  }, setPurchaseState] = useState<PurchaseState>({
+    invoiceID: initialInvoiceID || null,
+    paymentReferenceNumber: "",
+  });
+
+  const initModalState = useCallback(() => {
     // Make sure the progress tracker in BillingView and PaymentView is properly animated:
     resetStepperProgress();
 
     // Once authentication has loaded, we know if we need to skip the product confirmation step or not. Also, when the
     // modal is re-opened, we need to reset its state, taking into account if we need to resume a Plaid OAuth flow:s
-    const { selectedBillingInfo, continueOAuthFlow, savedStateUsed } = INITIAL_PLAID_OAUTH_FLOW_STATE;
+    const savedFlow = continueFlows();
 
-    setCheckoutModalState({ checkoutStep: continueOAuthFlow && !savedStateUsed ? "purchasing" : startAt });
+    // if (savedFlow.checkoutStep !== "") {
+    //   clearPersistedInfo();
+    //   clearPlaidInfo();
+    // }
+
+    setCheckoutModalState({
+      checkoutStep: savedFlow.checkoutStep || startAt,
+      checkoutError: savedFlow.checkoutError,
+    });
+
+    // setCheckoutModalState({ checkoutStep: "error", checkoutError: { errorMessage: "test" } });
+    // setCheckoutModalState({ checkoutStep: "purchasing" });
 
     setSelectedPaymentMethod({
-      billingInfo: selectedBillingInfo || "",
-      paymentInfo: "",
+      billingInfo: savedFlow.billingInfo || "",
+      paymentInfo: savedFlow.paymentInfo || "",
       cvv: "",
     });
+
+    setPurchaseState({
+      invoiceID: savedFlow.invoiceID || "",
+      paymentReferenceNumber: savedFlow.paymentReferenceNumber || "",
+    });
+
   }, [startAt]);
 
   const goBack = useCallback(() => {
@@ -126,11 +162,20 @@ export function useCheckoutModalState({
     });
   }, [onError]);
 
+
+  const setInvoiceID = useCallback((invoiceID: string) => {
+    setPurchaseState({ invoiceID, paymentReferenceNumber: "" });
+  }, []);
+
+  const setPaymentReferenceNumber = useCallback((paymentReferenceNumber: string) => {
+    setPurchaseState(({ invoiceID }) => ({ invoiceID, paymentReferenceNumber }));
+  }, [])
+
   return {
     // CheckoutModalState:
     checkoutStep,
     checkoutError,
-    resetModalState,
+    initModalState,
     goBack,
     goNext,
     goTo,
@@ -139,5 +184,11 @@ export function useCheckoutModalState({
     // SelectedPaymentMethod:
     selectedPaymentMethod,
     setSelectedPaymentMethod,
+
+    // PurchaseState:
+    invoiceID,
+    paymentReferenceNumber,
+    setInvoiceID,
+    setPaymentReferenceNumber,
   };
 }

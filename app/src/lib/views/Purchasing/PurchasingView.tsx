@@ -4,16 +4,20 @@ import { useFullPayment } from "../../hooks/useFullPayment";
 import React from "react";
 import { Box, Typography } from "@mui/material";
 import { useTimeout, useInterval } from "@swyg/corre";
-import { CheckoutModalError, SelectedPaymentMethod } from "../../components/payments/CheckoutModal/CheckoutModal.hooks";
-import { CheckoutItem } from "../..";
+import { CheckoutModalError, SelectedPaymentMethod } from "../../components/public/CheckoutOverlay/CheckoutOverlay.hooks";
 import { ERROR_PURCHASE } from "../../domain/errors/errors.constants";
 import { XS_MOBILE_MAX_WIDTH } from "../../config/theme/theme";
+import { StatusIcon } from "../../components/shared/StatusIcon/StatusIcon";
+import { useGetPaymentNotificationQuery } from "../../queries/graphqlGenerated";
+import { persistCheckoutModalInfo } from "../../components/public/CheckoutOverlay/CheckoutOverlay.utils";
 
-const DEFAULT_PURCHASING_IMAGE_SRC = "https://raw.githubusercontent.com/mojitoinc/mojito-mixers/main/app/src/lib/assets/mojito-loader.gif";
+// TODO: Move these to theme or similar config file:
 
 const PURCHASING_MIN_WAIT_MS = 3000;
 
 const PURCHASING_MESSAGES_INTERVAL_MS = 5000;
+
+const PAYMENT_NOTIFICATION_INTERVAL_MS = 1500;
 
 const PURCHASING_MESSAGES_DEFAULT = [
   "Muddling mint and lime.",
@@ -27,7 +31,6 @@ export interface PurchasingViewProps {
   purchasingMessages?: false | string[];
   orgID: string;
   invoiceID?: string;
-  checkoutItems: CheckoutItem[];
   savedPaymentMethods: SavedPaymentMethod[];
   selectedPaymentMethod: SelectedPaymentMethod;
   onPurchaseSuccess: (paymentReferenceNumber: string) => void;
@@ -41,7 +44,6 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
   purchasingMessages: customPurchasingMessages,
   orgID,
   invoiceID,
-  checkoutItems,
   savedPaymentMethods,
   selectedPaymentMethod,
   onPurchaseSuccess,
@@ -49,6 +51,19 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
   onDialogBlocked,
   debug,
 }) => {
+  const [fullPaymentState, fullPayment] = useFullPayment({
+    orgID,
+    invoiceID,
+    savedPaymentMethods,
+    selectedPaymentMethod,
+    debug,
+  });
+
+  const paymentNotificationResult = useGetPaymentNotificationQuery({
+    skip: fullPaymentState.paymentStatus !== "processed",
+    pollInterval: PAYMENT_NOTIFICATION_INTERVAL_MS,
+  });
+
   let purchasingMessages = customPurchasingMessages;
 
   if (purchasingMessages === false) {
@@ -60,28 +75,23 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
   const [hasWaited, setHasWaited] = useState(false);
   const [purchasingMessageIndex, setPurchasingMessageIndex] = useState(0);
   const purchasingMessage = purchasingMessages[purchasingMessageIndex];
+  const redirectURL = paymentNotificationResult.data?.getPaymentNotification?.message?.redirectURL || "";
+  const { billingInfo, paymentInfo, cvv } = selectedPaymentMethod;
+  const isCreditCardPayment = cvv || (typeof paymentInfo === "object" && paymentInfo.type === "CreditCard");
 
-  const [paymentState, fullPayment] = useFullPayment({
-    orgID,
-    invoiceID,
-    checkoutItems,
-    savedPaymentMethods,
-    selectedPaymentMethod,
-    debug,
-  });
-
-  const calledRef = useRef(false);
+  const fullPaymentCalledRef = useRef(false);
+  const checkoutInfoPersistedRef = useRef(false);
 
   useEffect(() => {
-    if (calledRef.current) return;
+    if (fullPaymentCalledRef.current) return;
 
-    calledRef.current = true;
+    fullPaymentCalledRef.current = true;
 
     fullPayment();
   }, [fullPayment]);
 
   useEffect(() => {
-    const { paymentStatus, paymentReferenceNumber, paymentError } = paymentState;
+    const { paymentStatus, paymentReferenceNumber, paymentError } = fullPaymentState;
 
     if (paymentStatus === "processing") {
       onDialogBlocked(true);
@@ -91,16 +101,46 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
 
     if (!hasWaited) return;
 
-    onDialogBlocked(false);
-
     if (paymentStatus === "error" || paymentError) {
+      onDialogBlocked(false);
       onPurchaseError(paymentError || ERROR_PURCHASE());
 
       return;
     }
 
+    if (isCreditCardPayment) {
+      if (!redirectURL || checkoutInfoPersistedRef.current) return;
+
+      checkoutInfoPersistedRef.current = true;
+
+      persistCheckoutModalInfo({
+        invoiceID,
+        paymentReferenceNumber,
+        billingInfo,
+        paymentInfo,
+      });
+
+      console.log("Redirecting to 3DS...");
+
+      location.href = redirectURL;
+
+      return;
+    }
+
+    onDialogBlocked(false);
     onPurchaseSuccess(paymentReferenceNumber);
-  }, [paymentState, hasWaited, onPurchaseError, onDialogBlocked, onPurchaseSuccess]);
+  }, [
+    fullPaymentState,
+    hasWaited,
+    isCreditCardPayment,
+    redirectURL,
+    billingInfo,
+    paymentInfo,
+    onPurchaseError,
+    onDialogBlocked,
+    onPurchaseSuccess,
+    invoiceID,
+  ]);
 
   useTimeout(() => {
     setHasWaited(true);
@@ -111,23 +151,20 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
   }, PURCHASING_MESSAGES_INTERVAL_MS);
 
   return (
-    <Box sx={{ position: "relative", mt: 2 }}>
-      <Box
-          component="img"
-          src={ purchasingImageSrc || DEFAULT_PURCHASING_IMAGE_SRC }
-          sx={{
-            width: 196,
-            height: 196,
-            mx: "auto",
-            mt: 5,
-          }} />
+    <Box>
+
+      <StatusIcon
+        variant="loading"
+        imgSrc={ purchasingImageSrc }
+        sx={{ mt: 5 }} />
 
       { purchasingMessage ? <Typography variant="body2" sx={{ textAlign: "center", mt: 1.5 }}>{ purchasingMessage }</Typography> : null }
 
-      <Box sx={{ maxWidth: XS_MOBILE_MAX_WIDTH, mx: "auto" }}>
-        <Typography variant="body2" sx={{ textAlign: "center", mt: 5, mb: 1.5 }}>Hang tight! We are currently processing your payment.</Typography>
-        <Typography variant="body2" sx={{ textAlign: "center", mt: 1.5, mb: 5 }}>Please, don't close or reload the page...</Typography>
+      <Box sx={{ maxWidth: XS_MOBILE_MAX_WIDTH, mx: "auto", my: 5 }}>
+        <Typography variant="body2" sx={{ textAlign: "center", mb: 1.5 }}>Hang tight! We are currently processing your payment.</Typography>
+        <Typography variant="body2" sx={{ textAlign: "center" }}>Please, don't close or reload the page...</Typography>
       </Box>
+
     </Box>
   );
 };

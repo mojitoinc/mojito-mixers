@@ -10,7 +10,7 @@ import { SavedPaymentDetailsSelector } from "../../components/shared/SavedPaymen
 import { BillingInfoItem } from "../../components/payments/BillingInfo/Item/BillingInfoItem";
 import { SavedPaymentMethod } from "../../domain/circle/circle.interfaces";
 import { billingInfoToSavedPaymentMethodBillingInfo } from "../../domain/circle/circle.utils";
-import { CheckoutModalError, SelectedPaymentMethod } from "../../components/payments/CheckoutModal/CheckoutModal.hooks";
+import { CheckoutModalError, SelectedPaymentMethod } from "../../components/public/CheckoutOverlay/CheckoutOverlay.hooks";
 import { BoxProps, Divider, Stack } from "@mui/material";
 import { usePlaid } from "../../hooks/usePlaid";
 import { ConsentType } from "../../components/shared/ConsentText/ConsentText";
@@ -33,7 +33,7 @@ export interface PaymentViewProps {
   consentType: ConsentType;
   privacyHref: string;
   termsOfUseHref: string;
-  wirePaymentsDisclaimerText?: React.ReactNode;
+  wirePaymentsDisclaimerText?: React.ReactFragment[];
   debug?: boolean;
 }
 
@@ -130,7 +130,7 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
       }}
       spacing={8.75}
     >
-      <Stack sx={{ display: 'flex', flex: 1 }}>
+      <Stack sx={{ display: 'flex', flex: 1, overflow: "hidden" }}>
         <CheckoutStepper progress={ 100 } />
 
         <BillingInfoItem
@@ -165,7 +165,7 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
             consentType={ consentType }
             privacyHref={ privacyHref }
             termsOfUseHref={ termsOfUseHref }
-            wirePaymentsDisclaimerText={ wirePaymentsDisclaimerText}
+            wirePaymentsDisclaimerText={ wirePaymentsDisclaimerText }
             debug={ debug } />
         ) }
       </Stack>

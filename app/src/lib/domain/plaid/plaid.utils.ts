@@ -1,43 +1,20 @@
 import { BillingInfo } from "../../forms/BillingInfoForm";
+import { getUrlWithoutParams, urlToPathnameWhenPossible } from "../url/url.utils";
 
+const STORAGE_EXPIRATION_MS = 1000 * 60 * 5; // 15 minutes.
 const PLAID_OAUTH_FLOW_INFO_KEY = "PLAID_OAUTH_FLOW_INFO";
 const PLAID_OAUTH_FLOW_RECEIVED_REDIRECT_URI_KEY = "PLAID_OAUTH_FLOW_RECEIVED_REDIRECT_URI_KEY";
 const PLAID_OAUTH_STATE_USED_KEY = "PLAID_OAUTH_STATE_USED_KEY";
 const PLAID_OAUTH_FLOW_URL_SEARCH = "?oauth_state_id=";
 
+const debug = false;
+
 export interface PlaidInfo {
   // TODO: Do we need to store product info?
-  url: string;
+  url?: string;
   linkToken: string;
   selectedBillingInfo: string | BillingInfo;
-}
-
-export function persistPlaidInfo(info: PlaidInfo) {
-  if (!process.browser) return;
-
-  try {
-    localStorage.setItem(PLAID_OAUTH_FLOW_INFO_KEY, JSON.stringify(info));
-  } catch (err) {
-    console.log(err);
-  }
-}
-
-export function persistPlaidReceivedRedirectUri(receivedRedirectUri: string) {
-  localStorage.setItem(PLAID_OAUTH_FLOW_RECEIVED_REDIRECT_URI_KEY, receivedRedirectUri);
-}
-
-export function persistPlaidOAuthStateUsed(used = true) {
-  localStorage.setItem(PLAID_OAUTH_STATE_USED_KEY, `${ used }`);
-}
-
-export function clearPlaidInfo() {
-  if (process.browser) {
-    localStorage.removeItem(PLAID_OAUTH_FLOW_INFO_KEY);
-    localStorage.removeItem(PLAID_OAUTH_FLOW_RECEIVED_REDIRECT_URI_KEY);
-    localStorage.removeItem(PLAID_OAUTH_STATE_USED_KEY);
-  }
-
-  return FALLBACK_PLAID_OAUTH_FLOW_STATE;
+  timestamp?: number;
 }
 
 export interface PlaidOAuthFlowState extends PlaidInfo {
@@ -54,6 +31,50 @@ const FALLBACK_PLAID_OAUTH_FLOW_STATE: PlaidOAuthFlowState = {
   savedStateUsed: false,
 };
 
+export function persistPlaidInfo(info: PlaidInfo) {
+  if (!process.browser) return;
+
+  try {
+    localStorage.setItem(PLAID_OAUTH_FLOW_INFO_KEY, JSON.stringify({
+      ...info,
+      url: info.url || getUrlWithoutParams(),
+      timestamp: info.timestamp || Date.now(),
+    }));
+  } catch (err) {
+    if (debug) console.log(err);
+  }
+}
+
+export function persistPlaidReceivedRedirectUri(receivedRedirectUri: string) {
+  localStorage.setItem(PLAID_OAUTH_FLOW_RECEIVED_REDIRECT_URI_KEY, receivedRedirectUri);
+}
+
+export function persistPlaidOAuthStateUsed(used = true) {
+  localStorage.setItem(PLAID_OAUTH_STATE_USED_KEY, `${ used }`);
+}
+
+export function clearPlaidInfo(isExpired?: boolean) {
+  if (debug) console.log(`💾 Clearing ${ isExpired ? "expired " : "" }state (Plaid)...`);
+
+  if (process.browser) {
+    localStorage.removeItem(PLAID_OAUTH_FLOW_INFO_KEY);
+    localStorage.removeItem(PLAID_OAUTH_FLOW_RECEIVED_REDIRECT_URI_KEY);
+    localStorage.removeItem(PLAID_OAUTH_STATE_USED_KEY);
+  }
+
+  return FALLBACK_PLAID_OAUTH_FLOW_STATE;
+}
+
+/*
+export function persistedInfoCleanUp() {
+
+}
+*/
+
+function isExpired(timestamp?: number) {
+  return timestamp !== undefined && Date.now() - timestamp > STORAGE_EXPIRATION_MS;
+}
+
 export function getPlaidOAuthFlowState(): PlaidOAuthFlowState {
   if (!process.browser) {
     return FALLBACK_PLAID_OAUTH_FLOW_STATE;
@@ -68,25 +89,30 @@ export function getPlaidOAuthFlowState(): PlaidOAuthFlowState {
     savedReceivedRedirectUri = localStorage.getItem(PLAID_OAUTH_FLOW_RECEIVED_REDIRECT_URI_KEY) || "";
     savedStateUsed = localStorage.getItem(PLAID_OAUTH_STATE_USED_KEY) === "true" || false;
   } catch (err) {
-    console.log(err);
+    if (debug) console.log(err);
   }
 
   const {
     url = "",
     linkToken = "",
-    selectedBillingInfo = ""
+    selectedBillingInfo = "",
+    timestamp,
   } = savedPlaidInfo || {};
 
   const receivedRedirectUri = savedReceivedRedirectUri || (window.location.search.startsWith(PLAID_OAUTH_FLOW_URL_SEARCH) ? window.location.href : undefined);
   // const receivedRedirectUri = savedReceivedRedirectUri || window.location.href || "";
 
-  const continueOAuthFlow = !!(url && linkToken && selectedBillingInfo && receivedRedirectUri);
+  // In dev, this works fine even if there's nothing in localStorage, which helps with testing across some other domain and localhost:
+  const continueOAuthFlow = (process.env.NODE_ENV === "development" && window.location.hostname !== "localhost") ||
+    !!(url && linkToken && selectedBillingInfo && receivedRedirectUri);
 
-  if ((continueOAuthFlow && savedStateUsed) || (!continueOAuthFlow && savedPlaidInfo)) return clearPlaidInfo();
+  if ((continueOAuthFlow && savedStateUsed) || (!continueOAuthFlow && localStorage.getItem(PLAID_OAUTH_FLOW_INFO_KEY)) || isExpired(timestamp)) {
+    return clearPlaidInfo();
+  }
 
   return {
     // The URL of the page where we initially opened the modal:
-    url,
+    url: urlToPathnameWhenPossible(url),
 
     // The Link token from the first Link initialization:
     linkToken,

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { UseFormSetError } from "react-hook-form";
-import { CheckoutModalError } from "../components/payments/CheckoutModal/CheckoutModal.hooks";
+import { CheckoutModalError } from "../components/public/CheckoutOverlay/CheckoutOverlay.hooks";
 import { CircleFieldErrorAt } from "../domain/circle/circle.utils";
 
 export interface UseFormCheckoutErrorOptions {
