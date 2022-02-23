@@ -144,8 +144,8 @@ interface PUISuccessOverlayProps extends FullScreenOverlayFunctionalProps {
     successImageSrc: string;
     onRedirect: (pathnameOrUrl: string) => void;
 }
-declare type PUISuccessProps = PUISuccessOverlayProps & ProviderInjectorProps;
-declare const PUISuccess: React.FC<PUISuccessProps>;
+declare type PUISuccessProps$1 = PUISuccessOverlayProps & ProviderInjectorProps;
+declare const PUISuccess: React.FC<PUISuccessProps$1>;
 
 interface PUIErrorOverlayProps extends FullScreenOverlayFunctionalProps {
     logoSrc?: string;
@@ -155,6 +155,12 @@ interface PUIErrorOverlayProps extends FullScreenOverlayFunctionalProps {
 }
 declare type PUIErrorProps = PUIErrorOverlayProps & ProviderInjectorProps;
 declare const PUIError: React.FC<PUIErrorProps>;
+
+interface PUIPlaidOverlayProps {
+    onRedirect: (pathnameOrUrl: string) => void;
+}
+declare type PUISuccessProps = PUIPlaidOverlayProps & ProviderInjectorProps;
+declare const PUIPlaid: React.FC<PUISuccessProps>;
 
 declare const MOJITO_LIGHT_THEME: Theme;
 declare const MOJITO_DARK_THEME: Theme;
@@ -201,4 +207,4 @@ interface ContinueFlowsReturn {
 }
 declare function continueFlows(noClear?: boolean): ContinueFlowsReturn;
 
-export { CheckoutItem, CheckoutModalError, CheckoutModalErrorAt, CircleFieldErrorAt, CircleFieldErrors, MOJITO_DARK_THEME, MOJITO_LIGHT_THEME, PUICheckout, PUICheckoutProps, PUIError, PUIErrorProps, PUISuccess, PUISuccessProps, PaymentType, UserFormat, continueCheckout, continueFlows, continuePlaidOAuthFlow, getPlaidOAuthFlowState, persistPlaidReceivedRedirectUri };
+export { CheckoutItem, CheckoutModalError, CheckoutModalErrorAt, CircleFieldErrorAt, CircleFieldErrors, MOJITO_DARK_THEME, MOJITO_LIGHT_THEME, PUICheckout, PUICheckoutProps, PUIError, PUIErrorProps, PUIPlaid, PUISuccess, PUISuccessProps$1 as PUISuccessProps, PaymentType, UserFormat, continueCheckout, continueFlows, continuePlaidOAuthFlow, getPlaidOAuthFlowState, persistPlaidReceivedRedirectUri };

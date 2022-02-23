@@ -5,4 +5,4 @@ export interface PUIPlaidOverlayProps {
 }
 export declare type PUISuccessProps = PUIPlaidOverlayProps & ProviderInjectorProps;
 export declare const PUIPlaidOverlay: React.FC<PUIPlaidOverlayProps>;
-export declare const PUISuccess: React.FC<PUISuccessProps>;
+export declare const PUIPlaid: React.FC<PUISuccessProps>;
