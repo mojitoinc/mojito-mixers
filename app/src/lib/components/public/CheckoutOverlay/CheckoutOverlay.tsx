@@ -1,5 +1,5 @@
 import { Backdrop, Box, CircularProgress } from "@mui/material";
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import { getSavedPaymentMethodAddressIdFromBillingInfo, savedPaymentMethodToBillingInfo, transformRawSavedPaymentMethods } from "../../../domain/circle/circle.utils";
 import { UserFormat } from "../../../domain/auth/authentication.interfaces";
 import { PaymentMethod, PaymentType } from "../../../domain/payment/payment.interfaces";
@@ -24,8 +24,6 @@ import { ProvidersInjectorProps, withProviders } from "../../shared/ProvidersInj
 import { transformCheckoutItemsFromInvoice } from "../../../domain/product/product.utils";
 import { useCreateInvoiceAndReservation } from "../../../hooks/useCreateInvoiceAndReservation";
 import { CustomTextsKeys } from "../../../domain/customTexts/customTexts.interfaces";
-
-const SELECTOR_DIALOG_SCROLLABLE = "[role=presentation]";
 
 export interface PUICheckoutOverlayProps {
   // Modal:
@@ -116,7 +114,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   onError,
   onMarketingOptInChange, // Not implemented yet. Used to let user subscribe / unsubscribe to marketing updates.
 }) => {
-  const dialogRootRef = useRef<HTMLDivElement>(null);
+  // First, get user data and saved payment methods:
 
   const {
     data: meData,
@@ -135,10 +133,15 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     variables: { orgID },
   });
 
+
+  // Get everything related to Payment UI routing, error and state handling, including resuming Plaid / 3DS flows:
+
   const {
     // CheckoutModalState:
     checkoutStep,
     checkoutError,
+    isDialogBlocked,
+    setIsDialogBlocked,
     initModalState,
     goBack,
     goNext,
@@ -161,6 +164,9 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     onError,
   });
 
+
+  // Once we have an invoiceID, load the invoice:
+
   const {
     data: invoiceDetailsData,
     loading: invoiceDetailsLoading,
@@ -171,37 +177,26 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     variables: { orgID, invoiceID },
   });
 
+
   // Modal loading state:
+
   const isDialogLoading = isAuthenticatedLoading || meLoading || paymentMethodsLoading;
   const isDialogInitializing = isDialogLoading || invoiceDetailsLoading || !invoiceID;
   const isPlaidFlowLoading = continuePlaidOAuthFlow();
 
+
   // Payment methods and checkout items / invoice items transforms:
+
   const rawSavedPaymentMethods = paymentMethodsData?.getPaymentMethodList;
   const invoiceItems = invoiceDetailsData?.getInvoiceDetails.items;
   const checkoutItems = useMemo(() => transformCheckoutItemsFromInvoice(parentCheckoutItems, invoiceItems), [parentCheckoutItems, invoiceItems]);
   const savedPaymentMethods = useMemo(() => transformRawSavedPaymentMethods(rawSavedPaymentMethods as RawSavedPaymentMethod[]), [rawSavedPaymentMethods]);
 
-  const [createInvoiceAndReservationState, createInvoiceAndReservation] = useCreateInvoiceAndReservation({
-    orgID,
-    checkoutItems,
-    debug,
-  });
 
-  useEffect(() => {
-    const dialogScrollable = dialogRootRef.current?.querySelector(SELECTOR_DIALOG_SCROLLABLE);
-
-    // Scroll to top on step change:
-    if (checkoutStep && dialogScrollable) dialogScrollable.scrollTop = 0;
-  }, [checkoutStep]);
-
-  useEffect(() => {
-    if (isDialogLoading || !open) return;
-
-    initModalState();
-  }, [isDialogLoading, open, initModalState]);
+  // Invoice creation & buy now lot reservation:
 
   const createInvoiceAndReservationCalledRef = useRef(false);
+  const [createInvoiceAndReservationState, createInvoiceAndReservation] = useCreateInvoiceAndReservation({ orgID, checkoutItems, debug });
 
   useEffect(() => {
     if (isDialogLoading || invoiceID === null || invoiceID || createInvoiceAndReservationCalledRef.current) return;
@@ -219,13 +214,24 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     }
   }, [createInvoiceAndReservationState, setError, setInvoiceID]);
 
-  const handleClose = useCallback(() => {
-    createInvoiceAndReservationCalledRef.current = false;
 
-    setInvoiceID(null);
+  // Init modal state once everything has been loaded:
 
-    onClose();
-  }, [setInvoiceID, onClose]);
+  useEffect(() => {
+    if (!isDialogLoading && open) initModalState();
+  }, [isDialogLoading, open, initModalState]);
+
+
+  // Data loading error handling:
+
+  useEffect(() => {
+    if (meError) setError(ERROR_LOADING_USER(meError));
+    if (paymentMethodsError) setError(ERROR_LOADING_PAYMENT_METHODS(paymentMethodsError));
+    if (invoiceDetailsError) setError(ERROR_LOADING_INVOICE(invoiceDetailsError));
+  }, [meError, paymentMethodsError, invoiceDetailsError, setError]);
+
+
+  // Saved payment method creation-reload-sync:
 
   useEffect(() => {
     if (savedPaymentMethods.length === 0) return;
@@ -265,11 +271,8 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     });
   }, [savedPaymentMethods, setSelectedPaymentMethod]);
 
-  useEffect(() => {
-    if (meError) setError(ERROR_LOADING_USER(meError));
-    if (paymentMethodsError) setError(ERROR_LOADING_PAYMENT_METHODS(paymentMethodsError));
-    if (invoiceDetailsError) setError(ERROR_LOADING_INVOICE(invoiceDetailsError));
-  }, [meError, paymentMethodsError, invoiceDetailsError, setError]);
+
+  // Form data / state:
 
   const handleBillingInfoSelected = useCallback((billingInfo: string | BillingInfo) => {
     // If we go back to the billing info step to fix some validation errors or change some data, we preserve the data
@@ -285,6 +288,9 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   const handleCvvSelected = useCallback((cvv: string) => {
     setSelectedPaymentMethod(({ billingInfo, paymentInfo }) => ({ billingInfo, paymentInfo, cvv }));
   }, [setSelectedPaymentMethod]);
+
+
+  // Delete payment methods:
 
   const [deletePaymentMethod] = useDeletePaymentMethodMutation();
 
@@ -335,10 +341,8 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     await refetchPaymentMethods({ orgID });
   }, [checkoutStep, deletePaymentMethod, orgID, refetchPaymentMethods, savedPaymentMethods, setSelectedPaymentMethod]);
 
-  // BLOCK DIALOG LOGIC & SHAKE ANIMATION:
 
-  // TODO: Move to hook.
-  const [isDialogBlocked, setIsDialogBlocked] = useState(false);
+  // Purchase:
 
   const handlePurchaseSuccess = useCallback(async (nextPaymentReferenceNumber: string) => {
     setPaymentReferenceNumber(nextPaymentReferenceNumber);
@@ -346,20 +350,24 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     // After a successful purchase, a new payment method might have been created, so we reload them:
     await refetchPaymentMethods();
 
-    setIsDialogBlocked(false);
-
     goNext();
-  }, [refetchPaymentMethods, setPaymentReferenceNumber, setIsDialogBlocked, goNext]);
+  }, [refetchPaymentMethods, setPaymentReferenceNumber, goNext]);
 
   const handlePurchaseError = useCallback(async (error: string | CheckoutModalError) => {
     // After a failed purchase, a new payment method might have been created anyway, so we reload them (createPaymentMethod
     // works but createPayment fails):
     await refetchPaymentMethods();
 
-    setIsDialogBlocked(false);
-
     setError(error);
-  }, [refetchPaymentMethods, setIsDialogBlocked, setError]);
+  }, [refetchPaymentMethods, setError]);
+
+  const handleClose = useCallback(() => {
+    createInvoiceAndReservationCalledRef.current = false;
+
+    setInvoiceID(null);
+
+    onClose();
+  }, [setInvoiceID, onClose]);
 
   const handleFixError = useCallback(async (): Promise<false> => {
     if (checkoutError.at === "reset") {
@@ -395,7 +403,8 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     return false;
   }, [checkoutError, goTo, createInvoiceAndReservation, meRefetch, refetchPaymentMethods, refetchInvoiceDetails, setSelectedPaymentMethod]);
 
-  // PLAID:
+
+  // Plaid integration (resume Plaid flow):
 
   const handlePlaidFlowCompleted = useCallback((paymentInfo?: PaymentMethod) => {
     if (!paymentInfo) {
@@ -408,6 +417,9 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
 
     goTo("purchasing");
   }, [initModalState, handlePaymentInfoSelected, goTo]);
+
+
+  // Loading UI:
 
   if ((isDialogInitializing || isPlaidFlowLoading) && (checkoutStep !== "error")) {
     return (<>
@@ -432,6 +444,9 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
       </Backdrop>
     </>);
   }
+
+
+  // Normal UI (steps / views):
 
   let headerVariant: CheckoutModalHeaderVariant = isAuthenticated ? 'loggedIn' : 'guest';
   let checkoutStepElement = null;
@@ -540,7 +555,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
       open={ open }
       onClose={ handleClose }
       isDialogBlocked={ isDialogBlocked }
-      dialogRootRef={ dialogRootRef }
+      contentKey={ checkoutStep }
       header={ headerElement }
       children={ checkoutStepElement } />
   );
