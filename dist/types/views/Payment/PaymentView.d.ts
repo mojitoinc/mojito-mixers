@@ -2,7 +2,7 @@ import { CheckoutItem } from "../../domain/product/product.interfaces";
 import React from "react";
 import { PaymentMethod, PaymentType } from "../../domain/payment/payment.interfaces";
 import { SavedPaymentMethod } from "../../domain/circle/circle.interfaces";
-import { CheckoutModalError, SelectedPaymentMethod } from "../../components/payments/CheckoutModal/CheckoutModal.hooks";
+import { CheckoutModalError, SelectedPaymentMethod } from "../../components/public/CheckoutOverlay/CheckoutOverlay.hooks";
 import { ConsentType } from "../../components/shared/ConsentText/ConsentText";
 export interface PaymentViewProps {
     checkoutItems: CheckoutItem[];
@@ -19,6 +19,7 @@ export interface PaymentViewProps {
     consentType: ConsentType;
     privacyHref: string;
     termsOfUseHref: string;
+    wirePaymentsDisclaimerText?: React.ReactFragment[];
     debug?: boolean;
 }
 export declare const PaymentView: React.FC<PaymentViewProps>;

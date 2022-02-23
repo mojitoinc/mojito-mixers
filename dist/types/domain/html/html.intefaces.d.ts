@@ -1,3 +1,4 @@
+/// <reference types="react" />
 export declare type HTMLTag = keyof JSX.IntrinsicElements;
 export declare type HTMLRootTag = 'div' | 'span' | 'li' | 'a';
 export declare type HTMLTarget = '_blank' | '_self' | '_parent' | '_top';

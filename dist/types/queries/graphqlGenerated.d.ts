@@ -412,6 +412,7 @@ export declare type MarketplaceCollection = {
 export declare type MarketplaceCollectionItemsArgs = {
     limit?: InputMaybe<Scalars['Int']>;
     offset?: InputMaybe<Scalars['Int']>;
+    statuses?: InputMaybe<Array<InputMaybe<MarketplaceCollectionItemStatus>>>;
 };
 export declare type MarketplaceCollectionCreateInput = {
     description: Scalars['String'];
@@ -431,8 +432,15 @@ export declare type MarketplaceCollectionItem = {
     name: Scalars['String'];
     saleType: MarketplaceSaleType;
     slug: Scalars['String'];
+    status: MarketplaceCollectionItemStatus;
 };
 export declare type MarketplaceCollectionItemDetails = MarketplaceAuctionLot | MarketplaceBuyNowOutput;
+export declare enum MarketplaceCollectionItemStatus {
+    Active = "Active",
+    Completed = "Completed",
+    Hidden = "Hidden",
+    Preview = "Preview"
+}
 export declare type MarketplaceCollectionUpdateInput = {
     description?: InputMaybe<Scalars['String']>;
     endDate?: InputMaybe<Scalars['Time']>;
@@ -449,6 +457,7 @@ export declare type MarketplaceToken = {
     __typename?: 'MarketplaceToken';
     id: Scalars['UUID'];
     marketplaceID: Scalars['UUID'];
+    name?: Maybe<Scalars['String']>;
     nftContractAddress: Scalars['String'];
     nftTokenID?: Maybe<Scalars['UUID']>;
     onChainTokenID: Scalars['Int'];
@@ -964,9 +973,9 @@ export declare type Subscription = {
     __typename?: 'Subscription';
     auctionLotUpdated: MarketplaceAuctionLot;
     bidFeed: MarketplaceAuctionBid;
-    /**  Returns a MarketplaceAuctionLot on subscribe and whenever a new bid is placed  */
+    /** Returns a MarketplaceAuctionLot on subscribe and whenever a new bid is placed */
     getMarketplaceAuctionLot: MarketplaceAuctionLot;
-    /**  Subscribes to lots and bids updates within given marketplace collection   */
+    /** Subscribes to lots and bids updates within given marketplace collection */
     marketplaceCollectionLotsUpdates: MarketplaceAuctionLot;
 };
 export declare type SubscriptionAuctionLotUpdatedArgs = {
@@ -1149,30 +1158,18 @@ export declare type WirePaymentMethodOutput = {
     status: Scalars['String'];
     type: PaymentType;
 };
-export declare type MeQueryVariables = Exact<{
+export declare type GetPaymentNotificationQueryVariables = Exact<{
     [key: string]: never;
 }>;
-export declare type MeQuery = {
+export declare type GetPaymentNotificationQuery = {
     __typename?: 'Query';
-    me?: {
-        __typename?: 'CurrentUser';
-        id: any;
-        user: {
-            __typename?: 'User';
-            id: any;
-            username: string;
-            name?: string | null;
-            email?: string | null;
+    getPaymentNotification: {
+        __typename?: 'PaymentNotificationOutput';
+        message: {
+            __typename?: 'PaymentNotification3DSMessage';
+            redirectURL: string;
         };
-        userOrgs: Array<{
-            __typename?: 'UserOrganization';
-            organization: {
-                __typename?: 'Organization';
-                id: any;
-                name: string;
-            };
-        }>;
-    } | null;
+    };
 };
 export declare type CreatePaymentMutationVariables = MutationCreatePaymentArgs;
 export declare type CreatePaymentMutation = {
@@ -1225,6 +1222,48 @@ export declare type CreateBuyNowInvoiceMutation = {
             } | null>;
         } | null;
     };
+};
+export declare type GetInvoiceDetailsQueryVariables = Exact<{
+    invoiceID: Scalars['UUID1'];
+    orgID: Scalars['UUID1'];
+}>;
+export declare type GetInvoiceDetailsQuery = {
+    __typename?: 'Query';
+    getInvoiceDetails: {
+        __typename?: 'InvoiceDetails';
+        items: Array<{
+            __typename?: 'ItemInvoiceDetail';
+            collectionItemID: any;
+            collectionItemTitle: string;
+            units: number;
+            unitPrice: number;
+        } | null>;
+    };
+};
+export declare type MeQueryVariables = Exact<{
+    [key: string]: never;
+}>;
+export declare type MeQuery = {
+    __typename?: 'Query';
+    me?: {
+        __typename?: 'CurrentUser';
+        id: any;
+        user: {
+            __typename?: 'User';
+            id: any;
+            username: string;
+            name?: string | null;
+            email?: string | null;
+        };
+        userOrgs: Array<{
+            __typename?: 'UserOrganization';
+            organization: {
+                __typename?: 'Organization';
+                id: any;
+                name: string;
+            };
+        }>;
+    } | null;
 };
 export declare type PaymentKeyQueryVariables = Exact<{
     [key: string]: never;
@@ -1328,31 +1367,31 @@ export declare type PreparePaymentMethodQuery = {
         linkToken: string;
     } | null;
 };
-export declare const MeDocument: Apollo.DocumentNode;
+export declare const GetPaymentNotificationDocument: Apollo.DocumentNode;
 /**
- * __useMeQuery__
+ * __useGetPaymentNotificationQuery__
  *
- * To run a query within a React component, call `useMeQuery` and pass it any options that fit your needs.
- * When your component renders, `useMeQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useGetPaymentNotificationQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetPaymentNotificationQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useMeQuery({
+ * const { data, loading, error } = useGetPaymentNotificationQuery({
  *   variables: {
  *   },
  * });
  */
-export declare function useMeQuery(baseOptions?: Apollo.QueryHookOptions<MeQuery, MeQueryVariables>): Apollo.QueryResult<MeQuery, Exact<{
+export declare function useGetPaymentNotificationQuery(baseOptions?: Apollo.QueryHookOptions<GetPaymentNotificationQuery, GetPaymentNotificationQueryVariables>): Apollo.QueryResult<GetPaymentNotificationQuery, Exact<{
     [key: string]: never;
 }>>;
-export declare function useMeLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<MeQuery, MeQueryVariables>): Apollo.QueryTuple<MeQuery, Exact<{
+export declare function useGetPaymentNotificationLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetPaymentNotificationQuery, GetPaymentNotificationQueryVariables>): Apollo.QueryTuple<GetPaymentNotificationQuery, Exact<{
     [key: string]: never;
 }>>;
-export declare type MeQueryHookResult = ReturnType<typeof useMeQuery>;
-export declare type MeLazyQueryHookResult = ReturnType<typeof useMeLazyQuery>;
-export declare type MeQueryResult = Apollo.QueryResult<MeQuery, MeQueryVariables>;
+export declare type GetPaymentNotificationQueryHookResult = ReturnType<typeof useGetPaymentNotificationQuery>;
+export declare type GetPaymentNotificationLazyQueryHookResult = ReturnType<typeof useGetPaymentNotificationLazyQuery>;
+export declare type GetPaymentNotificationQueryResult = Apollo.QueryResult<GetPaymentNotificationQuery, GetPaymentNotificationQueryVariables>;
 export declare const CreatePaymentDocument: Apollo.DocumentNode;
 export declare type CreatePaymentMutationFn = Apollo.MutationFunction<CreatePaymentMutation, CreatePaymentMutationVariables>;
 /**
@@ -1429,6 +1468,60 @@ export declare function useCreateBuyNowInvoiceMutation(baseOptions?: Apollo.Muta
 export declare type CreateBuyNowInvoiceMutationHookResult = ReturnType<typeof useCreateBuyNowInvoiceMutation>;
 export declare type CreateBuyNowInvoiceMutationResult = Apollo.MutationResult<CreateBuyNowInvoiceMutation>;
 export declare type CreateBuyNowInvoiceMutationOptions = Apollo.BaseMutationOptions<CreateBuyNowInvoiceMutation, CreateBuyNowInvoiceMutationVariables>;
+export declare const GetInvoiceDetailsDocument: Apollo.DocumentNode;
+/**
+ * __useGetInvoiceDetailsQuery__
+ *
+ * To run a query within a React component, call `useGetInvoiceDetailsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetInvoiceDetailsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetInvoiceDetailsQuery({
+ *   variables: {
+ *      invoiceID: // value for 'invoiceID'
+ *      orgID: // value for 'orgID'
+ *   },
+ * });
+ */
+export declare function useGetInvoiceDetailsQuery(baseOptions: Apollo.QueryHookOptions<GetInvoiceDetailsQuery, GetInvoiceDetailsQueryVariables>): Apollo.QueryResult<GetInvoiceDetailsQuery, Exact<{
+    invoiceID: any;
+    orgID: any;
+}>>;
+export declare function useGetInvoiceDetailsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetInvoiceDetailsQuery, GetInvoiceDetailsQueryVariables>): Apollo.QueryTuple<GetInvoiceDetailsQuery, Exact<{
+    invoiceID: any;
+    orgID: any;
+}>>;
+export declare type GetInvoiceDetailsQueryHookResult = ReturnType<typeof useGetInvoiceDetailsQuery>;
+export declare type GetInvoiceDetailsLazyQueryHookResult = ReturnType<typeof useGetInvoiceDetailsLazyQuery>;
+export declare type GetInvoiceDetailsQueryResult = Apollo.QueryResult<GetInvoiceDetailsQuery, GetInvoiceDetailsQueryVariables>;
+export declare const MeDocument: Apollo.DocumentNode;
+/**
+ * __useMeQuery__
+ *
+ * To run a query within a React component, call `useMeQuery` and pass it any options that fit your needs.
+ * When your component renders, `useMeQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useMeQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export declare function useMeQuery(baseOptions?: Apollo.QueryHookOptions<MeQuery, MeQueryVariables>): Apollo.QueryResult<MeQuery, Exact<{
+    [key: string]: never;
+}>>;
+export declare function useMeLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<MeQuery, MeQueryVariables>): Apollo.QueryTuple<MeQuery, Exact<{
+    [key: string]: never;
+}>>;
+export declare type MeQueryHookResult = ReturnType<typeof useMeQuery>;
+export declare type MeLazyQueryHookResult = ReturnType<typeof useMeLazyQuery>;
+export declare type MeQueryResult = Apollo.QueryResult<MeQuery, MeQueryVariables>;
 export declare const PaymentKeyDocument: Apollo.DocumentNode;
 /**
  * __usePaymentKeyQuery__

@@ -32,12 +32,14 @@ const CheckoutModalHeader = ({ variant, title: customTitle, logoSrc, logoSx, use
             React__default.createElement(Box, { component: "img", src: logoSrc, sx: Object.assign({ maxHeight: "32px", maxWidth: { xs: "180px", sm: "240px" } }, logoSx) })),
         React__default.createElement(Divider, null),
         showControls ? (React__default.createElement(React__default.Fragment, null,
-            React__default.createElement(Stack, { spacing: 2, direction: "row", sx: { justifyContent: "space-between", alignItems: "center", py: 2 } }, variant === "anonymous" ? (React__default.createElement(React__default.Fragment, null,
-                React__default.createElement(Typography, { sx: { fontWeight: "500" } }, "Already have an account?"),
-                React__default.createElement(PrimaryButton, { onClick: onLoginClicked }, "Log in"))) : (React__default.createElement(React__default.Fragment, null,
-                React__default.createElement(OutlinedSecondaryButton, { onClick: onPrevClicked },
-                    React__default.createElement(default_1, null)),
-                React__default.createElement(Typography, { sx: { fontWeight: "500", minHeight: 40, display: "flex", alignItems: "center" } }, displayUsername)))),
+            React__default.createElement(Stack, { spacing: 2, direction: "row", sx: { justifyContent: "space-between", alignItems: "center", py: 2 } },
+                (variant === "anonymous" && onLoginClicked) ? (React__default.createElement(React__default.Fragment, null,
+                    React__default.createElement(Typography, { sx: { fontWeight: "500" } }, "Already have an account?"),
+                    React__default.createElement(PrimaryButton, { onClick: onLoginClicked }, "Log in"))) : null,
+                (variant !== "anonymous" && onPrevClicked && displayUsername) ? (React__default.createElement(React__default.Fragment, null,
+                    React__default.createElement(OutlinedSecondaryButton, { onClick: onPrevClicked },
+                        React__default.createElement(default_1, null)),
+                    React__default.createElement(Typography, { sx: { fontWeight: "500", minHeight: 40, display: "flex", alignItems: "center" } }, displayUsername))) : null),
             React__default.createElement(Divider, null))) : null));
 };
 

@@ -54,7 +54,7 @@ const BillingView = ({ checkoutItems, savedPaymentMethods: rawSavedPaymentMethod
             sm: "column",
             md: "row",
         }, spacing: 8.75 },
-        React__default.createElement(Stack, { sx: { display: 'flex', flex: 1 } },
+        React__default.createElement(Stack, { sx: { display: 'flex', flex: 1, overflow: "hidden" } },
             React__default.createElement(CheckoutStepper, { progress: 50 }),
             showSaved ? (React__default.createElement(SavedBillingDetailsSelector, { showLoader: isDeleting, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethodAddressId: typeof selectedBillingInfo === "string" ? selectedBillingInfo : undefined, onNew: handleShowForm, onEdit: handleShowForm, onDelete: handleSavedPaymentMethodDeleted, onPick: onBillingInfoSelected, onNext: onNext, onClose: onClose })) : (React__default.createElement(BillingInfoForm
             // variant="loggedIn"

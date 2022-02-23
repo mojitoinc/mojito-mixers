@@ -1,9 +1,10 @@
 import { ApolloError } from "@apollo/client";
-import { CheckoutModalError, CheckoutModalErrorAt } from "../../components/payments/CheckoutModal/CheckoutModal.hooks";
+import { CheckoutModalError, CheckoutModalErrorAt } from "../../components/public/CheckoutOverlay/CheckoutOverlay.hooks";
 export declare const BUILT_IN_ERRORS: string[];
 export declare const DEFAULT_ERROR_AT: CheckoutModalErrorAt;
 export declare const ERROR_LOADING_USER: (error?: ApolloError | Error) => CheckoutModalError;
 export declare const ERROR_LOADING_PAYMENT_METHODS: (error?: ApolloError | Error) => CheckoutModalError;
+export declare const ERROR_LOADING_INVOICE: (error?: ApolloError | Error) => CheckoutModalError;
 export declare const ERROR_PURCHASE: (error?: ApolloError | Error) => CheckoutModalError;
 export declare const ERROR_PURCHASE_NO_ITEMS: (error?: ApolloError | Error) => CheckoutModalError;
 export declare const ERROR_PURCHASE_NO_UNITS: (error?: ApolloError | Error) => CheckoutModalError;
@@ -13,3 +14,4 @@ export declare const ERROR_PURCHASE_CREATING_PAYMENT_METHOD: (error?: ApolloErro
 export declare const ERROR_PURCHASE_CREATING_INVOICE: (error?: ApolloError | Error) => CheckoutModalError;
 export declare const ERROR_PURCHASE_CVV: (error?: ApolloError | Error) => CheckoutModalError;
 export declare const ERROR_PURCHASE_PAYING: (error?: ApolloError | Error) => CheckoutModalError;
+export declare const ERROR_PURCHASE_3DS: (error?: ApolloError | Error) => CheckoutModalError;

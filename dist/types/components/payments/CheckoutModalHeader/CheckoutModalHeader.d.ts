@@ -10,7 +10,7 @@ export interface CheckoutModalHeaderProps {
     logoSx?: SxProps<Theme>;
     user?: User;
     userFormat?: UserFormat;
-    onLoginClicked: () => void;
-    onPrevClicked: () => void;
+    onLoginClicked?: () => void;
+    onPrevClicked?: () => void;
 }
 export declare const CheckoutModalHeader: React.FC<CheckoutModalHeaderProps>;

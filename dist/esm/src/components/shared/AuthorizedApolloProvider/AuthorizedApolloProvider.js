@@ -1,25 +1,25 @@
 import { __awaiter } from '../../../../node_modules/tslib/tslib.es6.js';
-import React__default from 'react';
-import { createHttpLink, ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client';
+import React__default, { useMemo } from 'react';
+import { InMemoryCache, createHttpLink, ApolloClient, ApolloProvider } from '@apollo/client';
 import { setContext } from '../../../../node_modules/@apollo/client/link/context/index.js';
 import { useAuth0 } from '@auth0/auth0-react';
 
-const AuthorizedApolloProvider = ({ uri, children, }) => {
+const cache = new InMemoryCache();
+const AuthorizedApolloProvider = ({ apolloClient: parentApolloClient, uri, children, }) => {
     const { getIdTokenClaims } = useAuth0();
-    const httpLink = createHttpLink({
-        uri: uri,
-    });
-    const authLink = setContext((_, { headers }) => __awaiter(void 0, void 0, void 0, function* () {
-        const token = yield getIdTokenClaims();
-        return {
-            headers: token ? Object.assign(Object.assign({}, headers), { authorization: `Bearer ${token.__raw}` }) : headers,
-        };
-    }));
-    const apolloClient = new ApolloClient({
-        link: authLink.concat(httpLink),
-        uri: uri,
-        cache: new InMemoryCache(),
-    });
+    const apolloClient = useMemo(() => {
+        if (parentApolloClient)
+            return parentApolloClient;
+        const httpLink = createHttpLink({ uri });
+        const authLink = setContext((_, { headers }) => __awaiter(void 0, void 0, void 0, function* () {
+            const token = yield getIdTokenClaims();
+            return {
+                headers: Object.assign(Object.assign({}, headers), { authorization: token ? `Bearer ${token.__raw}` : "" }),
+            };
+        }));
+        const link = authLink.concat(httpLink);
+        return new ApolloClient({ uri, link, cache });
+    }, [parentApolloClient, uri, getIdTokenClaims]);
     return React__default.createElement(ApolloProvider, { client: apolloClient }, children);
 };
 
