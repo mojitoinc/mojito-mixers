@@ -24,4 +24,4 @@ export const PUIPlaidOverlay: React.FC<PUIPlaidOverlayProps> = ({
   return null;
 }
 
-export const PUISuccess: React.FC<PUISuccessProps> = withProviders(PUIPlaidOverlay);
+export const PUIPlaid: React.FC<PUISuccessProps> = withProviders(PUIPlaidOverlay);
