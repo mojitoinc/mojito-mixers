@@ -11,6 +11,8 @@ const THREEDS_FLOW_RECEIVED_REDIRECT_URI_KEY = "THREEDS_FLOW_RECEIVED_REDIRECT_U
 const THREEDS_STATE_USED_KEY = "THREEDS_STATE_USED_KEY";
 const THREEDS_FLOW_URL_SEARCH = "?paymentId=";
 
+const debug = false;
+
 export interface CheckoutModalInfo {
   url?: string;
   invoiceID: string; // TODO: Use this to load the products again.
@@ -43,8 +45,6 @@ const FALLBACK_MODAL_STATE: CheckoutModalState3DS = {
 export function persistCheckoutModalInfo(info: CheckoutModalInfo) {
   if (!process.browser) return;
 
-  console.log("Storing state:", info);
-
   try {
     localStorage.setItem(THREEDS_FLOW_INFO_KEY, JSON.stringify({
       ...info,
@@ -52,7 +52,7 @@ export function persistCheckoutModalInfo(info: CheckoutModalInfo) {
       timestamp: info.timestamp || Date.now(),
     }));
   } catch (err) {
-    console.log(err);
+    if (debug) console.log(err);
   }
 }
 
@@ -65,7 +65,7 @@ export function persistCheckoutModalInfoUsed(used = true) {
 }
 
 export function clearPersistedInfo(isExpired?: boolean) {
-  console.log(`Clearing ${ isExpired ? "expired " : "" }state (3DS)...`);
+  if (debug) console.log(`💾 Clearing ${ isExpired ? "expired " : "" }state (3DS)...`);
 
   if (process.browser) {
     localStorage.removeItem(THREEDS_FLOW_INFO_KEY);
@@ -100,7 +100,7 @@ export function getCheckoutModalState(): CheckoutModalState3DS {
     savedReceivedRedirectUri = localStorage.getItem(THREEDS_FLOW_RECEIVED_REDIRECT_URI_KEY) || "";
     savedStateUsed = localStorage.getItem(THREEDS_STATE_USED_KEY) === "true" || false;
   } catch (err) {
-    console.log(err);
+    if (debug) console.log(err);
   }
 
   const {
@@ -148,14 +148,14 @@ export function getCheckoutModalState(): CheckoutModalState3DS {
   };
 }
 
-if (process.browser) localStorage.setItem("THREEDS_FLOW_RECEIVED_REDIRECT_URI_KEY", "https://metaverse-staging.sothebys.com/payments/success?paymentId=408db30b-3a5b-44b1-96f1-a1e4aa8dac1e")
+// if (process.browser) localStorage.setItem("THREEDS_FLOW_RECEIVED_REDIRECT_URI_KEY", "https://metaverse-staging.sothebys.com/payments/success?paymentId=408db30b-3a5b-44b1-96f1-a1e4aa8dac1e")
 
 export function continueCheckout(noClear = false): [boolean, CheckoutModalState3DS] {
   const savedCheckoutModalState = getCheckoutModalState();
   const { continue3DSFlow } = savedCheckoutModalState;
 
   if (continue3DSFlow) {
-    console.log("💾 Continue 3DS Flow...", savedCheckoutModalState);
+    if (debug) console.log("💾 Continue 3DS Flow...", savedCheckoutModalState);
 
     if (!noClear) clearPersistedInfo();
   }
@@ -196,7 +196,7 @@ export function continueFlows(noClear = false) {
     continueFlowsReturn.paymentInfo = savedCheckoutModalState.paymentInfo;
     continueFlowsReturn.paymentReferenceNumber = savedCheckoutModalState.paymentReferenceNumber;
   } else if (continueOAuthFlow) {
-    console.log("💾 Continue Plaid OAuth Flow...", INITIAL_PLAID_OAUTH_FLOW_STATE);
+    if (debug) console.log("💾 Continue Plaid OAuth Flow...", INITIAL_PLAID_OAUTH_FLOW_STATE);
 
     continueFlowsReturn.checkoutStep = "purchasing";
     continueFlowsReturn.billingInfo = INITIAL_PLAID_OAUTH_FLOW_STATE.selectedBillingInfo;

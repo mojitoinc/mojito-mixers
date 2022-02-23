@@ -7,6 +7,8 @@ const PLAID_OAUTH_FLOW_RECEIVED_REDIRECT_URI_KEY = "PLAID_OAUTH_FLOW_RECEIVED_RE
 const PLAID_OAUTH_STATE_USED_KEY = "PLAID_OAUTH_STATE_USED_KEY";
 const PLAID_OAUTH_FLOW_URL_SEARCH = "?oauth_state_id=";
 
+const debug = false;
+
 export interface PlaidInfo {
   // TODO: Do we need to store product info?
   url?: string;
@@ -39,7 +41,7 @@ export function persistPlaidInfo(info: PlaidInfo) {
       timestamp: info.timestamp || Date.now(),
     }));
   } catch (err) {
-    console.log(err);
+    if (debug) console.log(err);
   }
 }
 
@@ -52,7 +54,7 @@ export function persistPlaidOAuthStateUsed(used = true) {
 }
 
 export function clearPlaidInfo(isExpired?: boolean) {
-  console.log(`Clearing ${ isExpired ? "expired " : "" }state (Plaid)...`);
+  if (debug) console.log(`💾 Clearing ${ isExpired ? "expired " : "" }state (Plaid)...`);
 
   if (process.browser) {
     localStorage.removeItem(PLAID_OAUTH_FLOW_INFO_KEY);
@@ -87,7 +89,7 @@ export function getPlaidOAuthFlowState(): PlaidOAuthFlowState {
     savedReceivedRedirectUri = localStorage.getItem(PLAID_OAUTH_FLOW_RECEIVED_REDIRECT_URI_KEY) || "";
     savedStateUsed = localStorage.getItem(PLAID_OAUTH_STATE_USED_KEY) === "true" || false;
   } catch (err) {
-    console.log(err);
+    if (debug) console.log(err);
   }
 
   const {

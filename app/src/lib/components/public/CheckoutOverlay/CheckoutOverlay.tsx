@@ -175,8 +175,6 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   const isDialogInitializing = isDialogLoading || invoiceDetailsLoading || !invoiceID;
   const isPlaidFlowLoading = continuePlaidOAuthFlow();
 
-  console.log(`invoiceID = ${ invoiceID } / ${ isDialogInitializing ? "Initializing..." : (isDialogLoading ? "Loading..." : "Ready.") }`);
-
   // Payment methods and checkout items / invoice items transforms:
   const rawSavedPaymentMethods = paymentMethodsData?.getPaymentMethodList;
   const invoiceItems = invoiceDetailsData?.getInvoiceDetails.items;
@@ -218,7 +216,15 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     } else if (createInvoiceAndReservationState.invoiceID) {
       setInvoiceID(createInvoiceAndReservationState.invoiceID);
     }
-  }, [createInvoiceAndReservationState, setError, setInvoiceID])
+  }, [createInvoiceAndReservationState, setError, setInvoiceID]);
+
+  const handleClose = useCallback(() => {
+    createInvoiceAndReservationCalledRef.current = false;
+
+    setInvoiceID(null);
+
+    onClose();
+  }, [setInvoiceID, onClose]);
 
   useEffect(() => {
     if (savedPaymentMethods.length === 0) return;
@@ -384,7 +390,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
 
       <Backdrop
         open={ open }
-        onClick={ onClose }>
+        onClick={ handleClose }>
         { loaderImageSrc ? (
           <Box
             component="img"
@@ -413,7 +419,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
         checkoutError={ checkoutError }
         errorImageSrc={ errorImageSrc }
         onFixError={ handleFixError }
-        onClose={ onClose }
+        onClose={ handleClose }
         debug={ debug } />
     );
   } else if (!checkoutStep) {
@@ -427,7 +433,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
         isAuthenticated={ isAuthenticated }
         guestCheckoutEnabled={ guestCheckoutEnabled }
         onGuestClicked={ goNext }
-        onCloseClicked={ onClose } />
+        onCloseClicked={ handleClose } />
     );
   } else if (checkoutStep === "billing") {
     checkoutStepElement = (
@@ -439,7 +445,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
         onBillingInfoSelected={ handleBillingInfoSelected }
         onSavedPaymentMethodDeleted={ handleSavedPaymentMethodDeleted }
         onNext={ goNext }
-        onClose={ onClose }
+        onClose={ handleClose }
         debug={ debug } />
     );
   } else if (checkoutStep === "payment") {
@@ -454,7 +460,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
         onSavedPaymentMethodDeleted={ handleSavedPaymentMethodDeleted }
         onNext={ goNext }
         onPrev={ goBack }
-        onClose={ onClose }
+        onClose={ handleClose }
         acceptedPaymentTypes={ acceptedPaymentTypes }
         consentType={ consentType }
         privacyHref={ privacyHref }
@@ -487,8 +493,8 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
         selectedPaymentMethod={ selectedPaymentMethod }
         paymentReferenceNumber={ paymentReferenceNumber }
         purchaseInstructions={ purchaseInstructions }
-        onNext={ onClose }
-        onClose={ onClose } />
+        onNext={ handleClose }
+        onClose={ handleClose } />
     );
   }
 
@@ -500,14 +506,14 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
       user={ meData?.me?.user }
       userFormat={ userFormat }
       onLoginClicked={ onLogin }
-      onPrevClicked={ checkoutStep === "authentication" ? onClose : goBack } />
+      onPrevClicked={ checkoutStep === "authentication" ? handleClose : goBack } />
   );
 
   return (
     <FullScreenOverlay
       centered={ checkoutStep === "purchasing" || checkoutStep === "error" }
       open={ open }
-      onClose={ onClose }
+      onClose={ handleClose }
       isDialogBlocked={ isDialogBlocked }
       dialogRootRef={ dialogRootRef }
       header={ headerElement }

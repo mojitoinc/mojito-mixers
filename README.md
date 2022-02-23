@@ -74,40 +74,6 @@ When testing the purchase flow, you need to make sure to:
 <br />
 
 
-DONE:
-- Extract FullScreenOverlay.
-- Re-structure exported components and providers.
-- Center modal content (with prop).
-- Add Placeholder props for columns in FullScreenOverlay.
-- Create 3DS pages in Next app.
-- 3DS success and error screen designs.
-- Extract StatusIcon.
-- Improve ProviderInjector logic and add Apollo.
-- Create PlaidOverlay just like SuccessOverlay or ErrorOverlay..
-- Update PurchasingView to do polling for CC payments instead of going to the confirmation step.
-- Implement persistance of state before redirecting users to 3DS.
-- Expose invoiceID fom useFullPayment and fix persistCheckoutModalInfo call.
-- Add expiration to persisted state.
-- Implement persistance in CheckoutOverlay.utils.
-- Load items from invoice when coming back from 3DS success or error pages.
-- When coming back from a 3DS error, CVV needs to be re-entered. Now redirecting to payment.
-- Move reservation / invoice creation logic to CheckoutOverlay and refactor / reorganize CheckoutOverlay
-  CheckoutOverlay.hooks, useFullPayment and useCreateInvoiceAndReservation.
-
-
-DOING:
-- Fix Payment UI not re-initializing properly when closing and opening again.
-- In staging, send back redirect URL in param
-
-
-TODO:
-- Update error handling to do take users back more often, instead of trying again with the same data.
-- Add a cleanup function that removes expired or marked as used states. See if the get state function can work as cleanup.
-- Improve names on 3DS stuff.
-- Update CheckoutItem props. The one passed doesn't have price info, the one used inside does (from invoice).
-- Plaid flow will re-create invoice and will hang loading.
-
-
 ## Building this project as a library
 
 The project includes a separated Rollup build to build it as a library that can be installed and consumed by other projects.

@@ -91,16 +91,12 @@ export function useCheckoutModalState({
   });
 
   const initModalState = useCallback(() => {
-    console.log("initModalState", startAt);
-
     // Make sure the progress tracker in BillingView and PaymentView is properly animated:
     resetStepperProgress();
 
     // Once authentication has loaded, we know if we need to skip the product confirmation step or not. Also, when the
     // modal is re-opened, we need to reset its state, taking into account if we need to resume a Plaid OAuth flow:s
     const savedFlow = continueFlows();
-
-    console.log("savedFlow =", savedFlow);
 
     // if (savedFlow.checkoutStep !== "") {
     //   clearPersistedInfo();
