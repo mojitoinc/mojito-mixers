@@ -95,7 +95,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   customTexts,
 
   // Legal:
-  consentType, // Not implemented yet. Used to let the app control where to log errors to (e.g. Sentry).
+  consentType,
   privacyHref,
   termsOfUseHref,
 
