@@ -3,9 +3,21 @@ import { Container, Typography, Box, Stack, Button, FormControl, FormLabel, Radi
 import { useCallback, useEffect, useRef, useState } from "react";
 import { PUICheckout, CheckoutModalError, PUICheckoutProps, PaymentType } from "../lib";
 import { useMeQuery } from "../services/graphql/generated";
-import { PLAYGROUND_PARAGRAPHS_ARRAY, PLAYGROUND_AUTH_PRESET, PLAYGROUND_NO_AUTH_PRESET, PLAYGROUND_PRIVACY_HREF, PLAYGROUND_PURCHASE_INSTRUCTIONS, PLAYGROUND_TERMS_OF_USE_HREF, PLAYGROUND_USER_FORMAT, PLAYGROUND_PURCHASING_IMAGE_SRC, PLAYGROUND_ERROR_IMAGE_SRC, PLAYGROUND_THEMES, PLAYGROUND_LOGOS_SRC, PLAYGROUND_LOGOS_SX, PLAYGROUND_MOCKED_LOT, PLAYGROUND_LOADER_IMAGE_SRC } from "../utils/playground/playground.constants";
+import { PLAYGROUND_PARAGRAPHS_ARRAY, PLAYGROUND_AUTH_PRESET, PLAYGROUND_NO_AUTH_PRESET, PLAYGROUND_PRIVACY_HREF, PLAYGROUND_TERMS_OF_USE_HREF, PLAYGROUND_USER_FORMAT, PLAYGROUND_PURCHASING_IMAGE_SRC, PLAYGROUND_ERROR_IMAGE_SRC, PLAYGROUND_THEMES, PLAYGROUND_LOGOS_SRC, PLAYGROUND_LOGOS_SX, PLAYGROUND_MOCKED_LOT, PLAYGROUND_LOADER_IMAGE_SRC } from "../utils/playground/playground.constants";
 import { PlaygroundFormData } from "../utils/playground/playground.interfaces";
 import { config } from "../utils/config/config.constants";
+
+export const PLAYGROUND_WIRE_PAYMENTS_DISCLAIMER: React.ReactFragment[] = [<>
+  <strong>Third-party wire transfers cannot be accepted. </strong>
+  Your bank account name needs to match with the name you used to register in Marketplace.
+</>, <>
+  Please note that wire transfers usually take <strong>1-3 business days</strong> to arrive. We
+  do not charge any deposit fee — however, your bank may charge you a wire transfer fee.
+</>];
+
+export const PLAYGROUND_PURCHASE_INSTRUCTIONS = [<>
+  Purchased instructions on how to claim item / how item will be delivered can be placed here...
+</>];
 
 const DEFAULT_FORM_VALUES: PlaygroundFormData = {
   // Organization:
@@ -31,8 +43,8 @@ const DEFAULT_FORM_VALUES: PlaygroundFormData = {
   // Payment:
   paymentCC: true,
   paymentACH: true,
-  paymentWire: false,
-  paymentCrypto: false,
+  paymentWire: true,
+  paymentCrypto: true,
 };
 
 const FORM_VALUES_KEY = "FORM_VALUES_KEY";
@@ -172,7 +184,10 @@ const HomePage = () => {
       formValues.paymentWire ? "Wire" : "",
       formValues.paymentCrypto ? "Crypto" : "",
     ].filter(Boolean) as PaymentType[],
-    purchaseInstructions: PLAYGROUND_PURCHASE_INSTRUCTIONS,
+    customTexts: {
+      wirePaymentsDisclaimer: PLAYGROUND_WIRE_PAYMENTS_DISCLAIMER,
+      purchaseInstructions: PLAYGROUND_PURCHASE_INSTRUCTIONS,
+    },
 
     // Legal:
     consentType: "disclaimer",

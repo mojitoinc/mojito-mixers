@@ -6,7 +6,7 @@ import { CheckoutItemList } from "../CheckoutItemCost/List/CheckoutItemList";
 
 export interface PurchaseConfirmationItemDetailsProps {
   checkoutItems: CheckoutItem[];
-  purchaseInstructions: string;
+  purchaseInstructions: React.ReactNode;
 }
 
 export const PurchaseConfirmationItemDetails: React.FC<

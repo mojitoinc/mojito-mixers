@@ -33,6 +33,7 @@ export interface PaymentViewProps {
   consentType: ConsentType;
   privacyHref: string;
   termsOfUseHref: string;
+  wirePaymentsDisclaimerText?: React.ReactFragment[];
   debug?: boolean;
 }
 
@@ -51,6 +52,7 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
   consentType,
   privacyHref,
   termsOfUseHref,
+  wirePaymentsDisclaimerText,
   debug,
 }) => {
   const {
@@ -128,7 +130,7 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
       }}
       spacing={8.75}
     >
-      <Stack sx={{ display: 'flex', flex: 1 }}>
+      <Stack sx={{ display: 'flex', flex: 1, overflow: "hidden" }}>
         <CheckoutStepper progress={ 100 } />
 
         <BillingInfoItem
@@ -163,6 +165,7 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
             consentType={ consentType }
             privacyHref={ privacyHref }
             termsOfUseHref={ termsOfUseHref }
+            wirePaymentsDisclaimerText={ wirePaymentsDisclaimerText }
             debug={ debug } />
         ) }
       </Stack>

@@ -40,6 +40,7 @@ interface PaymentTypeFormProps {
   consentType: ConsentType;
   privacyHref?: string;
   termsOfUseHref?: string;
+  wirePaymentsDisclaimerText?: React.ReactFragment[];
 }
 
 interface PaymentTypeFormData {
@@ -53,11 +54,14 @@ const FIELD_LABELS = {
   expiryDate: "Expiry Date",
   secureCode: "Secure Code",
   nameOnCard: "Name on Card",
+  accountNumber: "Account Number",
+  routingNumber: "Routing Number (ABA)",
 };
 
 const FIELD_NAMES = Object.keys(FIELD_LABELS);
 
 const isCreditCardThenRequireSchema = requireSchemaWhenKeyIs("CreditCard");
+const isWireThenRequireSchema = requireSchemaWhenKeyIs("Wire");
 
 const PAYMENT_TYPE_FORM_DATA: Record<PaymentType, PaymentTypeFormData> = {
   CreditCard: {
@@ -175,22 +179,42 @@ const PAYMENT_TYPE_FORM_DATA: Record<PaymentType, PaymentTypeFormData> = {
   Wire: {
     defaultValues: (consentType) => ({
       type: "Wire",
+      accountNumber: "",
+      routingNumber: "",
       consent: consentType === "checkbox" ? false: true,
     }),
-    schemaShape: {},
-    fields: ({ control, consentType, privacyHref, termsOfUseHref }) => (<>
-      <DisplayBox sx={{ mt: 1.5, mb: consentType === "checkbox" ? 1 : 0 }}>
-        <Typography variant="body1">
-          Not supported yet.
-        </Typography>
-      </DisplayBox>
-
+    schemaShape: {
+      accountNumber: string()
+        .label(FIELD_LABELS.accountNumber)
+        .when("type", isWireThenRequireSchema),
+      routingNumber: string()
+        .label(FIELD_LABELS.routingNumber)
+        .when("type", isWireThenRequireSchema),
+    },
+    fields: ({ control, consentType, privacyHref, termsOfUseHref, wirePaymentsDisclaimerText }) => (<>
+      <ControlledTextField
+          name="accountNumber"
+          control={control}
+          label={FIELD_LABELS.accountNumber}
+        />
+        <ControlledTextField
+          name="routingNumber"
+          control={control}
+          label={FIELD_LABELS.routingNumber}
+        />
       { consentType === "checkbox" && (
         <ControlledCheckbox
           name="consent"
           control={control}
           label={ <>I <ConsentText privacyHref={ privacyHref } termsOfUseHref={ termsOfUseHref } /></> } />
       ) }
+      {wirePaymentsDisclaimerText && (
+        <DisplayBox sx={{ mt: 1.5, flexDirection: "column" }} >
+          { wirePaymentsDisclaimerText.map((wirePaymentsDisclaimerLine, i) => {
+            return <Typography key={ i } variant="body1" sx={ i === 0 ? undefined : { mt: 1.5 } }>{ wirePaymentsDisclaimerLine }</Typography>;
+          }) }
+        </DisplayBox>
+      )}
     </>),
   },
   Crypto: {
@@ -200,7 +224,7 @@ const PAYMENT_TYPE_FORM_DATA: Record<PaymentType, PaymentTypeFormData> = {
     }),
     schemaShape: {},
     fields: ({ control, consentType, privacyHref, termsOfUseHref }) => (<>
-      <DisplayBox sx={{ mt: 1.5, mb: consentType === "checkbox" ? 1 : 0 }}>
+      <DisplayBox sx={{ mt: 1.5, mb: consentType === "checkbox" ? 1 : 0, flexDirection: "column" }}>
         <Typography variant="body1">
           Not supported yet.
         </Typography>
@@ -227,6 +251,7 @@ export interface PaymentMethodFormProps {
   consentType: ConsentType;
   privacyHref: string;
   termsOfUseHref: string;
+  wirePaymentsDisclaimerText?: React.ReactFragment[];
   debug?: boolean;
 }
 
@@ -241,6 +266,7 @@ export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
   consentType,
   privacyHref,
   termsOfUseHref,
+  wirePaymentsDisclaimerText,
   debug = false
 }) => {
   const defaultPaymentType = acceptedPaymentTypes[0] || "CreditCard";
@@ -294,7 +320,7 @@ export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
       }
 
       onPlaidLinkClicked();
-    } else if (selectedPaymentMethod === "CreditCard") {
+    } else if (["CreditCard", "Wire"].includes(selectedPaymentMethod)) {
       submitForm(e);
     }
   }, [selectedPaymentMethod, onPlaidLinkClicked, submitForm, trigger]);
@@ -325,7 +351,8 @@ export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
         control={ control }
         consentType={ consentType }
         privacyHref={ privacyHref }
-        termsOfUseHref={ termsOfUseHref } />
+        termsOfUseHref={ termsOfUseHref }
+        wirePaymentsDisclaimerText={ wirePaymentsDisclaimerText } />
 
       { checkoutErrorMessage && <FormErrorsBox error={ checkoutErrorMessage } sx={{ mt: 5 }} /> }
 
@@ -342,7 +369,7 @@ export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
         consentType={ consentType === "checkbox" ? undefined : consentType }
         privacyHref={ privacyHref }
         termsOfUseHref={ termsOfUseHref }
-        submitDisabled={ selectedPaymentMethod === "Wire" || selectedPaymentMethod === "Crypto" }
+        submitDisabled={ selectedPaymentMethod === "Crypto" }
         onCloseClicked={ onClose } />
     </form>
   );

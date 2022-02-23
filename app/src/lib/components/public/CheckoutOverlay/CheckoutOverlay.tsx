@@ -23,6 +23,7 @@ import { FullScreenOverlay } from "../../shared/FullScreenOverlay/FullScreenOver
 import { ProviderInjectorProps, withProviders } from "../../shared/ProvidersInjector/ProvidersInjector";
 import { transformCheckoutItemsFromInvoice } from "../../../domain/product/product.utils";
 import { useCreateInvoiceAndReservation } from "../../../hooks/useCreateInvoiceAndReservation";
+import { CustomTextsKeys } from "../../../domain/customTexts/customTexts.interfaces";
 
 const SELECTOR_DIALOG_SCROLLABLE = "[role=presentation]";
 
@@ -47,7 +48,7 @@ export interface PUICheckoutOverlayProps {
   userFormat: UserFormat;
   acceptedPaymentTypes: PaymentType[];
   paymentLimits?: Partial<Record<PaymentType, number>>;
-  purchaseInstructions: string;
+  customTexts: Record<CustomTextsKeys, React.ReactFragment[]>,
 
   // Legal:
   consentType?: ConsentType;
@@ -93,7 +94,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   userFormat,
   acceptedPaymentTypes,
   paymentLimits, // Not implemented yet. Used to show payment limits for some payment types.
-  purchaseInstructions,
+  customTexts,
 
   // Legal:
   consentType, // Not implemented yet. Used to let the app control where to log errors to (e.g. Sentry).
@@ -465,6 +466,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
         consentType={ consentType }
         privacyHref={ privacyHref }
         termsOfUseHref={ termsOfUseHref }
+        wirePaymentsDisclaimerText={ customTexts.wirePaymentsDisclaimer }
         debug={ debug } />
     );
   } else if (checkoutStep === "purchasing") {
@@ -492,7 +494,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
         savedPaymentMethods={ savedPaymentMethods }
         selectedPaymentMethod={ selectedPaymentMethod }
         paymentReferenceNumber={ paymentReferenceNumber }
-        purchaseInstructions={ purchaseInstructions }
+        purchaseInstructions={ customTexts.purchaseInstructions }
         onNext={ handleClose }
         onClose={ handleClose } />
     );

@@ -98,7 +98,7 @@ export const BillingView: React.FC<BillingViewProps> = ({
       }}
       spacing={8.75}
     >
-      <Stack sx={{ display: 'flex', flex: 1 }}>
+      <Stack sx={{ display: 'flex', flex: 1, overflow: "hidden" }}>
         <CheckoutStepper progress={ 50 } />
 
           { showSaved ? (
