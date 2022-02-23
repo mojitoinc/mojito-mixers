@@ -8,6 +8,7 @@ import { XS_MOBILE_MAX_WIDTH } from "../../config/theme/theme";
 import { StatusIcon } from "../../components/shared/StatusIcon/StatusIcon";
 
 const ERROR_ACTION_LABELS: Record<CheckoutModalErrorAt, string> = {
+  reset: "Try Again",
   authentication: "Review Information",
   billing: "Review Billing Information",
   payment: "Review Payment Information",

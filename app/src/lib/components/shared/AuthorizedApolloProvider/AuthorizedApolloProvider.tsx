@@ -12,8 +12,8 @@ import { useAuth0 } from "@auth0/auth0-react";
 const cache = new InMemoryCache();
 
 export interface AuthorizedApolloProviderProps {
-  apolloClient?: ApolloClient<NormalizedCacheObject>;
-  uri?: string;
+  apolloClient?: ApolloClient<NormalizedCacheObject> | null;
+  uri: string;
 }
 
 export const AuthorizedApolloProvider: React.FC<AuthorizedApolloProviderProps> = ({
@@ -25,6 +25,8 @@ export const AuthorizedApolloProvider: React.FC<AuthorizedApolloProviderProps> =
 
   const apolloClient = useMemo(() => {
     if (parentApolloClient) return parentApolloClient;
+
+    if (!uri) return null;
 
     const httpLink = createHttpLink({ uri });
 
@@ -44,5 +46,5 @@ export const AuthorizedApolloProvider: React.FC<AuthorizedApolloProviderProps> =
     return new ApolloClient({ uri, link, cache });
   }, [parentApolloClient, uri, getIdTokenClaims]);
 
-  return <ApolloProvider client={ apolloClient }>{ children }</ApolloProvider>;
+  return apolloClient ? <ApolloProvider client={ apolloClient }>{ children }</ApolloProvider> : <>{ children }</>;
 }

@@ -2,19 +2,22 @@ import React, { useEffect, useMemo } from "react";
 import { Theme, ThemeOptions, createTheme, ThemeProvider } from "@mui/material/styles";
 import { AuthorizedApolloProvider, AuthorizedApolloProviderProps } from "../AuthorizedApolloProvider/AuthorizedApolloProvider";
 
-export interface ProviderInjectorProps extends AuthorizedApolloProviderProps {
+export interface ThemeProviderProps {
   theme?: Theme;
   themeOptions?: ThemeOptions;
 }
 
-export const ProviderInjector: React.FC<ProviderInjectorProps> = ({
+export type ProvidersInjectorProps = ThemeProviderProps & AuthorizedApolloProviderProps;
+
+export const ProviderInjector: React.FC<ProvidersInjectorProps> = ({
   // AuthorizedApolloProviderProps:
   apolloClient,
   uri,
 
-  // ThemeProvider
+  // ThemeProvider:
   theme: parentTheme,
   themeOptions,
+
   children,
 }) => {
   // TODO: Replace createTheme with custom one.
@@ -31,6 +34,8 @@ export const ProviderInjector: React.FC<ProviderInjectorProps> = ({
   }, [parentTheme, themeOptions]);
 
   useEffect(() => {
+    if (apolloClient === null && uri === "") return;
+
     if (apolloClient && uri) {
       throw new Error("You can't use both `apolloClient` and `uri`. Please, use only one. `uri` is preferred.");
     }
@@ -47,8 +52,24 @@ export const ProviderInjector: React.FC<ProviderInjectorProps> = ({
   );
 }
 
+export function withThemeProvider<P extends object>(Component: React.ComponentType<P>) {
+  const WithThemeProvider: React.FC<P & ThemeProviderProps> = ({
+    theme,
+    themeOptions,
+    ...componentProps
+  }) => {
+    return (
+      <ProviderInjector apolloClient={ null } uri="" theme={ theme } themeOptions={ themeOptions }>
+        <Component { ...componentProps as P } />
+      </ProviderInjector>
+    );
+  };
+
+  return WithThemeProvider;
+}
+
 export function withProviders<P extends object>(Component: React.ComponentType<P>) {
-  const WithProviders: React.FC<P & ProviderInjectorProps> = ({
+  const WithProviders: React.FC<P & ProvidersInjectorProps> = ({
     apolloClient,
     uri,
     theme,

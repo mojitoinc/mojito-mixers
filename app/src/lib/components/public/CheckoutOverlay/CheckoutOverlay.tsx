@@ -20,7 +20,7 @@ import { ConsentType } from "../../shared/ConsentText/ConsentText";
 import { CheckoutModalError, useCheckoutModalState } from "./CheckoutOverlay.hooks";
 import { DEFAULT_ERROR_AT, ERROR_LOADING_INVOICE, ERROR_LOADING_PAYMENT_METHODS, ERROR_LOADING_USER } from "../../../domain/errors/errors.constants";
 import { FullScreenOverlay } from "../../shared/FullScreenOverlay/FullScreenOverlay";
-import { ProviderInjectorProps, withProviders } from "../../shared/ProvidersInjector/ProvidersInjector";
+import { ProvidersInjectorProps, withProviders } from "../../shared/ProvidersInjector/ProvidersInjector";
 import { transformCheckoutItemsFromInvoice } from "../../../domain/product/product.utils";
 import { useCreateInvoiceAndReservation } from "../../../hooks/useCreateInvoiceAndReservation";
 import { CustomTextsKeys } from "../../../domain/customTexts/customTexts.interfaces";
@@ -71,7 +71,7 @@ export interface PUICheckoutOverlayProps {
   onMarketingOptInChange?: (marketingOptIn: boolean) => void
 }
 
-export type PUICheckoutProps = PUICheckoutOverlayProps & ProviderInjectorProps;
+export type PUICheckoutProps = PUICheckoutOverlayProps & ProvidersInjectorProps;
 
 export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   // Modal:
@@ -335,16 +335,45 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     await refetchPaymentMethods({ orgID });
   }, [checkoutStep, deletePaymentMethod, orgID, refetchPaymentMethods, savedPaymentMethods, setSelectedPaymentMethod]);
 
+  // BLOCK DIALOG LOGIC & SHAKE ANIMATION:
+
+  // TODO: Move to hook.
+  const [isDialogBlocked, setIsDialogBlocked] = useState(false);
+
   const handlePurchaseSuccess = useCallback(async (nextPaymentReferenceNumber: string) => {
+    setPaymentReferenceNumber(nextPaymentReferenceNumber);
+
     // After a successful purchase, a new payment method might have been created, so we reload them:
     await refetchPaymentMethods();
 
-    setPaymentReferenceNumber(nextPaymentReferenceNumber);
+    setIsDialogBlocked(false);
 
     goNext();
-  }, [refetchPaymentMethods, setPaymentReferenceNumber, goNext]);
+  }, [refetchPaymentMethods, setPaymentReferenceNumber, setIsDialogBlocked, goNext]);
+
+  const handlePurchaseError = useCallback(async (error: string | CheckoutModalError) => {
+    // After a failed purchase, a new payment method might have been created anyway, so we reload them (createPaymentMethod
+    // works but createPayment fails):
+    await refetchPaymentMethods();
+
+    setIsDialogBlocked(false);
+
+    setError(error);
+  }, [refetchPaymentMethods, setIsDialogBlocked, setError]);
 
   const handleFixError = useCallback(async (): Promise<false> => {
+    if (checkoutError.at === "reset") {
+      goTo();
+
+      await Promise.allSettled([
+        meRefetch(),
+        refetchPaymentMethods(),
+        createInvoiceAndReservation(),
+      ]);
+
+      return false;
+    }
+
     // After an error, all data is reloaded in case the issue was caused by stale/cached data or in case a new payment
     // method has been created despite the error:
     await Promise.allSettled([
@@ -364,12 +393,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     // button when clicked but do not remove it once the Promise is resolved, as we are moving to another view and
     // CheckoutModalFooter will unmount (so doing this prevents a memory leak issue):
     return false;
-  }, [meRefetch, refetchPaymentMethods, refetchInvoiceDetails, setSelectedPaymentMethod, goTo, checkoutError]);
-
-  // BLOCK DIALOG LOGIC & SHAKE ANIMATION:
-
-  // TODO: Move to hook.
-  const [isDialogBlocked, setIsDialogBlocked] = useState(false);
+  }, [checkoutError, goTo, createInvoiceAndReservation, meRefetch, refetchPaymentMethods, refetchInvoiceDetails, setSelectedPaymentMethod]);
 
   // PLAID:
 
@@ -385,7 +409,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     goTo("purchasing");
   }, [initModalState, handlePaymentInfoSelected, goTo]);
 
-  if (isDialogInitializing || isPlaidFlowLoading) {
+  if ((isDialogInitializing || isPlaidFlowLoading) && (checkoutStep !== "error")) {
     return (<>
       { isPlaidFlowLoading && <PlaidFlow onSubmit={ handlePlaidFlowCompleted } /> }
 
@@ -481,7 +505,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
         savedPaymentMethods={ savedPaymentMethods }
         selectedPaymentMethod={ selectedPaymentMethod }
         onPurchaseSuccess={ handlePurchaseSuccess }
-        onPurchaseError={ setError }
+        onPurchaseError={ handlePurchaseError }
         onDialogBlocked={ setIsDialogBlocked }
         debug={ debug } />
     );

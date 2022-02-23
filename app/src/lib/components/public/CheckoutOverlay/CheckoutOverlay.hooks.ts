@@ -8,7 +8,7 @@ import { BillingInfo } from "../../../forms/BillingInfoForm";
 import { resetStepperProgress } from "../../payments/CheckoutStepper/CheckoutStepper";
 import { continueFlows } from "./CheckoutOverlay.utils";
 
-export type CheckoutModalErrorAt = "authentication" | "billing" | "payment" | "purchasing";
+export type CheckoutModalErrorAt = "reset" | "authentication" | "billing" | "payment" | "purchasing";
 
 export interface CheckoutModalError {
   at?: CheckoutModalErrorAt;
@@ -47,7 +47,7 @@ export interface CheckoutModalStateReturn extends CheckoutModalState, PurchaseSt
   initModalState: () => void;
   goBack: () => void;
   goNext: () => void;
-  goTo: (checkoutStep: CheckoutModalStep, error?: null | string | CheckoutModalError) => void;
+  goTo: (checkoutStep?: CheckoutModalStep, error?: null | string | CheckoutModalError) => void;
   setError: (error: null | string | CheckoutModalError) => void;
 
   // SelectedPaymentMethod:
@@ -138,7 +138,7 @@ export function useCheckoutModalState({
     }));
   }, []);
 
-  const goTo = useCallback((checkoutStep: CheckoutModalStep, error?: null | string | CheckoutModalError) => {
+  const goTo = useCallback((checkoutStep: CheckoutModalStep = startAt, error?: null | string | CheckoutModalError) => {
     setCheckoutModalState((prevCheckoutModalState) => {
       let checkoutError: CheckoutModalError | undefined;
 
@@ -149,7 +149,7 @@ export function useCheckoutModalState({
 
       return checkoutError ? { checkoutStep, checkoutError } : { checkoutStep };
     });
-  }, []);
+  }, [startAt]);
 
   const setError = useCallback((error: string | CheckoutModalError) => {
     const nextCheckoutError: CheckoutModalError = typeof error === "string" ? { errorMessage: error || ERROR_PURCHASE().errorMessage } : error;
@@ -163,7 +163,7 @@ export function useCheckoutModalState({
   }, [onError]);
 
 
-  const setInvoiceID = useCallback((invoiceID: string) => {
+  const setInvoiceID = useCallback((invoiceID: string | null) => {
     setPurchaseState({ invoiceID, paymentReferenceNumber: "" });
   }, []);
 

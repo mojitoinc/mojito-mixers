@@ -84,7 +84,9 @@ export const BillingView: React.FC<BillingViewProps> = ({
   useEffect(() => {
     const selectedPaymentInfoMatch = typeof selectedBillingInfo === "string" && savedPaymentMethods.some(({ addressId }) => addressId === selectedBillingInfo);
 
-    if (showSaved && !selectedPaymentInfoMatch /* && savedPaymentMethods.length > 0 && !checkoutError */) {
+    console.log({ selectedPaymentInfoMatch, savedPaymentMethods });
+
+    if (showSaved && !selectedPaymentInfoMatch && savedPaymentMethods.length > 0 /* && !checkoutError */) {
       onBillingInfoSelected(savedPaymentMethods[0].addressId);
     }
   }, [showSaved, savedPaymentMethods, selectedBillingInfo, onBillingInfoSelected/*, checkoutError*/]);

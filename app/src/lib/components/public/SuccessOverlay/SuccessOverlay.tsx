@@ -5,7 +5,7 @@ import { getUrlWithSearchParams, isUrlPathname } from "../../../domain/url/url.u
 import { SuccessView } from "../../../views/Success/SuccessView";
 import { CheckoutModalHeader } from "../../payments/CheckoutModalHeader/CheckoutModalHeader";
 import { FullScreenOverlay, FullScreenOverlayFunctionalProps } from "../../shared/FullScreenOverlay/FullScreenOverlay";
-import { ProviderInjectorProps, withProviders } from "../../shared/ProvidersInjector/ProvidersInjector";
+import { ThemeProviderProps, withThemeProvider } from "../../shared/ProvidersInjector/ProvidersInjector";
 import { getCheckoutModalState, persistReceivedRedirectUri3DS } from "../CheckoutOverlay/CheckoutOverlay.utils";
 
 const REDIRECT_DELAY_MS = 5000;
@@ -17,7 +17,7 @@ export interface PUISuccessOverlayProps extends FullScreenOverlayFunctionalProps
   onRedirect: (pathnameOrUrl: string) => void;
 }
 
-export type PUISuccessProps = PUISuccessOverlayProps & ProviderInjectorProps;
+export type PUISuccessProps = PUISuccessOverlayProps & ThemeProviderProps;
 
 export const PUISuccessOverlay: React.FC<PUISuccessOverlayProps> = ({
   logoSrc,
@@ -63,4 +63,4 @@ export const PUISuccessOverlay: React.FC<PUISuccessOverlayProps> = ({
   );
 }
 
-export const PUISuccess: React.FC<PUISuccessProps> = withProviders(PUISuccessOverlay);
+export const PUISuccess: React.FC<PUISuccessProps> = withThemeProvider(PUISuccessOverlay);

@@ -1,12 +1,12 @@
 import React, { useLayoutEffect } from "react";
 import { getPlaidOAuthFlowState, persistPlaidReceivedRedirectUri } from "../../../domain/plaid/plaid.utils";
-import { ProviderInjectorProps, withProviders } from "../../shared/ProvidersInjector/ProvidersInjector";
+import { ThemeProviderProps, withThemeProvider } from "../../shared/ProvidersInjector/ProvidersInjector";
 
 export interface PUIPlaidOverlayProps {
   onRedirect: (pathnameOrUrl: string) => void;
 }
 
-export type PUISuccessProps = PUIPlaidOverlayProps & ProviderInjectorProps;
+export type PUISuccessProps = PUIPlaidOverlayProps & ThemeProviderProps;
 
 export const PUIPlaidOverlay: React.FC<PUIPlaidOverlayProps> = ({
   onRedirect,
@@ -24,4 +24,4 @@ export const PUIPlaidOverlay: React.FC<PUIPlaidOverlayProps> = ({
   return null;
 }
 
-export const PUIPlaid: React.FC<PUISuccessProps> = withProviders(PUIPlaidOverlay);
+export const PUIPlaid: React.FC<PUISuccessProps> = withThemeProvider(PUIPlaidOverlay);
