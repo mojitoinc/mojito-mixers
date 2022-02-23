@@ -495,8 +495,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
         selectedPaymentMethod={ selectedPaymentMethod }
         paymentReferenceNumber={ paymentReferenceNumber }
         purchaseInstructions={ customTexts.purchaseInstructions }
-        onNext={ handleClose }
-        onClose={ handleClose } />
+        onNext={ handleClose } />
     );
   }
 

@@ -14,9 +14,8 @@ export interface ConfirmationViewProps {
   savedPaymentMethods: SavedPaymentMethod[];
   selectedPaymentMethod: SelectedPaymentMethod;
   paymentReferenceNumber: string;
-  purchaseInstructions: React.ReactNode;
+  purchaseInstructions: React.ReactFragment[];
   onNext: () => void;
-  onClose: () => void;
 }
 
 export const ConfirmationView: React.FC<ConfirmationViewProps> = ({
@@ -26,7 +25,6 @@ export const ConfirmationView: React.FC<ConfirmationViewProps> = ({
   paymentReferenceNumber,
   purchaseInstructions,
   onNext,
-  onClose,
 }) => {
   const {
     billingInfo: selectedBillingInfo,
@@ -76,8 +74,7 @@ export const ConfirmationView: React.FC<ConfirmationViewProps> = ({
       <Stack sx={{ display: "flex", flex: 1 }}>
         <PurchaseConfirmationItemDetails
           checkoutItems={checkoutItems}
-          purchaseInstructions={purchaseInstructions}
-        />
+          purchaseInstructions={purchaseInstructions} />
 
         <CheckoutModalFooter
           variant="toMarketplace"
