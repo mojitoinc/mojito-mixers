@@ -1,6 +1,7 @@
 export { PUICheckout } from "./components/public/CheckoutOverlay/CheckoutOverlay";
 export { PUISuccess } from "./components/public/SuccessOverlay/SuccessOverlay";
 export { PUIError } from "./components/public/ErrorOverlay/ErrorOverlay";
+export { PUIPlaid } from "./components/public/PlaidOverlay/PlaidOverlay";
 export { MOJITO_LIGHT_THEME, MOJITO_DARK_THEME } from "./config/theme/theme";
 export { ThemeProvider as CheckoutModalThemeProvider } from "@mui/material/styles";
 export { getPlaidOAuthFlowState, persistPlaidReceivedRedirectUri } from "./domain/plaid/plaid.utils";

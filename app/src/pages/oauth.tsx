@@ -1,7 +1,8 @@
 import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useCallback } from "react";
-import { PUIPlaidOverlay } from "../lib/components/public/PlaidOverlay/PlaidOverlay";
+import { PUIPlaid } from "../lib";
+import { PLAYGROUND_THEMES } from "../utils/playground/playground.constants";
 
 const PlaidOAuthPage: NextPage = () => {
   const router = useRouter();
@@ -17,7 +18,9 @@ const PlaidOAuthPage: NextPage = () => {
   }, [router]);
 
   return (
-    <PUIPlaidOverlay onRedirect={ handleRedirect } />
+    <PUIPlaid
+      theme={ PLAYGROUND_THEMES.light }
+      onRedirect={ handleRedirect } />
   );
 }
 
