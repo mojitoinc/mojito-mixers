@@ -26,12 +26,10 @@ export const PUISuccessOverlay: React.FC<PUISuccessOverlayProps> = ({
   ...fullScreenOverlayProps
 }) => {
   const { purchaseSuccess, url } = getCheckoutModalState();
-
-  // TODO: Replace same domain from URL in case it's the same.
-  // TODO: if it's not, do not call persistReceivedRedirectUri3DS and add it to the URL instead.
+  const isPathname = !url.startsWith("http");
 
   useLayoutEffect(() => {
-    if (purchaseSuccess) {
+    if (purchaseSuccess && isPathname) {
       persistReceivedRedirectUri3DS(window.location.href);
 
       return;
@@ -40,15 +38,13 @@ export const PUISuccessOverlay: React.FC<PUISuccessOverlayProps> = ({
     // Users should only see this page if they completed a credit card payment and 3DS' verification went ok.
     // Otherwise, they are immediately redirected to homepage:
     onRedirect("/");
-  }, [purchaseSuccess, onRedirect]);
+  }, [purchaseSuccess, isPathname, onRedirect]);
 
   useTimeout(() => {
-    // TODO: Redirect to localhost if staging...
-
     // If everything's ok, users see this confirmation screen for 5 seconds and then are redirected to the purchase
     // confirmation page:
-    if (purchaseSuccess) onRedirect(url || "/");
-  }, REDIRECT_DELAY_MS, [purchaseSuccess, onRedirect]);
+    if (purchaseSuccess) onRedirect(`${ url || "/" }${ isPathname ? "" : window.location.search }`);
+  }, REDIRECT_DELAY_MS, [purchaseSuccess, isPathname, onRedirect]);
 
   if (!purchaseSuccess) return null;
 

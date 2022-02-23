@@ -114,7 +114,6 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
       checkoutInfoPersistedRef.current = true;
 
       persistCheckoutModalInfo({
-        url: window.location.href,
         invoiceID,
         paymentReferenceNumber,
         billingInfo,

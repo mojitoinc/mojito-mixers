@@ -1,4 +1,5 @@
 import { BillingInfo } from "../../forms/BillingInfoForm";
+import { getUrlWithoutParams, urlToPathnameWhenPossible } from "../url/url.utils";
 
 const STORAGE_EXPIRATION_MS = 1000 * 60 * 5; // 15 minutes.
 const PLAID_OAUTH_FLOW_INFO_KEY = "PLAID_OAUTH_FLOW_INFO";
@@ -8,7 +9,7 @@ const PLAID_OAUTH_FLOW_URL_SEARCH = "?oauth_state_id=";
 
 export interface PlaidInfo {
   // TODO: Do we need to store product info?
-  url: string;
+  url?: string;
   linkToken: string;
   selectedBillingInfo: string | BillingInfo;
   timestamp?: number;
@@ -34,6 +35,7 @@ export function persistPlaidInfo(info: PlaidInfo) {
   try {
     localStorage.setItem(PLAID_OAUTH_FLOW_INFO_KEY, JSON.stringify({
       ...info,
+      url: info.url || getUrlWithoutParams(),
       timestamp: info.timestamp || Date.now(),
     }));
   } catch (err) {
@@ -106,7 +108,7 @@ export function getPlaidOAuthFlowState(): PlaidOAuthFlowState {
 
   return {
     // The URL of the page where we initially opened the modal:
-    url,
+    url: urlToPathnameWhenPossible(url),
 
     // The Link token from the first Link initialization:
     linkToken,

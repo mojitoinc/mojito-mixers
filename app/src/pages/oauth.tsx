@@ -9,7 +9,11 @@ const PlaidOAuthPage: NextPage = () => {
   const handleRedirect = useCallback((pathnameOrUrl: string) => {
     console.log(`Redirect to ${ pathnameOrUrl }...`);
 
-    router.replace(pathnameOrUrl || "/");
+    if (pathnameOrUrl && pathnameOrUrl.startsWith("http")) {
+      window.location.replace(pathnameOrUrl);
+    } else {
+      router.replace(pathnameOrUrl || "/");
+    }
   }, [router]);
 
   return (

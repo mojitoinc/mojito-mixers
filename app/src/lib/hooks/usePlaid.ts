@@ -128,7 +128,6 @@ export function usePlaid(options: UsePlaidOptions) {
     console.log("Open plain link manually", linkToken);
 
     persistPlaidInfo({
-      url: window.location.pathname,
       linkToken,
       selectedBillingInfo,
     });

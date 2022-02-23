@@ -1,5 +1,6 @@
 import { ERROR_PURCHASE_3DS } from "../../../domain/errors/errors.constants";
 import { PaymentMethod } from "../../../domain/payment/payment.interfaces";
+import { getUrlWithoutParams, urlToPathnameWhenPossible } from "../../../domain/url/url.utils";
 import { BillingInfo } from "../../../forms/BillingInfoForm";
 import { continuePlaidOAuthFlow, INITIAL_PLAID_OAUTH_FLOW_STATE } from "../../../hooks/usePlaid";
 import { CheckoutModalError, CheckoutModalStep } from "./CheckoutOverlay.hooks";
@@ -11,7 +12,7 @@ const THREEDS_STATE_USED_KEY = "THREEDS_STATE_USED_KEY";
 const THREEDS_FLOW_URL_SEARCH = "?paymentId=";
 
 export interface CheckoutModalInfo {
-  url: string;
+  url?: string;
   invoiceID: string; // TODO: Use this to load the products again.
   paymentReferenceNumber: string;
   billingInfo: string | BillingInfo;
@@ -47,6 +48,7 @@ export function persistCheckoutModalInfo(info: CheckoutModalInfo) {
   try {
     localStorage.setItem(THREEDS_FLOW_INFO_KEY, JSON.stringify({
       ...info,
+      url: info.url || getUrlWithoutParams(),
       timestamp: info.timestamp || Date.now(),
     }));
   } catch (err) {
@@ -121,7 +123,7 @@ export function getCheckoutModalState(): CheckoutModalState3DS {
 
   return {
     // The URL of the page where we initially opened the modal:
-    url,
+    url: urlToPathnameWhenPossible(url),
 
     // The invoiceID we need to re-load the products and units:
     invoiceID,

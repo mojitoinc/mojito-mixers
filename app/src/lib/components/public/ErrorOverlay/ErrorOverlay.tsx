@@ -33,10 +33,12 @@ export const PUIErrorOverlay: React.FC<PUIErrorOverlayProps> = ({
   const reviewData = useCallback(async (): Promise<false> => {
     if (!purchaseError) return;
 
-    persistReceivedRedirectUri3DS(window.location.href);
+    const isPathname = !url.startsWith("http");
+
+    if (isPathname) persistReceivedRedirectUri3DS(window.location.href);
 
     // If there was an error, users can click the review button and go back to the Payment UI to review the data...:
-    onRedirect(url || "/");
+    onRedirect(`${ url || "/" }${ isPathname ? "" : window.location.search }`);
 
     return false;
   }, [purchaseError, onRedirect, url]);
