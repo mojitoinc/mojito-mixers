@@ -18,6 +18,8 @@ const AuthorizedApolloProvider = ({ apolloClient: parentApolloClient, uri, child
     const apolloClient = React.useMemo(() => {
         if (parentApolloClient)
             return parentApolloClient;
+        if (!uri)
+            return null;
         const httpLink = Apollo.createHttpLink({ uri });
         const authLink = index.setContext((_, { headers }) => tslib_es6.__awaiter(void 0, void 0, void 0, function* () {
             const token = yield getIdTokenClaims();
@@ -28,7 +30,7 @@ const AuthorizedApolloProvider = ({ apolloClient: parentApolloClient, uri, child
         const link = authLink.concat(httpLink);
         return new Apollo.ApolloClient({ uri, link, cache });
     }, [parentApolloClient, uri, getIdTokenClaims]);
-    return React__default["default"].createElement(Apollo.ApolloProvider, { client: apolloClient }, children);
+    return apolloClient ? React__default["default"].createElement(Apollo.ApolloProvider, { client: apolloClient }, children) : React__default["default"].createElement(React__default["default"].Fragment, null, children);
 };
 
 exports.AuthorizedApolloProvider = AuthorizedApolloProvider;

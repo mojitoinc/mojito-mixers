@@ -18,6 +18,7 @@ function useCreateInvoiceAndReservation({ orgID, checkoutItems, debug = false, }
     const [createBuyNowInvoice] = graphqlGenerated.useCreateBuyNowInvoiceMutation();
     const createInvoiceAndReservation = React.useCallback(() => tslib_es6.__awaiter(this, void 0, void 0, function* () {
         var _a, _b, _c, _d, _e;
+        console.log("createInvoiceAndReservation");
         // TODO: Quick fix. The UI can currently display multiple items with multiple units each, but will only purchase the
         // selected amount (can be multiple units) of the first item:
         const { lotID, lotType, units, } = checkoutItems[0];
@@ -40,13 +41,13 @@ function useCreateInvoiceAndReservation({ orgID, checkoutItems, debug = false, }
         }
         let invoiceID = "";
         let mutationError;
-        if (debug) {
-            console.log("  🧾 createAuctionInvoice", {
-                orgID,
-                lotID,
-            });
-        }
         if (lotType === "buyNow") {
+            if (debug) {
+                console.log("  🧾 createBuyNowInvoice", {
+                    units,
+                    lotID,
+                });
+            }
             const createBuyNowInvoiceResult = yield createBuyNowInvoice({
                 variables: {
                     input: {
@@ -66,6 +67,12 @@ function useCreateInvoiceAndReservation({ orgID, checkoutItems, debug = false, }
             }
         }
         else if (lotType === "auction" && process.env.NODE_ENV === "development") {
+            if (debug) {
+                console.log("  🧾 createAuctionInvoice", {
+                    orgID,
+                    lotID,
+                });
+            }
             const createAuctionInvoiceResult = yield createAuctionInvoice({
                 variables: {
                     orgID,

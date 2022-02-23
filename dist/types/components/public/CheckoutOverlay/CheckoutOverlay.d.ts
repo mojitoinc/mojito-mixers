@@ -5,7 +5,7 @@ import { CheckoutItem } from "../../../domain/product/product.interfaces";
 import { Theme, ThemeOptions, SxProps } from "@mui/material/styles";
 import { ConsentType } from "../../shared/ConsentText/ConsentText";
 import { CheckoutModalError } from "./CheckoutOverlay.hooks";
-import { ProviderInjectorProps } from "../../shared/ProvidersInjector/ProvidersInjector";
+import { ProvidersInjectorProps } from "../../shared/ProvidersInjector/ProvidersInjector";
 import { CustomTextsKeys } from "../../../domain/customTexts/customTexts.interfaces";
 export interface PUICheckoutOverlayProps {
     open: boolean;
@@ -37,6 +37,6 @@ export interface PUICheckoutOverlayProps {
     onError?: (error: CheckoutModalError) => void;
     onMarketingOptInChange?: (marketingOptIn: boolean) => void;
 }
-export declare type PUICheckoutProps = PUICheckoutOverlayProps & ProviderInjectorProps;
+export declare type PUICheckoutProps = PUICheckoutOverlayProps & ProvidersInjectorProps;
 export declare const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps>;
 export declare const PUICheckout: React.FC<PUICheckoutProps>;

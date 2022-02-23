@@ -42,7 +42,7 @@ const PUISuccessOverlay = (_a) => {
     return (React__default["default"].createElement(FullScreenOverlay.FullScreenOverlay, Object.assign({ centered: true, header: headerElement }, fullScreenOverlayProps),
         React__default["default"].createElement(SuccessView.SuccessView, { successImageSrc: successImageSrc })));
 };
-const PUISuccess = ProvidersInjector.withProviders(PUISuccessOverlay);
+const PUISuccess = ProvidersInjector.withThemeProvider(PUISuccessOverlay);
 
 exports.PUISuccess = PUISuccess;
 exports.PUISuccessOverlay = PUISuccessOverlay;

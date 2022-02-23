@@ -5,7 +5,7 @@ import { isUrlPathname, getUrlWithSearchParams } from '../../../domain/url/url.u
 import { SuccessView } from '../../../views/Success/SuccessView.js';
 import { CheckoutModalHeader } from '../../payments/CheckoutModalHeader/CheckoutModalHeader.js';
 import { FullScreenOverlay } from '../../shared/FullScreenOverlay/FullScreenOverlay.js';
-import { withProviders } from '../../shared/ProvidersInjector/ProvidersInjector.js';
+import { withThemeProvider } from '../../shared/ProvidersInjector/ProvidersInjector.js';
 import { getCheckoutModalState, persistReceivedRedirectUri3DS } from '../CheckoutOverlay/CheckoutOverlay.utils.js';
 
 const REDIRECT_DELAY_MS = 5000;
@@ -34,7 +34,7 @@ const PUISuccessOverlay = (_a) => {
     return (React__default.createElement(FullScreenOverlay, Object.assign({ centered: true, header: headerElement }, fullScreenOverlayProps),
         React__default.createElement(SuccessView, { successImageSrc: successImageSrc })));
 };
-const PUISuccess = withProviders(PUISuccessOverlay);
+const PUISuccess = withThemeProvider(PUISuccessOverlay);
 
 export { PUISuccess, PUISuccessOverlay };
 //# sourceMappingURL=SuccessOverlay.js.map

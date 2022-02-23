@@ -15,6 +15,7 @@ function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'defau
 var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 
 const ERROR_ACTION_LABELS = {
+    reset: "Try Again",
     authentication: "Review Information",
     billing: "Review Billing Information",
     payment: "Review Payment Information",

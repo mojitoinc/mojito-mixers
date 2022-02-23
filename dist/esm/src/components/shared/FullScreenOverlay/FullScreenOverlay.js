@@ -1,6 +1,6 @@
 import { __rest } from '../../../../node_modules/tslib/tslib.es6.js';
 import { Dialog, DialogContent, Box } from '@mui/material';
-import React__default, { useRef } from 'react';
+import React__default, { useRef, useEffect } from 'react';
 import { useShakeAnimation } from '../../../utils/animationUtils.js';
 
 const centeredSx = {
@@ -10,9 +10,18 @@ const centeredSx = {
     justifyContent: "center",
     alignItems: "center",
 };
+const SELECTOR_DIALOG_SCROLLABLE = "[role=presentation]";
 const FullScreenOverlay = (_a) => {
-    var { open = true, onClose, isDialogBlocked, dialogRootRef, header, children } = _a, variantProps = __rest(_a, ["open", "onClose", "isDialogBlocked", "dialogRootRef", "header", "children"]);
+    var { open = true, onClose, isDialogBlocked, contentKey, header, children } = _a, variantProps = __rest(_a, ["open", "onClose", "isDialogBlocked", "contentKey", "header", "children"]);
+    const dialogRootRef = useRef(null);
     const paperRef = useRef(null);
+    // Scroll to top on step change:
+    useEffect(() => {
+        var _a;
+        const dialogScrollable = (_a = dialogRootRef.current) === null || _a === void 0 ? void 0 : _a.querySelector(SELECTOR_DIALOG_SCROLLABLE);
+        if (contentKey && dialogScrollable)
+            dialogScrollable.scrollTop = 0;
+    }, [contentKey]);
     const [shakeSx, shake] = useShakeAnimation(paperRef.current);
     return (React__default.createElement(Dialog, { open: isDialogBlocked ? true : open, onClose: isDialogBlocked ? shake : onClose, "aria-labelledby": "checkout-modal-header-title", scroll: "body", ref: dialogRootRef, PaperProps: { sx: shakeSx, ref: paperRef }, 
         // Dialog only:

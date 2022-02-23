@@ -3,9 +3,9 @@ export interface FullScreenOverlayFunctionalProps {
     open?: boolean;
     onClose?: () => void;
     isDialogBlocked?: boolean;
-    dialogRootRef?: React.RefObject<HTMLDivElement>;
 }
 interface FullScreenOverlayCommonProps extends FullScreenOverlayFunctionalProps {
+    contentKey?: string;
     header?: React.ReactElement;
 }
 export interface FullScreenOverlayNoColumnsProps extends FullScreenOverlayCommonProps {

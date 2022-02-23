@@ -15,7 +15,7 @@ var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 const ProviderInjector = ({ 
 // AuthorizedApolloProviderProps:
 apolloClient, uri, 
-// ThemeProvider
+// ThemeProvider:
 theme: parentTheme, themeOptions, children, }) => {
     // TODO: Replace createTheme with custom one.
     const theme = React.useMemo(() => themeOptions ? createTheme["default"](themeOptions) : parentTheme, [parentTheme, themeOptions]);
@@ -28,6 +28,8 @@ theme: parentTheme, themeOptions, children, }) => {
         }
     }, [parentTheme, themeOptions]);
     React.useEffect(() => {
+        if (apolloClient === null && uri === "")
+            return;
         if (apolloClient && uri) {
             throw new Error("You can't use both `apolloClient` and `uri`. Please, use only one. `uri` is preferred.");
         }
@@ -37,6 +39,14 @@ theme: parentTheme, themeOptions, children, }) => {
     }, [apolloClient, uri]);
     return (React__default["default"].createElement(AuthorizedApolloProvider.AuthorizedApolloProvider, { apolloClient: apolloClient, uri: uri }, theme ? React__default["default"].createElement(system.ThemeProvider, { theme: theme }, children) : children));
 };
+function withThemeProvider(Component) {
+    const WithThemeProvider = (_a) => {
+        var { theme, themeOptions } = _a, componentProps = tslib_es6.__rest(_a, ["theme", "themeOptions"]);
+        return (React__default["default"].createElement(ProviderInjector, { apolloClient: null, uri: "", theme: theme, themeOptions: themeOptions },
+            React__default["default"].createElement(Component, Object.assign({}, componentProps))));
+    };
+    return WithThemeProvider;
+}
 function withProviders(Component) {
     const WithProviders = (_a) => {
         var { apolloClient, uri, theme, themeOptions } = _a, componentProps = tslib_es6.__rest(_a, ["apolloClient", "uri", "theme", "themeOptions"]);
@@ -48,4 +58,5 @@ function withProviders(Component) {
 
 exports.ProviderInjector = ProviderInjector;
 exports.withProviders = withProviders;
+exports.withThemeProvider = withThemeProvider;
 //# sourceMappingURL=ProvidersInjector.js.map
