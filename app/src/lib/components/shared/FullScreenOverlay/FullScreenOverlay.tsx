@@ -1,5 +1,5 @@
 import { Box, Dialog, DialogContent, SxProps, Theme } from "@mui/material";
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { useShakeAnimation } from "../../../utils/animationUtils";
 
 const centeredSx: SxProps<Theme> = {
@@ -14,10 +14,10 @@ export interface FullScreenOverlayFunctionalProps {
   open?: boolean;
   onClose?: () => void;
   isDialogBlocked?: boolean;
-  dialogRootRef?: React.RefObject<HTMLDivElement>;
 }
 
 interface FullScreenOverlayCommonProps extends FullScreenOverlayFunctionalProps {
+  contentKey?: string;
   header?: React.ReactElement;
 }
 
@@ -33,16 +33,26 @@ export interface FullScreenOverlayWithColumnsProps extends FullScreenOverlayComm
 
 export type FullScreenOverlayProps = FullScreenOverlayNoColumnsProps | FullScreenOverlayWithColumnsProps;
 
+const SELECTOR_DIALOG_SCROLLABLE = "[role=presentation]";
+
 export const FullScreenOverlay: React.FC<FullScreenOverlayProps> = ({
   open = true,
   onClose,
   isDialogBlocked,
-  dialogRootRef,
+  contentKey,
   header,
   children,
   ...variantProps
 }) => {
+  const dialogRootRef = useRef<HTMLDivElement>(null);
   const paperRef = useRef<HTMLDivElement>(null);
+
+  // Scroll to top on step change:
+  useEffect(() => {
+    const dialogScrollable = dialogRootRef.current?.querySelector(SELECTOR_DIALOG_SCROLLABLE);
+
+    if (contentKey && dialogScrollable) dialogScrollable.scrollTop = 0;
+  }, [contentKey]);
 
   const [shakeSx, shake] = useShakeAnimation(paperRef.current);
 

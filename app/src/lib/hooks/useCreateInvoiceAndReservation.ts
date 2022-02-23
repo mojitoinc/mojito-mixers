@@ -33,6 +33,7 @@ export function useCreateInvoiceAndReservation({
   const [createBuyNowInvoice] = useCreateBuyNowInvoiceMutation();
 
   const createInvoiceAndReservation = useCallback(async () => {
+    console.log("createInvoiceAndReservation")
 
     // TODO: Quick fix. The UI can currently display multiple items with multiple units each, but will only purchase the
     // selected amount (can be multiple units) of the first item:
@@ -70,14 +71,14 @@ export function useCreateInvoiceAndReservation({
     let invoiceID = "";
     let mutationError: ApolloError | Error;
 
-    if (debug) {
-      console.log("  🧾 createAuctionInvoice", {
-        orgID,
-        lotID,
-      });
-    }
-
     if (lotType === "buyNow") {
+      if (debug) {
+        console.log("  🧾 createBuyNowInvoice", {
+          units,
+          lotID,
+        });
+      }
+
       const createBuyNowInvoiceResult = await createBuyNowInvoice({
         variables: {
           input: {
@@ -97,6 +98,13 @@ export function useCreateInvoiceAndReservation({
         invoiceID = createBuyNowInvoiceResult.data?.purchaseMarketplaceBuyNowLot?.invoice?.invoiceID;
       }
     } else if (lotType === "auction" && process.env.NODE_ENV === "development") {
+      if (debug) {
+        console.log("  🧾 createAuctionInvoice", {
+          orgID,
+          lotID,
+        });
+      }
+
       const createAuctionInvoiceResult = await createAuctionInvoice({
         variables: {
           orgID,

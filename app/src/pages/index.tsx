@@ -1,7 +1,7 @@
 import { useAuth0 } from "@auth0/auth0-react";
 import { Container, Typography, Box, Stack, Button, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio, FormHelperText, TextField, Switch, Select, MenuItem, InputLabel, FormGroup, Checkbox } from "@mui/material";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { PUICheckout, CheckoutModalError, PUICheckoutProps, PaymentType } from "../lib";
+import { PUICheckout, CheckoutModalError, PUICheckoutProps, PaymentType, useOpenCloseCheckoutModal } from "../lib";
 import { useMeQuery } from "../services/graphql/generated";
 import { PLAYGROUND_PARAGRAPHS_ARRAY, PLAYGROUND_AUTH_PRESET, PLAYGROUND_NO_AUTH_PRESET, PLAYGROUND_PRIVACY_HREF, PLAYGROUND_TERMS_OF_USE_HREF, PLAYGROUND_USER_FORMAT, PLAYGROUND_PURCHASING_IMAGE_SRC, PLAYGROUND_ERROR_IMAGE_SRC, PLAYGROUND_THEMES, PLAYGROUND_LOGOS_SRC, PLAYGROUND_LOGOS_SX, PLAYGROUND_MOCKED_LOT, PLAYGROUND_LOADER_IMAGE_SRC } from "../utils/playground/playground.constants";
 import { PlaygroundFormData } from "../utils/playground/playground.interfaces";
@@ -61,14 +61,19 @@ if (process.browser) {
 
 const HomePage = () => {
   const firstTimeRef = useRef(true);
-  const [open, setOpen] = useState(false);
+  const { isOpen, onOpen, onClose } = useOpenCloseCheckoutModal();
   const { loginWithPopup, isAuthenticated, isLoading: isAuthenticatedLoading, getIdTokenClaims } = useAuth0();
   const { data: meData, loading: meLoading, error: meError } = useMeQuery({ skip: !isAuthenticated });
   const isLoading = isAuthenticatedLoading || meLoading;
   const organizations = isLoading ? [] : (meData?.me?.userOrgs || []).map(userOrg => userOrg.organization);
+  const hasOrganizations = organizations.length > 0;
 
   useEffect(() => {
-    if (isLoading ||
+    if (
+      isLoading ||
+      !isAuthenticated ||
+      !meData ||
+      !hasOrganizations ||
       firstTimeRef.current === false ||
       (INITIAL_FORM_VALUES.lotType === "auction" && !INITIAL_FORM_VALUES.invoiceID) ||
       (INITIAL_FORM_VALUES.orgID === "custom" && !INITIAL_FORM_VALUES.customOrgID)
@@ -76,17 +81,8 @@ const HomePage = () => {
 
     firstTimeRef.current = false;
 
-    setOpen(true);
-  }, [isAuthenticated, isLoading, meData]);
-
-  const handleOpen = useCallback(() => {
-    setOpen(true);
-  }, []);
-
-  const handleClose = useCallback(() => {
-    // TODO: Pass a prop to indicate the user started adding info.
-    setOpen(false);
-  }, []);
+    onOpen();
+  }, [isLoading, isAuthenticated, meData, hasOrganizations, onOpen]);
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleError = useCallback((error: CheckoutModalError) => {
@@ -162,8 +158,8 @@ const HomePage = () => {
     uri: `${ config.API_HOSTNAME }/query`,
 
     // Modal:
-    open,
-    onClose: handleClose,
+    open: isOpen,
+    onClose,
 
     // Flow:
     guestCheckoutEnabled: testPreset.guestCheckoutEnabled,
@@ -221,7 +217,7 @@ const HomePage = () => {
     <Container>
       <Box sx={{ my: 4 }}>
         <Stack spacing={ 2 } direction="row">
-          <Button variant="contained" onClick={ handleOpen } disabled={ isLoading }>Open Checkout Modal</Button>
+          <Button variant="contained" onClick={ onOpen } disabled={ isLoading }>Open Checkout Modal</Button>
         </Stack>
       </Box>
 
@@ -406,7 +402,7 @@ const HomePage = () => {
 
       <Box sx={{ my: 4 }}>
         <Stack spacing={ 2 } direction="row">
-          <Button variant="contained" onClick={ handleOpen } disabled={ isLoading }>Open Checkout Modal</Button>
+          <Button variant="contained" onClick={ onOpen } disabled={ isLoading }>Open Checkout Modal</Button>
         </Stack>
       </Box>
 
@@ -421,7 +417,7 @@ const HomePage = () => {
 
       <Box sx={{ my: 4 }}>
         <Stack spacing={ 2 } direction="row">
-          <Button variant="contained" onClick={ handleOpen } disabled={ isLoading }>Open Checkout Modal</Button>
+          <Button variant="contained" onClick={ onOpen } disabled={ isLoading }>Open Checkout Modal</Button>
         </Stack>
       </Box>
 
@@ -433,7 +429,7 @@ const HomePage = () => {
 
       <Box sx={{ my: 4 }}>
         <Stack spacing={ 2 } direction="row">
-          <Button variant="contained" onClick={ handleOpen } disabled={ isLoading }>Open Checkout Modal</Button>
+          <Button variant="contained" onClick={ onOpen } disabled={ isLoading }>Open Checkout Modal</Button>
         </Stack>
       </Box>
 
