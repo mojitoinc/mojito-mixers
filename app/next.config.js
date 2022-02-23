@@ -7,7 +7,8 @@ module.exports = withImages({
   inlineImageLimit: false,
 
   images: {
-    domains: [],
+    // Do not add due to vulnerability: https://github.com/mojitoinc/mojito-mixers/security/dependabot/6
+    // domains: [],
     loader: "imgix",
     path: "/",
   },
