@@ -3,7 +3,7 @@ import { Container, Typography, Box, Stack, Button, FormControl, FormLabel, Radi
 import { useCallback, useEffect, useRef, useState } from "react";
 import { PUICheckout, CheckoutModalError, PUICheckoutProps, PaymentType, useOpenCloseCheckoutModal } from "../lib";
 import { useMeQuery } from "../services/graphql/generated";
-import { PLAYGROUND_PARAGRAPHS_ARRAY, PLAYGROUND_AUTH_PRESET, PLAYGROUND_NO_AUTH_PRESET, PLAYGROUND_PRIVACY_HREF, PLAYGROUND_TERMS_OF_USE_HREF, PLAYGROUND_USER_FORMAT, PLAYGROUND_PURCHASING_IMAGE_SRC, PLAYGROUND_ERROR_IMAGE_SRC, PLAYGROUND_THEMES, PLAYGROUND_LOGOS_SRC, PLAYGROUND_LOGOS_SX, PLAYGROUND_MOCKED_LOT, PLAYGROUND_LOADER_IMAGE_SRC } from "../utils/playground/playground.constants";
+import { PLAYGROUND_PARAGRAPHS_ARRAY, PLAYGROUND_AUTH_PRESET, PLAYGROUND_NO_AUTH_PRESET, PLAYGROUND_PRIVACY_HREF, PLAYGROUND_TERMS_OF_USE_HREF, PLAYGROUND_USER_FORMAT, PLAYGROUND_PURCHASING_IMAGE_SRC, PLAYGROUND_ERROR_IMAGE_SRC, PLAYGROUND_THEMES, PLAYGROUND_LOGOS_SRC, PLAYGROUND_LOGOS_SX, PLAYGROUND_LOADER_IMAGE_SRC, PLAYGROUND_MOCKED_AUCTION_LOT, PLAYGROUND_MOCKED_BUY_NOW_LOT } from "../utils/playground/playground.constants";
 import { PlaygroundFormData } from "../utils/playground/playground.interfaces";
 import { config } from "../utils/config/config.constants";
 
@@ -31,8 +31,6 @@ const DEFAULT_FORM_VALUES: PlaygroundFormData = {
   lotID: "",
   lotType: "buyNow",
   lotUnits: 1,
-  lotUnitPrice: 100,
-  lotFee: 5,
 
   // Personalization:
   theme: "light",
@@ -116,8 +114,6 @@ const HomePage = () => {
       lotID: INITIAL_FORM_VALUES.lotID || DEFAULT_FORM_VALUES.lotID,
       lotType: INITIAL_FORM_VALUES.lotType || DEFAULT_FORM_VALUES.lotType,
       lotUnits: INITIAL_FORM_VALUES.lotUnits || DEFAULT_FORM_VALUES.lotUnits,
-      lotUnitPrice: INITIAL_FORM_VALUES.lotUnitPrice || DEFAULT_FORM_VALUES.lotUnitPrice,
-      lotFee: INITIAL_FORM_VALUES.lotFee || DEFAULT_FORM_VALUES.lotFee,
 
       // Personalization:
       theme: INITIAL_FORM_VALUES.theme || DEFAULT_FORM_VALUES.theme,
@@ -151,7 +147,7 @@ const HomePage = () => {
   };
 
   const testPreset = (isAuthenticated ? PLAYGROUND_AUTH_PRESET[formValues.authPresets] : PLAYGROUND_NO_AUTH_PRESET[formValues.notAuthPreset]) || {};
-  const lotType = formValues.lotType || PLAYGROUND_MOCKED_LOT.lotType;
+  const lotType = formValues.lotType || DEFAULT_FORM_VALUES.lotType;
 
   const checkoutProps: PUICheckoutProps = {
     // ProviderInjector:
@@ -194,12 +190,10 @@ const HomePage = () => {
     orgID: (formValues.orgID === "custom" ? formValues.customOrgID : formValues.orgID) || "",
     invoiceID: (lotType === "auction" && formValues.invoiceID) || "",
     checkoutItems: [{
-      ...PLAYGROUND_MOCKED_LOT,
-      lotID: formValues.lotID || PLAYGROUND_MOCKED_LOT.lotID,
+      ...(lotType === "buyNow" ? PLAYGROUND_MOCKED_BUY_NOW_LOT : PLAYGROUND_MOCKED_AUCTION_LOT),
+      lotID: formValues.lotID || DEFAULT_FORM_VALUES.lotID,
       lotType,
-      units: lotType === "auction" ? 1 : (parseInt(`${ formValues.lotUnits || PLAYGROUND_MOCKED_LOT.units }`, 10) || 1),
-      unitPrice: parseInt(`${ formValues.lotUnitPrice || PLAYGROUND_MOCKED_LOT.unitPrice }`, 10) || 0,
-      fee: lotType === "buyNow" ? 0 : (parseInt(`${ formValues.lotFee || PLAYGROUND_MOCKED_LOT.fee }`, 10) || 0),
+      units: lotType === "auction" ? 1 : (parseInt(`${ formValues.lotUnits || DEFAULT_FORM_VALUES.lotUnits }`, 10) || 1),
     }],
 
     // Authentication:
@@ -286,14 +280,6 @@ const HomePage = () => {
               </Select>
             </FormControl>
 
-            <TextField
-              type="number"
-              name="lotUnitPrice"
-              label="Lot Unit Price"
-              size="small"
-              value={ formValues.lotUnitPrice }
-              onChange={ handleChange } />
-
             { formValues.lotType === "buyNow" ? (
               <TextField
                 type="number"
@@ -303,14 +289,6 @@ const HomePage = () => {
                 value={ formValues.lotUnits }
                 onChange={ handleChange } />
             ) : (<>
-              <TextField
-                type="number"
-                name="lotFee"
-                label="Lot Fee"
-                size="small"
-                value={ formValues.lotFee }
-                onChange={ handleChange } />
-
               <TextField
                 name="invoiceID"
                 label="Invoice ID"
@@ -409,7 +387,7 @@ const HomePage = () => {
       <Box component="pre" sx={{ my: 4, p: 2, overflow: "scroll", border: 2, borderRadius: "4px" }}>
         { JSON.stringify(checkoutProps, (key, value) => {
           if (typeof value === "function") return value.name ? `function ${ value.name }` : "() => { ... }";
-          if (key === "theme" || key === "themeOptions") return "{ ... }";
+          if (key === "theme" || key === "themeOptions" || key === "customTexts") return "{ ... }";
 
           return value;
         }, "  ") }

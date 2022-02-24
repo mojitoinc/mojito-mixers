@@ -47,3 +47,5 @@ export const ERROR_PURCHASE_CVV = createError("Could not verify CVV.");
 export const ERROR_PURCHASE_PAYING = createError("Payment failed.");
 
 export const ERROR_PURCHASE_3DS = createError("Payment method could not be verified.", "payment");
+
+export const ERROR_INVOICE_TIMEOUT = createError("Your product reservation expired. Please, try to complete the purchase again in time.", "reset");

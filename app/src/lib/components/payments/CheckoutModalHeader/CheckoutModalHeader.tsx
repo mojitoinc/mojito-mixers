@@ -8,6 +8,7 @@ import { UserFormat } from "../../../domain/auth/authentication.interfaces";
 import { getFormattedUser } from "./CheckoutModalHeader.utils";
 import { User } from "../../../queries/graphqlGenerated";
 import React from "react";
+import { RESERVATION_COUNTDOWN_FROM_MIN } from "../../../config/config";
 
 export type CheckoutModalHeaderVariant = "anonymous" | "guest" | "loggedIn" | "logoOnly" | "purchasing" | "error";
 
@@ -31,6 +32,7 @@ const CHECKOUT_MODAL_CONTROLS: Record<CheckoutModalHeaderVariant, boolean> = {
 
 export interface CheckoutModalHeaderProps {
   variant: CheckoutModalHeaderVariant;
+  countdownElementRef?: React.RefObject<HTMLSpanElement>;
   title?: string;
   logoSrc: string;
   logoSx?: SxProps<Theme>;
@@ -39,8 +41,25 @@ export interface CheckoutModalHeaderProps {
   onLoginClicked?: () => void;
   onPrevClicked?: () => void;
 }
+
+const COUNTDOWN_CONTAINER_SX: SxProps<Theme> = {
+  position: "relative",
+  color: "transparent",
+  userSelect: "none",
+};
+
+const COUNTDOWN_SX: SxProps<Theme> = {
+  position: "absolute",
+  top: 0,
+  bottom: 0,
+  left: 0,
+  color: theme => theme.palette.text.primary,
+  userSelect: "auto",
+};
+
 export const CheckoutModalHeader: React.FC<CheckoutModalHeaderProps> = ({
   variant,
+  countdownElementRef,
   title: customTitle,
   logoSrc,
   logoSx,
@@ -79,6 +98,15 @@ export const CheckoutModalHeader: React.FC<CheckoutModalHeaderProps> = ({
 
           { (variant !== "anonymous" && onPrevClicked && displayUsername) ? (<>
               <OutlinedSecondaryButton onClick={ onPrevClicked }><ChevronLeftIcon /></OutlinedSecondaryButton>
+              { variant === "loggedIn" && countdownElementRef ? (
+                <Typography sx={{ fontWeight: "500" }}>
+                  Time left: { " " }
+                  <Box component="span" sx={ COUNTDOWN_CONTAINER_SX }>
+                    00:00
+                    <Box component="span" ref={ countdownElementRef } sx={ COUNTDOWN_SX }>{ RESERVATION_COUNTDOWN_FROM_MIN }:00</Box>
+                  </Box>
+                </Typography>
+              ) : null }
               <Typography sx={{ fontWeight: "500", minHeight: 40, display: "flex", alignItems: "center" }}>{ displayUsername }</Typography>
           </>) : null }
         </Stack>

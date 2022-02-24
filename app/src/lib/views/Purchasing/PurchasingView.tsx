@@ -10,21 +10,7 @@ import { XS_MOBILE_MAX_WIDTH } from "../../config/theme/theme";
 import { StatusIcon } from "../../components/shared/StatusIcon/StatusIcon";
 import { useGetPaymentNotificationQuery } from "../../queries/graphqlGenerated";
 import { persistCheckoutModalInfo } from "../../components/public/CheckoutOverlay/CheckoutOverlay.utils";
-
-// TODO: Move these to theme or similar config file:
-
-const PURCHASING_MIN_WAIT_MS = 3000;
-
-const PURCHASING_MESSAGES_INTERVAL_MS = 5000;
-
-const PAYMENT_NOTIFICATION_INTERVAL_MS = 1500;
-
-const PURCHASING_MESSAGES_DEFAULT = [
-  "Muddling mint and lime.",
-  "Topping up with club soda.",
-  "Adding rum, lime juice and ice.",
-  "Shaking things up!",
-];
+import { PAYMENT_NOTIFICATION_INTERVAL_MS, PURCHASING_MESSAGES_DEFAULT, PURCHASING_MIN_WAIT_MS, PURCHASING_MESSAGES_INTERVAL_MS } from "../../config/config";
 
 export interface PurchasingViewProps {
   purchasingImageSrc?: string;

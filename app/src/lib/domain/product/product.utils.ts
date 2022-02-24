@@ -1,8 +1,8 @@
 import { GetInvoiceDetailsQuery } from "../../queries/graphqlGenerated";
-import { CheckoutItem } from "./product.interfaces";
+import { CheckoutItem, CheckoutItemInfo } from "./product.interfaces";
 
 export function transformCheckoutItemsFromInvoice(
-  checkoutItems: CheckoutItem[],
+  checkoutItems: CheckoutItemInfo[],
   invoiceItems: GetInvoiceDetailsQuery["getInvoiceDetails"]["items"] = [],
 ): CheckoutItem[] {
   // TODO: This function should later be updated to give precedence to whatever's in the invoice, but right now it's
@@ -12,12 +12,12 @@ export function transformCheckoutItemsFromInvoice(
     // TODO: We should find the match based on ID, not index, but it's ok for now as we never buy more than 1 item at a time:
     const invoiceItem = invoiceItems[i];
 
-    return invoiceItem ? {
+    return {
       ...checkoutItem,
-      units: invoiceItem.units,
-      unitPrice: invoiceItem.unitPrice,
-      // TODO: Include fees and fees calculation logic here for auctions.
-      // TODO: Include taxes too.
-    } : checkoutItem;
+      units: invoiceItem?.units || checkoutItem.units || 1,
+      unitPrice: invoiceItem?.unitPrice || 0,
+      // TODO: Include fees and fees calculation logic here for auctions (from invoice)
+      // TODO: Include taxes too (if present in invoice).
+    };
   });
 }
