@@ -102,7 +102,6 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
     if (!hasWaited) return;
 
     if (paymentStatus === "error" || paymentError) {
-      onDialogBlocked(false);
       onPurchaseError(paymentError || ERROR_PURCHASE());
 
       return;
@@ -127,7 +126,6 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
       return;
     }
 
-    onDialogBlocked(false);
     onPurchaseSuccess(paymentReferenceNumber);
   }, [
     fullPaymentState,

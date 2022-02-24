@@ -3,7 +3,7 @@ import { Dispatch, SetStateAction } from "react";
 import { CircleFieldErrors } from "../../../domain/circle/circle.utils";
 import { PaymentMethod } from "../../../domain/payment/payment.interfaces";
 import { BillingInfo } from "../../../forms/BillingInfoForm";
-export declare type CheckoutModalErrorAt = "authentication" | "billing" | "payment" | "purchasing";
+export declare type CheckoutModalErrorAt = "reset" | "authentication" | "billing" | "payment" | "purchasing";
 export interface CheckoutModalError {
     at?: CheckoutModalErrorAt;
     error?: ApolloError | Error;
@@ -20,6 +20,7 @@ export interface CheckoutModalStateOptions {
 export interface CheckoutModalState {
     checkoutStep: CheckoutModalStep;
     checkoutError?: CheckoutModalError;
+    isDialogBlocked: boolean;
 }
 export interface SelectedPaymentMethod {
     billingInfo: string | BillingInfo;
@@ -34,8 +35,9 @@ export interface CheckoutModalStateReturn extends CheckoutModalState, PurchaseSt
     initModalState: () => void;
     goBack: () => void;
     goNext: () => void;
-    goTo: (checkoutStep: CheckoutModalStep, error?: null | string | CheckoutModalError) => void;
+    goTo: (checkoutStep?: CheckoutModalStep, error?: null | string | CheckoutModalError) => void;
     setError: (error: null | string | CheckoutModalError) => void;
+    setIsDialogBlocked: (isDialogBlocked: boolean) => void;
     selectedPaymentMethod: SelectedPaymentMethod;
     setSelectedPaymentMethod: Dispatch<SetStateAction<SelectedPaymentMethod>>;
     setInvoiceID: (invoiceID: string) => void;

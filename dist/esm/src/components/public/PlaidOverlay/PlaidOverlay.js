@@ -1,6 +1,6 @@
 import { useLayoutEffect } from 'react';
 import { getPlaidOAuthFlowState, persistPlaidReceivedRedirectUri } from '../../../domain/plaid/plaid.utils.js';
-import { withProviders } from '../../shared/ProvidersInjector/ProvidersInjector.js';
+import { withThemeProvider } from '../../shared/ProvidersInjector/ProvidersInjector.js';
 
 const PUIPlaidOverlay = ({ onRedirect, }) => {
     const { continueOAuthFlow, url } = getPlaidOAuthFlowState();
@@ -12,7 +12,7 @@ const PUIPlaidOverlay = ({ onRedirect, }) => {
     }, [continueOAuthFlow, onRedirect, url]);
     return null;
 };
-const PUIPlaid = withProviders(PUIPlaidOverlay);
+const PUIPlaid = withThemeProvider(PUIPlaidOverlay);
 
 export { PUIPlaid, PUIPlaidOverlay };
 //# sourceMappingURL=PlaidOverlay.js.map

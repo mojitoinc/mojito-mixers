@@ -10,8 +10,9 @@ var CheckoutOverlay_utils = require('./CheckoutOverlay.utils.js');
 const CHECKOUT_STEPS = ["authentication", "billing", "payment", "purchasing", "confirmation"];
 function useCheckoutModalState({ invoiceID: initialInvoiceID = null, productConfirmationEnabled, isAuthenticated, onError, }) {
     const startAt = !isAuthenticated || productConfirmationEnabled ? "authentication" : "billing";
-    const [{ checkoutStep, checkoutError, }, setCheckoutModalState] = React.useState({
+    const [{ checkoutStep, checkoutError, isDialogBlocked, }, setCheckoutModalState] = React.useState({
         checkoutStep: startAt,
+        isDialogBlocked: false,
     });
     const [selectedPaymentMethod, setSelectedPaymentMethod] = React.useState({
         billingInfo: "",
@@ -35,6 +36,7 @@ function useCheckoutModalState({ invoiceID: initialInvoiceID = null, productConf
         setCheckoutModalState({
             checkoutStep: savedFlow.checkoutStep || startAt,
             checkoutError: savedFlow.checkoutError,
+            isDialogBlocked: false,
         });
         // setCheckoutModalState({ checkoutStep: "error", checkoutError: { errorMessage: "test" } });
         // setCheckoutModalState({ checkoutStep: "purchasing" });
@@ -52,15 +54,17 @@ function useCheckoutModalState({ invoiceID: initialInvoiceID = null, productConf
         setCheckoutModalState(({ checkoutStep, checkoutError }) => ({
             checkoutStep: CHECKOUT_STEPS[Math.max(CHECKOUT_STEPS.indexOf(checkoutStep) - 1, 0)],
             checkoutError,
+            isDialogBlocked: false,
         }));
     }, []);
     const goNext = React.useCallback(() => {
         setCheckoutModalState(({ checkoutStep, checkoutError }) => ({
             checkoutStep: CHECKOUT_STEPS[Math.min(CHECKOUT_STEPS.indexOf(checkoutStep) + 1, CHECKOUT_STEPS.length - 1)],
             checkoutError,
+            isDialogBlocked: false,
         }));
     }, []);
-    const goTo = React.useCallback((checkoutStep, error) => {
+    const goTo = React.useCallback((checkoutStep = startAt, error) => {
         setCheckoutModalState((prevCheckoutModalState) => {
             let checkoutError;
             if (error === null)
@@ -71,9 +75,9 @@ function useCheckoutModalState({ invoiceID: initialInvoiceID = null, productConf
                 checkoutError = { errorMessage: error };
             else
                 checkoutError = error;
-            return checkoutError ? { checkoutStep, checkoutError } : { checkoutStep };
+            return checkoutError ? { checkoutStep, checkoutError, isDialogBlocked: false } : { checkoutStep, isDialogBlocked: false };
         });
-    }, []);
+    }, [startAt]);
     const setError = React.useCallback((error) => {
         const nextCheckoutError = typeof error === "string" ? { errorMessage: error || errors_constants.ERROR_PURCHASE().errorMessage } : error;
         if (onError)
@@ -81,8 +85,16 @@ function useCheckoutModalState({ invoiceID: initialInvoiceID = null, productConf
         setCheckoutModalState({
             checkoutStep: "error",
             checkoutError: nextCheckoutError,
+            isDialogBlocked: false,
         });
     }, [onError]);
+    const setIsDialogBlocked = React.useCallback((isDialogBlocked) => {
+        setCheckoutModalState(({ checkoutStep, checkoutError }) => ({
+            checkoutStep,
+            checkoutError,
+            isDialogBlocked,
+        }));
+    }, []);
     const setInvoiceID = React.useCallback((invoiceID) => {
         setPurchaseState({ invoiceID, paymentReferenceNumber: "" });
     }, []);
@@ -93,11 +105,13 @@ function useCheckoutModalState({ invoiceID: initialInvoiceID = null, productConf
         // CheckoutModalState:
         checkoutStep,
         checkoutError,
+        isDialogBlocked,
         initModalState,
         goBack,
         goNext,
         goTo,
         setError,
+        setIsDialogBlocked,
         // SelectedPaymentMethod:
         selectedPaymentMethod,
         setSelectedPaymentMethod,

@@ -1,9 +1,11 @@
 import React from "react";
 import { Theme, ThemeOptions } from "@mui/material/styles";
 import { AuthorizedApolloProviderProps } from "../AuthorizedApolloProvider/AuthorizedApolloProvider";
-export interface ProviderInjectorProps extends AuthorizedApolloProviderProps {
+export interface ThemeProviderProps {
     theme?: Theme;
     themeOptions?: ThemeOptions;
 }
-export declare const ProviderInjector: React.FC<ProviderInjectorProps>;
-export declare function withProviders<P extends object>(Component: React.ComponentType<P>): React.FC<P & ProviderInjectorProps>;
+export declare type ProvidersInjectorProps = ThemeProviderProps & AuthorizedApolloProviderProps;
+export declare const ProviderInjector: React.FC<ProvidersInjectorProps>;
+export declare function withThemeProvider<P extends object>(Component: React.ComponentType<P>): React.FC<P & ThemeProviderProps>;
+export declare function withProviders<P extends object>(Component: React.ComponentType<P>): React.FC<P & ThemeProviderProps & AuthorizedApolloProviderProps>;

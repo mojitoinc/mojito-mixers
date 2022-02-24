@@ -1,7 +1,7 @@
 /// <reference types="react" />
 import React from 'react';
 import { Theme, ThemeOptions, SxProps } from '@mui/material/styles';
-export { Theme as CheckoutModalTheme, ThemeOptions as CheckoutModalThemeOptions, ThemeProvider as CheckoutModalThemeProvider } from '@mui/material/styles';
+export { Theme as CheckoutModalTheme, ThemeOptions as CheckoutModalThemeOptions, ThemeProvider as PUIThemeProvider } from '@mui/material/styles';
 import { ApolloError, ApolloClient, NormalizedCacheObject } from '@apollo/client';
 
 declare type UserFormat = "username" | "email" | "name";
@@ -77,7 +77,7 @@ interface CircleFieldErrors {
     firstAt: CircleFieldErrorAt;
 }
 
-declare type CheckoutModalErrorAt = "authentication" | "billing" | "payment" | "purchasing";
+declare type CheckoutModalErrorAt = "reset" | "authentication" | "billing" | "payment" | "purchasing";
 interface CheckoutModalError {
     at?: CheckoutModalErrorAt;
     error?: ApolloError | Error;
@@ -87,14 +87,15 @@ interface CheckoutModalError {
 declare type CheckoutModalStep = "authentication" | "billing" | "payment" | "purchasing" | "confirmation" | "error";
 
 interface AuthorizedApolloProviderProps {
-    apolloClient?: ApolloClient<NormalizedCacheObject>;
-    uri?: string;
+    apolloClient?: ApolloClient<NormalizedCacheObject> | null;
+    uri: string;
 }
 
-interface ProviderInjectorProps extends AuthorizedApolloProviderProps {
+interface ThemeProviderProps {
     theme?: Theme;
     themeOptions?: ThemeOptions;
 }
+declare type ProvidersInjectorProps = ThemeProviderProps & AuthorizedApolloProviderProps;
 
 declare type CustomTextsKeys = 'wirePaymentsDisclaimer' | 'purchaseInstructions';
 
@@ -128,14 +129,13 @@ interface PUICheckoutOverlayProps {
     onError?: (error: CheckoutModalError) => void;
     onMarketingOptInChange?: (marketingOptIn: boolean) => void;
 }
-declare type PUICheckoutProps = PUICheckoutOverlayProps & ProviderInjectorProps;
+declare type PUICheckoutProps = PUICheckoutOverlayProps & ProvidersInjectorProps;
 declare const PUICheckout: React.FC<PUICheckoutProps>;
 
 interface FullScreenOverlayFunctionalProps {
     open?: boolean;
     onClose?: () => void;
     isDialogBlocked?: boolean;
-    dialogRootRef?: React.RefObject<HTMLDivElement>;
 }
 
 interface PUISuccessOverlayProps extends FullScreenOverlayFunctionalProps {
@@ -144,7 +144,7 @@ interface PUISuccessOverlayProps extends FullScreenOverlayFunctionalProps {
     successImageSrc: string;
     onRedirect: (pathnameOrUrl: string) => void;
 }
-declare type PUISuccessProps$1 = PUISuccessOverlayProps & ProviderInjectorProps;
+declare type PUISuccessProps$1 = PUISuccessOverlayProps & ThemeProviderProps;
 declare const PUISuccess: React.FC<PUISuccessProps$1>;
 
 interface PUIErrorOverlayProps extends FullScreenOverlayFunctionalProps {
@@ -153,14 +153,20 @@ interface PUIErrorOverlayProps extends FullScreenOverlayFunctionalProps {
     errorImageSrc: string;
     onRedirect: (pathnameOrUrl: string) => void;
 }
-declare type PUIErrorProps = PUIErrorOverlayProps & ProviderInjectorProps;
+declare type PUIErrorProps = PUIErrorOverlayProps & ThemeProviderProps;
 declare const PUIError: React.FC<PUIErrorProps>;
 
 interface PUIPlaidOverlayProps {
     onRedirect: (pathnameOrUrl: string) => void;
 }
-declare type PUISuccessProps = PUIPlaidOverlayProps & ProviderInjectorProps;
+declare type PUISuccessProps = PUIPlaidOverlayProps & ThemeProviderProps;
 declare const PUIPlaid: React.FC<PUISuccessProps>;
+
+declare function useOpenCloseCheckoutModal(): {
+    isOpen: boolean;
+    onOpen: () => void;
+    onClose: () => void;
+};
 
 declare const MOJITO_LIGHT_THEME: Theme;
 declare const MOJITO_DARK_THEME: Theme;
@@ -196,6 +202,8 @@ interface CheckoutModalState3DS extends CheckoutModalInfo {
     purchaseError: boolean;
     savedStateUsed: boolean;
 }
+declare function persistReceivedRedirectUri3DS(receivedRedirectUri: string): void;
+declare function getCheckoutModalState(): CheckoutModalState3DS;
 declare function continueCheckout(noClear?: boolean): [boolean, CheckoutModalState3DS];
 interface ContinueFlowsReturn {
     checkoutStep: CheckoutModalStep | "";
@@ -207,4 +215,4 @@ interface ContinueFlowsReturn {
 }
 declare function continueFlows(noClear?: boolean): ContinueFlowsReturn;
 
-export { CheckoutItem, CheckoutModalError, CheckoutModalErrorAt, CircleFieldErrorAt, CircleFieldErrors, MOJITO_DARK_THEME, MOJITO_LIGHT_THEME, PUICheckout, PUICheckoutProps, PUIError, PUIErrorProps, PUIPlaid, PUISuccess, PUISuccessProps$1 as PUISuccessProps, PaymentType, UserFormat, continueCheckout, continueFlows, continuePlaidOAuthFlow, getPlaidOAuthFlowState, persistPlaidReceivedRedirectUri };
+export { CheckoutItem, CheckoutModalError, CheckoutModalErrorAt, CircleFieldErrorAt, CircleFieldErrors, MOJITO_DARK_THEME, MOJITO_LIGHT_THEME, PUICheckout, PUICheckoutProps, PUIError, PUIErrorProps, PUIPlaid, PUISuccess, PUISuccessProps$1 as PUISuccessProps, PaymentType, UserFormat, continueCheckout, continueFlows, continuePlaidOAuthFlow, getCheckoutModalState, getPlaidOAuthFlowState, persistPlaidReceivedRedirectUri, persistReceivedRedirectUri3DS, useOpenCloseCheckoutModal };

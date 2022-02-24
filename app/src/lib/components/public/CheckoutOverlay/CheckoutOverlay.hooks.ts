@@ -8,7 +8,7 @@ import { BillingInfo } from "../../../forms/BillingInfoForm";
 import { resetStepperProgress } from "../../payments/CheckoutStepper/CheckoutStepper";
 import { continueFlows } from "./CheckoutOverlay.utils";
 
-export type CheckoutModalErrorAt = "authentication" | "billing" | "payment" | "purchasing";
+export type CheckoutModalErrorAt = "reset" | "authentication" | "billing" | "payment" | "purchasing";
 
 export interface CheckoutModalError {
   at?: CheckoutModalErrorAt;
@@ -29,6 +29,7 @@ export interface CheckoutModalStateOptions {
 export interface CheckoutModalState {
   checkoutStep: CheckoutModalStep;
   checkoutError?: CheckoutModalError;
+  isDialogBlocked: boolean;
 }
 
 export interface SelectedPaymentMethod {
@@ -47,8 +48,9 @@ export interface CheckoutModalStateReturn extends CheckoutModalState, PurchaseSt
   initModalState: () => void;
   goBack: () => void;
   goNext: () => void;
-  goTo: (checkoutStep: CheckoutModalStep, error?: null | string | CheckoutModalError) => void;
+  goTo: (checkoutStep?: CheckoutModalStep, error?: null | string | CheckoutModalError) => void;
   setError: (error: null | string | CheckoutModalError) => void;
+  setIsDialogBlocked: (isDialogBlocked: boolean) => void;
 
   // SelectedPaymentMethod:
   selectedPaymentMethod: SelectedPaymentMethod;
@@ -72,8 +74,10 @@ export function useCheckoutModalState({
   const [{
     checkoutStep,
     checkoutError,
+    isDialogBlocked,
   }, setCheckoutModalState] = useState<CheckoutModalState>({
     checkoutStep: startAt,
+    isDialogBlocked: false,
   });
 
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<SelectedPaymentMethod>({
@@ -106,6 +110,7 @@ export function useCheckoutModalState({
     setCheckoutModalState({
       checkoutStep: savedFlow.checkoutStep || startAt,
       checkoutError: savedFlow.checkoutError,
+      isDialogBlocked: false,
     });
 
     // setCheckoutModalState({ checkoutStep: "error", checkoutError: { errorMessage: "test" } });
@@ -128,6 +133,7 @@ export function useCheckoutModalState({
     setCheckoutModalState(({ checkoutStep, checkoutError }) => ({
       checkoutStep: CHECKOUT_STEPS[Math.max(CHECKOUT_STEPS.indexOf(checkoutStep) - 1, 0)],
       checkoutError,
+      isDialogBlocked: false,
     }));
   }, []);
 
@@ -135,10 +141,11 @@ export function useCheckoutModalState({
     setCheckoutModalState(({ checkoutStep, checkoutError }) => ({
       checkoutStep: CHECKOUT_STEPS[Math.min(CHECKOUT_STEPS.indexOf(checkoutStep) + 1, CHECKOUT_STEPS.length - 1)],
       checkoutError,
+      isDialogBlocked: false,
     }));
   }, []);
 
-  const goTo = useCallback((checkoutStep: CheckoutModalStep, error?: null | string | CheckoutModalError) => {
+  const goTo = useCallback((checkoutStep: CheckoutModalStep = startAt, error?: null | string | CheckoutModalError) => {
     setCheckoutModalState((prevCheckoutModalState) => {
       let checkoutError: CheckoutModalError | undefined;
 
@@ -147,9 +154,9 @@ export function useCheckoutModalState({
       else if (typeof error === "string") checkoutError = { errorMessage: error };
       else checkoutError = error;
 
-      return checkoutError ? { checkoutStep, checkoutError } : { checkoutStep };
+      return checkoutError ? { checkoutStep, checkoutError, isDialogBlocked: false } : { checkoutStep, isDialogBlocked: false };
     });
-  }, []);
+  }, [startAt]);
 
   const setError = useCallback((error: string | CheckoutModalError) => {
     const nextCheckoutError: CheckoutModalError = typeof error === "string" ? { errorMessage: error || ERROR_PURCHASE().errorMessage } : error;
@@ -159,11 +166,19 @@ export function useCheckoutModalState({
     setCheckoutModalState({
       checkoutStep: "error",
       checkoutError: nextCheckoutError,
+      isDialogBlocked: false,
     });
   }, [onError]);
 
+  const setIsDialogBlocked = useCallback((isDialogBlocked: boolean) => {
+    setCheckoutModalState(({ checkoutStep, checkoutError }) => ({
+      checkoutStep,
+      checkoutError,
+      isDialogBlocked,
+    }));
+  }, []);
 
-  const setInvoiceID = useCallback((invoiceID: string) => {
+  const setInvoiceID = useCallback((invoiceID: string | null) => {
     setPurchaseState({ invoiceID, paymentReferenceNumber: "" });
   }, []);
 
@@ -175,11 +190,13 @@ export function useCheckoutModalState({
     // CheckoutModalState:
     checkoutStep,
     checkoutError,
+    isDialogBlocked,
     initModalState,
     goBack,
     goNext,
     goTo,
     setError,
+    setIsDialogBlocked,
 
     // SelectedPaymentMethod:
     selectedPaymentMethod,

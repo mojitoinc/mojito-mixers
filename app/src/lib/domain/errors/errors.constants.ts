@@ -3,7 +3,7 @@ import { CheckoutModalError, CheckoutModalErrorAt } from "../../components/publi
 
 export const BUILT_IN_ERRORS = ["EvalError", "RangeError", "ReferenceError", "SyntaxError", "TypeError", "URIError", "AggregateError", "InternalError"];
 
-export const DEFAULT_ERROR_AT: CheckoutModalErrorAt = "purchasing";
+export const DEFAULT_ERROR_AT = "purchasing";
 
 function createError(errorMessage: string, at: CheckoutModalErrorAt = DEFAULT_ERROR_AT): (error?: ApolloError | Error) => CheckoutModalError {
   return (error?: ApolloError | Error) => ({
@@ -40,7 +40,7 @@ export const ERROR_PURCHASE_SELECTED_PAYMENT_METHOD = createError("Could not fin
 
 export const ERROR_PURCHASE_CREATING_PAYMENT_METHOD = createError("Payment method could not be saved.", "billing");
 
-export const ERROR_PURCHASE_CREATING_INVOICE = createError("Invoice could not be created.", "billing");
+export const ERROR_PURCHASE_CREATING_INVOICE = createError("Invoice could not be created.", "reset");
 
 export const ERROR_PURCHASE_CVV = createError("Could not verify CVV.");
 
