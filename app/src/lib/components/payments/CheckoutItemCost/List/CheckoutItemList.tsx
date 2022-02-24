@@ -26,7 +26,7 @@ export const CheckoutItemList: React.FC<CheckoutItemListProps> = ({
     }
   >
     {checkoutItems.map(
-      ({ lotID, name, units, unitPrice, imageSrc, imageBackground }) => (
+      ({ lotID, name, imageSrc, imageBackground, totalSupply, remainingSupply, units, unitPrice }) => (
         <Grid
           key={lotID}
           container
@@ -57,23 +57,29 @@ export const CheckoutItemList: React.FC<CheckoutItemListProps> = ({
                 display: "flex",
                 flexDirection: "column",
                 flex: 1,
-                justifyContent: "space-between",
               }}
             >
-              <Typography sx={{ fontWeight: "500" }}>{name}</Typography>
+              <Typography sx={{ fontWeight: "500", pb: 0.5 }}>{name}</Typography>
+
+              <Typography sx={{ pb: 0.5 }}>
+                # { units === 1 ? (
+                  <Number>{totalSupply - remainingSupply + 1}</Number>
+                ) : (<>
+                  <Number>{totalSupply - remainingSupply + 1}</Number>-<Number>{totalSupply - remainingSupply + units}</Number>
+                </>) } / <Number>{totalSupply}</Number>
+              </Typography>
+
               <Box
                 sx={{
                   display: "flex",
                   flexDirection: "row",
                   justifyContent: "space-between",
+                  mt: "auto",
+                  pt: 0.5,
                 }}
               >
-                <Typography sx={{ marginTop: 0.5 }}>{units}</Typography>
-                {showPrices && (
-                  <Typography sx={{ marginTop: 0.5 }}>
-                    <Number suffix=" USD">{unitPrice}</Number>
-                  </Typography>
-                )}
+                <Typography sx={{ fontWeight: "500" }}>{units}</Typography>
+                { showPrices && <Typography><Number suffix=" USD">{unitPrice}</Number></Typography> }
               </Box>
             </Box>
           </Box>

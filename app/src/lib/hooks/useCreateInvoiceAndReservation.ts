@@ -1,9 +1,12 @@
 import { ApolloError } from "@apollo/client";
-import { useCallback, useState } from "react";
+import { useThrottledRequestAnimationFrame } from "@swyg/corre";
+import { useCallback, useRef, useState } from "react";
 import { CheckoutModalError } from "../components/public/CheckoutOverlay/CheckoutOverlay.hooks";
-import { ERROR_PURCHASE_CREATING_INVOICE, ERROR_PURCHASE_LOADING_ITEMS, ERROR_PURCHASE_NO_ITEMS, ERROR_PURCHASE_NO_UNITS } from "../domain/errors/errors.constants";
+import { RESERVATION_COUNTDOWN_FROM_MS, RESERVATION_COUNTDOWN_REFRESH_RATE_MS } from "../config/config";
+import { ERROR_INVOICE_TIMEOUT, ERROR_PURCHASE_CREATING_INVOICE, ERROR_PURCHASE_LOADING_ITEMS, ERROR_PURCHASE_NO_ITEMS, ERROR_PURCHASE_NO_UNITS } from "../domain/errors/errors.constants";
 import { CheckoutItem } from "../domain/product/product.interfaces";
 import { useCreateAuctionInvoiceMutation, useCreateBuyNowInvoiceMutation } from "../queries/graphqlGenerated";
+import { formatTimeLeft } from "../utils/formatUtils";
 
 export interface UseCreateInvoiceAndReservationOptions {
   orgID: string;
@@ -11,46 +14,74 @@ export interface UseCreateInvoiceAndReservationOptions {
   debug?: boolean;
 }
 
-export interface UseCreateInvoiceAndReservationState {
+export interface InvoiceAndReservationState {
   invoiceID?: string;
   error?: string | CheckoutModalError;
+}
+
+export interface UseCreateInvoiceAndReservationReturn {
+  invoiceAndReservationState: InvoiceAndReservationState;
+  createInvoiceAndReservation: () => Promise<void>;
+  countdownElementRef: React.RefObject<HTMLSpanElement>;
 }
 
 export function useCreateInvoiceAndReservation({
   orgID,
   checkoutItems,
   debug = false,
-}: UseCreateInvoiceAndReservationOptions): [UseCreateInvoiceAndReservationState, () => Promise<void>] {
-  const [createInvoiceAndReservationState, setCreateInvoiceAndReservationState] = useState<UseCreateInvoiceAndReservationState>({ });
+}: UseCreateInvoiceAndReservationOptions): UseCreateInvoiceAndReservationReturn {
+  const [invoiceAndReservationState, setInvoiceAndReservationState] = useState<InvoiceAndReservationState>({ });
 
   const setError = useCallback((error: string | CheckoutModalError) => {
-    setCreateInvoiceAndReservationState({
+    setInvoiceAndReservationState({
       error,
     });
   }, []);
+
+  const countdownStartRef = useRef<number>(null);
+  const countdownElementRef = useRef<HTMLSpanElement>(null);
+
+  useThrottledRequestAnimationFrame(() => {
+    const countdownStart = countdownStartRef.current;
+    const countdownElement = countdownElementRef.current;
+
+    if (countdownStart === null || countdownElement === null) return;
+
+    const formattedTimeLeft = formatTimeLeft(countdownStart, RESERVATION_COUNTDOWN_FROM_MS);
+
+    if (formattedTimeLeft === "00:00") {
+      countdownStartRef.current = null;
+
+      setError(ERROR_INVOICE_TIMEOUT());
+
+      return;
+    }
+
+    countdownElement.textContent = formattedTimeLeft;
+  }, countdownStartRef.current === null ? null : RESERVATION_COUNTDOWN_REFRESH_RATE_MS);
 
   const [createAuctionInvoice] = useCreateAuctionInvoiceMutation();
   const [createBuyNowInvoice] = useCreateBuyNowInvoiceMutation();
 
   const createInvoiceAndReservation = useCallback(async () => {
-    console.log("createInvoiceAndReservation")
-
     // TODO: Quick fix. The UI can currently display multiple items with multiple units each, but will only purchase the
     // selected amount (can be multiple units) of the first item:
+    const firstCheckoutItem = checkoutItems[0];
+
     const {
       lotID,
       lotType,
       units,
-    } = checkoutItems[0];
+    } = firstCheckoutItem || {};
 
     if (debug) {
-      console.log(checkoutItems[0]
+      console.log(firstCheckoutItem
         ? `\n🎫 Making reservation & creating invoice for ${ units } × ${ lotType } lot${ units > 1 ? "s" : "" } ${ lotID } (orgID = ${ orgID })...\n`
         : `\n🎫 Aborting reservation & creating invoice for unknown lot (orgID = ${ orgID })...\n`
       );
     }
 
-    if (checkoutItems.length === 0) {
+    if (!firstCheckoutItem) {
       setError(ERROR_PURCHASE_NO_ITEMS());
 
       return;
@@ -129,7 +160,9 @@ export function useCreateInvoiceAndReservation({
       return;
     }
 
-    setCreateInvoiceAndReservationState({ invoiceID });
+    countdownStartRef.current = Date.now();
+
+    setInvoiceAndReservationState({ invoiceID });
 
     // TODO: Error handling and automatic retry:
   }, [
@@ -141,5 +174,9 @@ export function useCreateInvoiceAndReservation({
     createBuyNowInvoice,
   ]);
 
-  return [createInvoiceAndReservationState, createInvoiceAndReservation];
+  return {
+    invoiceAndReservationState,
+    createInvoiceAndReservation,
+    countdownElementRef,
+  };
 }

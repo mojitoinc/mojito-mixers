@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import { getSavedPaymentMethodAddressIdFromBillingInfo, savedPaymentMethodToBillingInfo, transformRawSavedPaymentMethods } from "../../../domain/circle/circle.utils";
 import { UserFormat } from "../../../domain/auth/authentication.interfaces";
 import { PaymentMethod, PaymentType } from "../../../domain/payment/payment.interfaces";
-import { CheckoutItem } from "../../../domain/product/product.interfaces";
+import { CheckoutItemInfo } from "../../../domain/product/product.interfaces";
 import { BillingInfo } from "../../../forms/BillingInfoForm";
 import { useDeletePaymentMethodMutation, useGetInvoiceDetailsQuery, useGetPaymentMethodListQuery, useMeQuery } from "../../../queries/graphqlGenerated";
 import { AuthenticationView } from "../../../views/Authentication/AuthenticationView";
@@ -56,7 +56,7 @@ export interface PUICheckoutOverlayProps {
   // Data:
   orgID: string;
   invoiceID?: string;
-  checkoutItems: CheckoutItem[];
+  checkoutItems: CheckoutItemInfo[];
 
   // Authentication:
   onLogin: () => void;
@@ -196,7 +196,12 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   // Invoice creation & buy now lot reservation:
 
   const createInvoiceAndReservationCalledRef = useRef(false);
-  const [createInvoiceAndReservationState, createInvoiceAndReservation] = useCreateInvoiceAndReservation({ orgID, checkoutItems, debug });
+
+  const {
+    invoiceAndReservationState,
+    createInvoiceAndReservation,
+    countdownElementRef,
+   } = useCreateInvoiceAndReservation({ orgID, checkoutItems, debug });
 
   useEffect(() => {
     if (isDialogLoading || invoiceID === null || invoiceID || createInvoiceAndReservationCalledRef.current) return;
@@ -207,12 +212,12 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   }, [isDialogLoading, invoiceID, createInvoiceAndReservation]);
 
   useEffect(() => {
-    if (createInvoiceAndReservationState.error) {
-      setError(createInvoiceAndReservationState.error);
-    } else if (createInvoiceAndReservationState.invoiceID) {
-      setInvoiceID(createInvoiceAndReservationState.invoiceID);
+    if (invoiceAndReservationState.error) {
+      setError(invoiceAndReservationState.error);
+    } else if (invoiceAndReservationState.invoiceID) {
+      setInvoiceID(invoiceAndReservationState.invoiceID);
     }
-  }, [createInvoiceAndReservationState, setError, setInvoiceID]);
+  }, [invoiceAndReservationState, setError, setInvoiceID]);
 
 
   // Init modal state once everything has been loaded:
@@ -541,6 +546,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   const headerElement = (
     <CheckoutModalHeader
       variant={ headerVariant }
+      countdownElementRef={ countdownElementRef }
       logoSrc={ logoSrc }
       logoSx={ logoSx }
       user={ meData?.me?.user }
