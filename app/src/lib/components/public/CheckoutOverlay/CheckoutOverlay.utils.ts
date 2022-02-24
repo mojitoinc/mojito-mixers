@@ -1,15 +1,10 @@
+import { THREEDS_FLOW_INFO_KEY, THREEDS_FLOW_RECEIVED_REDIRECT_URI_KEY, THREEDS_FLOW_STATE_USED_KEY, THREEDS_STORAGE_EXPIRATION_MS, THREEDS_FLOW_URL_SEARCH } from "../../../config/config";
 import { ERROR_PURCHASE_3DS } from "../../../domain/errors/errors.constants";
 import { PaymentMethod } from "../../../domain/payment/payment.interfaces";
 import { getUrlWithoutParams, urlToPathnameWhenPossible } from "../../../domain/url/url.utils";
 import { BillingInfo } from "../../../forms/BillingInfoForm";
 import { continuePlaidOAuthFlow, INITIAL_PLAID_OAUTH_FLOW_STATE } from "../../../hooks/usePlaid";
 import { CheckoutModalError, CheckoutModalStep } from "./CheckoutOverlay.hooks";
-
-const THREEDS_STORAGE_EXPIRATION_MS = 1000 * 60; // One minute.
-const THREEDS_FLOW_INFO_KEY = "THREEDS_FLOW_INFO";
-const THREEDS_FLOW_RECEIVED_REDIRECT_URI_KEY = "THREEDS_FLOW_RECEIVED_REDIRECT_URI_KEY";
-const THREEDS_STATE_USED_KEY = "THREEDS_STATE_USED_KEY";
-const THREEDS_FLOW_URL_SEARCH = "?paymentId=";
 
 const debug = false;
 
@@ -61,7 +56,7 @@ export function persistReceivedRedirectUri3DS(receivedRedirectUri: string) {
 }
 
 export function persistCheckoutModalInfoUsed(used = true) {
-  localStorage.setItem(THREEDS_STATE_USED_KEY, `${ used }`);
+  localStorage.setItem(THREEDS_FLOW_STATE_USED_KEY, `${ used }`);
 }
 
 export function clearPersistedInfo(isExpired?: boolean) {
@@ -70,7 +65,7 @@ export function clearPersistedInfo(isExpired?: boolean) {
   if (process.browser) {
     localStorage.removeItem(THREEDS_FLOW_INFO_KEY);
     localStorage.removeItem(THREEDS_FLOW_RECEIVED_REDIRECT_URI_KEY);
-    localStorage.removeItem(THREEDS_STATE_USED_KEY);
+    localStorage.removeItem(THREEDS_FLOW_STATE_USED_KEY);
   }
 
   return FALLBACK_MODAL_STATE;
@@ -87,9 +82,7 @@ function isExpired(timestamp?: number) {
 }
 
 export function getCheckoutModalState(): CheckoutModalState3DS {
-  if (!process.browser) {
-    return FALLBACK_MODAL_STATE;
-  }
+  if (!process.browser) return FALLBACK_MODAL_STATE;
 
   let savedPlaidInfo: Partial<CheckoutModalState3DS> = {};
   let savedReceivedRedirectUri = "";
@@ -98,7 +91,7 @@ export function getCheckoutModalState(): CheckoutModalState3DS {
   try {
     savedPlaidInfo = JSON.parse(localStorage.getItem(THREEDS_FLOW_INFO_KEY) || "{}") || {};
     savedReceivedRedirectUri = localStorage.getItem(THREEDS_FLOW_RECEIVED_REDIRECT_URI_KEY) || "";
-    savedStateUsed = localStorage.getItem(THREEDS_STATE_USED_KEY) === "true" || false;
+    savedStateUsed = localStorage.getItem(THREEDS_FLOW_STATE_USED_KEY) === "true" || false;
   } catch (err) {
     if (debug) console.log(err);
   }
@@ -116,8 +109,8 @@ export function getCheckoutModalState(): CheckoutModalState3DS {
   // const receivedRedirectUri = savedReceivedRedirectUri || window.location.href || "";
 
   // In dev, this works fine even if there's nothing in localStorage, which helps with testing across some other domain and localhost:
-  const continue3DSFlow = (process.env.NODE_ENV === "development" && window.location.hostname !== "localhost") ||
-    !!(url && invoiceID && paymentReferenceNumber && billingInfo && paymentInfo && receivedRedirectUri);
+  const hasLocalhostOrigin = process.env.NODE_ENV === "development" && window.location.hostname !== "localhost";
+  const continue3DSFlow = hasLocalhostOrigin || !!(url && invoiceID && paymentReferenceNumber && billingInfo && paymentInfo && receivedRedirectUri);
 
   if ((continue3DSFlow && savedStateUsed) || (!continue3DSFlow && localStorage.getItem(THREEDS_FLOW_INFO_KEY)) || isExpired(timestamp)) {
     return clearPersistedInfo(isExpired(timestamp));
@@ -125,7 +118,7 @@ export function getCheckoutModalState(): CheckoutModalState3DS {
 
   return {
     // The URL of the page where we initially opened the modal:
-    url: urlToPathnameWhenPossible(url),
+    url: urlToPathnameWhenPossible(url || (hasLocalhostOrigin ? "http://localhost:3000" : "")),
 
     // The invoiceID we need to re-load the products and units:
     invoiceID,

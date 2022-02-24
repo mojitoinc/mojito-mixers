@@ -105,7 +105,7 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
         paymentInfo,
       });
 
-      console.log("Redirecting to 3DS...");
+      if (debug) console.log("Redirecting to 3DS...");
 
       location.href = redirectURL;
 
@@ -124,6 +124,7 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
     onDialogBlocked,
     onPurchaseSuccess,
     invoiceID,
+    debug,
   ]);
 
   useTimeout(() => {

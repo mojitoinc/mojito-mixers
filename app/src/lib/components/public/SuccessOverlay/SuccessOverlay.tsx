@@ -1,6 +1,7 @@
 import { SxProps, Theme } from "@mui/material/styles";
 import { useTimeout } from "@swyg/corre";
 import React, { useLayoutEffect } from "react";
+import { THREEDS_SUCCESS_REDIRECT_DELAY_MS } from "../../../config/config";
 import { getUrlWithSearchParams, isUrlPathname } from "../../../domain/url/url.utils";
 import { SuccessView } from "../../../views/Success/SuccessView";
 import { CheckoutModalHeader } from "../../payments/CheckoutModalHeader/CheckoutModalHeader";
@@ -8,7 +9,6 @@ import { FullScreenOverlay, FullScreenOverlayFunctionalProps } from "../../share
 import { ThemeProviderProps, withThemeProvider } from "../../shared/ProvidersInjector/ProvidersInjector";
 import { getCheckoutModalState, persistReceivedRedirectUri3DS } from "../CheckoutOverlay/CheckoutOverlay.utils";
 
-const REDIRECT_DELAY_MS = 5000;
 
 export interface PUISuccessOverlayProps extends FullScreenOverlayFunctionalProps {
   logoSrc?: string;
@@ -45,7 +45,7 @@ export const PUISuccessOverlay: React.FC<PUISuccessOverlayProps> = ({
     // If everything's ok, users see this confirmation screen for 5 seconds and then are redirected to the purchase
     // confirmation page:
     if (purchaseSuccess) onRedirect(isPathname ? url : getUrlWithSearchParams(url));
-  }, REDIRECT_DELAY_MS, [purchaseSuccess, isPathname, onRedirect]);
+  }, THREEDS_SUCCESS_REDIRECT_DELAY_MS, [purchaseSuccess, isPathname, onRedirect]);
 
   if (!purchaseSuccess) return null;
 

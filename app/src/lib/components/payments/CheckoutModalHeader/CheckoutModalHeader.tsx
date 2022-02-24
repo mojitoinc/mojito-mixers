@@ -55,6 +55,9 @@ const COUNTDOWN_SX: SxProps<Theme> = {
   left: 0,
   color: theme => theme.palette.text.primary,
   userSelect: "auto",
+  display: "flex",
+  justifyContent: "flex-start",
+  alignItems: "center",
 };
 
 export const CheckoutModalHeader: React.FC<CheckoutModalHeaderProps> = ({
