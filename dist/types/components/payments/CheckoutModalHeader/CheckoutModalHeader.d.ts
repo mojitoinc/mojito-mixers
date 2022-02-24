@@ -5,6 +5,7 @@ import React from "react";
 export declare type CheckoutModalHeaderVariant = "anonymous" | "guest" | "loggedIn" | "logoOnly" | "purchasing" | "error";
 export interface CheckoutModalHeaderProps {
     variant: CheckoutModalHeaderVariant;
+    countdownElementRef?: React.RefObject<HTMLSpanElement>;
     title?: string;
     logoSrc: string;
     logoSx?: SxProps<Theme>;

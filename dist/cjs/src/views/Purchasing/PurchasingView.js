@@ -11,21 +11,12 @@ var theme = require('../../config/theme/theme.js');
 var StatusIcon = require('../../components/shared/StatusIcon/StatusIcon.js');
 var graphqlGenerated = require('../../queries/graphqlGenerated.js');
 var CheckoutOverlay_utils = require('../../components/public/CheckoutOverlay/CheckoutOverlay.utils.js');
+var config = require('../../config/config.js');
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
 var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 
-// TODO: Move these to theme or similar config file:
-const PURCHASING_MIN_WAIT_MS = 3000;
-const PURCHASING_MESSAGES_INTERVAL_MS = 5000;
-const PAYMENT_NOTIFICATION_INTERVAL_MS = 1500;
-const PURCHASING_MESSAGES_DEFAULT = [
-    "Muddling mint and lime.",
-    "Topping up with club soda.",
-    "Adding rum, lime juice and ice.",
-    "Shaking things up!",
-];
 const PurchasingView = ({ purchasingImageSrc, purchasingMessages: customPurchasingMessages, orgID, invoiceID, savedPaymentMethods, selectedPaymentMethod, onPurchaseSuccess, onPurchaseError, onDialogBlocked, debug, }) => {
     var _a, _b, _c;
     const [fullPaymentState, fullPayment] = useFullPayment.useFullPayment({
@@ -37,14 +28,14 @@ const PurchasingView = ({ purchasingImageSrc, purchasingMessages: customPurchasi
     });
     const paymentNotificationResult = graphqlGenerated.useGetPaymentNotificationQuery({
         skip: fullPaymentState.paymentStatus !== "processed",
-        pollInterval: PAYMENT_NOTIFICATION_INTERVAL_MS,
+        pollInterval: config.PAYMENT_NOTIFICATION_INTERVAL_MS,
     });
     let purchasingMessages = customPurchasingMessages;
     if (purchasingMessages === false) {
         purchasingMessages = [];
     }
     else if (purchasingMessages === undefined || purchasingMessages.length === 0) {
-        purchasingMessages = PURCHASING_MESSAGES_DEFAULT;
+        purchasingMessages = config.PURCHASING_MESSAGES_DEFAULT;
     }
     const [hasWaited, setHasWaited] = React.useState(false);
     const [purchasingMessageIndex, setPurchasingMessageIndex] = React.useState(0);
@@ -82,7 +73,8 @@ const PurchasingView = ({ purchasingImageSrc, purchasingMessages: customPurchasi
                 billingInfo,
                 paymentInfo,
             });
-            console.log("Redirecting to 3DS...");
+            if (debug)
+                console.log("Redirecting to 3DS...");
             location.href = redirectURL;
             return;
         }
@@ -98,13 +90,14 @@ const PurchasingView = ({ purchasingImageSrc, purchasingMessages: customPurchasi
         onDialogBlocked,
         onPurchaseSuccess,
         invoiceID,
+        debug,
     ]);
     corre.useTimeout(() => {
         setHasWaited(true);
-    }, PURCHASING_MIN_WAIT_MS);
+    }, config.PURCHASING_MIN_WAIT_MS);
     corre.useInterval(() => {
-        setPurchasingMessageIndex(prevWaitMessageIndex => Math.min(prevWaitMessageIndex + 1, PURCHASING_MESSAGES_DEFAULT.length - 1));
-    }, PURCHASING_MESSAGES_INTERVAL_MS);
+        setPurchasingMessageIndex(prevWaitMessageIndex => Math.min(prevWaitMessageIndex + 1, config.PURCHASING_MESSAGES_DEFAULT.length - 1));
+    }, config.PURCHASING_MESSAGES_INTERVAL_MS);
     return (React__default["default"].createElement(material.Box, null,
         React__default["default"].createElement(StatusIcon.StatusIcon, { variant: "loading", imgSrc: purchasingImageSrc, sx: { mt: 5 } }),
         purchasingMessage ? React__default["default"].createElement(material.Typography, { variant: "body2", sx: { textAlign: "center", mt: 1.5 } }, purchasingMessage) : null,

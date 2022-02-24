@@ -141,7 +141,6 @@ function useFullPayment({ orgID, invoiceID, savedPaymentMethods, selectedPayment
             },
         }).catch((error) => {
             mutationError = error;
-            // TODO: Cancel invoice?
             if (debug)
                 console.log("    🔴 makePayment error", error);
         });

@@ -13,6 +13,16 @@ function formatSentence(str) {
 function parseSentences(str) {
     return str.split(/\n/).map(formatSentence);
 }
+/**
+ * Calculate how much time is left since <start> ms out of <total> ms and formats that as MM:SS.
+ */
+function formatTimeLeft(start, total) {
+    const elapsedMs = Date.now() - start;
+    const timeLeftMs = Math.max(total - elapsedMs, 0);
+    const timeLeftMins = (timeLeftMs / 60000) | 0;
+    const timeLeftSeconds = ((timeLeftMs % 60000) / 1000) | 0;
+    return `${`00${timeLeftMins}`.slice(-2)}:${`00${timeLeftSeconds}`.slice(-2)}`;
+}
 
-export { NBSP, formatSentence, parseSentences };
+export { NBSP, formatSentence, formatTimeLeft, parseSentences };
 //# sourceMappingURL=formatUtils.js.map

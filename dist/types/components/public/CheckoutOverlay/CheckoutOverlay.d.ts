@@ -1,7 +1,7 @@
 import React from "react";
 import { UserFormat } from "../../../domain/auth/authentication.interfaces";
 import { PaymentType } from "../../../domain/payment/payment.interfaces";
-import { CheckoutItem } from "../../../domain/product/product.interfaces";
+import { CheckoutItemInfo } from "../../../domain/product/product.interfaces";
 import { Theme, ThemeOptions, SxProps } from "@mui/material/styles";
 import { ConsentType } from "../../shared/ConsentText/ConsentText";
 import { CheckoutModalError } from "./CheckoutOverlay.hooks";
@@ -29,7 +29,7 @@ export interface PUICheckoutOverlayProps {
     termsOfUseHref?: string;
     orgID: string;
     invoiceID?: string;
-    checkoutItems: CheckoutItem[];
+    checkoutItems: CheckoutItemInfo[];
     onLogin: () => void;
     isAuthenticated?: boolean;
     isAuthenticatedLoading?: boolean;

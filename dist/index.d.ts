@@ -28,16 +28,20 @@ declare type CryptoAddress = {
 declare type PaymentMethod = CreditCard | AchAccount | WireAccount | CryptoAddress;
 
 declare type LotType = "auction" | "buyNow";
-interface CheckoutItem {
+interface CheckoutItemInfo {
     lotID: string;
     lotType: LotType;
     name: string;
     description: string;
-    units: number;
-    unitPrice: number;
-    fee: number;
     imageSrc: string;
     imageBackground: string;
+    totalSupply: number;
+    remainingSupply: number;
+    units: number;
+    fee: number;
+}
+interface CheckoutItem extends CheckoutItemInfo {
+    unitPrice: number;
 }
 
 declare type ConsentType = "disclaimer" | "checkbox";
@@ -121,7 +125,7 @@ interface PUICheckoutOverlayProps {
     termsOfUseHref?: string;
     orgID: string;
     invoiceID?: string;
-    checkoutItems: CheckoutItem[];
+    checkoutItems: CheckoutItemInfo[];
     onLogin: () => void;
     isAuthenticated?: boolean;
     isAuthenticatedLoading?: boolean;

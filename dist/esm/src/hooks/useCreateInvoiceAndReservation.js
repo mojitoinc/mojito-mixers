@@ -1,29 +1,47 @@
 import { __awaiter } from '../../node_modules/tslib/tslib.es6.js';
-import { useState, useCallback } from 'react';
-import { ERROR_PURCHASE_NO_ITEMS, ERROR_PURCHASE_NO_UNITS, ERROR_PURCHASE_LOADING_ITEMS, ERROR_PURCHASE_CREATING_INVOICE } from '../domain/errors/errors.constants.js';
+import { useThrottledRequestAnimationFrame } from '@swyg/corre';
+import { useState, useCallback, useRef } from 'react';
+import { RESERVATION_COUNTDOWN_REFRESH_RATE_MS, RESERVATION_COUNTDOWN_FROM_MS } from '../config/config.js';
+import { ERROR_INVOICE_TIMEOUT, ERROR_PURCHASE_NO_ITEMS, ERROR_PURCHASE_NO_UNITS, ERROR_PURCHASE_LOADING_ITEMS, ERROR_PURCHASE_CREATING_INVOICE } from '../domain/errors/errors.constants.js';
 import { useCreateAuctionInvoiceMutation, useCreateBuyNowInvoiceMutation } from '../queries/graphqlGenerated.js';
+import { formatTimeLeft } from '../utils/formatUtils.js';
 
 function useCreateInvoiceAndReservation({ orgID, checkoutItems, debug = false, }) {
-    const [createInvoiceAndReservationState, setCreateInvoiceAndReservationState] = useState({});
+    const [invoiceAndReservationState, setInvoiceAndReservationState] = useState({});
     const setError = useCallback((error) => {
-        setCreateInvoiceAndReservationState({
+        setInvoiceAndReservationState({
             error,
         });
     }, []);
+    const countdownStartRef = useRef(null);
+    const countdownElementRef = useRef(null);
+    useThrottledRequestAnimationFrame(() => {
+        const countdownStart = countdownStartRef.current;
+        const countdownElement = countdownElementRef.current;
+        if (countdownStart === null || countdownElement === null)
+            return;
+        const formattedTimeLeft = formatTimeLeft(countdownStart, RESERVATION_COUNTDOWN_FROM_MS);
+        if (formattedTimeLeft === "00:00") {
+            countdownStartRef.current = null;
+            setError(ERROR_INVOICE_TIMEOUT());
+            return;
+        }
+        countdownElement.textContent = formattedTimeLeft;
+    }, countdownStartRef.current === null ? null : RESERVATION_COUNTDOWN_REFRESH_RATE_MS);
     const [createAuctionInvoice] = useCreateAuctionInvoiceMutation();
     const [createBuyNowInvoice] = useCreateBuyNowInvoiceMutation();
     const createInvoiceAndReservation = useCallback(() => __awaiter(this, void 0, void 0, function* () {
         var _a, _b, _c, _d, _e;
-        console.log("createInvoiceAndReservation");
         // TODO: Quick fix. The UI can currently display multiple items with multiple units each, but will only purchase the
         // selected amount (can be multiple units) of the first item:
-        const { lotID, lotType, units, } = checkoutItems[0];
+        const firstCheckoutItem = checkoutItems[0];
+        const { lotID, lotType, units, } = firstCheckoutItem || {};
         if (debug) {
-            console.log(checkoutItems[0]
+            console.log(firstCheckoutItem
                 ? `\n🎫 Making reservation & creating invoice for ${units} × ${lotType} lot${units > 1 ? "s" : ""} ${lotID} (orgID = ${orgID})...\n`
                 : `\n🎫 Aborting reservation & creating invoice for unknown lot (orgID = ${orgID})...\n`);
         }
-        if (checkoutItems.length === 0) {
+        if (!firstCheckoutItem) {
             setError(ERROR_PURCHASE_NO_ITEMS());
             return;
         }
@@ -89,7 +107,8 @@ function useCreateInvoiceAndReservation({ orgID, checkoutItems, debug = false, }
             setError(ERROR_PURCHASE_CREATING_INVOICE(mutationError));
             return;
         }
-        setCreateInvoiceAndReservationState({ invoiceID });
+        countdownStartRef.current = Date.now();
+        setInvoiceAndReservationState({ invoiceID });
         // TODO: Error handling and automatic retry:
     }), [
         orgID,
@@ -99,7 +118,11 @@ function useCreateInvoiceAndReservation({ orgID, checkoutItems, debug = false, }
         createAuctionInvoice,
         createBuyNowInvoice,
     ]);
-    return [createInvoiceAndReservationState, createInvoiceAndReservation];
+    return {
+        invoiceAndReservationState,
+        createInvoiceAndReservation,
+        countdownElementRef,
+    };
 }
 
 export { useCreateInvoiceAndReservation };

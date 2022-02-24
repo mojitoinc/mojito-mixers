@@ -27,9 +27,11 @@ const ERROR_PURCHASE_CREATING_INVOICE = createError("Invoice could not be create
 const ERROR_PURCHASE_CVV = createError("Could not verify CVV.");
 const ERROR_PURCHASE_PAYING = createError("Payment failed.");
 const ERROR_PURCHASE_3DS = createError("Payment method could not be verified.", "payment");
+const ERROR_INVOICE_TIMEOUT = createError("Your product reservation expired. Please, try to complete the purchase again in time.", "reset");
 
 exports.BUILT_IN_ERRORS = BUILT_IN_ERRORS;
 exports.DEFAULT_ERROR_AT = DEFAULT_ERROR_AT;
+exports.ERROR_INVOICE_TIMEOUT = ERROR_INVOICE_TIMEOUT;
 exports.ERROR_LOADING_INVOICE = ERROR_LOADING_INVOICE;
 exports.ERROR_LOADING_PAYMENT_METHODS = ERROR_LOADING_PAYMENT_METHODS;
 exports.ERROR_LOADING_USER = ERROR_LOADING_USER;

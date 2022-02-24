@@ -15,3 +15,4 @@ export declare const ERROR_PURCHASE_CREATING_INVOICE: (error?: ApolloError | Err
 export declare const ERROR_PURCHASE_CVV: (error?: ApolloError | Error) => CheckoutModalError;
 export declare const ERROR_PURCHASE_PAYING: (error?: ApolloError | Error) => CheckoutModalError;
 export declare const ERROR_PURCHASE_3DS: (error?: ApolloError | Error) => CheckoutModalError;
+export declare const ERROR_INVOICE_TIMEOUT: (error?: ApolloError | Error) => CheckoutModalError;
