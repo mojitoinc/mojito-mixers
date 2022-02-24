@@ -205,8 +205,6 @@ export function useFullPayment({
     }).catch((error: ApolloError | Error) => {
       mutationError = error;
 
-      // TODO: Cancel invoice?
-
       if (debug) console.log("    🔴 makePayment error", error);
     });
 
