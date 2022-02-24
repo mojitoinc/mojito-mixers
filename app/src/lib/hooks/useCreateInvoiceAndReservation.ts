@@ -42,8 +42,6 @@ export function useCreateInvoiceAndReservation({
   const countdownElementRef = useRef<HTMLSpanElement>(null);
 
   useThrottledRequestAnimationFrame(() => {
-    console.log("useThrottledRequestAnimationFrame");
-
     const countdownStart = countdownStartRef.current;
     const countdownElement = countdownElementRef.current;
 
@@ -60,31 +58,30 @@ export function useCreateInvoiceAndReservation({
     }
 
     countdownElement.textContent = formattedTimeLeft;
-
   }, countdownStartRef.current === null ? null : RESERVATION_COUNTDOWN_REFRESH_RATE_MS);
 
   const [createAuctionInvoice] = useCreateAuctionInvoiceMutation();
   const [createBuyNowInvoice] = useCreateBuyNowInvoiceMutation();
 
   const createInvoiceAndReservation = useCallback(async () => {
-    console.log("createInvoiceAndReservation")
-
     // TODO: Quick fix. The UI can currently display multiple items with multiple units each, but will only purchase the
     // selected amount (can be multiple units) of the first item:
+    const firstCheckoutItem = checkoutItems[0];
+
     const {
       lotID,
       lotType,
       units,
-    } = checkoutItems[0];
+    } = firstCheckoutItem || {};
 
     if (debug) {
-      console.log(checkoutItems[0]
+      console.log(firstCheckoutItem
         ? `\n🎫 Making reservation & creating invoice for ${ units } × ${ lotType } lot${ units > 1 ? "s" : "" } ${ lotID } (orgID = ${ orgID })...\n`
         : `\n🎫 Aborting reservation & creating invoice for unknown lot (orgID = ${ orgID })...\n`
       );
     }
 
-    if (checkoutItems.length === 0) {
+    if (!firstCheckoutItem) {
       setError(ERROR_PURCHASE_NO_ITEMS());
 
       return;
