@@ -5,6 +5,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 var tslib_es6 = require('../../../../node_modules/tslib/tslib.es6.js');
 var corre = require('@swyg/corre');
 var React = require('react');
+var config = require('../../../config/config.js');
 var url_utils = require('../../../domain/url/url.utils.js');
 var SuccessView = require('../../../views/Success/SuccessView.js');
 var CheckoutModalHeader = require('../../payments/CheckoutModalHeader/CheckoutModalHeader.js');
@@ -16,7 +17,6 @@ function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'defau
 
 var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 
-const REDIRECT_DELAY_MS = 5000;
 const PUISuccessOverlay = (_a) => {
     var { logoSrc, logoSx, successImageSrc, onRedirect } = _a, fullScreenOverlayProps = tslib_es6.__rest(_a, ["logoSrc", "logoSx", "successImageSrc", "onRedirect"]);
     const { purchaseSuccess, url } = CheckoutOverlay_utils.getCheckoutModalState();
@@ -35,7 +35,7 @@ const PUISuccessOverlay = (_a) => {
         // confirmation page:
         if (purchaseSuccess)
             onRedirect(isPathname ? url : url_utils.getUrlWithSearchParams(url));
-    }, REDIRECT_DELAY_MS, [purchaseSuccess, isPathname, onRedirect]);
+    }, config.THREEDS_SUCCESS_REDIRECT_DELAY_MS, [purchaseSuccess, isPathname, onRedirect]);
     if (!purchaseSuccess)
         return null;
     const headerElement = logoSrc ? (React__default["default"].createElement(CheckoutModalHeader.CheckoutModalHeader, { variant: "purchasing", logoSrc: logoSrc, logoSx: logoSx })) : null;

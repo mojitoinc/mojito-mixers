@@ -1,6 +1,7 @@
 import { __rest } from '../../../../node_modules/tslib/tslib.es6.js';
 import { useTimeout } from '@swyg/corre';
 import React__default, { useLayoutEffect } from 'react';
+import { THREEDS_SUCCESS_REDIRECT_DELAY_MS } from '../../../config/config.js';
 import { isUrlPathname, getUrlWithSearchParams } from '../../../domain/url/url.utils.js';
 import { SuccessView } from '../../../views/Success/SuccessView.js';
 import { CheckoutModalHeader } from '../../payments/CheckoutModalHeader/CheckoutModalHeader.js';
@@ -8,7 +9,6 @@ import { FullScreenOverlay } from '../../shared/FullScreenOverlay/FullScreenOver
 import { withThemeProvider } from '../../shared/ProvidersInjector/ProvidersInjector.js';
 import { getCheckoutModalState, persistReceivedRedirectUri3DS } from '../CheckoutOverlay/CheckoutOverlay.utils.js';
 
-const REDIRECT_DELAY_MS = 5000;
 const PUISuccessOverlay = (_a) => {
     var { logoSrc, logoSx, successImageSrc, onRedirect } = _a, fullScreenOverlayProps = __rest(_a, ["logoSrc", "logoSx", "successImageSrc", "onRedirect"]);
     const { purchaseSuccess, url } = getCheckoutModalState();
@@ -27,7 +27,7 @@ const PUISuccessOverlay = (_a) => {
         // confirmation page:
         if (purchaseSuccess)
             onRedirect(isPathname ? url : getUrlWithSearchParams(url));
-    }, REDIRECT_DELAY_MS, [purchaseSuccess, isPathname, onRedirect]);
+    }, THREEDS_SUCCESS_REDIRECT_DELAY_MS, [purchaseSuccess, isPathname, onRedirect]);
     if (!purchaseSuccess)
         return null;
     const headerElement = logoSrc ? (React__default.createElement(CheckoutModalHeader, { variant: "purchasing", logoSrc: logoSrc, logoSx: logoSx })) : null;

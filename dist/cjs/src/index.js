@@ -13,7 +13,8 @@ var usePlaid = require('./hooks/usePlaid.js');
 var CheckoutOverlay_utils = require('./components/public/CheckoutOverlay/CheckoutOverlay.utils.js');
 var system = require('@mui/system');
 
-
+if (process.env.NODE_ENV === "development")
+    console.log("\n👨‍💻 PUI development mode.\n\n");
 
 exports.PUICheckout = CheckoutOverlay.PUICheckout;
 exports.PUISuccess = SuccessOverlay.PUISuccess;

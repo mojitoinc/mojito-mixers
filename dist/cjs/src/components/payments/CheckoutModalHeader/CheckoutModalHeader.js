@@ -9,6 +9,7 @@ var ChevronLeft = require('../../../../node_modules/@mui/icons-material/ChevronL
 var formatUtils = require('../../../utils/formatUtils.js');
 var CheckoutModalHeader_utils = require('./CheckoutModalHeader.utils.js');
 var React = require('react');
+var config = require('../../../config/config.js');
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
@@ -30,7 +31,23 @@ const CHECKOUT_MODAL_CONTROLS = {
     purchasing: false,
     error: false,
 };
-const CheckoutModalHeader = ({ variant, title: customTitle, logoSrc, logoSx, user, userFormat, onLoginClicked, onPrevClicked, }) => {
+const COUNTDOWN_CONTAINER_SX = {
+    position: "relative",
+    color: "transparent",
+    userSelect: "none",
+};
+const COUNTDOWN_SX = {
+    position: "absolute",
+    top: 0,
+    bottom: 0,
+    left: 0,
+    color: theme => theme.palette.text.primary,
+    userSelect: "auto",
+    display: "flex",
+    justifyContent: "flex-start",
+    alignItems: "center",
+};
+const CheckoutModalHeader = ({ variant, countdownElementRef, title: customTitle, logoSrc, logoSx, user, userFormat, onLoginClicked, onPrevClicked, }) => {
     const title = customTitle || CHECKOUT_MODAL_TITLE[variant] || formatUtils.NBSP;
     const displayUsername = CheckoutModalHeader_utils.getFormattedUser(variant, user, userFormat);
     const showControls = CHECKOUT_MODAL_CONTROLS[variant] || false;
@@ -47,6 +64,14 @@ const CheckoutModalHeader = ({ variant, title: customTitle, logoSrc, logoSx, use
                 (variant !== "anonymous" && onPrevClicked && displayUsername) ? (React__default["default"].createElement(React__default["default"].Fragment, null,
                     React__default["default"].createElement(OutlinedSecondaryButton.OutlinedSecondaryButton, { onClick: onPrevClicked },
                         React__default["default"].createElement(ChevronLeft["default"], null)),
+                    variant === "loggedIn" && countdownElementRef ? (React__default["default"].createElement(material.Typography, { sx: { fontWeight: "500" } },
+                        "Time left: ",
+                        " ",
+                        React__default["default"].createElement(material.Box, { component: "span", sx: COUNTDOWN_CONTAINER_SX },
+                            "00:00",
+                            React__default["default"].createElement(material.Box, { component: "span", ref: countdownElementRef, sx: COUNTDOWN_SX },
+                                config.RESERVATION_COUNTDOWN_FROM_MIN,
+                                ":00")))) : null,
                     React__default["default"].createElement(material.Typography, { sx: { fontWeight: "500", minHeight: 40, display: "flex", alignItems: "center" } }, displayUsername))) : null),
             React__default["default"].createElement(material.Divider, null))) : null));
 };

@@ -8,7 +8,7 @@ function transformCheckoutItemsFromInvoice(checkoutItems, invoiceItems = []) {
     return checkoutItems.map((checkoutItem, i) => {
         // TODO: We should find the match based on ID, not index, but it's ok for now as we never buy more than 1 item at a time:
         const invoiceItem = invoiceItems[i];
-        return invoiceItem ? Object.assign(Object.assign({}, checkoutItem), { units: invoiceItem.units, unitPrice: invoiceItem.unitPrice }) : checkoutItem;
+        return Object.assign(Object.assign({}, checkoutItem), { units: (invoiceItem === null || invoiceItem === void 0 ? void 0 : invoiceItem.units) || checkoutItem.units || 1, unitPrice: (invoiceItem === null || invoiceItem === void 0 ? void 0 : invoiceItem.unitPrice) || 0 });
     });
 }
 

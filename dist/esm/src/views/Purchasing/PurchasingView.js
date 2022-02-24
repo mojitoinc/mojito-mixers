@@ -7,17 +7,8 @@ import { XS_MOBILE_MAX_WIDTH } from '../../config/theme/theme.js';
 import { StatusIcon } from '../../components/shared/StatusIcon/StatusIcon.js';
 import { useGetPaymentNotificationQuery } from '../../queries/graphqlGenerated.js';
 import { persistCheckoutModalInfo } from '../../components/public/CheckoutOverlay/CheckoutOverlay.utils.js';
+import { PAYMENT_NOTIFICATION_INTERVAL_MS, PURCHASING_MESSAGES_DEFAULT, PURCHASING_MIN_WAIT_MS, PURCHASING_MESSAGES_INTERVAL_MS } from '../../config/config.js';
 
-// TODO: Move these to theme or similar config file:
-const PURCHASING_MIN_WAIT_MS = 3000;
-const PURCHASING_MESSAGES_INTERVAL_MS = 5000;
-const PAYMENT_NOTIFICATION_INTERVAL_MS = 1500;
-const PURCHASING_MESSAGES_DEFAULT = [
-    "Muddling mint and lime.",
-    "Topping up with club soda.",
-    "Adding rum, lime juice and ice.",
-    "Shaking things up!",
-];
 const PurchasingView = ({ purchasingImageSrc, purchasingMessages: customPurchasingMessages, orgID, invoiceID, savedPaymentMethods, selectedPaymentMethod, onPurchaseSuccess, onPurchaseError, onDialogBlocked, debug, }) => {
     var _a, _b, _c;
     const [fullPaymentState, fullPayment] = useFullPayment({
@@ -74,7 +65,8 @@ const PurchasingView = ({ purchasingImageSrc, purchasingMessages: customPurchasi
                 billingInfo,
                 paymentInfo,
             });
-            console.log("Redirecting to 3DS...");
+            if (debug)
+                console.log("Redirecting to 3DS...");
             location.href = redirectURL;
             return;
         }
@@ -90,6 +82,7 @@ const PurchasingView = ({ purchasingImageSrc, purchasingMessages: customPurchasi
         onDialogBlocked,
         onPurchaseSuccess,
         invoiceID,
+        debug,
     ]);
     useTimeout(() => {
         setHasWaited(true);

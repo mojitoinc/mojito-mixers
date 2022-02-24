@@ -79,7 +79,7 @@ debug, onError, onMarketingOptInChange, // Not implemented yet. Used to let user
     const savedPaymentMethods = React.useMemo(() => circle_utils.transformRawSavedPaymentMethods(rawSavedPaymentMethods), [rawSavedPaymentMethods]);
     // Invoice creation & buy now lot reservation:
     const createInvoiceAndReservationCalledRef = React.useRef(false);
-    const [createInvoiceAndReservationState, createInvoiceAndReservation] = useCreateInvoiceAndReservation.useCreateInvoiceAndReservation({ orgID, checkoutItems, debug });
+    const { invoiceAndReservationState, createInvoiceAndReservation, countdownElementRef, } = useCreateInvoiceAndReservation.useCreateInvoiceAndReservation({ orgID, checkoutItems, debug });
     React.useEffect(() => {
         if (isDialogLoading || invoiceID === null || invoiceID || createInvoiceAndReservationCalledRef.current)
             return;
@@ -87,13 +87,13 @@ debug, onError, onMarketingOptInChange, // Not implemented yet. Used to let user
         createInvoiceAndReservation();
     }, [isDialogLoading, invoiceID, createInvoiceAndReservation]);
     React.useEffect(() => {
-        if (createInvoiceAndReservationState.error) {
-            setError(createInvoiceAndReservationState.error);
+        if (invoiceAndReservationState.error) {
+            setError(invoiceAndReservationState.error);
         }
-        else if (createInvoiceAndReservationState.invoiceID) {
-            setInvoiceID(createInvoiceAndReservationState.invoiceID);
+        else if (invoiceAndReservationState.invoiceID) {
+            setInvoiceID(invoiceAndReservationState.invoiceID);
         }
-    }, [createInvoiceAndReservationState, setError, setInvoiceID]);
+    }, [invoiceAndReservationState, setError, setInvoiceID]);
     // Init modal state once everything has been loaded:
     React.useEffect(() => {
         if (!isDialogLoading && open)
@@ -286,7 +286,7 @@ debug, onError, onMarketingOptInChange, // Not implemented yet. Used to let user
         headerVariant = "logoOnly";
         checkoutStepElement = (React__default["default"].createElement(ConfirmationView.ConfirmationView, { checkoutItems: checkoutItems, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethod: selectedPaymentMethod, paymentReferenceNumber: paymentReferenceNumber, purchaseInstructions: customTexts.purchaseInstructions, onNext: handleClose }));
     }
-    const headerElement = (React__default["default"].createElement(CheckoutModalHeader.CheckoutModalHeader, { variant: headerVariant, logoSrc: logoSrc, logoSx: logoSx, user: (_a = meData === null || meData === void 0 ? void 0 : meData.me) === null || _a === void 0 ? void 0 : _a.user, userFormat: userFormat, onLoginClicked: onLogin, onPrevClicked: checkoutStep === "authentication" ? handleClose : goBack }));
+    const headerElement = (React__default["default"].createElement(CheckoutModalHeader.CheckoutModalHeader, { variant: headerVariant, countdownElementRef: countdownElementRef, logoSrc: logoSrc, logoSx: logoSx, user: (_a = meData === null || meData === void 0 ? void 0 : meData.me) === null || _a === void 0 ? void 0 : _a.user, userFormat: userFormat, onLoginClicked: onLogin, onPrevClicked: checkoutStep === "authentication" ? handleClose : goBack }));
     return (React__default["default"].createElement(FullScreenOverlay.FullScreenOverlay, { centered: checkoutStep === "purchasing" || checkoutStep === "error", open: open, onClose: handleClose, isDialogBlocked: isDialogBlocked, contentKey: checkoutStep, header: headerElement, children: checkoutStepElement }));
 };
 const PUICheckout = ProvidersInjector.withProviders(PUICheckoutOverlay);

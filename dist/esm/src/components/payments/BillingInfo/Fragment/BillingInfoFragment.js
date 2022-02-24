@@ -1,7 +1,8 @@
 import React__default from 'react';
+import { Box } from '@mui/material';
 import Typography from '../../../../../node_modules/@mui/material/Typography/Typography.js';
 
-const BillingInfoFragment = ({ savedPaymentMethod: { billingDetails: { name, address1, address2, city, district, postalCode, country, }, metadata: { email, phoneNumber }, }, }) => (React__default.createElement("div", { style: { display: "flex", flexDirection: 'column' } },
+const BillingInfoFragment = ({ savedPaymentMethod: { billingDetails: { name, address1, address2, city, district, postalCode, country, }, metadata: { email, phoneNumber }, }, }) => (React__default.createElement(Box, { sx: { display: "flex", flexDirection: 'column' } },
     React__default.createElement(Typography, { variant: "caption" }, name),
     address1 && React__default.createElement(Typography, { variant: "caption" }, address1),
     address2 && React__default.createElement(Typography, { variant: "caption" }, address2),

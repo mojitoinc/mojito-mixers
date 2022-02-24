@@ -8,4 +8,7 @@ export { getPlaidOAuthFlowState, persistPlaidReceivedRedirectUri } from './domai
 export { continuePlaidOAuthFlow } from './hooks/usePlaid.js';
 export { continueCheckout, continueFlows, getCheckoutModalState, persistReceivedRedirectUri3DS } from './components/public/CheckoutOverlay/CheckoutOverlay.utils.js';
 export { ThemeProvider as PUIThemeProvider } from '@mui/system';
+
+if (process.env.NODE_ENV === "development")
+    console.log("\n👨‍💻 PUI development mode.\n\n");
 //# sourceMappingURL=index.js.map
