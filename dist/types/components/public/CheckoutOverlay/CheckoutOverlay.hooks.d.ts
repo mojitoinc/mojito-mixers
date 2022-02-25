@@ -12,7 +12,7 @@ export interface CheckoutModalError {
 }
 export declare type CheckoutModalStep = "authentication" | "billing" | "payment" | "purchasing" | "confirmation" | "error";
 export interface CheckoutModalStateOptions {
-    invoiceID?: string;
+    invoiceID?: string | null;
     productConfirmationEnabled?: boolean;
     isAuthenticated?: boolean;
     onError?: (error: CheckoutModalError) => void;
@@ -36,11 +36,11 @@ export interface CheckoutModalStateReturn extends CheckoutModalState, PurchaseSt
     goBack: () => void;
     goNext: () => void;
     goTo: (checkoutStep?: CheckoutModalStep, error?: null | string | CheckoutModalError) => void;
-    setError: (error: null | string | CheckoutModalError) => void;
+    setError: (error: string | CheckoutModalError) => void;
     setIsDialogBlocked: (isDialogBlocked: boolean) => void;
     selectedPaymentMethod: SelectedPaymentMethod;
     setSelectedPaymentMethod: Dispatch<SetStateAction<SelectedPaymentMethod>>;
-    setInvoiceID: (invoiceID: string) => void;
+    setInvoiceID: (invoiceID: string | null) => void;
     setPaymentReferenceNumber: (paymentReferenceNumber: string) => void;
 }
 export declare const CHECKOUT_STEPS: CheckoutModalStep[];

@@ -124,13 +124,12 @@ const CARD_TYPES = [
         },
     },
 ];
-const imagesMap = index;
-function standaloneGetCardImageProps(network = "placeholder") {
-    const cardType = network.toLowerCase();
+function standaloneGetCardImageProps(network) {
     // See https://github.com/medipass/react-payment-inputs/blob/master/src/usePaymentInputs.js#L452
+    const paymentInputsNetwork = (network.toLowerCase().replace(/\s/g, "") || "placeholder");
     return {
-        "aria-label": network || "Placeholder card",
-        children: imagesMap[cardType] || imagesMap.placeholder,
+        "aria-label": network,
+        children: index[paymentInputsNetwork] || index.placeholder,
         width: "1.5em",
         height: "1em",
         viewBox: "0 0 24 16",
@@ -180,7 +179,7 @@ const getExpiryDateIsvalid = (expiryDate) => {
     return monthIsOnValidRange && yearIsOnValidRange && dateIsOnValidRange;
 };
 const getCVCIsValid = (cvc, cardNumber) => {
-    if (!cvc || cvc.length < 3)
+    if (!cvc || cvc.length < 3 || !cardNumber)
         return false;
     const rawCardNumber = cardNumber.replace(/\s/g, "");
     const cardType = getCardTypeByValue(rawCardNumber);

@@ -82,8 +82,8 @@ function getCheckoutModalState() {
         receivedRedirectUri,
         // Whether we need to resume the 3DS flow and show the confirmation or error screens:
         continue3DSFlow,
-        purchaseSuccess: continue3DSFlow && receivedRedirectUri && (receivedRedirectUri.includes("success") || receivedRedirectUri.includes(config.THREEDS_FLOW_URL_SEARCH)),
-        purchaseError: continue3DSFlow && receivedRedirectUri && receivedRedirectUri.includes("error"),
+        purchaseSuccess: continue3DSFlow && !!receivedRedirectUri && (receivedRedirectUri.includes("success") || receivedRedirectUri.includes(config.THREEDS_FLOW_URL_SEARCH)),
+        purchaseError: continue3DSFlow && !!receivedRedirectUri && receivedRedirectUri.includes("error"),
         // Wether we already tried to resume the previous OAuth flow:
         savedStateUsed,
     };

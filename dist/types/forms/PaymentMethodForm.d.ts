@@ -10,9 +10,9 @@ export interface PaymentMethodFormProps {
     onSaved?: () => void;
     onClose: () => void;
     onSubmit: (data: PaymentMethod) => void;
-    consentType: ConsentType;
-    privacyHref: string;
-    termsOfUseHref: string;
+    consentType?: ConsentType;
+    privacyHref?: string;
+    termsOfUseHref?: string;
     wirePaymentsDisclaimerText?: React.ReactFragment[];
     debug?: boolean;
 }

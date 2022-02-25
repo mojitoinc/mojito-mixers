@@ -11,7 +11,7 @@ import { getCheckoutModalState, persistReceivedRedirectUri3DS } from '../Checkou
 
 const PUISuccessOverlay = (_a) => {
     var { logoSrc, logoSx, successImageSrc, onRedirect } = _a, fullScreenOverlayProps = __rest(_a, ["logoSrc", "logoSx", "successImageSrc", "onRedirect"]);
-    const { purchaseSuccess, url } = getCheckoutModalState();
+    const { purchaseSuccess, url = "" } = getCheckoutModalState();
     const isPathname = isUrlPathname(url);
     useLayoutEffect(() => {
         if (purchaseSuccess && isPathname) {

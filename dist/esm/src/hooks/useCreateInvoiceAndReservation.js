@@ -54,7 +54,7 @@ function useCreateInvoiceAndReservation({ orgID, checkoutItems, debug = false, }
             return;
         }
         let invoiceID = "";
-        let mutationError;
+        let mutationError = undefined;
         if (lotType === "buyNow") {
             if (debug) {
                 console.log("  🧾 createBuyNowInvoice", {

@@ -5,6 +5,7 @@ import { parseSentences } from '../../utils/formatUtils.js';
 import { DebugBox } from '../../components/payments/DisplayBox/DisplayBox.js';
 import { XS_MOBILE_MAX_WIDTH } from '../../config/theme/theme.js';
 import { StatusIcon } from '../../components/shared/StatusIcon/StatusIcon.js';
+import { DEFAULT_ERROR_AT } from '../../domain/errors/errors.constants.js';
 
 const ERROR_ACTION_LABELS = {
     reset: "Try Again",
@@ -13,7 +14,7 @@ const ERROR_ACTION_LABELS = {
     payment: "Review Payment Information",
     purchasing: "Try Again",
 };
-const ErrorView = ({ checkoutError: { error, errorMessage, at, }, errorImageSrc, onFixError, onClose, debug, }) => {
+const ErrorView = ({ checkoutError: { error, errorMessage, at = DEFAULT_ERROR_AT, }, errorImageSrc, onFixError, onClose, debug, }) => {
     const stringifiedError = debug && error ? JSON.stringify(error, null, "  ") : "{}";
     const debugErrorMessage = stringifiedError === "{}" && error ? error.stack : stringifiedError;
     return (React__default.createElement(React__default.Fragment, null,

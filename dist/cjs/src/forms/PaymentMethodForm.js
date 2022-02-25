@@ -79,7 +79,7 @@ const PAYMENT_TYPE_FORM_DATA = {
                 is: "CreditCard",
                 then: (schema) => schema.required().test({
                     name: "is-valid-cvv-or-cid-number",
-                    test: (value, context) => payment_utils.getCVCIsValid(value, context.parent.cardNumber),
+                    test: (value, context) => { var _a; return payment_utils.getCVCIsValid(value, (_a = context === null || context === void 0 ? void 0 : context.parent) === null || _a === void 0 ? void 0 : _a.cardNumber); },
                     message: validationUtils.withInvalidErrorMessage
                 })
             }),

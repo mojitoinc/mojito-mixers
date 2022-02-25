@@ -31,13 +31,13 @@ const statusIconConfigs = {
     },
 };
 const StatusIcon = (_a) => {
-    var { variant, imgSrc, sx } = _a; tslib_es6.__rest(_a, ["variant", "imgSrc", "sx"]);
+    var { variant = "loading", imgSrc, sx } = _a; tslib_es6.__rest(_a, ["variant", "imgSrc", "sx"]);
     const { icon: Icon, iconColor, defaultImgSrc, } = statusIconConfigs[variant];
     const src = imgSrc || defaultImgSrc;
-    return src ? (React__default["default"].createElement(material.Box, { component: "img", src: src, sx: Object.assign({ width: 196, height: 196, mx: "auto" }, sx) })) : (React__default["default"].createElement(material.Box, { sx: Object.assign({ width: 96, height: 96, mx: "auto", display: "flex", justifyContent: "center", alignItems: "center", borderRadius: theme.ROUNDED_BORDER_RADIUS, border: theme => `4px solid ${iconColor(theme)}` }, sx) },
+    return src ? (React__default["default"].createElement(material.Box, { component: "img", src: src, sx: Object.assign({ width: 196, height: 196, mx: "auto" }, sx) })) : (React__default["default"].createElement(material.Box, { sx: Object.assign({ width: 96, height: 96, mx: "auto", display: "flex", justifyContent: "center", alignItems: "center", borderRadius: theme.ROUNDED_BORDER_RADIUS, border: (theme) => `4px solid ${iconColor(theme)}` }, sx) },
         React__default["default"].createElement(Icon, { sx: {
                 fontSize: 40,
-                color: theme => iconColor(theme),
+                color: (theme) => iconColor(theme),
             } })));
 };
 

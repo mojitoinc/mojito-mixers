@@ -6,7 +6,7 @@ export interface FullScreenOverlayFunctionalProps {
 }
 interface FullScreenOverlayCommonProps extends FullScreenOverlayFunctionalProps {
     contentKey?: string;
-    header?: React.ReactElement;
+    header?: React.ReactElement | null;
 }
 export interface FullScreenOverlayNoColumnsProps extends FullScreenOverlayCommonProps {
     centered?: boolean;

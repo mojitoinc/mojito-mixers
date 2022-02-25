@@ -16,7 +16,7 @@ const BILLING_INFO_ITEM_LABELS = {
 };
 const BillingInfoItem = (_a) => {
     var { data: savedPaymentMethod, additionalProps: savedItemProps, children, index } = _a, boxProps = tslib_es6.__rest(_a, ["data", "additionalProps", "children", "index"]);
-    return (React__default["default"].createElement(SavedItem.SavedItem, Object.assign({ variant: "stacked", labels: BILLING_INFO_ITEM_LABELS }, savedItemProps, { id: savedPaymentMethod.addressId, boxProps: Object.assign(Object.assign({}, boxProps), savedItemProps.boxProps) }),
+    return (React__default["default"].createElement(SavedItem.SavedItem, Object.assign({ variant: "stacked", labels: BILLING_INFO_ITEM_LABELS }, savedItemProps, { id: savedPaymentMethod.addressId, boxProps: Object.assign(Object.assign({}, boxProps), savedItemProps === null || savedItemProps === void 0 ? void 0 : savedItemProps.boxProps) }),
         React__default["default"].createElement(BillingInfoFragment.BillingInfoFragment, { savedPaymentMethod: savedPaymentMethod })));
 };
 
