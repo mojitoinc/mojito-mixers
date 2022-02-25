@@ -9,6 +9,7 @@ var formatUtils = require('../../utils/formatUtils.js');
 var DisplayBox = require('../../components/payments/DisplayBox/DisplayBox.js');
 var theme = require('../../config/theme/theme.js');
 var StatusIcon = require('../../components/shared/StatusIcon/StatusIcon.js');
+var errors_constants = require('../../domain/errors/errors.constants.js');
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
@@ -21,7 +22,7 @@ const ERROR_ACTION_LABELS = {
     payment: "Review Payment Information",
     purchasing: "Try Again",
 };
-const ErrorView = ({ checkoutError: { error, errorMessage, at, }, errorImageSrc, onFixError, onClose, debug, }) => {
+const ErrorView = ({ checkoutError: { error, errorMessage, at = errors_constants.DEFAULT_ERROR_AT, }, errorImageSrc, onFixError, onClose, debug, }) => {
     const stringifiedError = debug && error ? JSON.stringify(error, null, "  ") : "{}";
     const debugErrorMessage = stringifiedError === "{}" && error ? error.stack : stringifiedError;
     return (React__default["default"].createElement(React__default["default"].Fragment, null,

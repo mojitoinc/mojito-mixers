@@ -5,7 +5,7 @@ export interface PurchasingViewProps {
     purchasingImageSrc?: string;
     purchasingMessages?: false | string[];
     orgID: string;
-    invoiceID?: string;
+    invoiceID: string;
     savedPaymentMethods: SavedPaymentMethod[];
     selectedPaymentMethod: SelectedPaymentMethod;
     onPurchaseSuccess: (paymentReferenceNumber: string) => void;

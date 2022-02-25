@@ -7,7 +7,10 @@ var CheckoutOverlay_utils = require('../CheckoutOverlay/CheckoutOverlay.utils.js
 
 const initiallyOpen = CheckoutOverlay_utils.continueFlows(true).checkoutStep !== "";
 function useOpenCloseCheckoutModal() {
-    const [isOpen, setIsOpen] = React.useState(initiallyOpen);
+    const [isOpen, setIsOpen] = React.useState(false);
+    React.useEffect(() => {
+        setIsOpen(initiallyOpen);
+    }, []);
     const onOpen = React.useCallback(() => {
         setIsOpen(true);
     }, []);

@@ -29,9 +29,9 @@ export interface SavedPaymentDetailsSelectorProps {
   onCvvSelected: (cvv: string) => void;
   onNext: () => void;
   onClose: () => void;
-  consentType: ConsentType;
-  privacyHref: string;
-  termsOfUseHref: string;
+  consentType?: ConsentType;
+  privacyHref?: string;
+  termsOfUseHref?: string;
 }
 
 export const SavedPaymentDetailsSelector: React.FC<SavedPaymentDetailsSelectorProps> = ({

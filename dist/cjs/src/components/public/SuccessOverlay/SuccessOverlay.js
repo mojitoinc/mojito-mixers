@@ -19,7 +19,7 @@ var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 
 const PUISuccessOverlay = (_a) => {
     var { logoSrc, logoSx, successImageSrc, onRedirect } = _a, fullScreenOverlayProps = tslib_es6.__rest(_a, ["logoSrc", "logoSx", "successImageSrc", "onRedirect"]);
-    const { purchaseSuccess, url } = CheckoutOverlay_utils.getCheckoutModalState();
+    const { purchaseSuccess, url = "" } = CheckoutOverlay_utils.getCheckoutModalState();
     const isPathname = url_utils.isUrlPathname(url);
     React.useLayoutEffect(() => {
         if (purchaseSuccess && isPathname) {

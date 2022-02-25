@@ -17,7 +17,7 @@ var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 
 const PUIErrorOverlay = (_a) => {
     var { logoSrc, logoSx, errorImageSrc, onRedirect } = _a, fullScreenOverlayProps = tslib_es6.__rest(_a, ["logoSrc", "logoSx", "errorImageSrc", "onRedirect"]);
-    const { purchaseError, url } = CheckoutOverlay_utils.getCheckoutModalState();
+    const { purchaseError, url = "" } = CheckoutOverlay_utils.getCheckoutModalState();
     React.useLayoutEffect(() => {
         // Users should only see this page if they completed a credit card payment and 3DS' verification went wrong.
         // Otherwise, they are immediately redirected to homepage:
@@ -25,15 +25,13 @@ const PUIErrorOverlay = (_a) => {
             onRedirect("/");
     }, [purchaseError, onRedirect]);
     const reviewData = React.useCallback(() => tslib_es6.__awaiter(void 0, void 0, void 0, function* () {
-        if (!purchaseError)
-            return;
         const isPathname = url_utils.isUrlPathname(url);
         if (isPathname)
             CheckoutOverlay_utils.persistReceivedRedirectUri3DS(window.location.href);
         // If there was an error, users can click the review button and go back to the Payment UI to review the data...:
         onRedirect(isPathname ? url : url_utils.getUrlWithSearchParams(url));
         return false;
-    }), [purchaseError, onRedirect, url]);
+    }), [onRedirect, url]);
     const toMarketplace = React.useCallback(() => {
         if (!purchaseError)
             return;

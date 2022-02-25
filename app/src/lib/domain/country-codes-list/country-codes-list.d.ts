@@ -1,12 +1,3 @@
-declare module 'country-region-data/data.json' {
-  const _exported: {
-    countryName: string;
-    countryShortCode: string;
-    regions: {
-      name: string;
-      shortCode: string;
-    }[];
-  }[];
-
-  export default _exported;
+declare module "country-codes-list" {
+  export function customList(key: string, value: string): Record<string, string>;
 }

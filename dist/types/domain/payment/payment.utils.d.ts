@@ -1,3 +1,4 @@
+/// <reference types="react" />
 export declare const DEFAULT_CARD_FORMAT: RegExp;
 export declare const CARD_TYPES: {
     displayName: string;
@@ -11,13 +12,13 @@ export declare const CARD_TYPES: {
         length: number;
     };
 }[];
-export declare function standaloneGetCardImageProps(network?: string): {
+export declare function standaloneGetCardImageProps(network: string): {
     "aria-label": string;
-    children: {};
+    children: import("react").ReactSVGElement;
     width: string;
     height: string;
     viewBox: string;
 };
-export declare const getCardNumberIsValid: (cardNumber: string) => boolean;
-export declare const getExpiryDateIsvalid: (expiryDate: string) => boolean;
-export declare const getCVCIsValid: (cvc: string, cardNumber: string) => boolean;
+export declare const getCardNumberIsValid: (cardNumber?: string | undefined) => boolean;
+export declare const getExpiryDateIsvalid: (expiryDate?: string | undefined) => boolean;
+export declare const getCVCIsValid: (cvc?: string | undefined, cardNumber?: string | undefined) => boolean;

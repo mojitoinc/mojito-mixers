@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect } from "react";
-import { Controller, FieldError } from "react-hook-form";
+import { Control, Controller, FieldError } from "react-hook-form";
 import {
   EMPTY_OPTION,
   Select,
@@ -67,12 +67,14 @@ export const CountrySelector: React.FC<CountrySelectorProps> = ({
   );
 };
 
-export const ControlledCountrySelector = ({
+export type ControlledCountrySelectorProps = Omit<SelectProps, "value" | "options"> & { name: string; control: Control<any>; };
+
+export const ControlledCountrySelector: React.FC<ControlledCountrySelectorProps> = ({
   name,
   control,
   label,
 }) => (
-  <Controller<{ value: SelectOption }, "value">
+  <Controller
     name={name}
     control={control}
     render={({ field: { name, onChange, ref, ...field }, fieldState }) => {

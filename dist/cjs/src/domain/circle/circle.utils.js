@@ -152,19 +152,22 @@ function parseCircleError(error) {
                 parsedCircleErrors.forEach(({ location, message }) => {
                     const [at, inputName, inputLabel] = CIRCLE_FIELD_TO_FORM_FIELD[location] || ["unknown", location, location];
                     const searchRegExp = new RegExp(location, "g");
-                    circleFieldErrors[at][inputName] = [
-                        circleFieldErrors[at][inputName],
+                    const sectionFieldErrors = circleFieldErrors[at];
+                    if (!sectionFieldErrors)
+                        return;
+                    sectionFieldErrors[inputName] = [
+                        sectionFieldErrors[inputName],
                         formatUtils.formatSentence(message.replace(searchRegExp, inputLabel).replace(" (was )", "")),
                     ].filter(Boolean).join(" / ");
                     circleFieldErrors.summary = circleFieldErrors.summary.replace(searchRegExp, inputLabel).replace(" (was )", "");
                 });
             }
             if (circleFieldErrors.summary) {
-                if (Object.keys(circleFieldErrors.billing).length === 0)
+                if (circleFieldErrors.billing && Object.keys(circleFieldErrors.billing).length === 0)
                     delete circleFieldErrors.billing;
-                if (Object.keys(circleFieldErrors.payment).length === 0)
+                if (circleFieldErrors.payment && Object.keys(circleFieldErrors.payment).length === 0)
                     delete circleFieldErrors.payment;
-                if (Object.keys(circleFieldErrors.unknown).length === 0)
+                if (circleFieldErrors.unknown && Object.keys(circleFieldErrors.unknown).length === 0)
                     delete circleFieldErrors.unknown;
                 if (!circleFieldErrors.billing && circleFieldErrors.payment)
                     circleFieldErrors.firstAt = "payment";

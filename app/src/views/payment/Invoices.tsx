@@ -1,7 +1,7 @@
 import {
   useCreateAuctionInvoiceMutation,
 } from "../../services/graphql/generated";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import styled from "styled-components";
 
 export const InvoiceWrapper = styled.div`
@@ -13,24 +13,29 @@ button {
 `;
 
 export const Invoices: React.FC = () => {
-  const [createAuctionInvoiceMutation, { data, loading, error }] =
-    useCreateAuctionInvoiceMutation();
+  const [createAuctionInvoiceMutation] = useCreateAuctionInvoiceMutation();
 
   const [orgId, setOrgId] = useState("");
   const [lotId, setLotId] = useState("");
 
-  const createInvoice = async (e) => {
+  const createInvoice = useCallback(async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
 
-    const res = await createAuctionInvoiceMutation({
-      variables: {
-        orgID: orgId,
-        lotID: lotId,
-      },
-    });
+    try {
+      console.log("createAuctionInvoiceMutation()");
 
-    console.log({ res }, { error });
-  };
+      const res = await createAuctionInvoiceMutation({
+        variables: {
+          orgID: orgId,
+          lotID: lotId,
+        },
+      });
+
+      console.log(res);
+    } catch (err) {
+      console.log(err);
+    }
+  }, [createAuctionInvoiceMutation, orgId, lotId]);
 
   return (
     <InvoiceWrapper>

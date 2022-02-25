@@ -36,7 +36,7 @@ const statusIconConfigs: Record<StatusIconVariant, StatusIconConfig> = {
 };
 
 export const StatusIcon: React.FC<StatusIconProps> = ({
-  variant,
+  variant = "loading",
   imgSrc,
   sx,
   ...props
@@ -68,12 +68,12 @@ export const StatusIcon: React.FC<StatusIconProps> = ({
       justifyContent: "center",
       alignItems: "center",
       borderRadius: ROUNDED_BORDER_RADIUS,
-      border: theme => `4px solid ${ iconColor(theme) }`,
+      border: (theme: Theme) => `4px solid ${ iconColor(theme) }`,
       ...sx
     }}>
       <Icon sx={{
         fontSize: 40,
-        color: theme => iconColor(theme),
+        color: (theme: Theme) => iconColor(theme),
       }} />
     </Box>
   );

@@ -4,7 +4,7 @@ import MuiCheckbox, {
 } from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import React from "react";
-import { Controller } from "react-hook-form";
+import { Control, Controller } from "react-hook-form";
 import { CheckboxIconUnchecked } from "./CheckboxIconUnchecked/CheckboxIconUnchecked";
 import { CheckboxIconChecked } from "./CheckboxIconChecked/CheckboxIconChecked";
 
@@ -44,12 +44,14 @@ export const Checkbox: React.FC<CheckboxProps> = ({
   </FormControl>
 );
 
-export const ControlledCheckbox = ({
+export type ControlledCheckboxProps = CheckboxProps & { name: string; control: Control<any>; };
+
+export const ControlledCheckbox: React.FC<ControlledCheckboxProps> = ({
   name,
   control,
   label,
 }) => (
-  <Controller<{ value: boolean }, "value">
+  <Controller
     name={name}
     control={control}
     render={({ field: { name, onChange, ref, value, ...field }, fieldState }) => {

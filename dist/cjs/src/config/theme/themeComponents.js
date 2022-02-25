@@ -12,6 +12,7 @@ declare module "@mui/material/TextField" {
 }
 */
 function createComponentsTheme({ typography, palette, spacing, breakpoints }) {
+    var _a, _b, _c, _d;
     return {
         // FORMS:
         MuiFormLabel: {
@@ -175,7 +176,7 @@ function createComponentsTheme({ typography, palette, spacing, breakpoints }) {
                     }
                 },
                 containedPrimary: {
-                    background: palette.gradients.action,
+                    background: ((_a = palette.gradients) === null || _a === void 0 ? void 0 : _a.action) || palette.primary.light,
                     border: `${theme.BORDER_THICKNESS}px solid ${palette.primary.main}`,
                     color: palette.text.primary,
                     minWidth: "200px !important",
@@ -214,22 +215,22 @@ function createComponentsTheme({ typography, palette, spacing, breakpoints }) {
                         minWidth: spacing(17),
                     },
                     "&.Mui-selected": {
-                        background: palette.gradients.action,
+                        background: ((_b = palette.gradients) === null || _b === void 0 ? void 0 : _b.action) || palette.primary.light,
                         color: palette.grey["800"],
                         "&:hover": {
-                            background: palette.gradients.action
-                        }
+                            background: ((_c = palette.gradients) === null || _c === void 0 ? void 0 : _c.action) || palette.primary.light,
+                        },
                     },
                     "&:hover": {
                         background: palette.grey["100"],
-                    }
+                    },
                 },
             }
         },
         MuiToggleButtonGroup: {
             styleOverrides: {
                 root: {
-                    background: palette.gradients.stepperReverse,
+                    background: ((_d = palette.gradients) === null || _d === void 0 ? void 0 : _d.stepperReverse) || palette.primary.light,
                     backgroundOrigin: "border-box",
                     border: `${theme.BORDER_THICKNESS}px solid transparent`,
                     borderRadius: theme.MD_BORDER_RADIUS + theme.BORDER_THICKNESS,

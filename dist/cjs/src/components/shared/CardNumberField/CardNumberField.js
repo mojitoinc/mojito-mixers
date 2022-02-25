@@ -22,7 +22,7 @@ const CardNumberField = (props) => {
         onChange: props.onChange,
         onBlur: props.onBlur,
     }), { ref } = _a, paymentInputProps = tslib_es6.__rest(_a, ["ref"]);
-    const inputRef = useCallbackRef.useMergeRefs([props.inputRef, ref]);
+    const inputRef = useCallbackRef.useMergeRefs([props.inputRef, ref].filter(Boolean));
     return (React__default["default"].createElement(TextField.TextField, Object.assign({}, props, paymentInputProps, { inputRef: inputRef, InputProps: Object.assign(Object.assign({}, props.InputProps), { endAdornment: (React__default["default"].createElement(material.InputAdornment, { position: "end" },
                 React__default["default"].createElement(Icons.CreditCardIcon, Object.assign({}, getCardImageProps({ images: index["default"] }))))) }) })));
 };

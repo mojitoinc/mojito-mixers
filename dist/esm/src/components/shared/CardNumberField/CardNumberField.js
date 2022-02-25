@@ -14,7 +14,7 @@ const CardNumberField = (props) => {
         onChange: props.onChange,
         onBlur: props.onBlur,
     }), { ref } = _a, paymentInputProps = __rest(_a, ["ref"]);
-    const inputRef = useMergeRefs([props.inputRef, ref]);
+    const inputRef = useMergeRefs([props.inputRef, ref].filter(Boolean));
     return (React__default.createElement(TextField, Object.assign({}, props, paymentInputProps, { inputRef: inputRef, InputProps: Object.assign(Object.assign({}, props.InputProps), { endAdornment: (React__default.createElement(InputAdornment, { position: "end" },
                 React__default.createElement(CreditCardIcon, Object.assign({}, getCardImageProps({ images: index }))))) }) })));
 };

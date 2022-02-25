@@ -198,7 +198,7 @@ export function createComponentsTheme({ typography, palette, spacing, breakpoint
           }
         },
         containedPrimary: {
-          background: palette.gradients.action,
+          background: palette.gradients?.action || palette.primary.light,
           border: `${ BORDER_THICKNESS }px solid ${ palette.primary.main }`,
           color: palette.text.primary,
           minWidth: "200px !important",
@@ -242,17 +242,17 @@ export function createComponentsTheme({ typography, palette, spacing, breakpoint
           },
 
           "&.Mui-selected": {
-            background: palette.gradients.action,
+            background: palette.gradients?.action || palette.primary.light,
             color: palette.grey["800"],
 
             "&:hover": {
-              background: palette.gradients.action
-            }
+              background: palette.gradients?.action || palette.primary.light,
+            },
           },
 
           "&:hover": {
             background: palette.grey["100"],
-          }
+          },
         },
       }
     },
@@ -260,7 +260,7 @@ export function createComponentsTheme({ typography, palette, spacing, breakpoint
     MuiToggleButtonGroup: {
       styleOverrides: {
         root: {
-          background: palette.gradients.stepperReverse,
+          background: palette.gradients?.stepperReverse || palette.primary.light,
           backgroundOrigin: "border-box",
           border: `${ BORDER_THICKNESS }px solid transparent`,
           borderRadius: MD_BORDER_RADIUS + BORDER_THICKNESS,

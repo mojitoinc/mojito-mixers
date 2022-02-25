@@ -52,8 +52,8 @@ function useFullPayment({ orgID, invoiceID, savedPaymentMethods, selectedPayment
         });
         let paymentMethodID = "";
         let circlePaymentID = "";
-        let mutationError;
-        let circleFieldErrors;
+        let mutationError = undefined;
+        let checkoutError = undefined;
         let paymentMethodCreatedAt = 0;
         if (typeof selectedPaymentInfo === "string") {
             // If selectedPaymentInfo is a payment method ID, that's all we need, no need to create a new payment method:
@@ -84,11 +84,17 @@ function useFullPayment({ orgID, invoiceID, savedPaymentMethods, selectedPayment
             }
             const createPaymentMethodResult = yield createPaymentMethod(orgID, selectedBillingInfoData, selectedPaymentInfo).catch((error) => {
                 mutationError = error;
-                const parsedCircleErrors = circle_utils.parseCircleError(error);
+                const circleFieldErrors = circle_utils.parseCircleError(error);
                 if (debug)
-                    console.log("    🔴 createPaymentMethod error", error, parsedCircleErrors);
-                if (parsedCircleErrors)
-                    circleFieldErrors = parsedCircleErrors;
+                    console.log("    🔴 createPaymentMethod error", error, circleFieldErrors);
+                if (circleFieldErrors) {
+                    checkoutError = {
+                        at: circleFieldErrors.firstAt,
+                        error: mutationError,
+                        circleFieldErrors,
+                        errorMessage: circleFieldErrors.summary,
+                    };
+                }
             });
             paymentMethodCreatedAt = Date.now();
             if (createPaymentMethodResult && !createPaymentMethodResult.errors) {
@@ -98,12 +104,7 @@ function useFullPayment({ orgID, invoiceID, savedPaymentMethods, selectedPayment
             }
         }
         if (!paymentMethodID) {
-            setError(circleFieldErrors ? {
-                at: circleFieldErrors.firstAt,
-                circleFieldErrors,
-                error: mutationError,
-                errorMessage: circleFieldErrors.summary,
-            } : errors_constants.ERROR_PURCHASE_CREATING_PAYMENT_METHOD(mutationError));
+            setError(checkoutError || errors_constants.ERROR_PURCHASE_CREATING_PAYMENT_METHOD(mutationError));
             return;
         }
         if (debug) {

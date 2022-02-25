@@ -19,7 +19,7 @@ const CardSecureCodeField = (props) => {
         onChange: props.onChange,
         onBlur: props.onBlur,
     }), { ref } = _a, paymentInputProps = tslib_es6.__rest(_a, ["ref"]);
-    const inputRef = useCallbackRef.useMergeRefs([props.inputRef, ref]);
+    const inputRef = useCallbackRef.useMergeRefs([props.inputRef, ref].filter(Boolean));
     return (React__default["default"].createElement(TextField.TextField, Object.assign({}, props, paymentInputProps, { inputRef: inputRef })));
 };
 const ControlledCardSecureCodeField = TextField.controlledFieldFrom(CardSecureCodeField);

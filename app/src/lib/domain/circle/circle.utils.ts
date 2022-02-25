@@ -6,7 +6,7 @@ import { ApolloError } from "@apollo/client";
 import { formatSentence } from "../../utils/formatUtils";
 import { BUILT_IN_ERRORS } from "../errors/errors.constants";
 
-const countryPrefixes = customList('countryCode', '{countryCallingCode}') as Record<string, string>;
+const countryPrefixes = customList('countryCode', '{countryCallingCode}');
 
 export function formatPhoneAsE123(phoneNumber: string, countryCode: string) {
   const countryPrefix = countryPrefixes[countryCode] || "";
@@ -73,7 +73,7 @@ export function transformRawSavedPaymentMethods(rawSavedPaymentMethods: RawSaved
     };
 
     return savedPaymentMethod;
-  }).filter(Boolean);
+  }).filter(Boolean) as SavedPaymentMethod[];
 }
 
 export function getSavedPaymentMethodAddressId({ billingDetails, metadata }: SavedPaymentMethodBillingInfo): string {
@@ -198,9 +198,12 @@ export function parseCircleError(error: ApolloError | Error): CircleFieldErrors 
         parsedCircleErrors.forEach(({ location, message }) => {
           const [at, inputName, inputLabel] = CIRCLE_FIELD_TO_FORM_FIELD[location] || ["unknown", location, location];
           const searchRegExp = new RegExp(location, "g");
+          const sectionFieldErrors = circleFieldErrors[at];
 
-          circleFieldErrors[at][inputName] = [
-            circleFieldErrors[at][inputName],
+          if (!sectionFieldErrors) return;
+
+          sectionFieldErrors[inputName] = [
+            sectionFieldErrors[inputName],
             formatSentence(message.replace(searchRegExp, inputLabel).replace(" (was )", "")),
           ].filter(Boolean).join(" / ");
 
@@ -209,9 +212,9 @@ export function parseCircleError(error: ApolloError | Error): CircleFieldErrors 
       }
 
       if (circleFieldErrors.summary) {
-        if (Object.keys(circleFieldErrors.billing).length === 0) delete circleFieldErrors.billing;
-        if (Object.keys(circleFieldErrors.payment).length === 0) delete circleFieldErrors.payment;
-        if (Object.keys(circleFieldErrors.unknown).length === 0) delete circleFieldErrors.unknown;
+        if (circleFieldErrors.billing && Object.keys(circleFieldErrors.billing).length === 0) delete circleFieldErrors.billing;
+        if (circleFieldErrors.payment && Object.keys(circleFieldErrors.payment).length === 0) delete circleFieldErrors.payment;
+        if (circleFieldErrors.unknown && Object.keys(circleFieldErrors.unknown).length === 0) delete circleFieldErrors.unknown;
 
         if (!circleFieldErrors.billing && circleFieldErrors.payment) circleFieldErrors.firstAt = "payment";
 

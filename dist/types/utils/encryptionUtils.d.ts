@@ -6,4 +6,4 @@ export interface EncryptCardArgs extends EncryptCVVArgs {
     number: string;
 }
 export declare type EncryptCardDataArgs = EncryptCardArgs | EncryptCVVArgs;
-export declare function encryptCardData({ key, ...dataToEncrypt }: EncryptCardDataArgs): Promise<any>;
+export declare function encryptCardData({ key, ...dataToEncrypt }: EncryptCardDataArgs): Promise<string>;

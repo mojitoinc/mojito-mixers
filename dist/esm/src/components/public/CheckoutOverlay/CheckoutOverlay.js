@@ -113,7 +113,7 @@ debug, onError, onMarketingOptInChange, // Not implemented yet. Used to let user
             // To find the saved payment method(s) that was/were last created:
             const reversedSavedPaymentMethods = savedPaymentMethods.slice().reverse();
             // TODO: This logic can probably be simplified. Just get the last saved payment method...
-            let matchingPaymentMethod;
+            let matchingPaymentMethod = undefined;
             if (typeof billingInfo === "object") {
                 const addressId = getSavedPaymentMethodAddressIdFromBillingInfo(billingInfo);
                 matchingPaymentMethod = reversedSavedPaymentMethods.find(paymentMethod => paymentMethod.addressId === addressId);
@@ -203,7 +203,8 @@ debug, onError, onMarketingOptInChange, // Not implemented yet. Used to let user
         onClose();
     }, [setInvoiceID, onClose]);
     const handleFixError = useCallback(() => __awaiter(void 0, void 0, void 0, function* () {
-        if (checkoutError.at === "reset") {
+        const at = checkoutError === null || checkoutError === void 0 ? void 0 : checkoutError.at;
+        if (at === "reset") {
             goTo();
             yield Promise.allSettled([
                 meRefetch(),
@@ -219,11 +220,11 @@ debug, onError, onMarketingOptInChange, // Not implemented yet. Used to let user
             refetchPaymentMethods(),
             refetchInvoiceDetails(),
         ]);
-        if (checkoutError.at !== "purchasing") {
+        if (at !== "purchasing") {
             // If we are redirecting users to the PurchasingView again, we keep the CVV to be able to re-try the purchase:
             setSelectedPaymentMethod((prevSelectedPaymentMethod) => (Object.assign(Object.assign({}, prevSelectedPaymentMethod), { cvv: "" })));
         }
-        goTo(checkoutError.at || DEFAULT_ERROR_AT, checkoutError);
+        goTo(at || DEFAULT_ERROR_AT, checkoutError);
         // This function is used as a CheckoutModalFooter's onSubmitClicked, so we want that to show a loader on the submit
         // button when clicked but do not remove it once the Promise is resolved, as we are moving to another view and
         // CheckoutModalFooter will unmount (so doing this prevents a memory leak issue):
@@ -252,12 +253,9 @@ debug, onError, onMarketingOptInChange, // Not implemented yet. Used to let user
     // Normal UI (steps / views):
     let headerVariant = isAuthenticated ? 'loggedIn' : 'guest';
     let checkoutStepElement = null;
-    if (checkoutStep === "error") {
+    if (checkoutStep === "error" && checkoutError) {
         headerVariant = "error";
         checkoutStepElement = (React__default.createElement(ErrorView, { checkoutError: checkoutError, errorImageSrc: errorImageSrc, onFixError: handleFixError, onClose: handleClose, debug: debug }));
-    }
-    else if (!checkoutStep) {
-        return null;
     }
     else if (checkoutStep === "authentication") {
         if (!isAuthenticated)
@@ -270,13 +268,20 @@ debug, onError, onMarketingOptInChange, // Not implemented yet. Used to let user
     else if (checkoutStep === "payment") {
         checkoutStepElement = (React__default.createElement(PaymentView, { checkoutItems: checkoutItems, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethod: selectedPaymentMethod, checkoutError: checkoutError, onPaymentInfoSelected: handlePaymentInfoSelected, onCvvSelected: handleCvvSelected, onSavedPaymentMethodDeleted: handleSavedPaymentMethodDeleted, onNext: goNext, onPrev: goBack, onClose: handleClose, acceptedPaymentTypes: acceptedPaymentTypes, consentType: consentType, privacyHref: privacyHref, termsOfUseHref: termsOfUseHref, wirePaymentsDisclaimerText: customTexts.wirePaymentsDisclaimer, debug: debug }));
     }
-    else if (checkoutStep === "purchasing") {
+    else if (checkoutStep === "purchasing" && invoiceID) {
         headerVariant = "purchasing";
         checkoutStepElement = (React__default.createElement(PurchasingView, { purchasingImageSrc: purchasingImageSrc, purchasingMessages: purchasingMessages, orgID: orgID, invoiceID: invoiceID, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethod: selectedPaymentMethod, onPurchaseSuccess: handlePurchaseSuccess, onPurchaseError: handlePurchaseError, onDialogBlocked: setIsDialogBlocked, debug: debug }));
     }
     else if (checkoutStep === "confirmation") {
         headerVariant = "logoOnly";
         checkoutStepElement = (React__default.createElement(ConfirmationView, { checkoutItems: checkoutItems, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethod: selectedPaymentMethod, paymentReferenceNumber: paymentReferenceNumber, purchaseInstructions: customTexts.purchaseInstructions, onNext: handleClose }));
+    }
+    else {
+        // !checkoutStep or
+        // checkoutStep === "error" && !checkoutError or
+        // checkoutStep === "purchasing" && !invoiceID or
+        // some other kind of indeterminate / incorrect state:
+        return null;
     }
     const headerElement = (React__default.createElement(CheckoutModalHeader, { variant: headerVariant, countdownElementRef: countdownElementRef, logoSrc: logoSrc, logoSx: logoSx, user: (_a = meData === null || meData === void 0 ? void 0 : meData.me) === null || _a === void 0 ? void 0 : _a.user, userFormat: userFormat, onLoginClicked: onLogin, onPrevClicked: checkoutStep === "authentication" ? handleClose : goBack }));
     return (React__default.createElement(FullScreenOverlay, { centered: checkoutStep === "purchasing" || checkoutStep === "error", open: open, onClose: handleClose, isDialogBlocked: isDialogBlocked, contentKey: checkoutStep, header: headerElement, children: checkoutStepElement }));

@@ -37,14 +37,14 @@ import { useFormCheckoutError } from "../hooks/useFormCheckoutError";
 
 interface PaymentTypeFormProps {
   control: Control<PaymentMethod & { consent: boolean }>;
-  consentType: ConsentType;
+  consentType?: ConsentType;
   privacyHref?: string;
   termsOfUseHref?: string;
   wirePaymentsDisclaimerText?: React.ReactFragment[];
 }
 
 interface PaymentTypeFormData {
-  defaultValues: (consentType: ConsentType) => PaymentMethod & { consent: boolean };
+  defaultValues: (consentType?: ConsentType) => PaymentMethod & { consent: boolean };
   schemaShape: ObjectShape;
   fields: React.FC<PaymentTypeFormProps>;
 }
@@ -103,8 +103,8 @@ const PAYMENT_TYPE_FORM_DATA: Record<PaymentType, PaymentTypeFormData> = {
           then: (schema) =>
             schema.required().test({
               name: "is-valid-cvv-or-cid-number",
-              test: (value: string, context: TestContext) =>
-                getCVCIsValid(value, context.parent.cardNumber),
+              test: (value?: string, context?: TestContext) =>
+                getCVCIsValid(value, context?.parent?.cardNumber),
               message: withInvalidErrorMessage
             })
         }),
@@ -248,9 +248,9 @@ export interface PaymentMethodFormProps {
   onSaved?: () => void;
   onClose: () => void;
   onSubmit: (data: PaymentMethod) => void;
-  consentType: ConsentType;
-  privacyHref: string;
-  termsOfUseHref: string;
+  consentType?: ConsentType;
+  privacyHref?: string;
+  termsOfUseHref?: string;
   wirePaymentsDisclaimerText?: React.ReactFragment[];
   debug?: boolean;
 }

@@ -60,7 +60,7 @@ const MOJITO_LIGHT_PALETTE = {
     },
 };
 function createPaletteTheme(paletteOptions) {
-    return paletteOptions.mode === "dark" ? Object.assign(Object.assign({}, paletteOptions), MOJITO_LIGHT_PALETTE
+    return (paletteOptions === null || paletteOptions === void 0 ? void 0 : paletteOptions.mode) === "dark" ? Object.assign(Object.assign({}, paletteOptions), MOJITO_LIGHT_PALETTE
     // ...MOJITO_DARK_PALETTE, // TODO: Not implemented.
     ) : Object.assign(Object.assign({}, paletteOptions), MOJITO_LIGHT_PALETTE);
 }

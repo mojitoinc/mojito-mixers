@@ -11,7 +11,7 @@ const CardExpiryDateField = (props) => {
         onChange: props.onChange,
         onBlur: props.onBlur,
     }), { ref } = _a, paymentInputProps = __rest(_a, ["ref"]);
-    const inputRef = useMergeRefs([props.inputRef, ref]);
+    const inputRef = useMergeRefs([props.inputRef, ref].filter(Boolean));
     return (React__default.createElement(TextField, Object.assign({}, props, paymentInputProps, { inputRef: inputRef })));
 };
 const ControlledCardExpiryDateField = controlledFieldFrom(CardExpiryDateField);

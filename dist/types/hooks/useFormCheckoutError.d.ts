@@ -9,5 +9,5 @@ export interface UseFormCheckoutErrorOptions {
     setError: UseFormSetError<any>;
     deps?: React.DependencyList;
 }
-export declare function checkNeedsGenericErrorMessage(formKey: CircleFieldErrorAt, checkoutError?: CheckoutModalError): boolean;
+export declare function checkNeedsGenericErrorMessage(formKey: CircleFieldErrorAt, checkoutError?: CheckoutModalError): boolean | undefined;
 export declare function useFormCheckoutError({ formKey, checkoutError, fields, setError, deps, }: UseFormCheckoutErrorOptions): string;
