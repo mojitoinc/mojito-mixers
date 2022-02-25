@@ -47,6 +47,8 @@ export const BillingView: React.FC<BillingViewProps> = ({
     showSaved: savedPaymentMethods.length > 0 && typeof selectedBillingInfo === "string" && !checkNeedsGenericErrorMessage("billing", checkoutError),
   });
 
+  const [formSubmitAttempted, setFormSubmitAttempted] = useState(false);
+
   const handleShowForm = useCallback((savedPaymentMethodAddressId?: string) => {
     if (savedPaymentMethodAddressId && typeof savedPaymentMethodAddressId === "string") {
       savedPaymentMethodAddressIdRef.current = savedPaymentMethodAddressId;
@@ -85,6 +87,11 @@ export const BillingView: React.FC<BillingViewProps> = ({
     setViewState({ isDeleting: false, showSaved: remainingPaymentMethods > 0 });
   }, [onSavedPaymentMethodDeleted, savedPaymentMethods]);
 
+  const handleFormAttemptSubmit = useCallback(
+    () => setFormSubmitAttempted(true),
+    []
+  );
+
   useEffect(() => {
     const selectedPaymentInfoMatch = typeof selectedBillingInfo === "string" && savedPaymentMethods.some(({ addressId }) => addressId === selectedBillingInfo);
 
@@ -115,7 +122,8 @@ export const BillingView: React.FC<BillingViewProps> = ({
               onDelete={ handleSavedPaymentMethodDeleted }
               onPick={ onBillingInfoSelected }
               onNext={ onNext }
-              onClose={ onClose } />
+              onClose={ onClose }
+              onAttemptSubmit={ handleFormAttemptSubmit } />
           ) : (
             <BillingInfoForm
               // variant="loggedIn"
@@ -124,11 +132,13 @@ export const BillingView: React.FC<BillingViewProps> = ({
               onSaved={ savedPaymentMethods.length > 0 ? handleShowSaved : undefined }
               onClose={ onClose }
               onSubmit={ handleSubmit }
+              onAttemptSubmit={ handleFormAttemptSubmit }
               debug={ debug } />
           ) }
       </Stack>
       <CheckoutDeliveryAndItemCostBreakdown
         checkoutItems={ checkoutItems }
+        validatePersonalDeliveryAddress={ formSubmitAttempted }
         personalWalletAddressForDelivery={ personalWalletAddressForDelivery }
         onPersonalWalletAddressChange={ onPersonalWalletDeliveryAddressChange } />
     </Stack>

@@ -4,15 +4,20 @@ import { DisplayBox } from "../DisplayBox/DisplayBox";
 import { Checkbox } from "../../shared/Checkbox/Checkbox";
 import { InputGroupLabel } from "../../shared/InputGroupLabel/InputGroupLabel";
 import { TextField } from "../../shared/TextField/TextField";
+import { withInvalidErrorMessage } from "../../../utils/validationUtils";
+import { isValidWalletAddress } from "../../../domain/wallet/wallet.utils";
 
 export interface DeliveryWalletSelectorProps {
-  usePersonalWallet: boolean;
+  validatePersonalAddress: boolean;
   personalWalletAddress: string;
-  onUsePersonalWalletChange: (usePersonalWallet: boolean) => void;
   onWalletAddressChange: (walletAddress: string) => void;
 }
 
+const WALLET_ADDRESS_FIELD_LABEL = "Wallet Address";
+const INVALID_WALLET_ADDRESS_MESSAGE = withInvalidErrorMessage({ label: WALLET_ADDRESS_FIELD_LABEL });
+
 export const DeliveryWalletSelector: React.FC<DeliveryWalletSelectorProps> = ({
+  validatePersonalAddress,
   personalWalletAddress,
   onWalletAddressChange,
 }) => {
@@ -27,6 +32,9 @@ export const DeliveryWalletSelector: React.FC<DeliveryWalletSelectorProps> = ({
   ) => {
     if (usePersonalWallet) onWalletAddressChange(e.target.value);
   };
+
+  const isAddressOk = !usePersonalWallet || isValidWalletAddress(personalWalletAddress);
+  const showAddressError = validatePersonalAddress && !isAddressOk;
 
   return (
     <>
@@ -59,9 +67,11 @@ export const DeliveryWalletSelector: React.FC<DeliveryWalletSelectorProps> = ({
           </Typography>
 
           <TextField
-            label="Wallet Address"
+            label={WALLET_ADDRESS_FIELD_LABEL}
             onChange={handleWalletAddressChange}
             value={personalWalletAddress}
+            error={showAddressError}
+            helperText={showAddressError && INVALID_WALLET_ADDRESS_MESSAGE}
           />
         </>
       )}

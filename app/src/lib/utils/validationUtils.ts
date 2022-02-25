@@ -8,4 +8,4 @@ export const requireSchemaWhenKeyIs = (key: string) => ({
 
 export const withRequiredErrorMessage = ({ label: fieldLabel }: MessageParams) => `${fieldLabel} is required`;
 export const withTypeErrorMessageFor = (type: string) => ({ label: fieldLabel }: MessageParams) => `${fieldLabel} must be a ${type}`;
-export const withInvalidErrorMessage = ({ label: fieldLabel }: MessageParams) => `${fieldLabel} is not valid`;
+export const withInvalidErrorMessage = ({ label: fieldLabel }: { label: string }) => `${fieldLabel} is not valid`;

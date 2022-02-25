@@ -4,6 +4,7 @@ import { Dispatch, SetStateAction, useState, useCallback } from "react";
 import { CircleFieldErrors } from "../../../domain/circle/circle.utils";
 import { ERROR_PURCHASE } from "../../../domain/errors/errors.constants";
 import { PaymentMethod } from "../../../domain/payment/payment.interfaces";
+import { isValidWalletAddress } from "../../../domain/wallet/wallet.utils";
 import { BillingInfo } from "../../../forms/BillingInfoForm";
 import { resetStepperProgress } from "../../payments/CheckoutStepper/CheckoutStepper";
 import { continueFlows } from "./CheckoutOverlay.utils";
@@ -62,10 +63,12 @@ export interface CheckoutModalStateReturn extends CheckoutModalState, PurchaseSt
 
   // Wallet delivery address:
   personalWalletDeliveryAddress: string;
-  setPersonalWalletDeliveryAddress: Dispatch<SetStateAction<string>>;
+  setPersonalWalletDeliveryAddress: Dispatch<SetStateAction<string | null>>;
 }
 
 export const CHECKOUT_STEPS: CheckoutModalStep[] = ["authentication", "billing", "payment", "purchasing", "confirmation"];
+
+const WALLET_ADDRESS_FIELD_STEPS = ["billing", "payment"];
 
 export function useCheckoutModalState({
   invoiceID: initialInvoiceID = null,
@@ -99,6 +102,8 @@ export function useCheckoutModalState({
   });
 
   const [personalWalletDeliveryAddress, setPersonalWalletDeliveryAddress] = useState<string | null>(null);
+
+  const usePersonalWalletDeliveryAddress = personalWalletDeliveryAddress !== null;
 
   const initModalState = useCallback(() => {
     // Make sure the progress tracker in BillingView and PaymentView is properly animated:
@@ -145,12 +150,18 @@ export function useCheckoutModalState({
   }, []);
 
   const goNext = useCallback(() => {
+    if (
+      usePersonalWalletDeliveryAddress &&
+      !isValidWalletAddress(personalWalletDeliveryAddress) &&
+      WALLET_ADDRESS_FIELD_STEPS.includes(checkoutStep)
+    ) return;
+
     setCheckoutModalState(({ checkoutStep, checkoutError }) => ({
       checkoutStep: CHECKOUT_STEPS[Math.min(CHECKOUT_STEPS.indexOf(checkoutStep) + 1, CHECKOUT_STEPS.length - 1)],
       checkoutError,
       isDialogBlocked: false,
     }));
-  }, []);
+  }, [checkoutStep, usePersonalWalletDeliveryAddress, personalWalletDeliveryAddress]);
 
   const goTo = useCallback((checkoutStep: CheckoutModalStep = startAt, error?: null | string | CheckoutModalError) => {
     setCheckoutModalState((prevCheckoutModalState) => {

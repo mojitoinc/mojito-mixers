@@ -81,6 +81,8 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
     showSaved: savedPaymentMethods.length > 0 && typeof selectedBillingInfo === "string" && !checkNeedsGenericErrorMessage("payment", checkoutError),
   });
 
+  const [formSubmitAttempted, setFormSubmitAttempted] = useState(false);
+
   const handleShowForm = useCallback(() => {
     setViewState({ isDeleting: false, showSaved: false });
   }, []);
@@ -103,6 +105,11 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
 
     setViewState({ isDeleting: false, showSaved: remainingPaymentMethods > 0 });
   }, [onSavedPaymentMethodDeleted, savedPaymentMethods.length]);
+
+  const handleFormAttemptSubmit = useCallback(
+    () => setFormSubmitAttempted(true),
+    []
+  );
 
   useEffect(() => {
     if (!selectedPaymentMethodBillingInfo) onPrev();
@@ -154,6 +161,7 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
             onCvvSelected={ onCvvSelected }
             onNext={ onNext }
             onClose={ onClose }
+            onAttemptSubmit={ handleFormAttemptSubmit }
             consentType={ consentType }
             privacyHref={ privacyHref }
             termsOfUseHref={ termsOfUseHref } />
@@ -166,6 +174,7 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
             onSaved={ savedPaymentMethods.length > 0 ? handleShowSaved : undefined }
             onClose={ onClose }
             onSubmit={ handleSubmit }
+            onAttemptSubmit={ handleFormAttemptSubmit }
             consentType={ consentType }
             privacyHref={ privacyHref }
             termsOfUseHref={ termsOfUseHref }
@@ -175,6 +184,7 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
       </Stack>
       <CheckoutDeliveryAndItemCostBreakdown
         checkoutItems={ checkoutItems }
+        validatePersonalDeliveryAddress={formSubmitAttempted}
         personalWalletAddressForDelivery={ personalWalletAddressForDelivery }
         onPersonalWalletAddressChange={ onPersonalWalletDeliveryAddressChange } />
     </Stack>
