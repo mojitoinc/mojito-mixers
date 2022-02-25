@@ -2,7 +2,7 @@ import { ApolloError } from "@apollo/client";
 import { useState, useCallback } from "react";
 import { CheckoutModalError, SelectedPaymentMethod } from "../components/public/CheckoutOverlay/CheckoutOverlay.hooks";
 import { SavedPaymentMethod } from "../domain/circle/circle.interfaces";
-import { CircleFieldErrors, parseCircleError, savedPaymentMethodToBillingInfo } from "../domain/circle/circle.utils";
+import { parseCircleError, savedPaymentMethodToBillingInfo } from "../domain/circle/circle.utils";
 import { ERROR_PURCHASE_CREATING_PAYMENT_METHOD, ERROR_PURCHASE_CVV, ERROR_PURCHASE_NO_ITEMS, ERROR_PURCHASE_PAYING, ERROR_PURCHASE_SELECTED_PAYMENT_METHOD } from "../domain/errors/errors.constants";
 import { PaymentStatus } from "../domain/payment/payment.interfaces";
 import { BillingInfo } from "../forms/BillingInfoForm";
@@ -85,8 +85,8 @@ export function useFullPayment({
 
     let paymentMethodID = "";
     let circlePaymentID = "";
-    let mutationError: ApolloError | Error;
-    let circleFieldErrors: CircleFieldErrors;
+    let mutationError: ApolloError | Error | undefined = undefined;
+    let checkoutError: CheckoutModalError | undefined = undefined;
     let paymentMethodCreatedAt = 0;
 
     if (typeof selectedPaymentInfo === "string") {
@@ -128,11 +128,18 @@ export function useFullPayment({
       ).catch((error: ApolloError | Error) => {
         mutationError = error;
 
-        const parsedCircleErrors = parseCircleError(error);
+        const circleFieldErrors = parseCircleError(error);
 
-        if (debug) console.log("    🔴 createPaymentMethod error", error, parsedCircleErrors);
+        if (debug) console.log("    🔴 createPaymentMethod error", error, circleFieldErrors);
 
-        if (parsedCircleErrors) circleFieldErrors = parsedCircleErrors;
+        if (circleFieldErrors) {
+          checkoutError = {
+            at: circleFieldErrors.firstAt,
+            error: mutationError,
+            circleFieldErrors,
+            errorMessage: circleFieldErrors.summary,
+          };
+        }
       });
 
       paymentMethodCreatedAt = Date.now();
@@ -145,12 +152,7 @@ export function useFullPayment({
     }
 
     if (!paymentMethodID) {
-      setError(circleFieldErrors ? {
-        at: circleFieldErrors.firstAt,
-        circleFieldErrors,
-        error: mutationError,
-        errorMessage: circleFieldErrors.summary,
-      } : ERROR_PURCHASE_CREATING_PAYMENT_METHOD(mutationError));
+      setError(checkoutError || ERROR_PURCHASE_CREATING_PAYMENT_METHOD(mutationError));
 
       return;
     }

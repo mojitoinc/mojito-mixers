@@ -1214,6 +1214,18 @@
   resolved "https://registry.yarnpkg.com/@tootallnate/once/-/once-2.0.0.tgz#f544a148d3ab35801c1f633a7441fd87c2e484bf"
   integrity sha512-XCuKFP5PS55gnMVu3dty8KPatLqUoy/ZYzDzAGCQ8JNFCkLXzmI7vNHCR+XpbZaMWQK/vQubr7PkYq8g470J/A==
 
+"@types/atob@^2.1.2":
+  version "2.1.2"
+  resolved "https://registry.yarnpkg.com/@types/atob/-/atob-2.1.2.tgz#157eb0cc46264a8c55f2273a836c7a1a644fb820"
+  integrity sha512-8GAYQ1jDRUQkSpHzJUqXwAkYFOxuWAOGLhIR4aPd/Y/yL12Q/9m7LsKpHKlfKdNE/362Hc9wPI1Yh6opDfxVJg==
+
+"@types/btoa@^1.2.3":
+  version "1.2.3"
+  resolved "https://registry.yarnpkg.com/@types/btoa/-/btoa-1.2.3.tgz#2c8e7093f902bf8f0e10992a731a4996aa1a5732"
+  integrity sha512-ANNCZICS/ofxhzUl8V1DniBJs+sFQ+Yg5am1ZwVEf/sxoKY/J2+h5Fuw3xUErlZ7eJLdgzukBjZwnsV6+/2Rmg==
+  dependencies:
+    "@types/node" "*"
+
 "@types/estree@*":
   version "0.0.51"
   resolved "https://registry.yarnpkg.com/@types/estree/-/estree-0.0.51.tgz#cfd70924a25a3fd32b218e5e420e6897e1ac4f40"
@@ -3736,10 +3748,10 @@ react-is@^17.0.2:
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-17.0.2.tgz#e691d4a8e9c789365655539ab372762b0efb54f0"
   integrity sha512-w2GsyukL62IJnlaff/nRegPQR94C/XXamvMWmSHRJ4y7Ts/4ocGRmTHvOs8PSE6pB3dWOrD/nueuU5sduBsQ4w==
 
-react-payment-inputs@^1.1.8:
-  version "1.1.8"
-  resolved "https://registry.yarnpkg.com/react-payment-inputs/-/react-payment-inputs-1.1.8.tgz#fa98567a2829167afed5b61ea950d5105b027711"
-  integrity sha512-7bU/hsxc79HLwJWRx5MRBUDg9LIOIK3uyqRWAVzPv9uPF33ZjuV+ghm6U0YzX/z9Xlab7D1VS++lzn2CK8d0sg==
+react-payment-inputs@^1.1.9:
+  version "1.1.9"
+  resolved "https://registry.yarnpkg.com/react-payment-inputs/-/react-payment-inputs-1.1.9.tgz#12b3c7fd10511998bb71999d9f69dfcc456762e1"
+  integrity sha512-k5j6fFCqcYRqbLP8UjWxJlNZXwVCO0pApXBLYvZZkTCPlqxXyumcnkxToHbLwLfO4Sxey3lD3At9Hwi8AAw0Ig==
 
 react-plaid-link@^3.3.0:
   version "3.3.0"

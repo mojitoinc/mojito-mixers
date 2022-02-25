@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import {
   usePaymentKeyQuery,
   useCreatePaymentMethodMutation,
@@ -83,7 +83,24 @@ const SectionTitle = styled.h3`
   display: block;
 `;
 
-const defaultValues = {
+
+interface PaymentDetails {
+  cardNumber: string;
+  cvv: string;
+  expMonth: number;
+  expYear: number;
+  line1: string;
+  line2: string;
+  city: string;
+  district: string;
+  postalCode: string;
+  country: string;
+  name: string;
+  phoneNumber: string;
+  email: string;
+}
+
+const defaultValues: PaymentDetails = {
   cardNumber: "4007400000000007",
   cvv: "000",
   expMonth: 7,
@@ -95,11 +112,11 @@ const defaultValues = {
   postalCode: "000000",
   country: "MO",
   name: "Satoshi Nakamoto",
-  phoneNumber: null,
+  phoneNumber: "",
   email: "filip@mojito.xyz",
 };
 
-const emptyValues = {
+const emptyValues: PaymentDetails = {
   cardNumber: "",
   cvv: "",
   expMonth: 1,
@@ -111,7 +128,7 @@ const emptyValues = {
   postalCode: "",
   country: "",
   name: "",
-  phoneNumber: null,
+  phoneNumber: "",
   email: "",
 };
 
@@ -124,16 +141,16 @@ export const CreatePayment = () => {
   ] = useCreatePaymentMethodMutation();
 
   const prefillValues = () => {
-    setPaymnentDetails(defaultValues);
+    setPaymentDetails(defaultValues);
   };
 
   const clearValues = () => {
-    setPaymnentDetails(emptyValues);
+    setPaymentDetails(emptyValues);
   };
 
   const [orgId, setOrgId] = useState("");
 
-  const [paymentDetails, setPaymnentDetails] = useState({
+  const [paymentDetails, setPaymentDetails] = useState<PaymentDetails>({
     cardNumber: "",
     cvv: "",
     expMonth: 1,
@@ -186,7 +203,7 @@ export const CreatePayment = () => {
   const onChange = (e: any) => {
     e.preventDefault();
     const { name, value } = e.target;
-    setPaymnentDetails((prevVal) => {
+    setPaymentDetails((prevVal) => {
       return { ...prevVal, [name]: value };
     });
   };
@@ -219,8 +236,9 @@ export const CreatePayment = () => {
     };
   };
 
-  const createCard = async (e) => {
+  const createCard = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
+
     if (!orgId) {
       console.log("Please fill in Org ID");
       return;
@@ -274,7 +292,7 @@ export const CreatePayment = () => {
     } finally {
       console.log("loading done");
     }
-  };
+  }, [createPaymentMethod, data, error, orgId, paymentDetails]);
 
   return (
     <>

@@ -1,7 +1,7 @@
 import {
   useCreatePaymentMutation,
 } from "../../services/graphql/generated";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { InvoiceWrapper } from "./Invoices";
 
 export const ChargeCard: React.FC = () => {
@@ -11,18 +11,24 @@ export const ChargeCard: React.FC = () => {
   const [paymentMethodId, setPaymentMethodId] = useState("");
   const [invoiceId, setInvoiceId] = useState("");
 
-  const chargeCard = async (e) => {
+  const chargeCard = useCallback(async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
 
-    const res = await createPaymentMutation({
-      variables: {
-        paymentMethodID: paymentMethodId,
-        invoiceID: invoiceId,
-      },
-    });
+    try {
+      console.log("createPaymentMutation()");
 
-    console.log({ res }, { error });
-  };
+      const res = await createPaymentMutation({
+        variables: {
+          paymentMethodID: paymentMethodId,
+          invoiceID: invoiceId,
+        },
+      });
+
+      console.log(res);
+    } catch (err) {
+      console.log(err);
+    }
+  }, [createPaymentMutation, paymentMethodId, invoiceId]);
 
   return (
     <InvoiceWrapper>

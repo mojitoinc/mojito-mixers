@@ -15,13 +15,11 @@ export const SelectIcon = (props: SvgIconProps) => (
   </SvgIcon>
 );
 
-export interface CreditCardIconProps extends SvgIconProps {
-  network?: string;
-}
-
-export const CreditCardIcon = ({ network, ...props }) => (
-  <SvgIcon
-    { ...standaloneGetCardImageProps(network) }
-    { ...props }
-    sx={ { ...CREDIT_CARD_ICON_SX, ...props.sx } } />
-);
+export const CreditCardIcon: React.FC<SvgIconProps & { network: string }> = ({ network, ...props }) => {
+  return (
+    <SvgIcon
+      { ...standaloneGetCardImageProps(network) }
+      { ...props }
+      sx={ { ...CREDIT_CARD_ICON_SX, ...props.sx } } />
+  );
+};

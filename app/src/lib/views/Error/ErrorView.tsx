@@ -6,6 +6,7 @@ import { CheckoutModalError, CheckoutModalErrorAt } from "../../components/publi
 import { DebugBox } from "../../components/payments/DisplayBox/DisplayBox";
 import { XS_MOBILE_MAX_WIDTH } from "../../config/theme/theme";
 import { StatusIcon } from "../../components/shared/StatusIcon/StatusIcon";
+import { DEFAULT_ERROR_AT } from "../../domain/errors/errors.constants";
 
 const ERROR_ACTION_LABELS: Record<CheckoutModalErrorAt, string> = {
   reset: "Try Again",
@@ -27,7 +28,7 @@ export const ErrorView: React.FC<ErrorViewProps> = ({
   checkoutError: {
     error,
     errorMessage,
-    at,
+    at = DEFAULT_ERROR_AT,
   },
   errorImageSrc,
   onFixError,

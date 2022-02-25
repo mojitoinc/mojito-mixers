@@ -31,7 +31,7 @@ const reduceSelectOptionsToMap = (
   return optionsMap;
 };
 
-export function useCountryOptions(countryCode?: string) {
+export function useCountryOptions(countryCode?: string | number) {
   const { result: country, getCountryList } = useCountryRegion(countryCode);
 
   return useMemo(() => {

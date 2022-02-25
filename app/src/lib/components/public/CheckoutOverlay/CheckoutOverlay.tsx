@@ -254,7 +254,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
 
       // TODO: This logic can probably be simplified. Just get the last saved payment method...
 
-      let matchingPaymentMethod: SavedPaymentMethod;
+      let matchingPaymentMethod: SavedPaymentMethod | undefined = undefined;
 
       if (typeof billingInfo === "object") {
         const addressId = getSavedPaymentMethodAddressIdFromBillingInfo(billingInfo);
@@ -375,7 +375,9 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   }, [setInvoiceID, onClose]);
 
   const handleFixError = useCallback(async (): Promise<false> => {
-    if (checkoutError.at === "reset") {
+    const at = checkoutError?.at;
+
+    if (at === "reset") {
       goTo();
 
       await Promise.allSettled([
@@ -395,12 +397,12 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
       refetchInvoiceDetails(),
     ]);
 
-    if (checkoutError.at !== "purchasing") {
+    if (at !== "purchasing") {
       // If we are redirecting users to the PurchasingView again, we keep the CVV to be able to re-try the purchase:
       setSelectedPaymentMethod((prevSelectedPaymentMethod) => ({ ...prevSelectedPaymentMethod, cvv: "" }));
     }
 
-    goTo(checkoutError.at || DEFAULT_ERROR_AT, checkoutError);
+    goTo(at || DEFAULT_ERROR_AT, checkoutError);
 
     // This function is used as a CheckoutModalFooter's onSubmitClicked, so we want that to show a loader on the submit
     // button when clicked but do not remove it once the Promise is resolved, as we are moving to another view and
@@ -456,7 +458,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   let headerVariant: CheckoutModalHeaderVariant = isAuthenticated ? 'loggedIn' : 'guest';
   let checkoutStepElement = null;
 
-  if (checkoutStep === "error") {
+  if (checkoutStep === "error" && checkoutError) {
     headerVariant = "error";
 
     checkoutStepElement = (
@@ -467,8 +469,6 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
         onClose={ handleClose }
         debug={ debug } />
     );
-  } else if (!checkoutStep) {
-    return null;
   } else if (checkoutStep === "authentication") {
     if (!isAuthenticated) headerVariant = 'anonymous';
 
@@ -513,7 +513,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
         wirePaymentsDisclaimerText={ customTexts.wirePaymentsDisclaimer }
         debug={ debug } />
     );
-  } else if (checkoutStep === "purchasing") {
+  } else if (checkoutStep === "purchasing" && invoiceID) {
     headerVariant = "purchasing";
 
     checkoutStepElement = (
@@ -541,6 +541,12 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
         purchaseInstructions={ customTexts.purchaseInstructions }
         onNext={ handleClose } />
     );
+  } else {
+    // !checkoutStep or
+    // checkoutStep === "error" && !checkoutError or
+    // checkoutStep === "purchasing" && !invoiceID or
+    // some other kind of indeterminate / incorrect state:
+    return null;
   }
 
   const headerElement = (

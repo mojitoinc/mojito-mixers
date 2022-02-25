@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import React from "react";
 
 const StyledContainer = styled.div`
   width: 80%;
@@ -7,6 +8,6 @@ const StyledContainer = styled.div`
   position: relative;
 `;
 
-export const ViewContainer = ({ children }) => {
+export const ViewContainer: React.FC = ({ children }) => {
   return <StyledContainer>{children}</StyledContainer>;
 };

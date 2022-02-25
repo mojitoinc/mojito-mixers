@@ -1,5 +1,5 @@
 import { useAuth0 } from "@auth0/auth0-react";
-import { Container, Typography, Box, Stack, Button, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio, FormHelperText, TextField, Switch, Select, MenuItem, InputLabel, FormGroup, Checkbox } from "@mui/material";
+import { Container, Typography, Box, Stack, Button, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio, FormHelperText, TextField, Switch, Select, MenuItem, InputLabel, FormGroup, Checkbox, SelectChangeEvent } from "@mui/material";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { PUICheckout, CheckoutModalError, PUICheckoutProps, PaymentType, useOpenCloseCheckoutModal } from "../lib";
 import { useMeQuery } from "../services/graphql/generated";
@@ -274,7 +274,7 @@ const HomePage = () => {
                 label="Lot Type"
                 size="small"
                 value={ formValues.lotType }
-                onChange={ handleChange }>
+                onChange={ handleChange as (e: SelectChangeEvent<"buyNow" | "auction">) => void }>
                 <MenuItem value="buyNow">Buy Now</MenuItem>
                 <MenuItem value="auction">Auction</MenuItem>
               </Select>

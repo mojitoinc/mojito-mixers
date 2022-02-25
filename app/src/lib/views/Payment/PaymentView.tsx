@@ -30,9 +30,9 @@ export interface PaymentViewProps {
   onPrev: () => void;
   onClose: () => void;
   acceptedPaymentTypes: PaymentType[];
-  consentType: ConsentType;
-  privacyHref: string;
-  termsOfUseHref: string;
+  consentType?: ConsentType;
+  privacyHref?: string;
+  termsOfUseHref?: string;
   wirePaymentsDisclaimerText?: React.ReactFragment[];
   debug?: boolean;
 }

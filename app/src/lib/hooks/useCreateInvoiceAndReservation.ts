@@ -38,8 +38,8 @@ export function useCreateInvoiceAndReservation({
     });
   }, []);
 
-  const countdownStartRef = useRef<number>(null);
-  const countdownElementRef = useRef<HTMLSpanElement>(null);
+  const countdownStartRef = useRef<number | null>(null);
+  const countdownElementRef = useRef<HTMLSpanElement | null>(null);
 
   useThrottledRequestAnimationFrame(() => {
     const countdownStart = countdownStartRef.current;
@@ -100,7 +100,7 @@ export function useCreateInvoiceAndReservation({
     }
 
     let invoiceID = "";
-    let mutationError: ApolloError | Error;
+    let mutationError: ApolloError | Error | undefined = undefined;
 
     if (lotType === "buyNow") {
       if (debug) {

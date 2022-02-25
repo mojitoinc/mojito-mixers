@@ -24,7 +24,12 @@ const NavItem = styled.p<{ active: boolean }>`
     ${(props) => (props.active ? "#EF9F40" : "transparent")};
 `;
 
-const NavMenu: React.FC<{ activeTab: string; setMenuTab(string): void }> = ({
+interface NavMenuProps {
+  activeTab: string;
+  setMenuTab(tab: string): void;
+}
+
+const NavMenu: React.FC<NavMenuProps> = ({
   activeTab,
   setMenuTab,
 }) => {

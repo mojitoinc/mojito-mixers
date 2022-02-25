@@ -38,8 +38,8 @@ export const PaymentDetailsItem: React.FC<PaymentDetailsItemProps> = ({
   index,
   ...boxProps
 }) => {
-  let disabled = savedItemProps.disabled;
-  let status: SavedItemStatus;
+  let disabled = savedItemProps?.disabled;
+  let status: SavedItemStatus | undefined = undefined;
 
   if (savedPaymentMethod.status === "pending") {
     disabled = disabled || "selectOnly";
@@ -68,8 +68,8 @@ export const PaymentDetailsItem: React.FC<PaymentDetailsItemProps> = ({
       status={ status }
       id={ savedPaymentMethod.id }
       boxProps={ boxProps }
-      cvvError={ savedPaymentMethod.type === "CreditCard" ? savedItemProps.cvvError : undefined }
-      onCvvChange={ savedPaymentMethod.type === "CreditCard" ? savedItemProps.onCvvChange : undefined }>
+      cvvError={ savedPaymentMethod.type === "CreditCard" ? savedItemProps?.cvvError : undefined }
+      onCvvChange={ savedPaymentMethod.type === "CreditCard" ? savedItemProps?.onCvvChange : undefined }>
       <PaymentDetailsFragment savedPaymentMethod={ savedPaymentMethod } />
     </SavedItem>
   );

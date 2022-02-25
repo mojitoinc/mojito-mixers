@@ -23,7 +23,7 @@ export const PUIErrorOverlay: React.FC<PUIErrorOverlayProps> = ({
   onRedirect,
   ...fullScreenOverlayProps
 }) => {
-  const { purchaseError, url } = getCheckoutModalState();
+  const { purchaseError, url = "" } = getCheckoutModalState();
 
   useLayoutEffect(() => {
     // Users should only see this page if they completed a credit card payment and 3DS' verification went wrong.
@@ -32,8 +32,6 @@ export const PUIErrorOverlay: React.FC<PUIErrorOverlayProps> = ({
   }, [purchaseError, onRedirect]);
 
   const reviewData = useCallback(async (): Promise<false> => {
-    if (!purchaseError) return;
-
     const isPathname = isUrlPathname(url);
 
     if (isPathname) persistReceivedRedirectUri3DS(window.location.href);
@@ -42,7 +40,7 @@ export const PUIErrorOverlay: React.FC<PUIErrorOverlayProps> = ({
     onRedirect(isPathname ? url : getUrlWithSearchParams(url));
 
     return false;
-  }, [purchaseError, onRedirect, url]);
+  }, [onRedirect, url]);
 
   const toMarketplace = useCallback(() => {
     if (!purchaseError) return;

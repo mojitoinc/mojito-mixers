@@ -1,4 +1,5 @@
 import images from "react-payment-inputs/images";
+import { CreditCardNetwork } from "react-payment-inputs";
 
 export const DEFAULT_CARD_FORMAT = /(\d{1,4})/g;
 const MONTH_REGEX = /(0[1-9]|1[0-2])/;
@@ -127,16 +128,14 @@ export const CARD_TYPES = [
   },
 ];
 
-const imagesMap: Record<string, React.ReactNode> = images;
-
-export function standaloneGetCardImageProps(network = "placeholder") {
-  const cardType = network.toLowerCase();
-
+export function standaloneGetCardImageProps(network: string) {
   // See https://github.com/medipass/react-payment-inputs/blob/master/src/usePaymentInputs.js#L452
 
+  const paymentInputsNetwork = (network.toLowerCase().replace(/\s/g, "") || "placeholder") as CreditCardNetwork;
+
   return {
-    "aria-label": network || "Placeholder card",
-    children: imagesMap[cardType] || imagesMap.placeholder,
+    "aria-label": network,
+    children: images[paymentInputsNetwork] || images.placeholder,
     width: "1.5em",
     height: "1em",
     viewBox: "0 0 24 16",
@@ -162,7 +161,7 @@ const validateLuhn = (cardNumber : string) => {
   );
 };
 
-export const getCardNumberIsValid = (cardNumber: string) => {
+export const getCardNumberIsValid = (cardNumber?: string) => {
   if (!cardNumber) return false;
 
   const rawCardNumber = cardNumber.replace(/\s/g, "");
@@ -182,7 +181,7 @@ export const getCardNumberIsValid = (cardNumber: string) => {
   return false;
 };
 
-export const getExpiryDateIsvalid = (expiryDate: string) => {
+export const getExpiryDateIsvalid = (expiryDate?: string) => {
   if (!expiryDate) return false;
 
   const rawExpiryDate = expiryDate.replace(" / ", "").replace("/", "");
@@ -201,8 +200,8 @@ export const getExpiryDateIsvalid = (expiryDate: string) => {
   return monthIsOnValidRange && yearIsOnValidRange && dateIsOnValidRange;
 };
 
-export const getCVCIsValid = (cvc: string, cardNumber: string) => {
-  if (!cvc || cvc.length < 3) return false;
+export const getCVCIsValid = (cvc?: string, cardNumber?: string) => {
+  if (!cvc || cvc.length < 3 || !cardNumber) return false;
 
   const rawCardNumber = cardNumber.replace(/\s/g, "");
   const cardType = getCardTypeByValue(rawCardNumber);
