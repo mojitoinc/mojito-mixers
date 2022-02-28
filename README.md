@@ -283,9 +283,21 @@ You will have to copy the following file into your project to avoid TypeScript e
 
 ## Images
 
-The `PurchasingView` and `ErrorView` default images are loaded directly from GitHub to avoid bundling them with the library
+The `PaymentView`, `PurchasingView` and `ErrorView` default images are loaded directly from GitHub to avoid bundling them with the library
 or forcing users to include them in their repos and add the necessary build setup to load them. They should just work out
 of the box, no setup required.
+
+**`PaymentView`'s default image:**
+
+<p>
+  <a href="https://raw.githubusercontent.com/mojitoinc/mojito-mixers/main/app/src/lib/assets/circle.png">
+    <img src="./app/src/lib/assets/circle.png" width="128">
+  </a>
+</p>
+
+    > Repo: https://github.com/mojitoinc/mojito-mixers/blob/main/app/src/lib/assets/circle.png
+
+    > CDN URL: https://raw.githubusercontent.com/mojitoinc/mojito-mixers/main/app/src/lib/assets/circle.png
 
 **`PurchaseView`'s default image:**
 

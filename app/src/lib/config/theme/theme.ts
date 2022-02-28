@@ -21,6 +21,7 @@ export const OVERLAY_OPACITY = 0.75;
 
 // Default images:
 export const DEFAULT_PURCHASING_IMAGE_SRC = "https://raw.githubusercontent.com/mojitoinc/mojito-mixers/main/app/src/lib/assets/mojito-loader.gif";
+export const DEFAULT_PAYMENT_IMAGE_SRC = "https://raw.githubusercontent.com/mojitoinc/mojito-mixers/main/app/src/lib/assets/circle.png";
 
 const createThemeBase = (paletteMode?: PaletteMode): Theme => createTheme({
   typography: createTypographyTheme(),
