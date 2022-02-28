@@ -20,6 +20,10 @@
 <br />
 
 
+// TODO: "Calculating taxes..." in the footer button.
+// TODO: Review tax quote logic in BillingView.
+
+
 ## Working on the project
 
 ### Next.js development playground:

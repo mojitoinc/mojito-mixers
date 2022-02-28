@@ -7,9 +7,10 @@ import { SecondaryButton } from "../SecondaryButton/SecondaryButton";
 import { CheckoutModalFooter } from "../../payments/CheckoutModalFooter/CheckoutModalFooter";
 import { SavedPaymentMethod } from "../../../domain/circle/circle.interfaces";
 import React from "react";
-import { alpha, Box, CircularProgress, Typography } from "@mui/material";
+import { alpha, Box, CircularProgress } from "@mui/material";
 import { OVERLAY_OPACITY } from "../../../config/theme/theme";
 import { TaxesState } from "../../../views/Billing/BillingView";
+import { TaxesMessagesBox } from "../TaxesMessagesBox/TaxesMessagesBox";
 
 export interface SavedBillingDetailsSelectorProps {
   showLoader: boolean;
@@ -75,12 +76,7 @@ export const SavedBillingDetailsSelector: React.FC<SavedBillingDetailsSelectorPr
         Add New Billing Info
       </SecondaryButton>
 
-      <Typography variant="caption" component="p" sx={{ mt: 5, color: theme => taxes.status === "incomplete" || taxes.status === "error" ? theme.palette.warning.dark : theme.palette.text.primary }}>
-        { taxes.status === "incomplete" ? "Please, select a valid address to calculate taxes." : null }
-        { taxes.status === "loading" ? "Calculating taxes..." : null }
-        { taxes.status === "error" ? "Invalid address." : null }
-        { taxes.status === "complete" ? `Tax (${ (taxes.taxRate || 0).toFixed(2) }): ${ taxes.taxAmount }` : null }
-      </Typography>
+      <TaxesMessagesBox sx={{ mt: 5 }} taxes={ taxes } variant="selector" />
     </Box>
 
     <CheckoutModalFooter

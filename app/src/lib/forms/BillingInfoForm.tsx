@@ -10,15 +10,16 @@ import { CheckoutModalFooter } from "../components/payments/CheckoutModalFooter/
 import { InputGroupLabel } from "../components/shared/InputGroupLabel/InputGroupLabel";
 import { ControlledTextField } from "../components/shared/TextField/TextField";
 import { SecondaryButton } from "../components/shared/SecondaryButton/SecondaryButton";
-import { Box, Typography } from "@mui/material";
+import { Box } from "@mui/material";
 import BookIcon from "@mui/icons-material/Book";
 import { EMPTY_OPTION, SelectOption } from "../components/shared/Select/Select";
 import { withRequiredErrorMessage } from "../utils/validationUtils";
 import { DebugBox } from "../components/payments/DisplayBox/DisplayBox";
 import { CheckoutModalError } from "../components/public/CheckoutOverlay/CheckoutOverlay.hooks";
 import { useFormCheckoutError } from "../hooks/useFormCheckoutError";
-import { FormErrorsBox } from "../components/shared/FormErrorsBox/FormErrorsBox";
+import { TaxesMessagesBox } from "../components/shared/TaxesMessagesBox/TaxesMessagesBox";
 import { TaxesState } from "../views/Billing/BillingView";
+import { FormErrorsBox } from "../components/shared/FormErrorsBox/FormErrorsBox";
 
 const FULL_NAME_FIELD = "fullName";
 const EMAIL_FIELD = "email";
@@ -260,12 +261,7 @@ export const BillingInfoForm: React.FC<BillingInfoFormProps> = ({
 
       { checkoutErrorMessage && <FormErrorsBox error={ checkoutErrorMessage } sx={{ mt: 5 }} /> }
 
-      <Typography variant="caption" component="p" sx={{ mt: 5, color: theme => taxes.status === "incomplete" || taxes.status === "error" ? theme.palette.warning.dark : theme.palette.text.primary }}>
-        { taxes.status === "incomplete" ? "Please, enter a valid address to calculate taxes." : null }
-        { taxes.status === "loading" ? "Calculating taxes..." : null }
-        { taxes.status === "error" ? "Invalid address." : null }
-        { taxes.status === "complete" ? `Tax (${ (taxes.taxRate || 0).toFixed(2) }): ${ taxes.taxAmount }` : null }
-      </Typography>
+      <TaxesMessagesBox sx={{ mt: 5 }} taxes={ taxes } variant="form" />
 
       { debug && (
         <DebugBox sx={{ mt: 5 }}>

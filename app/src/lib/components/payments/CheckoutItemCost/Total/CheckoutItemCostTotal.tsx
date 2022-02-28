@@ -1,7 +1,22 @@
-import { Box, Typography } from "@mui/material";
+import { Box, SxProps, Theme, Tooltip, Typography } from "@mui/material";
 import React from "react";
+import { formatTaxRate } from "../../../../utils/formatUtils";
 import { TaxesState } from "../../../../views/Billing/BillingView";
 import { Number } from "../../../shared/Number/Number";
+
+const TAX_RATE_PLACEHOLDER_SX: SxProps<Theme> = {
+  background: theme => theme.palette.grey[100],
+  borderRadius: "128px",
+  color: "transparent",
+  fontSize: "10px",
+  margin: "0 0 0 2px",
+  userSelect: "none",
+};
+
+const TAX_AMOUNT_PLACEHOLDER_SX: SxProps<Theme> = {
+  ...TAX_RATE_PLACEHOLDER_SX,
+  margin: "0 2px 0 0",
+};
 
 export interface CheckoutItemCostTotalProps {
   total: number;
@@ -20,10 +35,22 @@ export const CheckoutItemCostTotal: React.FC<CheckoutItemCostTotalProps> = ({
   fees,
   withDetails = false,
 }) => {
+  let taxRateElement: React.ReactNode = null;
+  let taxAmountElement: React.ReactNode = null;
+
+  if (status === "loading") {
+    taxRateElement = <Tooltip title="Calculating taxes..."><span>(<Box component="span" sx={ TAX_RATE_PLACEHOLDER_SX }>0000</Box> %)</span></Tooltip>;
+    taxAmountElement = <Tooltip title="Calculating taxes..."><span><Box component="span" sx={ TAX_AMOUNT_PLACEHOLDER_SX }>00000000</Box> USD</span></Tooltip>;
+  } else if (status === "complete" && taxAmount !== undefined ) {
+    taxRateElement = `(${ formatTaxRate(taxRate) })`;
+    taxAmountElement = <Number suffix=" USD">{taxAmount}</Number>;
+  } else {
+    taxRateElement = <Tooltip title="Enter a valid address to calculate taxes"><span>(- %)</span></Tooltip>;
+    taxAmountElement = <Tooltip title="Enter a valid address to calculate taxes"><span>- USD</span></Tooltip>;
+  }
+
   return (
-    <Box
-      sx={{ display: "flex", flexDirection: "column", mt: { xs: 3, sm: 0.5 } }}
-    >
+    <Box sx={{ display: "flex", flexDirection: "column", mt: { xs: 3, sm: 0.5 } }}>
       {withDetails && (
         <>
           <Box
@@ -42,23 +69,12 @@ export const CheckoutItemCostTotal: React.FC<CheckoutItemCostTotalProps> = ({
               justifyContent: "space-between",
             }}
           >
-            { /* TODO: Format tax rate function */ }
-            { /* TODO: TaxMessagesBox component */ }
-
             <Typography sx={(theme) => ({ color: theme.palette.grey["500"] })}>
-              Taxes{ taxRate > 0 ? ` (${ taxRate }%)` : "" }
+              Taxes { taxRateElement }
             </Typography>
 
             <Typography>
-              { status === "loading" ? (
-                <Box component="span"><Box component="span">....</Box> USD</Box>
-              ) : (
-                status === "complete" && taxAmount !== undefined ? (
-                  <Number suffix=" USD">{taxAmount}</Number>
-                ) : (
-                  <Box component="span"><Box component="span">....</Box> USD</Box>
-                )
-              ) }
+              { taxAmountElement }
             </Typography>
           </Box>
           <Box
