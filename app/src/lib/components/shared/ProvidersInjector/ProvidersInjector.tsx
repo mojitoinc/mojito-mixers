@@ -1,11 +1,13 @@
 import React, { useEffect, useMemo } from "react";
-import { Theme, ThemeOptions, createTheme, ThemeProvider } from "@mui/material/styles";
+import { Theme, ThemeOptions, ThemeProvider } from "@mui/material/styles";
 import { AuthorizedApolloProvider, AuthorizedApolloProviderProps } from "../AuthorizedApolloProvider/AuthorizedApolloProvider";
+import { CreateMixerTheme } from "../../../config/theme/theme";
 
 export interface ThemeProviderProps {
   theme?: Theme;
   themeOptions?: ThemeOptions;
 }
+
 
 export type ProvidersInjectorProps = ThemeProviderProps & AuthorizedApolloProviderProps;
 
@@ -17,19 +19,16 @@ export const ProviderInjector: React.FC<ProvidersInjectorProps> = ({
   // ThemeProvider:
   theme: parentTheme,
   themeOptions,
-
   children,
 }) => {
   // TODO: Replace createTheme with custom one.
-  const theme = useMemo(() => themeOptions ? createTheme(themeOptions) : parentTheme, [parentTheme, themeOptions]);
+  const theme = useMemo(() => parentTheme ??
+    CreateMixerTheme(themeOptions), [parentTheme, themeOptions])
+
 
   useEffect(() => {
     if (parentTheme && themeOptions) {
       throw new Error("You can't use both `themeOptions` and `theme`. Please, use only one. `themeOptions` is preferred.");
-    }
-
-    if (!parentTheme && !themeOptions) {
-      throw new Error("You must set `themeOptions` or `theme`. Please, add one. `themeOptions` is preferred.");
     }
   }, [parentTheme, themeOptions]);
 
@@ -43,11 +42,12 @@ export const ProviderInjector: React.FC<ProvidersInjectorProps> = ({
     if (!apolloClient && !uri) {
       throw new Error("You must set `apolloClient` or  `uri`. Please, add one. `uri` is preferred.");
     }
+
   }, [apolloClient, uri]);
 
   return (
-    <AuthorizedApolloProvider apolloClient={ apolloClient } uri={ uri }>
-      { theme ? <ThemeProvider theme={ theme }>{ children }</ThemeProvider> : children }
+    <AuthorizedApolloProvider apolloClient={apolloClient} uri={uri}>
+      {theme ? <ThemeProvider theme={theme}>{children}</ThemeProvider> : children}
     </AuthorizedApolloProvider>
   );
 }
@@ -56,11 +56,12 @@ export function withThemeProvider<P extends object>(Component: React.ComponentTy
   const WithThemeProvider: React.FC<P & ThemeProviderProps> = ({
     theme,
     themeOptions,
+
     ...componentProps
   }) => {
     return (
-      <ProviderInjector apolloClient={ null } uri="" theme={ theme } themeOptions={ themeOptions }>
-        <Component { ...componentProps as P } />
+      <ProviderInjector apolloClient={null} uri="" theme={theme} themeOptions={themeOptions}>
+        <Component {...componentProps as P} />
       </ProviderInjector>
     );
   };
@@ -77,8 +78,8 @@ export function withProviders<P extends object>(Component: React.ComponentType<P
     ...componentProps
   }) => {
     return (
-      <ProviderInjector apolloClient={ apolloClient } uri={ uri } theme={ theme } themeOptions={ themeOptions }>
-        <Component { ...componentProps as P } />
+      <ProviderInjector apolloClient={apolloClient} uri={uri} theme={theme} themeOptions={themeOptions}>
+        <Component {...componentProps as P} />
       </ProviderInjector>
     );
   };

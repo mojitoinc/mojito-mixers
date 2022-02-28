@@ -11,9 +11,9 @@ export const PrimaryButton = React.forwardRef<HTMLButtonElement, ButtonProps>((p
       variant="contained"
       color="primary"
       size="medium"
-      ref={ ref }
+      ref={ref}
       disableElevation
-      { ...props }
-      sx={ isIcon ? { ...props.sx, p: 0 } : undefined } />
+      {...props}
+      sx={isIcon ? { ...props.sx, p: 0 } : undefined} />
   );
 });

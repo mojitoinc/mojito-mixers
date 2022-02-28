@@ -14,7 +14,7 @@ import { CheckoutModalHeader, CheckoutModalHeaderVariant } from "../../payments/
 import { PurchasingView } from "../../../views/Purchasing/PurchasingView";
 import { ErrorView } from "../../../views/Error/ErrorView";
 import { RawSavedPaymentMethod, SavedPaymentMethod } from "../../../domain/circle/circle.interfaces";
-import { Theme, ThemeOptions, SxProps } from "@mui/material/styles";
+import { Theme, SxProps } from "@mui/material/styles";
 import { continuePlaidOAuthFlow, PlaidFlow } from "../../../hooks/usePlaid";
 import { ConsentType } from "../../shared/ConsentText/ConsentText";
 import { CheckoutModalError, useCheckoutModalState } from "./CheckoutOverlay.hooks";
@@ -34,9 +34,7 @@ export interface PUICheckoutOverlayProps {
   guestCheckoutEnabled?: boolean;
   productConfirmationEnabled?: boolean;
 
-  // Personalization:
-  theme?: Theme;
-  themeOptions?: ThemeOptions;
+
   logoSrc: string;
   logoSx?: SxProps<Theme>;
   loaderImageSrc: string;
@@ -81,8 +79,6 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   productConfirmationEnabled,
 
   // Personalization:
-  theme: parentTheme,
-  themeOptions,
   logoSrc,
   logoSx,
   loaderImageSrc,
@@ -201,7 +197,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     invoiceAndReservationState,
     createInvoiceAndReservation,
     countdownElementRef,
-   } = useCreateInvoiceAndReservation({ orgID, checkoutItems, debug });
+  } = useCreateInvoiceAndReservation({ orgID, checkoutItems, debug });
 
   useEffect(() => {
     if (isDialogLoading || invoiceID === null || invoiceID || createInvoiceAndReservationCalledRef.current) return;
@@ -430,15 +426,15 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
 
   if ((isDialogInitializing || isPlaidFlowLoading) && (checkoutStep !== "error")) {
     return (<>
-      { isPlaidFlowLoading && <PlaidFlow onSubmit={ handlePlaidFlowCompleted } /> }
+      {isPlaidFlowLoading && <PlaidFlow onSubmit={handlePlaidFlowCompleted} />}
 
       <Backdrop
-        open={ open }
-        onClick={ handleClose }>
-        { loaderImageSrc ? (
+        open={open}
+        onClick={handleClose}>
+        {loaderImageSrc ? (
           <Box
             component="img"
-            src={ loaderImageSrc }
+            src={loaderImageSrc}
             sx={{
               width: 196,
               height: 196,
@@ -447,7 +443,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
             }} />
         ) : (
           <CircularProgress color="primary" />
-        ) }
+        )}
       </Backdrop>
     </>);
   }
@@ -463,83 +459,83 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
 
     checkoutStepElement = (
       <ErrorView
-        checkoutError={ checkoutError }
-        errorImageSrc={ errorImageSrc }
-        onFixError={ handleFixError }
-        onClose={ handleClose }
-        debug={ debug } />
+        checkoutError={checkoutError}
+        errorImageSrc={errorImageSrc}
+        onFixError={handleFixError}
+        onClose={handleClose}
+        debug={debug} />
     );
   } else if (checkoutStep === "authentication") {
     if (!isAuthenticated) headerVariant = 'anonymous';
 
     checkoutStepElement = (
       <AuthenticationView
-        checkoutItems={ checkoutItems }
-        isAuthenticated={ isAuthenticated }
-        guestCheckoutEnabled={ guestCheckoutEnabled }
-        onGuestClicked={ goNext }
-        onCloseClicked={ handleClose } />
+        checkoutItems={checkoutItems}
+        isAuthenticated={isAuthenticated}
+        guestCheckoutEnabled={guestCheckoutEnabled}
+        onGuestClicked={goNext}
+        onCloseClicked={handleClose} />
     );
   } else if (checkoutStep === "billing") {
     checkoutStepElement = (
       <BillingView
-        checkoutItems={ checkoutItems }
-        savedPaymentMethods={ savedPaymentMethods }
-        selectedBillingInfo={ selectedPaymentMethod.billingInfo }
-        checkoutError={ checkoutError }
-        onBillingInfoSelected={ handleBillingInfoSelected }
-        onSavedPaymentMethodDeleted={ handleSavedPaymentMethodDeleted }
-        onNext={ goNext }
-        onClose={ handleClose }
-        debug={ debug } />
+        checkoutItems={checkoutItems}
+        savedPaymentMethods={savedPaymentMethods}
+        selectedBillingInfo={selectedPaymentMethod.billingInfo}
+        checkoutError={checkoutError}
+        onBillingInfoSelected={handleBillingInfoSelected}
+        onSavedPaymentMethodDeleted={handleSavedPaymentMethodDeleted}
+        onNext={goNext}
+        onClose={handleClose}
+        debug={debug} />
     );
   } else if (checkoutStep === "payment") {
     checkoutStepElement = (
       <PaymentView
-        checkoutItems={ checkoutItems }
-        savedPaymentMethods={ savedPaymentMethods }
-        selectedPaymentMethod={ selectedPaymentMethod }
-        checkoutError={ checkoutError }
-        onPaymentInfoSelected={ handlePaymentInfoSelected }
-        onCvvSelected={ handleCvvSelected }
-        onSavedPaymentMethodDeleted={ handleSavedPaymentMethodDeleted }
-        onNext={ goNext }
-        onPrev={ goBack }
-        onClose={ handleClose }
-        acceptedPaymentTypes={ acceptedPaymentTypes }
-        consentType={ consentType }
-        privacyHref={ privacyHref }
-        termsOfUseHref={ termsOfUseHref }
-        wirePaymentsDisclaimerText={ customTexts.wirePaymentsDisclaimer }
-        debug={ debug } />
+        checkoutItems={checkoutItems}
+        savedPaymentMethods={savedPaymentMethods}
+        selectedPaymentMethod={selectedPaymentMethod}
+        checkoutError={checkoutError}
+        onPaymentInfoSelected={handlePaymentInfoSelected}
+        onCvvSelected={handleCvvSelected}
+        onSavedPaymentMethodDeleted={handleSavedPaymentMethodDeleted}
+        onNext={goNext}
+        onPrev={goBack}
+        onClose={handleClose}
+        acceptedPaymentTypes={acceptedPaymentTypes}
+        consentType={consentType}
+        privacyHref={privacyHref}
+        termsOfUseHref={termsOfUseHref}
+        wirePaymentsDisclaimerText={customTexts.wirePaymentsDisclaimer}
+        debug={debug} />
     );
   } else if (checkoutStep === "purchasing" && invoiceID) {
     headerVariant = "purchasing";
 
     checkoutStepElement = (
       <PurchasingView
-        purchasingImageSrc={ purchasingImageSrc }
-        purchasingMessages={ purchasingMessages }
-        orgID={ orgID }
-        invoiceID={ invoiceID }
-        savedPaymentMethods={ savedPaymentMethods }
-        selectedPaymentMethod={ selectedPaymentMethod }
-        onPurchaseSuccess={ handlePurchaseSuccess }
-        onPurchaseError={ handlePurchaseError }
-        onDialogBlocked={ setIsDialogBlocked }
-        debug={ debug } />
+        purchasingImageSrc={purchasingImageSrc}
+        purchasingMessages={purchasingMessages}
+        orgID={orgID}
+        invoiceID={invoiceID}
+        savedPaymentMethods={savedPaymentMethods}
+        selectedPaymentMethod={selectedPaymentMethod}
+        onPurchaseSuccess={handlePurchaseSuccess}
+        onPurchaseError={handlePurchaseError}
+        onDialogBlocked={setIsDialogBlocked}
+        debug={debug} />
     );
   } else if (checkoutStep === "confirmation") {
     headerVariant = "logoOnly";
 
     checkoutStepElement = (
       <ConfirmationView
-        checkoutItems={ checkoutItems }
-        savedPaymentMethods={ savedPaymentMethods }
-        selectedPaymentMethod={ selectedPaymentMethod }
-        paymentReferenceNumber={ paymentReferenceNumber }
-        purchaseInstructions={ customTexts.purchaseInstructions }
-        onNext={ handleClose } />
+        checkoutItems={checkoutItems}
+        savedPaymentMethods={savedPaymentMethods}
+        selectedPaymentMethod={selectedPaymentMethod}
+        paymentReferenceNumber={paymentReferenceNumber}
+        purchaseInstructions={customTexts.purchaseInstructions}
+        onNext={handleClose} />
     );
   } else {
     // !checkoutStep or
@@ -551,25 +547,25 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
 
   const headerElement = (
     <CheckoutModalHeader
-      variant={ headerVariant }
-      countdownElementRef={ countdownElementRef }
-      logoSrc={ logoSrc }
-      logoSx={ logoSx }
-      user={ meData?.me?.user }
-      userFormat={ userFormat }
-      onLoginClicked={ onLogin }
-      onPrevClicked={ checkoutStep === "authentication" ? handleClose : goBack } />
+      variant={headerVariant}
+      countdownElementRef={countdownElementRef}
+      logoSrc={logoSrc}
+      logoSx={logoSx}
+      user={meData?.me?.user}
+      userFormat={userFormat}
+      onLoginClicked={onLogin}
+      onPrevClicked={checkoutStep === "authentication" ? handleClose : goBack} />
   );
 
   return (
     <FullScreenOverlay
-      centered={ checkoutStep === "purchasing" || checkoutStep === "error" }
-      open={ open }
-      onClose={ handleClose }
-      isDialogBlocked={ isDialogBlocked }
-      contentKey={ checkoutStep }
-      header={ headerElement }
-      children={ checkoutStepElement } />
+      centered={checkoutStep === "purchasing" || checkoutStep === "error"}
+      open={open}
+      onClose={handleClose}
+      isDialogBlocked={isDialogBlocked}
+      contentKey={checkoutStep}
+      header={headerElement}
+      children={checkoutStepElement} />
   );
 }
 

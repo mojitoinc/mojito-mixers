@@ -1,7 +1,8 @@
-import { Theme, createTheme } from "@mui/material/styles";
+import { Theme, ThemeOptions, createTheme } from "@mui/material/styles";
 import { createTypographyTheme } from "./themeTypography";
 import { createPaletteTheme } from "./themePalette";
 import { createComponentsTheme } from "./themeComponents";
+import { PaletteMode } from "@mui/material";
 
 // Used to limit text width in PaymentView's disclaimer text and PurchasingView's loading text:
 export const XS_MOBILE_MAX_WIDTH = 320;
@@ -21,23 +22,18 @@ export const OVERLAY_OPACITY = 0.75;
 // Default images:
 export const DEFAULT_PURCHASING_IMAGE_SRC = "https://raw.githubusercontent.com/mojitoinc/mojito-mixers/main/app/src/lib/assets/mojito-loader.gif";
 
-
-const mojitoLightTheme: Theme = createTheme({
+const createThemeBase = (paletteMode?: PaletteMode): Theme => createTheme({
   typography: createTypographyTheme(),
-  palette: createPaletteTheme({ mode: "light" }),
+  palette: createPaletteTheme({ mode: paletteMode }),
 });
 
-export const MOJITO_LIGHT_THEME = createTheme({
-  ...mojitoLightTheme,
-  components: createComponentsTheme(mojitoLightTheme),
-});
+export const CreateMixerTheme = (themeOptions?: ThemeOptions): Theme => {
+  const themeBase = createThemeBase(themeOptions?.palette?.mode) ?? 'light';
+  const theme = themeOptions ? createTheme(themeBase, themeOptions) : themeBase;
 
-const mojitoDarkTheme: Theme = createTheme({
-  typography: createTypographyTheme(),
-  palette: createPaletteTheme({ mode: "dark" }),
-});
+  return createTheme(
+    createTheme({ components: createComponentsTheme(theme) }),
+    theme,
+  );
+}
 
-export const MOJITO_DARK_THEME = createTheme({
-  ...mojitoDarkTheme,
-  components: createComponentsTheme(mojitoDarkTheme),
-});
