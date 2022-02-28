@@ -3,7 +3,7 @@ import React, { Fragment } from "react";
 
 export const CONSENT_ERROR_MESSAGE = "You must accept the terms and conditions of the sale.";
 
-export type ConsentType = "disclaimer" | "checkbox";
+export type ConsentType = "disclaimer" | "checkbox" | "circle";
 
 export interface ConsentTextProps {
   privacyHref?: string;
