@@ -152,7 +152,7 @@ export const CheckoutModalFooter: React.FC<CheckoutModalFooterProps> = ({
             <Typography sx={{ maxWidth: SM_MOBILE_MAX_WIDTH, marginRight: 1 }} align="center">
               Payments powered by
             </Typography>
-            <Image width={100} height={20} src={DEFAULT_PAYMENT_IMAGE_SRC} />
+            <Box component="img" src={DEFAULT_PAYMENT_IMAGE_SRC} height={20} />
           </Box>
         </>
       )}

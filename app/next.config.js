@@ -11,7 +11,7 @@ module.exports = withImages({
     domains: [
     ],
     loader: "imgix",
-    path: "",
+    path: "/",
   },
 
   distDir: "build",
