@@ -1,8 +1,10 @@
+import { Palette } from "@mui/material";
 import { TypographyOptions } from "@mui/material/styles/createTypography";
 
-export function createTypographyTheme(typographyOptions?: TypographyOptions): TypographyOptions {
+export function createTypographyTheme(typographyOptions?: TypographyOptions | ((palette: Palette) => TypographyOptions)
+): TypographyOptions {
   return {
-    ...typographyOptions,
+
 
     fontFamily: "IBM Plex Sans, sans-serif",
 
@@ -45,5 +47,6 @@ export function createTypographyTheme(typographyOptions?: TypographyOptions): Ty
       fontWeight: 600,
       textTransform: "none",
     },
+    ...typographyOptions,
   };
 }

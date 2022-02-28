@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo } from "react";
 import { Theme, ThemeOptions, ThemeProvider } from "@mui/material/styles";
 import { AuthorizedApolloProvider, AuthorizedApolloProviderProps } from "../AuthorizedApolloProvider/AuthorizedApolloProvider";
-import { CreateMixerTheme } from "../../../config/theme/theme";
+import { extendDefaultTheme } from "../../../config/theme/theme";
 
 export interface ThemeProviderProps {
   theme?: Theme;
@@ -23,7 +23,7 @@ export const ProviderInjector: React.FC<ProvidersInjectorProps> = ({
 }) => {
   // TODO: Replace createTheme with custom one.
   const theme = useMemo(() => parentTheme ??
-    CreateMixerTheme(themeOptions), [parentTheme, themeOptions])
+    extendDefaultTheme(themeOptions), [parentTheme, themeOptions])
 
 
   useEffect(() => {

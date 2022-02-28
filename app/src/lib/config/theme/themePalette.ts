@@ -72,12 +72,12 @@ const MOJITO_LIGHT_PALETTE: PaletteOptions = {
 export function createPaletteTheme(paletteOptions?: PaletteOptions): PaletteOptions {
   return paletteOptions?.mode === "dark" ? {
     // TODO: Do a proper merge here:
+    ...MOJITO_LIGHT_PALETTE,
     ...paletteOptions,
-    ...MOJITO_LIGHT_PALETTE
     // ...MOJITO_DARK_PALETTE, // TODO: Not implemented.
   } : {
     // TODO: Do a proper merge here:
-    ...paletteOptions,
     ...MOJITO_LIGHT_PALETTE,
+    ...paletteOptions,
   }
 }

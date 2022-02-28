@@ -23,18 +23,16 @@ export const OVERLAY_OPACITY = 0.75;
 export const DEFAULT_PURCHASING_IMAGE_SRC = "https://raw.githubusercontent.com/mojitoinc/mojito-mixers/main/app/src/lib/assets/mojito-loader.gif";
 export const DEFAULT_PAYMENT_IMAGE_SRC = "https://raw.githubusercontent.com/mojitoinc/mojito-mixers/main/app/src/lib/assets/circle.png";
 
-const createThemeBase = (paletteMode?: PaletteMode): Theme => createTheme({
-  typography: createTypographyTheme(),
-  palette: createPaletteTheme({ mode: paletteMode }),
-});
 
-export const CreateMixerTheme = (themeOptions?: ThemeOptions): Theme => {
-  const themeBase = createThemeBase(themeOptions?.palette?.mode) ?? 'light';
-  const theme = themeOptions ? createTheme(themeBase, themeOptions) : themeBase;
+export const extendDefaultTheme = (themeOptions?: ThemeOptions): Theme => {
+  const baseTheme = createTheme({
+    ...themeOptions,
+    typography: createTypographyTheme(themeOptions?.typography),
+    palette: createPaletteTheme(themeOptions?.palette)
+  });
 
-  return createTheme(
-    createTheme({ components: createComponentsTheme(theme) }),
-    theme,
-  );
+  return createTheme({
+    components: createComponentsTheme(baseTheme),
+  }, baseTheme)
 }
 
