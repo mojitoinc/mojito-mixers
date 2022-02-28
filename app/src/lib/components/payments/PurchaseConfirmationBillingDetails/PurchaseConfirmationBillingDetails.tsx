@@ -9,9 +9,11 @@ import { CheckoutItemCostPurchase } from "../CheckoutItemCost/Purchase/CheckoutI
 import { PAYMENT_TYPE_LABEL } from "./PurchaseConfirmationBillingDetails.constants";
 import { getFormattedPaymentMethod } from "./PurchaseConfirmationBillingDetails.utils";
 import CheckIcon from "@mui/icons-material/Check";
+import { TaxesState } from "../../../views/Billing/BillingView";
 
 export interface PurchaseConfirmationBillingDetailsProps {
   checkoutItems: CheckoutItem[];
+  taxes: TaxesState;
   paymentReferenceNumber: string;
   selectedPaymentMethodBillingInfo: SavedPaymentMethodBillingInfo;
   selectedPaymentMethodPaymentInfo: PaymentMethod | SavedPaymentMethod;
@@ -19,6 +21,7 @@ export interface PurchaseConfirmationBillingDetailsProps {
 
 export const PurchaseConfirmationBillingDetails: React.FC<PurchaseConfirmationBillingDetailsProps> = ({
   checkoutItems,
+  taxes,
   paymentReferenceNumber,
   selectedPaymentMethodBillingInfo,
   selectedPaymentMethodPaymentInfo,
@@ -90,6 +93,7 @@ export const PurchaseConfirmationBillingDetails: React.FC<PurchaseConfirmationBi
 
       <CheckoutItemCostPurchase
         checkoutItems={ checkoutItems }
+        taxes={ taxes }
         selectedPaymentMethodBillingInfo={ selectedPaymentMethodBillingInfo } />
     </Box>
   );

@@ -3,14 +3,14 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { object, string } from "yup";
 
 import Grid from "@mui/material/Grid";
-import React from "react";
+import React, { useEffect } from "react";
 import { ControlledCountrySelector } from "../components/shared/Select/CountrySelector/CountrySelector";
 import { ControlledStateSelector } from "../components/shared/Select/StateSelector/StateSelector";
 import { CheckoutModalFooter } from "../components/payments/CheckoutModalFooter/CheckoutModalFooter";
 import { InputGroupLabel } from "../components/shared/InputGroupLabel/InputGroupLabel";
 import { ControlledTextField } from "../components/shared/TextField/TextField";
 import { SecondaryButton } from "../components/shared/SecondaryButton/SecondaryButton";
-import { Box } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import BookIcon from "@mui/icons-material/Book";
 import { EMPTY_OPTION, SelectOption } from "../components/shared/Select/Select";
 import { withRequiredErrorMessage } from "../utils/validationUtils";
@@ -18,6 +18,7 @@ import { DebugBox } from "../components/payments/DisplayBox/DisplayBox";
 import { CheckoutModalError } from "../components/public/CheckoutOverlay/CheckoutOverlay.hooks";
 import { useFormCheckoutError } from "../hooks/useFormCheckoutError";
 import { FormErrorsBox } from "../components/shared/FormErrorsBox/FormErrorsBox";
+import { TaxesState } from "../views/Billing/BillingView";
 
 const FULL_NAME_FIELD = "fullName";
 const EMAIL_FIELD = "email";
@@ -40,6 +41,8 @@ export type BillingInfo = {
   [STREET_FIELD]: string;
   [ZIP_CODE_FIELD]: string;
 };
+
+export type TaxInfo = Omit<BillingInfo, "fullName" | "email" | "phone" | "apartment">
 
 const FIELD_LABELS = {
   [FULL_NAME_FIELD]: "Full Name",
@@ -108,6 +111,8 @@ export interface BillingInfoFormProps {
   // variant: BillingInfoFormVariant;
   defaultValues?: BillingInfo;
   checkoutError?: CheckoutModalError;
+  taxes: TaxesState;
+  onTaxInfoChange: (taxInfo: Partial<TaxInfo>) => void;
   onSaved?: () => void;
   onClose: () => void;
   onSubmit: (data: BillingInfo) => void;
@@ -118,6 +123,8 @@ export const BillingInfoForm: React.FC<BillingInfoFormProps> = ({
   // variant,
   defaultValues,
   checkoutError,
+  taxes,
+  onTaxInfoChange,
   onSaved,
   onClose,
   onSubmit,
@@ -137,6 +144,20 @@ export const BillingInfoForm: React.FC<BillingInfoFormProps> = ({
     reValidateMode: "onChange",
     resolver: yupResolver(schema),
   });
+
+  const [street, country, city, state, zip] = watch([STREET_FIELD, COUNTRY_FIELD, CITY_FIELD, STATE_FIELD, ZIP_CODE_FIELD]);
+
+  useEffect(() => {
+    onTaxInfoChange({
+      [STREET_FIELD]: street,
+      [COUNTRY_FIELD]: country,
+      [CITY_FIELD]: city,
+      [STATE_FIELD]: state,
+      [ZIP_CODE_FIELD]: zip,
+    });
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [onTaxInfoChange, street, country.value, city, state.value, zip]);
 
   const selectedCountryOption: SelectOption = watch(COUNTRY_FIELD);
   const selectedCountryCode = selectedCountryOption?.value;
@@ -239,6 +260,13 @@ export const BillingInfoForm: React.FC<BillingInfoFormProps> = ({
 
       { checkoutErrorMessage && <FormErrorsBox error={ checkoutErrorMessage } sx={{ mt: 5 }} /> }
 
+      <Typography variant="caption" component="p" sx={{ mt: 5, color: theme => taxes.status === "incomplete" || taxes.status === "error" ? theme.palette.warning.dark : theme.palette.text.primary }}>
+        { taxes.status === "incomplete" ? "Please, enter a valid address to calculate taxes." : null }
+        { taxes.status === "loading" ? "Calculating taxes..." : null }
+        { taxes.status === "error" ? "Invalid address." : null }
+        { taxes.status === "complete" ? `Tax (${ (taxes.taxRate || 0).toFixed(2) }): ${ taxes.taxAmount }` : null }
+      </Typography>
+
       { debug && (
         <DebugBox sx={{ mt: 5 }}>
           { JSON.stringify(watch(), null, 2) }
@@ -251,6 +279,7 @@ export const BillingInfoForm: React.FC<BillingInfoFormProps> = ({
 
       <CheckoutModalFooter
         variant="toPayment"
+        submitDisabled={ taxes.status !== "complete" }
         onCloseClicked={onClose} />
     </form>
   );

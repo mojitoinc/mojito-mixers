@@ -4,14 +4,17 @@ import { CheckoutItemCostTotal } from "../Total/CheckoutItemCostTotal";
 import { CheckoutItem } from "../../../../domain/product/product.interfaces";
 import { useCheckoutItemsCostTotal } from "../../../../hooks/useCheckoutItemCostTotal";
 import { CheckoutItemList } from "../List/CheckoutItemList";
+import { TaxesState } from "../../../../views/Billing/BillingView";
 
 export interface CheckoutItemCostBreakdownProps {
   checkoutItems: CheckoutItem[];
+  taxes: TaxesState;
 }
 
-export const CheckoutItemCostBreakdown: React.FC<
-  CheckoutItemCostBreakdownProps
-> = ({ checkoutItems }) => {
+export const CheckoutItemCostBreakdown: React.FC<CheckoutItemCostBreakdownProps> = ({
+  checkoutItems,
+  taxes,
+}) => {
   const { total, fees } = useCheckoutItemsCostTotal(checkoutItems);
 
   return (
@@ -19,10 +22,15 @@ export const CheckoutItemCostBreakdown: React.FC<
       <CheckoutItemList
         checkoutItems={checkoutItems}
         withSeparators
-        showPrices
-      />
+        showPrices />
+
       <Divider sx={{ mt: 3.75, mb: 1.5 }} />
-      <CheckoutItemCostTotal withDetails total={total} taxes={0} fees={fees} />
+
+      <CheckoutItemCostTotal
+        withDetails
+        total={ total }
+        taxes={ taxes }
+        fees={ fees } />
     </Stack>
   );
 };

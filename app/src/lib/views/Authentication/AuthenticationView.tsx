@@ -4,9 +4,11 @@ import { CheckoutModalFooter } from "../../components/payments/CheckoutModalFoot
 import { CheckoutItem } from "../../domain/product/product.interfaces";
 import React, { useEffect } from "react";
 import { resetStepperProgress } from "../../components/payments/CheckoutStepper/CheckoutStepper";
+import { TaxesState } from "../Billing/BillingView";
 
 export interface AuthenticationViewProps {
   checkoutItems: CheckoutItem[];
+  taxes: TaxesState;
   isAuthenticated?: boolean;
   guestCheckoutEnabled?: boolean;
   onGuestClicked: () => void;
@@ -15,6 +17,7 @@ export interface AuthenticationViewProps {
 
 export const AuthenticationView: React.FC<AuthenticationViewProps> = ({
   checkoutItems,
+  taxes,
   isAuthenticated,
   guestCheckoutEnabled,
   onGuestClicked,
@@ -26,7 +29,7 @@ export const AuthenticationView: React.FC<AuthenticationViewProps> = ({
   }, []);
 
   return (<>
-    <CheckoutItemCostBreakdown checkoutItems={ checkoutItems } />
+    <CheckoutItemCostBreakdown checkoutItems={ checkoutItems } taxes={ taxes } />
 
     <CheckoutModalFooter
       variant={ isAuthenticated ? "toPayment" : "toGuestCheckout" }

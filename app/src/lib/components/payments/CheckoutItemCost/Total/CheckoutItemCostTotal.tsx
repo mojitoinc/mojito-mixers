@@ -1,17 +1,22 @@
 import { Box, Typography } from "@mui/material";
 import React from "react";
+import { TaxesState } from "../../../../views/Billing/BillingView";
 import { Number } from "../../../shared/Number/Number";
 
 export interface CheckoutItemCostTotalProps {
   total: number;
-  taxes: number;
+  taxes: TaxesState;
   fees: number;
   withDetails?: boolean;
 }
 
 export const CheckoutItemCostTotal: React.FC<CheckoutItemCostTotalProps> = ({
   total,
-  taxes,
+  taxes: {
+    status,
+    taxAmount = 0,
+    taxRate = 0,
+  },
   fees,
   withDetails = false,
 }) => {
@@ -37,11 +42,23 @@ export const CheckoutItemCostTotal: React.FC<CheckoutItemCostTotalProps> = ({
               justifyContent: "space-between",
             }}
           >
+            { /* TODO: Format tax rate function */ }
+            { /* TODO: TaxMessagesBox component */ }
+
             <Typography sx={(theme) => ({ color: theme.palette.grey["500"] })}>
-              Taxes
+              Taxes{ taxRate > 0 ? ` (${ taxRate }%)` : "" }
             </Typography>
+
             <Typography>
-              <Number suffix=" USD">{taxes}</Number>
+              { status === "loading" ? (
+                <Box component="span"><Box component="span">....</Box> USD</Box>
+              ) : (
+                status === "complete" && taxAmount !== undefined ? (
+                  <Number suffix=" USD">{taxAmount}</Number>
+                ) : (
+                  <Box component="span"><Box component="span">....</Box> USD</Box>
+                )
+              ) }
             </Typography>
           </Box>
           <Box
@@ -80,7 +97,7 @@ export const CheckoutItemCostTotal: React.FC<CheckoutItemCostTotalProps> = ({
             color: "success.main",
           }}
         >
-          <Number suffix=" USD">{total + taxes + fees}</Number>
+          <Number suffix=" USD">{total + taxAmount + fees}</Number>
         </Typography>
       </Box>
     </Box>
