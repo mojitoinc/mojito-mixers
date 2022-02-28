@@ -1,4 +1,4 @@
-import { PUICheckoutProps, UserFormat, MOJITO_LIGHT_THEME, MOJITO_DARK_THEME } from "../../lib";
+import { PUICheckoutProps, UserFormat } from "../../lib";
 import { PlaygroundAuthPresetFieldValues, PlaygroundNoAuthPresetFieldValues, PlaygroundThemeFieldValues } from "./playground.interfaces";
 import { SxProps, Theme } from "@mui/material";
 import { CheckoutItemInfo } from "../../lib/domain/product/product.interfaces";
