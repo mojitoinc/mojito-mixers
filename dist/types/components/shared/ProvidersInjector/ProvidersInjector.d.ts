@@ -7,5 +7,9 @@ export interface ThemeProviderProps {
 }
 export declare type ProvidersInjectorProps = ThemeProviderProps & AuthorizedApolloProviderProps;
 export declare const ProviderInjector: React.FC<ProvidersInjectorProps>;
-export declare function withThemeProvider<P extends object>(Component: React.ComponentType<P>): React.FC<P & ThemeProviderProps>;
-export declare function withProviders<P extends object>(Component: React.ComponentType<P>): React.FC<P & ThemeProviderProps & AuthorizedApolloProviderProps>;
+export declare function withThemeProvider<P extends object>(Component: React.ComponentType<P>): React.FC<P & ThemeProviderProps & {
+    onCatch?: ((error: Error) => void) | undefined;
+}>;
+export declare function withProviders<P extends object>(Component: React.ComponentType<P>): React.FC<P & ThemeProviderProps & AuthorizedApolloProviderProps & {
+    onCatch?: ((error: Error) => void) | undefined;
+}>;
