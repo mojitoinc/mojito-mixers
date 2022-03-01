@@ -70,7 +70,7 @@
     "@types/react-dom": "^17.0.11",
     "@typescript-eslint/eslint-plugin": "^5.12.1",
     "@typescript-eslint/parser": "^5.12.1",
-    "ansi-regex": "^5.0.0",
+    "ansi-regex": "^5.0.1",
     "graphql": "^16.3.0",
     "node-fetch": "^2.6.7",
     "prettier": "^2.3.2",
@@ -82,7 +82,7 @@
     "typescript": "^4.5.5"
   },
   "resolutions": {
-    "ansi-regex": "^5.0.0",
+    "ansi-regex": "^5.0.1",
     "node-fetch": "^2.6.7"
   }
 }
