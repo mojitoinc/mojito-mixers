@@ -2,10 +2,8 @@ import { PUICheckoutProps, UserFormat } from "../../lib";
 import { PlaygroundAuthPresetFieldValues, PlaygroundNoAuthPresetFieldValues, PlaygroundThemeFieldValues } from "./playground.interfaces";
 import { SxProps, Theme } from "@mui/material";
 import { CheckoutItemInfo } from "../../lib/domain/product/product.interfaces";
-import { extendDefaultTheme } from "../../lib/config/theme/theme";
+import { MOJITO_LIGHT_THEME, MOJITO_DARK_THEME } from "../../lib/config/theme/theme";
 
-export const MOJITO_LIGHT_THEME = extendDefaultTheme();
-export const MOJITO_DARK_THEME = extendDefaultTheme({ palette: { mode: "dark" } });
 export const PLAYGROUND_LOREM_IPSUM = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
 export const PLAYGROUND_PARAGRAPHS_ARRAY = new Array(32).fill(PLAYGROUND_LOREM_IPSUM);
 

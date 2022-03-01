@@ -437,12 +437,12 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
           <Box
             component="img"
             src={ loaderImageSrc }
-            sx={ {
+            sx={{
               width: 196,
               height: 196,
               mx: "auto",
               mt: 5,
-            } } />
+            }} />
         ) : (
           <CircularProgress color="primary" />
         ) }
@@ -572,6 +572,6 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
       header={ headerElement }
       children={ checkoutStepElement } />
   );
- }
+};
 
 export const PUICheckout: React.FC<PUICheckoutProps> = withProviders(PUICheckoutOverlay);

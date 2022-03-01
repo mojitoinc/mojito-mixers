@@ -1,11 +1,8 @@
-import { Palette } from "@mui/material";
 import { TypographyOptions } from "@mui/material/styles/createTypography";
+import mergeDeep from "merge-deep";
 
-export function createTypographyTheme(typographyOptions?: TypographyOptions | ((palette: Palette) => TypographyOptions)
-): TypographyOptions {
-  return {
-
-
+export function createTypographyTheme(typographyOptions?: TypographyOptions): TypographyOptions {
+  return mergeDeep({
     fontFamily: "IBM Plex Sans, sans-serif",
 
     h5: {
@@ -47,6 +44,5 @@ export function createTypographyTheme(typographyOptions?: TypographyOptions | ((
       fontWeight: 600,
       textTransform: "none",
     },
-    ...typographyOptions,
-  };
+  }, typographyOptions);
 }

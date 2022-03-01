@@ -21,10 +21,7 @@ export const ProviderInjector: React.FC<ProvidersInjectorProps> = ({
   themeOptions,
   children,
 }) => {
-  // TODO: Replace createTheme with custom one.
-  const theme = useMemo(() => parentTheme ??
-    extendDefaultTheme(themeOptions), [parentTheme, themeOptions])
-
+  const theme = useMemo(() => parentTheme ?? extendDefaultTheme(themeOptions), [parentTheme, themeOptions])
 
   useEffect(() => {
     if (parentTheme && themeOptions) {
@@ -46,8 +43,8 @@ export const ProviderInjector: React.FC<ProvidersInjectorProps> = ({
   }, [apolloClient, uri]);
 
   return (
-    <AuthorizedApolloProvider apolloClient={apolloClient} uri={uri}>
-      {theme ? <ThemeProvider theme={theme}>{children}</ThemeProvider> : children}
+    <AuthorizedApolloProvider apolloClient={ apolloClient } uri={ uri }>
+      { theme ? <ThemeProvider theme={ theme }>{children}</ThemeProvider> : children }
     </AuthorizedApolloProvider>
   );
 }
@@ -56,12 +53,11 @@ export function withThemeProvider<P extends object>(Component: React.ComponentTy
   const WithThemeProvider: React.FC<P & ThemeProviderProps> = ({
     theme,
     themeOptions,
-
     ...componentProps
   }) => {
     return (
-      <ProviderInjector apolloClient={null} uri="" theme={theme} themeOptions={themeOptions}>
-        <Component {...componentProps as P} />
+      <ProviderInjector apolloClient={ null } uri="" theme={ theme } themeOptions={ themeOptions }>
+        <Component { ...componentProps as P } />
       </ProviderInjector>
     );
   };
@@ -78,8 +74,8 @@ export function withProviders<P extends object>(Component: React.ComponentType<P
     ...componentProps
   }) => {
     return (
-      <ProviderInjector apolloClient={apolloClient} uri={uri} theme={theme} themeOptions={themeOptions}>
-        <Component {...componentProps as P} />
+      <ProviderInjector apolloClient={ apolloClient } uri={ uri } theme={ theme } themeOptions={ themeOptions }>
+        <Component { ...componentProps as P } />
       </ProviderInjector>
     );
   };
