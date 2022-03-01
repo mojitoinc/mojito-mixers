@@ -77,7 +77,7 @@ function useCreateInvoiceAndReservation({ orgID, checkoutItems, debug = false, }
             if (createBuyNowInvoiceResult && !createBuyNowInvoiceResult.errors) {
                 if (debug)
                     console.log("    🟢 createBuyNowInvoice result", createBuyNowInvoiceResult);
-                invoiceID = (_c = (_b = (_a = createBuyNowInvoiceResult.data) === null || _a === void 0 ? void 0 : _a.purchaseMarketplaceBuyNowLot) === null || _b === void 0 ? void 0 : _b.invoice) === null || _c === void 0 ? void 0 : _c.invoiceID;
+                invoiceID = (_c = (_b = (_a = createBuyNowInvoiceResult.data) === null || _a === void 0 ? void 0 : _a.reserveMarketplaceBuyNowLot) === null || _b === void 0 ? void 0 : _b.invoice) === null || _c === void 0 ? void 0 : _c.invoiceID;
             }
         }
         else if (lotType === "auction" && process.env.NODE_ENV === "development") {
