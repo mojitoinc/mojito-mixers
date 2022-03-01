@@ -13,4 +13,6 @@ export interface CheckoutItemInfo {
 }
 export interface CheckoutItem extends CheckoutItemInfo {
     unitPrice: number;
+    taxes: number;
+    totalPrice: number;
 }

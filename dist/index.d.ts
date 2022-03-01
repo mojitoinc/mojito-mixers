@@ -42,9 +42,11 @@ interface CheckoutItemInfo {
 }
 interface CheckoutItem extends CheckoutItemInfo {
     unitPrice: number;
+    taxes: number;
+    totalPrice: number;
 }
 
-declare type ConsentType = "disclaimer" | "checkbox";
+declare type ConsentType = "disclaimer" | "checkbox" | "circle";
 
 interface SelectOption {
     value: string | number;
@@ -56,20 +58,20 @@ declare const EMAIL_FIELD = "email";
 declare const PHONE_FIELD = "phone";
 declare const STREET_FIELD = "street";
 declare const APARTMENT_FIELD = "apartment";
-declare const COUNTRY_FIELD = "country";
+declare const ZIP_CODE_FIELD = "zipCode";
 declare const CITY_FIELD = "city";
 declare const STATE_FIELD = "state";
-declare const ZIP_CODE_FIELD = "zipCode";
+declare const COUNTRY_FIELD = "country";
 declare type BillingInfo = {
-    [APARTMENT_FIELD]: string;
-    [CITY_FIELD]: string;
-    [COUNTRY_FIELD]: SelectOption;
-    [EMAIL_FIELD]: string;
     [FULL_NAME_FIELD]: string;
+    [EMAIL_FIELD]: string;
     [PHONE_FIELD]: string;
-    [STATE_FIELD]: SelectOption;
     [STREET_FIELD]: string;
+    [APARTMENT_FIELD]: string;
     [ZIP_CODE_FIELD]: string;
+    [CITY_FIELD]: string;
+    [STATE_FIELD]: SelectOption;
+    [COUNTRY_FIELD]: SelectOption;
 };
 
 declare type CircleFieldErrorAt = "billing" | "payment";

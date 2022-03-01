@@ -11,7 +11,7 @@ import { usePlaid } from '../../hooks/usePlaid.js';
 import { checkNeedsGenericErrorMessage } from '../../hooks/useFormCheckoutError.js';
 
 const billingInfoItemBoxProps = { sx: { mt: 2.5 } };
-const PaymentView = ({ checkoutItems, savedPaymentMethods: rawSavedPaymentMethods, selectedPaymentMethod, checkoutError, onPaymentInfoSelected, onCvvSelected, onSavedPaymentMethodDeleted, onNext, onPrev, onClose, acceptedPaymentTypes, consentType, privacyHref, termsOfUseHref, wirePaymentsDisclaimerText, debug, }) => {
+const PaymentView = ({ checkoutItems, taxes, savedPaymentMethods: rawSavedPaymentMethods, selectedPaymentMethod, checkoutError, onPaymentInfoSelected, onCvvSelected, onSavedPaymentMethodDeleted, onNext, onPrev, onClose, acceptedPaymentTypes, consentType, privacyHref, termsOfUseHref, wirePaymentsDisclaimerText, debug, }) => {
     const { billingInfo: selectedBillingInfo, paymentInfo: selectedPaymentInfo, } = selectedPaymentMethod;
     const savedPaymentMethods = useMemo(() => {
         if (typeof selectedBillingInfo !== "string")
@@ -71,7 +71,7 @@ const PaymentView = ({ checkoutItems, savedPaymentMethods: rawSavedPaymentMethod
             React__default.createElement(BillingInfoItem, { data: selectedPaymentMethodBillingInfo, additionalProps: { onEdit: onPrev, disabled: isDeleting, boxProps: billingInfoItemBoxProps } }),
             React__default.createElement(Divider, { sx: { mt: 2.5 } }),
             showSaved ? (React__default.createElement(SavedPaymentDetailsSelector, { showLoader: isDeleting, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethodId: typeof selectedPaymentInfo === "string" ? selectedPaymentInfo : undefined, onNew: handleShowForm, onDelete: handleSavedPaymentMethodDeleted, onPick: onPaymentInfoSelected, onCvvSelected: onCvvSelected, onNext: onNext, onClose: onClose, consentType: consentType, privacyHref: privacyHref, termsOfUseHref: termsOfUseHref })) : (React__default.createElement(PaymentMethodForm, { acceptedPaymentTypes: acceptedPaymentTypes, defaultValues: typeof selectedPaymentInfo === "string" ? undefined : selectedPaymentInfo, checkoutError: checkoutError, onPlaidLinkClicked: onPlaidLinkClicked, onSaved: savedPaymentMethods.length > 0 ? handleShowSaved : undefined, onClose: onClose, onSubmit: handleSubmit, consentType: consentType, privacyHref: privacyHref, termsOfUseHref: termsOfUseHref, wirePaymentsDisclaimerText: wirePaymentsDisclaimerText, debug: debug }))),
-        React__default.createElement(CheckoutItemCostBreakdown, { checkoutItems: checkoutItems })));
+        React__default.createElement(CheckoutItemCostBreakdown, { checkoutItems: checkoutItems, taxes: taxes })));
 };
 
 export { PaymentView };

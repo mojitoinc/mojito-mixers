@@ -19,9 +19,10 @@ function useCheckoutModalState({ invoiceID: initialInvoiceID = null, productConf
         paymentInfo: "",
         cvv: "",
     });
-    const [{ invoiceID, paymentReferenceNumber, }, setPurchaseState] = React.useState({
+    const [{ invoiceID, paymentReferenceNumber, taxes, }, setPurchaseState] = React.useState({
         invoiceID: initialInvoiceID || null,
         paymentReferenceNumber: "",
+        taxes: { status: "incomplete" },
     });
     const initModalState = React.useCallback(() => {
         // Make sure the progress tracker in BillingView and PaymentView is properly animated:
@@ -48,6 +49,7 @@ function useCheckoutModalState({ invoiceID: initialInvoiceID = null, productConf
         setPurchaseState({
             invoiceID: savedFlow.invoiceID || "",
             paymentReferenceNumber: savedFlow.paymentReferenceNumber || "",
+            taxes: { status: "incomplete" },
         });
     }, [startAt]);
     const goBack = React.useCallback(() => {
@@ -96,10 +98,13 @@ function useCheckoutModalState({ invoiceID: initialInvoiceID = null, productConf
         }));
     }, []);
     const setInvoiceID = React.useCallback((invoiceID) => {
-        setPurchaseState({ invoiceID, paymentReferenceNumber: "" });
+        setPurchaseState(({ taxes }) => ({ invoiceID, paymentReferenceNumber: "", taxes }));
     }, []);
     const setPaymentReferenceNumber = React.useCallback((paymentReferenceNumber) => {
-        setPurchaseState(({ invoiceID }) => ({ invoiceID, paymentReferenceNumber }));
+        setPurchaseState(({ invoiceID, taxes }) => ({ invoiceID, paymentReferenceNumber, taxes }));
+    }, []);
+    const setTaxes = React.useCallback((taxes) => {
+        setPurchaseState(({ invoiceID, paymentReferenceNumber }) => ({ invoiceID, paymentReferenceNumber, taxes }));
     }, []);
     return {
         // CheckoutModalState:
@@ -120,6 +125,8 @@ function useCheckoutModalState({ invoiceID: initialInvoiceID = null, productConf
         paymentReferenceNumber,
         setInvoiceID,
         setPaymentReferenceNumber,
+        taxes,
+        setTaxes,
     };
 }
 

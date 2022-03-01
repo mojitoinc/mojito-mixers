@@ -43,7 +43,9 @@ const CheckoutItemList = ({ sx = {}, checkoutItems, withSeparators = false, show
                     mt: "auto",
                     pt: 0.5,
                 } },
-                React__default["default"].createElement(material.Typography, { sx: { fontWeight: "500" } }, units),
+                React__default["default"].createElement(material.Typography, null,
+                    "Quantity: ",
+                    React__default["default"].createElement(material.Box, { component: "span", sx: { fontWeight: 500 } }, units)),
                 showPrices && React__default["default"].createElement(material.Typography, null,
                     React__default["default"].createElement(Number.Number, { suffix: " USD" }, unitPrice))))))))));
 

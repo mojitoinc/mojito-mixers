@@ -7,11 +7,14 @@ var typescriptUtils = require('../utils/typescriptUtils.js');
 
 const useCheckoutItemsCostTotal = (checkoutItems) => {
     return React.useMemo(() => {
-        return checkoutItems.reduce((result, checkoutItem) => {
-            result.total += checkoutItem.unitPrice * checkoutItem.units;
+        const reduceResult = checkoutItems.reduce((result, checkoutItem) => {
+            // result.total += checkoutItem.unitPrice * checkoutItem.units;
+            result.total += checkoutItem.totalPrice;
             result.fees += checkoutItem.fee;
+            result.taxAmount += checkoutItem.taxes;
             return result;
-        }, typescriptUtils.to({ total: 0, fees: 0 }));
+        }, typescriptUtils.to({ total: 0, fees: 0, taxAmount: 0 }));
+        return Object.assign(Object.assign({}, reduceResult), { taxRate: 100 * reduceResult.taxAmount / reduceResult.total });
     }, [checkoutItems]);
 };
 
