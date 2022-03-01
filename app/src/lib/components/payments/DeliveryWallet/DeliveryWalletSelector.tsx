@@ -10,10 +10,8 @@ import { ChangeEvent, useCallback } from "react";
 
 export interface DeliveryWalletSelectorProps {
   validatePersonalAddress: boolean;
-  personalWalletAddress: string;
-  usePersonalWallet: boolean;
-  onWalletAddressChange: (walletAddress: string) => void;
-  onUsePersonalWalletChange: (state: boolean) => void
+  walletAddress: string | null;
+  onWalletAddressChange: (walletAddress: string | null) => void;
 }
 
 const WALLET_ADDRESS_FIELD_LABEL = "Wallet Address";
@@ -21,22 +19,20 @@ const INVALID_WALLET_ADDRESS_MESSAGE = withInvalidErrorMessage({ label: WALLET_A
 
 export const DeliveryWalletSelector: React.FC<DeliveryWalletSelectorProps> = ({
   validatePersonalAddress,
-  personalWalletAddress,
-  usePersonalWallet,
-  onUsePersonalWalletChange,
+  walletAddress,
   onWalletAddressChange,
 }) => {
 
-  const onCheckChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-    onUsePersonalWalletChange(e.target.checked);
-    onWalletAddressChange("");
-  }, [onUsePersonalWalletChange, onWalletAddressChange])
+  const handleCheckboxChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+    onWalletAddressChange(e.target.checked ? "" : null);
+  }, [onWalletAddressChange])
 
-  const handleWalletAddressChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    if (usePersonalWallet) onWalletAddressChange(e.target.value);
-  }, [usePersonalWallet, onWalletAddressChange]);
+  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    onWalletAddressChange(e.target.value);
+  }, [onWalletAddressChange]);
 
-  const isAddressOk = !usePersonalWallet || isValidWalletAddress(personalWalletAddress);
+  const usePersonalWallet = typeof walletAddress === "string";
+  const isAddressOk = isValidWalletAddress(walletAddress);
   const showAddressError = validatePersonalAddress && !isAddressOk;
 
   return (<>
@@ -54,7 +50,7 @@ export const DeliveryWalletSelector: React.FC<DeliveryWalletSelectorProps> = ({
 
     <Checkbox
       label="I would like to deliver to a personal wallet"
-      onChange={ onCheckChange }
+      onChange={ handleCheckboxChange }
       checked={ usePersonalWallet }
       sx={{ mb: "-13px" }} />
 
@@ -70,8 +66,8 @@ export const DeliveryWalletSelector: React.FC<DeliveryWalletSelectorProps> = ({
       <TextField
         margin="none"
         label={ WALLET_ADDRESS_FIELD_LABEL }
-        onChange={ handleWalletAddressChange }
-        value={ personalWalletAddress }
+        onChange={ handleInputChange }
+        value={ walletAddress }
         error={ showAddressError }
         helperText={ showAddressError && INVALID_WALLET_ADDRESS_MESSAGE } />
     </>) }

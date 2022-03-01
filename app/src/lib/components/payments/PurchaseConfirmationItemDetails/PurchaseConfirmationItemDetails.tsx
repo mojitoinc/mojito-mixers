@@ -13,8 +13,6 @@ export const PurchaseConfirmationItemDetails: React.FC<PurchaseConfirmationItemD
   checkoutItems,
   purchaseInstructions,
 }) => {
-  const checkoutItem = checkoutItems[0];
-
   return (
     <Stack sx={{ display: "flex", flex: 1, pt: 2.5 }}>
       <Typography variant="body2">You purchased</Typography>

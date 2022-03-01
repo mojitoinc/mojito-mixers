@@ -29,14 +29,12 @@ export interface PaymentViewProps {
   taxes: TaxesState;
   savedPaymentMethods: SavedPaymentMethod[];
   selectedPaymentMethod: SelectedPaymentMethod;
-  personalWalletAddressForDelivery: string;
+  walletAddress: string | null;
   checkoutError?: CheckoutModalError;
   onPaymentInfoSelected: (data: string | PaymentMethod) => void;
   onCvvSelected: (cvv: string) => void;
   onSavedPaymentMethodDeleted: (savedPaymentMethodId: string) => void;
-  onPersonalWalletDeliveryAddressChange: (personalWalletAddress: string) => void;
-  usePersonalWallet: boolean;
-  onUsePersonalWalletChange: (state: boolean) => void;
+  onWalletAddressChange: (walletAddress: string | null) => void;
   onNext: () => void;
   onPrev: () => void;
   onClose: () => void;
@@ -53,14 +51,12 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
   taxes,
   savedPaymentMethods: rawSavedPaymentMethods,
   selectedPaymentMethod,
-  personalWalletAddressForDelivery,
+  walletAddress,
   checkoutError,
   onPaymentInfoSelected,
   onCvvSelected,
   onSavedPaymentMethodDeleted,
-  onPersonalWalletDeliveryAddressChange,
-  onUsePersonalWalletChange,
-  usePersonalWallet,
+  onWalletAddressChange,
   onNext,
   onPrev,
   onClose,
@@ -118,10 +114,7 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
     setViewState({ isDeleting: false, showSaved: remainingPaymentMethods > 0 });
   }, [onSavedPaymentMethodDeleted, savedPaymentMethods.length]);
 
-  const handleFormAttemptSubmit = useCallback(
-    () => setFormSubmitAttempted(true),
-    []
-  );
+  const handleFormAttemptSubmit = useCallback(() => setFormSubmitAttempted(true), []);
 
   useEffect(() => {
     if (!selectedPaymentMethodBillingInfo) onPrev();
@@ -196,14 +189,11 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
       </Stack>
 
       <CheckoutDeliveryAndItemCostBreakdown
-        checkoutItems={checkoutItems}
+        checkoutItems={ checkoutItems }
         taxes={ taxes }
-        validatePersonalDeliveryAddress={formSubmitAttempted}
-        personalWalletAddressForDelivery={personalWalletAddressForDelivery}
-        onPersonalWalletAddressChange={onPersonalWalletDeliveryAddressChange}
-        onUsePersonalWalletChange={onUsePersonalWalletChange}
-        usePersonalWallet={usePersonalWallet}
-      />
+        validatePersonalDeliveryAddress={ formSubmitAttempted }
+        walletAddress={ walletAddress }
+        onWalletAddressChange={ onWalletAddressChange } />
     </Stack>
   );
 };
