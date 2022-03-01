@@ -428,12 +428,12 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
 
   if ((isDialogInitializing || isPlaidFlowLoading) && (checkoutStep !== "error")) {
     return (<>
-      {isPlaidFlowLoading && <PlaidFlow onSubmit={ handlePlaidFlowCompleted} /> }
+      { isPlaidFlowLoading && <PlaidFlow onSubmit={ handlePlaidFlowCompleted } /> }
 
       <Backdrop
         open={ open }
-        onClick={ handleClose}>
-        {loaderImageSrc ? (
+        onClick={ handleClose }>
+        { loaderImageSrc ? (
           <Box
             component="img"
             src={ loaderImageSrc }
@@ -442,7 +442,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
               height: 196,
               mx: "auto",
               mt: 5,
-            }} />
+            } } />
         ) : (
           <CircularProgress color="primary" />
         ) }
@@ -465,7 +465,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
         errorImageSrc={ errorImageSrc }
         onFixError={ handleFixError }
         onClose={ handleClose }
-        debug={ debug} />
+        debug={ debug } />
     );
   } else if (checkoutStep === "authentication") {
     if (!isAuthenticated) headerVariant = 'anonymous';
@@ -528,7 +528,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
         onPurchaseSuccess={ handlePurchaseSuccess }
         onPurchaseError={ handlePurchaseError }
         onDialogBlocked={ setIsDialogBlocked }
-        debug={ debug} />
+        debug={ debug } />
     );
   } else if (checkoutStep === "confirmation") {
     headerVariant = "logoOnly";
@@ -540,7 +540,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
         selectedPaymentMethod={ selectedPaymentMethod }
         paymentReferenceNumber={ paymentReferenceNumber }
         purchaseInstructions={ customTexts.purchaseInstructions }
-        onNext={ handleClose} />
+        onNext={ handleClose } />
     );
   } else {
     // !checkoutStep or
@@ -559,7 +559,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
       user={ meData?.me?.user }
       userFormat={ userFormat }
       onLoginClicked={ onLogin }
-      onPrevClicked={ checkoutStep === "authentication" ? handleClose : goBack} />
+      onPrevClicked={ checkoutStep === "authentication" ? handleClose : goBack } />
   );
 
   return (
@@ -570,7 +570,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
       isDialogBlocked={ isDialogBlocked }
       contentKey={ checkoutStep }
       header={ headerElement }
-      children={ checkoutStepElement} />
+      children={ checkoutStepElement } />
   );
  }
 
