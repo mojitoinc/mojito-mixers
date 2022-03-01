@@ -28,7 +28,7 @@ const MOJITO_LIGHT_PALETTE: PaletteOptions = {
   },
   info: {
     main: "#0A96B4",
-    light: "#55E0FF",
+    light: "#55E0FF66",
   },
   success: {
     main: "#31A136",
