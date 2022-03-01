@@ -24,23 +24,25 @@ import { FormErrorsBox } from "../components/shared/FormErrorsBox/FormErrorsBox"
 const FULL_NAME_FIELD = "fullName";
 const EMAIL_FIELD = "email";
 const PHONE_FIELD = "phone";
+
 const STREET_FIELD = "street";
 const APARTMENT_FIELD = "apartment";
-const COUNTRY_FIELD = "country";
+const ZIP_CODE_FIELD = "zipCode";
 const CITY_FIELD = "city";
 const STATE_FIELD = "state";
-const ZIP_CODE_FIELD = "zipCode";
+const COUNTRY_FIELD = "country";
 
 export type BillingInfo = {
-  [APARTMENT_FIELD]: string;
-  [CITY_FIELD]: string;
-  [COUNTRY_FIELD]: SelectOption;
-  [EMAIL_FIELD]: string;
   [FULL_NAME_FIELD]: string;
+  [EMAIL_FIELD]: string;
   [PHONE_FIELD]: string;
-  [STATE_FIELD]: SelectOption;
+
   [STREET_FIELD]: string;
+  [APARTMENT_FIELD]: string;
   [ZIP_CODE_FIELD]: string;
+  [CITY_FIELD]: string;
+  [STATE_FIELD]: SelectOption;
+  [COUNTRY_FIELD]: SelectOption;
 };
 
 export type TaxInfo = Omit<BillingInfo, "fullName" | "email" | "phone" | "apartment">
@@ -49,12 +51,13 @@ const FIELD_LABELS = {
   [FULL_NAME_FIELD]: "Full Name",
   [EMAIL_FIELD]: "Email",
   [PHONE_FIELD]: "Phone",
+
   [STREET_FIELD]: "Street",
   [APARTMENT_FIELD]: "Apartment, Suite, etc. (optional)",
-  [COUNTRY_FIELD]: "Country",
+  [ZIP_CODE_FIELD]: "Zip Code",
   [CITY_FIELD]: "City",
   [STATE_FIELD]: "State",
-  [ZIP_CODE_FIELD]: "Zip Code"
+  [COUNTRY_FIELD]: "Country",
 };
 
 const FIELD_NAMES = Object.keys(FIELD_LABELS);
@@ -63,12 +66,13 @@ const EMPTY_FORM_VALUES: BillingInfo = {
   [FULL_NAME_FIELD]: "",
   [EMAIL_FIELD]: "",
   [PHONE_FIELD]: "",
+
   [STREET_FIELD]: "",
   [APARTMENT_FIELD]: "",
-  [COUNTRY_FIELD]: EMPTY_OPTION,
+  [ZIP_CODE_FIELD]: "",
   [CITY_FIELD]: "",
   [STATE_FIELD]: EMPTY_OPTION,
-  [ZIP_CODE_FIELD]: ""
+  [COUNTRY_FIELD]: EMPTY_OPTION,
 };
 
 // export type BillingInfoFormVariant = "guest" | "loggedIn";
@@ -88,12 +92,11 @@ const schema = object()
     [STREET_FIELD]: string()
       .label(FIELD_LABELS[STREET_FIELD])
       .required(withRequiredErrorMessage),
-    [APARTMENT_FIELD]: string().label(FIELD_LABELS[APARTMENT_FIELD]),
-    [COUNTRY_FIELD]: object().shape({
-      value: string()
-        .label(FIELD_LABELS[COUNTRY_FIELD])
-        .required(withRequiredErrorMessage)
-    }),
+    [APARTMENT_FIELD]: string()
+      .label(FIELD_LABELS[APARTMENT_FIELD]),
+    [ZIP_CODE_FIELD]: string()
+      .label(FIELD_LABELS[ZIP_CODE_FIELD])
+      .required(withRequiredErrorMessage),
     [CITY_FIELD]: string()
       .label(FIELD_LABELS[CITY_FIELD])
       .required(withRequiredErrorMessage),
@@ -101,12 +104,13 @@ const schema = object()
       value: string()
         .label(FIELD_LABELS[STATE_FIELD])
         .required(withRequiredErrorMessage)
-    }),
-    [ZIP_CODE_FIELD]: string()
-      .label(FIELD_LABELS[ZIP_CODE_FIELD])
-      .required(withRequiredErrorMessage)
-  })
-  .required();
+      }),
+    [COUNTRY_FIELD]: object().shape({
+      value: string()
+        .label(FIELD_LABELS[COUNTRY_FIELD])
+        .required(withRequiredErrorMessage)
+      }),
+  }).required();
 
 export interface BillingInfoFormProps {
   // variant: BillingInfoFormVariant;
@@ -135,7 +139,6 @@ export const BillingInfoForm: React.FC<BillingInfoFormProps> = ({
     control,
     handleSubmit,
     watch,
-    trigger,
     setError,
     formState,
   } = useForm<BillingInfo>({
@@ -147,23 +150,20 @@ export const BillingInfoForm: React.FC<BillingInfoFormProps> = ({
     resolver: yupResolver(schema),
   });
 
-  const [street, country, city, state, zip] = watch([STREET_FIELD, COUNTRY_FIELD, CITY_FIELD, STATE_FIELD, ZIP_CODE_FIELD]);
+  const [street, zip, city, state, country] = watch([STREET_FIELD, ZIP_CODE_FIELD, CITY_FIELD, STATE_FIELD, COUNTRY_FIELD]);
 
   useEffect(() => {
     onTaxInfoChange({
       [STREET_FIELD]: street,
-      [COUNTRY_FIELD]: country,
+      [ZIP_CODE_FIELD]: zip,
       [CITY_FIELD]: city,
       [STATE_FIELD]: state,
-      [ZIP_CODE_FIELD]: zip,
+      [COUNTRY_FIELD]: country,
     });
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [onTaxInfoChange, street, country.value, city, state.value, zip]);
+  }, [onTaxInfoChange, street, zip, city, state, country]);
 
   const taxesStatus = taxes.status;
-  const selectedCountryOption: SelectOption = watch(COUNTRY_FIELD);
-  const selectedCountryCode = selectedCountryOption?.value;
+  const selectedCountryCode = country?.value;
   const submitForm = handleSubmit(onSubmit);
   const checkoutErrorMessage = useFormCheckoutError({ formKey: "billing", checkoutError, fields: FIELD_NAMES, setError });
 

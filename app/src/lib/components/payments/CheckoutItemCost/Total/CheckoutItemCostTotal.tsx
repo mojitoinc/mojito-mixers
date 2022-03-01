@@ -18,6 +18,17 @@ const TAX_AMOUNT_PLACEHOLDER_SX: SxProps<Theme> = {
   margin: "0 2px 0 0",
 };
 
+const TOTAL_PLACEHOLDER_SX: SxProps<Theme> = {
+  background: theme => theme.palette.success.light,
+  borderRadius: "128px",
+  color: "transparent",
+  fontFamily: theme => theme.typography.subtitle1.fontFamily,
+  fontSize: "14px",
+  margin: "0 4px 0 0",
+  userSelect: "none",
+};
+
+
 export interface CheckoutItemCostTotalProps {
   total: number;
   taxes: TaxesState;
@@ -37,16 +48,20 @@ export const CheckoutItemCostTotal: React.FC<CheckoutItemCostTotalProps> = ({
 }) => {
   let taxRateElement: React.ReactNode = null;
   let taxAmountElement: React.ReactNode = null;
+  let totalElement: React.ReactNode = null;
 
   if (status === "loading") {
     taxRateElement = <Tooltip title="Calculating taxes..."><span>(<Box component="span" sx={ TAX_RATE_PLACEHOLDER_SX }>00.00</Box> %)</span></Tooltip>;
-    taxAmountElement = <Tooltip title="Calculating taxes..."><span><Box component="span" sx={ TAX_AMOUNT_PLACEHOLDER_SX }>{ `${ total * 0.10 | 0 }`.replace(/./, "0") }.00</Box> USD</span></Tooltip>;
+    taxAmountElement = <Tooltip title="Calculating taxes..."><span><Box component="span" sx={ TAX_AMOUNT_PLACEHOLDER_SX }>{ `${ (total + fees) * 0.10 | 0 }`.replace(/./, "0") }.00</Box> USD</span></Tooltip>;
+    totalElement = <Tooltip title="Calculating total..."><span><Box component="span" sx={ TOTAL_PLACEHOLDER_SX }>{ `${ (total + fees) * 1.10 | 0 }`.replace(/./, "0") }.00</Box> USD</span></Tooltip>;
   } else if (status === "complete" && taxAmount !== undefined ) {
     taxRateElement = `(${ formatTaxRate(taxRate) })`;
     taxAmountElement = <Number suffix=" USD">{taxAmount}</Number>;
+    totalElement = <Number suffix=" USD">{total + fees + taxAmount}</Number>
   } else {
-    taxRateElement = <Tooltip title="Enter a valid address to calculate taxes"><span>(- %)</span></Tooltip>;
-    taxAmountElement = <Tooltip title="Enter a valid address to calculate taxes"><span>- USD</span></Tooltip>;
+    taxRateElement = <Tooltip title="Enter a valid address to calculate the taxes"><span>(- %)</span></Tooltip>;
+    taxAmountElement = <Tooltip title="Enter a valid address to calculate the taxes"><span>- USD</span></Tooltip>;
+    totalElement = <Tooltip title="Enter a valid address to calculate the total"><span>- USD</span></Tooltip>;
   }
 
   return (
@@ -111,9 +126,8 @@ export const CheckoutItemCostTotal: React.FC<CheckoutItemCostTotalProps> = ({
           sx={{
             fontWeight: "500",
             color: "success.main",
-          }}
-        >
-          <Number suffix=" USD">{total + taxAmount + fees}</Number>
+          }}>
+          { totalElement }
         </Typography>
       </Box>
     </Box>
