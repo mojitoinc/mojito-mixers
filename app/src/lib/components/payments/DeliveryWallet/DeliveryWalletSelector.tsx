@@ -42,7 +42,7 @@ export const DeliveryWalletSelector: React.FC<DeliveryWalletSelectorProps> = ({
         Wallet Delivery Address
       </InputGroupLabel>
 
-      <DisplayBox sx={{ border: 0 }}>
+      <DisplayBox sx={{ border: 0, mb: 0.5 }}>
         <Typography>
           We will cover gas cost for minting and delivery on both MultiSig and
           personal wallets. Your items will be delivered to a MultiSig wallet by
@@ -52,11 +52,10 @@ export const DeliveryWalletSelector: React.FC<DeliveryWalletSelectorProps> = ({
 
       <Checkbox
         label="I would like to deliver to a personal wallet"
-        onChange={handleUsePersonalWalletChange}
-        checked={usePersonalWallet}
-      />
+        onChange={ handleUsePersonalWalletChange }
+        checked={ usePersonalWallet } />
 
-      {usePersonalWallet && (
+      { usePersonalWallet && (
         <>
           <Typography>
             Once minted, this is where your items will be delivered:
@@ -75,7 +74,7 @@ export const DeliveryWalletSelector: React.FC<DeliveryWalletSelectorProps> = ({
             helperText={showAddressError && INVALID_WALLET_ADDRESS_MESSAGE}
           />
         </>
-      )}
+      ) }
     </>
   );
 };
