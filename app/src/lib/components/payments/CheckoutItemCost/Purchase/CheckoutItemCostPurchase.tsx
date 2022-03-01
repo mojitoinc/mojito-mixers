@@ -15,6 +15,7 @@ export const CheckoutItemCostPurchase: React.FC<CheckoutItemCostPurchaseProps> =
   checkoutItems,
   selectedPaymentMethodBillingInfo,
 }) => {
+  const firstCheckoutItem = checkoutItems[0];
   const { total, fees, taxRate, taxAmount } = useCheckoutItemsCostTotal(checkoutItems);
 
   return (<>
@@ -23,8 +24,14 @@ export const CheckoutItemCostPurchase: React.FC<CheckoutItemCostPurchaseProps> =
       item
       direction="column"
       sx={{ display: "flex", pb: 2 }}>
+
       <BillingInfoFragment savedPaymentMethod={ selectedPaymentMethodBillingInfo } />
-      <CheckoutItemCostTotal total={ total } fees={ fees } taxes={ { status: "complete", taxRate, taxAmount } }  />
+
+      <CheckoutItemCostTotal
+        total={ total }
+        fees={ fees === 0 && firstCheckoutItem.lotType === "buyNow" ? null : fees }
+        taxes={ { status: "complete", taxRate, taxAmount } }  />
+
     </Grid>
 
     <Divider />

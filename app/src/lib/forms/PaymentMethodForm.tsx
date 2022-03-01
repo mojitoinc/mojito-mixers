@@ -248,6 +248,7 @@ export interface PaymentMethodFormProps {
   onSaved?: () => void;
   onClose: () => void;
   onSubmit: (data: PaymentMethod) => void;
+  onAttemptSubmit: () => void;
   consentType?: ConsentType;
   privacyHref?: string;
   termsOfUseHref?: string;
@@ -263,6 +264,7 @@ export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
   onSaved,
   onClose,
   onSubmit,
+  onAttemptSubmit,
   consentType,
   privacyHref,
   termsOfUseHref,
@@ -310,6 +312,8 @@ export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
   const handleFormSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
 
+    onAttemptSubmit();
+
     if (selectedPaymentMethod === "ACH") {
       const isFormValid = await trigger();
 
@@ -323,7 +327,7 @@ export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
     } else if (["CreditCard", "Wire"].includes(selectedPaymentMethod)) {
       submitForm(e);
     }
-  }, [selectedPaymentMethod, onPlaidLinkClicked, submitForm, trigger]);
+  }, [onAttemptSubmit, selectedPaymentMethod, onPlaidLinkClicked, submitForm, trigger]);
 
   return (
     <form onSubmit={ handleFormSubmit }>

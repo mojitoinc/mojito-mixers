@@ -288,6 +288,7 @@ The `PaymentView`, `PurchasingView` and `ErrorView` default images are loaded di
 or forcing users to include them in their repos and add the necessary build setup to load them. They should just work out
 of the box, no setup required.
 
+
 **`PaymentView`'s default image:**
 
 <p>
@@ -299,6 +300,7 @@ of the box, no setup required.
     > Repo: https://github.com/mojitoinc/mojito-mixers/blob/main/app/src/lib/assets/circle.png
 
     > CDN URL: https://raw.githubusercontent.com/mojitoinc/mojito-mixers/main/app/src/lib/assets/circle.png
+
 
 **`PurchaseView`'s default image:**
 

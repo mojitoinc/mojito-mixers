@@ -29,6 +29,7 @@ export interface SavedPaymentDetailsSelectorProps {
   onCvvSelected: (cvv: string) => void;
   onNext: () => void;
   onClose: () => void;
+  onAttemptSubmit: () => void;
   consentType?: ConsentType;
   privacyHref?: string;
   termsOfUseHref?: string;
@@ -44,6 +45,7 @@ export const SavedPaymentDetailsSelector: React.FC<SavedPaymentDetailsSelectorPr
   onCvvSelected,
   onNext,
   onClose,
+  onAttemptSubmit,
   consentType,
   privacyHref,
   termsOfUseHref,
@@ -71,6 +73,8 @@ export const SavedPaymentDetailsSelector: React.FC<SavedPaymentDetailsSelectorPr
   const cvvError = isFormSubmitted && !isCvvOk;
 
   const handleNextClicked = useCallback((canSubmit: boolean) => {
+    onAttemptSubmit();
+
     if (canSubmit && selectedPaymentMethodId && isCvvOk) {
       onCvvSelected(cvv);
       onNext();
@@ -79,7 +83,7 @@ export const SavedPaymentDetailsSelector: React.FC<SavedPaymentDetailsSelectorPr
     }
 
     setSelectorState(({ cvv }) => ({ isFormSubmitted: true, cvv }));
-  }, [selectedPaymentMethodId, cvv, isCvvOk, onCvvSelected, onNext]);
+  }, [onAttemptSubmit, selectedPaymentMethodId, cvv, isCvvOk, onCvvSelected, onNext]);
 
   const handleCvvChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const cvv = e.currentTarget.value || "";

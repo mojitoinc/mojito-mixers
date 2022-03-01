@@ -23,6 +23,7 @@ export interface SavedBillingDetailsSelectorProps {
   onPick: (billingInfoId: string) => void;
   onNext: () => void;
   onClose: () => void;
+  onAttemptSubmit: () => void;
 }
 
 export const SavedBillingDetailsSelector: React.FC<SavedBillingDetailsSelectorProps> = ({
@@ -36,8 +37,14 @@ export const SavedBillingDetailsSelector: React.FC<SavedBillingDetailsSelectorPr
   onPick,
   onNext,
   onClose,
+  onAttemptSubmit,
 }) => {
   const getPaymentMethodAddressId = useCallback((savedPaymentMethod: SavedPaymentMethod) => savedPaymentMethod.addressId, []);
+
+  const handleNextClicked = useCallback(() => {
+    onAttemptSubmit();
+    onNext();
+  }, [onAttemptSubmit, onNext]);
 
   return (<>
     <Box sx={{ position: "relative" }}>
@@ -83,7 +90,7 @@ export const SavedBillingDetailsSelector: React.FC<SavedBillingDetailsSelectorPr
       variant="toPayment"
       buttonLabel={ taxes.status === "loading" ? "Calculating taxes..." : undefined }
       submitDisabled={ taxes.status !== "complete" }
-      onSubmitClicked={ onNext }
+      onSubmitClicked={ handleNextClicked }
       onCloseClicked={ onClose } />
   </>);
 }

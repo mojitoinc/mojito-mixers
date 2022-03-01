@@ -1,6 +1,6 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { CheckoutItemCostBreakdown } from "../../components/payments/CheckoutItemCost/Breakdown/CheckoutItemCostBreakdown";
+import { CheckoutDeliveryAndItemCostBreakdown } from "../../components/payments/CheckoutDeliveryAndItemCostBreakdown/CheckoutDeliveryAndItemCostBreakdown";
 import { CheckoutStepper } from "../../components/payments/CheckoutStepper/CheckoutStepper";
 import { CheckoutItem } from "../../domain/product/product.interfaces";
 import React from "react";
@@ -29,10 +29,12 @@ export interface PaymentViewProps {
   taxes: TaxesState;
   savedPaymentMethods: SavedPaymentMethod[];
   selectedPaymentMethod: SelectedPaymentMethod;
+  walletAddress: string | null;
   checkoutError?: CheckoutModalError;
   onPaymentInfoSelected: (data: string | PaymentMethod) => void;
   onCvvSelected: (cvv: string) => void;
   onSavedPaymentMethodDeleted: (savedPaymentMethodId: string) => void;
+  onWalletAddressChange: (walletAddress: string | null) => void;
   onNext: () => void;
   onPrev: () => void;
   onClose: () => void;
@@ -49,10 +51,12 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
   taxes,
   savedPaymentMethods: rawSavedPaymentMethods,
   selectedPaymentMethod,
+  walletAddress,
   checkoutError,
   onPaymentInfoSelected,
   onCvvSelected,
   onSavedPaymentMethodDeleted,
+  onWalletAddressChange,
   onNext,
   onPrev,
   onClose,
@@ -85,6 +89,8 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
     showSaved: savedPaymentMethods.length > 0 && typeof selectedBillingInfo === "string" && !checkNeedsGenericErrorMessage("payment", checkoutError),
   });
 
+  const [formSubmitAttempted, setFormSubmitAttempted] = useState(false);
+
   const handleShowForm = useCallback(() => {
     setViewState({ isDeleting: false, showSaved: false });
   }, []);
@@ -107,6 +113,8 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
 
     setViewState({ isDeleting: false, showSaved: remainingPaymentMethods > 0 });
   }, [onSavedPaymentMethodDeleted, savedPaymentMethods.length]);
+
+  const handleFormAttemptSubmit = useCallback(() => setFormSubmitAttempted(true), []);
 
   useEffect(() => {
     if (!selectedPaymentMethodBillingInfo) onPrev();
@@ -158,6 +166,7 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
             onCvvSelected={ onCvvSelected }
             onNext={ onNext }
             onClose={ onClose }
+            onAttemptSubmit={ handleFormAttemptSubmit }
             consentType={ consentType }
             privacyHref={ privacyHref }
             termsOfUseHref={ termsOfUseHref } />
@@ -170,6 +179,7 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
             onSaved={ savedPaymentMethods.length > 0 ? handleShowSaved : undefined }
             onClose={ onClose }
             onSubmit={ handleSubmit }
+            onAttemptSubmit={ handleFormAttemptSubmit }
             consentType={ consentType }
             privacyHref={ privacyHref }
             termsOfUseHref={ termsOfUseHref }
@@ -177,7 +187,13 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
             debug={ debug } />
         ) }
       </Stack>
-      <CheckoutItemCostBreakdown checkoutItems={ checkoutItems } taxes={ taxes } />
+
+      <CheckoutDeliveryAndItemCostBreakdown
+        checkoutItems={ checkoutItems }
+        taxes={ taxes }
+        validatePersonalDeliveryAddress={ formSubmitAttempted }
+        walletAddress={ walletAddress }
+        onWalletAddressChange={ onWalletAddressChange } />
     </Stack>
   );
 };

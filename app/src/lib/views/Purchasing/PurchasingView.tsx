@@ -93,7 +93,7 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
       return;
     }
 
-    if (isCreditCardPayment) {
+    if (isCreditCardPayment && window.location.hostname !== "localhost") {
       if (!redirectURL || checkoutInfoPersistedRef.current) return;
 
       checkoutInfoPersistedRef.current = true;

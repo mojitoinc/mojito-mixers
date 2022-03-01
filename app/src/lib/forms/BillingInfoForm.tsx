@@ -3,7 +3,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { object, string } from "yup";
 
 import Grid from "@mui/material/Grid";
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect } from "react";
 import { ControlledCountrySelector } from "../components/shared/Select/CountrySelector/CountrySelector";
 import { ControlledStateSelector } from "../components/shared/Select/StateSelector/StateSelector";
 import { CheckoutModalFooter } from "../components/payments/CheckoutModalFooter/CheckoutModalFooter";
@@ -121,6 +121,7 @@ export interface BillingInfoFormProps {
   onSaved?: () => void;
   onClose: () => void;
   onSubmit: (data: BillingInfo) => void;
+  onAttemptSubmit: () => void;
   debug?: boolean;
 }
 
@@ -133,6 +134,7 @@ export const BillingInfoForm: React.FC<BillingInfoFormProps> = ({
   onSaved,
   onClose,
   onSubmit,
+  onAttemptSubmit,
   debug
 }) => {
   const {
@@ -167,8 +169,13 @@ export const BillingInfoForm: React.FC<BillingInfoFormProps> = ({
   const submitForm = handleSubmit(onSubmit);
   const checkoutErrorMessage = useFormCheckoutError({ formKey: "billing", checkoutError, fields: FIELD_NAMES, setError });
 
+  const handleFormSubmit = useCallback(async (e: React.FormEvent) => {
+    onAttemptSubmit();
+    submitForm(e);
+  }, [onAttemptSubmit, submitForm]);
+
   return (
-    <form onSubmit={ submitForm }>
+    <form onSubmit={handleFormSubmit}>
       {onSaved && (
         <Box sx={{ my: 2.5 }}>
           <SecondaryButton onClick={onSaved} startIcon={<BookIcon />}>

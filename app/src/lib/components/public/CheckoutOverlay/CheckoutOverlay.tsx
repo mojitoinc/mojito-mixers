@@ -44,7 +44,7 @@ export interface PUICheckoutOverlayProps {
   userFormat: UserFormat;
   acceptedPaymentTypes: PaymentType[];
   paymentLimits?: Partial<Record<PaymentType, number>>;
-  customTexts: Record<CustomTextsKeys, React.ReactFragment[]>,
+  customTexts: Record<CustomTextsKeys, (string | React.ReactFragment)[]>,
 
   // Legal:
   consentType?: ConsentType;
@@ -150,11 +150,13 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
 
     // PurchaseState:
     invoiceID,
-    paymentReferenceNumber,
     setInvoiceID,
-    setPaymentReferenceNumber,
     taxes,
     setTaxes,
+    walletAddress,
+    setWalletAddress,
+    paymentReferenceNumber,
+    setPaymentReferenceNumber,
   } = useCheckoutModalState({
     invoiceID: initialInvoiceID,
     productConfirmationEnabled,
@@ -485,10 +487,12 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
         checkoutItems={ checkoutItems }
         savedPaymentMethods={ savedPaymentMethods }
         selectedBillingInfo={ selectedPaymentMethod.billingInfo }
+        walletAddress={ walletAddress }
         checkoutError={ checkoutError }
         onBillingInfoSelected={ handleBillingInfoSelected }
         onTaxesChange={ setTaxes }
         onSavedPaymentMethodDeleted={ handleSavedPaymentMethodDeleted }
+        onWalletAddressChange={ setWalletAddress }
         onNext={ goNext }
         onClose={ handleClose }
         debug={ debug } />
@@ -500,10 +504,12 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
         taxes={ taxes }
         savedPaymentMethods={ savedPaymentMethods }
         selectedPaymentMethod={ selectedPaymentMethod }
+        walletAddress={ walletAddress }
         checkoutError={ checkoutError }
         onPaymentInfoSelected={ handlePaymentInfoSelected }
         onCvvSelected={ handleCvvSelected }
         onSavedPaymentMethodDeleted={ handleSavedPaymentMethodDeleted }
+        onWalletAddressChange={ setWalletAddress }
         onNext={ goNext }
         onPrev={ goBack }
         onClose={ handleClose }
