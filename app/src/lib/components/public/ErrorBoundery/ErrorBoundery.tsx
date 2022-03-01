@@ -1,4 +1,4 @@
-import { Component, ErrorInfo, ReactNode } from "react";
+import React, { Component, ErrorInfo, ReactNode } from "react";
 
 interface Props {
     children: ReactNode;
@@ -11,7 +11,7 @@ interface State {
 
 class ErrorBoundary extends Component<Props, State>{
 
-    constructor(props:Props) {
+    constructor(props: Props) {
         super(props)
 
         // Define a state variable to track whether is an error or not
