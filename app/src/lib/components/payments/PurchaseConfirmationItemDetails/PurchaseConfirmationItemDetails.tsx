@@ -21,10 +21,10 @@ export const PurchaseConfirmationItemDetails: React.FC<PurchaseConfirmationItemD
 
       <CheckoutItemList sx={{ mt: 3 }} checkoutItems={ checkoutItems } />
 
-      <Typography sx={{ mt: 6 }}>{ checkoutItem.name }</Typography>
-      <Typography sx={{ mt: 0.5 }}>{ checkoutItem.description }</Typography>
+      <Typography sx={{ mt: 6 }}>Purchase confirmed!</Typography>
+
       { purchaseInstructions.map((instructionsLine, i) => (
-        <Typography key={ i } sx={{ mt: 0.5 }}>{ instructionsLine }</Typography>
+        <Typography key={ i } sx={{ mt: 1 }}>{ instructionsLine }</Typography>
       )) }
     </Stack>
   );

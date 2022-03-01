@@ -15,18 +15,23 @@ export const CheckoutItemCostBreakdown: React.FC<CheckoutItemCostBreakdownProps>
   checkoutItems,
   taxes,
 }) => {
+  const firstCheckoutItem = checkoutItems[0];
   const { total, fees } = useCheckoutItemsCostTotal(checkoutItems);
 
   return (
     <Stack sx={{ display: "flex", flex: 1 }}>
       <CheckoutItemList
-        checkoutItems={checkoutItems}
+        checkoutItems={ checkoutItems }
         withSeparators
         showPrices />
 
       <Divider sx={{ mt: 3.75, mb: 1.5 }} />
 
-      <CheckoutItemCostTotal withDetails total={ total } fees={ fees } taxes={ taxes } />
+      <CheckoutItemCostTotal
+        withDetails
+        total={ total }
+        fees={ fees === 0 && firstCheckoutItem.lotType === "buyNow" ? null : fees }
+        taxes={ taxes } />
     </Stack>
   );
 };

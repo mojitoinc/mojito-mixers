@@ -6,7 +6,7 @@ import { SM_BORDER_RADIUS } from "../../../config/theme/theme";
 
 export const ReadOnlyField: React.FC<TextFieldProps> = styled((props) => (
   <TextField variant="standard" disabled { ...props } />
-))(({ theme: { palette } }) => ({
+))(({ theme: { palette, typography } }) => ({
   "& .MuiInputLabel-root": {
     "&.Mui-disabled": {
       color: palette.text.primary,
@@ -15,7 +15,6 @@ export const ReadOnlyField: React.FC<TextFieldProps> = styled((props) => (
   "& .MuiInputBase-root": {
     "&.Mui-disabled": {
       background: palette.grey[50],
-      color: palette.text.primary,
       padding: 8,
       height: "40px",
       borderRadius: SM_BORDER_RADIUS,
@@ -24,6 +23,7 @@ export const ReadOnlyField: React.FC<TextFieldProps> = styled((props) => (
   },
   "& .MuiInputBase-input": {
     "&.Mui-disabled": {
+      ...typography.body1,
       color: palette.text.primary,
       WebkitTextFillColor: palette.text.primary,
       fontSize: "12px",
@@ -35,7 +35,7 @@ export const ReadOnlyField: React.FC<TextFieldProps> = styled((props) => (
 
 export const ReadOnlyCardField: React.FC<TextFieldProps> = styled((props) => (
   <CardNumberField variant="standard" disabled { ...props } />
-))(({ theme: { palette } }) => ({
+))(({ theme: { palette, typography } }) => ({
   "& .MuiInputLabel-root": {
     "&.Mui-disabled": {
       color: palette.text.primary,
@@ -44,7 +44,6 @@ export const ReadOnlyCardField: React.FC<TextFieldProps> = styled((props) => (
   "& .MuiInputBase-root": {
     "&.Mui-disabled": {
       background: palette.grey[50],
-      color: palette.text.primary,
       padding: 8,
       height: "40px",
       borderRadius: SM_BORDER_RADIUS,
@@ -53,6 +52,7 @@ export const ReadOnlyCardField: React.FC<TextFieldProps> = styled((props) => (
   },
   "& .MuiInputBase-input": {
     "&.Mui-disabled": {
+      ...typography.body1,
       color: palette.text.primary,
       WebkitTextFillColor: palette.text.primary,
       fontSize: "12px",
@@ -63,7 +63,7 @@ export const ReadOnlyCardField: React.FC<TextFieldProps> = styled((props) => (
 
 export const ReadOnlyWalletAddress: React.FC<TextFieldProps> = styled((props) => (
   <TextField variant="standard" disabled { ...props } />
-))(({ theme: { palette } }) => ({
+))(({ theme: { palette, typography } }) => ({
   "& .MuiInputLabel-root": {
     "&.Mui-disabled": {
       color: palette.text.primary,
@@ -72,7 +72,6 @@ export const ReadOnlyWalletAddress: React.FC<TextFieldProps> = styled((props) =>
   "& .MuiInputBase-root": {
     "&.Mui-disabled": {
       background: palette.grey[50],
-      color: palette.text.primary,
       padding: 8,
       height: "60px",
       borderRadius: SM_BORDER_RADIUS,
@@ -80,6 +79,7 @@ export const ReadOnlyWalletAddress: React.FC<TextFieldProps> = styled((props) =>
   },
   "& .MuiInputBase-input": {
     "&.Mui-disabled": {
+      ...typography.body2,
       color: palette.text.primary,
       WebkitTextFillColor: palette.text.primary,
       fontSize: "12px",

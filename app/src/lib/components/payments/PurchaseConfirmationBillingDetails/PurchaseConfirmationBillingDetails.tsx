@@ -10,6 +10,7 @@ import { PAYMENT_TYPE_LABEL } from "./PurchaseConfirmationBillingDetails.constan
 import { getFormattedPaymentMethod } from "./PurchaseConfirmationBillingDetails.utils";
 import CheckIcon from "@mui/icons-material/Check";
 import DeliveryWalletDetails from "../DeliveryWallet/DeliveryWalletDetails";
+import { CopyButton } from "../../shared/CopyButton/CopyButton";
 
 export interface PurchaseConfirmationBillingDetailsProps {
   checkoutItems: CheckoutItem[];
@@ -71,7 +72,6 @@ export const PurchaseConfirmationBillingDetails: React.FC<PurchaseConfirmationBi
           <ReadOnlyField
             label={ PAYMENT_TYPE_LABEL[paymentType] }
             value={ displayValue }
-            size="medium"
             InputProps={ icon ? {
               endAdornment: (
                 <InputAdornment position="end">
@@ -87,7 +87,15 @@ export const PurchaseConfirmationBillingDetails: React.FC<PurchaseConfirmationBi
 
         <ReadOnlyField
           label="Reference No."
-          value={ paymentReferenceNumber || "-" } />
+          value={ paymentReferenceNumber || "-" }
+          InputProps={ paymentReferenceNumber ? {
+            endAdornment: (
+              <CopyButton
+                label="Reference No."
+                value={ paymentReferenceNumber }
+                size="small" />
+            ),
+          } : undefined } />
       </Stack>
 
       <CheckoutItemCostPurchase

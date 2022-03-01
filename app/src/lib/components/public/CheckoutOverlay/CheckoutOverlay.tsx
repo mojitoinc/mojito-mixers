@@ -44,7 +44,7 @@ export interface PUICheckoutOverlayProps {
   userFormat: UserFormat;
   acceptedPaymentTypes: PaymentType[];
   paymentLimits?: Partial<Record<PaymentType, number>>;
-  customTexts: Record<CustomTextsKeys, React.ReactFragment[]>,
+  customTexts: Record<CustomTextsKeys, (string | React.ReactFragment)[]>,
 
   // Legal:
   consentType?: ConsentType;

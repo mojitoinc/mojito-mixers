@@ -1,6 +1,6 @@
 import { Box, Chip, Typography } from "@mui/material";
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import Clipboard from "../../shared/ClipBoard/ClipBoard";
+import { CopyButton } from "../../shared/CopyButton/CopyButton";
 import { ReadOnlyWalletAddress } from "../../shared/ReadOnlyField/ReadOnlyField";
 
 export interface DeliveryWalletDetailsProps {
@@ -30,27 +30,16 @@ const DeliveryWalletDetails: React.FC<DeliveryWalletDetailsProps> = ({
           ) }
       </Box>
 
-
       <ReadOnlyWalletAddress
         value={ walletAddress }
         margin="none"
         InputProps={{
           endAdornment: (
-            <Clipboard
-              tooltip="Copy Wallet Address"
-              value={walletAddress}
-              resultTooltip="Wallet Address Copied" />
+            <CopyButton
+              label="Wallet Address"
+              value={ walletAddress } />
           ),
         }} />
-
-      <Box width="100%" textAlign="center" mt={ 2 } bgcolor={(theme) => theme.palette.grey["50"]} borderRadius={0.5} py="10px">
-        <Typography minWidth="100%" fontWeight={500} variant="overline" width="100%" mr={2}>{ walletAddress }</Typography>
-          <Clipboard
-              tooltip="Copy Wallet Address"
-              value={walletAddress}
-              resultTooltip="Wallet Address Copied"
-          />
-      </Box>
     </Box>
   );
 }

@@ -272,6 +272,18 @@ const PlaidOAuthPage = () => {
 
 <br />
 
+// TODO: Back to marketplace OR collection buttons.
+// TODO: Updates fonts in ConfirmationView.
+// TODO: MultiSig tooltip missing.
+// TODO: Single function to manage custom address...
+
+
+// DONE: Adjust checkbox distance in wallet address selector.
+// DONE: No fees for buy now.
+// DONE: Update copy in confirmation message (it's placeholder content anyway).
+// DONE: Align copy button in reference field properly.
+// DONE: Copy button tooltip stays automatically.
+
 
 ## TypeScript Support
 
