@@ -1,4 +1,4 @@
-import { Theme, createTheme } from "@mui/material/styles";
+import { Theme, ThemeOptions, createTheme } from "@mui/material/styles";
 import { createTypographyTheme } from "./themeTypography";
 import { createPaletteTheme } from "./themePalette";
 import { createComponentsTheme } from "./themeComponents";
@@ -22,23 +22,23 @@ export const OVERLAY_OPACITY = 0.75;
 export const DEFAULT_PURCHASING_IMAGE_SRC = "https://raw.githubusercontent.com/mojitoinc/mojito-mixers/main/app/src/lib/assets/mojito-loader.gif";
 export const DEFAULT_PAYMENT_IMAGE_SRC = "https://raw.githubusercontent.com/mojitoinc/mojito-mixers/main/app/src/lib/assets/circle.png";
 
+// Theme merger:
+export const extendDefaultTheme = (themeOptions?: ThemeOptions): Theme => {
+  const baseTheme = createTheme({
+    ...themeOptions,
+    palette: createPaletteTheme(themeOptions?.palette),
+    typography: createTypographyTheme(
+      typeof themeOptions?.typography === "function"
+        ? themeOptions.typography(createTheme({ palette: themeOptions?.palette }).palette)
+        : themeOptions?.typography
+    ),
+  });
 
-const mojitoLightTheme: Theme = createTheme({
-  typography: createTypographyTheme(),
-  palette: createPaletteTheme({ mode: "light" }),
-});
+  return createTheme({
+    components: createComponentsTheme(baseTheme),
+  }, baseTheme)
+}
 
-export const MOJITO_LIGHT_THEME = createTheme({
-  ...mojitoLightTheme,
-  components: createComponentsTheme(mojitoLightTheme),
-});
-
-const mojitoDarkTheme: Theme = createTheme({
-  typography: createTypographyTheme(),
-  palette: createPaletteTheme({ mode: "dark" }),
-});
-
-export const MOJITO_DARK_THEME = createTheme({
-  ...mojitoDarkTheme,
-  components: createComponentsTheme(mojitoDarkTheme),
-});
+// Default Mojito themes:
+export const MOJITO_LIGHT_THEME = extendDefaultTheme();
+export const MOJITO_DARK_THEME = extendDefaultTheme({ palette: { mode: "dark" } });

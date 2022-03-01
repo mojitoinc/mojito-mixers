@@ -143,8 +143,6 @@ export function getCheckoutModalState(): CheckoutModalState3DS {
   };
 }
 
-// if (process.browser) localStorage.setItem("THREEDS_FLOW_RECEIVED_REDIRECT_URI_KEY", "https://metaverse-staging.sothebys.com/payments/success?paymentId=408db30b-3a5b-44b1-96f1-a1e4aa8dac1e")
-
 export function continueCheckout(noClear = false): [boolean, CheckoutModalState3DS] {
   const savedCheckoutModalState = getCheckoutModalState();
   const { continue3DSFlow } = savedCheckoutModalState;

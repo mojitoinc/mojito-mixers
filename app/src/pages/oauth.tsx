@@ -8,7 +8,7 @@ const PlaidOAuthPage: NextPage = () => {
   const router = useRouter();
 
   const handleRedirect = useCallback((pathnameOrUrl: string) => {
-    console.log(`Redirect to ${ pathnameOrUrl }...`);
+    console.log(`Redirect to ${pathnameOrUrl}...`);
 
     if (pathnameOrUrl && pathnameOrUrl.startsWith("http")) {
       window.location.replace(pathnameOrUrl);
@@ -19,8 +19,8 @@ const PlaidOAuthPage: NextPage = () => {
 
   return (
     <PUIPlaid
-      theme={ PLAYGROUND_THEMES.light }
-      onRedirect={ handleRedirect } />
+      theme={PLAYGROUND_THEMES.light}
+      onRedirect={handleRedirect} />
   );
 }
 

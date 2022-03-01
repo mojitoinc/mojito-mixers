@@ -14,7 +14,7 @@ import { CheckoutModalHeader, CheckoutModalHeaderVariant } from "../../payments/
 import { PurchasingView } from "../../../views/Purchasing/PurchasingView";
 import { ErrorView } from "../../../views/Error/ErrorView";
 import { RawSavedPaymentMethod, SavedPaymentMethod } from "../../../domain/circle/circle.interfaces";
-import { Theme, ThemeOptions, SxProps } from "@mui/material/styles";
+import { Theme, SxProps } from "@mui/material/styles";
 import { continuePlaidOAuthFlow, PlaidFlow } from "../../../hooks/usePlaid";
 import { ConsentType } from "../../shared/ConsentText/ConsentText";
 import { CheckoutModalError, useCheckoutModalState } from "./CheckoutOverlay.hooks";
@@ -35,8 +35,6 @@ export interface PUICheckoutOverlayProps {
   productConfirmationEnabled?: boolean;
 
   // Personalization:
-  theme?: Theme;
-  themeOptions?: ThemeOptions;
   logoSrc: string;
   logoSx?: SxProps<Theme>;
   loaderImageSrc: string;
@@ -67,7 +65,7 @@ export interface PUICheckoutOverlayProps {
   debug?: boolean;
   onError?: (error: CheckoutModalError) => void;
   onMarketingOptInChange?: (marketingOptIn: boolean) => void
-}
+ }
 
 export type PUICheckoutProps = PUICheckoutOverlayProps & ProvidersInjectorProps;
 
@@ -81,8 +79,6 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   productConfirmationEnabled,
 
   // Personalization:
-  theme: parentTheme,
-  themeOptions,
   logoSrc,
   logoSx,
   loaderImageSrc,
@@ -203,7 +199,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     invoiceAndReservationState,
     createInvoiceAndReservation,
     countdownElementRef,
-   } = useCreateInvoiceAndReservation({ orgID, checkoutItems, debug });
+  } = useCreateInvoiceAndReservation({ orgID, checkoutItems, debug });
 
   useEffect(() => {
     if (isDialogLoading || invoiceID === null || invoiceID || createInvoiceAndReservationCalledRef.current) return;
@@ -576,6 +572,6 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
       header={ headerElement }
       children={ checkoutStepElement } />
   );
-}
+};
 
 export const PUICheckout: React.FC<PUICheckoutProps> = withProviders(PUICheckoutOverlay);
