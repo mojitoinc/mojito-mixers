@@ -71,6 +71,7 @@ export const PurchaseConfirmationBillingDetails: React.FC<PurchaseConfirmationBi
           <ReadOnlyField
             label={ PAYMENT_TYPE_LABEL[paymentType] }
             value={ displayValue }
+            size="medium"
             InputProps={ icon ? {
               endAdornment: (
                 <InputAdornment position="end">
@@ -92,7 +93,8 @@ export const PurchaseConfirmationBillingDetails: React.FC<PurchaseConfirmationBi
       <CheckoutItemCostPurchase
         checkoutItems={checkoutItems}
         selectedPaymentMethodBillingInfo={selectedPaymentMethodBillingInfo} />
-      <DeliveryWalletDetails walletAdress="0xC000A000bC00D3E4c792d2aFDE0000000d000001" />
+
+      <DeliveryWalletDetails walletAddress="0xC000A000bC00D3E4c792d2aFDE0000000d000001" />
     </Box>
   );
 }

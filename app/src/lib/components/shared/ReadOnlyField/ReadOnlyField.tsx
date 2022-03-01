@@ -60,3 +60,30 @@ export const ReadOnlyCardField: React.FC<TextFieldProps> = styled((props) => (
     },
   },
 }));
+
+export const ReadOnlyWalletAddress: React.FC<TextFieldProps> = styled((props) => (
+  <TextField variant="standard" disabled { ...props } />
+))(({ theme: { palette } }) => ({
+  "& .MuiInputLabel-root": {
+    "&.Mui-disabled": {
+      color: palette.text.primary,
+    },
+  },
+  "& .MuiInputBase-root": {
+    "&.Mui-disabled": {
+      background: palette.grey[50],
+      color: palette.text.primary,
+      padding: 8,
+      height: "60px",
+      borderRadius: SM_BORDER_RADIUS,
+    },
+  },
+  "& .MuiInputBase-input": {
+    "&.Mui-disabled": {
+      color: palette.text.primary,
+      WebkitTextFillColor: palette.text.primary,
+      fontSize: "12px",
+      cursor: "default",
+    },
+  },
+}));
