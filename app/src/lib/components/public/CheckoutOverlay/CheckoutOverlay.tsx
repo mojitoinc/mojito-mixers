@@ -157,6 +157,8 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     paymentReferenceNumber,
     setInvoiceID,
     setPaymentReferenceNumber,
+    taxes,
+    setTaxes,
   } = useCheckoutModalState({
     invoiceID: initialInvoiceID,
     productConfirmationEnabled,
@@ -475,6 +477,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     checkoutStepElement = (
       <AuthenticationView
         checkoutItems={ checkoutItems }
+        taxes={ taxes }
         isAuthenticated={ isAuthenticated }
         guestCheckoutEnabled={ guestCheckoutEnabled }
         onGuestClicked={ goNext }
@@ -488,6 +491,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
         selectedBillingInfo={ selectedPaymentMethod.billingInfo }
         checkoutError={ checkoutError }
         onBillingInfoSelected={ handleBillingInfoSelected }
+        onTaxesChange={ setTaxes }
         onSavedPaymentMethodDeleted={ handleSavedPaymentMethodDeleted }
         onNext={ goNext }
         onClose={ handleClose }
@@ -497,6 +501,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     checkoutStepElement = (
       <PaymentView
         checkoutItems={ checkoutItems }
+        taxes={ taxes }
         savedPaymentMethods={ savedPaymentMethods }
         selectedPaymentMethod={ selectedPaymentMethod }
         checkoutError={ checkoutError }

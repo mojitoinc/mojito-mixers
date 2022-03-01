@@ -2,18 +2,27 @@ import { useMemo } from "react";
 import { CheckoutItem } from "../domain/product/product.interfaces";
 import { to } from "../utils/typescriptUtils";
 
-export interface UseCheckoutItemsCostTotalResult {
+export interface UseCheckoutItemsCostTotalReduceResult {
   total: number;
   fees: number;
+  taxAmount: number;
+}
+
+export interface UseCheckoutItemsCostTotalResult extends UseCheckoutItemsCostTotalReduceResult {
+  taxRate: number;
 }
 
 export const useCheckoutItemsCostTotal = (checkoutItems: CheckoutItem[]): UseCheckoutItemsCostTotalResult => {
   return useMemo(() => {
-    return checkoutItems.reduce((result, checkoutItem) => {
-      result.total += checkoutItem.unitPrice * checkoutItem.units;
+    const reduceResult = checkoutItems.reduce((result, checkoutItem) => {
+      // result.total += checkoutItem.unitPrice * checkoutItem.units;
+      result.total += checkoutItem.totalPrice;
       result.fees += checkoutItem.fee;
+      result.taxAmount += checkoutItem.taxes;
 
       return result;
-    }, to<UseCheckoutItemsCostTotalResult>({ total: 0, fees: 0 }));
+    }, to<UseCheckoutItemsCostTotalReduceResult>({ total: 0, fees: 0, taxAmount: 0 }));
+
+    return { ...reduceResult, taxRate: 100 * reduceResult.taxAmount / reduceResult.total };
   }, [checkoutItems]);
 };

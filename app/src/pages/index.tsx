@@ -182,7 +182,7 @@ const HomePage = () => {
     },
 
     // Legal:
-    consentType: "disclaimer",
+    consentType: "circle",
     privacyHref: PLAYGROUND_PRIVACY_HREF,
     termsOfUseHref: PLAYGROUND_TERMS_OF_USE_HREF,
 

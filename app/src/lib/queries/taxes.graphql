@@ -1,0 +1,14 @@
+query GetTaxQuote($input: TaxQuoteInput!) {
+  getTaxQuote(input: $input) {
+    verifiedAddress {
+      street1
+      city
+      state
+      postalCode
+      country
+    }
+    taxablePrice
+    totalTaxAmount
+    totalTaxedPrice
+  }
+}

@@ -28,3 +28,10 @@ export function formatTimeLeft(start: number, total: number) {
 
   return `${ `00${ timeLeftMins }`.slice(-2) }:${ `00${ timeLeftSeconds }`.slice(-2) }`;
 }
+
+/**
+ * Returns a formatted tax rate with none or two decimal places.
+ */
+export function formatTaxRate(taxRate: number): string {
+  return `${ (Math.round(taxRate * 100) / 100).toFixed(2).replace(/\.00$/, "") } %`;
+}
