@@ -1,7 +1,8 @@
-import React, { useEffect, useMemo } from "react";
+import React, {  useEffect, useMemo } from "react";
 import { Theme, ThemeOptions, ThemeProvider } from "@mui/material/styles";
 import { AuthorizedApolloProvider, AuthorizedApolloProviderProps } from "../AuthorizedApolloProvider/AuthorizedApolloProvider";
 import { extendDefaultTheme } from "../../../config/theme/theme";
+import ErrorBoundary from "../../public/ErrorBoundery/ErrorBoundery";
 
 export interface ThemeProviderProps {
   theme?: Theme;
@@ -43,42 +44,52 @@ export const ProviderInjector: React.FC<ProvidersInjectorProps> = ({
   }, [apolloClient, uri]);
 
   return (
-    <AuthorizedApolloProvider apolloClient={ apolloClient } uri={ uri }>
-      { theme ? <ThemeProvider theme={ theme }>{children}</ThemeProvider> : children }
+    <AuthorizedApolloProvider apolloClient={apolloClient} uri={uri}>
+      {theme ? <ThemeProvider theme={theme}>{children}</ThemeProvider> : children}
     </AuthorizedApolloProvider>
   );
 }
 
 export function withThemeProvider<P extends object>(Component: React.ComponentType<P>) {
-  const WithThemeProvider: React.FC<P & ThemeProviderProps> = ({
+  const WithThemeProvider: React.FC<P & ThemeProviderProps & { onCatch?: (error: Error) => void }> = ({
     theme,
     themeOptions,
+    onCatch,
     ...componentProps
   }) => {
     return (
-      <ProviderInjector apolloClient={ null } uri="" theme={ theme } themeOptions={ themeOptions }>
-        <Component { ...componentProps as P } />
-      </ProviderInjector>
+      <ErrorBoundary onCatch={onCatch}>
+        <ProviderInjector apolloClient={null} uri="" theme={theme} themeOptions={themeOptions}>
+          <Component {...componentProps as P} />
+        </ProviderInjector>
+      </ErrorBoundary>
     );
   };
 
   return WithThemeProvider;
 }
 
+
+
 export function withProviders<P extends object>(Component: React.ComponentType<P>) {
-  const WithProviders: React.FC<P & ProvidersInjectorProps> = ({
+  const WithProviders: React.FC<P & ProvidersInjectorProps & {
+    onCatch?: (error: Error) => void
+  }> = ({
     apolloClient,
     uri,
     theme,
     themeOptions,
+    onCatch,
     ...componentProps
   }) => {
-    return (
-      <ProviderInjector apolloClient={ apolloClient } uri={ uri } theme={ theme } themeOptions={ themeOptions }>
-        <Component { ...componentProps as P } />
-      </ProviderInjector>
-    );
-  };
+      return (
+        <ErrorBoundary onCatch={onCatch}>
+          <ProviderInjector apolloClient={apolloClient} uri={uri} theme={theme} themeOptions={themeOptions}>
+            <Component {...componentProps as P} />
+          </ProviderInjector>
+        </ErrorBoundary>
+      );
+    };
 
   return WithProviders;
 }

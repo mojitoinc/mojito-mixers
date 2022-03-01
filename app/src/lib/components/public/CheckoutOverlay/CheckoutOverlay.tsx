@@ -60,7 +60,7 @@ export interface PUICheckoutOverlayProps {
   onLogin: () => void;
   isAuthenticated?: boolean;
   isAuthenticatedLoading?: boolean;
-
+  onCatch?: (error: Error) => void;
   // Other Events:
   debug?: boolean;
   onError?: (error: CheckoutModalError) => void;
