@@ -2,7 +2,7 @@ import React from "react";
 import { UserFormat } from "../../../domain/auth/authentication.interfaces";
 import { PaymentType } from "../../../domain/payment/payment.interfaces";
 import { CheckoutItemInfo } from "../../../domain/product/product.interfaces";
-import { Theme, ThemeOptions, SxProps } from "@mui/material/styles";
+import { Theme, SxProps } from "@mui/material/styles";
 import { ConsentType } from "../../shared/ConsentText/ConsentText";
 import { CheckoutModalError } from "./CheckoutOverlay.hooks";
 import { ProvidersInjectorProps } from "../../shared/ProvidersInjector/ProvidersInjector";
@@ -12,8 +12,6 @@ export interface PUICheckoutOverlayProps {
     onClose: () => void;
     guestCheckoutEnabled?: boolean;
     productConfirmationEnabled?: boolean;
-    theme?: Theme;
-    themeOptions?: ThemeOptions;
     logoSrc: string;
     logoSx?: SxProps<Theme>;
     loaderImageSrc: string;
