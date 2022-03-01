@@ -81,7 +81,12 @@ const CheckoutModalFooter = ({ variant, buttonLabel, guestCheckoutEnabled, conse
             React__default["default"].createElement(material.Typography, { sx: { maxWidth: theme.SM_MOBILE_MAX_WIDTH }, align: "center" },
                 "By placing an order you affirm that you ",
                 consentTextElement,
-                ".")))));
+                "."))),
+        showConsent && consentType === "circle" && (React__default["default"].createElement(React__default["default"].Fragment, null,
+            React__default["default"].createElement(material.Divider, { sx: { my: 5, width: "100%" } }),
+            React__default["default"].createElement(material.Box, { display: "flex" },
+                React__default["default"].createElement(material.Typography, { sx: { maxWidth: theme.SM_MOBILE_MAX_WIDTH, marginRight: 1 }, align: "center" }, "Payments powered by"),
+                React__default["default"].createElement(material.Box, { component: "img", src: theme.DEFAULT_PAYMENT_IMAGE_SRC, height: 20 }))))));
 };
 
 exports.CheckoutModalFooter = CheckoutModalFooter;

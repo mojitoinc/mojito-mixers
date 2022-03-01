@@ -128,7 +128,7 @@ const CARD_TYPES = [
         },
     },
 ];
-function standaloneGetCardImageProps(network) {
+function standaloneGetCardImageProps(network = "") {
     // See https://github.com/medipass/react-payment-inputs/blob/master/src/usePaymentInputs.js#L452
     const paymentInputsNetwork = (network.toLowerCase().replace(/\s/g, "") || "placeholder");
     return {

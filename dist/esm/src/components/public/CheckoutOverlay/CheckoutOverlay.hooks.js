@@ -15,9 +15,10 @@ function useCheckoutModalState({ invoiceID: initialInvoiceID = null, productConf
         paymentInfo: "",
         cvv: "",
     });
-    const [{ invoiceID, paymentReferenceNumber, }, setPurchaseState] = useState({
+    const [{ invoiceID, paymentReferenceNumber, taxes, }, setPurchaseState] = useState({
         invoiceID: initialInvoiceID || null,
         paymentReferenceNumber: "",
+        taxes: { status: "incomplete" },
     });
     const initModalState = useCallback(() => {
         // Make sure the progress tracker in BillingView and PaymentView is properly animated:
@@ -44,6 +45,7 @@ function useCheckoutModalState({ invoiceID: initialInvoiceID = null, productConf
         setPurchaseState({
             invoiceID: savedFlow.invoiceID || "",
             paymentReferenceNumber: savedFlow.paymentReferenceNumber || "",
+            taxes: { status: "incomplete" },
         });
     }, [startAt]);
     const goBack = useCallback(() => {
@@ -92,10 +94,13 @@ function useCheckoutModalState({ invoiceID: initialInvoiceID = null, productConf
         }));
     }, []);
     const setInvoiceID = useCallback((invoiceID) => {
-        setPurchaseState({ invoiceID, paymentReferenceNumber: "" });
+        setPurchaseState(({ taxes }) => ({ invoiceID, paymentReferenceNumber: "", taxes }));
     }, []);
     const setPaymentReferenceNumber = useCallback((paymentReferenceNumber) => {
-        setPurchaseState(({ invoiceID }) => ({ invoiceID, paymentReferenceNumber }));
+        setPurchaseState(({ invoiceID, taxes }) => ({ invoiceID, paymentReferenceNumber, taxes }));
+    }, []);
+    const setTaxes = useCallback((taxes) => {
+        setPurchaseState(({ invoiceID, paymentReferenceNumber }) => ({ invoiceID, paymentReferenceNumber, taxes }));
     }, []);
     return {
         // CheckoutModalState:
@@ -116,6 +121,8 @@ function useCheckoutModalState({ invoiceID: initialInvoiceID = null, productConf
         paymentReferenceNumber,
         setInvoiceID,
         setPaymentReferenceNumber,
+        taxes,
+        setTaxes,
     };
 }
 

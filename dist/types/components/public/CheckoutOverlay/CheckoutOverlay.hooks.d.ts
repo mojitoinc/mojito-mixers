@@ -3,6 +3,7 @@ import { Dispatch, SetStateAction } from "react";
 import { CircleFieldErrors } from "../../../domain/circle/circle.utils";
 import { PaymentMethod } from "../../../domain/payment/payment.interfaces";
 import { BillingInfo } from "../../../forms/BillingInfoForm";
+import { TaxesState } from "../../../views/Billing/BillingView";
 export declare type CheckoutModalErrorAt = "reset" | "authentication" | "billing" | "payment" | "purchasing";
 export interface CheckoutModalError {
     at?: CheckoutModalErrorAt;
@@ -30,6 +31,7 @@ export interface SelectedPaymentMethod {
 export interface PurchaseState {
     invoiceID: string | null;
     paymentReferenceNumber: string;
+    taxes: TaxesState;
 }
 export interface CheckoutModalStateReturn extends CheckoutModalState, PurchaseState {
     initModalState: () => void;
@@ -42,6 +44,7 @@ export interface CheckoutModalStateReturn extends CheckoutModalState, PurchaseSt
     setSelectedPaymentMethod: Dispatch<SetStateAction<SelectedPaymentMethod>>;
     setInvoiceID: (invoiceID: string | null) => void;
     setPaymentReferenceNumber: (paymentReferenceNumber: string) => void;
+    setTaxes: (taxes: TaxesState) => void;
 }
 export declare const CHECKOUT_STEPS: CheckoutModalStep[];
 export declare function useCheckoutModalState({ invoiceID: initialInvoiceID, productConfirmationEnabled, isAuthenticated, onError, }: CheckoutModalStateOptions): CheckoutModalStateReturn;
