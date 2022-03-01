@@ -1,5 +1,5 @@
 import { PaletteOptions } from "@mui/material/styles";
-import mergeDeep from "merge-deep";
+import mergeOptions from "merge-options";
 
 const MOJITO_LIGHT_PALETTE: PaletteOptions = {
   background: {
@@ -18,8 +18,8 @@ const MOJITO_LIGHT_PALETTE: PaletteOptions = {
   },
 
   gradients: {
-    stepper: "linear-gradient(to right, #ffc7c7 -3%, #98df77 47%, #41ad46 100%)",
-    stepperReverse: "linear-gradient(to left, #ffc7c7 -3%, #98df77 47%, #41ad46 100%)",
+    stepper: "linear-gradient(to right, #FFC7C7 -3%, #98DF77 47%, #41AD46 100%)",
+    stepperReverse: "linear-gradient(to left, #FFC7C7 -3%, #98DF77 47%, #41AD46 100%)",
     // Simplified gradients:
     action: "linear-gradient(272.88deg, #FFC5C5 -97.9%, #98DF77 123.11%)",
     actionReverse: "linear-gradient(272.88deg, #FFC5C5 -97.9%, #98DF77 123.11%)",
@@ -77,6 +77,6 @@ const MOJITO_LIGHT_PALETTE: PaletteOptions = {
 // TODO: Not implemented:
 const MOJITO_DARK_PALETTE: PaletteOptions = MOJITO_LIGHT_PALETTE;
 
-export function createPaletteTheme(paletteOptions?: PaletteOptions): PaletteOptions {
-  return mergeDeep(paletteOptions?.mode === "dark" ? MOJITO_DARK_PALETTE : MOJITO_LIGHT_PALETTE, paletteOptions);
+export function createPaletteTheme(paletteOptions: PaletteOptions = {}): PaletteOptions {
+  return mergeOptions(paletteOptions?.mode === "dark" ? MOJITO_DARK_PALETTE : MOJITO_LIGHT_PALETTE, paletteOptions);
 }

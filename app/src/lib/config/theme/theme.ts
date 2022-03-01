@@ -2,7 +2,6 @@ import { Theme, ThemeOptions, createTheme } from "@mui/material/styles";
 import { createTypographyTheme } from "./themeTypography";
 import { createPaletteTheme } from "./themePalette";
 import { createComponentsTheme } from "./themeComponents";
-import createPalette from "@mui/material/styles/createPalette";
 
 // Used to limit text width in PaymentView's disclaimer text and PurchasingView's loading text:
 export const XS_MOBILE_MAX_WIDTH = 320;
@@ -30,7 +29,7 @@ export const extendDefaultTheme = (themeOptions?: ThemeOptions): Theme => {
     palette: createPaletteTheme(themeOptions?.palette),
     typography: createTypographyTheme(
       typeof themeOptions?.typography === "function"
-        ? themeOptions.typography(createPalette(themeOptions?.palette || {}))
+        ? themeOptions.typography(createTheme({ palette: themeOptions?.palette }).palette)
         : themeOptions?.typography
     ),
   });

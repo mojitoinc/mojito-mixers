@@ -1,8 +1,8 @@
 import { TypographyOptions } from "@mui/material/styles/createTypography";
-import mergeDeep from "merge-deep";
+import mergeOptions from "merge-options";
 
-export function createTypographyTheme(typographyOptions?: TypographyOptions): TypographyOptions {
-  return mergeDeep({
+export function createTypographyTheme(typographyOptions: TypographyOptions = {}): TypographyOptions {
+  return mergeOptions({
     fontFamily: "IBM Plex Sans, sans-serif",
 
     h5: {
@@ -29,14 +29,14 @@ export function createTypographyTheme(typographyOptions?: TypographyOptions): Ty
       fontSize: "12px",
     },
 
-    caption: {
-      // Saved item lines:
-      fontFamily: "IBM Plex Mono, monospace",
+    body1: {
+      // Default text, form input labels and tooltips:
       fontSize: "12px",
     },
 
-    body1: {
-      // Default text, form input labels and tooltips:
+    caption: {
+      // Saved item lines:
+      fontFamily: "IBM Plex Mono, monospace",
       fontSize: "12px",
     },
 

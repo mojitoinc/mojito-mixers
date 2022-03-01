@@ -34,7 +34,7 @@ export interface PUICheckoutOverlayProps {
   guestCheckoutEnabled?: boolean;
   productConfirmationEnabled?: boolean;
 
-
+  // Personalization:
   logoSrc: string;
   logoSx?: SxProps<Theme>;
   loaderImageSrc: string;

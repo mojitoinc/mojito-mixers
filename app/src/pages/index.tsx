@@ -161,7 +161,7 @@ const HomePage = () => {
     guestCheckoutEnabled: testPreset.guestCheckoutEnabled,
     productConfirmationEnabled: testPreset.productConfirmationEnabled,
 
-    // Personalization:    
+    // Personalization:
     theme: PLAYGROUND_THEMES[formValues.theme],
     logoSrc: PLAYGROUND_LOGOS_SRC[formValues.theme],
     logoSx: PLAYGROUND_LOGOS_SX[formValues.theme],
