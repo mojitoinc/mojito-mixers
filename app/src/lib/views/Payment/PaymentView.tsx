@@ -15,11 +15,18 @@ import { BoxProps, Divider, Stack } from "@mui/material";
 import { usePlaid } from "../../hooks/usePlaid";
 import { ConsentType } from "../../components/shared/ConsentText/ConsentText";
 import { checkNeedsGenericErrorMessage } from "../../hooks/useFormCheckoutError";
+import { TaxesState } from "../Billing/BillingView";
 
 const billingInfoItemBoxProps: BoxProps = { sx: { mt: 2.5 } };
 
+interface PaymentViewState {
+  isDeleting: boolean;
+  showSaved: boolean;
+}
+
 export interface PaymentViewProps {
   checkoutItems: CheckoutItem[];
+  taxes: TaxesState;
   savedPaymentMethods: SavedPaymentMethod[];
   selectedPaymentMethod: SelectedPaymentMethod;
   personalWalletAddressForDelivery: string;
@@ -43,6 +50,7 @@ export interface PaymentViewProps {
 
 export const PaymentView: React.FC<PaymentViewProps> = ({
   checkoutItems,
+  taxes,
   savedPaymentMethods: rawSavedPaymentMethods,
   selectedPaymentMethod,
   personalWalletAddressForDelivery,
@@ -80,7 +88,7 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
       : billingInfoToSavedPaymentMethodBillingInfo(selectedBillingInfo) as SavedPaymentMethod;
   }, [rawSavedPaymentMethods, selectedBillingInfo]);
 
-  const [{ isDeleting, showSaved }, setViewState] = useState({
+  const [{ isDeleting, showSaved }, setViewState] = useState<PaymentViewState>({
     isDeleting: false,
     showSaved: savedPaymentMethods.length > 0 && typeof selectedBillingInfo === "string" && !checkNeedsGenericErrorMessage("payment", checkoutError),
   });
@@ -186,8 +194,10 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
             debug={ debug } />
         ) }
       </Stack>
+
       <CheckoutDeliveryAndItemCostBreakdown
         checkoutItems={checkoutItems}
+        taxes={ taxes }
         validatePersonalDeliveryAddress={formSubmitAttempted}
         personalWalletAddressForDelivery={personalWalletAddressForDelivery}
         onPersonalWalletAddressChange={onPersonalWalletDeliveryAddressChange}

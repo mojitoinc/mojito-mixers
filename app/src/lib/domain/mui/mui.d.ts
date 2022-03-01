@@ -1,6 +1,6 @@
-import "@mui/material/styles/createPalette";
+import "@mui/material/styles";
 
-declare module "@mui/material/styles/createPalette" {
+declare module "@mui/material/styles" {
   interface Palette {
     gradients?: {
       stepper?: string;

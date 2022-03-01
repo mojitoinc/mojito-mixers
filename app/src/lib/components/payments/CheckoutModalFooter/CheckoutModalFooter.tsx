@@ -1,6 +1,6 @@
 import { Box, Link, Typography, Divider, CircularProgress } from "@mui/material";
 import React, { useCallback, useState } from "react";
-import { SM_MOBILE_MAX_WIDTH } from "../../../config/theme/theme";
+import { DEFAULT_PAYMENT_IMAGE_SRC, SM_MOBILE_MAX_WIDTH } from "../../../config/theme/theme";
 import { isPromise } from "../../../utils/promiseUtils";
 import { Checkbox } from "../../shared/Checkbox/Checkbox";
 import { ConsentText, ConsentType, CONSENT_ERROR_MESSAGE } from "../../shared/ConsentText/ConsentText";
@@ -40,7 +40,7 @@ export const CheckoutModalFooter: React.FC<CheckoutModalFooterProps> = ({
 }) => {
   // CONSENT:
   const showConsent = consentType && (privacyHref || termsOfUseHref) && (variant === "toConfirmation" || variant === "toPlaid");
-  const consentTextElement = showConsent ? <ConsentText privacyHref={ privacyHref } termsOfUseHref={ termsOfUseHref } /> : null;
+  const consentTextElement = showConsent ? <ConsentText privacyHref={privacyHref} termsOfUseHref={termsOfUseHref} /> : null;
 
   const [{
     isFormSubmitted,
@@ -107,43 +107,54 @@ export const CheckoutModalFooter: React.FC<CheckoutModalFooterProps> = ({
         pb: 5,
       }}>
 
-      { showConsent && consentType === "checkbox" && (
+      {showConsent && consentType === "checkbox" && (
         <Checkbox
-          label={ <>I { consentTextElement }</> }
-          checked={ isConsentChecked }
-          onChange={ handleConsentClicked }
-          error={ showConsentError }
-          helperText={ showConsentError ? CONSENT_ERROR_MESSAGE : undefined }
+          label={<>I {consentTextElement}</>}
+          checked={isConsentChecked}
+          onChange={handleConsentClicked}
+          error={showConsentError}
+          helperText={showConsentError ? CONSENT_ERROR_MESSAGE : undefined}
           sx={{ alignSelf: "flex-start", mb: 5 }} />
-      ) }
+      )}
 
-      { primaryButtonVisible && (
+      {primaryButtonVisible && (
         <PrimaryButton
-          onClick={ onSubmitClicked ? handleSubmitClicked : undefined }
-          type={ onSubmitClicked ? "button" : "submit" }
-          endIcon={ isFormLoading ? <CircularProgress color="inherit" size="1em" /> : (PrimaryButtonIcon && <PrimaryButtonIcon />) }
-          disabled={ submitDisabled || isFormLoading }>
-          { primaryButtonLabel }
+          onClick={onSubmitClicked ? handleSubmitClicked : undefined}
+          type={onSubmitClicked ? "button" : "submit"}
+          endIcon={isFormLoading ? <CircularProgress color="inherit" size="1em" /> : (PrimaryButtonIcon && <PrimaryButtonIcon />)}
+          disabled={submitDisabled || isFormLoading}>
+          {primaryButtonLabel}
         </PrimaryButton>
-      ) }
+      )}
 
-      { variant !== "toMarketplace" && onCloseClicked && (
-        <Typography sx={ primaryButtonVisible ? { pt: 2 } : undefined }>
-          { primaryButtonVisible ? "or " : null }
-          <Link sx={{ color: "text.primary" }} href="" onClick={ handleCancelClicked }>
+      {variant !== "toMarketplace" && onCloseClicked && (
+        <Typography sx={primaryButtonVisible ? { pt: 2 } : undefined}>
+          {primaryButtonVisible ? "or " : null}
+          <Link sx={{ color: "text.primary" }} href="" onClick={handleCancelClicked}>
             Cancel and Return to Marketplace
           </Link>
         </Typography>
-      ) }
+      )}
 
-      { showConsent && consentType === "disclaimer" && (<>
-        <Divider sx={{ my: 5, width: "100%" }}/>
+      {showConsent && consentType === "disclaimer" && (<>
+        <Divider sx={{ my: 5, width: "100%" }} />
 
         <Typography sx={{ maxWidth: SM_MOBILE_MAX_WIDTH }} align="center">
-          By placing an order you affirm that you { consentTextElement }.
+          By placing an order you affirm that you {consentTextElement}.
         </Typography>
-      </>) }
+      </>)}
 
+      {showConsent && consentType === "circle" && (
+        <>
+          <Divider sx={{ my: 5, width: "100%" }} />
+          <Box display="flex">
+            <Typography sx={{ maxWidth: SM_MOBILE_MAX_WIDTH, marginRight: 1 }} align="center">
+              Payments powered by
+            </Typography>
+            <Box component="img" src={DEFAULT_PAYMENT_IMAGE_SRC} height={20} />
+          </Box>
+        </>
+      )}
     </Box>
   );
 }

@@ -9,11 +9,14 @@ import { SavedPaymentMethod } from "../../../domain/circle/circle.interfaces";
 import React from "react";
 import { alpha, Box, CircularProgress } from "@mui/material";
 import { OVERLAY_OPACITY } from "../../../config/theme/theme";
+import { TaxesState } from "../../../views/Billing/BillingView";
+import { TaxesMessagesBox } from "../TaxesMessagesBox/TaxesMessagesBox";
 
 export interface SavedBillingDetailsSelectorProps {
   showLoader: boolean;
   savedPaymentMethods: SavedPaymentMethod[];
   selectedPaymentMethodAddressId?: string;
+  taxes: TaxesState;
   onNew: () => void;
   onEdit: (billingInfoId: string) => void;
   onDelete: (billingInfoId: string) => Promise<void>;
@@ -27,6 +30,7 @@ export const SavedBillingDetailsSelector: React.FC<SavedBillingDetailsSelectorPr
   showLoader,
   savedPaymentMethods,
   selectedPaymentMethodAddressId,
+  taxes,
   onNew,
   onEdit,
   onDelete,
@@ -78,10 +82,14 @@ export const SavedBillingDetailsSelector: React.FC<SavedBillingDetailsSelectorPr
       <SecondaryButton onClick={ onNew } startIcon={ <AddIcon /> } sx={{ mt: 2.5 }} disabled={ showLoader }>
         Add New Billing Info
       </SecondaryButton>
+
+      <TaxesMessagesBox sx={{ mt: 5 }} taxes={ taxes } variant="selector" />
     </Box>
 
     <CheckoutModalFooter
       variant="toPayment"
+      buttonLabel={ taxes.status === "loading" ? "Calculating taxes..." : undefined }
+      submitDisabled={ taxes.status !== "complete" }
       onSubmitClicked={ handleNextClicked }
       onCloseClicked={ onClose } />
   </>);

@@ -12,12 +12,12 @@ function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'defau
 
 var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 
-const CheckoutItemCostBreakdown = ({ checkoutItems }) => {
+const CheckoutItemCostBreakdown = ({ checkoutItems, taxes, }) => {
     const { total, fees } = useCheckoutItemCostTotal.useCheckoutItemsCostTotal(checkoutItems);
     return (React__default["default"].createElement(material.Stack, { sx: { display: "flex", flex: 1, py: 5 } },
         React__default["default"].createElement(CheckoutItemList.CheckoutItemList, { checkoutItems: checkoutItems, withSeparators: true, showPrices: true }),
         React__default["default"].createElement(material.Divider, { sx: { mt: 3.75, mb: 1.5 } }),
-        React__default["default"].createElement(CheckoutItemCostTotal.CheckoutItemCostTotal, { withDetails: true, total: total, taxes: 0, fees: fees })));
+        React__default["default"].createElement(CheckoutItemCostTotal.CheckoutItemCostTotal, { withDetails: true, total: total, fees: fees, taxes: taxes })));
 };
 
 exports.CheckoutItemCostBreakdown = CheckoutItemCostBreakdown;

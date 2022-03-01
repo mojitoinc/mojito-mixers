@@ -13,13 +13,13 @@ const PURCHASING_MESSAGES_DEFAULT = [
 ];
 const PAYMENT_NOTIFICATION_INTERVAL_MS = 1500; // Polling interval for GetPaymentNotificationQuery.
 // Plaid:
-const PLAID_STORAGE_EXPIRATION_MS = 1000 * 60 * 5; // 15 minutes (Plaid requires filling in some data).
+const PLAID_STORAGE_EXPIRATION_MS = 1000 * 60 * 15; // 15 minutes (Plaid requires filling in some data).
 const PLAID_OAUTH_FLOW_INFO_KEY = "PLAID_OAUTH_FLOW_INFO";
 const PLAID_OAUTH_FLOW_RECEIVED_REDIRECT_URI_KEY = "PLAID_OAUTH_FLOW_RECEIVED_REDIRECT_URI";
 const PLAID_OAUTH_FLOW_STATE_USED_KEY = "PLAID_OAUTH_FLOW_STATE_USED";
 const PLAID_OAUTH_FLOW_URL_SEARCH = "?oauth_state_id=";
 // 3DS:
-const THREEDS_STORAGE_EXPIRATION_MS = 1000 * 120; // 2 minutes (in case page loads slowly).
+const THREEDS_STORAGE_EXPIRATION_MS = 1000 * 60 * 7; // 7 minutes (3DS will also ask for some information (in PROD only)).
 const THREEDS_FLOW_INFO_KEY = "THREEDS_FLOW_INFO";
 const THREEDS_FLOW_RECEIVED_REDIRECT_URI_KEY = "THREEDS_FLOW_RECEIVED_REDIRECT_URI";
 const THREEDS_FLOW_STATE_USED_KEY = "THREEDS_FLOW_STATE_USED";

@@ -3,11 +3,11 @@ export { PUISuccess } from "./components/public/SuccessOverlay/SuccessOverlay";
 export { PUIError } from "./components/public/ErrorOverlay/ErrorOverlay";
 export { PUIPlaid } from "./components/public/PlaidOverlay/PlaidOverlay";
 export { useOpenCloseCheckoutModal } from "./components/public/useOpenCloseCheckoutModal/useOpenCloseCheckoutModal";
-export { MOJITO_LIGHT_THEME, MOJITO_DARK_THEME } from "./config/theme/theme";
 export { ThemeProvider as PUIThemeProvider } from "@mui/material/styles";
 export { getPlaidOAuthFlowState, persistPlaidReceivedRedirectUri } from "./domain/plaid/plaid.utils";
 export { continuePlaidOAuthFlow } from "./hooks/usePlaid";
 export { continueCheckout, continueFlows, getCheckoutModalState, persistReceivedRedirectUri3DS } from "./components/public/CheckoutOverlay/CheckoutOverlay.utils";
+export { extendDefaultTheme, MOJITO_LIGHT_THEME, MOJITO_DARK_THEME } from "./config/theme/theme";
 
 export type { Theme as CheckoutModalTheme, ThemeOptions as CheckoutModalThemeOptions } from "@mui/material/styles";
 export type { PUICheckoutProps } from "./components/public/CheckoutOverlay/CheckoutOverlay";

@@ -11,12 +11,13 @@ var SecondaryButton = require('../SecondaryButton/SecondaryButton.js');
 var CheckoutModalFooter = require('../../payments/CheckoutModalFooter/CheckoutModalFooter.js');
 var material = require('@mui/material');
 var theme = require('../../../config/theme/theme.js');
+var TaxesMessagesBox = require('../TaxesMessagesBox/TaxesMessagesBox.js');
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
 var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 
-const SavedBillingDetailsSelector = ({ showLoader, savedPaymentMethods, selectedPaymentMethodAddressId, onNew, onEdit, onDelete, onPick, onNext, onClose, }) => {
+const SavedBillingDetailsSelector = ({ showLoader, savedPaymentMethods, selectedPaymentMethodAddressId, taxes, onNew, onEdit, onDelete, onPick, onNext, onClose, }) => {
     const getPaymentMethodAddressId = React.useCallback((savedPaymentMethod) => savedPaymentMethod.addressId, []);
     return (React__default["default"].createElement(React__default["default"].Fragment, null,
         React__default["default"].createElement(material.Box, { sx: { position: "relative" } },
@@ -39,8 +40,9 @@ const SavedBillingDetailsSelector = ({ showLoader, savedPaymentMethods, selected
                     onPick,
                     onEdit,
                 }), component: BillingInfoItem.BillingInfoItem, itemKey: getPaymentMethodAddressId, deps: [selectedPaymentMethodAddressId, showLoader, onDelete, onPick, onEdit] }),
-            React__default["default"].createElement(SecondaryButton.SecondaryButton, { onClick: onNew, startIcon: React__default["default"].createElement(Add["default"], null), sx: { mt: 2.5 }, disabled: showLoader }, "Add New Billing Info")),
-        React__default["default"].createElement(CheckoutModalFooter.CheckoutModalFooter, { variant: "toPayment", onSubmitClicked: onNext, onCloseClicked: onClose })));
+            React__default["default"].createElement(SecondaryButton.SecondaryButton, { onClick: onNew, startIcon: React__default["default"].createElement(Add["default"], null), sx: { mt: 2.5 }, disabled: showLoader }, "Add New Billing Info"),
+            React__default["default"].createElement(TaxesMessagesBox.TaxesMessagesBox, { sx: { mt: 5 }, taxes: taxes, variant: "selector" })),
+        React__default["default"].createElement(CheckoutModalFooter.CheckoutModalFooter, { variant: "toPayment", buttonLabel: taxes.status === "loading" ? "Calculating taxes..." : undefined, submitDisabled: taxes.status !== "complete", onSubmitClicked: onNext, onCloseClicked: onClose })));
 };
 
 exports.SavedBillingDetailsSelector = SavedBillingDetailsSelector;

@@ -20,18 +20,22 @@ const BORDER_THICKNESS = 1;
 const OVERLAY_OPACITY = 0.75;
 // Default images:
 const DEFAULT_PURCHASING_IMAGE_SRC = "https://raw.githubusercontent.com/mojitoinc/mojito-mixers/main/app/src/lib/assets/mojito-loader.gif";
-const mojitoLightTheme = createTheme["default"]({
-    typography: themeTypography.createTypographyTheme(),
-    palette: themePalette.createPaletteTheme({ mode: "light" }),
-});
-const MOJITO_LIGHT_THEME = createTheme["default"](Object.assign(Object.assign({}, mojitoLightTheme), { components: themeComponents.createComponentsTheme(mojitoLightTheme) }));
-const mojitoDarkTheme = createTheme["default"]({
-    typography: themeTypography.createTypographyTheme(),
-    palette: themePalette.createPaletteTheme({ mode: "dark" }),
-});
-const MOJITO_DARK_THEME = createTheme["default"](Object.assign(Object.assign({}, mojitoDarkTheme), { components: themeComponents.createComponentsTheme(mojitoDarkTheme) }));
+const DEFAULT_PAYMENT_IMAGE_SRC = "https://raw.githubusercontent.com/mojitoinc/mojito-mixers/main/app/src/lib/assets/circle.png";
+// Theme merger:
+const extendDefaultTheme = (themeOptions) => {
+    const baseTheme = createTheme["default"](Object.assign(Object.assign({}, themeOptions), { palette: themePalette.createPaletteTheme(themeOptions === null || themeOptions === void 0 ? void 0 : themeOptions.palette), typography: themeTypography.createTypographyTheme(typeof (themeOptions === null || themeOptions === void 0 ? void 0 : themeOptions.typography) === "function"
+            ? themeOptions.typography(createTheme["default"]({ palette: themeOptions === null || themeOptions === void 0 ? void 0 : themeOptions.palette }).palette)
+            : themeOptions === null || themeOptions === void 0 ? void 0 : themeOptions.typography) }));
+    return createTheme["default"]({
+        components: themeComponents.createComponentsTheme(baseTheme),
+    }, baseTheme);
+};
+// Default Mojito themes:
+const MOJITO_LIGHT_THEME = extendDefaultTheme();
+const MOJITO_DARK_THEME = extendDefaultTheme({ palette: { mode: "dark" } });
 
 exports.BORDER_THICKNESS = BORDER_THICKNESS;
+exports.DEFAULT_PAYMENT_IMAGE_SRC = DEFAULT_PAYMENT_IMAGE_SRC;
 exports.DEFAULT_PURCHASING_IMAGE_SRC = DEFAULT_PURCHASING_IMAGE_SRC;
 exports.MD_BORDER_RADIUS = MD_BORDER_RADIUS;
 exports.MOJITO_DARK_THEME = MOJITO_DARK_THEME;
@@ -41,4 +45,5 @@ exports.ROUNDED_BORDER_RADIUS = ROUNDED_BORDER_RADIUS;
 exports.SM_BORDER_RADIUS = SM_BORDER_RADIUS;
 exports.SM_MOBILE_MAX_WIDTH = SM_MOBILE_MAX_WIDTH;
 exports.XS_MOBILE_MAX_WIDTH = XS_MOBILE_MAX_WIDTH;
+exports.extendDefaultTheme = extendDefaultTheme;
 //# sourceMappingURL=theme.js.map

@@ -18,6 +18,7 @@ var Select = require('../components/shared/Select/Select.js');
 var validationUtils = require('../utils/validationUtils.js');
 var DisplayBox = require('../components/payments/DisplayBox/DisplayBox.js');
 var useFormCheckoutError = require('../hooks/useFormCheckoutError.js');
+var TaxesMessagesBox = require('../components/shared/TaxesMessagesBox/TaxesMessagesBox.js');
 var FormErrorsBox = require('../components/shared/FormErrorsBox/FormErrorsBox.js');
 var Grid = require('../../node_modules/@mui/material/Grid/Grid.js');
 
@@ -30,20 +31,20 @@ const EMAIL_FIELD = "email";
 const PHONE_FIELD = "phone";
 const STREET_FIELD = "street";
 const APARTMENT_FIELD = "apartment";
-const COUNTRY_FIELD = "country";
+const ZIP_CODE_FIELD = "zipCode";
 const CITY_FIELD = "city";
 const STATE_FIELD = "state";
-const ZIP_CODE_FIELD = "zipCode";
+const COUNTRY_FIELD = "country";
 const FIELD_LABELS = {
     [FULL_NAME_FIELD]: "Full Name",
     [EMAIL_FIELD]: "Email",
     [PHONE_FIELD]: "Phone",
     [STREET_FIELD]: "Street",
     [APARTMENT_FIELD]: "Apartment, Suite, etc. (optional)",
-    [COUNTRY_FIELD]: "Country",
+    [ZIP_CODE_FIELD]: "Zip Code",
     [CITY_FIELD]: "City",
     [STATE_FIELD]: "State",
-    [ZIP_CODE_FIELD]: "Zip Code"
+    [COUNTRY_FIELD]: "Country",
 };
 const FIELD_NAMES = Object.keys(FIELD_LABELS);
 const EMPTY_FORM_VALUES = {
@@ -52,10 +53,10 @@ const EMPTY_FORM_VALUES = {
     [PHONE_FIELD]: "",
     [STREET_FIELD]: "",
     [APARTMENT_FIELD]: "",
-    [COUNTRY_FIELD]: Select.EMPTY_OPTION,
+    [ZIP_CODE_FIELD]: "",
     [CITY_FIELD]: "",
     [STATE_FIELD]: Select.EMPTY_OPTION,
-    [ZIP_CODE_FIELD]: ""
+    [COUNTRY_FIELD]: Select.EMPTY_OPTION,
 };
 // export type BillingInfoFormVariant = "guest" | "loggedIn";
 const schema = yup.object()
@@ -73,12 +74,11 @@ const schema = yup.object()
     [STREET_FIELD]: yup.string()
         .label(FIELD_LABELS[STREET_FIELD])
         .required(validationUtils.withRequiredErrorMessage),
-    [APARTMENT_FIELD]: yup.string().label(FIELD_LABELS[APARTMENT_FIELD]),
-    [COUNTRY_FIELD]: yup.object().shape({
-        value: yup.string()
-            .label(FIELD_LABELS[COUNTRY_FIELD])
-            .required(validationUtils.withRequiredErrorMessage)
-    }),
+    [APARTMENT_FIELD]: yup.string()
+        .label(FIELD_LABELS[APARTMENT_FIELD]),
+    [ZIP_CODE_FIELD]: yup.string()
+        .label(FIELD_LABELS[ZIP_CODE_FIELD])
+        .required(validationUtils.withRequiredErrorMessage),
     [CITY_FIELD]: yup.string()
         .label(FIELD_LABELS[CITY_FIELD])
         .required(validationUtils.withRequiredErrorMessage),
@@ -87,21 +87,32 @@ const schema = yup.object()
             .label(FIELD_LABELS[STATE_FIELD])
             .required(validationUtils.withRequiredErrorMessage)
     }),
-    [ZIP_CODE_FIELD]: yup.string()
-        .label(FIELD_LABELS[ZIP_CODE_FIELD])
-        .required(validationUtils.withRequiredErrorMessage)
-})
-    .required();
+    [COUNTRY_FIELD]: yup.object().shape({
+        value: yup.string()
+            .label(FIELD_LABELS[COUNTRY_FIELD])
+            .required(validationUtils.withRequiredErrorMessage)
+    }),
+}).required();
 const BillingInfoForm = ({ 
 // variant,
-defaultValues, checkoutError, onSaved, onClose, onSubmit, debug }) => {
+defaultValues, checkoutError, taxes, onTaxInfoChange, onSaved, onClose, onSubmit, debug }) => {
     const { control, handleSubmit, watch, setError, formState, } = reactHookForm.useForm({
         defaultValues: Object.assign(Object.assign({}, EMPTY_FORM_VALUES), defaultValues),
         reValidateMode: "onChange",
         resolver: yup$1.yupResolver(schema),
     });
-    const selectedCountryOption = watch(COUNTRY_FIELD);
-    const selectedCountryCode = selectedCountryOption === null || selectedCountryOption === void 0 ? void 0 : selectedCountryOption.value;
+    const [street, zip, city, state, country] = watch([STREET_FIELD, ZIP_CODE_FIELD, CITY_FIELD, STATE_FIELD, COUNTRY_FIELD]);
+    React.useEffect(() => {
+        onTaxInfoChange({
+            [STREET_FIELD]: street,
+            [ZIP_CODE_FIELD]: zip,
+            [CITY_FIELD]: city,
+            [STATE_FIELD]: state,
+            [COUNTRY_FIELD]: country,
+        });
+    }, [onTaxInfoChange, street, zip, city, state, country]);
+    const taxesStatus = taxes.status;
+    const selectedCountryCode = country === null || country === void 0 ? void 0 : country.value;
     const submitForm = handleSubmit(onSubmit);
     const checkoutErrorMessage = useFormCheckoutError.useFormCheckoutError({ formKey: "billing", checkoutError, fields: FIELD_NAMES, setError });
     return (React__default["default"].createElement("form", { onSubmit: submitForm },
@@ -131,11 +142,12 @@ defaultValues, checkoutError, onSaved, onClose, onSubmit, debug }) => {
             React__default["default"].createElement(Grid["default"], { item: true, sm: 6 },
                 React__default["default"].createElement(TextField.ControlledTextField, { name: ZIP_CODE_FIELD, control: control, label: FIELD_LABELS[ZIP_CODE_FIELD] }))),
         checkoutErrorMessage && React__default["default"].createElement(FormErrorsBox.FormErrorsBox, { error: checkoutErrorMessage, sx: { mt: 5 } }),
+        formState.isSubmitted && React__default["default"].createElement(TaxesMessagesBox.TaxesMessagesBox, { sx: { mt: 5 }, taxes: taxes, variant: "form" }),
         debug && (React__default["default"].createElement(DisplayBox.DebugBox, { sx: { mt: 5 } },
             JSON.stringify(watch(), null, 2),
             "\n\n",
             JSON.stringify(formState.errors, null, 2))),
-        React__default["default"].createElement(CheckoutModalFooter.CheckoutModalFooter, { variant: "toPayment", onCloseClicked: onClose })));
+        React__default["default"].createElement(CheckoutModalFooter.CheckoutModalFooter, { variant: "toPayment", buttonLabel: taxesStatus === "loading" ? "Calculating taxes..." : undefined, submitDisabled: taxesStatus === "loading", onCloseClicked: onClose })));
 };
 
 exports.BillingInfoForm = BillingInfoForm;

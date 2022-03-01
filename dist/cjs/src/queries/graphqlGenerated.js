@@ -270,6 +270,8 @@ const GetInvoiceDetailsDocument = Apollo.gql `
       collectionItemTitle
       units
       unitPrice
+      taxes
+      totalPrice
     }
   }
 }
@@ -505,6 +507,26 @@ function usePreparePaymentMethodQuery(baseOptions) {
     const options = Object.assign(Object.assign({}, defaultOptions), baseOptions);
     return Apollo__namespace.useQuery(PreparePaymentMethodDocument, options);
 }
+const GetTaxQuoteDocument = Apollo.gql `
+    query GetTaxQuote($input: TaxQuoteInput!) {
+  getTaxQuote(input: $input) {
+    verifiedAddress {
+      street1
+      city
+      state
+      postalCode
+      country
+    }
+    taxablePrice
+    totalTaxAmount
+    totalTaxedPrice
+  }
+}
+    `;
+function useGetTaxQuoteLazyQuery(baseOptions) {
+    const options = Object.assign(Object.assign({}, defaultOptions), baseOptions);
+    return Apollo__namespace.useLazyQuery(GetTaxQuoteDocument, options);
+}
 
 exports.CreateAuctionInvoiceDocument = CreateAuctionInvoiceDocument;
 exports.CreateBuyNowInvoiceDocument = CreateBuyNowInvoiceDocument;
@@ -514,6 +536,7 @@ exports.DeletePaymentMethodDocument = DeletePaymentMethodDocument;
 exports.GetInvoiceDetailsDocument = GetInvoiceDetailsDocument;
 exports.GetPaymentMethodListDocument = GetPaymentMethodListDocument;
 exports.GetPaymentNotificationDocument = GetPaymentNotificationDocument;
+exports.GetTaxQuoteDocument = GetTaxQuoteDocument;
 exports.MeDocument = MeDocument;
 exports.PaymentKeyDocument = PaymentKeyDocument;
 exports.PreparePaymentMethodDocument = PreparePaymentMethodDocument;
@@ -525,6 +548,7 @@ exports.useDeletePaymentMethodMutation = useDeletePaymentMethodMutation;
 exports.useGetInvoiceDetailsQuery = useGetInvoiceDetailsQuery;
 exports.useGetPaymentMethodListQuery = useGetPaymentMethodListQuery;
 exports.useGetPaymentNotificationQuery = useGetPaymentNotificationQuery;
+exports.useGetTaxQuoteLazyQuery = useGetTaxQuoteLazyQuery;
 exports.useMeQuery = useMeQuery;
 exports.usePaymentKeyLazyQuery = usePaymentKeyLazyQuery;
 exports.usePreparePaymentMethodQuery = usePreparePaymentMethodQuery;
