@@ -65,10 +65,9 @@ export const CopyButton: FunctionComponent<CopyButtonProps> = ({
   useTimeout(async () => {
     if (title !== confirmationLabel) return;
 
-    console.log("RESET");
-
     setState({ title: confirmationLabel, open: false });
 
+    // Wait to allow the tooltip close animation to play before the title is reset back to the default one:
     await wait(250);
 
     setState(({ open }) => ({ title: tooltipLabel, open: open || false }));
