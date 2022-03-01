@@ -24,7 +24,7 @@ open, onClose,
 // Flow:
 guestCheckoutEnabled, productConfirmationEnabled, 
 // Personalization:
-theme: parentTheme, themeOptions, logoSrc, logoSx, loaderImageSrc, purchasingImageSrc, purchasingMessages, errorImageSrc, userFormat, acceptedPaymentTypes, paymentLimits, // Not implemented yet. Used to show payment limits for some payment types.
+logoSrc, logoSx, loaderImageSrc, purchasingImageSrc, purchasingMessages, errorImageSrc, userFormat, acceptedPaymentTypes, paymentLimits, // Not implemented yet. Used to show payment limits for some payment types.
 customTexts, 
 // Legal:
 consentType, privacyHref, termsOfUseHref, 

@@ -2,6 +2,12 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
+var mergeOptions = require('merge-options');
+
+function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
+
+var mergeOptions__default = /*#__PURE__*/_interopDefaultLegacy(mergeOptions);
+
 const MOJITO_LIGHT_PALETTE = {
     background: {
         default: "#FFFFFF",
@@ -16,8 +22,8 @@ const MOJITO_LIGHT_PALETTE = {
         disabled: "#D9D9D9",
     },
     gradients: {
-        stepper: "linear-gradient(to right, #ffc7c7 -3%, #98df77 47%, #41ad46 100%)",
-        stepperReverse: "linear-gradient(to left, #ffc7c7 -3%, #98df77 47%, #41ad46 100%)",
+        stepper: "linear-gradient(to right, #FFC7C7 -3%, #98DF77 47%, #41AD46 100%)",
+        stepperReverse: "linear-gradient(to left, #FFC7C7 -3%, #98DF77 47%, #41AD46 100%)",
         // Simplified gradients:
         action: "linear-gradient(272.88deg, #FFC5C5 -97.9%, #98DF77 123.11%)",
         actionReverse: "linear-gradient(272.88deg, #FFC5C5 -97.9%, #98DF77 123.11%)",
@@ -59,10 +65,10 @@ const MOJITO_LIGHT_PALETTE = {
         "800": "#292929",
     },
 };
-function createPaletteTheme(paletteOptions) {
-    return (paletteOptions === null || paletteOptions === void 0 ? void 0 : paletteOptions.mode) === "dark" ? Object.assign(Object.assign({}, paletteOptions), MOJITO_LIGHT_PALETTE
-    // ...MOJITO_DARK_PALETTE, // TODO: Not implemented.
-    ) : Object.assign(Object.assign({}, paletteOptions), MOJITO_LIGHT_PALETTE);
+// TODO: Not implemented:
+const MOJITO_DARK_PALETTE = MOJITO_LIGHT_PALETTE;
+function createPaletteTheme(paletteOptions = {}) {
+    return mergeOptions__default["default"]((paletteOptions === null || paletteOptions === void 0 ? void 0 : paletteOptions.mode) === "dark" ? MOJITO_DARK_PALETTE : MOJITO_LIGHT_PALETTE, paletteOptions);
 }
 
 exports.createPaletteTheme = createPaletteTheme;

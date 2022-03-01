@@ -110,8 +110,6 @@ interface PUICheckoutOverlayProps {
     onClose: () => void;
     guestCheckoutEnabled?: boolean;
     productConfirmationEnabled?: boolean;
-    theme?: Theme;
-    themeOptions?: ThemeOptions;
     logoSrc: string;
     logoSx?: SxProps<Theme>;
     loaderImageSrc: string;
@@ -174,9 +172,6 @@ declare function useOpenCloseCheckoutModal(): {
     onClose: () => void;
 };
 
-declare const MOJITO_LIGHT_THEME: Theme;
-declare const MOJITO_DARK_THEME: Theme;
-
 interface PlaidInfo {
     url?: string;
     linkToken: string;
@@ -221,4 +216,8 @@ interface ContinueFlowsReturn {
 }
 declare function continueFlows(noClear?: boolean): ContinueFlowsReturn;
 
-export { CheckoutItem, CheckoutModalError, CheckoutModalErrorAt, CircleFieldErrorAt, CircleFieldErrors, MOJITO_DARK_THEME, MOJITO_LIGHT_THEME, PUICheckout, PUICheckoutProps, PUIError, PUIErrorProps, PUIPlaid, PUISuccess, PUISuccessProps$1 as PUISuccessProps, PaymentType, UserFormat, continueCheckout, continueFlows, continuePlaidOAuthFlow, getCheckoutModalState, getPlaidOAuthFlowState, persistPlaidReceivedRedirectUri, persistReceivedRedirectUri3DS, useOpenCloseCheckoutModal };
+declare const extendDefaultTheme: (themeOptions?: ThemeOptions | undefined) => Theme;
+declare const MOJITO_LIGHT_THEME: Theme;
+declare const MOJITO_DARK_THEME: Theme;
+
+export { CheckoutItem, CheckoutModalError, CheckoutModalErrorAt, CircleFieldErrorAt, CircleFieldErrors, MOJITO_DARK_THEME, MOJITO_LIGHT_THEME, PUICheckout, PUICheckoutProps, PUIError, PUIErrorProps, PUIPlaid, PUISuccess, PUISuccessProps$1 as PUISuccessProps, PaymentType, UserFormat, continueCheckout, continueFlows, continuePlaidOAuthFlow, extendDefaultTheme, getCheckoutModalState, getPlaidOAuthFlowState, persistPlaidReceivedRedirectUri, persistReceivedRedirectUri3DS, useOpenCloseCheckoutModal };
