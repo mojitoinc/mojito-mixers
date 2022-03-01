@@ -307,6 +307,12 @@ function createComponentsTheme({ typography, palette, spacing, breakpoints }) {
                 },
             },
         },
+        // TOOLTIPS:
+        MuiTooltip: {
+            styleOverrides: {
+                tooltip: Object.assign(Object.assign({}, typography.body1), { padding: spacing(1, 1.5) }),
+            },
+        },
     };
 }
 
