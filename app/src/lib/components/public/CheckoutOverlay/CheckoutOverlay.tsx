@@ -556,8 +556,6 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     return null;
   }
 
-  console.log("checkoutStep =", checkoutStep);
-
   const headerElement = (
     <CheckoutModalHeader
       variant={ headerVariant }
