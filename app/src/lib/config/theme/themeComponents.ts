@@ -298,6 +298,11 @@ export function createComponentsTheme({ typography, palette, spacing, breakpoint
           backgroundColor: palette.error.light,
           color: palette.error.main,
         } as any,
+
+        ["colorInfo" as any]: {
+          backgroundColor: palette.info.light,
+          color: palette.info.main,
+        } as any,
       },
     },
 

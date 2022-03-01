@@ -63,7 +63,9 @@ export interface CheckoutModalStateReturn extends CheckoutModalState, PurchaseSt
 
   // Wallet delivery address:
   personalWalletDeliveryAddress: string;
-  setPersonalWalletDeliveryAddress: Dispatch<SetStateAction<string | null>>;
+  usePersonalWallet: boolean;
+  setPersonalWalletDeliveryAddress: Dispatch<SetStateAction<string>>;
+  setUsePersonalWallet: Dispatch<SetStateAction<boolean>>;
 }
 
 export const CHECKOUT_STEPS: CheckoutModalStep[] = ["authentication", "billing", "payment", "purchasing", "confirmation"];
@@ -101,9 +103,9 @@ export function useCheckoutModalState({
     paymentReferenceNumber: "",
   });
 
-  const [personalWalletDeliveryAddress, setPersonalWalletDeliveryAddress] = useState<string | null>(null);
+  const [personalWalletDeliveryAddress, setPersonalWalletDeliveryAddress] = useState<string>('');
+  const [usePersonalWallet, setUsePersonalWallet] = useState<boolean>(false);
 
-  const usePersonalWalletDeliveryAddress = personalWalletDeliveryAddress !== null;
 
   const initModalState = useCallback(() => {
     // Make sure the progress tracker in BillingView and PaymentView is properly animated:
@@ -138,7 +140,7 @@ export function useCheckoutModalState({
       paymentReferenceNumber: savedFlow.paymentReferenceNumber || "",
     });
 
-    setPersonalWalletDeliveryAddress(null);
+    setPersonalWalletDeliveryAddress('');
   }, [startAt]);
 
   const goBack = useCallback(() => {
@@ -151,7 +153,7 @@ export function useCheckoutModalState({
 
   const goNext = useCallback(() => {
     if (
-      usePersonalWalletDeliveryAddress &&
+      usePersonalWallet &&
       !isValidWalletAddress(personalWalletDeliveryAddress) &&
       WALLET_ADDRESS_FIELD_STEPS.includes(checkoutStep)
     ) return;
@@ -161,7 +163,7 @@ export function useCheckoutModalState({
       checkoutError,
       isDialogBlocked: false,
     }));
-  }, [checkoutStep, usePersonalWalletDeliveryAddress, personalWalletDeliveryAddress]);
+  }, [checkoutStep, usePersonalWallet, personalWalletDeliveryAddress]);
 
   const goTo = useCallback((checkoutStep: CheckoutModalStep = startAt, error?: null | string | CheckoutModalError) => {
     setCheckoutModalState((prevCheckoutModalState) => {
@@ -229,5 +231,7 @@ export function useCheckoutModalState({
     // Wallet delivery address:
     personalWalletDeliveryAddress,
     setPersonalWalletDeliveryAddress,
+    usePersonalWallet,
+    setUsePersonalWallet
   };
 }

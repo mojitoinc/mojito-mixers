@@ -28,6 +28,8 @@ export interface PaymentViewProps {
   onCvvSelected: (cvv: string) => void;
   onSavedPaymentMethodDeleted: (savedPaymentMethodId: string) => void;
   onPersonalWalletDeliveryAddressChange: (personalWalletAddress: string) => void;
+  usePersonalWallet: boolean;
+  onUsePersonalWalletChange: (state: boolean) => void;
   onNext: () => void;
   onPrev: () => void;
   onClose: () => void;
@@ -49,6 +51,8 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
   onCvvSelected,
   onSavedPaymentMethodDeleted,
   onPersonalWalletDeliveryAddressChange,
+  onUsePersonalWalletChange,
+  usePersonalWallet,
   onNext,
   onPrev,
   onClose,
@@ -183,10 +187,13 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
         ) }
       </Stack>
       <CheckoutDeliveryAndItemCostBreakdown
-        checkoutItems={ checkoutItems }
+        checkoutItems={checkoutItems}
         validatePersonalDeliveryAddress={formSubmitAttempted}
-        personalWalletAddressForDelivery={ personalWalletAddressForDelivery }
-        onPersonalWalletAddressChange={ onPersonalWalletDeliveryAddressChange } />
+        personalWalletAddressForDelivery={personalWalletAddressForDelivery}
+        onPersonalWalletAddressChange={onPersonalWalletDeliveryAddressChange}
+        onUsePersonalWalletChange={onUsePersonalWalletChange}
+        usePersonalWallet={usePersonalWallet}
+      />
     </Stack>
   );
 };

@@ -6,11 +6,14 @@ import { InputGroupLabel } from "../../shared/InputGroupLabel/InputGroupLabel";
 import { TextField } from "../../shared/TextField/TextField";
 import { withInvalidErrorMessage } from "../../../utils/validationUtils";
 import { isValidWalletAddress } from "../../../domain/wallet/wallet.utils";
+import { ChangeEvent } from "react";
 
 export interface DeliveryWalletSelectorProps {
   validatePersonalAddress: boolean;
   personalWalletAddress: string;
+  usePersonalWallet: boolean;
   onWalletAddressChange: (walletAddress: string) => void;
+  onUsePersonalWalletChange: (state: boolean) => void
 }
 
 const WALLET_ADDRESS_FIELD_LABEL = "Wallet Address";
@@ -19,18 +22,22 @@ const INVALID_WALLET_ADDRESS_MESSAGE = withInvalidErrorMessage({ label: WALLET_A
 export const DeliveryWalletSelector: React.FC<DeliveryWalletSelectorProps> = ({
   validatePersonalAddress,
   personalWalletAddress,
+  usePersonalWallet,
+  onUsePersonalWalletChange,
   onWalletAddressChange,
 }) => {
-  const usePersonalWallet = personalWalletAddress !== null;
 
-  const handleUsePersonalWalletChange = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => onWalletAddressChange(e.target.checked ? "" : null);
+  const onCheckChange = (e: ChangeEvent<HTMLInputElement>) => {
+    onUsePersonalWalletChange(e.target.checked);
+    onWalletAddressChange('');
+  }
 
   const handleWalletAddressChange = (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
-    if (usePersonalWallet) onWalletAddressChange(e.target.value);
+    if (usePersonalWallet) {
+      onWalletAddressChange(e.target.value);
+    }
   };
 
   const isAddressOk = !usePersonalWallet || isValidWalletAddress(personalWalletAddress);
@@ -52,7 +59,7 @@ export const DeliveryWalletSelector: React.FC<DeliveryWalletSelectorProps> = ({
 
       <Checkbox
         label="I would like to deliver to a personal wallet"
-        onChange={handleUsePersonalWalletChange}
+        onChange={onCheckChange}
         checked={usePersonalWallet}
       />
 
@@ -60,10 +67,10 @@ export const DeliveryWalletSelector: React.FC<DeliveryWalletSelectorProps> = ({
         <>
           <Typography>
             Once minted, this is where your items will be delivered:
-            <Typography sx={{ fontWeight: 500 }}>
-              (IMPORTANT: Please make sure the wallet address you provide is
-              correct)
-            </Typography>
+          </Typography>
+          <Typography sx={{ fontWeight: 500 }}>
+            (IMPORTANT: Please make sure the wallet address you provide is
+            correct)
           </Typography>
 
           <TextField

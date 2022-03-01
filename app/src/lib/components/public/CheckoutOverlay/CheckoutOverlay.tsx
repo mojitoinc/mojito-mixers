@@ -159,8 +159,10 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     setPaymentReferenceNumber,
 
     // Wallet delivery address:
+    usePersonalWallet,
     personalWalletDeliveryAddress,
     setPersonalWalletDeliveryAddress,
+    setUsePersonalWallet,
   } = useCheckoutModalState({
     invoiceID: initialInvoiceID,
     productConfirmationEnabled,
@@ -495,6 +497,8 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
         onBillingInfoSelected={ handleBillingInfoSelected }
         onSavedPaymentMethodDeleted={ handleSavedPaymentMethodDeleted }
         onPersonalWalletDeliveryAddressChange={ setPersonalWalletDeliveryAddress }
+        onUsePersonalWalletChange={setUsePersonalWallet}
+        usePersonalWallet={usePersonalWallet}
         onNext={ goNext }
         onClose={ handleClose }
         debug={ debug } />
@@ -511,6 +515,8 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
         onCvvSelected={ handleCvvSelected }
         onSavedPaymentMethodDeleted={ handleSavedPaymentMethodDeleted }
         onPersonalWalletDeliveryAddressChange={ setPersonalWalletDeliveryAddress }
+        onUsePersonalWalletChange={setUsePersonalWallet}
+        usePersonalWallet={usePersonalWallet}
         onNext={ goNext }
         onPrev={ goBack }
         onClose={ handleClose }

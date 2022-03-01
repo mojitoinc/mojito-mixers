@@ -18,9 +18,11 @@ export interface BillingViewProps {
   selectedBillingInfo: string | BillingInfo;
   personalWalletAddressForDelivery: string;
   checkoutError?: CheckoutModalError;
+  usePersonalWallet: boolean;
   onBillingInfoSelected: (data: string | BillingInfo) => void;
   onSavedPaymentMethodDeleted: (savedPaymentMethodId: string) => Promise<void>;
   onPersonalWalletDeliveryAddressChange: (personalWalletAddress: string) => void;
+  onUsePersonalWalletChange: (state: boolean) => void
   onNext: () => void;
   onClose: () => void;
   debug?: boolean;
@@ -30,11 +32,13 @@ export const BillingView: React.FC<BillingViewProps> = ({
   checkoutItems,
   savedPaymentMethods: rawSavedPaymentMethods,
   selectedBillingInfo,
+  usePersonalWallet,
   personalWalletAddressForDelivery,
   checkoutError,
   onBillingInfoSelected,
   onSavedPaymentMethodDeleted,
   onPersonalWalletDeliveryAddressChange,
+  onUsePersonalWalletChange,
   onNext,
   onClose,
   debug,
@@ -137,10 +141,12 @@ export const BillingView: React.FC<BillingViewProps> = ({
           ) }
       </Stack>
       <CheckoutDeliveryAndItemCostBreakdown
-        checkoutItems={ checkoutItems }
-        validatePersonalDeliveryAddress={ formSubmitAttempted }
-        personalWalletAddressForDelivery={ personalWalletAddressForDelivery }
-        onPersonalWalletAddressChange={ onPersonalWalletDeliveryAddressChange } />
+        checkoutItems={checkoutItems}
+        onUsePersonalWalletChange={onUsePersonalWalletChange}
+        usePersonalWallet={usePersonalWallet}
+        validatePersonalDeliveryAddress={formSubmitAttempted}
+        personalWalletAddressForDelivery={personalWalletAddressForDelivery}
+        onPersonalWalletAddressChange={onPersonalWalletDeliveryAddressChange} />
     </Stack>
   );
 };

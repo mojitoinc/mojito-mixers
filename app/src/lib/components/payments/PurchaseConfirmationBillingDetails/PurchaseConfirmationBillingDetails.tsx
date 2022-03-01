@@ -9,6 +9,7 @@ import { CheckoutItemCostPurchase } from "../CheckoutItemCost/Purchase/CheckoutI
 import { PAYMENT_TYPE_LABEL } from "./PurchaseConfirmationBillingDetails.constants";
 import { getFormattedPaymentMethod } from "./PurchaseConfirmationBillingDetails.utils";
 import CheckIcon from "@mui/icons-material/Check";
+import DeliveryWalletDetails from "../DeliveryWallet/DeliveryWalletDetails";
 
 export interface PurchaseConfirmationBillingDetailsProps {
   checkoutItems: CheckoutItem[];
@@ -89,8 +90,9 @@ export const PurchaseConfirmationBillingDetails: React.FC<PurchaseConfirmationBi
       </Stack>
 
       <CheckoutItemCostPurchase
-        checkoutItems={ checkoutItems }
-        selectedPaymentMethodBillingInfo={ selectedPaymentMethodBillingInfo } />
+        checkoutItems={checkoutItems}
+        selectedPaymentMethodBillingInfo={selectedPaymentMethodBillingInfo} />
+      <DeliveryWalletDetails walletAdress="0xC000A000bC00D3E4c792d2aFDE0000000d000001" />
     </Box>
   );
 }

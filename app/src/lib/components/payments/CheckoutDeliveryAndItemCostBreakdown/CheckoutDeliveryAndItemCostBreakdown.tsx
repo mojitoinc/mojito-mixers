@@ -10,6 +10,8 @@ interface CheckoutDeliveryAndItemCostBreakdownProps {
   checkoutItems: CheckoutItem[];
   validatePersonalDeliveryAddress: boolean;
   personalWalletAddressForDelivery: string;
+  usePersonalWallet: boolean;
+  onUsePersonalWalletChange: (state: boolean) => void
   onPersonalWalletAddressChange: (personalWalletAddress: string) => void;
 }
 
@@ -20,14 +22,18 @@ export const CheckoutDeliveryAndItemCostBreakdown: React.FC<
   validatePersonalDeliveryAddress,
   personalWalletAddressForDelivery,
   onPersonalWalletAddressChange,
+  usePersonalWallet,
+  onUsePersonalWalletChange,
 }) => (
-  <Stack sx={{ display: "flex", flex: 1 }}>
-    <DeliveryWalletSelector
-      validatePersonalAddress={validatePersonalDeliveryAddress}
-      personalWalletAddress={personalWalletAddressForDelivery}
-      onWalletAddressChange={onPersonalWalletAddressChange}
-    />
-    <Divider sx={{ my: 3.75 }} />
-    <CheckoutItemCostBreakdown checkoutItems={checkoutItems} />
-  </Stack>
-);
+    <Stack sx={{ display: "flex", flex: 1 }}>
+      <DeliveryWalletSelector
+        validatePersonalAddress={validatePersonalDeliveryAddress}
+        personalWalletAddress={personalWalletAddressForDelivery}
+        onWalletAddressChange={onPersonalWalletAddressChange}
+        onUsePersonalWalletChange={onUsePersonalWalletChange}
+        usePersonalWallet={usePersonalWallet}
+      />
+      <Divider sx={{ my: 3.75 }} />
+      <CheckoutItemCostBreakdown checkoutItems={checkoutItems} />
+    </Stack>
+  );

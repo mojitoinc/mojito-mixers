@@ -26,6 +26,10 @@ const MOJITO_LIGHT_PALETTE: PaletteOptions = {
     // action: "linear-gradient(to right, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1)), linear-gradient(272.88deg, #FFC5C5 -97.9%, #98DF77 123.11%)",
     // actionReverse: "linear-gradient(to left, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1)), linear-gradient(272.88deg, #FFC5C5 -97.9%, #98DF77 123.11%)",
   },
+  info: {
+    main: "#0A96B4",
+    light: "#55E0FF",
+  },
   success: {
     main: "#31A136",
     light: "#E5F2E5",
