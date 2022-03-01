@@ -353,5 +353,16 @@ export function createComponentsTheme({ typography, palette, spacing, breakpoint
       },
     },
 
+    // TOOLTIPS:
+
+    MuiTooltip: {
+      styleOverrides: {
+        tooltip: {
+          ...typography.body1,
+          padding: spacing(1, 1.5),
+        },
+      },
+    },
+
   };
 }
