@@ -12,9 +12,9 @@ mutation CreateAuctionInvoice($orgID: UUID1!, $lotID: UUID1!) {
 }
 
 mutation CreateBuyNowInvoice(
-  $input: PurchaseMarketplaceBuyNowLotInput!
+  $input: ReserveMarketplaceBuyNowLotInput!
 ) {
-  purchaseMarketplaceBuyNowLot(input: $input) {
+  reserveMarketplaceBuyNowLot(input: $input) {
     invoice {
       invoiceID
       status

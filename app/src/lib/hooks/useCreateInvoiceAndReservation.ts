@@ -126,7 +126,7 @@ export function useCreateInvoiceAndReservation({
       if (createBuyNowInvoiceResult && !createBuyNowInvoiceResult.errors) {
         if (debug) console.log("    🟢 createBuyNowInvoice result", createBuyNowInvoiceResult);
 
-        invoiceID = createBuyNowInvoiceResult.data?.purchaseMarketplaceBuyNowLot?.invoice?.invoiceID;
+        invoiceID = createBuyNowInvoiceResult.data?.reserveMarketplaceBuyNowLot?.invoice?.invoiceID;
       }
     } else if (lotType === "auction" && process.env.NODE_ENV === "development") {
       if (debug) {

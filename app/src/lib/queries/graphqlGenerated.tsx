@@ -596,7 +596,7 @@ export type Mutation = {
   nftDeployContract: NftContract;
   orgCreateMarketplace: Marketplace;
   ping: Scalars['String'];
-  purchaseMarketplaceBuyNowLot: MarketplaceBuyNowOutput;
+  reserveMarketplaceBuyNowLot: MarketplaceBuyNowOutput;
   revealGenerativeToken: Scalars['String'];
   setJwtIssuerDomain: Organization;
   transferToken: Scalars['String'];
@@ -804,8 +804,8 @@ export type MutationOrgCreateMarketplaceArgs = {
 };
 
 
-export type MutationPurchaseMarketplaceBuyNowLotArgs = {
-  input: PurchaseMarketplaceBuyNowLotInput;
+export type MutationReserveMarketplaceBuyNowLotArgs = {
+  input: ReserveMarketplaceBuyNowLotInput;
 };
 
 
@@ -1033,11 +1033,6 @@ export enum PaymentType {
   Wire = 'Wire'
 }
 
-export type PurchaseMarketplaceBuyNowLotInput = {
-  itemCount: Scalars['Int'];
-  marketplaceBuyNowLotID: Scalars['UUID1'];
-};
-
 export type Query = {
   __typename?: 'Query';
   collection?: Maybe<MarketplaceCollection>;
@@ -1193,6 +1188,11 @@ export type QueryValidatePaymentLimitArgs = {
 
 export type QueryWalletArgs = {
   id: Scalars['UUID1'];
+};
+
+export type ReserveMarketplaceBuyNowLotInput = {
+  itemCount: Scalars['Int'];
+  marketplaceBuyNowLotID: Scalars['UUID1'];
 };
 
 export enum Role {
@@ -1511,11 +1511,11 @@ export type CreateAuctionInvoiceMutationVariables = Exact<{
 export type CreateAuctionInvoiceMutation = { __typename?: 'Mutation', createAuctionLotInvoice: { __typename?: 'InvoiceDetails', invoiceID: any, status: InvoiceStatus, items: Array<{ __typename?: 'ItemInvoiceDetail', units: number, unitPrice: number, taxes: number, totalPrice: number } | null> } };
 
 export type CreateBuyNowInvoiceMutationVariables = Exact<{
-  input: PurchaseMarketplaceBuyNowLotInput;
+  input: ReserveMarketplaceBuyNowLotInput;
 }>;
 
 
-export type CreateBuyNowInvoiceMutation = { __typename?: 'Mutation', purchaseMarketplaceBuyNowLot: { __typename?: 'MarketplaceBuyNowOutput', invoice?: { __typename?: 'InvoiceDetails', invoiceID: any, status: InvoiceStatus, items: Array<{ __typename?: 'ItemInvoiceDetail', units: number, unitPrice: number, taxes: number, totalPrice: number } | null> } | null } };
+export type CreateBuyNowInvoiceMutation = { __typename?: 'Mutation', reserveMarketplaceBuyNowLot: { __typename?: 'MarketplaceBuyNowOutput', invoice?: { __typename?: 'InvoiceDetails', invoiceID: any, status: InvoiceStatus, items: Array<{ __typename?: 'ItemInvoiceDetail', units: number, unitPrice: number, taxes: number, totalPrice: number } | null> } | null } };
 
 export type GetInvoiceDetailsQueryVariables = Exact<{
   invoiceID: Scalars['UUID1'];
@@ -1689,8 +1689,8 @@ export type CreateAuctionInvoiceMutationHookResult = ReturnType<typeof useCreate
 export type CreateAuctionInvoiceMutationResult = Apollo.MutationResult<CreateAuctionInvoiceMutation>;
 export type CreateAuctionInvoiceMutationOptions = Apollo.BaseMutationOptions<CreateAuctionInvoiceMutation, CreateAuctionInvoiceMutationVariables>;
 export const CreateBuyNowInvoiceDocument = gql`
-    mutation CreateBuyNowInvoice($input: PurchaseMarketplaceBuyNowLotInput!) {
-  purchaseMarketplaceBuyNowLot(input: $input) {
+    mutation CreateBuyNowInvoice($input: ReserveMarketplaceBuyNowLotInput!) {
+  reserveMarketplaceBuyNowLot(input: $input) {
     invoice {
       invoiceID
       status
