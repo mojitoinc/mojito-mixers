@@ -1523,7 +1523,7 @@ export type GetInvoiceDetailsQueryVariables = Exact<{
 }>;
 
 
-export type GetInvoiceDetailsQuery = { __typename?: 'Query', getInvoiceDetails: { __typename?: 'InvoiceDetails', items: Array<{ __typename?: 'ItemInvoiceDetail', collectionItemID: any, collectionItemTitle: string, units: number, unitPrice: number } | null> } };
+export type GetInvoiceDetailsQuery = { __typename?: 'Query', getInvoiceDetails: { __typename?: 'InvoiceDetails', items: Array<{ __typename?: 'ItemInvoiceDetail', collectionItemID: any, collectionItemTitle: string, units: number, unitPrice: number, taxes: number, totalPrice: number } | null> } };
 
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -1738,6 +1738,8 @@ export const GetInvoiceDetailsDocument = gql`
       collectionItemTitle
       units
       unitPrice
+      taxes
+      totalPrice
     }
   }
 }

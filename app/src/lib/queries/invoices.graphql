@@ -35,6 +35,8 @@ query GetInvoiceDetails($invoiceID: UUID1!, $orgID: UUID1!) {
       collectionItemTitle
       units
       unitPrice
+      taxes
+      totalPrice
     }
   }
 }

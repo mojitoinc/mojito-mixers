@@ -8,11 +8,9 @@ import { SavedPaymentMethod } from "../../domain/circle/circle.interfaces";
 import { billingInfoToSavedPaymentMethodBillingInfo } from "../../domain/circle/circle.utils";
 import { CheckoutItem } from "../../domain/product/product.interfaces";
 import { SelectedPaymentMethod } from "../../components/public/CheckoutOverlay/CheckoutOverlay.hooks";
-import { TaxesState } from "../Billing/BillingView";
 
 export interface ConfirmationViewProps {
   checkoutItems: CheckoutItem[];
-  taxes: TaxesState;
   savedPaymentMethods: SavedPaymentMethod[];
   selectedPaymentMethod: SelectedPaymentMethod;
   paymentReferenceNumber: string;
@@ -22,7 +20,6 @@ export interface ConfirmationViewProps {
 
 export const ConfirmationView: React.FC<ConfirmationViewProps> = ({
   checkoutItems,
-  taxes,
   savedPaymentMethods,
   selectedPaymentMethod,
   paymentReferenceNumber,
@@ -69,7 +66,6 @@ export const ConfirmationView: React.FC<ConfirmationViewProps> = ({
     >
       <PurchaseConfirmationBillingDetails
         checkoutItems={checkoutItems}
-        taxes={taxes}
         paymentReferenceNumber={paymentReferenceNumber}
         selectedPaymentMethodBillingInfo={selectedPaymentMethodBillingInfo}
         selectedPaymentMethodPaymentInfo={selectedPaymentMethodPaymentInfo}

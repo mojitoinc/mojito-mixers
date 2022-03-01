@@ -16,6 +16,8 @@ export function transformCheckoutItemsFromInvoice(
       ...checkoutItem,
       units: invoiceItem?.units || checkoutItem.units || 1,
       unitPrice: invoiceItem?.unitPrice || 0,
+      taxes: invoiceItem?.taxes || 0,
+      totalPrice: invoiceItem?.totalPrice || 0,
       // TODO: Include fees and fees calculation logic here for auctions (from invoice)
       // TODO: Include taxes too (if present in invoice).
     };

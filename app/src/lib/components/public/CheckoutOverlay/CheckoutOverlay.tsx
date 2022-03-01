@@ -540,7 +540,6 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     checkoutStepElement = (
       <ConfirmationView
         checkoutItems={ checkoutItems }
-        taxes={ taxes }
         savedPaymentMethods={ savedPaymentMethods }
         selectedPaymentMethod={ selectedPaymentMethod }
         paymentReferenceNumber={ paymentReferenceNumber }

@@ -26,11 +26,7 @@ export const CheckoutItemCostBreakdown: React.FC<CheckoutItemCostBreakdownProps>
 
       <Divider sx={{ mt: 3.75, mb: 1.5 }} />
 
-      <CheckoutItemCostTotal
-        withDetails
-        total={ total }
-        taxes={ taxes }
-        fees={ fees } />
+      <CheckoutItemCostTotal withDetails total={ total } fees={ fees } taxes={ taxes } />
     </Stack>
   );
 };
