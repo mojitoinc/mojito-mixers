@@ -30,8 +30,8 @@ export const PUISuccessOverlay: React.FC<PUISuccessOverlayProps> = ({
   const isPathname = isUrlPathname(url);
 
   useLayoutEffect(() => {
-    if (purchaseSuccess && isPathname) {
-      persistReceivedRedirectUri3DS(window.location.href);
+    if (purchaseSuccess) {
+      if (isPathname) persistReceivedRedirectUri3DS(window.location.href);
 
       return;
     }
