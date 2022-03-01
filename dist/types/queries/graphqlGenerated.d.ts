@@ -531,7 +531,7 @@ export declare type Mutation = {
     nftDeployContract: NftContract;
     orgCreateMarketplace: Marketplace;
     ping: Scalars['String'];
-    purchaseMarketplaceBuyNowLot: MarketplaceBuyNowOutput;
+    reserveMarketplaceBuyNowLot: MarketplaceBuyNowOutput;
     revealGenerativeToken: Scalars['String'];
     setJwtIssuerDomain: Organization;
     transferToken: Scalars['String'];
@@ -671,8 +671,8 @@ export declare type MutationOrgCreateMarketplaceArgs = {
     name: Scalars['String'];
     orgId?: InputMaybe<Scalars['UUID1']>;
 };
-export declare type MutationPurchaseMarketplaceBuyNowLotArgs = {
-    input: PurchaseMarketplaceBuyNowLotInput;
+export declare type MutationReserveMarketplaceBuyNowLotArgs = {
+    input: ReserveMarketplaceBuyNowLotInput;
 };
 export declare type MutationRevealGenerativeTokenArgs = {
     contractId: Scalars['UUID'];
@@ -852,10 +852,6 @@ export declare enum PaymentType {
     CreditCard = "CreditCard",
     Wire = "Wire"
 }
-export declare type PurchaseMarketplaceBuyNowLotInput = {
-    itemCount: Scalars['Int'];
-    marketplaceBuyNowLotID: Scalars['UUID1'];
-};
 export declare type Query = {
     __typename?: 'Query';
     collection?: Maybe<MarketplaceCollection>;
@@ -969,6 +965,10 @@ export declare type QueryValidatePaymentLimitArgs = {
 };
 export declare type QueryWalletArgs = {
     id: Scalars['UUID1'];
+};
+export declare type ReserveMarketplaceBuyNowLotInput = {
+    itemCount: Scalars['Int'];
+    marketplaceBuyNowLotID: Scalars['UUID1'];
 };
 export declare enum Role {
     Admin = "admin",
@@ -1265,11 +1265,11 @@ export declare type CreateAuctionInvoiceMutation = {
     };
 };
 export declare type CreateBuyNowInvoiceMutationVariables = Exact<{
-    input: PurchaseMarketplaceBuyNowLotInput;
+    input: ReserveMarketplaceBuyNowLotInput;
 }>;
 export declare type CreateBuyNowInvoiceMutation = {
     __typename?: 'Mutation';
-    purchaseMarketplaceBuyNowLot: {
+    reserveMarketplaceBuyNowLot: {
         __typename?: 'MarketplaceBuyNowOutput';
         invoice?: {
             __typename?: 'InvoiceDetails';
@@ -1547,7 +1547,7 @@ export declare type CreateBuyNowInvoiceMutationFn = Apollo.MutationFunction<Crea
  * });
  */
 export declare function useCreateBuyNowInvoiceMutation(baseOptions?: Apollo.MutationHookOptions<CreateBuyNowInvoiceMutation, CreateBuyNowInvoiceMutationVariables>): Apollo.MutationTuple<CreateBuyNowInvoiceMutation, Exact<{
-    input: PurchaseMarketplaceBuyNowLotInput;
+    input: ReserveMarketplaceBuyNowLotInput;
 }>, Apollo.DefaultContext, Apollo.ApolloCache<any>>;
 export declare type CreateBuyNowInvoiceMutationHookResult = ReturnType<typeof useCreateBuyNowInvoiceMutation>;
 export declare type CreateBuyNowInvoiceMutationResult = Apollo.MutationResult<CreateBuyNowInvoiceMutation>;

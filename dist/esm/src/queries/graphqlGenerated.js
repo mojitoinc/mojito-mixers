@@ -203,8 +203,8 @@ function useCreateAuctionInvoiceMutation(baseOptions) {
     return Apollo.useMutation(CreateAuctionInvoiceDocument, options);
 }
 const CreateBuyNowInvoiceDocument = gql `
-    mutation CreateBuyNowInvoice($input: PurchaseMarketplaceBuyNowLotInput!) {
-  purchaseMarketplaceBuyNowLot(input: $input) {
+    mutation CreateBuyNowInvoice($input: ReserveMarketplaceBuyNowLotInput!) {
+  reserveMarketplaceBuyNowLot(input: $input) {
     invoice {
       invoiceID
       status
