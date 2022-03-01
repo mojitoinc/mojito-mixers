@@ -135,6 +135,7 @@ export const BillingInfoForm: React.FC<BillingInfoFormProps> = ({
     control,
     handleSubmit,
     watch,
+    trigger,
     setError,
     formState,
   } = useForm<BillingInfo>({
@@ -160,13 +161,14 @@ export const BillingInfoForm: React.FC<BillingInfoFormProps> = ({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [onTaxInfoChange, street, country.value, city, state.value, zip]);
 
+  const taxesStatus = taxes.status;
   const selectedCountryOption: SelectOption = watch(COUNTRY_FIELD);
   const selectedCountryCode = selectedCountryOption?.value;
   const submitForm = handleSubmit(onSubmit);
   const checkoutErrorMessage = useFormCheckoutError({ formKey: "billing", checkoutError, fields: FIELD_NAMES, setError });
 
   return (
-    <form onSubmit={submitForm}>
+    <form onSubmit={ submitForm }>
       {onSaved && (
         <Box sx={{ my: 2.5 }}>
           <SecondaryButton onClick={onSaved} startIcon={<BookIcon />}>
@@ -261,7 +263,7 @@ export const BillingInfoForm: React.FC<BillingInfoFormProps> = ({
 
       { checkoutErrorMessage && <FormErrorsBox error={ checkoutErrorMessage } sx={{ mt: 5 }} /> }
 
-      <TaxesMessagesBox sx={{ mt: 5 }} taxes={ taxes } variant="form" />
+      { formState.isSubmitted && <TaxesMessagesBox sx={{ mt: 5 }} taxes={ taxes } variant="form" /> }
 
       { debug && (
         <DebugBox sx={{ mt: 5 }}>
@@ -275,7 +277,8 @@ export const BillingInfoForm: React.FC<BillingInfoFormProps> = ({
 
       <CheckoutModalFooter
         variant="toPayment"
-        submitDisabled={ taxes.status !== "complete" }
+        buttonLabel={ taxesStatus === "loading" ? "Calculating taxes..." : undefined }
+        submitDisabled={ taxesStatus === "loading" }
         onCloseClicked={onClose} />
     </form>
   );

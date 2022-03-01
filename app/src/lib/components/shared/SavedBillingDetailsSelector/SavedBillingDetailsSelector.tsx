@@ -81,6 +81,7 @@ export const SavedBillingDetailsSelector: React.FC<SavedBillingDetailsSelectorPr
 
     <CheckoutModalFooter
       variant="toPayment"
+      buttonLabel={ taxes.status === "loading" ? "Calculating taxes..." : undefined }
       submitDisabled={ taxes.status !== "complete" }
       onSubmitClicked={ onNext }
       onCloseClicked={ onClose } />

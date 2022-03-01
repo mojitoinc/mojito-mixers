@@ -15,15 +15,12 @@ export const TaxesMessagesBox: React.FC<TaxesMessagesBoxProps> = ({
   sx,
   ...props
 }) => {
-  if (status === "loading" || status === "complete") return null;
+  if (status !== "error") return null;
 
   return (
     <Box { ...props }>
-      <Typography variant="caption" component="p" sx={{
-        color: theme => status === "incomplete" || status === "error" ? theme.palette.warning.dark : theme.palette.text.primary,
-        ...sx
-      }}>
-        { status === "incomplete" ? `Please, ${ variant === "form" ? "enter" : "select" } a valid address to calculate taxes.` : "Invalid address." }
+      <Typography variant="caption" component="p" sx={{ color: theme => theme.palette.warning.dark, ...sx }}>
+        Please, { variant === "form" ? "enter" : "select" } a valid address to calculate taxes.
       </Typography>
     </Box>
   );

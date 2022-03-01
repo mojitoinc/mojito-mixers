@@ -20,10 +20,6 @@
 <br />
 
 
-// TODO: "Calculating taxes..." in the footer button.
-// TODO: Review tax quote logic in BillingView.
-
-
 ## Working on the project
 
 ### Next.js development playground:
@@ -46,11 +42,12 @@ While this project will be installed as a dependency in other apps, it also prov
 4.  Before committing, be sure to run:
 
     ```bash
-    yarn prettier
     yarn lint
     ```
 
     There is also `yarn lint:fix` which can automatically fix some lint issues.
+
+    Do not run `yarn deprecated:prettier`, that will be either updated or removed from the project later.
 
 <br />
 

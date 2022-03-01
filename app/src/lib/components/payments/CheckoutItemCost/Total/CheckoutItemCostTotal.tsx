@@ -39,8 +39,8 @@ export const CheckoutItemCostTotal: React.FC<CheckoutItemCostTotalProps> = ({
   let taxAmountElement: React.ReactNode = null;
 
   if (status === "loading") {
-    taxRateElement = <Tooltip title="Calculating taxes..."><span>(<Box component="span" sx={ TAX_RATE_PLACEHOLDER_SX }>0000</Box> %)</span></Tooltip>;
-    taxAmountElement = <Tooltip title="Calculating taxes..."><span><Box component="span" sx={ TAX_AMOUNT_PLACEHOLDER_SX }>00000000</Box> USD</span></Tooltip>;
+    taxRateElement = <Tooltip title="Calculating taxes..."><span>(<Box component="span" sx={ TAX_RATE_PLACEHOLDER_SX }>00.00</Box> %)</span></Tooltip>;
+    taxAmountElement = <Tooltip title="Calculating taxes..."><span><Box component="span" sx={ TAX_AMOUNT_PLACEHOLDER_SX }>{ `${ total * 0.10 | 0 }`.replace(/./, "0") }.00</Box> USD</span></Tooltip>;
   } else if (status === "complete" && taxAmount !== undefined ) {
     taxRateElement = `(${ formatTaxRate(taxRate) })`;
     taxAmountElement = <Number suffix=" USD">{taxAmount}</Number>;

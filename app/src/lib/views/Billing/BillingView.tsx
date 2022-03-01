@@ -67,8 +67,10 @@ export const BillingView: React.FC<BillingViewProps> = ({
 
   const [getTaxQuote] = useGetTaxQuoteLazyQuery();
 
+  const getTaxQuoteTimestampRef = useRef<number>();
+
   const calculateTaxes = useCallback(async (taxInfo: TaxInfo | BillingInfo) => {
-    console.log("calculateTaxes()", taxInfo);
+    const calledAt = getTaxQuoteTimestampRef.current;
 
     const result = await getTaxQuote({
       variables: {
@@ -85,10 +87,10 @@ export const BillingView: React.FC<BillingViewProps> = ({
       },
     }).catch(() => ({ data: null }));
 
+    // Discard stale result:
+    if (calledAt !== getTaxQuoteTimestampRef.current) return;
+
     const taxResult = result.data?.getTaxQuote || {} as TaxQuoteOutput;
-
-    console.log({ taxInfo, taxResult });
-
     const isValid = !!taxResult.verifiedAddress;
 
     setViewState((prevViewState) => ({ ...prevViewState, taxes: isValid ? {
@@ -99,17 +101,19 @@ export const BillingView: React.FC<BillingViewProps> = ({
   }, [getTaxQuote, total]);
 
   const handleThrottledTaxInfoChange = useThrottledCallback((taxInfo: Partial<TaxInfo>) => {
-    console.log("throttled taxInfo =", taxInfo);
+    if (!taxInfo.street || !taxInfo.city || !taxInfo.zipCode || !taxInfo.country?.value || !taxInfo.state?.value) {
+      setViewState((prevViewState) => prevViewState.taxes.status === "incomplete" ? prevViewState : ({ ...prevViewState, taxes: { status: "incomplete" }}));
 
-    if (Object.values(taxInfo).some(value => !value)) return;
+      return;
+    }
 
     calculateTaxes(taxInfo as TaxInfo);
   }, 1000, [calculateTaxes]);
 
   const handleTaxInfoChange = useCallback((taxInfo: Partial<TaxInfo>) => {
-    console.log("taxInfo =", taxInfo);
-
     setViewState((prevViewState) => prevViewState.taxes.status === "loading" ? prevViewState : ({ ...prevViewState, taxes: { status: "loading" }}));
+
+    getTaxQuoteTimestampRef.current = Date.now();
 
     handleThrottledTaxInfoChange(taxInfo);
   }, [handleThrottledTaxInfoChange]);
@@ -123,16 +127,15 @@ export const BillingView: React.FC<BillingViewProps> = ({
         ? savedPaymentMethodToBillingInfo(savedPaymentMethodData)
         : (typeof selectedBillingInfo === "string" ? null : selectedBillingInfo);
 
-
       setViewState((prevViewState) => ({ ...prevViewState, taxes: { status: billingInfo ? "loading" : "error" } }));
 
-      if (billingInfo) calculateTaxes(billingInfo);
+      if (billingInfo) {
+        getTaxQuoteTimestampRef.current = Date.now();
+
+        calculateTaxes(billingInfo);
+      }
     } else {
-      console.log(selectedBillingInfo ? "loading" : "incomplete", selectedBillingInfo);
-
       setViewState((prevViewState) => ({ ...prevViewState, taxes: { status: selectedBillingInfo ? "loading" : "incomplete" } }));
-
-      // TODO: Re-compute taxes here too...
     }
   }, [selectedBillingInfo, savedPaymentMethods, showSaved, calculateTaxes]);
 
@@ -147,6 +150,8 @@ export const BillingView: React.FC<BillingViewProps> = ({
       const data = savedPaymentMethods.find(({ addressId }) => addressId === savedPaymentMethodAddressId);
 
       if (data) onBillingInfoSelected(savedPaymentMethodToBillingInfo(data));
+    } else {
+      onBillingInfoSelected("");
     }
 
     setViewState({ isDeleting: false, showSaved: false, taxes: { status: "loading" } });
@@ -161,12 +166,14 @@ export const BillingView: React.FC<BillingViewProps> = ({
   }, [onBillingInfoSelected]);
 
   const handleSubmit = useCallback((data: BillingInfo) => {
+    if (taxes.status !== "complete") return;
+
     const savedPaymentMethodAddressId = getSavedPaymentMethodAddressIdFromBillingInfo(data);
     const savedPaymentMethodData = savedPaymentMethods.find(({ addressId }) => addressId === savedPaymentMethodAddressId);
 
     onBillingInfoSelected(savedPaymentMethodData ? savedPaymentMethodAddressId : data);
     onNext();
-  }, [savedPaymentMethods, onBillingInfoSelected, onNext]);
+  }, [savedPaymentMethods, onBillingInfoSelected, onNext, taxes.status]);
 
   const handleSavedPaymentMethodDeleted = useCallback(async (savedPaymentMethodId: string) => {
     setViewState(({ taxes }) => ({ isDeleting: true, showSaved: true, taxes }));
