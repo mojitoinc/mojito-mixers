@@ -13,11 +13,11 @@ function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'defau
 var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 
 const CheckoutItemCostPurchase = ({ checkoutItems, selectedPaymentMethodBillingInfo, }) => {
-    const { total, fees } = useCheckoutItemCostTotal.useCheckoutItemsCostTotal(checkoutItems);
+    const { total, fees, taxRate, taxAmount } = useCheckoutItemCostTotal.useCheckoutItemsCostTotal(checkoutItems);
     return (React__default["default"].createElement(React__default["default"].Fragment, null,
         React__default["default"].createElement(material.Grid, { container: true, item: true, direction: "column", sx: { display: "flex", pb: 2 } },
             React__default["default"].createElement(BillingInfoFragment.BillingInfoFragment, { savedPaymentMethod: selectedPaymentMethodBillingInfo }),
-            React__default["default"].createElement(CheckoutItemCostTotal.CheckoutItemCostTotal, { total: total, taxes: 0, fees: fees })),
+            React__default["default"].createElement(CheckoutItemCostTotal.CheckoutItemCostTotal, { total: total, fees: fees, taxes: { status: "complete", taxRate, taxAmount } })),
         React__default["default"].createElement(material.Divider, null)));
 };
 

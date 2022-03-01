@@ -7,8 +7,9 @@ import { SecondaryButton } from '../SecondaryButton/SecondaryButton.js';
 import { CheckoutModalFooter } from '../../payments/CheckoutModalFooter/CheckoutModalFooter.js';
 import { Box, alpha, CircularProgress } from '@mui/material';
 import { OVERLAY_OPACITY } from '../../../config/theme/theme.js';
+import { TaxesMessagesBox } from '../TaxesMessagesBox/TaxesMessagesBox.js';
 
-const SavedBillingDetailsSelector = ({ showLoader, savedPaymentMethods, selectedPaymentMethodAddressId, onNew, onEdit, onDelete, onPick, onNext, onClose, }) => {
+const SavedBillingDetailsSelector = ({ showLoader, savedPaymentMethods, selectedPaymentMethodAddressId, taxes, onNew, onEdit, onDelete, onPick, onNext, onClose, }) => {
     const getPaymentMethodAddressId = useCallback((savedPaymentMethod) => savedPaymentMethod.addressId, []);
     return (React__default.createElement(React__default.Fragment, null,
         React__default.createElement(Box, { sx: { position: "relative" } },
@@ -31,8 +32,9 @@ const SavedBillingDetailsSelector = ({ showLoader, savedPaymentMethods, selected
                     onPick,
                     onEdit,
                 }), component: BillingInfoItem, itemKey: getPaymentMethodAddressId, deps: [selectedPaymentMethodAddressId, showLoader, onDelete, onPick, onEdit] }),
-            React__default.createElement(SecondaryButton, { onClick: onNew, startIcon: React__default.createElement(default_1, null), sx: { mt: 2.5 }, disabled: showLoader }, "Add New Billing Info")),
-        React__default.createElement(CheckoutModalFooter, { variant: "toPayment", onSubmitClicked: onNext, onCloseClicked: onClose })));
+            React__default.createElement(SecondaryButton, { onClick: onNew, startIcon: React__default.createElement(default_1, null), sx: { mt: 2.5 }, disabled: showLoader }, "Add New Billing Info"),
+            React__default.createElement(TaxesMessagesBox, { sx: { mt: 5 }, taxes: taxes, variant: "selector" })),
+        React__default.createElement(CheckoutModalFooter, { variant: "toPayment", buttonLabel: taxes.status === "loading" ? "Calculating taxes..." : undefined, submitDisabled: taxes.status !== "complete", onSubmitClicked: onNext, onCloseClicked: onClose })));
 };
 
 export { SavedBillingDetailsSelector };

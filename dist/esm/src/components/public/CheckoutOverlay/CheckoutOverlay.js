@@ -24,7 +24,7 @@ open, onClose,
 // Flow:
 guestCheckoutEnabled, productConfirmationEnabled, 
 // Personalization:
-theme: parentTheme, themeOptions, logoSrc, logoSx, loaderImageSrc, purchasingImageSrc, purchasingMessages, errorImageSrc, userFormat, acceptedPaymentTypes, paymentLimits, // Not implemented yet. Used to show payment limits for some payment types.
+logoSrc, logoSx, loaderImageSrc, purchasingImageSrc, purchasingMessages, errorImageSrc, userFormat, acceptedPaymentTypes, paymentLimits, // Not implemented yet. Used to show payment limits for some payment types.
 customTexts, 
 // Legal:
 consentType, privacyHref, termsOfUseHref, 
@@ -49,7 +49,7 @@ debug, onError, onMarketingOptInChange, // Not implemented yet. Used to let user
     // SelectedPaymentMethod:
     selectedPaymentMethod, setSelectedPaymentMethod, 
     // PurchaseState:
-    invoiceID, paymentReferenceNumber, setInvoiceID, setPaymentReferenceNumber, } = useCheckoutModalState({
+    invoiceID, paymentReferenceNumber, setInvoiceID, setPaymentReferenceNumber, taxes, setTaxes, } = useCheckoutModalState({
         invoiceID: initialInvoiceID,
         productConfirmationEnabled,
         isAuthenticated,
@@ -260,13 +260,13 @@ debug, onError, onMarketingOptInChange, // Not implemented yet. Used to let user
     else if (checkoutStep === "authentication") {
         if (!isAuthenticated)
             headerVariant = 'anonymous';
-        checkoutStepElement = (React__default.createElement(AuthenticationView, { checkoutItems: checkoutItems, isAuthenticated: isAuthenticated, guestCheckoutEnabled: guestCheckoutEnabled, onGuestClicked: goNext, onCloseClicked: handleClose }));
+        checkoutStepElement = (React__default.createElement(AuthenticationView, { checkoutItems: checkoutItems, taxes: taxes, isAuthenticated: isAuthenticated, guestCheckoutEnabled: guestCheckoutEnabled, onGuestClicked: goNext, onCloseClicked: handleClose }));
     }
     else if (checkoutStep === "billing") {
-        checkoutStepElement = (React__default.createElement(BillingView, { checkoutItems: checkoutItems, savedPaymentMethods: savedPaymentMethods, selectedBillingInfo: selectedPaymentMethod.billingInfo, checkoutError: checkoutError, onBillingInfoSelected: handleBillingInfoSelected, onSavedPaymentMethodDeleted: handleSavedPaymentMethodDeleted, onNext: goNext, onClose: handleClose, debug: debug }));
+        checkoutStepElement = (React__default.createElement(BillingView, { checkoutItems: checkoutItems, savedPaymentMethods: savedPaymentMethods, selectedBillingInfo: selectedPaymentMethod.billingInfo, checkoutError: checkoutError, onBillingInfoSelected: handleBillingInfoSelected, onTaxesChange: setTaxes, onSavedPaymentMethodDeleted: handleSavedPaymentMethodDeleted, onNext: goNext, onClose: handleClose, debug: debug }));
     }
     else if (checkoutStep === "payment") {
-        checkoutStepElement = (React__default.createElement(PaymentView, { checkoutItems: checkoutItems, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethod: selectedPaymentMethod, checkoutError: checkoutError, onPaymentInfoSelected: handlePaymentInfoSelected, onCvvSelected: handleCvvSelected, onSavedPaymentMethodDeleted: handleSavedPaymentMethodDeleted, onNext: goNext, onPrev: goBack, onClose: handleClose, acceptedPaymentTypes: acceptedPaymentTypes, consentType: consentType, privacyHref: privacyHref, termsOfUseHref: termsOfUseHref, wirePaymentsDisclaimerText: customTexts.wirePaymentsDisclaimer, debug: debug }));
+        checkoutStepElement = (React__default.createElement(PaymentView, { checkoutItems: checkoutItems, taxes: taxes, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethod: selectedPaymentMethod, checkoutError: checkoutError, onPaymentInfoSelected: handlePaymentInfoSelected, onCvvSelected: handleCvvSelected, onSavedPaymentMethodDeleted: handleSavedPaymentMethodDeleted, onNext: goNext, onPrev: goBack, onClose: handleClose, acceptedPaymentTypes: acceptedPaymentTypes, consentType: consentType, privacyHref: privacyHref, termsOfUseHref: termsOfUseHref, wirePaymentsDisclaimerText: customTexts.wirePaymentsDisclaimer, debug: debug }));
     }
     else if (checkoutStep === "purchasing" && invoiceID) {
         headerVariant = "purchasing";

@@ -4,8 +4,10 @@ import { PaymentMethod, PaymentType } from "../../domain/payment/payment.interfa
 import { SavedPaymentMethod } from "../../domain/circle/circle.interfaces";
 import { CheckoutModalError, SelectedPaymentMethod } from "../../components/public/CheckoutOverlay/CheckoutOverlay.hooks";
 import { ConsentType } from "../../components/shared/ConsentText/ConsentText";
+import { TaxesState } from "../Billing/BillingView";
 export interface PaymentViewProps {
     checkoutItems: CheckoutItem[];
+    taxes: TaxesState;
     savedPaymentMethods: SavedPaymentMethod[];
     selectedPaymentMethod: SelectedPaymentMethod;
     checkoutError?: CheckoutModalError;

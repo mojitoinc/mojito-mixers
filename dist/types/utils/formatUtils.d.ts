@@ -11,3 +11,7 @@ export declare function parseSentences(str: string): string[];
  * Calculate how much time is left since <start> ms out of <total> ms and formats that as MM:SS.
  */
 export declare function formatTimeLeft(start: number, total: number): string;
+/**
+ * Returns a formatted tax rate with none or two decimal places.
+ */
+export declare function formatTaxRate(taxRate: number): string;

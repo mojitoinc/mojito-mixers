@@ -1,4 +1,4 @@
-import { Theme } from "@mui/material/styles";
+import { Theme, ThemeOptions } from "@mui/material/styles";
 export declare const XS_MOBILE_MAX_WIDTH = 320;
 export declare const SM_MOBILE_MAX_WIDTH = 400;
 export declare const SM_BORDER_RADIUS = 2;
@@ -7,5 +7,7 @@ export declare const ROUNDED_BORDER_RADIUS = 1024;
 export declare const BORDER_THICKNESS = 1;
 export declare const OVERLAY_OPACITY = 0.75;
 export declare const DEFAULT_PURCHASING_IMAGE_SRC = "https://raw.githubusercontent.com/mojitoinc/mojito-mixers/main/app/src/lib/assets/mojito-loader.gif";
+export declare const DEFAULT_PAYMENT_IMAGE_SRC = "https://raw.githubusercontent.com/mojitoinc/mojito-mixers/main/app/src/lib/assets/circle.png";
+export declare const extendDefaultTheme: (themeOptions?: ThemeOptions | undefined) => Theme;
 export declare const MOJITO_LIGHT_THEME: Theme;
 export declare const MOJITO_DARK_THEME: Theme;

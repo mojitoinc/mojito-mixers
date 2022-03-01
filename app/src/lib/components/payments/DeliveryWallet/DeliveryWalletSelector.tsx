@@ -9,8 +9,8 @@ import { isValidWalletAddress } from "../../../domain/wallet/wallet.utils";
 
 export interface DeliveryWalletSelectorProps {
   validatePersonalAddress: boolean;
-  personalWalletAddress: string;
-  onWalletAddressChange: (walletAddress: string) => void;
+  personalWalletAddress: string | null;
+  onWalletAddressChange: (walletAddress: string | null) => void;
 }
 
 const WALLET_ADDRESS_FIELD_LABEL = "Wallet Address";
@@ -60,13 +60,14 @@ export const DeliveryWalletSelector: React.FC<DeliveryWalletSelectorProps> = ({
         <>
           <Typography>
             Once minted, this is where your items will be delivered:
-            <Typography sx={{ fontWeight: 500 }}>
-              (IMPORTANT: Please make sure the wallet address you provide is
-              correct)
-            </Typography>
+          </Typography>
+
+          <Typography sx={{ fontWeight: 500, mt: 0.5, mb: 2 }}>
+            IMPORTANT: Please make sure the wallet address you provide is correct.
           </Typography>
 
           <TextField
+            margin="none"
             label={WALLET_ADDRESS_FIELD_LABEL}
             onChange={handleWalletAddressChange}
             value={personalWalletAddress}

@@ -3,7 +3,7 @@ import { Container, Typography, Box, Stack, Button, FormControl, FormLabel, Radi
 import { useCallback, useEffect, useRef, useState } from "react";
 import { PUICheckout, CheckoutModalError, PUICheckoutProps, PaymentType, useOpenCloseCheckoutModal } from "../lib";
 import { useMeQuery } from "../services/graphql/generated";
-import { PLAYGROUND_PARAGRAPHS_ARRAY, PLAYGROUND_AUTH_PRESET, PLAYGROUND_NO_AUTH_PRESET, PLAYGROUND_PRIVACY_HREF, PLAYGROUND_TERMS_OF_USE_HREF, PLAYGROUND_USER_FORMAT, PLAYGROUND_PURCHASING_IMAGE_SRC, PLAYGROUND_ERROR_IMAGE_SRC, PLAYGROUND_THEMES, PLAYGROUND_LOGOS_SRC, PLAYGROUND_LOGOS_SX, PLAYGROUND_LOADER_IMAGE_SRC, PLAYGROUND_MOCKED_AUCTION_LOT, PLAYGROUND_MOCKED_BUY_NOW_LOT } from "../utils/playground/playground.constants";
+import { PLAYGROUND_PARAGRAPHS_ARRAY, PLAYGROUND_AUTH_PRESET, PLAYGROUND_NO_AUTH_PRESET, PLAYGROUND_PRIVACY_HREF, PLAYGROUND_TERMS_OF_USE_HREF, PLAYGROUND_USER_FORMAT, PLAYGROUND_PURCHASING_IMAGE_SRC, PLAYGROUND_ERROR_IMAGE_SRC, PLAYGROUND_LOGOS_SRC, PLAYGROUND_LOGOS_SX, PLAYGROUND_LOADER_IMAGE_SRC, PLAYGROUND_MOCKED_AUCTION_LOT, PLAYGROUND_MOCKED_BUY_NOW_LOT, PLAYGROUND_THEMES } from "../utils/playground/playground.constants";
 import { PlaygroundFormData } from "../utils/playground/playground.interfaces";
 import { config } from "../utils/config/config.constants";
 
@@ -52,7 +52,7 @@ let INITIAL_FORM_VALUES: Partial<PlaygroundFormData> = {};
 if (process.browser) {
   try {
     INITIAL_FORM_VALUES = JSON.parse(localStorage.getItem(FORM_VALUES_KEY) || "{}") as Partial<PlaygroundFormData>;
-  } catch(err) {
+  } catch (err) {
     console.log(err);
   }
 }
@@ -151,7 +151,7 @@ const HomePage = () => {
 
   const checkoutProps: PUICheckoutProps = {
     // ProviderInjector:
-    uri: `${ config.API_HOSTNAME }/query`,
+    uri: `${config.API_HOSTNAME}/query`,
 
     // Modal:
     open: isOpen,
@@ -182,7 +182,7 @@ const HomePage = () => {
     },
 
     // Legal:
-    consentType: "disclaimer",
+    consentType: "circle",
     privacyHref: PLAYGROUND_PRIVACY_HREF,
     termsOfUseHref: PLAYGROUND_TERMS_OF_USE_HREF,
 
@@ -193,7 +193,7 @@ const HomePage = () => {
       ...(lotType === "buyNow" ? PLAYGROUND_MOCKED_BUY_NOW_LOT : PLAYGROUND_MOCKED_AUCTION_LOT),
       lotID: formValues.lotID || DEFAULT_FORM_VALUES.lotID,
       lotType,
-      units: lotType === "auction" ? 1 : (parseInt(`${ formValues.lotUnits || DEFAULT_FORM_VALUES.lotUnits }`, 10) || 1),
+      units: lotType === "auction" ? 1 : (parseInt(`${formValues.lotUnits || DEFAULT_FORM_VALUES.lotUnits}`, 10) || 1),
     }],
 
     // Authentication:
@@ -210,8 +210,8 @@ const HomePage = () => {
   return (
     <Container>
       <Box sx={{ my: 4 }}>
-        <Stack spacing={ 2 } direction="row">
-          <Button variant="contained" onClick={ onOpen } disabled={ isLoading }>Open Checkout Modal</Button>
+        <Stack spacing={2} direction="row">
+          <Button variant="contained" onClick={onOpen} disabled={isLoading}>Open Checkout Modal</Button>
         </Stack>
       </Box>
 
@@ -221,16 +221,16 @@ const HomePage = () => {
 
           <RadioGroup
             name="orgID"
-            value={ formValues.orgID }
-            onChange={ handleChange }>
+            value={formValues.orgID}
+            onChange={handleChange}>
 
-            { organizations.map((organization) => (
+            {organizations.map((organization) => (
               <FormControlLabel
-                key={ organization.id }
-                value={ organization.id }
+                key={organization.id}
+                value={organization.id}
                 control={<Radio />}
-                label={ organization.name } />
-            )) }
+                label={organization.name} />
+            ))}
 
             <FormControlLabel
               value="custom"
@@ -241,9 +241,9 @@ const HomePage = () => {
                   name="customOrgID"
                   label="Custom Org ID"
                   size="small"
-                  value={ formValues.customOrgID }
-                  onChange={ handleChange }
-                  disabled={ formValues.orgID !== "custom" } />
+                  value={formValues.customOrgID}
+                  onChange={handleChange}
+                  disabled={formValues.orgID !== "custom"} />
               } />
 
           </RadioGroup>
@@ -257,13 +257,13 @@ const HomePage = () => {
         <FormControl component="fieldset">
           <FormLabel component="legend" sx={{ mb: 2 }}>Lot Data</FormLabel>
 
-          <Stack spacing={ 2 }>
+          <Stack spacing={2}>
             <TextField
               name="lotID"
               label="Lot ID"
               size="small"
-              value={ formValues.lotID }
-              onChange={ handleChange } />
+              value={formValues.lotID}
+              onChange={handleChange} />
 
             <FormControl fullWidth>
               <InputLabel id="lotTypeLabel">Lot Type</InputLabel>
@@ -273,30 +273,30 @@ const HomePage = () => {
                 name="lotType"
                 label="Lot Type"
                 size="small"
-                value={ formValues.lotType }
-                onChange={ handleChange as (e: SelectChangeEvent<"buyNow" | "auction">) => void }>
+                value={formValues.lotType}
+                onChange={handleChange as (e: SelectChangeEvent<"buyNow" | "auction">) => void}>
                 <MenuItem value="buyNow">Buy Now</MenuItem>
                 <MenuItem value="auction">Auction</MenuItem>
               </Select>
             </FormControl>
 
-            { formValues.lotType === "buyNow" ? (
+            {formValues.lotType === "buyNow" ? (
               <TextField
                 type="number"
                 name="lotUnits"
                 label="Lot Units"
                 size="small"
-                value={ formValues.lotUnits }
-                onChange={ handleChange } />
+                value={formValues.lotUnits}
+                onChange={handleChange} />
             ) : (<>
               <TextField
                 name="invoiceID"
                 label="Invoice ID"
                 size="small"
-                value={ formValues.invoiceID }
-                onChange={ handleChange }
+                value={formValues.invoiceID}
+                onChange={handleChange}
                 required />
-            </>) }
+            </>)}
 
           </Stack>
         </FormControl>
@@ -332,7 +332,7 @@ const HomePage = () => {
         <FormControl component="fieldset">
           <FormLabel component="legend">Images</FormLabel>
           <FormControlLabel label="Custom Purchasing & Error images." control={
-            <Switch name="customImages" checked={ formValues.customImages } value="" onChange={ handleChange } />
+            <Switch name="customImages" checked={formValues.customImages} value="" onChange={handleChange} />
           } />
         </FormControl>
       </Box>
@@ -341,79 +341,79 @@ const HomePage = () => {
         <FormControl component="fieldset">
           <FormLabel component="legend">Payment Methods</FormLabel>
           <FormGroup>
-            <FormControlLabel control={ <Checkbox checked={ formValues.paymentCC } value="" onChange={handleChange} name="paymentCC" /> } label="Credit Card" />
-            <FormControlLabel control={ <Checkbox checked={ formValues.paymentACH } value="" onChange={handleChange} name="paymentACH" /> } label="ACH" />
-            <FormControlLabel control={ <Checkbox checked={ formValues.paymentWire } value="" onChange={handleChange} name="paymentWire" /> } label="Wire" />
-            <FormControlLabel control={ <Checkbox checked={ formValues.paymentCrypto } value="" onChange={handleChange} name="paymentCrypto" /> } label="Crypto" />
+            <FormControlLabel control={<Checkbox checked={formValues.paymentCC} value="" onChange={handleChange} name="paymentCC" />} label="Credit Card" />
+            <FormControlLabel control={<Checkbox checked={formValues.paymentACH} value="" onChange={handleChange} name="paymentACH" />} label="ACH" />
+            <FormControlLabel control={<Checkbox checked={formValues.paymentWire} value="" onChange={handleChange} name="paymentWire" />} label="Wire" />
+            <FormControlLabel control={<Checkbox checked={formValues.paymentCrypto} value="" onChange={handleChange} name="paymentCrypto" />} label="Crypto" />
           </FormGroup>
         </FormControl>
       </Box>
 
       <Box sx={{ my: 4 }}>
-        <FormControl component="fieldset" disabled={ isAuthenticatedLoading || isAuthenticated }>
+        <FormControl component="fieldset" disabled={isAuthenticatedLoading || isAuthenticated}>
           <FormLabel component="legend">Not Authenticated Presets</FormLabel>
           <RadioGroup
             name="notAuthPreset"
-            value={ formValues.notAuthPreset }
-            onChange={ handleChange }>
+            value={formValues.notAuthPreset}
+            onChange={handleChange}>
             <FormControlLabel value="noAuthGuestDisabled" control={<Radio />} label="Guest Checkout Disabled (and Product Confirmation Enabled)" />
             <FormControlLabel value="noAuthGuestEnabled" control={<Radio />} label="Guest Checkout Enabled (and Product Confirmation Enabled)" />
           </RadioGroup>
-          { (isAuthenticatedLoading || isAuthenticated) &&  <FormHelperText>You must not be authenticated.</FormHelperText> }
+          {(isAuthenticatedLoading || isAuthenticated) && <FormHelperText>You must not be authenticated.</FormHelperText>}
         </FormControl>
       </Box>
 
       <Box sx={{ my: 4 }}>
-        <FormControl component="fieldset" disabled={ isAuthenticatedLoading || !isAuthenticated }>
+        <FormControl component="fieldset" disabled={isAuthenticatedLoading || !isAuthenticated}>
           <FormLabel component="legend">Authenticated Presets</FormLabel>
           <RadioGroup
             name="authPresets"
-            value={ formValues.authPresets }
+            value={formValues.authPresets}
             onChange={handleChange}>
             <FormControlLabel value="authConfirmationDisabled" control={<Radio />} label="Skip Product Confirmation" />
             <FormControlLabel value="authConfirmationEnabledNoGuest" control={<Radio />} label="Guest Checkout Disabled + With Product Confirmation" />
             <FormControlLabel value="authConfirmationEnabledGuest" control={<Radio />} label="Guest Checkout Enabled + With Product Confirmation (not implemented)" />
           </RadioGroup>
-            { (isAuthenticatedLoading || !isAuthenticated) && <FormHelperText>You must be authenticated.</FormHelperText> }
+          {(isAuthenticatedLoading || !isAuthenticated) && <FormHelperText>You must be authenticated.</FormHelperText>}
         </FormControl>
       </Box>
 
       <Box sx={{ my: 4 }}>
-        <Stack spacing={ 2 } direction="row">
-          <Button variant="contained" onClick={ onOpen } disabled={ isLoading }>Open Checkout Modal</Button>
+        <Stack spacing={2} direction="row">
+          <Button variant="contained" onClick={onOpen} disabled={isLoading}>Open Checkout Modal</Button>
         </Stack>
       </Box>
 
       <Box component="pre" sx={{ my: 4, p: 2, overflow: "scroll", border: 2, borderRadius: "4px" }}>
-        { JSON.stringify(checkoutProps, (key, value) => {
-          if (typeof value === "function") return value.name ? `function ${ value.name }` : "() => { ... }";
+        {JSON.stringify(checkoutProps, (key, value) => {
+          if (typeof value === "function") return value.name ? `function ${value.name}` : "() => { ... }";
           if (key === "theme" || key === "themeOptions" || key === "customTexts") return "{ ... }";
 
           return value;
-        }, "  ") }
+        }, "  ")}
       </Box>
 
       <Box sx={{ my: 4 }}>
-        <Stack spacing={ 2 } direction="row">
-          <Button variant="contained" onClick={ onOpen } disabled={ isLoading }>Open Checkout Modal</Button>
+        <Stack spacing={2} direction="row">
+          <Button variant="contained" onClick={onOpen} disabled={isLoading}>Open Checkout Modal</Button>
         </Stack>
       </Box>
 
       <Box sx={{ my: 2 }}>
-        { PLAYGROUND_PARAGRAPHS_ARRAY.map((paragraph, index) => (
-          <Typography key={index} variant="body2" sx={{ my: 2 }}>{ paragraph }</Typography>
-        )) }
+        {PLAYGROUND_PARAGRAPHS_ARRAY.map((paragraph, index) => (
+          <Typography key={index} variant="body2" sx={{ my: 2 }}>{paragraph}</Typography>
+        ))}
       </Box>
 
       <Box sx={{ my: 4 }}>
-        <Stack spacing={ 2 } direction="row">
-          <Button variant="contained" onClick={ onOpen } disabled={ isLoading }>Open Checkout Modal</Button>
+        <Stack spacing={2} direction="row">
+          <Button variant="contained" onClick={onOpen} disabled={isLoading}>Open Checkout Modal</Button>
         </Stack>
       </Box>
 
-      { /* <CheckoutModalThemeProvider theme={ CUSTOM_THEME }> */ }
-        <PUICheckout { ...checkoutProps } />
-      { /* </CheckoutModalThemeProvider> */ }
+      { /* <CheckoutModalThemeProvider theme={ CUSTOM_THEME }> */}
+      <PUICheckout {...checkoutProps} />
+      { /* </CheckoutModalThemeProvider> */}
 
     </Container>
   );

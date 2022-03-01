@@ -95,7 +95,7 @@ export function createComponentsTheme({ typography, palette, spacing, breakpoint
     MuiFilledInput: {
       styleOverrides: {
         root: {
-          border: `${ BORDER_THICKNESS }px solid ${ palette.grey[200] }`,
+          border: `${BORDER_THICKNESS}px solid ${palette.grey[200]}`,
           background: palette.background.default,
 
           "&:hover": {
@@ -174,7 +174,7 @@ export function createComponentsTheme({ typography, palette, spacing, breakpoint
 
           "&.Mui-disabled": {
             background: palette.grey["50"],
-            border: `${ BORDER_THICKNESS }px solid ${ palette.grey[100] }`,
+            border: `${BORDER_THICKNESS}px solid ${palette.grey[100]}`,
             cursor: "not-allowed",
             pointerEvents: "auto",
           },
@@ -199,7 +199,7 @@ export function createComponentsTheme({ typography, palette, spacing, breakpoint
         },
         containedPrimary: {
           background: palette.gradients?.action || palette.primary.light,
-          border: `${ BORDER_THICKNESS }px solid ${ palette.primary.main }`,
+          border: `${BORDER_THICKNESS}px solid ${palette.primary.main}`,
           color: palette.text.primary,
           minWidth: "200px !important",
         },
@@ -262,7 +262,7 @@ export function createComponentsTheme({ typography, palette, spacing, breakpoint
         root: {
           background: palette.gradients?.stepperReverse || palette.primary.light,
           backgroundOrigin: "border-box",
-          border: `${ BORDER_THICKNESS }px solid transparent`,
+          border: `${BORDER_THICKNESS}px solid transparent`,
           borderRadius: MD_BORDER_RADIUS + BORDER_THICKNESS,
         },
       },
@@ -349,6 +349,17 @@ export function createComponentsTheme({ typography, palette, spacing, breakpoint
 
         colorSecondary: {
           color: palette.text.primary,
+        },
+      },
+    },
+
+    // TOOLTIPS:
+
+    MuiTooltip: {
+      styleOverrides: {
+        tooltip: {
+          ...typography.body1,
+          padding: spacing(1, 1.5),
         },
       },
     },

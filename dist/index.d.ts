@@ -42,9 +42,11 @@ interface CheckoutItemInfo {
 }
 interface CheckoutItem extends CheckoutItemInfo {
     unitPrice: number;
+    taxes: number;
+    totalPrice: number;
 }
 
-declare type ConsentType = "disclaimer" | "checkbox";
+declare type ConsentType = "disclaimer" | "checkbox" | "circle";
 
 interface SelectOption {
     value: string | number;
@@ -56,20 +58,20 @@ declare const EMAIL_FIELD = "email";
 declare const PHONE_FIELD = "phone";
 declare const STREET_FIELD = "street";
 declare const APARTMENT_FIELD = "apartment";
-declare const COUNTRY_FIELD = "country";
+declare const ZIP_CODE_FIELD = "zipCode";
 declare const CITY_FIELD = "city";
 declare const STATE_FIELD = "state";
-declare const ZIP_CODE_FIELD = "zipCode";
+declare const COUNTRY_FIELD = "country";
 declare type BillingInfo = {
-    [APARTMENT_FIELD]: string;
-    [CITY_FIELD]: string;
-    [COUNTRY_FIELD]: SelectOption;
-    [EMAIL_FIELD]: string;
     [FULL_NAME_FIELD]: string;
+    [EMAIL_FIELD]: string;
     [PHONE_FIELD]: string;
-    [STATE_FIELD]: SelectOption;
     [STREET_FIELD]: string;
+    [APARTMENT_FIELD]: string;
     [ZIP_CODE_FIELD]: string;
+    [CITY_FIELD]: string;
+    [STATE_FIELD]: SelectOption;
+    [COUNTRY_FIELD]: SelectOption;
 };
 
 declare type CircleFieldErrorAt = "billing" | "payment";
@@ -108,8 +110,6 @@ interface PUICheckoutOverlayProps {
     onClose: () => void;
     guestCheckoutEnabled?: boolean;
     productConfirmationEnabled?: boolean;
-    theme?: Theme;
-    themeOptions?: ThemeOptions;
     logoSrc: string;
     logoSx?: SxProps<Theme>;
     loaderImageSrc: string;
@@ -172,9 +172,6 @@ declare function useOpenCloseCheckoutModal(): {
     onClose: () => void;
 };
 
-declare const MOJITO_LIGHT_THEME: Theme;
-declare const MOJITO_DARK_THEME: Theme;
-
 interface PlaidInfo {
     url?: string;
     linkToken: string;
@@ -219,4 +216,8 @@ interface ContinueFlowsReturn {
 }
 declare function continueFlows(noClear?: boolean): ContinueFlowsReturn;
 
-export { CheckoutItem, CheckoutModalError, CheckoutModalErrorAt, CircleFieldErrorAt, CircleFieldErrors, MOJITO_DARK_THEME, MOJITO_LIGHT_THEME, PUICheckout, PUICheckoutProps, PUIError, PUIErrorProps, PUIPlaid, PUISuccess, PUISuccessProps$1 as PUISuccessProps, PaymentType, UserFormat, continueCheckout, continueFlows, continuePlaidOAuthFlow, getCheckoutModalState, getPlaidOAuthFlowState, persistPlaidReceivedRedirectUri, persistReceivedRedirectUri3DS, useOpenCloseCheckoutModal };
+declare const extendDefaultTheme: (themeOptions?: ThemeOptions | undefined) => Theme;
+declare const MOJITO_LIGHT_THEME: Theme;
+declare const MOJITO_DARK_THEME: Theme;
+
+export { CheckoutItem, CheckoutModalError, CheckoutModalErrorAt, CircleFieldErrorAt, CircleFieldErrors, MOJITO_DARK_THEME, MOJITO_LIGHT_THEME, PUICheckout, PUICheckoutProps, PUIError, PUIErrorProps, PUIPlaid, PUISuccess, PUISuccessProps$1 as PUISuccessProps, PaymentType, UserFormat, continueCheckout, continueFlows, continuePlaidOAuthFlow, extendDefaultTheme, getCheckoutModalState, getPlaidOAuthFlowState, persistPlaidReceivedRedirectUri, persistReceivedRedirectUri3DS, useOpenCloseCheckoutModal };

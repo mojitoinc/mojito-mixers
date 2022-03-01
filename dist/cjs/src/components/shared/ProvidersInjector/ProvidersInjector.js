@@ -5,7 +5,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 var tslib_es6 = require('../../../../node_modules/tslib/tslib.es6.js');
 var React = require('react');
 var AuthorizedApolloProvider = require('../AuthorizedApolloProvider/AuthorizedApolloProvider.js');
-var createTheme = require('../../../../node_modules/@mui/material/styles/createTheme.js');
+var theme = require('../../../config/theme/theme.js');
 var system = require('@mui/system');
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
@@ -17,14 +17,10 @@ const ProviderInjector = ({
 apolloClient, uri, 
 // ThemeProvider:
 theme: parentTheme, themeOptions, children, }) => {
-    // TODO: Replace createTheme with custom one.
-    const theme = React.useMemo(() => themeOptions ? createTheme["default"](themeOptions) : parentTheme, [parentTheme, themeOptions]);
+    const theme$1 = React.useMemo(() => parentTheme !== null && parentTheme !== void 0 ? parentTheme : theme.extendDefaultTheme(themeOptions), [parentTheme, themeOptions]);
     React.useEffect(() => {
         if (parentTheme && themeOptions) {
             throw new Error("You can't use both `themeOptions` and `theme`. Please, use only one. `themeOptions` is preferred.");
-        }
-        if (!parentTheme && !themeOptions) {
-            throw new Error("You must set `themeOptions` or `theme`. Please, add one. `themeOptions` is preferred.");
         }
     }, [parentTheme, themeOptions]);
     React.useEffect(() => {
@@ -37,7 +33,7 @@ theme: parentTheme, themeOptions, children, }) => {
             throw new Error("You must set `apolloClient` or  `uri`. Please, add one. `uri` is preferred.");
         }
     }, [apolloClient, uri]);
-    return (React__default["default"].createElement(AuthorizedApolloProvider.AuthorizedApolloProvider, { apolloClient: apolloClient, uri: uri }, theme ? React__default["default"].createElement(system.ThemeProvider, { theme: theme }, children) : children));
+    return (React__default["default"].createElement(AuthorizedApolloProvider.AuthorizedApolloProvider, { apolloClient: apolloClient, uri: uri }, theme$1 ? React__default["default"].createElement(system.ThemeProvider, { theme: theme$1 }, children) : children));
 };
 function withThemeProvider(Component) {
     const WithThemeProvider = (_a) => {

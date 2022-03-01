@@ -1,4 +1,5 @@
-import { PaletteOptions } from "@mui/material/styles/createPalette";
+import { PaletteOptions } from "@mui/material/styles";
+import mergeOptions from "merge-options";
 
 const MOJITO_LIGHT_PALETTE: PaletteOptions = {
   background: {
@@ -17,8 +18,8 @@ const MOJITO_LIGHT_PALETTE: PaletteOptions = {
   },
 
   gradients: {
-    stepper: "linear-gradient(to right, #ffc7c7 -3%, #98df77 47%, #41ad46 100%)",
-    stepperReverse: "linear-gradient(to left, #ffc7c7 -3%, #98df77 47%, #41ad46 100%)",
+    stepper: "linear-gradient(to right, #FFC7C7 -3%, #98DF77 47%, #41AD46 100%)",
+    stepperReverse: "linear-gradient(to left, #FFC7C7 -3%, #98DF77 47%, #41AD46 100%)",
     // Simplified gradients:
     action: "linear-gradient(272.88deg, #FFC5C5 -97.9%, #98DF77 123.11%)",
     actionReverse: "linear-gradient(272.88deg, #FFC5C5 -97.9%, #98DF77 123.11%)",
@@ -26,19 +27,23 @@ const MOJITO_LIGHT_PALETTE: PaletteOptions = {
     // action: "linear-gradient(to right, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1)), linear-gradient(272.88deg, #FFC5C5 -97.9%, #98DF77 123.11%)",
     // actionReverse: "linear-gradient(to left, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1)), linear-gradient(272.88deg, #FFC5C5 -97.9%, #98DF77 123.11%)",
   },
+
   success: {
     main: "#31A136",
     light: "#E5F2E5",
   },
+
   warning: {
     main: "#D57E00",
     light: "#F3E9DB",
     dark: "#FF5E00",
   },
+
   error: {
     main: "#E14343",
     light: "#FFE6E6",
   },
+
   grey: {
     // Address box, read only input and payment method toggle (selected) background:
     "50": "#F8F8F8",
@@ -69,15 +74,9 @@ const MOJITO_LIGHT_PALETTE: PaletteOptions = {
   },
 };
 
-export function createPaletteTheme(paletteOptions?: PaletteOptions): PaletteOptions {
-  return paletteOptions?.mode === "dark" ? {
-    // TODO: Do a proper merge here:
-    ...paletteOptions,
-    ...MOJITO_LIGHT_PALETTE
-    // ...MOJITO_DARK_PALETTE, // TODO: Not implemented.
-  } : {
-    // TODO: Do a proper merge here:
-    ...paletteOptions,
-    ...MOJITO_LIGHT_PALETTE,
-  }
+// TODO: Not implemented:
+const MOJITO_DARK_PALETTE: PaletteOptions = MOJITO_LIGHT_PALETTE;
+
+export function createPaletteTheme(paletteOptions: PaletteOptions = {}): PaletteOptions {
+  return mergeOptions(paletteOptions?.mode === "dark" ? MOJITO_DARK_PALETTE : MOJITO_LIGHT_PALETTE, paletteOptions);
 }

@@ -1,10 +1,10 @@
-import { PUICheckoutProps, UserFormat, MOJITO_LIGHT_THEME, MOJITO_DARK_THEME } from "../../lib";
+import { PUICheckoutProps, UserFormat } from "../../lib";
 import { PlaygroundAuthPresetFieldValues, PlaygroundNoAuthPresetFieldValues, PlaygroundThemeFieldValues } from "./playground.interfaces";
 import { SxProps, Theme } from "@mui/material";
 import { CheckoutItemInfo } from "../../lib/domain/product/product.interfaces";
+import { MOJITO_LIGHT_THEME, MOJITO_DARK_THEME } from "../../lib/config/theme/theme";
 
 export const PLAYGROUND_LOREM_IPSUM = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
-
 export const PLAYGROUND_PARAGRAPHS_ARRAY = new Array(32).fill(PLAYGROUND_LOREM_IPSUM);
 
 
@@ -38,7 +38,6 @@ export const PLAYGROUND_AUTH_PRESET: Record<PlaygroundAuthPresetFieldValues, Par
 
 
 // Personalization:
-
 export const PLAYGROUND_THEMES: Record<PlaygroundThemeFieldValues, Theme> = {
   light: MOJITO_LIGHT_THEME,
   dark: MOJITO_DARK_THEME,
@@ -50,8 +49,8 @@ export const PLAYGROUND_LOGOS_SRC: Record<PlaygroundThemeFieldValues, string> = 
 };
 
 export const PLAYGROUND_LOGOS_SX: Record<PlaygroundThemeFieldValues, SxProps<Theme>> = {
-  light: { },
-  dark: { },
+  light: {},
+  dark: {},
 };
 
 export const PLAYGROUND_LOADER_IMAGE_SRC = "https://media3.giphy.com/media/YpqWbjNDq8y4DVu4BO/giphy.gif?cid=ecf05e47hoq39f52knk6b767w9234wjjf9kg1yw319oqcpyx&rid=giphy.gif&ct=g";
@@ -71,7 +70,7 @@ export const PLAYGROUND_MOCKED_BUY_NOW_LOT: CheckoutItemInfo = {
   lotID: "",
   lotType: "buyNow",
   name: "Your Buy Now Lot",
-  description: `${ PLAYGROUND_LOREM_IPSUM.slice(0, 128) }...`,
+  description: `${PLAYGROUND_LOREM_IPSUM.slice(0, 128)}...`,
   units: 1,
   totalSupply: 100,
   remainingSupply: 10,
@@ -84,7 +83,7 @@ export const PLAYGROUND_MOCKED_AUCTION_LOT: CheckoutItemInfo = {
   lotID: "",
   lotType: "auction",
   name: "Your Auction Lot",
-  description: `${ PLAYGROUND_LOREM_IPSUM.slice(0, 128) }...`,
+  description: `${PLAYGROUND_LOREM_IPSUM.slice(0, 128)}...`,
   units: 1,
   totalSupply: 1,
   remainingSupply: 1,

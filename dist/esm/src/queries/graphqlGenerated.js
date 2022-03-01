@@ -247,6 +247,8 @@ const GetInvoiceDetailsDocument = gql `
       collectionItemTitle
       units
       unitPrice
+      taxes
+      totalPrice
     }
   }
 }
@@ -482,6 +484,26 @@ function usePreparePaymentMethodQuery(baseOptions) {
     const options = Object.assign(Object.assign({}, defaultOptions), baseOptions);
     return Apollo.useQuery(PreparePaymentMethodDocument, options);
 }
+const GetTaxQuoteDocument = gql `
+    query GetTaxQuote($input: TaxQuoteInput!) {
+  getTaxQuote(input: $input) {
+    verifiedAddress {
+      street1
+      city
+      state
+      postalCode
+      country
+    }
+    taxablePrice
+    totalTaxAmount
+    totalTaxedPrice
+  }
+}
+    `;
+function useGetTaxQuoteLazyQuery(baseOptions) {
+    const options = Object.assign(Object.assign({}, defaultOptions), baseOptions);
+    return Apollo.useLazyQuery(GetTaxQuoteDocument, options);
+}
 
-export { AuctionBidOrder, AuctionLotStatus, CollectionType, ContractType, CreateAuctionInvoiceDocument, CreateBuyNowInvoiceDocument, CreatePaymentDocument, CreatePaymentMethodDocument, DeletePaymentMethodDocument, ExtensionType, GetInvoiceDetailsDocument, GetPaymentMethodListDocument, GetPaymentNotificationDocument, InvoiceStatus, KycStatus, MarketCollectionStatus, MarketplaceCollectionItemStatus, MarketplaceSaleType, MeDocument, PaymentKeyDocument, PaymentStatus, PaymentType, PreparePaymentMethodDocument, Role, TransactionStatus, TransactionType, WalletParentType, WalletTxType, useCreateAuctionInvoiceMutation, useCreateBuyNowInvoiceMutation, useCreatePaymentMethodMutation, useCreatePaymentMutation, useDeletePaymentMethodMutation, useGetInvoiceDetailsQuery, useGetPaymentMethodListQuery, useGetPaymentNotificationQuery, useMeQuery, usePaymentKeyLazyQuery, usePreparePaymentMethodQuery };
+export { AuctionBidOrder, AuctionLotStatus, CollectionType, ContractType, CreateAuctionInvoiceDocument, CreateBuyNowInvoiceDocument, CreatePaymentDocument, CreatePaymentMethodDocument, DeletePaymentMethodDocument, ExtensionType, GetInvoiceDetailsDocument, GetPaymentMethodListDocument, GetPaymentNotificationDocument, GetTaxQuoteDocument, InvoiceStatus, KycStatus, MarketCollectionStatus, MarketplaceCollectionItemStatus, MarketplaceSaleType, MeDocument, PaymentKeyDocument, PaymentStatus, PaymentType, PreparePaymentMethodDocument, Role, TransactionStatus, TransactionType, WalletParentType, WalletTxType, useCreateAuctionInvoiceMutation, useCreateBuyNowInvoiceMutation, useCreatePaymentMethodMutation, useCreatePaymentMutation, useDeletePaymentMethodMutation, useGetInvoiceDetailsQuery, useGetPaymentMethodListQuery, useGetPaymentNotificationQuery, useGetTaxQuoteLazyQuery, useMeQuery, usePaymentKeyLazyQuery, usePreparePaymentMethodQuery };
 //# sourceMappingURL=graphqlGenerated.js.map

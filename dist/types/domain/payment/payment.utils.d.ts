@@ -12,7 +12,7 @@ export declare const CARD_TYPES: {
         length: number;
     };
 }[];
-export declare function standaloneGetCardImageProps(network: string): {
+export declare function standaloneGetCardImageProps(network?: string): {
     "aria-label": string;
     children: import("react").ReactSVGElement;
     width: string;

@@ -80,7 +80,7 @@ export const CheckoutItemList: React.FC<CheckoutItemListProps> = ({
                   pt: 0.5,
                 }}
               >
-                <Typography sx={{ fontWeight: "500" }}>{units}</Typography>
+                <Typography>Quantity: <Box component="span" sx={{ fontWeight: 500 }}>{units}</Box></Typography>
                 { showPrices && <Typography><Number suffix=" USD">{unitPrice}</Number></Typography> }
               </Box>
             </Box>
