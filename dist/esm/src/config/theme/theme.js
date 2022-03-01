@@ -16,6 +16,7 @@ const BORDER_THICKNESS = 1;
 const OVERLAY_OPACITY = 0.75;
 // Default images:
 const DEFAULT_PURCHASING_IMAGE_SRC = "https://raw.githubusercontent.com/mojitoinc/mojito-mixers/main/app/src/lib/assets/mojito-loader.gif";
+const DEFAULT_PAYMENT_IMAGE_SRC = "https://raw.githubusercontent.com/mojitoinc/mojito-mixers/main/app/src/lib/assets/circle.png";
 const mojitoLightTheme = createTheme({
     typography: createTypographyTheme(),
     palette: createPaletteTheme({ mode: "light" }),
@@ -27,5 +28,5 @@ const mojitoDarkTheme = createTheme({
 });
 const MOJITO_DARK_THEME = createTheme(Object.assign(Object.assign({}, mojitoDarkTheme), { components: createComponentsTheme(mojitoDarkTheme) }));
 
-export { BORDER_THICKNESS, DEFAULT_PURCHASING_IMAGE_SRC, MD_BORDER_RADIUS, MOJITO_DARK_THEME, MOJITO_LIGHT_THEME, OVERLAY_OPACITY, ROUNDED_BORDER_RADIUS, SM_BORDER_RADIUS, SM_MOBILE_MAX_WIDTH, XS_MOBILE_MAX_WIDTH };
+export { BORDER_THICKNESS, DEFAULT_PAYMENT_IMAGE_SRC, DEFAULT_PURCHASING_IMAGE_SRC, MD_BORDER_RADIUS, MOJITO_DARK_THEME, MOJITO_LIGHT_THEME, OVERLAY_OPACITY, ROUNDED_BORDER_RADIUS, SM_BORDER_RADIUS, SM_MOBILE_MAX_WIDTH, XS_MOBILE_MAX_WIDTH };
 //# sourceMappingURL=theme.js.map

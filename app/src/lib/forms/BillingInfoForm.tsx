@@ -3,7 +3,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { object, string } from "yup";
 
 import Grid from "@mui/material/Grid";
-import React from "react";
+import React, { useEffect } from "react";
 import { ControlledCountrySelector } from "../components/shared/Select/CountrySelector/CountrySelector";
 import { ControlledStateSelector } from "../components/shared/Select/StateSelector/StateSelector";
 import { CheckoutModalFooter } from "../components/payments/CheckoutModalFooter/CheckoutModalFooter";
@@ -17,40 +17,47 @@ import { withRequiredErrorMessage } from "../utils/validationUtils";
 import { DebugBox } from "../components/payments/DisplayBox/DisplayBox";
 import { CheckoutModalError } from "../components/public/CheckoutOverlay/CheckoutOverlay.hooks";
 import { useFormCheckoutError } from "../hooks/useFormCheckoutError";
+import { TaxesMessagesBox } from "../components/shared/TaxesMessagesBox/TaxesMessagesBox";
+import { TaxesState } from "../views/Billing/BillingView";
 import { FormErrorsBox } from "../components/shared/FormErrorsBox/FormErrorsBox";
 
 const FULL_NAME_FIELD = "fullName";
 const EMAIL_FIELD = "email";
 const PHONE_FIELD = "phone";
+
 const STREET_FIELD = "street";
 const APARTMENT_FIELD = "apartment";
-const COUNTRY_FIELD = "country";
+const ZIP_CODE_FIELD = "zipCode";
 const CITY_FIELD = "city";
 const STATE_FIELD = "state";
-const ZIP_CODE_FIELD = "zipCode";
+const COUNTRY_FIELD = "country";
 
 export type BillingInfo = {
-  [APARTMENT_FIELD]: string;
-  [CITY_FIELD]: string;
-  [COUNTRY_FIELD]: SelectOption;
-  [EMAIL_FIELD]: string;
   [FULL_NAME_FIELD]: string;
+  [EMAIL_FIELD]: string;
   [PHONE_FIELD]: string;
-  [STATE_FIELD]: SelectOption;
+
   [STREET_FIELD]: string;
+  [APARTMENT_FIELD]: string;
   [ZIP_CODE_FIELD]: string;
+  [CITY_FIELD]: string;
+  [STATE_FIELD]: SelectOption;
+  [COUNTRY_FIELD]: SelectOption;
 };
+
+export type TaxInfo = Omit<BillingInfo, "fullName" | "email" | "phone" | "apartment">
 
 const FIELD_LABELS = {
   [FULL_NAME_FIELD]: "Full Name",
   [EMAIL_FIELD]: "Email",
   [PHONE_FIELD]: "Phone",
+
   [STREET_FIELD]: "Street",
   [APARTMENT_FIELD]: "Apartment, Suite, etc. (optional)",
-  [COUNTRY_FIELD]: "Country",
+  [ZIP_CODE_FIELD]: "Zip Code",
   [CITY_FIELD]: "City",
   [STATE_FIELD]: "State",
-  [ZIP_CODE_FIELD]: "Zip Code"
+  [COUNTRY_FIELD]: "Country",
 };
 
 const FIELD_NAMES = Object.keys(FIELD_LABELS);
@@ -59,12 +66,13 @@ const EMPTY_FORM_VALUES: BillingInfo = {
   [FULL_NAME_FIELD]: "",
   [EMAIL_FIELD]: "",
   [PHONE_FIELD]: "",
+
   [STREET_FIELD]: "",
   [APARTMENT_FIELD]: "",
-  [COUNTRY_FIELD]: EMPTY_OPTION,
+  [ZIP_CODE_FIELD]: "",
   [CITY_FIELD]: "",
   [STATE_FIELD]: EMPTY_OPTION,
-  [ZIP_CODE_FIELD]: ""
+  [COUNTRY_FIELD]: EMPTY_OPTION,
 };
 
 // export type BillingInfoFormVariant = "guest" | "loggedIn";
@@ -84,12 +92,11 @@ const schema = object()
     [STREET_FIELD]: string()
       .label(FIELD_LABELS[STREET_FIELD])
       .required(withRequiredErrorMessage),
-    [APARTMENT_FIELD]: string().label(FIELD_LABELS[APARTMENT_FIELD]),
-    [COUNTRY_FIELD]: object().shape({
-      value: string()
-        .label(FIELD_LABELS[COUNTRY_FIELD])
-        .required(withRequiredErrorMessage)
-    }),
+    [APARTMENT_FIELD]: string()
+      .label(FIELD_LABELS[APARTMENT_FIELD]),
+    [ZIP_CODE_FIELD]: string()
+      .label(FIELD_LABELS[ZIP_CODE_FIELD])
+      .required(withRequiredErrorMessage),
     [CITY_FIELD]: string()
       .label(FIELD_LABELS[CITY_FIELD])
       .required(withRequiredErrorMessage),
@@ -97,17 +104,20 @@ const schema = object()
       value: string()
         .label(FIELD_LABELS[STATE_FIELD])
         .required(withRequiredErrorMessage)
-    }),
-    [ZIP_CODE_FIELD]: string()
-      .label(FIELD_LABELS[ZIP_CODE_FIELD])
-      .required(withRequiredErrorMessage)
-  })
-  .required();
+      }),
+    [COUNTRY_FIELD]: object().shape({
+      value: string()
+        .label(FIELD_LABELS[COUNTRY_FIELD])
+        .required(withRequiredErrorMessage)
+      }),
+  }).required();
 
 export interface BillingInfoFormProps {
   // variant: BillingInfoFormVariant;
   defaultValues?: BillingInfo;
   checkoutError?: CheckoutModalError;
+  taxes: TaxesState;
+  onTaxInfoChange: (taxInfo: Partial<TaxInfo>) => void;
   onSaved?: () => void;
   onClose: () => void;
   onSubmit: (data: BillingInfo) => void;
@@ -118,6 +128,8 @@ export const BillingInfoForm: React.FC<BillingInfoFormProps> = ({
   // variant,
   defaultValues,
   checkoutError,
+  taxes,
+  onTaxInfoChange,
   onSaved,
   onClose,
   onSubmit,
@@ -138,13 +150,25 @@ export const BillingInfoForm: React.FC<BillingInfoFormProps> = ({
     resolver: yupResolver(schema),
   });
 
-  const selectedCountryOption: SelectOption = watch(COUNTRY_FIELD);
-  const selectedCountryCode = selectedCountryOption?.value;
+  const [street, zip, city, state, country] = watch([STREET_FIELD, ZIP_CODE_FIELD, CITY_FIELD, STATE_FIELD, COUNTRY_FIELD]);
+
+  useEffect(() => {
+    onTaxInfoChange({
+      [STREET_FIELD]: street,
+      [ZIP_CODE_FIELD]: zip,
+      [CITY_FIELD]: city,
+      [STATE_FIELD]: state,
+      [COUNTRY_FIELD]: country,
+    });
+  }, [onTaxInfoChange, street, zip, city, state, country]);
+
+  const taxesStatus = taxes.status;
+  const selectedCountryCode = country?.value;
   const submitForm = handleSubmit(onSubmit);
   const checkoutErrorMessage = useFormCheckoutError({ formKey: "billing", checkoutError, fields: FIELD_NAMES, setError });
 
   return (
-    <form onSubmit={submitForm}>
+    <form onSubmit={ submitForm }>
       {onSaved && (
         <Box sx={{ my: 2.5 }}>
           <SecondaryButton onClick={onSaved} startIcon={<BookIcon />}>
@@ -239,6 +263,8 @@ export const BillingInfoForm: React.FC<BillingInfoFormProps> = ({
 
       { checkoutErrorMessage && <FormErrorsBox error={ checkoutErrorMessage } sx={{ mt: 5 }} /> }
 
+      { formState.isSubmitted && <TaxesMessagesBox sx={{ mt: 5 }} taxes={ taxes } variant="form" /> }
+
       { debug && (
         <DebugBox sx={{ mt: 5 }}>
           { JSON.stringify(watch(), null, 2) }
@@ -251,6 +277,8 @@ export const BillingInfoForm: React.FC<BillingInfoFormProps> = ({
 
       <CheckoutModalFooter
         variant="toPayment"
+        buttonLabel={ taxesStatus === "loading" ? "Calculating taxes..." : undefined }
+        submitDisabled={ taxesStatus === "loading" }
         onCloseClicked={onClose} />
     </form>
   );

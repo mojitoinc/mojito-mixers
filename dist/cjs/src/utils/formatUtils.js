@@ -27,9 +27,16 @@ function formatTimeLeft(start, total) {
     const timeLeftSeconds = ((timeLeftMs % 60000) / 1000) | 0;
     return `${`00${timeLeftMins}`.slice(-2)}:${`00${timeLeftSeconds}`.slice(-2)}`;
 }
+/**
+ * Returns a formatted tax rate with none or two decimal places.
+ */
+function formatTaxRate(taxRate) {
+    return `${(Math.round(taxRate * 100) / 100).toFixed(2).replace(/\.00$/, "")} %`;
+}
 
 exports.NBSP = NBSP;
 exports.formatSentence = formatSentence;
+exports.formatTaxRate = formatTaxRate;
 exports.formatTimeLeft = formatTimeLeft;
 exports.parseSentences = parseSentences;
 //# sourceMappingURL=formatUtils.js.map

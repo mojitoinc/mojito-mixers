@@ -23,6 +23,12 @@ function formatTimeLeft(start, total) {
     const timeLeftSeconds = ((timeLeftMs % 60000) / 1000) | 0;
     return `${`00${timeLeftMins}`.slice(-2)}:${`00${timeLeftSeconds}`.slice(-2)}`;
 }
+/**
+ * Returns a formatted tax rate with none or two decimal places.
+ */
+function formatTaxRate(taxRate) {
+    return `${(Math.round(taxRate * 100) / 100).toFixed(2).replace(/\.00$/, "")} %`;
+}
 
-export { NBSP, formatSentence, formatTimeLeft, parseSentences };
+export { NBSP, formatSentence, formatTaxRate, formatTimeLeft, parseSentences };
 //# sourceMappingURL=formatUtils.js.map

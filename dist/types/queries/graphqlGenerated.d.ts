@@ -488,6 +488,7 @@ export declare type Mutation = {
     addTokensToCollection: Scalars['String'];
     /** Cancels invoice by ID, can be called by org admin */
     cancelInvoice: Scalars['Boolean'];
+    cancelMarketplaceAuctionBid: Scalars['Boolean'];
     /** Cancels payment by ID, can be called by org admin */
     cancelPayment: Scalars['Boolean'];
     /** Creates invoice for given Lot, can be called by org admin */
@@ -566,6 +567,10 @@ export declare type MutationAddTokensToCollectionArgs = {
 export declare type MutationCancelInvoiceArgs = {
     invoiceID: Scalars['UUID1'];
     orgID?: InputMaybe<Scalars['UUID1']>;
+};
+export declare type MutationCancelMarketplaceAuctionBidArgs = {
+    bidID: Scalars['UUID1'];
+    marketplaceID: Scalars['UUID1'];
 };
 export declare type MutationCancelPaymentArgs = {
     orgID: Scalars['UUID1'];
@@ -875,6 +880,8 @@ export declare type Query = {
     getPaymentPublicKey: PaymentPublicKey;
     /** Retrieves payment list for given user, can be called by org admin */
     getPaymentsByUserID: Array<Maybe<Payment>>;
+    /** Get Tax Quote */
+    getTaxQuote: TaxQuoteOutput;
     marketplace: Marketplace;
     me?: Maybe<CurrentUser>;
     network: Network;
@@ -887,6 +894,9 @@ export declare type Query = {
     /** Prepare requested Payment method for further use */
     preparePaymentMethod?: Maybe<PaymentMethodPrepareStatementOutput>;
     serverTime: Scalars['Time'];
+    validateIp: ValidateIpResponse;
+    /** Validate Payment limit */
+    validatePaymentLimit: ValidatePaymentLimitOutput;
     wallet: Wallet;
 };
 export declare type QueryCollectionArgs = {
@@ -920,6 +930,9 @@ export declare type QueryGetPaymentsByUserIdArgs = {
     orgID: Scalars['UUID1'];
     userID: Scalars['UUID1'];
 };
+export declare type QueryGetTaxQuoteArgs = {
+    input: TaxQuoteInput;
+};
 export declare type QueryMarketplaceArgs = {
     id: Scalars['UUID'];
 };
@@ -944,6 +957,15 @@ export declare type QueryOrganizationByIdArgs = {
 };
 export declare type QueryPreparePaymentMethodArgs = {
     paymentMethodType: PaymentType;
+};
+export declare type QueryValidateIpArgs = {
+    ip: Scalars['String'];
+    organizationID: Scalars['UUID1'];
+};
+export declare type QueryValidatePaymentLimitArgs = {
+    collectionID: Scalars['UUID1'];
+    itemsCount: Scalars['Int'];
+    paymentType: PaymentType;
 };
 export declare type QueryWalletArgs = {
     id: Scalars['UUID1'];
@@ -989,6 +1011,32 @@ export declare type SubscriptionGetMarketplaceAuctionLotArgs = {
 };
 export declare type SubscriptionMarketplaceCollectionLotsUpdatesArgs = {
     collectionId: Scalars['UUID1'];
+};
+export declare type TaxQuoteBillingAddressInput = {
+    city: Scalars['String'];
+    country: Scalars['String'];
+    postalCode: Scalars['String'];
+    state: Scalars['String'];
+    street1: Scalars['String'];
+};
+export declare type TaxQuoteBillingAddressOutput = {
+    __typename?: 'TaxQuoteBillingAddressOutput';
+    city: Scalars['String'];
+    country: Scalars['String'];
+    postalCode: Scalars['String'];
+    state: Scalars['String'];
+    street1: Scalars['String'];
+};
+export declare type TaxQuoteInput = {
+    address: TaxQuoteBillingAddressInput;
+    taxablePrice: Scalars['Float'];
+};
+export declare type TaxQuoteOutput = {
+    __typename?: 'TaxQuoteOutput';
+    taxablePrice: Scalars['Float'];
+    totalTaxAmount: Scalars['Float'];
+    totalTaxedPrice: Scalars['Float'];
+    verifiedAddress: TaxQuoteBillingAddressOutput;
 };
 export declare type TokenDraft = {
     assetId?: InputMaybe<Scalars['UUID1']>;
@@ -1049,6 +1097,20 @@ export declare type UserOrganization = {
     user: User;
     userId: Scalars['UUID'];
     username?: Maybe<Scalars['String']>;
+};
+export declare type ValidateIpResponse = {
+    __typename?: 'ValidateIPResponse';
+    Success: Scalars['Boolean'];
+    ipScreeningId: Scalars['UUID1'];
+};
+export declare type ValidatePaymentLimitOutput = {
+    __typename?: 'ValidatePaymentLimitOutput';
+    creditCardData: ValidatePaymentLimitOutputCreditCardData;
+};
+export declare type ValidatePaymentLimitOutputCreditCardData = {
+    __typename?: 'ValidatePaymentLimitOutputCreditCardData';
+    remainingTotal: Scalars['Int'];
+    remainingTransaction: Scalars['Int'];
 };
 export declare type Wallet = {
     __typename?: 'Wallet';
@@ -1237,6 +1299,8 @@ export declare type GetInvoiceDetailsQuery = {
             collectionItemTitle: string;
             units: number;
             unitPrice: number;
+            taxes: number;
+            totalPrice: number;
         } | null>;
     };
 };
@@ -1366,6 +1430,26 @@ export declare type PreparePaymentMethodQuery = {
         __typename?: 'ACHPaymentMethodPrepareStatementOutput';
         linkToken: string;
     } | null;
+};
+export declare type GetTaxQuoteQueryVariables = Exact<{
+    input: TaxQuoteInput;
+}>;
+export declare type GetTaxQuoteQuery = {
+    __typename?: 'Query';
+    getTaxQuote: {
+        __typename?: 'TaxQuoteOutput';
+        taxablePrice: number;
+        totalTaxAmount: number;
+        totalTaxedPrice: number;
+        verifiedAddress: {
+            __typename?: 'TaxQuoteBillingAddressOutput';
+            street1: string;
+            city: string;
+            state: string;
+            postalCode: string;
+            country: string;
+        };
+    };
 };
 export declare const GetPaymentNotificationDocument: Apollo.DocumentNode;
 /**
@@ -1652,3 +1736,29 @@ export declare function usePreparePaymentMethodLazyQuery(baseOptions?: Apollo.La
 export declare type PreparePaymentMethodQueryHookResult = ReturnType<typeof usePreparePaymentMethodQuery>;
 export declare type PreparePaymentMethodLazyQueryHookResult = ReturnType<typeof usePreparePaymentMethodLazyQuery>;
 export declare type PreparePaymentMethodQueryResult = Apollo.QueryResult<PreparePaymentMethodQuery, PreparePaymentMethodQueryVariables>;
+export declare const GetTaxQuoteDocument: Apollo.DocumentNode;
+/**
+ * __useGetTaxQuoteQuery__
+ *
+ * To run a query within a React component, call `useGetTaxQuoteQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetTaxQuoteQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetTaxQuoteQuery({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export declare function useGetTaxQuoteQuery(baseOptions: Apollo.QueryHookOptions<GetTaxQuoteQuery, GetTaxQuoteQueryVariables>): Apollo.QueryResult<GetTaxQuoteQuery, Exact<{
+    input: TaxQuoteInput;
+}>>;
+export declare function useGetTaxQuoteLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetTaxQuoteQuery, GetTaxQuoteQueryVariables>): Apollo.QueryTuple<GetTaxQuoteQuery, Exact<{
+    input: TaxQuoteInput;
+}>>;
+export declare type GetTaxQuoteQueryHookResult = ReturnType<typeof useGetTaxQuoteQuery>;
+export declare type GetTaxQuoteLazyQueryHookResult = ReturnType<typeof useGetTaxQuoteLazyQuery>;
+export declare type GetTaxQuoteQueryResult = Apollo.QueryResult<GetTaxQuoteQuery, GetTaxQuoteQueryVariables>;
