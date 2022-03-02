@@ -162,8 +162,8 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     setWalletAddress,
     paymentReferenceNumber,
     setPaymentReferenceNumber,
-    paymentId,
-    setpaymentId,
+    paymentID,
+    setPaymentID,
   } = useCheckoutModalState({
     invoiceID: initialInvoiceID,
     productConfirmationEnabled,
@@ -332,12 +332,12 @@ console.log(selectedPaymentMethod)
         tax: taxAmount,
         products: checkoutItems,
         circlePaymentID: paymentReferenceNumber,
-        paymentID:paymentId,
+        paymentID:paymentID,
         total: total
       }
       onOrderCompleted(orderDetails)
     }
-  },[checkoutStep, mapCheckout, subtotal, taxAmount, checkoutItems, paymentReferenceNumber, onOrderCompleted, fees, paymentId])
+  },[checkoutStep, mapCheckout, subtotal, taxAmount, checkoutItems, paymentReferenceNumber, onOrderCompleted, fees, paymentID])
 
   // Delete payment methods:
 
@@ -397,7 +397,7 @@ console.log(selectedPaymentMethod)
 
   const handlePurchaseSuccess = useCallback(async (nextPaymentReferenceNumber: string, nextPaymentIdNumber:string) => {
     setPaymentReferenceNumber(nextPaymentReferenceNumber);
-    setpaymentId(nextPaymentIdNumber);
+    setPaymentID(nextPaymentIdNumber);
     // After a successful purchase, a new payment method might have been created, so we reload them:
     await refetchPaymentMethods();
 
@@ -408,7 +408,7 @@ console.log(selectedPaymentMethod)
     }
 
     goNext();
-  }, [refetchPaymentMethods, setPaymentReferenceNumber, goNext, onCheckoutCompleted, mapCheckout, setpaymentId]);
+  }, [refetchPaymentMethods, setPaymentReferenceNumber, goNext, onCheckoutCompleted, mapCheckout, setPaymentID]);
 
   const handlePurchaseError = useCallback(async (error: string | CheckoutModalError) => {
     // After a failed purchase, a new payment method might have been created anyway, so we reload them (createPaymentMethod

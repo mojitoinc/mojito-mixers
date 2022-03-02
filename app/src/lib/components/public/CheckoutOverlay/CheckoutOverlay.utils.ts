@@ -12,7 +12,7 @@ export interface CheckoutModalInfo {
   url?: string;
   invoiceID: string;
   paymentReferenceNumber: string;
-  paymentId: string;
+  paymentID: string;
   billingInfo: string | BillingInfo;
   paymentInfo: string | PaymentMethod;
   timestamp?: number;
@@ -30,7 +30,7 @@ const FALLBACK_MODAL_STATE: CheckoutModalState3DS = {
   url: "",
   invoiceID: "",
   paymentReferenceNumber: "",
-  paymentId: "",
+  paymentID: "",
   billingInfo: "",
   paymentInfo: "",
   continue3DSFlow: false,
@@ -104,7 +104,7 @@ export function getCheckoutModalState(): CheckoutModalState3DS {
     paymentReferenceNumber = "",
     billingInfo = "",
     paymentInfo = "",
-    paymentId = "",
+    paymentID = "",
     timestamp,
   } = savedPlaidInfo || {};
 
@@ -128,7 +128,7 @@ export function getCheckoutModalState(): CheckoutModalState3DS {
 
     // The reference number of the payment:
     paymentReferenceNumber,
-    paymentId,
+    paymentID,
     // The billing & payment info selected / entered before starting the 3DS flow:
     billingInfo,
     paymentInfo,
@@ -166,7 +166,7 @@ export interface ContinueFlowsReturn {
   billingInfo: string | BillingInfo;
   paymentInfo: string | PaymentMethod;
   paymentReferenceNumber: string;
-  paymentId: string;
+  paymentID: string;
 }
 
 export function continueFlows(noClear = false) {
@@ -178,7 +178,7 @@ export function continueFlows(noClear = false) {
     billingInfo: "",
     paymentInfo: "",
     paymentReferenceNumber: "",
-    paymentId: ""
+    paymentID: ""
   };
 
   if (continue3DSFlow) {
@@ -193,7 +193,7 @@ export function continueFlows(noClear = false) {
     continueFlowsReturn.billingInfo = savedCheckoutModalState.billingInfo;
     continueFlowsReturn.paymentInfo = savedCheckoutModalState.paymentInfo;
     continueFlowsReturn.paymentReferenceNumber = savedCheckoutModalState.paymentReferenceNumber;
-    continueFlowsReturn.paymentId = savedCheckoutModalState.paymentId;
+    continueFlowsReturn.paymentID = savedCheckoutModalState.paymentID;
   } else if (continueOAuthFlow) {
     if (debug) console.log("💾 Continue Plaid OAuth Flow...", INITIAL_PLAID_OAUTH_FLOW_STATE);
 

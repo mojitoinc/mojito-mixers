@@ -19,7 +19,7 @@ export interface PurchasingViewProps {
   invoiceID: string;
   savedPaymentMethods: SavedPaymentMethod[];
   selectedPaymentMethod: SelectedPaymentMethod;
-  onPurchaseSuccess: (paymentReferenceNumber: string, paymentId: string) => void;
+  onPurchaseSuccess: (paymentReferenceNumber: string, paymentID: string) => void;
   onPurchaseError: (error: string | CheckoutModalError) => void;
   onDialogBlocked: (blocked: boolean) => void;
   debug?: boolean;
@@ -77,7 +77,7 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
   }, [fullPayment]);
 
   useEffect(() => {
-    const { paymentStatus, paymentReferenceNumber, paymentId, paymentError } = fullPaymentState;
+    const { paymentStatus, paymentReferenceNumber, paymentID, paymentError } = fullPaymentState;
 
     if (paymentStatus === "processing") {
       onDialogBlocked(true);
@@ -103,7 +103,7 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
         paymentReferenceNumber,
         billingInfo,
         paymentInfo,
-        paymentId
+        paymentID
       });
 
       if (debug) console.log("Redirecting to 3DS...");
@@ -113,7 +113,7 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
       return;
     }
 
-    onPurchaseSuccess(paymentReferenceNumber, paymentId);
+    onPurchaseSuccess(paymentReferenceNumber, paymentID);
   }, [
     fullPaymentState,
     hasWaited,

@@ -24,7 +24,7 @@ export interface UseFullPaymentOptions {
 export interface FullPaymentState {
   paymentStatus: PaymentStatus;
   paymentReferenceNumber: string;
-  paymentId: string;
+  paymentID: string;
   paymentError?: string | CheckoutModalError;
 }
 
@@ -38,14 +38,14 @@ export function useFullPayment({
   const [paymentState, setPaymentState] = useState<FullPaymentState>({
     paymentStatus: "processing",
     paymentReferenceNumber: "",
-    paymentId: ""
+    paymentID: ""
   });
 
   const setError = useCallback((paymentError: string | CheckoutModalError) => {
     setPaymentState({
       paymentStatus: "error",
       paymentReferenceNumber: "",
-      paymentId: "",
+      paymentID: "",
       paymentError,
     });
   }, []);
@@ -84,11 +84,11 @@ export function useFullPayment({
     setPaymentState({
       paymentStatus: "processing",
       paymentReferenceNumber: "",
-      paymentId: "",
+      paymentID: "",
     });
 
     let paymentMethodID = "";
-    let circlePaymentID = "";
+    let circlepaymentID = "";
     let paymentID = "";
     let mutationError: ApolloError | Error | undefined = undefined;
     let checkoutError: CheckoutModalError | undefined = undefined;
@@ -218,12 +218,11 @@ export function useFullPayment({
     if (makePaymentResult && !makePaymentResult.errors) {
       if (debug) console.log("    🟢 makePayment result", makePaymentResult);
 
-      circlePaymentID = makePaymentResult.data?.createPayment?.circlePaymentID || "";
-      circlePaymentID = makePaymentResult.data?.createPayment?.circlePaymentID || "";
+      circlepaymentID = makePaymentResult.data?.createPayment?.circlePaymentID || "";
       paymentID = makePaymentResult.data?.createPayment?.id || "";
     }
 
-    if (!circlePaymentID) {
+    if (!circlepaymentID) {
       setError(ERROR_PURCHASE_PAYING(mutationError));
 
       return;
@@ -233,8 +232,8 @@ export function useFullPayment({
 
     setPaymentState({
       paymentStatus: "processed",
-      paymentReferenceNumber: circlePaymentID,
-      paymentId: paymentID
+      paymentReferenceNumber: circlepaymentID,
+      paymentID: paymentID
     });
   }, [
     orgID,
