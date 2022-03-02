@@ -1,8 +1,8 @@
-import React, { Component, ErrorInfo, ReactNode } from "react";
+import { Component, ErrorInfo, ReactNode } from "react";
 
 interface Props {
     children: ReactNode;
-    onCatch?: (error: Error) => void
+    onCatch?: (error: Error, errorInfo?: ErrorInfo) => void
 }
 
 interface State {
@@ -11,42 +11,27 @@ interface State {
 
 class ErrorBoundary extends Component<Props, State>{
 
-    constructor(props: Props) {
-        super(props)
+    state = { hasError: false };
 
-        // Define a state variable to track whether is an error or not
-        this.state = { hasError: false }
-    }
-    static getDerivedStateFromError(error: Error) {
-        // Update state so the next render will show the fallback UI
+    static getDerivedStateFromError() {
 
         return { hasError: true }
     }
     componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-        // You can use your own error logging service here
-        console.log({ error, errorInfo })
+        if (this.props.onCatch) {
+            this.props.onCatch(error, errorInfo);
+
+            const retry = window.confirm("Sorry, there was an unexpected error. Do you want to re-open the payment modal?");
+
+            if (retry) this.setState({ hasError: false });
+        }
+        else{
+            console.warn(error);
+        }
     }
 
     render(): ReactNode {
-        // Check if the error is thrown
-        if (this.state.hasError) {
-            // You can render any custom fallback UI
-            return (
-                <div>
-                    <h2>Oops, there is an error!</h2>
-                    <button
-                        type="button"
-                        onClick={() => this.setState({ hasError: false })}
-                    >
-                        Try again?
-                    </button>
-                </div>
-            )
-        }
-
-        // Return children components in case of no error
-
-        return this.props.children
+        return this.state.hasError ? null : this.props.children;
     }
 
 }
