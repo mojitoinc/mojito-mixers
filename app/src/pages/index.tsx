@@ -151,7 +151,6 @@ const HomePage = () => {
 
     // Personalization:
     theme: PLAYGROUND_THEMES[formValues.theme],
-    themeOptions: {},
     logoSrc: PLAYGROUND_LOGOS_SRC[formValues.theme],
     logoSx: PLAYGROUND_LOGOS_SX[formValues.theme],
     loaderImageSrc: formValues.customImages ? PLAYGROUND_LOADER_IMAGE_SRC : "",
