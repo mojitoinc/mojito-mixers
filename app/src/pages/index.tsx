@@ -188,6 +188,7 @@ const HomePage = () => {
     // Other Events:
     debug: true,
     onError: handleError,
+    onCatch: () => undefined,
     onMarketingOptInChange: handleMarketingOptInChange,
   };
 

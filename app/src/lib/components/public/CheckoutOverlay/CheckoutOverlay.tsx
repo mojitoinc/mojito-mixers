@@ -1,5 +1,5 @@
 import { Backdrop, Box, CircularProgress } from "@mui/material";
-import React, { useCallback, useEffect, useMemo, useRef } from "react";
+import React, { ErrorInfo, useCallback, useEffect, useMemo, useRef } from "react";
 import { getSavedPaymentMethodAddressIdFromBillingInfo, savedPaymentMethodToBillingInfo, transformRawSavedPaymentMethods } from "../../../domain/circle/circle.utils";
 import { UserFormat } from "../../../domain/auth/authentication.interfaces";
 import { PaymentMethod, PaymentType } from "../../../domain/payment/payment.interfaces";
@@ -65,7 +65,8 @@ export interface PUICheckoutOverlayProps {
   // Other Events:
   debug?: boolean;
   onError?: (error: CheckoutModalError) => void;
-  onMarketingOptInChange?: (marketingOptIn: boolean) => void
+  onCatch?: (error: Error, errorInfo?: ErrorInfo) => void | true;
+  onMarketingOptInChange?: (marketingOptIn: boolean) => void;
  }
 
 export type PUICheckoutProps = PUICheckoutOverlayProps & ProvidersInjectorProps;
