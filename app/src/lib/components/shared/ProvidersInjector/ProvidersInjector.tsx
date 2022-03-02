@@ -2,7 +2,7 @@ import React, { ErrorInfo, useEffect, useMemo } from "react";
 import { Theme, ThemeOptions, ThemeProvider } from "@mui/material/styles";
 import { AuthorizedApolloProvider, AuthorizedApolloProviderProps } from "../AuthorizedApolloProvider/AuthorizedApolloProvider";
 import { extendDefaultTheme } from "../../../config/theme/theme";
-import ErrorBoundary from "../../public/ErrorBoundery/ErrorBoundery";
+import { ErrorBoundary } from "../../public/ErrorBoundary/ErrorBoundary";
 
 export interface ThemeProviderProps extends CommonProviderProps {
   theme?: Theme;
@@ -61,7 +61,7 @@ export function withThemeProvider<P extends object>(Component: React.ComponentTy
     ...componentProps
   }) => {
     return (
-      <ErrorBoundary onCatch={onCatch}>
+      <ErrorBoundary onCatch={ onCatch }>
         <ProviderInjector apolloClient={null} uri="" theme={theme} themeOptions={themeOptions}>
           <Component {...componentProps as P} />
         </ProviderInjector>

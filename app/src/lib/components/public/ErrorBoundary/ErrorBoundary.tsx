@@ -1,15 +1,15 @@
 import React, { ErrorInfo } from "react";
 
-interface Props {
+interface ErrorBoundaryProps {
   children: React.ReactNode;
   onCatch?: (error: Error, errorInfo?: ErrorInfo) => void | true;
 }
 
-interface State {
+interface ErrorBoundaryState {
   hasError: boolean;
 }
 
-class ErrorBoundary extends React.Component<Props, State> {
+export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
 
   state = { hasError: false };
 
@@ -35,6 +35,3 @@ class ErrorBoundary extends React.Component<Props, State> {
     return this.state.hasError ? null : this.props.children;
   }
 }
-
-
-export default ErrorBoundary;
