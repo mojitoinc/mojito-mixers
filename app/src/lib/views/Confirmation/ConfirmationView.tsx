@@ -15,6 +15,7 @@ export interface ConfirmationViewProps {
   savedPaymentMethods: SavedPaymentMethod[];
   selectedPaymentMethod: SelectedPaymentMethod;
   paymentReferenceNumber: string;
+  onGoToCollection?: () => void;
   onNext: () => void;
   dictionary: PUIDictionary;
 }
@@ -24,6 +25,7 @@ export const ConfirmationView: React.FC<ConfirmationViewProps> = ({
   savedPaymentMethods,
   selectedPaymentMethod,
   paymentReferenceNumber,
+  onGoToCollection,
   onNext,
   dictionary,
 }) => {
@@ -79,7 +81,8 @@ export const ConfirmationView: React.FC<ConfirmationViewProps> = ({
 
         <CheckoutModalFooter
           variant="toMarketplace"
-          onSubmitClicked={ onNext } />
+          onSubmitClicked={ onNext }
+          onGoToCollection={ onGoToCollection } />
       </Stack>
 
     </Stack>

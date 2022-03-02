@@ -1,6 +1,6 @@
 import { useAuth0 } from "@auth0/auth0-react";
 import { Container, Typography, Box, Stack, Button, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio, FormHelperText, TextField, Switch, Select, MenuItem, InputLabel, FormGroup, Checkbox, SelectChangeEvent } from "@mui/material";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { ErrorInfo, useCallback, useEffect, useRef, useState } from "react";
 import { PUICheckout, CheckoutModalError, PUICheckoutProps, PaymentType, useOpenCloseCheckoutModal } from "../lib";
 import { useMeQuery } from "../services/graphql/generated";
 import { PLAYGROUND_PARAGRAPHS_ARRAY, PLAYGROUND_AUTH_PRESET, PLAYGROUND_NO_AUTH_PRESET, PLAYGROUND_PRIVACY_HREF, PLAYGROUND_TERMS_OF_USE_HREF, PLAYGROUND_USER_FORMAT, PLAYGROUND_PURCHASING_IMAGE_SRC, PLAYGROUND_ERROR_IMAGE_SRC, PLAYGROUND_LOGOS_SRC, PLAYGROUND_LOGOS_SX, PLAYGROUND_LOADER_IMAGE_SRC, PLAYGROUND_MOCKED_AUCTION_LOT, PLAYGROUND_MOCKED_BUY_NOW_LOT, PLAYGROUND_THEMES } from "../utils/playground/playground.constants";
@@ -45,7 +45,7 @@ if (process.browser) {
   }
 }
 
-const HomePage = () => {
+const HomePage: React.FC = () => {
   const firstTimeRef = useRef(true);
   const { isOpen, onOpen, onClose } = useOpenCloseCheckoutModal();
   const { loginWithPopup, isAuthenticated, isLoading: isAuthenticatedLoading, getIdTokenClaims } = useAuth0();
@@ -70,9 +70,19 @@ const HomePage = () => {
     onOpen();
   }, [isLoading, isAuthenticated, meData, hasOrganizations, onOpen]);
 
+  const handleGoToCollection = useCallback(() => {
+    console.log("Go to Collection Page.");
+    // router.push("/collection");
+  }, []);
+
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleError = useCallback((error: CheckoutModalError) => {
     // console.log(error);
+  }, []);
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const handleCatch = useCallback((error: Error, errorInfo?: ErrorInfo) => {
+    // console.log(error, errorInfo);
   }, []);
 
   const handleMarketingOptInChange = useCallback((marketingOptIn: boolean) => {
@@ -144,6 +154,7 @@ const HomePage = () => {
     // Modal:
     open: isOpen,
     onClose,
+    onGoToCollection: handleGoToCollection,
 
     // Flow:
     guestCheckoutEnabled: testPreset.guestCheckoutEnabled,
@@ -188,7 +199,7 @@ const HomePage = () => {
     // Other Events:
     debug: true,
     onError: handleError,
-    onCatch: () => undefined,
+    onCatch: handleCatch,
     onMarketingOptInChange: handleMarketingOptInChange,
   };
 
