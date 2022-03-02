@@ -5,7 +5,7 @@ import { CheckoutModalError } from "../components/public/CheckoutOverlay/Checkou
 import { RESERVATION_COUNTDOWN_FROM_MS, RESERVATION_COUNTDOWN_REFRESH_RATE_MS } from "../config/config";
 import { ERROR_INVOICE_TIMEOUT, ERROR_PURCHASE_CREATING_INVOICE, ERROR_PURCHASE_LOADING_ITEMS, ERROR_PURCHASE_NO_ITEMS, ERROR_PURCHASE_NO_UNITS } from "../domain/errors/errors.constants";
 import { CheckoutItem } from "../domain/product/product.interfaces";
-import { useCreateAuctionInvoiceMutation, useCreateBuyNowInvoiceMutation } from "../queries/graphqlGenerated";
+import { useCreateAuctionInvoiceMutation, useReserveBuyNowLotMutation } from "../queries/graphqlGenerated";
 import { formatTimeLeft } from "../utils/formatUtils";
 
 export interface UseCreateInvoiceAndReservationOptions {
@@ -61,7 +61,7 @@ export function useCreateInvoiceAndReservation({
   }, countdownStartRef.current === null ? null : RESERVATION_COUNTDOWN_REFRESH_RATE_MS);
 
   const [createAuctionInvoice] = useCreateAuctionInvoiceMutation();
-  const [createBuyNowInvoice] = useCreateBuyNowInvoiceMutation();
+  const [reserveBuyNowLot] = useReserveBuyNowLotMutation();
 
   const createInvoiceAndReservation = useCallback(async () => {
     // TODO: Quick fix. The UI can currently display multiple items with multiple units each, but will only purchase the
@@ -76,8 +76,8 @@ export function useCreateInvoiceAndReservation({
 
     if (debug) {
       console.log(firstCheckoutItem
-        ? `\n🎫 Making reservation & creating invoice for ${ units } × ${ lotType } lot${ units > 1 ? "s" : "" } ${ lotID } (orgID = ${ orgID })...\n`
-        : `\n🎫 Aborting reservation & creating invoice for unknown lot (orgID = ${ orgID })...\n`
+        ? `\n🎫 Making reservation / creating invoice for ${ units } × ${ lotType } lot${ units > 1 ? "s" : "" } ${ lotID } (orgID = ${ orgID })...\n`
+        : `\n🎫 Aborting reservation / creating invoice for unknown lot (orgID = ${ orgID })...\n`
       );
     }
 
@@ -104,13 +104,13 @@ export function useCreateInvoiceAndReservation({
 
     if (lotType === "buyNow") {
       if (debug) {
-        console.log("  🧾 createBuyNowInvoice", {
+        console.log("  🧾 reserveBuyNowLot", {
           units,
           lotID,
         });
       }
 
-      const createBuyNowInvoiceResult = await createBuyNowInvoice({
+      const reserveBuyNowLotResult = await reserveBuyNowLot({
         variables: {
           input: {
             itemCount: units,
@@ -120,13 +120,13 @@ export function useCreateInvoiceAndReservation({
       }).catch((error: ApolloError | Error) => {
         mutationError = error;
 
-        if (debug) console.log("    🔴 createBuyNowInvoice error", error);
+        if (debug) console.log("    🔴 reserveBuyNowLot error", error);
       });
 
-      if (createBuyNowInvoiceResult && !createBuyNowInvoiceResult.errors) {
-        if (debug) console.log("    🟢 createBuyNowInvoice result", createBuyNowInvoiceResult);
+      if (reserveBuyNowLotResult && !reserveBuyNowLotResult.errors) {
+        if (debug) console.log("    🟢 reserveBuyNowLot result", reserveBuyNowLotResult);
 
-        invoiceID = createBuyNowInvoiceResult.data?.reserveMarketplaceBuyNowLot?.invoice?.invoiceID;
+        invoiceID = reserveBuyNowLotResult.data?.reserveMarketplaceBuyNowLot?.invoice?.invoiceID;
       }
     } else if (lotType === "auction" && process.env.NODE_ENV === "development") {
       if (debug) {
@@ -171,7 +171,7 @@ export function useCreateInvoiceAndReservation({
     setError,
     debug,
     createAuctionInvoice,
-    createBuyNowInvoice,
+    reserveBuyNowLot,
   ]);
 
   return {

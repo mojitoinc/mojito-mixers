@@ -1510,12 +1510,12 @@ export type CreateAuctionInvoiceMutationVariables = Exact<{
 
 export type CreateAuctionInvoiceMutation = { __typename?: 'Mutation', createAuctionLotInvoice: { __typename?: 'InvoiceDetails', invoiceID: any, status: InvoiceStatus, items: Array<{ __typename?: 'ItemInvoiceDetail', units: number, unitPrice: number, taxes: number, totalPrice: number } | null> } };
 
-export type CreateBuyNowInvoiceMutationVariables = Exact<{
+export type ReserveBuyNowLotMutationVariables = Exact<{
   input: ReserveMarketplaceBuyNowLotInput;
 }>;
 
 
-export type CreateBuyNowInvoiceMutation = { __typename?: 'Mutation', reserveMarketplaceBuyNowLot: { __typename?: 'MarketplaceBuyNowOutput', invoice?: { __typename?: 'InvoiceDetails', invoiceID: any, status: InvoiceStatus, items: Array<{ __typename?: 'ItemInvoiceDetail', units: number, unitPrice: number, taxes: number, totalPrice: number } | null> } | null } };
+export type ReserveBuyNowLotMutation = { __typename?: 'Mutation', reserveMarketplaceBuyNowLot: { __typename?: 'MarketplaceBuyNowOutput', invoice?: { __typename?: 'InvoiceDetails', invoiceID: any, status: InvoiceStatus, items: Array<{ __typename?: 'ItemInvoiceDetail', units: number, unitPrice: number, taxes: number, totalPrice: number } | null> } | null } };
 
 export type GetInvoiceDetailsQueryVariables = Exact<{
   invoiceID: Scalars['UUID1'];
@@ -1688,8 +1688,8 @@ export function useCreateAuctionInvoiceMutation(baseOptions?: Apollo.MutationHoo
 export type CreateAuctionInvoiceMutationHookResult = ReturnType<typeof useCreateAuctionInvoiceMutation>;
 export type CreateAuctionInvoiceMutationResult = Apollo.MutationResult<CreateAuctionInvoiceMutation>;
 export type CreateAuctionInvoiceMutationOptions = Apollo.BaseMutationOptions<CreateAuctionInvoiceMutation, CreateAuctionInvoiceMutationVariables>;
-export const CreateBuyNowInvoiceDocument = gql`
-    mutation CreateBuyNowInvoice($input: ReserveMarketplaceBuyNowLotInput!) {
+export const ReserveBuyNowLotDocument = gql`
+    mutation ReserveBuyNowLot($input: ReserveMarketplaceBuyNowLotInput!) {
   reserveMarketplaceBuyNowLot(input: $input) {
     invoice {
       invoiceID
@@ -1704,32 +1704,32 @@ export const CreateBuyNowInvoiceDocument = gql`
   }
 }
     `;
-export type CreateBuyNowInvoiceMutationFn = Apollo.MutationFunction<CreateBuyNowInvoiceMutation, CreateBuyNowInvoiceMutationVariables>;
+export type ReserveBuyNowLotMutationFn = Apollo.MutationFunction<ReserveBuyNowLotMutation, ReserveBuyNowLotMutationVariables>;
 
 /**
- * __useCreateBuyNowInvoiceMutation__
+ * __useReserveBuyNowLotMutation__
  *
- * To run a mutation, you first call `useCreateBuyNowInvoiceMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useCreateBuyNowInvoiceMutation` returns a tuple that includes:
+ * To run a mutation, you first call `useReserveBuyNowLotMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useReserveBuyNowLotMutation` returns a tuple that includes:
  * - A mutate function that you can call at any time to execute the mutation
  * - An object with fields that represent the current status of the mutation's execution
  *
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const [createBuyNowInvoiceMutation, { data, loading, error }] = useCreateBuyNowInvoiceMutation({
+ * const [reserveBuyNowLotMutation, { data, loading, error }] = useReserveBuyNowLotMutation({
  *   variables: {
  *      input: // value for 'input'
  *   },
  * });
  */
-export function useCreateBuyNowInvoiceMutation(baseOptions?: Apollo.MutationHookOptions<CreateBuyNowInvoiceMutation, CreateBuyNowInvoiceMutationVariables>) {
+export function useReserveBuyNowLotMutation(baseOptions?: Apollo.MutationHookOptions<ReserveBuyNowLotMutation, ReserveBuyNowLotMutationVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<CreateBuyNowInvoiceMutation, CreateBuyNowInvoiceMutationVariables>(CreateBuyNowInvoiceDocument, options);
+        return Apollo.useMutation<ReserveBuyNowLotMutation, ReserveBuyNowLotMutationVariables>(ReserveBuyNowLotDocument, options);
       }
-export type CreateBuyNowInvoiceMutationHookResult = ReturnType<typeof useCreateBuyNowInvoiceMutation>;
-export type CreateBuyNowInvoiceMutationResult = Apollo.MutationResult<CreateBuyNowInvoiceMutation>;
-export type CreateBuyNowInvoiceMutationOptions = Apollo.BaseMutationOptions<CreateBuyNowInvoiceMutation, CreateBuyNowInvoiceMutationVariables>;
+export type ReserveBuyNowLotMutationHookResult = ReturnType<typeof useReserveBuyNowLotMutation>;
+export type ReserveBuyNowLotMutationResult = Apollo.MutationResult<ReserveBuyNowLotMutation>;
+export type ReserveBuyNowLotMutationOptions = Apollo.BaseMutationOptions<ReserveBuyNowLotMutation, ReserveBuyNowLotMutationVariables>;
 export const GetInvoiceDetailsDocument = gql`
     query GetInvoiceDetails($invoiceID: UUID1!, $orgID: UUID1!) {
   getInvoiceDetails(invoiceID: $invoiceID, orgID: $orgID) {
