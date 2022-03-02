@@ -65,8 +65,8 @@ export interface PUICheckoutOverlayProps {
   // Other Events:
   debug?: boolean;
   onError?: (error: CheckoutModalError) => void;
-  onCatch?: (error: Error, errorInfo?: ErrorInfo) => void
-  onMarketingOptInChange?: (marketingOptIn: boolean) => void
+  onCatch?: (error: Error, errorInfo?: ErrorInfo) => void | true;
+  onMarketingOptInChange?: (marketingOptIn: boolean) => void;
  }
 
 export type PUICheckoutProps = PUICheckoutOverlayProps & ProvidersInjectorProps;

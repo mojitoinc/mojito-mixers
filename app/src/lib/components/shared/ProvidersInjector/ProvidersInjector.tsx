@@ -4,13 +4,13 @@ import { AuthorizedApolloProvider, AuthorizedApolloProviderProps } from "../Auth
 import { extendDefaultTheme } from "../../../config/theme/theme";
 import { ErrorBoundary } from "../../public/ErrorBoundary/ErrorBoundary";
 
+export interface CommonProviderProps {
+  onCatch?: (error: Error, errorInfo?: ErrorInfo) => void | true;
+}
+
 export interface ThemeProviderProps extends CommonProviderProps {
   theme?: Theme;
   themeOptions?: ThemeOptions;
-}
-
-export interface CommonProviderProps {
-  onCatch?: (error: Error, errorInfo?: ErrorInfo) => void
 }
 
 export type ProvidersInjectorProps = ThemeProviderProps & AuthorizedApolloProviderProps;
