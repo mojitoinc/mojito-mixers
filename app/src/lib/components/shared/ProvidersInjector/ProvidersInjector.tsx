@@ -4,11 +4,14 @@ import { AuthorizedApolloProvider, AuthorizedApolloProviderProps } from "../Auth
 import { extendDefaultTheme } from "../../../config/theme/theme";
 import ErrorBoundary from "../../public/ErrorBoundery/ErrorBoundery";
 
-export interface ThemeProviderProps {
+export interface ThemeProviderProps extends CommonProviderProps {
   theme?: Theme;
   themeOptions?: ThemeOptions;
 }
 
+export interface CommonProviderProps {
+  onCatch?: (error: Error, errorInfo?: ErrorInfo) => void
+}
 
 export type ProvidersInjectorProps = ThemeProviderProps & AuthorizedApolloProviderProps;
 
@@ -51,7 +54,7 @@ export const ProviderInjector: React.FC<ProvidersInjectorProps> = ({
 }
 
 export function withThemeProvider<P extends object>(Component: React.ComponentType<P>) {
-  const WithThemeProvider: React.FC<P & ThemeProviderProps & { onCatch?: (error: Error, errorInfo?: ErrorInfo) => void }> = ({
+  const WithThemeProvider: React.FC<P & ThemeProviderProps> = ({
     theme,
     themeOptions,
     onCatch,
@@ -72,9 +75,7 @@ export function withThemeProvider<P extends object>(Component: React.ComponentTy
 
 
 export function withProviders<P extends object>(Component: React.ComponentType<P>) {
-  const WithProviders: React.FC<P & ProvidersInjectorProps & {
-    onCatch?: (error: Error, errorInfo?: ErrorInfo) => void
-  }> = ({
+  const WithProviders: React.FC<P & ProvidersInjectorProps> = ({
     apolloClient,
     uri,
     theme,
@@ -82,14 +83,14 @@ export function withProviders<P extends object>(Component: React.ComponentType<P
     onCatch,
     ...componentProps
   }) => {
-      return (
-        <ErrorBoundary onCatch={onCatch}>
-          <ProviderInjector apolloClient={apolloClient} uri={uri} theme={theme} themeOptions={themeOptions}>
-            <Component {...componentProps as P} />
-          </ProviderInjector>
-        </ErrorBoundary>
-      );
-    };
+    return (
+      <ErrorBoundary onCatch={onCatch}>
+        <ProviderInjector apolloClient={apolloClient} uri={uri} theme={theme} themeOptions={themeOptions}>
+          <Component {...componentProps as P} />
+        </ProviderInjector>
+      </ErrorBoundary>
+    );
+  };
 
   return WithProviders;
 }
