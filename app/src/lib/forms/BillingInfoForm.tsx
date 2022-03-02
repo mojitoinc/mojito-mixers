@@ -224,22 +224,19 @@ export const BillingInfoForm: React.FC<BillingInfoFormProps> = ({
         direction={{
           xs: "column",
           sm: "row"
-        }}
-      >
+        }}>
         <Grid item sm={6} zeroMinWidth>
-          <ControlledCountrySelector
-            name={COUNTRY_FIELD}
-            control={control}
-            label={FIELD_LABELS[COUNTRY_FIELD]}
-          />
-        </Grid>
-
-        <Grid item sm={6}>
           <ControlledTextField
             name={CITY_FIELD}
             control={control}
-            label={FIELD_LABELS[CITY_FIELD]}
-          />
+            label={FIELD_LABELS[CITY_FIELD]} />
+        </Grid>
+
+        <Grid item sm={6}>
+          <ControlledCountrySelector
+            name={COUNTRY_FIELD}
+            control={control}
+            label={FIELD_LABELS[COUNTRY_FIELD]} />
         </Grid>
       </Grid>
 
@@ -249,22 +246,19 @@ export const BillingInfoForm: React.FC<BillingInfoFormProps> = ({
         direction={{
           xs: "column",
           sm: "row"
-        }}
-      >
+        }}>
         <Grid item sm={6} zeroMinWidth sx={{ maxWidth: "100%" }}>
           <ControlledStateSelector
             name={STATE_FIELD}
             control={control}
             label={FIELD_LABELS[STATE_FIELD]}
-            countryCode={selectedCountryCode}
-          />
+            countryCode={selectedCountryCode} />
         </Grid>
         <Grid item sm={6}>
           <ControlledTextField
             name={ZIP_CODE_FIELD}
             control={control}
-            label={FIELD_LABELS[ZIP_CODE_FIELD]}
-          />
+            label={FIELD_LABELS[ZIP_CODE_FIELD]} />
         </Grid>
       </Grid>
 
