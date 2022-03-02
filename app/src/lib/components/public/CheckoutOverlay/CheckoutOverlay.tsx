@@ -2,7 +2,7 @@ import { Backdrop, Box, CircularProgress } from "@mui/material";
 import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import { getSavedPaymentMethodAddressIdFromBillingInfo, savedPaymentMethodToBillingInfo, transformRawSavedPaymentMethods } from "../../../domain/circle/circle.utils";
 import { UserFormat } from "../../../domain/auth/authentication.interfaces";
-import { PaymentMethod, PaymentType } from "../../../domain/payment/payment.interfaces";
+import { CheckoutDetails, OrderDetails, PaymentMethod, PaymentType } from "../../../domain/payment/payment.interfaces";
 import { CheckoutItemInfo } from "../../../domain/product/product.interfaces";
 import { BillingInfo } from "../../../forms/BillingInfoForm";
 import { useDeletePaymentMethodMutation, useGetInvoiceDetailsQuery, useGetPaymentMethodListQuery, useMeQuery } from "../../../queries/graphqlGenerated";
@@ -17,13 +17,14 @@ import { RawSavedPaymentMethod, SavedPaymentMethod } from "../../../domain/circl
 import { Theme, SxProps } from "@mui/material/styles";
 import { continuePlaidOAuthFlow, PlaidFlow } from "../../../hooks/usePlaid";
 import { ConsentType } from "../../shared/ConsentText/ConsentText";
-import { CheckoutModalError, useCheckoutModalState } from "./CheckoutOverlay.hooks";
+import { CheckoutModalError, CheckoutModalStepIndex, useCheckoutModalState } from "./CheckoutOverlay.hooks";
 import { DEFAULT_ERROR_AT, ERROR_LOADING_INVOICE, ERROR_LOADING_PAYMENT_METHODS, ERROR_LOADING_USER } from "../../../domain/errors/errors.constants";
 import { FullScreenOverlay } from "../../shared/FullScreenOverlay/FullScreenOverlay";
 import { ProvidersInjectorProps, withProviders } from "../../shared/ProvidersInjector/ProvidersInjector";
 import { transformCheckoutItemsFromInvoice } from "../../../domain/product/product.utils";
 import { useCreateInvoiceAndReservation } from "../../../hooks/useCreateInvoiceAndReservation";
 import { CustomTextsKeys } from "../../../domain/customTexts/customTexts.interfaces";
+import { useCheckoutItemsCostTotal } from "../../../hooks/useCheckoutItemCostTotal";
 
 export interface PUICheckoutOverlayProps {
   // Modal:
@@ -33,7 +34,8 @@ export interface PUICheckoutOverlayProps {
   // Flow:
   guestCheckoutEnabled?: boolean;
   productConfirmationEnabled?: boolean;
-  onCheckoutCompleted?: () => void,
+  onCheckoutCompleted?: (checkoutDetails:CheckoutDetails) => void,
+  onOrderCompleted?: (orderDetails:OrderDetails) => void,
 
   // Personalization:
   logoSrc: string;
@@ -101,6 +103,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   invoiceID: initialInvoiceID,
   checkoutItems: parentCheckoutItems,
   onCheckoutCompleted,
+  onOrderCompleted,
 
   // Authentication:
   onLogin,
@@ -131,7 +134,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     variables: { orgID },
   });
 
-
+  console.log(paymentMethodsData)
   // Get everything related to Payment UI routing, error and state handling, including resuming Plaid / 3DS flows:
 
   const {
@@ -159,6 +162,8 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     setWalletAddress,
     paymentReferenceNumber,
     setPaymentReferenceNumber,
+    paymentId,
+    setpaymentId,
   } = useCheckoutModalState({
     invoiceID: initialInvoiceID,
     productConfirmationEnabled,
@@ -205,6 +210,8 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     countdownElementRef,
   } = useCreateInvoiceAndReservation({ orgID, checkoutItems, debug });
 
+  const { total: subtotal, fees, taxAmount } = useCheckoutItemsCostTotal(checkoutItems);
+
   useEffect(() => {
     if (isDialogLoading || invoiceID === null || invoiceID || createInvoiceAndReservationCalledRef.current) return;
 
@@ -228,7 +235,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     if (!isDialogLoading && open) initModalState();
   }, [isDialogLoading, open, initModalState]);
 
-
+console.log(selectedPaymentMethod)
   // Data loading error handling:
 
   useEffect(() => {
@@ -279,7 +286,21 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   }, [savedPaymentMethods, setSelectedPaymentMethod]);
 
 
+
   // Form data / state:
+  const mapCheckout = useCallback(():CheckoutDetails=>{
+    const payment = savedPaymentMethods.find(paymentMethod=>paymentMethod.id===selectedPaymentMethod.paymentInfo)
+    return {
+      checkoutType: "metaverse",
+      customerId: "", //empty for now
+      departmenCategory: "NFT",
+      paymentMethod: payment?.type,
+      revenue: subtotal,
+      shippingMethod: walletAddress ? "custom wallet" : "multisig wallet",
+      step: CheckoutModalStepIndex[checkoutStep],
+      stepName: checkoutStep,
+    }
+  },[subtotal, walletAddress, checkoutStep, savedPaymentMethods, selectedPaymentMethod])
 
   const handleBillingInfoSelected = useCallback((billingInfo: string | BillingInfo) => {
     // If we go back to the billing info step to fix some validation errors or change some data, we preserve the data
@@ -287,6 +308,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     // method doesn't belong to the now updated billing info anymore, so we do reset it:
     setSelectedPaymentMethod(({ paymentInfo }) => ({ billingInfo, paymentInfo: typeof paymentInfo === "object" ? paymentInfo : "", cvv: "" }));
   }, [setSelectedPaymentMethod]);
+
 
   const handlePaymentInfoSelected = useCallback((paymentInfo: string | PaymentMethod) => {
     setSelectedPaymentMethod(({ billingInfo }) => ({ billingInfo, paymentInfo, cvv: "" }));
@@ -296,6 +318,26 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     setSelectedPaymentMethod(({ billingInfo, paymentInfo }) => ({ billingInfo, paymentInfo, cvv }));
   }, [setSelectedPaymentMethod]);
 
+
+  // Confirmation Step
+  useEffect(()=>{
+    if(checkoutStep === "confirmation" && onOrderCompleted){
+      const checkoutDetails = mapCheckout();
+      const total = subtotal + fees;
+
+      const orderDetails:OrderDetails = {
+        ...checkoutDetails,
+        currency: "USD",
+        fees,
+        tax: taxAmount,
+        products: checkoutItems,
+        circlePaymentID: paymentReferenceNumber,
+        paymentID:paymentId,
+        total: total
+      }
+      onOrderCompleted(orderDetails)
+    }
+  },[checkoutStep, mapCheckout, subtotal, taxAmount, checkoutItems, paymentReferenceNumber, onOrderCompleted, fees, paymentId])
 
   // Delete payment methods:
 
@@ -349,19 +391,24 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   }, [checkoutStep, deletePaymentMethod, orgID, refetchPaymentMethods, savedPaymentMethods, setSelectedPaymentMethod]);
 
 
+
+
   // Purchase:
 
-  const handlePurchaseSuccess = useCallback(async (nextPaymentReferenceNumber: string) => {
+  const handlePurchaseSuccess = useCallback(async (nextPaymentReferenceNumber: string, nextPaymentIdNumber:string) => {
     setPaymentReferenceNumber(nextPaymentReferenceNumber);
-
+    setpaymentId(nextPaymentIdNumber);
     // After a successful purchase, a new payment method might have been created, so we reload them:
     await refetchPaymentMethods();
+
     if(onCheckoutCompleted){
-      onCheckoutCompleted();
+
+      const checkoutDetails = mapCheckout();
+      onCheckoutCompleted(checkoutDetails);
     }
 
     goNext();
-  }, [refetchPaymentMethods, setPaymentReferenceNumber, goNext, onCheckoutCompleted]);
+  }, [refetchPaymentMethods, setPaymentReferenceNumber, goNext, onCheckoutCompleted, mapCheckout, setpaymentId]);
 
   const handlePurchaseError = useCallback(async (error: string | CheckoutModalError) => {
     // After a failed purchase, a new payment method might have been created anyway, so we reload them (createPaymentMethod
