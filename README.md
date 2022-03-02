@@ -1,20 +1,23 @@
 <h1 align="center">Mojito Payment UI</h1>
 
 <p align="center">
-    👨‍💻 Payment UI modal & playground UI to easily test it.
+  👨‍💻 Payment UI modal & playground UI to easily test it.
 </p><p align="center">
-    🚀 Check it out at <a href="https://payments-staging.mojito.xyz/" target="_blank">https://payments-staging.mojito.xyz/</a>!
+  🚀 Check it out at <a href="https://payments-staging.mojito.xyz/" target="_blank">https://payments-staging.mojito.xyz/</a>!
 </p><p align="center">
-    ⚠️ This is still in alpha, use with caution.
+  ⚠️ This is still in alpha, use with caution.
 </p>
 
 <br />
 
 
 <p align="center">
-    <a href="https://payments-staging.mojito.xyz/" target="_blank">
-        <img src="./app/public/img/og-images/mojito-payment-ui.png" width="1280" />
-    </a>
+  <a href="https://payments-staging.mojito.xyz/" target="_blank">
+    <img src="./app/public/img/og-images/mojito-payment-ui-billing.png" width="1280" />
+  </a>
+  <a href="https://payments-staging.mojito.xyz/" target="_blank">
+    <img src="./app/public/img/og-images/mojito-payment-ui-payment.png" width="1280" />
+  </a>
 </p>
 
 <br />
@@ -284,25 +287,13 @@ You will have to copy the following file into your project to avoid TypeScript e
 
 ## Images
 
-The `PaymentView`, `PurchasingView` and `ErrorView` default images are loaded directly from GitHub to avoid bundling them with the library
-or forcing users to include them in their repos and add the necessary build setup to load them. They should just work out
-of the box, no setup required.
+The following images are loaded directly from GitHub to avoid bundling them with the library or forcing users to include them in their repos and add the necessary build setup to load them. They should just work out of the box, no setup required:
 
-
-**`PaymentView`'s default image:**
-
-<p>
-  <a href="https://raw.githubusercontent.com/mojitoinc/mojito-mixers/main/app/src/lib/assets/circle.png">
-    <img src="./app/src/lib/assets/circle.png" width="128">
-  </a>
-</p>
-
-    > Repo: https://github.com/mojitoinc/mojito-mixers/blob/main/app/src/lib/assets/circle.png
-
-    > CDN URL: https://raw.githubusercontent.com/mojitoinc/mojito-mixers/main/app/src/lib/assets/circle.png
-
-
-**`PurchaseView`'s default image:**
+- `PurchasingView`'s default loader image.
+- `ErrorView`'s default error image.
+- `PaymentView`'s Circle logo image.
+ 
+**`PurchaseView`'s default loader image:**
 
 <p>
   <a href="https://github.com/mojitoinc/mojito-mixers/blob/main/app/src/lib/assets/mojito-loader.gif">
@@ -315,8 +306,8 @@ of the box, no setup required.
 
     > CDN URL: https://raw.githubusercontent.com/mojitoinc/mojito-mixers/main/app/src/lib/assets/mojito-loader.gif
 
-    
-**`ErrorView`'s default image:**
+   
+**`ErrorView`'s default error image:**
 
 <p>
   <a href="https://github.com/mojitoinc/mojito-mixers/blob/main/app/src/lib/assets/mojito-error.gif">
@@ -329,3 +320,15 @@ of the box, no setup required.
     > CDN URL: To be added...
 
     
+**`PaymentView`'s Circle logo image:**
+
+<p>
+  <a href="https://raw.githubusercontent.com/mojitoinc/mojito-mixers/main/app/src/lib/assets/circle.png">
+    <img src="./app/src/lib/assets/circle.png" height="20">
+  </a>
+</p>
+
+    > Repo: https://github.com/mojitoinc/mojito-mixers/blob/main/app/src/lib/assets/circle.png
+
+    > CDN URL: https://raw.githubusercontent.com/mojitoinc/mojito-mixers/main/app/src/lib/assets/circle.png
+
