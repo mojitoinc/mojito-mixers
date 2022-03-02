@@ -1,4 +1,4 @@
-export type PaymentType = "CreditCard" |  "ACH" | "Wire" | "Crypto";
+export type PaymentType = "CreditCard" | "ACH" | "Wire" | "Crypto";
 
 export type PaymentStatus = "processed" | "processing" | "error";
 
@@ -32,4 +32,16 @@ export interface PaymentDetails {
   status: PaymentStatus;
   cardNumber: string;
   referenceNumber: string;
+}
+
+export interface CheckoutDetails {
+  auth0Id: string;
+  checkoutType: string;
+  customerId?: string;
+  departmenCategory: "NFT";
+  paymentMethod: "credit card" | "crypto";
+  revenue: number;
+  shippingMethod: "custom wallet" | "multisig wallet";
+  step: number;
+  stepName: string;
 }

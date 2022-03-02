@@ -33,6 +33,7 @@ export interface PUICheckoutOverlayProps {
   // Flow:
   guestCheckoutEnabled?: boolean;
   productConfirmationEnabled?: boolean;
+  onCheckoutCompleted?: () => void,
 
   // Personalization:
   logoSrc: string;
@@ -99,6 +100,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   orgID,
   invoiceID: initialInvoiceID,
   checkoutItems: parentCheckoutItems,
+  onCheckoutCompleted,
 
   // Authentication:
   onLogin,
@@ -354,9 +356,12 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
 
     // After a successful purchase, a new payment method might have been created, so we reload them:
     await refetchPaymentMethods();
+    if(onCheckoutCompleted){
+      onCheckoutCompleted();
+    }
 
     goNext();
-  }, [refetchPaymentMethods, setPaymentReferenceNumber, goNext]);
+  }, [refetchPaymentMethods, setPaymentReferenceNumber, goNext, onCheckoutCompleted]);
 
   const handlePurchaseError = useCallback(async (error: string | CheckoutModalError) => {
     // After a failed purchase, a new payment method might have been created anyway, so we reload them (createPaymentMethod
