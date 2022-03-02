@@ -48,7 +48,7 @@ export const DeliveryWalletSelector: React.FC<DeliveryWalletSelectorProps> = ({
     </DisplayBox>
 
     <Checkbox
-      label="I would like to deliver to a personal wallet"
+      label="I would like to deliver to a self-hosted wallet (such as Metamask or Rainbow Wallet)"
       onChange={ handleCheckboxChange }
       checked={ usePersonalWallet }
       sx={{ mb: "-13px" }} />
