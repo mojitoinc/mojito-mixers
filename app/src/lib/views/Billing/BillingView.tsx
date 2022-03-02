@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Stack } from "@mui/material";
 
-import { CheckoutItemCostBreakdown } from "../../components/payments/CheckoutItemCost/Breakdown/CheckoutItemCostBreakdown";
+import { CheckoutDeliveryAndItemCostBreakdown } from "../../components/payments/CheckoutDeliveryAndItemCostBreakdown/CheckoutDeliveryAndItemCostBreakdown";
 import { CheckoutStepper } from "../../components/payments/CheckoutStepper/CheckoutStepper";
 import { SavedBillingDetailsSelector } from "../../components/shared/SavedBillingDetailsSelector/SavedBillingDetailsSelector";
 import { SavedPaymentMethod } from "../../domain/circle/circle.interfaces";
@@ -33,10 +33,12 @@ export interface BillingViewProps {
   checkoutItems: CheckoutItem[];
   savedPaymentMethods: SavedPaymentMethod[];
   selectedBillingInfo: string | BillingInfo;
+  walletAddress: string | null;
   checkoutError?: CheckoutModalError;
   onBillingInfoSelected: (data: string | BillingInfo) => void;
   onTaxesChange: (taxes: TaxesState) => void;
   onSavedPaymentMethodDeleted: (savedPaymentMethodId: string) => Promise<void>;
+  onWalletAddressChange: (personalWalletAddress: string | null) => void;
   onNext: () => void;
   onClose: () => void;
   debug?: boolean;
@@ -46,10 +48,12 @@ export const BillingView: React.FC<BillingViewProps> = ({
   checkoutItems,
   savedPaymentMethods: rawSavedPaymentMethods,
   selectedBillingInfo,
+  walletAddress,
   checkoutError,
   onBillingInfoSelected,
   onTaxesChange,
   onSavedPaymentMethodDeleted,
+  onWalletAddressChange,
   onNext,
   onClose,
   debug,
@@ -64,6 +68,8 @@ export const BillingView: React.FC<BillingViewProps> = ({
     showSaved: savedPaymentMethods.length > 0 && typeof selectedBillingInfo === "string" && !checkNeedsGenericErrorMessage("billing", checkoutError),
     taxes: { status: "incomplete" },
   });
+
+  const [formSubmitAttempted, setFormSubmitAttempted] = useState(false);
 
   const [getTaxQuote] = useGetTaxQuoteLazyQuery();
 
@@ -185,6 +191,8 @@ export const BillingView: React.FC<BillingViewProps> = ({
     setViewState(({ taxes }) => ({ isDeleting: false, showSaved: remainingPaymentMethods > 0, taxes }));
   }, [onSavedPaymentMethodDeleted, savedPaymentMethods]);
 
+  const handleFormAttemptSubmit = useCallback(() => setFormSubmitAttempted(true), []);
+
   useEffect(() => {
     const selectedPaymentInfoMatch = typeof selectedBillingInfo === "string" && savedPaymentMethods.some(({ addressId }) => addressId === selectedBillingInfo);
 
@@ -216,7 +224,8 @@ export const BillingView: React.FC<BillingViewProps> = ({
               onDelete={ handleSavedPaymentMethodDeleted }
               onPick={ onBillingInfoSelected }
               onNext={ onNext }
-              onClose={ onClose } />
+              onClose={ onClose }
+              onAttemptSubmit={ handleFormAttemptSubmit } />
           ) : (
             <BillingInfoForm
               // variant="loggedIn"
@@ -227,11 +236,17 @@ export const BillingView: React.FC<BillingViewProps> = ({
               onSaved={ savedPaymentMethods.length > 0 ? handleShowSaved : undefined }
               onClose={ onClose }
               onSubmit={ handleSubmit }
+              onAttemptSubmit={ handleFormAttemptSubmit }
               debug={ debug } />
           ) }
       </Stack>
 
-      <CheckoutItemCostBreakdown checkoutItems={ checkoutItems } taxes={ taxes } />
+      <CheckoutDeliveryAndItemCostBreakdown
+        checkoutItems={ checkoutItems }
+        taxes={ taxes }
+        validatePersonalDeliveryAddress={ formSubmitAttempted }
+        walletAddress={ walletAddress }
+        onWalletAddressChange={ onWalletAddressChange } />
     </Stack>
   );
 };

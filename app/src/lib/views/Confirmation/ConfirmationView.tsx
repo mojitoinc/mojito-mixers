@@ -62,25 +62,24 @@ export const ConfirmationView: React.FC<ConfirmationViewProps> = ({
         md: "row",
       }}
       spacing={8.75}
-      sx={{ display: "flex" }}
-    >
+      sx={{ display: "flex" }}>
+
       <PurchaseConfirmationBillingDetails
-        checkoutItems={checkoutItems}
-        paymentReferenceNumber={paymentReferenceNumber}
-        selectedPaymentMethodBillingInfo={selectedPaymentMethodBillingInfo}
-        selectedPaymentMethodPaymentInfo={selectedPaymentMethodPaymentInfo}
-      />
+        checkoutItems={ checkoutItems }
+        paymentReferenceNumber={ paymentReferenceNumber }
+        selectedPaymentMethodBillingInfo={ selectedPaymentMethodBillingInfo }
+        selectedPaymentMethodPaymentInfo={ selectedPaymentMethodPaymentInfo } />
 
       <Stack sx={{ display: "flex", flex: 1 }}>
         <PurchaseConfirmationItemDetails
-          checkoutItems={checkoutItems}
-          purchaseInstructions={purchaseInstructions} />
+          checkoutItems={ checkoutItems }
+          purchaseInstructions={ purchaseInstructions } />
 
         <CheckoutModalFooter
           variant="toMarketplace"
-          onSubmitClicked={onNext}
-        />
+          onSubmitClicked={ onNext } />
       </Stack>
+
     </Stack>
   );
 };
