@@ -80,7 +80,7 @@ function useCreateInvoiceAndReservation({ orgID, checkoutItems, debug = false, }
                 invoiceID = (_c = (_b = (_a = createBuyNowInvoiceResult.data) === null || _a === void 0 ? void 0 : _a.reserveMarketplaceBuyNowLot) === null || _b === void 0 ? void 0 : _b.invoice) === null || _c === void 0 ? void 0 : _c.invoiceID;
             }
         }
-        else if (lotType === "auction" && process.env.NODE_ENV === "development") {
+        else if (lotType === "auction" && String("production") === "development") {
             if (debug) {
                 console.log("  🧾 createAuctionInvoice", {
                     orgID,

@@ -2,6 +2,7 @@ import commonjs from '@rollup/plugin-commonjs';
 import dts from 'rollup-plugin-dts'
 import resolve from "@rollup/plugin-node-resolve";
 import typescript from 'rollup-plugin-typescript2'
+import replace from 'rollup-plugin-replace';
 // import { terser } from 'rollup-plugin-terser';
 // import { babel } from '@rollup/plugin-babel';
 
@@ -64,7 +65,9 @@ export default [{
         // externals({ deps: true }), // TODO: This could replace external: EXTERNAL with peerDeps: true. See https://www.npmjs.com/package/rollup-plugin-node-externals.
 
         resolve(),
-
+        require('rollup-plugin-replace')({
+          'process.env.NODE_ENV':JSON.stringify('production')
+        }),
         commonjs({
             // exclude: 'node_modules',
             ignoreGlobal: true,

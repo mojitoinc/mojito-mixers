@@ -13,8 +13,7 @@ var CheckoutOverlay_utils = require('./components/public/CheckoutOverlay/Checkou
 var theme = require('./config/theme/theme.js');
 var system = require('@mui/system');
 
-if (process.env.NODE_ENV === "development")
-    console.log("\n👨‍💻 PUI development mode.\n\n");
+
 
 exports.PUICheckout = CheckoutOverlay.PUICheckout;
 exports.PUISuccess = SuccessOverlay.PUISuccess;

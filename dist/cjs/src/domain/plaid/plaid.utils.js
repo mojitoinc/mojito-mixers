@@ -61,7 +61,7 @@ function getPlaidOAuthFlowState() {
     const receivedRedirectUri = savedReceivedRedirectUri || (window.location.search.startsWith(config.PLAID_OAUTH_FLOW_URL_SEARCH) ? window.location.href : undefined);
     // const receivedRedirectUri = savedReceivedRedirectUri || window.location.href || "";
     // In dev, this works fine even if there's nothing in localStorage, which helps with testing across some other domain and localhost:
-    const hasLocalhostOrigin = process.env.NODE_ENV === "development" && window.location.hostname !== "localhost";
+    const hasLocalhostOrigin = String("production") === "development" && window.location.hostname !== "localhost";
     const continueOAuthFlow = hasLocalhostOrigin || !!(url && linkToken && selectedBillingInfo && receivedRedirectUri);
     if ((continueOAuthFlow && savedStateUsed) || (!continueOAuthFlow && localStorage.getItem(config.PLAID_OAUTH_FLOW_INFO_KEY)) || isExpired(timestamp)) {
         return clearPlaidInfo();
