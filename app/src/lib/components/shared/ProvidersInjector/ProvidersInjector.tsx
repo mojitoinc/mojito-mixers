@@ -1,4 +1,4 @@
-import React, {  useEffect, useMemo } from "react";
+import React, { ErrorInfo, useEffect, useMemo } from "react";
 import { Theme, ThemeOptions, ThemeProvider } from "@mui/material/styles";
 import { AuthorizedApolloProvider, AuthorizedApolloProviderProps } from "../AuthorizedApolloProvider/AuthorizedApolloProvider";
 import { extendDefaultTheme } from "../../../config/theme/theme";
@@ -51,7 +51,7 @@ export const ProviderInjector: React.FC<ProvidersInjectorProps> = ({
 }
 
 export function withThemeProvider<P extends object>(Component: React.ComponentType<P>) {
-  const WithThemeProvider: React.FC<P & ThemeProviderProps & { onCatch?: (error: Error) => void }> = ({
+  const WithThemeProvider: React.FC<P & ThemeProviderProps & { onCatch?: (error: Error, errorInfo?: ErrorInfo) => void }> = ({
     theme,
     themeOptions,
     onCatch,
@@ -73,7 +73,7 @@ export function withThemeProvider<P extends object>(Component: React.ComponentTy
 
 export function withProviders<P extends object>(Component: React.ComponentType<P>) {
   const WithProviders: React.FC<P & ProvidersInjectorProps & {
-    onCatch?: (error: Error) => void
+    onCatch?: (error: Error, errorInfo?: ErrorInfo) => void
   }> = ({
     apolloClient,
     uri,
