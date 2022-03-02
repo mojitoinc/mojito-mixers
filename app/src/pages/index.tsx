@@ -7,19 +7,6 @@ import { PLAYGROUND_PARAGRAPHS_ARRAY, PLAYGROUND_AUTH_PRESET, PLAYGROUND_NO_AUTH
 import { PlaygroundFormData } from "../utils/playground/playground.interfaces";
 import { config } from "../utils/config/config.constants";
 
-export const PLAYGROUND_WIRE_PAYMENTS_DISCLAIMER: (string | React.ReactFragment)[] = [<>
-  <strong>Third-party wire transfers cannot be accepted. </strong>
-  Your bank account name needs to match with the name you used to register in Marketplace.
-</>, <>
-  Please note that wire transfers usually take <strong>1-3 business days</strong> to arrive. We
-  do not charge any deposit fee — however, your bank may charge you a wire transfer fee.
-</>];
-
-export const PLAYGROUND_PURCHASE_INSTRUCTIONS: (string | React.ReactFragment)[] = [
-  "Purchased item info with instructions on how to claim item / how item will be delivered can be placed here.",
-  "Payment processing info info can also be added here if payment will take time to process / is not processed instantly.",
-];
-
 const DEFAULT_FORM_VALUES: PlaygroundFormData = {
   // Organization:
   orgID: "custom",
@@ -177,10 +164,6 @@ const HomePage = () => {
       formValues.paymentWire ? "Wire" : "",
       formValues.paymentCrypto ? "Crypto" : "",
     ].filter(Boolean) as PaymentType[],
-    customTexts: {
-      wirePaymentsDisclaimer: PLAYGROUND_WIRE_PAYMENTS_DISCLAIMER,
-      purchaseInstructions: PLAYGROUND_PURCHASE_INSTRUCTIONS,
-    },
 
     // Legal:
     consentType: "circle",

@@ -151,7 +151,9 @@ export const CheckoutModalFooter: React.FC<CheckoutModalFooterProps> = ({
             <Typography sx={{ maxWidth: SM_MOBILE_MAX_WIDTH, marginRight: 1 }} align="center">
               Payments powered by
             </Typography>
-            <Box component="img" src={DEFAULT_PAYMENT_IMAGE_SRC} height={20} />
+            <Link href="https://www.circle.com/en/" target="_blank" rel="noopener noreferrer">
+              <Box component="img" src={DEFAULT_PAYMENT_IMAGE_SRC} height={20} />
+            </Link>
           </Box>
         </>
       )}
