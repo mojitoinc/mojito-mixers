@@ -31,6 +31,7 @@ export interface BillingInfoFormProps {
     onSaved?: () => void;
     onClose: () => void;
     onSubmit: (data: BillingInfo) => void;
+    onAttemptSubmit: () => void;
     debug?: boolean;
 }
 export declare const BillingInfoForm: React.FC<BillingInfoFormProps>;

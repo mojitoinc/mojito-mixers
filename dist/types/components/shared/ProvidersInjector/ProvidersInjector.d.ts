@@ -1,7 +1,10 @@
-import React from "react";
+import React, { ErrorInfo } from "react";
 import { Theme, ThemeOptions } from "@mui/material/styles";
 import { AuthorizedApolloProviderProps } from "../AuthorizedApolloProvider/AuthorizedApolloProvider";
-export interface ThemeProviderProps {
+export interface CommonProviderProps {
+    onCatch?: (error: Error, errorInfo?: ErrorInfo) => void | true;
+}
+export interface ThemeProviderProps extends CommonProviderProps {
     theme?: Theme;
     themeOptions?: ThemeOptions;
 }

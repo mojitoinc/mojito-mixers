@@ -10,12 +10,14 @@ var CheckoutItemCostPurchase = require('../CheckoutItemCost/Purchase/CheckoutIte
 var PurchaseConfirmationBillingDetails_constants = require('./PurchaseConfirmationBillingDetails.constants.js');
 var PurchaseConfirmationBillingDetails_utils = require('./PurchaseConfirmationBillingDetails.utils.js');
 var Check = require('../../../../node_modules/@mui/icons-material/Check.js');
+var DeliveryWalletDetails = require('../DeliveryWallet/DeliveryWalletDetails.js');
+var CopyButton = require('../../shared/CopyButton/CopyButton.js');
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
 var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 
-const PurchaseConfirmationBillingDetails = ({ checkoutItems, paymentReferenceNumber, selectedPaymentMethodBillingInfo, selectedPaymentMethodPaymentInfo, }) => {
+const PurchaseConfirmationBillingDetails = ({ checkoutItems, paymentReferenceNumber, selectedPaymentMethodBillingInfo, selectedPaymentMethodPaymentInfo, dictionary }) => {
     const { isMasked, paymentType, displayValue, network, } = PurchaseConfirmationBillingDetails_utils.getFormattedPaymentMethod(selectedPaymentMethodPaymentInfo);
     const icon = network ? React__default["default"].createElement(Icons.CreditCardIcon, { network: network }) : null;
     return (React__default["default"].createElement(material.Box, { sx: { display: 'flex', flexDirection: 'column', flex: 1, position: "relative" } },
@@ -37,8 +39,11 @@ const PurchaseConfirmationBillingDetails = ({ checkoutItems, paymentReferenceNum
             isMasked ? (React__default["default"].createElement(ReadOnlyField.ReadOnlyField, { label: PurchaseConfirmationBillingDetails_constants.PAYMENT_TYPE_LABEL[paymentType], value: displayValue, InputProps: icon ? {
                     endAdornment: (React__default["default"].createElement(material.InputAdornment, { position: "end" }, icon)),
                 } : undefined })) : (React__default["default"].createElement(ReadOnlyField.ReadOnlyCardField, { label: PurchaseConfirmationBillingDetails_constants.PAYMENT_TYPE_LABEL[paymentType], value: displayValue })),
-            React__default["default"].createElement(ReadOnlyField.ReadOnlyField, { label: "Reference No.", value: paymentReferenceNumber || "-" })),
-        React__default["default"].createElement(CheckoutItemCostPurchase.CheckoutItemCostPurchase, { checkoutItems: checkoutItems, selectedPaymentMethodBillingInfo: selectedPaymentMethodBillingInfo })));
+            React__default["default"].createElement(ReadOnlyField.ReadOnlyField, { label: "Reference No.", value: paymentReferenceNumber || "-", InputProps: paymentReferenceNumber ? {
+                    endAdornment: (React__default["default"].createElement(CopyButton.CopyButton, { label: "Reference No.", value: paymentReferenceNumber, size: "small" })),
+                } : undefined })),
+        React__default["default"].createElement(CheckoutItemCostPurchase.CheckoutItemCostPurchase, { checkoutItems: checkoutItems, selectedPaymentMethodBillingInfo: selectedPaymentMethodBillingInfo }),
+        React__default["default"].createElement(DeliveryWalletDetails["default"], { walletAddress: "0xC000A000bC00D3E4c792d2aFDE0000000d000001", dictionary: dictionary })));
 };
 
 exports.PurchaseConfirmationBillingDetails = PurchaseConfirmationBillingDetails;

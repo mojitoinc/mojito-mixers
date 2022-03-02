@@ -11,6 +11,7 @@ export interface SavedPaymentDetailsSelectorProps {
     onCvvSelected: (cvv: string) => void;
     onNext: () => void;
     onClose: () => void;
+    onAttemptSubmit: () => void;
     consentType?: ConsentType;
     privacyHref?: string;
     termsOfUseHref?: string;

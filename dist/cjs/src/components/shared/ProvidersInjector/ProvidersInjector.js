@@ -6,6 +6,7 @@ var tslib_es6 = require('../../../../node_modules/tslib/tslib.es6.js');
 var React = require('react');
 var AuthorizedApolloProvider = require('../AuthorizedApolloProvider/AuthorizedApolloProvider.js');
 var theme = require('../../../config/theme/theme.js');
+var ErrorBoundary = require('../../public/ErrorBoundary/ErrorBoundary.js');
 var system = require('@mui/system');
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
@@ -37,17 +38,19 @@ theme: parentTheme, themeOptions, children, }) => {
 };
 function withThemeProvider(Component) {
     const WithThemeProvider = (_a) => {
-        var { theme, themeOptions } = _a, componentProps = tslib_es6.__rest(_a, ["theme", "themeOptions"]);
-        return (React__default["default"].createElement(ProviderInjector, { apolloClient: null, uri: "", theme: theme, themeOptions: themeOptions },
-            React__default["default"].createElement(Component, Object.assign({}, componentProps))));
+        var { theme, themeOptions, onCatch } = _a, componentProps = tslib_es6.__rest(_a, ["theme", "themeOptions", "onCatch"]);
+        return (React__default["default"].createElement(ErrorBoundary.ErrorBoundary, { onCatch: onCatch },
+            React__default["default"].createElement(ProviderInjector, { apolloClient: null, uri: "", theme: theme, themeOptions: themeOptions },
+                React__default["default"].createElement(Component, Object.assign({}, componentProps)))));
     };
     return WithThemeProvider;
 }
 function withProviders(Component) {
     const WithProviders = (_a) => {
-        var { apolloClient, uri, theme, themeOptions } = _a, componentProps = tslib_es6.__rest(_a, ["apolloClient", "uri", "theme", "themeOptions"]);
-        return (React__default["default"].createElement(ProviderInjector, { apolloClient: apolloClient, uri: uri, theme: theme, themeOptions: themeOptions },
-            React__default["default"].createElement(Component, Object.assign({}, componentProps))));
+        var { apolloClient, uri, theme, themeOptions, onCatch } = _a, componentProps = tslib_es6.__rest(_a, ["apolloClient", "uri", "theme", "themeOptions", "onCatch"]);
+        return (React__default["default"].createElement(ErrorBoundary.ErrorBoundary, { onCatch: onCatch },
+            React__default["default"].createElement(ProviderInjector, { apolloClient: apolloClient, uri: uri, theme: theme, themeOptions: themeOptions },
+                React__default["default"].createElement(Component, Object.assign({}, componentProps)))));
     };
     return WithProviders;
 }

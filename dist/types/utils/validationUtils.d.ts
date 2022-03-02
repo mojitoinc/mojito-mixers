@@ -6,4 +6,6 @@ export declare const requireSchemaWhenKeyIs: (key: string) => {
 };
 export declare const withRequiredErrorMessage: ({ label: fieldLabel }: MessageParams) => string;
 export declare const withTypeErrorMessageFor: (type: string) => ({ label: fieldLabel }: MessageParams) => string;
-export declare const withInvalidErrorMessage: ({ label: fieldLabel }: MessageParams) => string;
+export declare const withInvalidErrorMessage: ({ label: fieldLabel }: {
+    label: string;
+}) => string;

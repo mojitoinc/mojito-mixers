@@ -225,8 +225,8 @@ function useCreateAuctionInvoiceMutation(baseOptions) {
     const options = Object.assign(Object.assign({}, defaultOptions), baseOptions);
     return Apollo__namespace.useMutation(CreateAuctionInvoiceDocument, options);
 }
-const CreateBuyNowInvoiceDocument = Apollo.gql `
-    mutation CreateBuyNowInvoice($input: ReserveMarketplaceBuyNowLotInput!) {
+const ReserveBuyNowLotDocument = Apollo.gql `
+    mutation ReserveBuyNowLot($input: ReserveMarketplaceBuyNowLotInput!) {
   reserveMarketplaceBuyNowLot(input: $input) {
     invoice {
       invoiceID
@@ -242,25 +242,25 @@ const CreateBuyNowInvoiceDocument = Apollo.gql `
 }
     `;
 /**
- * __useCreateBuyNowInvoiceMutation__
+ * __useReserveBuyNowLotMutation__
  *
- * To run a mutation, you first call `useCreateBuyNowInvoiceMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useCreateBuyNowInvoiceMutation` returns a tuple that includes:
+ * To run a mutation, you first call `useReserveBuyNowLotMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useReserveBuyNowLotMutation` returns a tuple that includes:
  * - A mutate function that you can call at any time to execute the mutation
  * - An object with fields that represent the current status of the mutation's execution
  *
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const [createBuyNowInvoiceMutation, { data, loading, error }] = useCreateBuyNowInvoiceMutation({
+ * const [reserveBuyNowLotMutation, { data, loading, error }] = useReserveBuyNowLotMutation({
  *   variables: {
  *      input: // value for 'input'
  *   },
  * });
  */
-function useCreateBuyNowInvoiceMutation(baseOptions) {
+function useReserveBuyNowLotMutation(baseOptions) {
     const options = Object.assign(Object.assign({}, defaultOptions), baseOptions);
-    return Apollo__namespace.useMutation(CreateBuyNowInvoiceDocument, options);
+    return Apollo__namespace.useMutation(ReserveBuyNowLotDocument, options);
 }
 const GetInvoiceDetailsDocument = Apollo.gql `
     query GetInvoiceDetails($invoiceID: UUID1!, $orgID: UUID1!) {
@@ -529,7 +529,6 @@ function useGetTaxQuoteLazyQuery(baseOptions) {
 }
 
 exports.CreateAuctionInvoiceDocument = CreateAuctionInvoiceDocument;
-exports.CreateBuyNowInvoiceDocument = CreateBuyNowInvoiceDocument;
 exports.CreatePaymentDocument = CreatePaymentDocument;
 exports.CreatePaymentMethodDocument = CreatePaymentMethodDocument;
 exports.DeletePaymentMethodDocument = DeletePaymentMethodDocument;
@@ -540,8 +539,8 @@ exports.GetTaxQuoteDocument = GetTaxQuoteDocument;
 exports.MeDocument = MeDocument;
 exports.PaymentKeyDocument = PaymentKeyDocument;
 exports.PreparePaymentMethodDocument = PreparePaymentMethodDocument;
+exports.ReserveBuyNowLotDocument = ReserveBuyNowLotDocument;
 exports.useCreateAuctionInvoiceMutation = useCreateAuctionInvoiceMutation;
-exports.useCreateBuyNowInvoiceMutation = useCreateBuyNowInvoiceMutation;
 exports.useCreatePaymentMethodMutation = useCreatePaymentMethodMutation;
 exports.useCreatePaymentMutation = useCreatePaymentMutation;
 exports.useDeletePaymentMethodMutation = useDeletePaymentMethodMutation;
@@ -552,4 +551,5 @@ exports.useGetTaxQuoteLazyQuery = useGetTaxQuoteLazyQuery;
 exports.useMeQuery = useMeQuery;
 exports.usePaymentKeyLazyQuery = usePaymentKeyLazyQuery;
 exports.usePreparePaymentMethodQuery = usePreparePaymentMethodQuery;
+exports.useReserveBuyNowLotMutation = useReserveBuyNowLotMutation;
 //# sourceMappingURL=graphqlGenerated.js.map

@@ -19,7 +19,7 @@ var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 function validateCvv(isCvvRequired, cvv) {
     return !isCvvRequired || cvv.length === 3 || cvv.length === 4;
 }
-const SavedPaymentDetailsSelector = ({ showLoader, savedPaymentMethods, selectedPaymentMethodId, onNew, onDelete, onPick, onCvvSelected, onNext, onClose, consentType, privacyHref, termsOfUseHref, }) => {
+const SavedPaymentDetailsSelector = ({ showLoader, savedPaymentMethods, selectedPaymentMethodId, onNew, onDelete, onPick, onCvvSelected, onNext, onClose, onAttemptSubmit, consentType, privacyHref, termsOfUseHref, }) => {
     const isCvvRequired = React.useMemo(() => {
         const selectedPaymentMethod = savedPaymentMethods.find(savedPaymentMethod => savedPaymentMethod.id === selectedPaymentMethodId);
         return (selectedPaymentMethod === null || selectedPaymentMethod === void 0 ? void 0 : selectedPaymentMethod.type) === "CreditCard";
@@ -35,13 +35,14 @@ const SavedPaymentDetailsSelector = ({ showLoader, savedPaymentMethods, selected
     const isCvvOk = validateCvv(isCvvRequired, cvv);
     const cvvError = isFormSubmitted && !isCvvOk;
     const handleNextClicked = React.useCallback((canSubmit) => {
+        onAttemptSubmit();
         if (canSubmit && selectedPaymentMethodId && isCvvOk) {
             onCvvSelected(cvv);
             onNext();
             return;
         }
         setSelectorState(({ cvv }) => ({ isFormSubmitted: true, cvv }));
-    }, [selectedPaymentMethodId, cvv, isCvvOk, onCvvSelected, onNext]);
+    }, [onAttemptSubmit, selectedPaymentMethodId, cvv, isCvvOk, onCvvSelected, onNext]);
     const handleCvvChange = React.useCallback((e) => {
         const cvv = e.currentTarget.value || "";
         setSelectorState(({ isFormSubmitted }) => ({ isFormSubmitted, cvv }));

@@ -5,6 +5,7 @@ import Tooltip from '@mui/material/Tooltip'
 import { useTimeout } from '@swyg/corre'
 import { FunctionComponent, useCallback, useState } from 'react'
 import { wait } from '../../../utils/promiseUtils'
+import React from "react";
 
 type CopyButtonSize = "small" | "medium";
 

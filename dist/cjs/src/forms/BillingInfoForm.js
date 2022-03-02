@@ -2,6 +2,7 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
+var tslib_es6 = require('../../node_modules/tslib/tslib.es6.js');
 var reactHookForm = require('react-hook-form');
 var yup$1 = require('../../node_modules/@hookform/resolvers/yup/dist/yup.mjs.js');
 var yup = require('yup');
@@ -95,7 +96,7 @@ const schema = yup.object()
 }).required();
 const BillingInfoForm = ({ 
 // variant,
-defaultValues, checkoutError, taxes, onTaxInfoChange, onSaved, onClose, onSubmit, debug }) => {
+defaultValues, checkoutError, taxes, onTaxInfoChange, onSaved, onClose, onSubmit, onAttemptSubmit, debug }) => {
     const { control, handleSubmit, watch, setError, formState, } = reactHookForm.useForm({
         defaultValues: Object.assign(Object.assign({}, EMPTY_FORM_VALUES), defaultValues),
         reValidateMode: "onChange",
@@ -115,7 +116,11 @@ defaultValues, checkoutError, taxes, onTaxInfoChange, onSaved, onClose, onSubmit
     const selectedCountryCode = country === null || country === void 0 ? void 0 : country.value;
     const submitForm = handleSubmit(onSubmit);
     const checkoutErrorMessage = useFormCheckoutError.useFormCheckoutError({ formKey: "billing", checkoutError, fields: FIELD_NAMES, setError });
-    return (React__default["default"].createElement("form", { onSubmit: submitForm },
+    const handleFormSubmit = React.useCallback((e) => tslib_es6.__awaiter(void 0, void 0, void 0, function* () {
+        onAttemptSubmit();
+        submitForm(e);
+    }), [onAttemptSubmit, submitForm]);
+    return (React__default["default"].createElement("form", { onSubmit: handleFormSubmit },
         onSaved && (React__default["default"].createElement(material.Box, { sx: { my: 2.5 } },
             React__default["default"].createElement(SecondaryButton.SecondaryButton, { onClick: onSaved, startIcon: React__default["default"].createElement(Book["default"], null) }, "Use Saved Billing Info"))),
         React__default["default"].createElement(InputGroupLabel.InputGroupLabel, { sx: { m: 0, pt: 2 } }, "Information"),
@@ -130,9 +135,9 @@ defaultValues, checkoutError, taxes, onTaxInfoChange, onSaved, onClose, onSubmit
                 sm: "row"
             } },
             React__default["default"].createElement(Grid["default"], { item: true, sm: 6, zeroMinWidth: true },
-                React__default["default"].createElement(CountrySelector.ControlledCountrySelector, { name: COUNTRY_FIELD, control: control, label: FIELD_LABELS[COUNTRY_FIELD] })),
+                React__default["default"].createElement(TextField.ControlledTextField, { name: CITY_FIELD, control: control, label: FIELD_LABELS[CITY_FIELD] })),
             React__default["default"].createElement(Grid["default"], { item: true, sm: 6 },
-                React__default["default"].createElement(TextField.ControlledTextField, { name: CITY_FIELD, control: control, label: FIELD_LABELS[CITY_FIELD] }))),
+                React__default["default"].createElement(CountrySelector.ControlledCountrySelector, { name: COUNTRY_FIELD, control: control, label: FIELD_LABELS[COUNTRY_FIELD] }))),
         React__default["default"].createElement(Grid["default"], { container: true, columnSpacing: 2, direction: {
                 xs: "column",
                 sm: "row"

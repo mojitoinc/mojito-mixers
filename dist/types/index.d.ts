@@ -17,3 +17,4 @@ export type { UserFormat } from "./domain/auth/authentication.interfaces";
 export type { PaymentType } from "./domain/payment/payment.interfaces";
 export type { CheckoutItem } from "./domain/product/product.interfaces";
 export type { CircleFieldErrorAt, CircleFieldErrors } from "./domain/circle/circle.utils";
+export type { PUIDictionary, PUIDictionaryKeys, PUIDictionarySingleLine, PUIDictionaryMultiLine } from "./domain/dictionary/dictionary.interfaces";

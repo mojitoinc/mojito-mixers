@@ -4,7 +4,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 var tslib_es6 = require('../../../node_modules/tslib/tslib.es6.js');
 var React = require('react');
-var CheckoutItemCostBreakdown = require('../../components/payments/CheckoutItemCost/Breakdown/CheckoutItemCostBreakdown.js');
+var CheckoutDeliveryAndItemCostBreakdown = require('../../components/payments/CheckoutDeliveryAndItemCostBreakdown/CheckoutDeliveryAndItemCostBreakdown.js');
 var CheckoutStepper = require('../../components/payments/CheckoutStepper/CheckoutStepper.js');
 var PaymentMethodForm = require('../../forms/PaymentMethodForm.js');
 var SavedPaymentDetailsSelector = require('../../components/shared/SavedPaymentDetailsSelector/SavedPaymentDetailsSelector.js');
@@ -19,7 +19,7 @@ function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'defau
 var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 
 const billingInfoItemBoxProps = { sx: { mt: 2.5 } };
-const PaymentView = ({ checkoutItems, taxes, savedPaymentMethods: rawSavedPaymentMethods, selectedPaymentMethod, checkoutError, onPaymentInfoSelected, onCvvSelected, onSavedPaymentMethodDeleted, onNext, onPrev, onClose, acceptedPaymentTypes, consentType, privacyHref, termsOfUseHref, wirePaymentsDisclaimerText, debug, }) => {
+const PaymentView = ({ checkoutItems, taxes, savedPaymentMethods: rawSavedPaymentMethods, selectedPaymentMethod, walletAddress, checkoutError, onPaymentInfoSelected, onCvvSelected, onSavedPaymentMethodDeleted, onWalletAddressChange, onNext, onPrev, onClose, acceptedPaymentTypes, consentType, privacyHref, termsOfUseHref, dictionary, debug, }) => {
     const { billingInfo: selectedBillingInfo, paymentInfo: selectedPaymentInfo, } = selectedPaymentMethod;
     const savedPaymentMethods = React.useMemo(() => {
         if (typeof selectedBillingInfo !== "string")
@@ -35,6 +35,7 @@ const PaymentView = ({ checkoutItems, taxes, savedPaymentMethods: rawSavedPaymen
         isDeleting: false,
         showSaved: savedPaymentMethods.length > 0 && typeof selectedBillingInfo === "string" && !useFormCheckoutError.checkNeedsGenericErrorMessage("payment", checkoutError),
     });
+    const [formSubmitAttempted, setFormSubmitAttempted] = React.useState(false);
     const handleShowForm = React.useCallback(() => {
         setViewState({ isDeleting: false, showSaved: false });
     }, []);
@@ -51,6 +52,7 @@ const PaymentView = ({ checkoutItems, taxes, savedPaymentMethods: rawSavedPaymen
         const remainingPaymentMethods = savedPaymentMethods.length - 1;
         setViewState({ isDeleting: false, showSaved: remainingPaymentMethods > 0 });
     }), [onSavedPaymentMethodDeleted, savedPaymentMethods.length]);
+    const handleFormAttemptSubmit = React.useCallback(() => setFormSubmitAttempted(true), []);
     React.useEffect(() => {
         if (!selectedPaymentMethodBillingInfo)
             onPrev();
@@ -78,8 +80,8 @@ const PaymentView = ({ checkoutItems, taxes, savedPaymentMethods: rawSavedPaymen
             React__default["default"].createElement(CheckoutStepper.CheckoutStepper, { progress: 100 }),
             React__default["default"].createElement(BillingInfoItem.BillingInfoItem, { data: selectedPaymentMethodBillingInfo, additionalProps: { onEdit: onPrev, disabled: isDeleting, boxProps: billingInfoItemBoxProps } }),
             React__default["default"].createElement(material.Divider, { sx: { mt: 2.5 } }),
-            showSaved ? (React__default["default"].createElement(SavedPaymentDetailsSelector.SavedPaymentDetailsSelector, { showLoader: isDeleting, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethodId: typeof selectedPaymentInfo === "string" ? selectedPaymentInfo : undefined, onNew: handleShowForm, onDelete: handleSavedPaymentMethodDeleted, onPick: onPaymentInfoSelected, onCvvSelected: onCvvSelected, onNext: onNext, onClose: onClose, consentType: consentType, privacyHref: privacyHref, termsOfUseHref: termsOfUseHref })) : (React__default["default"].createElement(PaymentMethodForm.PaymentMethodForm, { acceptedPaymentTypes: acceptedPaymentTypes, defaultValues: typeof selectedPaymentInfo === "string" ? undefined : selectedPaymentInfo, checkoutError: checkoutError, onPlaidLinkClicked: onPlaidLinkClicked, onSaved: savedPaymentMethods.length > 0 ? handleShowSaved : undefined, onClose: onClose, onSubmit: handleSubmit, consentType: consentType, privacyHref: privacyHref, termsOfUseHref: termsOfUseHref, wirePaymentsDisclaimerText: wirePaymentsDisclaimerText, debug: debug }))),
-        React__default["default"].createElement(CheckoutItemCostBreakdown.CheckoutItemCostBreakdown, { checkoutItems: checkoutItems, taxes: taxes })));
+            showSaved ? (React__default["default"].createElement(SavedPaymentDetailsSelector.SavedPaymentDetailsSelector, { showLoader: isDeleting, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethodId: typeof selectedPaymentInfo === "string" ? selectedPaymentInfo : undefined, onNew: handleShowForm, onDelete: handleSavedPaymentMethodDeleted, onPick: onPaymentInfoSelected, onCvvSelected: onCvvSelected, onNext: onNext, onClose: onClose, onAttemptSubmit: handleFormAttemptSubmit, consentType: consentType, privacyHref: privacyHref, termsOfUseHref: termsOfUseHref })) : (React__default["default"].createElement(PaymentMethodForm.PaymentMethodForm, { acceptedPaymentTypes: acceptedPaymentTypes, defaultValues: typeof selectedPaymentInfo === "string" ? undefined : selectedPaymentInfo, checkoutError: checkoutError, onPlaidLinkClicked: onPlaidLinkClicked, onSaved: savedPaymentMethods.length > 0 ? handleShowSaved : undefined, onClose: onClose, onSubmit: handleSubmit, onAttemptSubmit: handleFormAttemptSubmit, consentType: consentType, privacyHref: privacyHref, termsOfUseHref: termsOfUseHref, dictionary: dictionary, debug: debug }))),
+        React__default["default"].createElement(CheckoutDeliveryAndItemCostBreakdown.CheckoutDeliveryAndItemCostBreakdown, { checkoutItems: checkoutItems, taxes: taxes, validatePersonalDeliveryAddress: formSubmitAttempted, walletAddress: walletAddress, onWalletAddressChange: onWalletAddressChange, dictionary: dictionary })));
 };
 
 exports.PaymentView = PaymentView;

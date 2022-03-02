@@ -22,8 +22,9 @@ const PUISuccessOverlay = (_a) => {
     const { purchaseSuccess, url = "" } = CheckoutOverlay_utils.getCheckoutModalState();
     const isPathname = url_utils.isUrlPathname(url);
     React.useLayoutEffect(() => {
-        if (purchaseSuccess && isPathname) {
-            CheckoutOverlay_utils.persistReceivedRedirectUri3DS(window.location.href);
+        if (purchaseSuccess) {
+            if (isPathname)
+                CheckoutOverlay_utils.persistReceivedRedirectUri3DS(window.location.href);
             return;
         }
         // Users should only see this page if they completed a credit card payment and 3DS' verification went ok.

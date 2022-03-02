@@ -3,6 +3,7 @@ import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { CopyButton } from "../../shared/CopyButton/CopyButton";
 import { ReadOnlyWalletAddress } from "../../shared/ReadOnlyField/ReadOnlyField";
 import { PUIDictionary } from "../../../domain/dictionary/dictionary.interfaces";
+import React from "react";
 
 export interface DeliveryWalletDetailsProps {
   walletAddress: string;

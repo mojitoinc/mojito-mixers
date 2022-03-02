@@ -63,7 +63,7 @@ const PurchasingView = ({ purchasingImageSrc, purchasingMessages: customPurchasi
             onPurchaseError(paymentError || errors_constants.ERROR_PURCHASE());
             return;
         }
-        if (isCreditCardPayment) {
+        if (isCreditCardPayment && window.location.hostname !== "localhost") {
             if (!redirectURL || checkoutInfoPersistedRef.current)
                 return;
             checkoutInfoPersistedRef.current = true;

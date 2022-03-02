@@ -29,10 +29,17 @@ const TOTAL_PLACEHOLDER_SX = {
     margin: "0 4px 0 0",
     userSelect: "none",
 };
-const CheckoutItemCostTotal = ({ total, taxes: { status, taxAmount = 0, taxRate = 0, }, fees, withDetails = false, }) => {
+const ROW_SX = {
+    display: "flex",
+    mb: 1,
+    flex: 1,
+    justifyContent: "space-between",
+};
+const CheckoutItemCostTotal = ({ total, fees, taxes: { status, taxAmount = 0, taxRate = 0, }, withDetails = false, }) => {
     let taxRateElement = null;
     let taxAmountElement = null;
     let totalElement = null;
+    const feesValue = fees || 0;
     if (status === "loading") {
         taxRateElement = React__default["default"].createElement(material.Tooltip, { title: "Calculating taxes..." },
             React__default["default"].createElement("span", null,
@@ -42,54 +49,45 @@ const CheckoutItemCostTotal = ({ total, taxes: { status, taxAmount = 0, taxRate 
         taxAmountElement = React__default["default"].createElement(material.Tooltip, { title: "Calculating taxes..." },
             React__default["default"].createElement("span", null,
                 React__default["default"].createElement(material.Box, { component: "span", sx: TAX_AMOUNT_PLACEHOLDER_SX },
-                    `${(total + fees) * 0.10 | 0}`.replace(/./, "0"),
+                    `${(total + feesValue) * 0.10 | 0}`.replace(/./, "0"),
                     ".00"),
                 " USD"));
         totalElement = React__default["default"].createElement(material.Tooltip, { title: "Calculating total..." },
             React__default["default"].createElement("span", null,
                 React__default["default"].createElement(material.Box, { component: "span", sx: TOTAL_PLACEHOLDER_SX },
-                    `${(total + fees) * 1.10 | 0}`.replace(/./, "0"),
+                    `${(total + feesValue) * 1.10 | 0}`.replace(/./, "0"),
                     ".00"),
                 " USD"));
     }
     else if (status === "complete" && taxAmount !== undefined) {
         taxRateElement = `(${formatUtils.formatTaxRate(taxRate)})`;
         taxAmountElement = React__default["default"].createElement(Number.Number, { suffix: " USD" }, taxAmount);
-        totalElement = React__default["default"].createElement(Number.Number, { suffix: " USD" }, total + fees + taxAmount);
+        totalElement = React__default["default"].createElement(Number.Number, { suffix: " USD" }, total + feesValue + taxAmount);
     }
     else {
-        taxRateElement = React__default["default"].createElement(material.Tooltip, { title: "Enter a valid address to calculate the taxes" },
-            React__default["default"].createElement("span", null, "(- %)"));
+        taxRateElement = null;
         taxAmountElement = React__default["default"].createElement(material.Tooltip, { title: "Enter a valid address to calculate the taxes" },
-            React__default["default"].createElement("span", null, "- USD"));
+            React__default["default"].createElement("span", null,
+                React__default["default"].createElement(Number.Number, { suffix: " USD" }, 0)));
         totalElement = React__default["default"].createElement(material.Tooltip, { title: "Enter a valid address to calculate the total" },
-            React__default["default"].createElement("span", null, "- USD"));
+            React__default["default"].createElement("span", null,
+                React__default["default"].createElement(Number.Number, { suffix: " USD" }, total + feesValue)));
     }
     return (React__default["default"].createElement(material.Box, { sx: { display: "flex", flexDirection: "column", mt: { xs: 3, sm: 0.5 } } },
         withDetails && (React__default["default"].createElement(React__default["default"].Fragment, null,
-            React__default["default"].createElement(material.Box, { sx: { display: "flex", flex: 1, justifyContent: "space-between" } },
+            React__default["default"].createElement(material.Box, { sx: ROW_SX },
                 React__default["default"].createElement(material.Typography, null, "Your purchase"),
                 React__default["default"].createElement(material.Typography, null,
                     React__default["default"].createElement(Number.Number, { suffix: " USD" }, total))),
-            React__default["default"].createElement(material.Box, { sx: {
-                    display: "flex",
-                    pt: 1,
-                    flex: 1,
-                    justifyContent: "space-between",
-                } },
+            React__default["default"].createElement(material.Box, { sx: ROW_SX },
                 React__default["default"].createElement(material.Typography, { sx: (theme) => ({ color: theme.palette.grey["500"] }) },
                     "Taxes ",
                     taxRateElement),
                 React__default["default"].createElement(material.Typography, null, taxAmountElement)),
-            React__default["default"].createElement(material.Box, { sx: {
-                    display: "flex",
-                    pt: 1,
-                    flex: 1,
-                    justifyContent: "space-between",
-                } },
+            fees === null ? null : (React__default["default"].createElement(material.Box, { sx: ROW_SX },
                 React__default["default"].createElement(material.Typography, { sx: (theme) => ({ color: theme.palette.grey["500"] }) }, "Fees"),
                 React__default["default"].createElement(material.Typography, null,
-                    React__default["default"].createElement(Number.Number, { suffix: " USD" }, fees))))),
+                    React__default["default"].createElement(Number.Number, { suffix: " USD" }, fees)))))),
         React__default["default"].createElement(material.Box, { sx: {
                 display: "flex",
                 mt: 3,
