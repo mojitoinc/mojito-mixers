@@ -16,6 +16,7 @@ import { usePlaid } from "../../hooks/usePlaid";
 import { ConsentType } from "../../components/shared/ConsentText/ConsentText";
 import { checkNeedsGenericErrorMessage } from "../../hooks/useFormCheckoutError";
 import { TaxesState } from "../Billing/BillingView";
+import { PUIDictionary } from "../../domain/dictionary/dictionary.interfaces";
 
 const billingInfoItemBoxProps: BoxProps = { sx: { mt: 2.5 } };
 
@@ -42,7 +43,7 @@ export interface PaymentViewProps {
   consentType?: ConsentType;
   privacyHref?: string;
   termsOfUseHref?: string;
-  wirePaymentsDisclaimerText?: React.ReactFragment[];
+  dictionary: PUIDictionary;
   debug?: boolean;
 }
 
@@ -64,7 +65,7 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
   consentType,
   privacyHref,
   termsOfUseHref,
-  wirePaymentsDisclaimerText,
+  dictionary,
   debug,
 }) => {
   const {
@@ -183,7 +184,7 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
             consentType={ consentType }
             privacyHref={ privacyHref }
             termsOfUseHref={ termsOfUseHref }
-            wirePaymentsDisclaimerText={ wirePaymentsDisclaimerText }
+            dictionary={ dictionary }
             debug={ debug } />
         ) }
       </Stack>
@@ -193,7 +194,8 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
         taxes={ taxes }
         validatePersonalDeliveryAddress={ formSubmitAttempted }
         walletAddress={ walletAddress }
-        onWalletAddressChange={ onWalletAddressChange } />
+        onWalletAddressChange={ onWalletAddressChange }
+        dictionary={ dictionary } />
     </Stack>
   );
 };

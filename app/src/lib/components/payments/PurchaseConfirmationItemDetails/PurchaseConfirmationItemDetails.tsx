@@ -3,15 +3,16 @@ import { Stack, Typography } from "@mui/material";
 
 import { CheckoutItem } from "../../../domain/product/product.interfaces";
 import { CheckoutItemList } from "../CheckoutItemCost/List/CheckoutItemList";
+import { PUIDictionary } from "../../../domain/dictionary/dictionary.interfaces";
 
 export interface PurchaseConfirmationItemDetailsProps {
   checkoutItems: CheckoutItem[];
-  purchaseInstructions: React.ReactFragment[];
+  dictionary: PUIDictionary;
 }
 
 export const PurchaseConfirmationItemDetails: React.FC<PurchaseConfirmationItemDetailsProps> = ({
   checkoutItems,
-  purchaseInstructions,
+  dictionary,
 }) => {
   return (
     <Stack sx={{ display: "flex", flex: 1, pt: 2.5 }}>
@@ -21,8 +22,8 @@ export const PurchaseConfirmationItemDetails: React.FC<PurchaseConfirmationItemD
 
       <Typography sx={{ mt: 6 }}>Purchase confirmed!</Typography>
 
-      { purchaseInstructions.map((instructionsLine, i) => (
-        <Typography key={ i } sx={{ mt: 1 }}>{ instructionsLine }</Typography>
+      { dictionary.purchaseInstructions.map((line, i) => (
+        <Typography key={ i } sx={{ mt: 1 }}>{ line }</Typography>
       )) }
     </Stack>
   );
