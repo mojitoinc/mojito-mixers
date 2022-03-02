@@ -11,7 +11,7 @@ mutation CreateAuctionInvoice($orgID: UUID1!, $lotID: UUID1!) {
   }
 }
 
-mutation CreateBuyNowInvoice(
+mutation ReserveBuyNowLot(
   $input: ReserveMarketplaceBuyNowLotInput!
 ) {
   reserveMarketplaceBuyNowLot(input: $input) {
