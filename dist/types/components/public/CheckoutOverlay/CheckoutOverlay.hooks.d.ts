@@ -30,8 +30,9 @@ export interface SelectedPaymentMethod {
 }
 export interface PurchaseState {
     invoiceID: string | null;
-    paymentReferenceNumber: string;
     taxes: TaxesState;
+    walletAddress: string | null;
+    paymentReferenceNumber: string;
 }
 export interface CheckoutModalStateReturn extends CheckoutModalState, PurchaseState {
     initModalState: () => void;
@@ -43,8 +44,9 @@ export interface CheckoutModalStateReturn extends CheckoutModalState, PurchaseSt
     selectedPaymentMethod: SelectedPaymentMethod;
     setSelectedPaymentMethod: Dispatch<SetStateAction<SelectedPaymentMethod>>;
     setInvoiceID: (invoiceID: string | null) => void;
-    setPaymentReferenceNumber: (paymentReferenceNumber: string) => void;
     setTaxes: (taxes: TaxesState) => void;
+    setWalletAddress: (walletAddress: string | null) => void;
+    setPaymentReferenceNumber: (paymentReferenceNumber: string) => void;
 }
 export declare const CHECKOUT_STEPS: CheckoutModalStep[];
 export declare function useCheckoutModalState({ invoiceID: initialInvoiceID, productConfirmationEnabled, isAuthenticated, onError, }: CheckoutModalStateOptions): CheckoutModalStateReturn;

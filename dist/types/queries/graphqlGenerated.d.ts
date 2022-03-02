@@ -1264,10 +1264,10 @@ export declare type CreateAuctionInvoiceMutation = {
         } | null>;
     };
 };
-export declare type CreateBuyNowInvoiceMutationVariables = Exact<{
+export declare type ReserveBuyNowLotMutationVariables = Exact<{
     input: ReserveMarketplaceBuyNowLotInput;
 }>;
-export declare type CreateBuyNowInvoiceMutation = {
+export declare type ReserveBuyNowLotMutation = {
     __typename?: 'Mutation';
     reserveMarketplaceBuyNowLot: {
         __typename?: 'MarketplaceBuyNowOutput';
@@ -1527,31 +1527,31 @@ export declare function useCreateAuctionInvoiceMutation(baseOptions?: Apollo.Mut
 export declare type CreateAuctionInvoiceMutationHookResult = ReturnType<typeof useCreateAuctionInvoiceMutation>;
 export declare type CreateAuctionInvoiceMutationResult = Apollo.MutationResult<CreateAuctionInvoiceMutation>;
 export declare type CreateAuctionInvoiceMutationOptions = Apollo.BaseMutationOptions<CreateAuctionInvoiceMutation, CreateAuctionInvoiceMutationVariables>;
-export declare const CreateBuyNowInvoiceDocument: Apollo.DocumentNode;
-export declare type CreateBuyNowInvoiceMutationFn = Apollo.MutationFunction<CreateBuyNowInvoiceMutation, CreateBuyNowInvoiceMutationVariables>;
+export declare const ReserveBuyNowLotDocument: Apollo.DocumentNode;
+export declare type ReserveBuyNowLotMutationFn = Apollo.MutationFunction<ReserveBuyNowLotMutation, ReserveBuyNowLotMutationVariables>;
 /**
- * __useCreateBuyNowInvoiceMutation__
+ * __useReserveBuyNowLotMutation__
  *
- * To run a mutation, you first call `useCreateBuyNowInvoiceMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useCreateBuyNowInvoiceMutation` returns a tuple that includes:
+ * To run a mutation, you first call `useReserveBuyNowLotMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useReserveBuyNowLotMutation` returns a tuple that includes:
  * - A mutate function that you can call at any time to execute the mutation
  * - An object with fields that represent the current status of the mutation's execution
  *
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const [createBuyNowInvoiceMutation, { data, loading, error }] = useCreateBuyNowInvoiceMutation({
+ * const [reserveBuyNowLotMutation, { data, loading, error }] = useReserveBuyNowLotMutation({
  *   variables: {
  *      input: // value for 'input'
  *   },
  * });
  */
-export declare function useCreateBuyNowInvoiceMutation(baseOptions?: Apollo.MutationHookOptions<CreateBuyNowInvoiceMutation, CreateBuyNowInvoiceMutationVariables>): Apollo.MutationTuple<CreateBuyNowInvoiceMutation, Exact<{
+export declare function useReserveBuyNowLotMutation(baseOptions?: Apollo.MutationHookOptions<ReserveBuyNowLotMutation, ReserveBuyNowLotMutationVariables>): Apollo.MutationTuple<ReserveBuyNowLotMutation, Exact<{
     input: ReserveMarketplaceBuyNowLotInput;
 }>, Apollo.DefaultContext, Apollo.ApolloCache<any>>;
-export declare type CreateBuyNowInvoiceMutationHookResult = ReturnType<typeof useCreateBuyNowInvoiceMutation>;
-export declare type CreateBuyNowInvoiceMutationResult = Apollo.MutationResult<CreateBuyNowInvoiceMutation>;
-export declare type CreateBuyNowInvoiceMutationOptions = Apollo.BaseMutationOptions<CreateBuyNowInvoiceMutation, CreateBuyNowInvoiceMutationVariables>;
+export declare type ReserveBuyNowLotMutationHookResult = ReturnType<typeof useReserveBuyNowLotMutation>;
+export declare type ReserveBuyNowLotMutationResult = Apollo.MutationResult<ReserveBuyNowLotMutation>;
+export declare type ReserveBuyNowLotMutationOptions = Apollo.BaseMutationOptions<ReserveBuyNowLotMutation, ReserveBuyNowLotMutationVariables>;
 export declare const GetInvoiceDetailsDocument: Apollo.DocumentNode;
 /**
  * __useGetInvoiceDetailsQuery__

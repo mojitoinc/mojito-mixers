@@ -5,15 +5,18 @@ import { SavedPaymentMethod } from "../../domain/circle/circle.interfaces";
 import { CheckoutModalError, SelectedPaymentMethod } from "../../components/public/CheckoutOverlay/CheckoutOverlay.hooks";
 import { ConsentType } from "../../components/shared/ConsentText/ConsentText";
 import { TaxesState } from "../Billing/BillingView";
+import { PUIDictionary } from "../../domain/dictionary/dictionary.interfaces";
 export interface PaymentViewProps {
     checkoutItems: CheckoutItem[];
     taxes: TaxesState;
     savedPaymentMethods: SavedPaymentMethod[];
     selectedPaymentMethod: SelectedPaymentMethod;
+    walletAddress: string | null;
     checkoutError?: CheckoutModalError;
     onPaymentInfoSelected: (data: string | PaymentMethod) => void;
     onCvvSelected: (cvv: string) => void;
     onSavedPaymentMethodDeleted: (savedPaymentMethodId: string) => void;
+    onWalletAddressChange: (walletAddress: string | null) => void;
     onNext: () => void;
     onPrev: () => void;
     onClose: () => void;
@@ -21,7 +24,7 @@ export interface PaymentViewProps {
     consentType?: ConsentType;
     privacyHref?: string;
     termsOfUseHref?: string;
-    wirePaymentsDisclaimerText?: React.ReactFragment[];
+    dictionary: PUIDictionary;
     debug?: boolean;
 }
 export declare const PaymentView: React.FC<PaymentViewProps>;

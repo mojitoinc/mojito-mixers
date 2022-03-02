@@ -1,7 +1,8 @@
+import { __awaiter } from '../../node_modules/tslib/tslib.es6.js';
 import { useForm } from 'react-hook-form';
 import { yupResolver as o } from '../../node_modules/@hookform/resolvers/yup/dist/yup.mjs.js';
 import { object, string } from 'yup';
-import React__default, { useEffect } from 'react';
+import React__default, { useEffect, useCallback } from 'react';
 import { ControlledCountrySelector } from '../components/shared/Select/CountrySelector/CountrySelector.js';
 import { ControlledStateSelector } from '../components/shared/Select/StateSelector/StateSelector.js';
 import { CheckoutModalFooter } from '../components/payments/CheckoutModalFooter/CheckoutModalFooter.js';
@@ -87,7 +88,7 @@ const schema = object()
 }).required();
 const BillingInfoForm = ({ 
 // variant,
-defaultValues, checkoutError, taxes, onTaxInfoChange, onSaved, onClose, onSubmit, debug }) => {
+defaultValues, checkoutError, taxes, onTaxInfoChange, onSaved, onClose, onSubmit, onAttemptSubmit, debug }) => {
     const { control, handleSubmit, watch, setError, formState, } = useForm({
         defaultValues: Object.assign(Object.assign({}, EMPTY_FORM_VALUES), defaultValues),
         reValidateMode: "onChange",
@@ -107,7 +108,11 @@ defaultValues, checkoutError, taxes, onTaxInfoChange, onSaved, onClose, onSubmit
     const selectedCountryCode = country === null || country === void 0 ? void 0 : country.value;
     const submitForm = handleSubmit(onSubmit);
     const checkoutErrorMessage = useFormCheckoutError({ formKey: "billing", checkoutError, fields: FIELD_NAMES, setError });
-    return (React__default.createElement("form", { onSubmit: submitForm },
+    const handleFormSubmit = useCallback((e) => __awaiter(void 0, void 0, void 0, function* () {
+        onAttemptSubmit();
+        submitForm(e);
+    }), [onAttemptSubmit, submitForm]);
+    return (React__default.createElement("form", { onSubmit: handleFormSubmit },
         onSaved && (React__default.createElement(Box, { sx: { my: 2.5 } },
             React__default.createElement(SecondaryButton, { onClick: onSaved, startIcon: React__default.createElement(default_1, null) }, "Use Saved Billing Info"))),
         React__default.createElement(InputGroupLabel, { sx: { m: 0, pt: 2 } }, "Information"),
@@ -122,9 +127,9 @@ defaultValues, checkoutError, taxes, onTaxInfoChange, onSaved, onClose, onSubmit
                 sm: "row"
             } },
             React__default.createElement(Grid, { item: true, sm: 6, zeroMinWidth: true },
-                React__default.createElement(ControlledCountrySelector, { name: COUNTRY_FIELD, control: control, label: FIELD_LABELS[COUNTRY_FIELD] })),
+                React__default.createElement(ControlledTextField, { name: CITY_FIELD, control: control, label: FIELD_LABELS[CITY_FIELD] })),
             React__default.createElement(Grid, { item: true, sm: 6 },
-                React__default.createElement(ControlledTextField, { name: CITY_FIELD, control: control, label: FIELD_LABELS[CITY_FIELD] }))),
+                React__default.createElement(ControlledCountrySelector, { name: COUNTRY_FIELD, control: control, label: FIELD_LABELS[COUNTRY_FIELD] }))),
         React__default.createElement(Grid, { container: true, columnSpacing: 2, direction: {
                 xs: "column",
                 sm: "row"

@@ -21,6 +21,7 @@ var FullScreenOverlay = require('../../shared/FullScreenOverlay/FullScreenOverla
 var ProvidersInjector = require('../../shared/ProvidersInjector/ProvidersInjector.js');
 var product_utils = require('../../../domain/product/product.utils.js');
 var useCreateInvoiceAndReservation = require('../../../hooks/useCreateInvoiceAndReservation.js');
+var dictionary_constants = require('../../../domain/dictionary/dictionary.constants.js');
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
@@ -28,12 +29,12 @@ var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 
 const PUICheckoutOverlay = ({ 
 // Modal:
-open, onClose, 
+open, onClose, onGoToCollection, 
 // Flow:
 guestCheckoutEnabled, productConfirmationEnabled, 
 // Personalization:
 logoSrc, logoSx, loaderImageSrc, purchasingImageSrc, purchasingMessages, errorImageSrc, userFormat, acceptedPaymentTypes, paymentLimits, // Not implemented yet. Used to show payment limits for some payment types.
-customTexts, 
+dictionary: parentDictionary, 
 // Legal:
 consentType, privacyHref, termsOfUseHref, 
 // Data:
@@ -43,8 +44,10 @@ onLogin, isAuthenticated, isAuthenticatedLoading,
 // Other Events:
 debug, onError, onMarketingOptInChange, // Not implemented yet. Used to let user subscribe / unsubscribe to marketing updates.
  }) => {
-    // First, get user data and saved payment methods:
     var _a;
+    // TODO: This should end up being in a context + hook to avoid prop drilling and it should be memoized:
+    const dictionary = Object.assign(Object.assign({}, dictionary_constants.DEFAULT_DICTIONARY), parentDictionary);
+    // First, get user data and saved payment methods:
     const { data: meData, loading: meLoading, error: meError, refetch: meRefetch, } = graphqlGenerated.useMeQuery({ skip: !isAuthenticated });
     const { data: paymentMethodsData, loading: paymentMethodsLoading, error: paymentMethodsError, refetch: refetchPaymentMethods, } = graphqlGenerated.useGetPaymentMethodListQuery({
         skip: !isAuthenticated,
@@ -57,7 +60,7 @@ debug, onError, onMarketingOptInChange, // Not implemented yet. Used to let user
     // SelectedPaymentMethod:
     selectedPaymentMethod, setSelectedPaymentMethod, 
     // PurchaseState:
-    invoiceID, paymentReferenceNumber, setInvoiceID, setPaymentReferenceNumber, taxes, setTaxes, } = CheckoutOverlay_hooks.useCheckoutModalState({
+    invoiceID, setInvoiceID, taxes, setTaxes, walletAddress, setWalletAddress, paymentReferenceNumber, setPaymentReferenceNumber, } = CheckoutOverlay_hooks.useCheckoutModalState({
         invoiceID: initialInvoiceID,
         productConfirmationEnabled,
         isAuthenticated,
@@ -271,10 +274,10 @@ debug, onError, onMarketingOptInChange, // Not implemented yet. Used to let user
         checkoutStepElement = (React__default["default"].createElement(AuthenticationView.AuthenticationView, { checkoutItems: checkoutItems, taxes: taxes, isAuthenticated: isAuthenticated, guestCheckoutEnabled: guestCheckoutEnabled, onGuestClicked: goNext, onCloseClicked: handleClose }));
     }
     else if (checkoutStep === "billing") {
-        checkoutStepElement = (React__default["default"].createElement(BillingView.BillingView, { checkoutItems: checkoutItems, savedPaymentMethods: savedPaymentMethods, selectedBillingInfo: selectedPaymentMethod.billingInfo, checkoutError: checkoutError, onBillingInfoSelected: handleBillingInfoSelected, onTaxesChange: setTaxes, onSavedPaymentMethodDeleted: handleSavedPaymentMethodDeleted, onNext: goNext, onClose: handleClose, debug: debug }));
+        checkoutStepElement = (React__default["default"].createElement(BillingView.BillingView, { checkoutItems: checkoutItems, savedPaymentMethods: savedPaymentMethods, selectedBillingInfo: selectedPaymentMethod.billingInfo, walletAddress: walletAddress, checkoutError: checkoutError, onBillingInfoSelected: handleBillingInfoSelected, onTaxesChange: setTaxes, onSavedPaymentMethodDeleted: handleSavedPaymentMethodDeleted, onWalletAddressChange: setWalletAddress, onNext: goNext, onClose: handleClose, dictionary: dictionary, debug: debug }));
     }
     else if (checkoutStep === "payment") {
-        checkoutStepElement = (React__default["default"].createElement(PaymentView.PaymentView, { checkoutItems: checkoutItems, taxes: taxes, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethod: selectedPaymentMethod, checkoutError: checkoutError, onPaymentInfoSelected: handlePaymentInfoSelected, onCvvSelected: handleCvvSelected, onSavedPaymentMethodDeleted: handleSavedPaymentMethodDeleted, onNext: goNext, onPrev: goBack, onClose: handleClose, acceptedPaymentTypes: acceptedPaymentTypes, consentType: consentType, privacyHref: privacyHref, termsOfUseHref: termsOfUseHref, wirePaymentsDisclaimerText: customTexts.wirePaymentsDisclaimer, debug: debug }));
+        checkoutStepElement = (React__default["default"].createElement(PaymentView.PaymentView, { checkoutItems: checkoutItems, taxes: taxes, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethod: selectedPaymentMethod, walletAddress: walletAddress, checkoutError: checkoutError, onPaymentInfoSelected: handlePaymentInfoSelected, onCvvSelected: handleCvvSelected, onSavedPaymentMethodDeleted: handleSavedPaymentMethodDeleted, onWalletAddressChange: setWalletAddress, onNext: goNext, onPrev: goBack, onClose: handleClose, acceptedPaymentTypes: acceptedPaymentTypes, consentType: consentType, privacyHref: privacyHref, termsOfUseHref: termsOfUseHref, dictionary: dictionary, debug: debug }));
     }
     else if (checkoutStep === "purchasing" && invoiceID) {
         headerVariant = "purchasing";
@@ -282,7 +285,7 @@ debug, onError, onMarketingOptInChange, // Not implemented yet. Used to let user
     }
     else if (checkoutStep === "confirmation") {
         headerVariant = "logoOnly";
-        checkoutStepElement = (React__default["default"].createElement(ConfirmationView.ConfirmationView, { checkoutItems: checkoutItems, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethod: selectedPaymentMethod, paymentReferenceNumber: paymentReferenceNumber, purchaseInstructions: customTexts.purchaseInstructions, onNext: handleClose }));
+        checkoutStepElement = (React__default["default"].createElement(ConfirmationView.ConfirmationView, { checkoutItems: checkoutItems, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethod: selectedPaymentMethod, paymentReferenceNumber: paymentReferenceNumber, onGoToCollection: onGoToCollection, onNext: handleClose, dictionary: dictionary }));
     }
     else {
         // !checkoutStep or

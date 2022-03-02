@@ -1,5 +1,5 @@
-import { CheckoutItem } from "../../domain/product/product.interfaces";
 import React from "react";
+import { CheckoutItem } from "../../domain/product/product.interfaces";
 import { TaxesState } from "../Billing/BillingView";
 export interface AuthenticationViewProps {
     checkoutItems: CheckoutItem[];

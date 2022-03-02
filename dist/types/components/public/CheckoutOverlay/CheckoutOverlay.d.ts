@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ErrorInfo } from "react";
 import { UserFormat } from "../../../domain/auth/authentication.interfaces";
 import { PaymentType } from "../../../domain/payment/payment.interfaces";
 import { CheckoutItemInfo } from "../../../domain/product/product.interfaces";
@@ -6,10 +6,11 @@ import { Theme, SxProps } from "@mui/material/styles";
 import { ConsentType } from "../../shared/ConsentText/ConsentText";
 import { CheckoutModalError } from "./CheckoutOverlay.hooks";
 import { ProvidersInjectorProps } from "../../shared/ProvidersInjector/ProvidersInjector";
-import { CustomTextsKeys } from "../../../domain/customTexts/customTexts.interfaces";
+import { PUIDictionary } from "../../../domain/dictionary/dictionary.interfaces";
 export interface PUICheckoutOverlayProps {
     open: boolean;
     onClose: () => void;
+    onGoToCollection?: () => void;
     guestCheckoutEnabled?: boolean;
     productConfirmationEnabled?: boolean;
     logoSrc: string;
@@ -21,7 +22,7 @@ export interface PUICheckoutOverlayProps {
     userFormat: UserFormat;
     acceptedPaymentTypes: PaymentType[];
     paymentLimits?: Partial<Record<PaymentType, number>>;
-    customTexts: Record<CustomTextsKeys, React.ReactFragment[]>;
+    dictionary?: Partial<PUIDictionary>;
     consentType?: ConsentType;
     privacyHref?: string;
     termsOfUseHref?: string;
@@ -33,6 +34,7 @@ export interface PUICheckoutOverlayProps {
     isAuthenticatedLoading?: boolean;
     debug?: boolean;
     onError?: (error: CheckoutModalError) => void;
+    onCatch?: (error: Error, errorInfo?: ErrorInfo) => void | true;
     onMarketingOptInChange?: (marketingOptIn: boolean) => void;
 }
 export declare type PUICheckoutProps = PUICheckoutOverlayProps & ProvidersInjectorProps;

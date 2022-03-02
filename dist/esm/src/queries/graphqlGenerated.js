@@ -202,8 +202,8 @@ function useCreateAuctionInvoiceMutation(baseOptions) {
     const options = Object.assign(Object.assign({}, defaultOptions), baseOptions);
     return Apollo.useMutation(CreateAuctionInvoiceDocument, options);
 }
-const CreateBuyNowInvoiceDocument = gql `
-    mutation CreateBuyNowInvoice($input: ReserveMarketplaceBuyNowLotInput!) {
+const ReserveBuyNowLotDocument = gql `
+    mutation ReserveBuyNowLot($input: ReserveMarketplaceBuyNowLotInput!) {
   reserveMarketplaceBuyNowLot(input: $input) {
     invoice {
       invoiceID
@@ -219,25 +219,25 @@ const CreateBuyNowInvoiceDocument = gql `
 }
     `;
 /**
- * __useCreateBuyNowInvoiceMutation__
+ * __useReserveBuyNowLotMutation__
  *
- * To run a mutation, you first call `useCreateBuyNowInvoiceMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useCreateBuyNowInvoiceMutation` returns a tuple that includes:
+ * To run a mutation, you first call `useReserveBuyNowLotMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useReserveBuyNowLotMutation` returns a tuple that includes:
  * - A mutate function that you can call at any time to execute the mutation
  * - An object with fields that represent the current status of the mutation's execution
  *
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const [createBuyNowInvoiceMutation, { data, loading, error }] = useCreateBuyNowInvoiceMutation({
+ * const [reserveBuyNowLotMutation, { data, loading, error }] = useReserveBuyNowLotMutation({
  *   variables: {
  *      input: // value for 'input'
  *   },
  * });
  */
-function useCreateBuyNowInvoiceMutation(baseOptions) {
+function useReserveBuyNowLotMutation(baseOptions) {
     const options = Object.assign(Object.assign({}, defaultOptions), baseOptions);
-    return Apollo.useMutation(CreateBuyNowInvoiceDocument, options);
+    return Apollo.useMutation(ReserveBuyNowLotDocument, options);
 }
 const GetInvoiceDetailsDocument = gql `
     query GetInvoiceDetails($invoiceID: UUID1!, $orgID: UUID1!) {
@@ -505,5 +505,5 @@ function useGetTaxQuoteLazyQuery(baseOptions) {
     return Apollo.useLazyQuery(GetTaxQuoteDocument, options);
 }
 
-export { AuctionBidOrder, AuctionLotStatus, CollectionType, ContractType, CreateAuctionInvoiceDocument, CreateBuyNowInvoiceDocument, CreatePaymentDocument, CreatePaymentMethodDocument, DeletePaymentMethodDocument, ExtensionType, GetInvoiceDetailsDocument, GetPaymentMethodListDocument, GetPaymentNotificationDocument, GetTaxQuoteDocument, InvoiceStatus, KycStatus, MarketCollectionStatus, MarketplaceCollectionItemStatus, MarketplaceSaleType, MeDocument, PaymentKeyDocument, PaymentStatus, PaymentType, PreparePaymentMethodDocument, Role, TransactionStatus, TransactionType, WalletParentType, WalletTxType, useCreateAuctionInvoiceMutation, useCreateBuyNowInvoiceMutation, useCreatePaymentMethodMutation, useCreatePaymentMutation, useDeletePaymentMethodMutation, useGetInvoiceDetailsQuery, useGetPaymentMethodListQuery, useGetPaymentNotificationQuery, useGetTaxQuoteLazyQuery, useMeQuery, usePaymentKeyLazyQuery, usePreparePaymentMethodQuery };
+export { AuctionBidOrder, AuctionLotStatus, CollectionType, ContractType, CreateAuctionInvoiceDocument, CreatePaymentDocument, CreatePaymentMethodDocument, DeletePaymentMethodDocument, ExtensionType, GetInvoiceDetailsDocument, GetPaymentMethodListDocument, GetPaymentNotificationDocument, GetTaxQuoteDocument, InvoiceStatus, KycStatus, MarketCollectionStatus, MarketplaceCollectionItemStatus, MarketplaceSaleType, MeDocument, PaymentKeyDocument, PaymentStatus, PaymentType, PreparePaymentMethodDocument, ReserveBuyNowLotDocument, Role, TransactionStatus, TransactionType, WalletParentType, WalletTxType, useCreateAuctionInvoiceMutation, useCreatePaymentMethodMutation, useCreatePaymentMutation, useDeletePaymentMethodMutation, useGetInvoiceDetailsQuery, useGetPaymentMethodListQuery, useGetPaymentNotificationQuery, useGetTaxQuoteLazyQuery, useMeQuery, usePaymentKeyLazyQuery, usePreparePaymentMethodQuery, useReserveBuyNowLotMutation };
 //# sourceMappingURL=graphqlGenerated.js.map

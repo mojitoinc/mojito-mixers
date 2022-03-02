@@ -12,5 +12,6 @@ export interface SavedBillingDetailsSelectorProps {
     onPick: (billingInfoId: string) => void;
     onNext: () => void;
     onClose: () => void;
+    onAttemptSubmit: () => void;
 }
 export declare const SavedBillingDetailsSelector: React.FC<SavedBillingDetailsSelectorProps>;

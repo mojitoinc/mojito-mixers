@@ -12,7 +12,7 @@ var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 
 const PrimaryButton = React__default["default"].forwardRef((props, ref) => {
     const isIcon = reactUtils.containsOnlyIcon(props.children);
-    return (React__default["default"].createElement(material.Button, Object.assign({ variant: "contained", color: "primary", size: "medium", ref: ref, disableElevation: true }, props, { sx: isIcon ? Object.assign(Object.assign({}, props.sx), { p: 0 }) : undefined })));
+    return (React__default["default"].createElement(material.Button, Object.assign({ variant: "contained", color: "primary", size: "medium", ref: ref, disableElevation: true }, props, { sx: isIcon ? Object.assign(Object.assign({}, props.sx), { p: 0 }) : props.sx })));
 });
 
 exports.PrimaryButton = PrimaryButton;

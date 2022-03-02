@@ -5,11 +5,12 @@ import { useCheckoutItemsCostTotal } from '../../../../hooks/useCheckoutItemCost
 import { CheckoutItemList } from '../List/CheckoutItemList.js';
 
 const CheckoutItemCostBreakdown = ({ checkoutItems, taxes, }) => {
+    const firstCheckoutItem = checkoutItems[0];
     const { total, fees } = useCheckoutItemsCostTotal(checkoutItems);
-    return (React__default.createElement(Stack, { sx: { display: "flex", flex: 1, py: 5 } },
+    return (React__default.createElement(Stack, { sx: { display: "flex", flex: 1 } },
         React__default.createElement(CheckoutItemList, { checkoutItems: checkoutItems, withSeparators: true, showPrices: true }),
         React__default.createElement(Divider, { sx: { mt: 3.75, mb: 1.5 } }),
-        React__default.createElement(CheckoutItemCostTotal, { withDetails: true, total: total, fees: fees, taxes: taxes })));
+        React__default.createElement(CheckoutItemCostTotal, { withDetails: true, total: total, fees: fees === 0 && firstCheckoutItem.lotType === "buyNow" ? null : fees, taxes: taxes })));
 };
 
 export { CheckoutItemCostBreakdown };

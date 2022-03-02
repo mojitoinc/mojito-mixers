@@ -4,10 +4,12 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 var React = require('react');
 var errors_constants = require('../../../domain/errors/errors.constants.js');
+var wallet_utils = require('../../../domain/wallet/wallet.utils.js');
 var CheckoutStepper = require('../../payments/CheckoutStepper/CheckoutStepper.js');
 var CheckoutOverlay_utils = require('./CheckoutOverlay.utils.js');
 
 const CHECKOUT_STEPS = ["authentication", "billing", "payment", "purchasing", "confirmation"];
+const WALLET_ADDRESS_FIELD_STEPS = ["billing", "payment"];
 function useCheckoutModalState({ invoiceID: initialInvoiceID = null, productConfirmationEnabled, isAuthenticated, onError, }) {
     const startAt = !isAuthenticated || productConfirmationEnabled ? "authentication" : "billing";
     const [{ checkoutStep, checkoutError, isDialogBlocked, }, setCheckoutModalState] = React.useState({
@@ -19,10 +21,11 @@ function useCheckoutModalState({ invoiceID: initialInvoiceID = null, productConf
         paymentInfo: "",
         cvv: "",
     });
-    const [{ invoiceID, paymentReferenceNumber, taxes, }, setPurchaseState] = React.useState({
+    const [{ invoiceID, taxes, walletAddress, paymentReferenceNumber, }, setPurchaseState] = React.useState({
         invoiceID: initialInvoiceID || null,
-        paymentReferenceNumber: "",
         taxes: { status: "incomplete" },
+        walletAddress: null,
+        paymentReferenceNumber: "",
     });
     const initModalState = React.useCallback(() => {
         // Make sure the progress tracker in BillingView and PaymentView is properly animated:
@@ -48,8 +51,9 @@ function useCheckoutModalState({ invoiceID: initialInvoiceID = null, productConf
         });
         setPurchaseState({
             invoiceID: savedFlow.invoiceID || "",
-            paymentReferenceNumber: savedFlow.paymentReferenceNumber || "",
             taxes: { status: "incomplete" },
+            walletAddress: null,
+            paymentReferenceNumber: savedFlow.paymentReferenceNumber || "",
         });
     }, [startAt]);
     const goBack = React.useCallback(() => {
@@ -60,12 +64,14 @@ function useCheckoutModalState({ invoiceID: initialInvoiceID = null, productConf
         }));
     }, []);
     const goNext = React.useCallback(() => {
+        if (!wallet_utils.isValidWalletAddress(walletAddress) && WALLET_ADDRESS_FIELD_STEPS.includes(checkoutStep))
+            return;
         setCheckoutModalState(({ checkoutStep, checkoutError }) => ({
             checkoutStep: CHECKOUT_STEPS[Math.min(CHECKOUT_STEPS.indexOf(checkoutStep) + 1, CHECKOUT_STEPS.length - 1)],
             checkoutError,
             isDialogBlocked: false,
         }));
-    }, []);
+    }, [checkoutStep, walletAddress]);
     const goTo = React.useCallback((checkoutStep = startAt, error) => {
         setCheckoutModalState((prevCheckoutModalState) => {
             let checkoutError;
@@ -98,13 +104,16 @@ function useCheckoutModalState({ invoiceID: initialInvoiceID = null, productConf
         }));
     }, []);
     const setInvoiceID = React.useCallback((invoiceID) => {
-        setPurchaseState(({ taxes }) => ({ invoiceID, paymentReferenceNumber: "", taxes }));
-    }, []);
-    const setPaymentReferenceNumber = React.useCallback((paymentReferenceNumber) => {
-        setPurchaseState(({ invoiceID, taxes }) => ({ invoiceID, paymentReferenceNumber, taxes }));
+        setPurchaseState(({ taxes, walletAddress }) => ({ invoiceID, taxes, walletAddress, paymentReferenceNumber: "" }));
     }, []);
     const setTaxes = React.useCallback((taxes) => {
-        setPurchaseState(({ invoiceID, paymentReferenceNumber }) => ({ invoiceID, paymentReferenceNumber, taxes }));
+        setPurchaseState(({ invoiceID, walletAddress, paymentReferenceNumber }) => ({ invoiceID, taxes, walletAddress, paymentReferenceNumber }));
+    }, []);
+    const setWalletAddress = React.useCallback((walletAddress) => {
+        setPurchaseState(({ invoiceID, taxes, paymentReferenceNumber }) => ({ invoiceID, taxes, walletAddress, paymentReferenceNumber }));
+    }, []);
+    const setPaymentReferenceNumber = React.useCallback((paymentReferenceNumber) => {
+        setPurchaseState(({ invoiceID, taxes, walletAddress }) => ({ invoiceID, taxes, walletAddress, paymentReferenceNumber }));
     }, []);
     return {
         // CheckoutModalState:
@@ -122,11 +131,13 @@ function useCheckoutModalState({ invoiceID: initialInvoiceID = null, productConf
         setSelectedPaymentMethod,
         // PurchaseState:
         invoiceID,
-        paymentReferenceNumber,
         setInvoiceID,
-        setPaymentReferenceNumber,
         taxes,
         setTaxes,
+        walletAddress,
+        setWalletAddress,
+        paymentReferenceNumber,
+        setPaymentReferenceNumber,
     };
 }
 
