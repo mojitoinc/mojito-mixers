@@ -64,12 +64,12 @@ export const CheckoutItemCostTotal: React.FC<CheckoutItemCostTotalProps> = ({
     totalElement = <Tooltip title="Calculating total..."><span><Box component="span" sx={ TOTAL_PLACEHOLDER_SX }>{ `${ (total + feesValue) * 1.10 | 0 }`.replace(/./, "0") }.00</Box> USD</span></Tooltip>;
   } else if (status === "complete" && taxAmount !== undefined ) {
     taxRateElement = `(${ formatTaxRate(taxRate) })`;
-    taxAmountElement = <Number suffix=" USD">{taxAmount}</Number>;
-    totalElement = <Number suffix=" USD">{total + feesValue + taxAmount}</Number>
+    taxAmountElement = <Number suffix=" USD">{ taxAmount }</Number>;
+    totalElement = <Number suffix=" USD">{ total + feesValue + taxAmount }</Number>;
   } else {
-    taxRateElement = <Tooltip title="Enter a valid address to calculate the taxes"><span>(- %)</span></Tooltip>;
-    taxAmountElement = <Tooltip title="Enter a valid address to calculate the taxes"><span>- USD</span></Tooltip>;
-    totalElement = <Tooltip title="Enter a valid address to calculate the total"><span>- USD</span></Tooltip>;
+    taxRateElement = null;
+    taxAmountElement = <Tooltip title="Enter a valid address to calculate the taxes"><span><Number suffix=" USD">{ 0 }</Number></span></Tooltip>;
+    totalElement = <Tooltip title="Enter a valid address to calculate the total"><span><Number suffix=" USD">{ total + feesValue }</Number></span></Tooltip>;
   }
 
   return (
