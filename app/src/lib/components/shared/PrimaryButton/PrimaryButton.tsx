@@ -14,6 +14,6 @@ export const PrimaryButton = React.forwardRef<HTMLButtonElement, ButtonProps>((p
       ref={ ref }
       disableElevation
       { ...props }
-      sx={ isIcon ? { ...props.sx, p: 0 } : undefined } />
+      sx={ isIcon ? { ...props.sx, p: 0 } : props.sx } />
   );
 });

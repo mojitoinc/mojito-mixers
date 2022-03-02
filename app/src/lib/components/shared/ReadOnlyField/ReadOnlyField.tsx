@@ -9,6 +9,9 @@ export const ReadOnlyField: React.FC<TextFieldProps> = styled((props) => (
 ))(({ theme: { palette, typography } }) => ({
   "& .MuiInputLabel-root": {
     "&.Mui-disabled": {
+      ...typography.body2,
+      fontSize: "16px", // 12px accounting for 0.75 scale.
+      lineHeight: "24px", // 18px accounting for 0.75 scale.
       color: palette.text.primary,
     },
   },
@@ -18,7 +21,7 @@ export const ReadOnlyField: React.FC<TextFieldProps> = styled((props) => (
       padding: 8,
       height: "40px",
       borderRadius: SM_BORDER_RADIUS,
-      marginTop: 32,
+      marginTop: 24,
     },
   },
   "& .MuiInputBase-input": {
@@ -38,6 +41,9 @@ export const ReadOnlyCardField: React.FC<TextFieldProps> = styled((props) => (
 ))(({ theme: { palette, typography } }) => ({
   "& .MuiInputLabel-root": {
     "&.Mui-disabled": {
+      ...typography.body2,
+      fontSize: "16px", // 12px accounting for 0.75 scale.
+      lineHeight: "24px", // 18px accounting for 0.75 scale.
       color: palette.text.primary,
     },
   },
@@ -47,7 +53,7 @@ export const ReadOnlyCardField: React.FC<TextFieldProps> = styled((props) => (
       padding: 8,
       height: "40px",
       borderRadius: SM_BORDER_RADIUS,
-      marginTop: 32,
+      marginTop: 24,
     },
   },
   "& .MuiInputBase-input": {
@@ -66,6 +72,9 @@ export const ReadOnlyWalletAddress: React.FC<TextFieldProps> = styled((props) =>
 ))(({ theme: { palette, typography } }) => ({
   "& .MuiInputLabel-root": {
     "&.Mui-disabled": {
+      ...typography.body1,
+      fontSize: "16px", // 12px accounting for 0.75 scale.
+      lineHeight: "24px", // 18px accounting for 0.75 scale.
       color: palette.text.primary,
     },
   },

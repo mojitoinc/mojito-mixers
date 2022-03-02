@@ -30,6 +30,7 @@ export interface PUICheckoutOverlayProps {
   // Modal:
   open: boolean;
   onClose: () => void;
+  onGoToCollection?: () => void;
 
   // Flow:
   guestCheckoutEnabled?: boolean;
@@ -75,6 +76,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   // Modal:
   open,
   onClose,
+  onGoToCollection,
 
   // Flow:
   guestCheckoutEnabled,
@@ -554,8 +556,9 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
         savedPaymentMethods={ savedPaymentMethods }
         selectedPaymentMethod={ selectedPaymentMethod }
         paymentReferenceNumber={ paymentReferenceNumber }
-        dictionary={ dictionary }
-        onNext={ handleClose } />
+        onGoToCollection={ onGoToCollection }
+        onNext={ handleClose }
+        dictionary={ dictionary } />
     );
   } else {
     // !checkoutStep or
