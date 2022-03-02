@@ -1,39 +1,39 @@
-import { Component, ErrorInfo, ReactNode } from "react";
+import React, { ErrorInfo } from "react";
 
 interface Props {
-    children: ReactNode;
-    onCatch?: (error: Error, errorInfo?: ErrorInfo) => void
+  children: React.ReactNode;
+  onCatch?: (error: Error, errorInfo?: ErrorInfo) => void | true;
 }
 
 interface State {
-    hasError: boolean
+  hasError: boolean;
 }
 
-class ErrorBoundary extends Component<Props, State>{
+class ErrorBoundary extends React.Component<Props, State> {
 
-    state = { hasError: false };
+  state = { hasError: false };
 
-    static getDerivedStateFromError() {
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
 
-        return { hasError: true }
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    const { onCatch } = this.props;
+
+    if (!onCatch) console.error(error, errorInfo);
+
+    const useConfirmModal = !onCatch || onCatch(error, errorInfo) === true;
+
+    if (useConfirmModal) {
+      const retry = window.confirm("Sorry, there was an unexpected error. Do you want to re-open the payment modal?");
+
+      if (retry) this.setState({ hasError: false });
     }
-    componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-        if (this.props.onCatch) {
-            this.props.onCatch(error, errorInfo);
+  }
 
-            const retry = window.confirm("Sorry, there was an unexpected error. Do you want to re-open the payment modal?");
-
-            if (retry) this.setState({ hasError: false });
-        }
-        else{
-            console.warn(error);
-        }
-    }
-
-    render(): ReactNode {
-        return this.state.hasError ? null : this.props.children;
-    }
-
+  render() {
+    return this.state.hasError ? null : this.props.children;
+  }
 }
 
 
