@@ -1,5 +1,8 @@
 <h1 align="center">Mojito Payment UI</h1>
 
+<br />
+<br />
+
 <p align="center">
   👨‍💻 Payment UI modal & playground UI to easily test it.
 </p><p align="center">
@@ -11,14 +14,23 @@
 <br />
 
 
+----
+
 <p align="center">
   <a href="https://payments-staging.mojito.xyz/" target="_blank">
     <img src="./app/public/img/og-images/mojito-payment-ui-billing.png" width="1280" />
   </a>
+</p>
+
+----
+
+<p align="center">
   <a href="https://payments-staging.mojito.xyz/" target="_blank">
     <img src="./app/public/img/og-images/mojito-payment-ui-payment.png" width="1280" />
   </a>
 </p>
+
+----
 
 <br />
 
