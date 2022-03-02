@@ -1,3 +1,4 @@
+import React from "react";
 import { Link, Tooltip } from "@mui/material";
 import { PUIDictionary, PUIDictionarySingleLine } from "./dictionary.interfaces";
 
