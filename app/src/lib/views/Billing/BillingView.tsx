@@ -14,6 +14,7 @@ import { checkNeedsGenericErrorMessage } from "../../hooks/useFormCheckoutError"
 import { TaxQuoteOutput, useGetTaxQuoteLazyQuery } from "../../queries/graphqlGenerated";
 import { useCheckoutItemsCostTotal } from "../../hooks/useCheckoutItemCostTotal";
 import { useThrottledCallback } from "@swyg/corre";
+import { PUIDictionary } from "../../domain/dictionary/dictionary.interfaces";
 
 export type TaxStatus = "incomplete" | "loading" | "complete" | "error";
 
@@ -41,6 +42,7 @@ export interface BillingViewProps {
   onWalletAddressChange: (personalWalletAddress: string | null) => void;
   onNext: () => void;
   onClose: () => void;
+  dictionary: PUIDictionary;
   debug?: boolean;
 }
 
@@ -56,6 +58,7 @@ export const BillingView: React.FC<BillingViewProps> = ({
   onWalletAddressChange,
   onNext,
   onClose,
+  dictionary,
   debug,
 }) => {
   const savedPaymentMethodAddressIdRef = useRef<string>("");
@@ -246,7 +249,8 @@ export const BillingView: React.FC<BillingViewProps> = ({
         taxes={ taxes }
         validatePersonalDeliveryAddress={ formSubmitAttempted }
         walletAddress={ walletAddress }
-        onWalletAddressChange={ onWalletAddressChange } />
+        onWalletAddressChange={ onWalletAddressChange }
+        dictionary={ dictionary } />
     </Stack>
   );
 };

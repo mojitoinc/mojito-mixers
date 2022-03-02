@@ -34,13 +34,14 @@ import { ConsentText, ConsentType, CONSENT_ERROR_MESSAGE } from "../components/s
 import { CheckoutModalError } from "../components/public/CheckoutOverlay/CheckoutOverlay.hooks";
 import { FormErrorsBox } from "../components/shared/FormErrorsBox/FormErrorsBox";
 import { useFormCheckoutError } from "../hooks/useFormCheckoutError";
+import { PUIDictionary } from "../domain/dictionary/dictionary.interfaces";
 
 interface PaymentTypeFormProps {
   control: Control<PaymentMethod & { consent: boolean }>;
   consentType?: ConsentType;
   privacyHref?: string;
   termsOfUseHref?: string;
-  wirePaymentsDisclaimerText?: React.ReactFragment[];
+  dictionary: PUIDictionary;
 }
 
 interface PaymentTypeFormData {
@@ -191,7 +192,7 @@ const PAYMENT_TYPE_FORM_DATA: Record<PaymentType, PaymentTypeFormData> = {
         .label(FIELD_LABELS.routingNumber)
         .when("type", isWireThenRequireSchema),
     },
-    fields: ({ control, consentType, privacyHref, termsOfUseHref, wirePaymentsDisclaimerText }) => (<>
+    fields: ({ control, consentType, privacyHref, termsOfUseHref, dictionary }) => (<>
       <ControlledTextField
           name="accountNumber"
           control={control}
@@ -208,13 +209,12 @@ const PAYMENT_TYPE_FORM_DATA: Record<PaymentType, PaymentTypeFormData> = {
           control={control}
           label={ <>I <ConsentText privacyHref={ privacyHref } termsOfUseHref={ termsOfUseHref } /></> } />
       ) }
-      {wirePaymentsDisclaimerText && (
-        <DisplayBox sx={{ mt: 1.5, flexDirection: "column" }} >
-          { wirePaymentsDisclaimerText.map((wirePaymentsDisclaimerLine, i) => {
-            return <Typography key={ i } variant="body1" sx={ i === 0 ? undefined : { mt: 1.5 } }>{ wirePaymentsDisclaimerLine }</Typography>;
-          }) }
-        </DisplayBox>
-      )}
+
+      <DisplayBox sx={{ mt: 1.5, flexDirection: "column" }} >
+        { dictionary.wirePaymentsDisclaimer.map((line, i) => (
+          <Typography key={ i } variant="body1" sx={ i === 0 ? undefined : { mt: 1.5 } }>{ line }</Typography>
+        )) }
+      </DisplayBox>
     </>),
   },
   Crypto: {
@@ -252,7 +252,7 @@ export interface PaymentMethodFormProps {
   consentType?: ConsentType;
   privacyHref?: string;
   termsOfUseHref?: string;
-  wirePaymentsDisclaimerText?: React.ReactFragment[];
+  dictionary: PUIDictionary;
   debug?: boolean;
 }
 
@@ -268,7 +268,7 @@ export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
   consentType,
   privacyHref,
   termsOfUseHref,
-  wirePaymentsDisclaimerText,
+  dictionary,
   debug = false
 }) => {
   const defaultPaymentType = acceptedPaymentTypes[0] || "CreditCard";
@@ -356,7 +356,7 @@ export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
         consentType={ consentType }
         privacyHref={ privacyHref }
         termsOfUseHref={ termsOfUseHref }
-        wirePaymentsDisclaimerText={ wirePaymentsDisclaimerText } />
+        dictionary={ dictionary } />
 
       { checkoutErrorMessage && <FormErrorsBox error={ checkoutErrorMessage } sx={{ mt: 5 }} /> }
 
