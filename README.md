@@ -183,7 +183,8 @@ const App: React.FC = () => {
     productConfirmationEnabled: false,
 
     // Personalization:
-    // These two options, `theme` (replace default theme) and `themeOptions` (merge with default theme):
+    // These two options, `theme` (replace default theme) and `themeOptions` (merge with default theme) are optional and 
+    // can't be defined at the same time:
     // theme: YOUR_CUSTOM_THEME,
     themeOptions: YOUR_CUSTOM_THEME_OPTIONS,
     logoSrc: "https://...",
@@ -350,6 +351,8 @@ You can use the `themeOptions` or `theme` props to pass a custom theme or theme 
   See 
 [`ProvidersInjector`](app/src/lib/components/shared/ProvidersInjector/ProvidersInjector.tsx).
 
+- If none is provided, the [default Mojito theme](app/src/lib/config/theme) will be used.
+
 <br />
 
 
@@ -400,7 +403,7 @@ By default, if an unexpected error occurs, a confirm window/modal will be presen
 <br/>
 
 
-If you don't want this behavior or would like to implement a custom one, you should pass a value for `onCatch: (error: Error, errorInfo?: ErrorInfo) => void | true;` prop with a callback. If you want to get notified about unexpected errors but would still like to preserve th default behavior, return `true` from your callback.
+If you don't want this behavior or would like to implement a custom one, you should pass a value for `onCatch: (error: Error, errorInfo?: ErrorInfo) => void | true;` prop with a callback. If you want to get notified about unexpected errors but would still like to preserve the default behavior, return `true` from your callback.
 
 <br />
 
