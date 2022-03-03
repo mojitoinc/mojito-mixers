@@ -38,7 +38,6 @@ export interface PaymentDetails {
 }
 
 export interface CheckoutDetails {
-  checkoutType: "metaverse";
   customerId?: string;
   departmenCategory: "NFT";
   paymentMethod: "ACH" | "CreditCard" | undefined;

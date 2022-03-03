@@ -23,7 +23,7 @@ export interface UseFullPaymentOptions {
 
 export interface FullPaymentState {
   paymentStatus: PaymentStatus;
-  paymentReferenceNumber: string;
+  circlePaymentID: string;
   paymentID: string;
   paymentError?: string | CheckoutModalError;
 }
@@ -37,14 +37,14 @@ export function useFullPayment({
 }: UseFullPaymentOptions): [FullPaymentState, () => Promise<void>] {
   const [paymentState, setPaymentState] = useState<FullPaymentState>({
     paymentStatus: "processing",
-    paymentReferenceNumber: "",
+    circlePaymentID: "",
     paymentID: ""
   });
 
   const setError = useCallback((paymentError: string | CheckoutModalError) => {
     setPaymentState({
       paymentStatus: "error",
-      paymentReferenceNumber: "",
+      circlePaymentID: "",
       paymentID: "",
       paymentError,
     });
@@ -70,8 +70,8 @@ export function useFullPayment({
 
     if (debug) {
       console.log(invoiceID
-        ? `\n💵 Making payment for invoice ${ invoiceID } (orgID = ${ orgID })...\n`
-        : `\n💵 Aborting payment for unknown invoice (orgID = ${ orgID })...\n`
+        ? `\n💵 Making payment for invoice ${invoiceID} (orgID = ${orgID})...\n`
+        : `\n💵 Aborting payment for unknown invoice (orgID = ${orgID})...\n`
       );
     }
 
@@ -83,12 +83,12 @@ export function useFullPayment({
 
     setPaymentState({
       paymentStatus: "processing",
-      paymentReferenceNumber: "",
+      circlePaymentID: "",
       paymentID: "",
     });
 
     let paymentMethodID = "";
-    let circlepaymentID = "";
+    let circlePaymentID = "";
     let paymentID = "";
     let mutationError: ApolloError | Error | undefined = undefined;
     let checkoutError: CheckoutModalError | undefined = undefined;
@@ -218,11 +218,11 @@ export function useFullPayment({
     if (makePaymentResult && !makePaymentResult.errors) {
       if (debug) console.log("    🟢 makePayment result", makePaymentResult);
 
-      circlepaymentID = makePaymentResult.data?.createPayment?.circlePaymentID || "";
+      circlePaymentID = makePaymentResult.data?.createPayment?.circlePaymentID || "";
       paymentID = makePaymentResult.data?.createPayment?.id || "";
     }
 
-    if (!circlepaymentID) {
+    if (!circlePaymentID) {
       setError(ERROR_PURCHASE_PAYING(mutationError));
 
       return;
@@ -232,8 +232,8 @@ export function useFullPayment({
 
     setPaymentState({
       paymentStatus: "processed",
-      paymentReferenceNumber: circlepaymentID,
-      paymentID: paymentID
+      circlePaymentID,
+      paymentID
     });
   }, [
     orgID,

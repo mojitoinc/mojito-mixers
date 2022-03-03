@@ -144,7 +144,6 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     variables: { orgID },
   });
 
-  console.log(paymentMethodsData)
   // Get everything related to Payment UI routing, error and state handling, including resuming Plaid / 3DS flows:
 
   const {
@@ -170,10 +169,9 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     setTaxes,
     walletAddress,
     setWalletAddress,
-    paymentReferenceNumber,
-    setPaymentReferenceNumber,
     paymentID,
-    setPaymentID,
+    circlePaymentID,
+    setPayments,
   } = useCheckoutModalState({
     invoiceID: initialInvoiceID,
     productConfirmationEnabled,
@@ -301,7 +299,6 @@ console.log(selectedPaymentMethod)
   const mapCheckout = useCallback(():CheckoutDetails=>{
     const payment = savedPaymentMethods.find(paymentMethod=>paymentMethod.id===selectedPaymentMethod.paymentInfo)
     return {
-      checkoutType: "metaverse",
       customerId: "", //empty for now
       departmenCategory: "NFT",
       paymentMethod: payment?.type,
@@ -341,13 +338,13 @@ console.log(selectedPaymentMethod)
         fees,
         tax: taxAmount,
         products: checkoutItems,
-        circlePaymentID: paymentReferenceNumber,
-        paymentID:paymentID,
+        circlePaymentID,
+        paymentID,
         total: total
       }
       onOrderCompleted(orderDetails)
     }
-  },[checkoutStep, mapCheckout, subtotal, taxAmount, checkoutItems, paymentReferenceNumber, onOrderCompleted, fees, paymentID])
+  },[checkoutStep, mapCheckout, subtotal, taxAmount, checkoutItems, circlePaymentID, onOrderCompleted, fees, paymentID])
 
   // Delete payment methods:
 
@@ -405,9 +402,8 @@ console.log(selectedPaymentMethod)
 
   // Purchase:
 
-  const handlePurchaseSuccess = useCallback(async (nextPaymentReferenceNumber: string, nextPaymentIdNumber:string) => {
-    setPaymentReferenceNumber(nextPaymentReferenceNumber);
-    setPaymentID(nextPaymentIdNumber);
+  const handlePurchaseSuccess = useCallback(async (nextCirclePaymentIDNumber: string, nextPaymentIdNumber:string) => {
+    setPayments(nextCirclePaymentIDNumber,nextPaymentIdNumber);
     // After a successful purchase, a new payment method might have been created, so we reload them:
     await refetchPaymentMethods();
 
@@ -418,7 +414,7 @@ console.log(selectedPaymentMethod)
     }
 
     goNext();
-  }, [refetchPaymentMethods, setPaymentReferenceNumber, goNext, onCheckoutCompleted, mapCheckout, setPaymentID]);
+  }, [refetchPaymentMethods, goNext, onCheckoutCompleted, mapCheckout, setPayments]);
 
   const handlePurchaseError = useCallback(async (error: string | CheckoutModalError) => {
     // After a failed purchase, a new payment method might have been created anyway, so we reload them (createPaymentMethod
@@ -607,7 +603,7 @@ console.log(selectedPaymentMethod)
         checkoutItems={ checkoutItems }
         savedPaymentMethods={ savedPaymentMethods }
         selectedPaymentMethod={ selectedPaymentMethod }
-        paymentReferenceNumber={ paymentReferenceNumber }
+        circlePaymentID={ circlePaymentID }
         onGoToCollection={ onGoToCollection }
         onNext={ handleClose }
         dictionary={ dictionary } />
