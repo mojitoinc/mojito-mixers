@@ -21,7 +21,6 @@ export interface CheckoutModalError {
 
 export type CheckoutModalStep = "authentication" | "billing" | "payment" | "purchasing" | "confirmation" | "error";
 
-// navigate:"billing" | "payment" | "purchasing"->before redirection= event:payment-> after redirect:confirmation
 
 export enum CheckoutModalStepIndex {
   authentication,

@@ -198,6 +198,7 @@ const HomePage: React.FC = () => {
     onLogin: handleLogin,
     isAuthenticated,
     isAuthenticatedLoading,
+    // Steps Events:
     onEvent:(eventType: CheckoutEventType, eventData: Partial<CheckoutEventData>) => {
       console.log(eventType,eventData);
     },
