@@ -13,8 +13,8 @@ const CheckoutStepper = ({ progress: currentProgress, }) => {
     }, 0, [currentProgress]);
     return (React__default.createElement(Box, { sx: { position: "relative" } },
         React__default.createElement(Stack, { spacing: 2, direction: "row", sx: { justifyContent: "space-between", alignItems: "center", pt: 2, pb: 1 } },
-            React__default.createElement(Typography, { variant: "subtitle2", sx: { width: "100%", color: theme => theme.palette.grey[progress === 50 ? "700" : "600"] } }, "Billing Info"),
-            React__default.createElement(Typography, { variant: "subtitle2", sx: { width: "100%", color: theme => theme.palette.grey[progress === 50 ? "600" : "700"] } }, "Payment")),
+            React__default.createElement(Typography, { variant: "subtitle2", sx: { width: "100%", color: theme => theme.palette.grey[progress === 50 ? "700" : "600"] } }, "Billing Information"),
+            React__default.createElement(Typography, { variant: "subtitle2", sx: { width: "100%", color: theme => theme.palette.grey[progress === 50 ? "600" : "700"] } }, "Payment and Delivery")),
         React__default.createElement(Box, { sx: {
                 position: "relative",
                 width: "100%",

@@ -1,5 +1,5 @@
 import { Typography } from "@mui/material";
-
+import React from "react";
 import { DisplayBox } from "../DisplayBox/DisplayBox";
 import { Checkbox } from "../../shared/Checkbox/Checkbox";
 import { InputGroupLabel } from "../../shared/InputGroupLabel/InputGroupLabel";
@@ -7,11 +7,13 @@ import { TextField } from "../../shared/TextField/TextField";
 import { withInvalidErrorMessage } from "../../../utils/validationUtils";
 import { isValidWalletAddress } from "../../../domain/wallet/wallet.utils";
 import { ChangeEvent, useCallback } from "react";
+import { PUIDictionary } from "../../../domain/dictionary/dictionary.interfaces";
 
 export interface DeliveryWalletSelectorProps {
   validatePersonalAddress: boolean;
   walletAddress: string | null;
   onWalletAddressChange: (walletAddress: string | null) => void;
+  dictionary: PUIDictionary;
 }
 
 const WALLET_ADDRESS_FIELD_LABEL = "Wallet Address";
@@ -21,6 +23,7 @@ export const DeliveryWalletSelector: React.FC<DeliveryWalletSelectorProps> = ({
   validatePersonalAddress,
   walletAddress,
   onWalletAddressChange,
+  dictionary,
 }) => {
 
   const handleCheckboxChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
@@ -41,15 +44,11 @@ export const DeliveryWalletSelector: React.FC<DeliveryWalletSelectorProps> = ({
     </InputGroupLabel>
 
     <DisplayBox sx={{ border: 0, mb: 0.5 }}>
-      <Typography>
-        We will cover gas cost for minting and delivery on both MultiSig and
-        personal wallets. Your items will be delivered to a MultiSig wallet by
-        default.
-      </Typography>
+      <Typography>{ dictionary.walletInfo }</Typography>
     </DisplayBox>
 
     <Checkbox
-      label="I would like to deliver to a personal wallet"
+      label="I would like to deliver to a self-hosted wallet (such as Metamask or Rainbow Wallet)"
       onChange={ handleCheckboxChange }
       checked={ usePersonalWallet }
       sx={{ mb: "-13px" }} />

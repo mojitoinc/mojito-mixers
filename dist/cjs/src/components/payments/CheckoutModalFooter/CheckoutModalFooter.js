@@ -16,7 +16,7 @@ function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'defau
 
 var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 
-const CheckoutModalFooter = ({ variant, buttonLabel, guestCheckoutEnabled, consentType, privacyHref, termsOfUseHref, submitDisabled, onSubmitClicked, onCloseClicked, }) => {
+const CheckoutModalFooter = ({ variant, buttonLabel, guestCheckoutEnabled, consentType, privacyHref, termsOfUseHref, onGoToCollection, submitDisabled, onSubmitClicked, onCloseClicked, }) => {
     // CONSENT:
     const showConsent = consentType && (privacyHref || termsOfUseHref) && (variant === "toConfirmation" || variant === "toPlaid");
     const consentTextElement = showConsent ? React__default["default"].createElement(ConsentText.ConsentText, { privacyHref: privacyHref, termsOfUseHref: termsOfUseHref }) : null;
@@ -33,6 +33,18 @@ const CheckoutModalFooter = ({ variant, buttonLabel, guestCheckoutEnabled, conse
             isConsentChecked: checked,
         }));
     }, []);
+    // COLLECTION BUTTON (ConfirmationView-specific):
+    const handleCollectionClicked = React.useCallback((e) => {
+        e.preventDefault();
+        // TODO: In order to implement be functionality below, we need to pass a Link component to PUI to use, and then we
+        // can just pass a collectionPathname instead of onGoToCollection:
+        // We want to display the link (href) if the user hovers the button or if they click with the wheel or Ctrl + Click,
+        // but we don't know what type of routing the parent app is using (Next.js, React Router, etc.) so we just prevent
+        // default here and let the parent app handle the routing:
+        // console.log(e.ctrlKey, e.button);
+        if (onGoToCollection)
+            onGoToCollection();
+    }, [onGoToCollection]);
     // PRIMARY BUTTON:
     const primaryButtonVisible = variant !== "toGuestCheckout" || guestCheckoutEnabled;
     const primaryButtonLabel = buttonLabel || CheckoutModalFooter_constants.LABELS_BY_VARIANT[variant];
@@ -72,6 +84,7 @@ const CheckoutModalFooter = ({ variant, buttonLabel, guestCheckoutEnabled, conse
         showConsent && consentType === "checkbox" && (React__default["default"].createElement(Checkbox.Checkbox, { label: React__default["default"].createElement(React__default["default"].Fragment, null,
                 "I ",
                 consentTextElement), checked: isConsentChecked, onChange: handleConsentClicked, error: showConsentError, helperText: showConsentError ? ConsentText.CONSENT_ERROR_MESSAGE : undefined, sx: { alignSelf: "flex-start", mb: 5 } })),
+        onGoToCollection && (React__default["default"].createElement(PrimaryButton.PrimaryButton, { onClick: handleCollectionClicked, disabled: submitDisabled || isFormLoading, sx: { mb: 2 } }, "View Collection")),
         primaryButtonVisible && (React__default["default"].createElement(PrimaryButton.PrimaryButton, { onClick: onSubmitClicked ? handleSubmitClicked : undefined, type: onSubmitClicked ? "button" : "submit", endIcon: isFormLoading ? React__default["default"].createElement(material.CircularProgress, { color: "inherit", size: "1em" }) : (PrimaryButtonIcon && React__default["default"].createElement(PrimaryButtonIcon, null)), disabled: submitDisabled || isFormLoading }, primaryButtonLabel)),
         variant !== "toMarketplace" && onCloseClicked && (React__default["default"].createElement(material.Typography, { sx: primaryButtonVisible ? { pt: 2 } : undefined },
             primaryButtonVisible ? "or " : null,
@@ -86,7 +99,8 @@ const CheckoutModalFooter = ({ variant, buttonLabel, guestCheckoutEnabled, conse
             React__default["default"].createElement(material.Divider, { sx: { my: 5, width: "100%" } }),
             React__default["default"].createElement(material.Box, { display: "flex" },
                 React__default["default"].createElement(material.Typography, { sx: { maxWidth: theme.SM_MOBILE_MAX_WIDTH, marginRight: 1 }, align: "center" }, "Payments powered by"),
-                React__default["default"].createElement(material.Box, { component: "img", src: theme.DEFAULT_PAYMENT_IMAGE_SRC, height: 20 }))))));
+                React__default["default"].createElement(material.Link, { href: "https://www.circle.com/en/", target: "_blank", rel: "noopener noreferrer" },
+                    React__default["default"].createElement(material.Box, { component: "img", src: theme.DEFAULT_PAYMENT_IMAGE_SRC, height: 20 })))))));
 };
 
 exports.CheckoutModalFooter = CheckoutModalFooter;

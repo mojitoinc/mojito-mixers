@@ -1,5 +1,5 @@
 import { Backdrop, Box, CircularProgress } from "@mui/material";
-import React, { useCallback, useEffect, useMemo, useRef } from "react";
+import React, { ErrorInfo, useCallback, useEffect, useMemo, useRef } from "react";
 import { getSavedPaymentMethodAddressIdFromBillingInfo, savedPaymentMethodToBillingInfo, transformRawSavedPaymentMethods } from "../../../domain/circle/circle.utils";
 import { UserFormat } from "../../../domain/auth/authentication.interfaces";
 import { CheckoutDetails, OrderDetails, PaymentMethod, PaymentType } from "../../../domain/payment/payment.interfaces";
@@ -23,13 +23,15 @@ import { FullScreenOverlay } from "../../shared/FullScreenOverlay/FullScreenOver
 import { ProvidersInjectorProps, withProviders } from "../../shared/ProvidersInjector/ProvidersInjector";
 import { transformCheckoutItemsFromInvoice } from "../../../domain/product/product.utils";
 import { useCreateInvoiceAndReservation } from "../../../hooks/useCreateInvoiceAndReservation";
-import { CustomTextsKeys } from "../../../domain/customTexts/customTexts.interfaces";
 import { useCheckoutItemsCostTotal } from "../../../hooks/useCheckoutItemCostTotal";
+import { PUIDictionary } from "../../../domain/dictionary/dictionary.interfaces";
+import { DEFAULT_DICTIONARY } from "../../../domain/dictionary/dictionary.constants";
 
 export interface PUICheckoutOverlayProps {
   // Modal:
   open: boolean;
   onClose: () => void;
+  onGoToCollection?: () => void;
 
   // Flow:
   guestCheckoutEnabled?: boolean;
@@ -47,7 +49,7 @@ export interface PUICheckoutOverlayProps {
   userFormat: UserFormat;
   acceptedPaymentTypes: PaymentType[];
   paymentLimits?: Partial<Record<PaymentType, number>>;
-  customTexts: Record<CustomTextsKeys, (string | React.ReactFragment)[]>,
+  dictionary?: Partial<PUIDictionary>,
 
   // Legal:
   consentType?: ConsentType;
@@ -67,7 +69,8 @@ export interface PUICheckoutOverlayProps {
   // Other Events:
   debug?: boolean;
   onError?: (error: CheckoutModalError) => void;
-  onMarketingOptInChange?: (marketingOptIn: boolean) => void
+  onCatch?: (error: Error, errorInfo?: ErrorInfo) => void | true;
+  onMarketingOptInChange?: (marketingOptIn: boolean) => void;
  }
 
 export type PUICheckoutProps = PUICheckoutOverlayProps & ProvidersInjectorProps;
@@ -76,6 +79,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   // Modal:
   open,
   onClose,
+  onGoToCollection,
 
   // Flow:
   guestCheckoutEnabled,
@@ -91,7 +95,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   userFormat,
   acceptedPaymentTypes,
   paymentLimits, // Not implemented yet. Used to show payment limits for some payment types.
-  customTexts,
+  dictionary: parentDictionary,
 
   // Legal:
   consentType,
@@ -115,6 +119,12 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   onError,
   onMarketingOptInChange, // Not implemented yet. Used to let user subscribe / unsubscribe to marketing updates.
 }) => {
+  // TODO: This should end up being in a context + hook to avoid prop drilling and it should be memoized:
+  const dictionary = {
+    ...DEFAULT_DICTIONARY,
+    ...parentDictionary,
+  };
+
   // First, get user data and saved payment methods:
 
   const {
@@ -547,6 +557,7 @@ console.log(selectedPaymentMethod)
         onWalletAddressChange={ setWalletAddress }
         onNext={ goNext }
         onClose={ handleClose }
+        dictionary={ dictionary }
         debug={ debug } />
     );
   } else if (checkoutStep === "payment") {
@@ -569,7 +580,7 @@ console.log(selectedPaymentMethod)
         consentType={ consentType }
         privacyHref={ privacyHref }
         termsOfUseHref={ termsOfUseHref }
-        wirePaymentsDisclaimerText={ customTexts.wirePaymentsDisclaimer }
+        dictionary={ dictionary }
         debug={ debug } />
     );
   } else if (checkoutStep === "purchasing" && invoiceID) {
@@ -597,8 +608,9 @@ console.log(selectedPaymentMethod)
         savedPaymentMethods={ savedPaymentMethods }
         selectedPaymentMethod={ selectedPaymentMethod }
         paymentReferenceNumber={ paymentReferenceNumber }
-        purchaseInstructions={ customTexts.purchaseInstructions }
-        onNext={ handleClose } />
+        onGoToCollection={ onGoToCollection }
+        onNext={ handleClose }
+        dictionary={ dictionary } />
     );
   } else {
     // !checkoutStep or

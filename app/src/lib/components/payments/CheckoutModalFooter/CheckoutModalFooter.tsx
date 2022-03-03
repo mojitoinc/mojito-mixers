@@ -1,6 +1,6 @@
 import { Box, Link, Typography, Divider, CircularProgress } from "@mui/material";
 import React, { useCallback, useState } from "react";
-import { DEFAULT_PAYMENT_IMAGE_SRC, SM_MOBILE_MAX_WIDTH } from "../../../config/theme/theme";
+import { CIRCLE_LOGO_IMAGE_SRC, SM_MOBILE_MAX_WIDTH } from "../../../config/theme/theme";
 import { isPromise } from "../../../utils/promiseUtils";
 import { Checkbox } from "../../shared/Checkbox/Checkbox";
 import { ConsentText, ConsentType, CONSENT_ERROR_MESSAGE } from "../../shared/ConsentText/ConsentText";
@@ -22,6 +22,7 @@ export interface CheckoutModalFooterProps {
   consentType?: ConsentType;
   privacyHref?: string;
   termsOfUseHref?: string;
+  onGoToCollection?: () => void;
   submitDisabled?: boolean;
   onSubmitClicked?: (canSubmit: boolean) => void | Promise<void | false>;
   onCloseClicked?: () => void;
@@ -34,6 +35,7 @@ export const CheckoutModalFooter: React.FC<CheckoutModalFooterProps> = ({
   consentType,
   privacyHref,
   termsOfUseHref,
+  onGoToCollection,
   submitDisabled,
   onSubmitClicked,
   onCloseClicked,
@@ -61,6 +63,21 @@ export const CheckoutModalFooter: React.FC<CheckoutModalFooterProps> = ({
       isConsentChecked: checked,
     }));
   }, []);
+
+  // COLLECTION BUTTON (ConfirmationView-specific):
+  const handleCollectionClicked = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+
+    // TODO: In order to implement be functionality below, we need to pass a Link component to PUI to use, and then we
+    // can just pass a collectionPathname instead of onGoToCollection:
+
+    // We want to display the link (href) if the user hovers the button or if they click with the wheel or Ctrl + Click,
+    // but we don't know what type of routing the parent app is using (Next.js, React Router, etc.) so we just prevent
+    // default here and let the parent app handle the routing:
+    // console.log(e.ctrlKey, e.button);
+
+    if (onGoToCollection) onGoToCollection();
+  }, [onGoToCollection]);
 
 
   // PRIMARY BUTTON:
@@ -117,6 +134,15 @@ export const CheckoutModalFooter: React.FC<CheckoutModalFooterProps> = ({
           sx={{ alignSelf: "flex-start", mb: 5 }} />
       )}
 
+      { onGoToCollection && (
+        <PrimaryButton
+          onClick={ handleCollectionClicked }
+          disabled={ submitDisabled || isFormLoading }
+          sx={{ mb: 2 }}>
+          View Collection
+        </PrimaryButton>
+      ) }
+
       {primaryButtonVisible && (
         <PrimaryButton
           onClick={onSubmitClicked ? handleSubmitClicked : undefined}
@@ -151,7 +177,9 @@ export const CheckoutModalFooter: React.FC<CheckoutModalFooterProps> = ({
             <Typography sx={{ maxWidth: SM_MOBILE_MAX_WIDTH, marginRight: 1 }} align="center">
               Payments powered by
             </Typography>
-            <Box component="img" src={DEFAULT_PAYMENT_IMAGE_SRC} height={20} />
+            <Link href="https://www.circle.com/en/" target="_blank" rel="noopener noreferrer">
+              <Box component="img" src={CIRCLE_LOGO_IMAGE_SRC} height={20} />
+            </Link>
           </Box>
         </>
       )}

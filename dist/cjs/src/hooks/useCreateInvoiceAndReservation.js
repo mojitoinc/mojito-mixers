@@ -33,7 +33,7 @@ function useCreateInvoiceAndReservation({ orgID, checkoutItems, debug = false, }
         countdownElement.textContent = formattedTimeLeft;
     }, countdownStartRef.current === null ? null : config.RESERVATION_COUNTDOWN_REFRESH_RATE_MS);
     const [createAuctionInvoice] = graphqlGenerated.useCreateAuctionInvoiceMutation();
-    const [createBuyNowInvoice] = graphqlGenerated.useCreateBuyNowInvoiceMutation();
+    const [reserveBuyNowLot] = graphqlGenerated.useReserveBuyNowLotMutation();
     const createInvoiceAndReservation = React.useCallback(() => tslib_es6.__awaiter(this, void 0, void 0, function* () {
         var _a, _b, _c, _d, _e;
         // TODO: Quick fix. The UI can currently display multiple items with multiple units each, but will only purchase the
@@ -42,8 +42,8 @@ function useCreateInvoiceAndReservation({ orgID, checkoutItems, debug = false, }
         const { lotID, lotType, units, } = firstCheckoutItem || {};
         if (debug) {
             console.log(firstCheckoutItem
-                ? `\n🎫 Making reservation & creating invoice for ${units} × ${lotType} lot${units > 1 ? "s" : ""} ${lotID} (orgID = ${orgID})...\n`
-                : `\n🎫 Aborting reservation & creating invoice for unknown lot (orgID = ${orgID})...\n`);
+                ? `\n🎫 Making reservation / creating invoice for ${units} × ${lotType} lot${units > 1 ? "s" : ""} ${lotID} (orgID = ${orgID})...\n`
+                : `\n🎫 Aborting reservation / creating invoice for unknown lot (orgID = ${orgID})...\n`);
         }
         if (!firstCheckoutItem) {
             setError(errors_constants.ERROR_PURCHASE_NO_ITEMS());
@@ -61,12 +61,12 @@ function useCreateInvoiceAndReservation({ orgID, checkoutItems, debug = false, }
         let mutationError = undefined;
         if (lotType === "buyNow") {
             if (debug) {
-                console.log("  🧾 createBuyNowInvoice", {
+                console.log("  🧾 reserveBuyNowLot", {
                     units,
                     lotID,
                 });
             }
-            const createBuyNowInvoiceResult = yield createBuyNowInvoice({
+            const reserveBuyNowLotResult = yield reserveBuyNowLot({
                 variables: {
                     input: {
                         itemCount: units,
@@ -76,12 +76,12 @@ function useCreateInvoiceAndReservation({ orgID, checkoutItems, debug = false, }
             }).catch((error) => {
                 mutationError = error;
                 if (debug)
-                    console.log("    🔴 createBuyNowInvoice error", error);
+                    console.log("    🔴 reserveBuyNowLot error", error);
             });
-            if (createBuyNowInvoiceResult && !createBuyNowInvoiceResult.errors) {
+            if (reserveBuyNowLotResult && !reserveBuyNowLotResult.errors) {
                 if (debug)
-                    console.log("    🟢 createBuyNowInvoice result", createBuyNowInvoiceResult);
-                invoiceID = (_c = (_b = (_a = createBuyNowInvoiceResult.data) === null || _a === void 0 ? void 0 : _a.reserveMarketplaceBuyNowLot) === null || _b === void 0 ? void 0 : _b.invoice) === null || _c === void 0 ? void 0 : _c.invoiceID;
+                    console.log("    🟢 reserveBuyNowLot result", reserveBuyNowLotResult);
+                invoiceID = (_c = (_b = (_a = reserveBuyNowLotResult.data) === null || _a === void 0 ? void 0 : _a.reserveMarketplaceBuyNowLot) === null || _b === void 0 ? void 0 : _b.invoice) === null || _c === void 0 ? void 0 : _c.invoiceID;
             }
         }
         else if (lotType === "auction" && process.env.NODE_ENV === "development") {
@@ -120,7 +120,7 @@ function useCreateInvoiceAndReservation({ orgID, checkoutItems, debug = false, }
         setError,
         debug,
         createAuctionInvoice,
-        createBuyNowInvoice,
+        reserveBuyNowLot,
     ]);
     return {
         invoiceAndReservationState,

@@ -10,14 +10,12 @@ function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'defau
 
 var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 
-const PurchaseConfirmationItemDetails = ({ checkoutItems, purchaseInstructions, }) => {
-    const checkoutItem = checkoutItems[0];
+const PurchaseConfirmationItemDetails = ({ checkoutItems, dictionary, }) => {
     return (React__default["default"].createElement(material.Stack, { sx: { display: "flex", flex: 1, pt: 2.5 } },
         React__default["default"].createElement(material.Typography, { variant: "body2" }, "You purchased"),
         React__default["default"].createElement(CheckoutItemList.CheckoutItemList, { sx: { mt: 3 }, checkoutItems: checkoutItems }),
-        React__default["default"].createElement(material.Typography, { sx: { mt: 6 } }, checkoutItem.name),
-        React__default["default"].createElement(material.Typography, { sx: { mt: 0.5 } }, checkoutItem.description),
-        purchaseInstructions.map((instructionsLine, i) => (React__default["default"].createElement(material.Typography, { key: i, sx: { mt: 0.5 } }, instructionsLine)))));
+        React__default["default"].createElement(material.Typography, { sx: { mt: 6 } }, "Purchase confirmed!"),
+        dictionary.purchaseInstructions.map((line, i) => (React__default["default"].createElement(material.Typography, { key: i, sx: { mt: 1 } }, line)))));
 };
 
 exports.PurchaseConfirmationItemDetails = PurchaseConfirmationItemDetails;

@@ -258,6 +258,10 @@ function createComponentsTheme({ typography, palette, spacing, breakpoints }) {
                     backgroundColor: palette.error.light,
                     color: palette.error.main,
                 },
+                ["colorInfo"]: {
+                    backgroundColor: palette.info.light,
+                    color: palette.info.main,
+                },
             },
         },
         // GRID:

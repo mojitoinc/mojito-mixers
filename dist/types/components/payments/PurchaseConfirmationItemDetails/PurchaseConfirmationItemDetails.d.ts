@@ -1,7 +1,8 @@
 import React from "react";
 import { CheckoutItem } from "../../../domain/product/product.interfaces";
+import { PUIDictionary } from "../../../domain/dictionary/dictionary.interfaces";
 export interface PurchaseConfirmationItemDetailsProps {
     checkoutItems: CheckoutItem[];
-    purchaseInstructions: React.ReactFragment[];
+    dictionary: PUIDictionary;
 }
 export declare const PurchaseConfirmationItemDetails: React.FC<PurchaseConfirmationItemDetailsProps>;

@@ -1,5 +1,5 @@
 /// <reference types="react" />
-import React from 'react';
+import React$1, { ErrorInfo } from 'react';
 import { Theme, ThemeOptions, SxProps } from '@mui/material/styles';
 export { Theme as CheckoutModalTheme, ThemeOptions as CheckoutModalThemeOptions, ThemeProvider as PUIThemeProvider } from '@mui/material/styles';
 import { ApolloError, ApolloClient, NormalizedCacheObject } from '@apollo/client';
@@ -53,6 +53,16 @@ interface SelectOption {
     label: string;
 }
 
+declare type PUIDictionarySingleLine = string | React.ReactFragment;
+declare type PUIDictionaryMultiLine = PUIDictionarySingleLine[];
+declare type PUIDictionary = {
+    walletInfo: PUIDictionarySingleLine;
+    walletMultiSigTooltip: PUIDictionarySingleLine;
+    wirePaymentsDisclaimer: PUIDictionaryMultiLine;
+    purchaseInstructions: PUIDictionaryMultiLine;
+};
+declare type PUIDictionaryKeys = keyof PUIDictionary;
+
 declare const FULL_NAME_FIELD = "fullName";
 declare const EMAIL_FIELD = "email";
 declare const PHONE_FIELD = "phone";
@@ -97,17 +107,19 @@ interface AuthorizedApolloProviderProps {
     uri: string;
 }
 
-interface ThemeProviderProps {
+interface CommonProviderProps {
+    onCatch?: (error: Error, errorInfo?: ErrorInfo) => void | true;
+}
+interface ThemeProviderProps extends CommonProviderProps {
     theme?: Theme;
     themeOptions?: ThemeOptions;
 }
 declare type ProvidersInjectorProps = ThemeProviderProps & AuthorizedApolloProviderProps;
 
-declare type CustomTextsKeys = 'wirePaymentsDisclaimer' | 'purchaseInstructions';
-
 interface PUICheckoutOverlayProps {
     open: boolean;
     onClose: () => void;
+    onGoToCollection?: () => void;
     guestCheckoutEnabled?: boolean;
     productConfirmationEnabled?: boolean;
     logoSrc: string;
@@ -119,7 +131,7 @@ interface PUICheckoutOverlayProps {
     userFormat: UserFormat;
     acceptedPaymentTypes: PaymentType[];
     paymentLimits?: Partial<Record<PaymentType, number>>;
-    customTexts: Record<CustomTextsKeys, React.ReactFragment[]>;
+    dictionary?: Partial<PUIDictionary>;
     consentType?: ConsentType;
     privacyHref?: string;
     termsOfUseHref?: string;
@@ -131,10 +143,11 @@ interface PUICheckoutOverlayProps {
     isAuthenticatedLoading?: boolean;
     debug?: boolean;
     onError?: (error: CheckoutModalError) => void;
+    onCatch?: (error: Error, errorInfo?: ErrorInfo) => void | true;
     onMarketingOptInChange?: (marketingOptIn: boolean) => void;
 }
 declare type PUICheckoutProps = PUICheckoutOverlayProps & ProvidersInjectorProps;
-declare const PUICheckout: React.FC<PUICheckoutProps>;
+declare const PUICheckout: React$1.FC<PUICheckoutProps>;
 
 interface FullScreenOverlayFunctionalProps {
     open?: boolean;
@@ -149,7 +162,7 @@ interface PUISuccessOverlayProps extends FullScreenOverlayFunctionalProps {
     onRedirect: (pathnameOrUrl: string) => void;
 }
 declare type PUISuccessProps$1 = PUISuccessOverlayProps & ThemeProviderProps;
-declare const PUISuccess: React.FC<PUISuccessProps$1>;
+declare const PUISuccess: React$1.FC<PUISuccessProps$1>;
 
 interface PUIErrorOverlayProps extends FullScreenOverlayFunctionalProps {
     logoSrc?: string;
@@ -158,13 +171,13 @@ interface PUIErrorOverlayProps extends FullScreenOverlayFunctionalProps {
     onRedirect: (pathnameOrUrl: string) => void;
 }
 declare type PUIErrorProps = PUIErrorOverlayProps & ThemeProviderProps;
-declare const PUIError: React.FC<PUIErrorProps>;
+declare const PUIError: React$1.FC<PUIErrorProps>;
 
 interface PUIPlaidOverlayProps {
     onRedirect: (pathnameOrUrl: string) => void;
 }
 declare type PUISuccessProps = PUIPlaidOverlayProps & ThemeProviderProps;
-declare const PUIPlaid: React.FC<PUISuccessProps>;
+declare const PUIPlaid: React$1.FC<PUISuccessProps>;
 
 declare function useOpenCloseCheckoutModal(): {
     isOpen: boolean;
@@ -220,4 +233,4 @@ declare const extendDefaultTheme: (themeOptions?: ThemeOptions | undefined) => T
 declare const MOJITO_LIGHT_THEME: Theme;
 declare const MOJITO_DARK_THEME: Theme;
 
-export { CheckoutItem, CheckoutModalError, CheckoutModalErrorAt, CircleFieldErrorAt, CircleFieldErrors, MOJITO_DARK_THEME, MOJITO_LIGHT_THEME, PUICheckout, PUICheckoutProps, PUIError, PUIErrorProps, PUIPlaid, PUISuccess, PUISuccessProps$1 as PUISuccessProps, PaymentType, UserFormat, continueCheckout, continueFlows, continuePlaidOAuthFlow, extendDefaultTheme, getCheckoutModalState, getPlaidOAuthFlowState, persistPlaidReceivedRedirectUri, persistReceivedRedirectUri3DS, useOpenCloseCheckoutModal };
+export { CheckoutItem, CheckoutModalError, CheckoutModalErrorAt, CircleFieldErrorAt, CircleFieldErrors, MOJITO_DARK_THEME, MOJITO_LIGHT_THEME, PUICheckout, PUICheckoutProps, PUIDictionary, PUIDictionaryKeys, PUIDictionaryMultiLine, PUIDictionarySingleLine, PUIError, PUIErrorProps, PUIPlaid, PUISuccess, PUISuccessProps$1 as PUISuccessProps, PaymentType, UserFormat, continueCheckout, continueFlows, continuePlaidOAuthFlow, extendDefaultTheme, getCheckoutModalState, getPlaidOAuthFlowState, persistPlaidReceivedRedirectUri, persistReceivedRedirectUri3DS, useOpenCloseCheckoutModal };

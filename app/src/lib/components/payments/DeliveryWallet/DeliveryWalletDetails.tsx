@@ -1,15 +1,19 @@
-import { Box, Chip, Typography } from "@mui/material";
+import { Box, Chip, Tooltip, Typography } from "@mui/material";
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { CopyButton } from "../../shared/CopyButton/CopyButton";
 import { ReadOnlyWalletAddress } from "../../shared/ReadOnlyField/ReadOnlyField";
+import { PUIDictionary } from "../../../domain/dictionary/dictionary.interfaces";
+import React from "react";
 
 export interface DeliveryWalletDetailsProps {
-    walletAddress: string,
-    isMultiSig?: boolean
+  walletAddress: string;
+  isMultiSig?: boolean;
+  dictionary: PUIDictionary;
 }
 const DeliveryWalletDetails: React.FC<DeliveryWalletDetailsProps> = ({
   isMultiSig = true,
   walletAddress,
+  dictionary,
 }) => {
   return (
     <Box pt={2}>
@@ -19,14 +23,16 @@ const DeliveryWalletDetails: React.FC<DeliveryWalletDetailsProps> = ({
         <Typography sx={{ fontWeight: "500" }}>Wallet Address</Typography>
 
           { isMultiSig && (
-            <Chip
-              variant="outlined"
-              size="small"
-              color="info"
-              label={ (<>
-                MultiSig
-                <InfoOutlinedIcon sx={{ fontSize: "16px", ml: 1 }} />
-              </>) } />
+            <Tooltip title={ dictionary.walletMultiSigTooltip }>
+              <Chip
+                variant="outlined"
+                size="small"
+                color="info"
+                label={ (<>
+                  MultiSig
+                  <InfoOutlinedIcon sx={{ fontSize: "16px", ml: 1 }} />
+                </>) } />
+            </Tooltip>
           ) }
       </Box>
 

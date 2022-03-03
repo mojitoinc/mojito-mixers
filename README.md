@@ -1,7 +1,7 @@
 <h1 align="center">Mojito Payment UI</h1>
 
-<br />
-<br />
+
+<br /><br />
 
 <p align="center">
   👨‍💻 Payment UI modal & playground UI to easily test it.
@@ -12,6 +12,7 @@
 </p>
 
 <br />
+
 
 <p align="center">
   <a href="https://payments-staging.mojito.xyz/" target="_blank">
@@ -292,6 +293,7 @@ The following images are loaded directly from GitHub to avoid bundling them with
 - `ErrorView`'s default error image.
 - `PaymentView`'s Circle logo image.
  
+
 **`PurchaseView`'s default loader image:**
 
 <p>
@@ -309,14 +311,27 @@ The following images are loaded directly from GitHub to avoid bundling them with
 **`ErrorView`'s default error image:**
 
 <p>
-  <a href="https://github.com/mojitoinc/mojito-mixers/blob/main/app/src/lib/assets/mojito-error.gif">
-    <img src="./app/src/lib/assets/mojito-error.gif" width="128">
+  <a href="https://github.com/mojitoinc/mojito-mixers/blob/main/app/src/lib/assets/mojito-error-loader.gif">
+    <img src="./app/src/lib/assets/mojito-error-loader.gif" width="128">
   </a>
 </p>
 
-    > Repo: To be added...
+    > Repo: https://github.com/mojitoinc/mojito-mixers/blob/main/app/src/lib/assets/mojito-error-loader.gif (add `?raw=true` to get the CDN URL below)
 
-    > CDN URL: To be added...
+    > CDN URL: https://raw.githubusercontent.com/mojitoinc/mojito-mixers/main/app/src/lib/assets/mojito-error-loader.gif
+
+
+Alternative static version:
+
+<p>
+  <a href="https://github.com/mojitoinc/mojito-mixers/blob/main/app/src/lib/assets/mojito-error-loader-static.png">
+    <img src="./app/src/lib/assets/mojito-error-loader-static.png" width="128">
+  </a>
+</p>
+
+    > Repo: https://github.com/mojitoinc/mojito-mixers/blob/main/app/src/lib/assets/mojito-error-loader-static.png (add `?raw=true` to get the CDN URL below)
+
+    > CDN URL: https://raw.githubusercontent.com/mojitoinc/mojito-mixers/main/app/src/lib/assets/mojito-error-loader-static.png
 
     
 **`PaymentView`'s Circle logo image:**
@@ -327,7 +342,7 @@ The following images are loaded directly from GitHub to avoid bundling them with
   </a>
 </p>
 
-    > Repo: https://github.com/mojitoinc/mojito-mixers/blob/main/app/src/lib/assets/circle.png
+    > Repo: https://github.com/mojitoinc/mojito-mixers/blob/main/app/src/lib/assets/circle.png (add `?raw=true` to get the CDN URL below)
 
     > CDN URL: https://raw.githubusercontent.com/mojitoinc/mojito-mixers/main/app/src/lib/assets/circle.png
 

@@ -1,24 +1,11 @@
 import { useAuth0 } from "@auth0/auth0-react";
 import { Container, Typography, Box, Stack, Button, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio, FormHelperText, TextField, Switch, Select, MenuItem, InputLabel, FormGroup, Checkbox, SelectChangeEvent } from "@mui/material";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { ErrorInfo, useCallback, useEffect, useRef, useState } from "react";
 import { PUICheckout, CheckoutModalError, PUICheckoutProps, PaymentType, useOpenCloseCheckoutModal } from "../lib";
 import { useMeQuery } from "../services/graphql/generated";
 import { PLAYGROUND_PARAGRAPHS_ARRAY, PLAYGROUND_AUTH_PRESET, PLAYGROUND_NO_AUTH_PRESET, PLAYGROUND_PRIVACY_HREF, PLAYGROUND_TERMS_OF_USE_HREF, PLAYGROUND_USER_FORMAT, PLAYGROUND_PURCHASING_IMAGE_SRC, PLAYGROUND_ERROR_IMAGE_SRC, PLAYGROUND_LOGOS_SRC, PLAYGROUND_LOGOS_SX, PLAYGROUND_LOADER_IMAGE_SRC, PLAYGROUND_MOCKED_AUCTION_LOT, PLAYGROUND_MOCKED_BUY_NOW_LOT, PLAYGROUND_THEMES } from "../utils/playground/playground.constants";
 import { PlaygroundFormData } from "../utils/playground/playground.interfaces";
 import { config } from "../utils/config/config.constants";
-
-export const PLAYGROUND_WIRE_PAYMENTS_DISCLAIMER: (string | React.ReactFragment)[] = [<>
-  <strong>Third-party wire transfers cannot be accepted. </strong>
-  Your bank account name needs to match with the name you used to register in Marketplace.
-</>, <>
-  Please note that wire transfers usually take <strong>1-3 business days</strong> to arrive. We
-  do not charge any deposit fee — however, your bank may charge you a wire transfer fee.
-</>];
-
-export const PLAYGROUND_PURCHASE_INSTRUCTIONS: (string | React.ReactFragment)[] = [
-  "Purchased item info with instructions on how to claim item / how item will be delivered can be placed here.",
-  "Payment processing info info can also be added here if payment will take time to process / is not processed instantly.",
-];
 
 const DEFAULT_FORM_VALUES: PlaygroundFormData = {
   // Organization:
@@ -58,7 +45,7 @@ if (process.browser) {
   }
 }
 
-const HomePage = () => {
+const HomePage: React.FC = () => {
   const firstTimeRef = useRef(true);
   const { isOpen, onOpen, onClose } = useOpenCloseCheckoutModal();
   const { loginWithPopup, isAuthenticated, isLoading: isAuthenticatedLoading, getIdTokenClaims } = useAuth0();
@@ -83,9 +70,19 @@ const HomePage = () => {
     onOpen();
   }, [isLoading, isAuthenticated, meData, hasOrganizations, onOpen]);
 
+  const handleGoToCollection = useCallback(() => {
+    console.log("Go to Collection Page.");
+    // router.push("/collection");
+  }, []);
+
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleError = useCallback((error: CheckoutModalError) => {
     // console.log(error);
+  }, []);
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const handleCatch = useCallback((error: Error, errorInfo?: ErrorInfo) => {
+    // console.log(error, errorInfo);
   }, []);
 
   const handleMarketingOptInChange = useCallback((marketingOptIn: boolean) => {
@@ -157,6 +154,7 @@ const HomePage = () => {
     // Modal:
     open: isOpen,
     onClose,
+    onGoToCollection: handleGoToCollection,
 
     // Flow:
     guestCheckoutEnabled: testPreset.guestCheckoutEnabled,
@@ -164,6 +162,7 @@ const HomePage = () => {
 
     // Personalization:
     theme: PLAYGROUND_THEMES[formValues.theme],
+    // themeOptions: {},
     logoSrc: PLAYGROUND_LOGOS_SRC[formValues.theme],
     logoSx: PLAYGROUND_LOGOS_SX[formValues.theme],
     loaderImageSrc: formValues.customImages ? PLAYGROUND_LOADER_IMAGE_SRC : "",
@@ -177,10 +176,7 @@ const HomePage = () => {
       formValues.paymentWire ? "Wire" : "",
       formValues.paymentCrypto ? "Crypto" : "",
     ].filter(Boolean) as PaymentType[],
-    customTexts: {
-      wirePaymentsDisclaimer: PLAYGROUND_WIRE_PAYMENTS_DISCLAIMER,
-      purchaseInstructions: PLAYGROUND_PURCHASE_INSTRUCTIONS,
-    },
+    // dictionary,
 
     // Legal:
     consentType: "circle",
@@ -205,6 +201,7 @@ const HomePage = () => {
     // Other Events:
     debug: true,
     onError: handleError,
+    onCatch: handleCatch,
     onMarketingOptInChange: handleMarketingOptInChange,
   };
 

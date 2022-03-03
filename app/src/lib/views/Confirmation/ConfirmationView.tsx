@@ -8,14 +8,16 @@ import { SavedPaymentMethod } from "../../domain/circle/circle.interfaces";
 import { billingInfoToSavedPaymentMethodBillingInfo } from "../../domain/circle/circle.utils";
 import { CheckoutItem } from "../../domain/product/product.interfaces";
 import { SelectedPaymentMethod } from "../../components/public/CheckoutOverlay/CheckoutOverlay.hooks";
+import { PUIDictionary } from "../../domain/dictionary/dictionary.interfaces";
 
 export interface ConfirmationViewProps {
   checkoutItems: CheckoutItem[];
   savedPaymentMethods: SavedPaymentMethod[];
   selectedPaymentMethod: SelectedPaymentMethod;
   paymentReferenceNumber: string;
-  purchaseInstructions: React.ReactFragment[];
+  onGoToCollection?: () => void;
   onNext: () => void;
+  dictionary: PUIDictionary;
 }
 
 export const ConfirmationView: React.FC<ConfirmationViewProps> = ({
@@ -23,8 +25,9 @@ export const ConfirmationView: React.FC<ConfirmationViewProps> = ({
   savedPaymentMethods,
   selectedPaymentMethod,
   paymentReferenceNumber,
-  purchaseInstructions,
+  onGoToCollection,
   onNext,
+  dictionary,
 }) => {
   const {
     billingInfo: selectedBillingInfo,
@@ -68,16 +71,18 @@ export const ConfirmationView: React.FC<ConfirmationViewProps> = ({
         checkoutItems={ checkoutItems }
         paymentReferenceNumber={ paymentReferenceNumber }
         selectedPaymentMethodBillingInfo={ selectedPaymentMethodBillingInfo }
-        selectedPaymentMethodPaymentInfo={ selectedPaymentMethodPaymentInfo } />
+        selectedPaymentMethodPaymentInfo={ selectedPaymentMethodPaymentInfo }
+        dictionary={ dictionary } />
 
       <Stack sx={{ display: "flex", flex: 1 }}>
         <PurchaseConfirmationItemDetails
           checkoutItems={ checkoutItems }
-          purchaseInstructions={ purchaseInstructions } />
+          dictionary={ dictionary } />
 
         <CheckoutModalFooter
           variant="toMarketplace"
-          onSubmitClicked={ onNext } />
+          onSubmitClicked={ onNext }
+          onGoToCollection={ onGoToCollection } />
       </Stack>
 
     </Stack>

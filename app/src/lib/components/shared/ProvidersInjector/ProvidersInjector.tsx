@@ -1,13 +1,17 @@
-import React, { useEffect, useMemo } from "react";
+import React, { ErrorInfo, useEffect, useMemo } from "react";
 import { Theme, ThemeOptions, ThemeProvider } from "@mui/material/styles";
 import { AuthorizedApolloProvider, AuthorizedApolloProviderProps } from "../AuthorizedApolloProvider/AuthorizedApolloProvider";
 import { extendDefaultTheme } from "../../../config/theme/theme";
+import { ErrorBoundary } from "../../public/ErrorBoundary/ErrorBoundary";
 
-export interface ThemeProviderProps {
+export interface CommonProviderProps {
+  onCatch?: (error: Error, errorInfo?: ErrorInfo) => void | true;
+}
+
+export interface ThemeProviderProps extends CommonProviderProps {
   theme?: Theme;
   themeOptions?: ThemeOptions;
 }
-
 
 export type ProvidersInjectorProps = ThemeProviderProps & AuthorizedApolloProviderProps;
 
@@ -43,8 +47,8 @@ export const ProviderInjector: React.FC<ProvidersInjectorProps> = ({
   }, [apolloClient, uri]);
 
   return (
-    <AuthorizedApolloProvider apolloClient={ apolloClient } uri={ uri }>
-      { theme ? <ThemeProvider theme={ theme }>{children}</ThemeProvider> : children }
+    <AuthorizedApolloProvider apolloClient={apolloClient} uri={uri}>
+      {theme ? <ThemeProvider theme={theme}>{children}</ThemeProvider> : children}
     </AuthorizedApolloProvider>
   );
 }
@@ -53,17 +57,22 @@ export function withThemeProvider<P extends object>(Component: React.ComponentTy
   const WithThemeProvider: React.FC<P & ThemeProviderProps> = ({
     theme,
     themeOptions,
+    onCatch,
     ...componentProps
   }) => {
     return (
-      <ProviderInjector apolloClient={ null } uri="" theme={ theme } themeOptions={ themeOptions }>
-        <Component { ...componentProps as P } />
-      </ProviderInjector>
+      <ErrorBoundary onCatch={ onCatch }>
+        <ProviderInjector apolloClient={null} uri="" theme={theme} themeOptions={themeOptions}>
+          <Component {...componentProps as P} />
+        </ProviderInjector>
+      </ErrorBoundary>
     );
   };
 
   return WithThemeProvider;
 }
+
+
 
 export function withProviders<P extends object>(Component: React.ComponentType<P>) {
   const WithProviders: React.FC<P & ProvidersInjectorProps> = ({
@@ -71,12 +80,15 @@ export function withProviders<P extends object>(Component: React.ComponentType<P
     uri,
     theme,
     themeOptions,
+    onCatch,
     ...componentProps
   }) => {
     return (
-      <ProviderInjector apolloClient={ apolloClient } uri={ uri } theme={ theme } themeOptions={ themeOptions }>
-        <Component { ...componentProps as P } />
-      </ProviderInjector>
+      <ErrorBoundary onCatch={onCatch}>
+        <ProviderInjector apolloClient={apolloClient} uri={uri} theme={theme} themeOptions={themeOptions}>
+          <Component {...componentProps as P} />
+        </ProviderInjector>
+      </ErrorBoundary>
     );
   };
 
