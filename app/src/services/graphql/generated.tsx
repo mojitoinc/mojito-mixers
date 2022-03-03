@@ -551,8 +551,6 @@ export type Mutation = {
   addExistingTokenToCollection: Scalars['String'];
   addOrganization: Organization;
   addTokensToCollection: Scalars['String'];
-  /** Cancels invoice by ID, can be called by org admin */
-  cancelInvoice: Scalars['Boolean'];
   cancelMarketplaceAuctionBid: Scalars['Boolean'];
   /** Cancels payment by ID, can be called by org admin */
   cancelPayment: Scalars['Boolean'];
@@ -596,6 +594,8 @@ export type Mutation = {
   nftDeployContract: NftContract;
   orgCreateMarketplace: Marketplace;
   ping: Scalars['String'];
+  /** Release reservations held by invoice ID */
+  releaseReservation: Scalars['Boolean'];
   reserveMarketplaceBuyNowLot: MarketplaceBuyNowOutput;
   revealGenerativeToken: Scalars['String'];
   setJwtIssuerDomain: Organization;
@@ -636,12 +636,6 @@ export type MutationAddOrganizationArgs = {
 export type MutationAddTokensToCollectionArgs = {
   marketplaceId: Scalars['UUID1'];
   tokenIds: Array<Scalars['UUID1']>;
-};
-
-
-export type MutationCancelInvoiceArgs = {
-  invoiceID: Scalars['UUID1'];
-  orgID?: InputMaybe<Scalars['UUID1']>;
 };
 
 
@@ -801,6 +795,12 @@ export type MutationNftDeployContractArgs = {
 export type MutationOrgCreateMarketplaceArgs = {
   name: Scalars['String'];
   orgId?: InputMaybe<Scalars['UUID1']>;
+};
+
+
+export type MutationReleaseReservationArgs = {
+  invoiceID: Scalars['UUID1'];
+  orgID?: InputMaybe<Scalars['UUID1']>;
 };
 
 
@@ -1514,6 +1514,14 @@ export type ReserveBuyNowLotMutationVariables = Exact<{
 
 export type ReserveBuyNowLotMutation = { __typename?: 'Mutation', reserveMarketplaceBuyNowLot: { __typename?: 'MarketplaceBuyNowOutput', invoice?: { __typename?: 'InvoiceDetails', invoiceID: any, status: InvoiceStatus, items: Array<{ __typename?: 'ItemInvoiceDetail', units: number, unitPrice: number, taxes: number, totalPrice: number } | null> } | null } };
 
+export type ReleaseReservationBuyNowLotMutationVariables = Exact<{
+  orgID: Scalars['UUID1'];
+  invoiceID: Scalars['UUID1'];
+}>;
+
+
+export type ReleaseReservationBuyNowLotMutation = { __typename?: 'Mutation', releaseReservation: boolean };
+
 export type GetInvoiceDetailsQueryVariables = Exact<{
   invoiceID: Scalars['UUID1'];
   orgID: Scalars['UUID1'];
@@ -1732,6 +1740,38 @@ export function useReserveBuyNowLotMutation(baseOptions?: Apollo.MutationHookOpt
 export type ReserveBuyNowLotMutationHookResult = ReturnType<typeof useReserveBuyNowLotMutation>;
 export type ReserveBuyNowLotMutationResult = Apollo.MutationResult<ReserveBuyNowLotMutation>;
 export type ReserveBuyNowLotMutationOptions = Apollo.BaseMutationOptions<ReserveBuyNowLotMutation, ReserveBuyNowLotMutationVariables>;
+export const ReleaseReservationBuyNowLotDocument = gql`
+    mutation ReleaseReservationBuyNowLot($orgID: UUID1!, $invoiceID: UUID1!) {
+  releaseReservation(orgID: $orgID, invoiceID: $invoiceID)
+}
+    `;
+export type ReleaseReservationBuyNowLotMutationFn = Apollo.MutationFunction<ReleaseReservationBuyNowLotMutation, ReleaseReservationBuyNowLotMutationVariables>;
+
+/**
+ * __useReleaseReservationBuyNowLotMutation__
+ *
+ * To run a mutation, you first call `useReleaseReservationBuyNowLotMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useReleaseReservationBuyNowLotMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [releaseReservationBuyNowLotMutation, { data, loading, error }] = useReleaseReservationBuyNowLotMutation({
+ *   variables: {
+ *      orgID: // value for 'orgID'
+ *      invoiceID: // value for 'invoiceID'
+ *   },
+ * });
+ */
+export function useReleaseReservationBuyNowLotMutation(baseOptions?: Apollo.MutationHookOptions<ReleaseReservationBuyNowLotMutation, ReleaseReservationBuyNowLotMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<ReleaseReservationBuyNowLotMutation, ReleaseReservationBuyNowLotMutationVariables>(ReleaseReservationBuyNowLotDocument, options);
+      }
+export type ReleaseReservationBuyNowLotMutationHookResult = ReturnType<typeof useReleaseReservationBuyNowLotMutation>;
+export type ReleaseReservationBuyNowLotMutationResult = Apollo.MutationResult<ReleaseReservationBuyNowLotMutation>;
+export type ReleaseReservationBuyNowLotMutationOptions = Apollo.BaseMutationOptions<ReleaseReservationBuyNowLotMutation, ReleaseReservationBuyNowLotMutationVariables>;
 export const GetInvoiceDetailsDocument = gql`
     query GetInvoiceDetails($invoiceID: UUID1!, $orgID: UUID1!) {
   getInvoiceDetails(invoiceID: $invoiceID, orgID: $orgID) {

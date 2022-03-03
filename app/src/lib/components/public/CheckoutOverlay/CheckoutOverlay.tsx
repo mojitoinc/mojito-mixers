@@ -5,7 +5,7 @@ import { UserFormat } from "../../../domain/auth/authentication.interfaces";
 import { PaymentMethod, PaymentType } from "../../../domain/payment/payment.interfaces";
 import { CheckoutItemInfo } from "../../../domain/product/product.interfaces";
 import { BillingInfo } from "../../../forms/BillingInfoForm";
-import { useDeletePaymentMethodMutation, useGetInvoiceDetailsQuery, useGetPaymentMethodListQuery, useMeQuery } from "../../../queries/graphqlGenerated";
+import { useDeletePaymentMethodMutation, useGetInvoiceDetailsQuery, useGetPaymentMethodListQuery, useMeQuery, useReleaseReservationBuyNowLotMutation } from "../../../queries/graphqlGenerated";
 import { AuthenticationView } from "../../../views/Authentication/AuthenticationView";
 import { BillingView } from "../../../views/Billing/BillingView";
 import { ConfirmationView } from "../../../views/Confirmation/ConfirmationView";
@@ -376,13 +376,22 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     setError(error);
   }, [refetchPaymentMethods, setError]);
 
+  const [releaseReservationBuyNowLot] = useReleaseReservationBuyNowLotMutation();
+
   const handleClose = useCallback(() => {
+    releaseReservationBuyNowLot({
+      variables: {
+        orgID,
+        invoiceID,
+      },
+    });
+
     createInvoiceAndReservationCalledRef.current = false;
 
     setInvoiceID(null);
 
     onClose();
-  }, [setInvoiceID, onClose]);
+  }, [releaseReservationBuyNowLot, orgID, invoiceID, setInvoiceID, onClose]);
 
   const handleFixError = useCallback(async (): Promise<false> => {
     const at = checkoutError?.at;
