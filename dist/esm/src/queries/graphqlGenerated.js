@@ -239,6 +239,33 @@ function useReserveBuyNowLotMutation(baseOptions) {
     const options = Object.assign(Object.assign({}, defaultOptions), baseOptions);
     return Apollo.useMutation(ReserveBuyNowLotDocument, options);
 }
+const ReleaseReservationBuyNowLotDocument = gql `
+    mutation ReleaseReservationBuyNowLot($orgID: UUID1!, $invoiceID: UUID1!) {
+  releaseReservation(orgID: $orgID, invoiceID: $invoiceID)
+}
+    `;
+/**
+ * __useReleaseReservationBuyNowLotMutation__
+ *
+ * To run a mutation, you first call `useReleaseReservationBuyNowLotMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useReleaseReservationBuyNowLotMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [releaseReservationBuyNowLotMutation, { data, loading, error }] = useReleaseReservationBuyNowLotMutation({
+ *   variables: {
+ *      orgID: // value for 'orgID'
+ *      invoiceID: // value for 'invoiceID'
+ *   },
+ * });
+ */
+function useReleaseReservationBuyNowLotMutation(baseOptions) {
+    const options = Object.assign(Object.assign({}, defaultOptions), baseOptions);
+    return Apollo.useMutation(ReleaseReservationBuyNowLotDocument, options);
+}
 const GetInvoiceDetailsDocument = gql `
     query GetInvoiceDetails($invoiceID: UUID1!, $orgID: UUID1!) {
   getInvoiceDetails(invoiceID: $invoiceID, orgID: $orgID) {
@@ -505,5 +532,5 @@ function useGetTaxQuoteLazyQuery(baseOptions) {
     return Apollo.useLazyQuery(GetTaxQuoteDocument, options);
 }
 
-export { AuctionBidOrder, AuctionLotStatus, CollectionType, ContractType, CreateAuctionInvoiceDocument, CreatePaymentDocument, CreatePaymentMethodDocument, DeletePaymentMethodDocument, ExtensionType, GetInvoiceDetailsDocument, GetPaymentMethodListDocument, GetPaymentNotificationDocument, GetTaxQuoteDocument, InvoiceStatus, KycStatus, MarketCollectionStatus, MarketplaceCollectionItemStatus, MarketplaceSaleType, MeDocument, PaymentKeyDocument, PaymentStatus, PaymentType, PreparePaymentMethodDocument, ReserveBuyNowLotDocument, Role, TransactionStatus, TransactionType, WalletParentType, WalletTxType, useCreateAuctionInvoiceMutation, useCreatePaymentMethodMutation, useCreatePaymentMutation, useDeletePaymentMethodMutation, useGetInvoiceDetailsQuery, useGetPaymentMethodListQuery, useGetPaymentNotificationQuery, useGetTaxQuoteLazyQuery, useMeQuery, usePaymentKeyLazyQuery, usePreparePaymentMethodQuery, useReserveBuyNowLotMutation };
+export { AuctionBidOrder, AuctionLotStatus, CollectionType, ContractType, CreateAuctionInvoiceDocument, CreatePaymentDocument, CreatePaymentMethodDocument, DeletePaymentMethodDocument, ExtensionType, GetInvoiceDetailsDocument, GetPaymentMethodListDocument, GetPaymentNotificationDocument, GetTaxQuoteDocument, InvoiceStatus, KycStatus, MarketCollectionStatus, MarketplaceCollectionItemStatus, MarketplaceSaleType, MeDocument, PaymentKeyDocument, PaymentStatus, PaymentType, PreparePaymentMethodDocument, ReleaseReservationBuyNowLotDocument, ReserveBuyNowLotDocument, Role, TransactionStatus, TransactionType, WalletParentType, WalletTxType, useCreateAuctionInvoiceMutation, useCreatePaymentMethodMutation, useCreatePaymentMutation, useDeletePaymentMethodMutation, useGetInvoiceDetailsQuery, useGetPaymentMethodListQuery, useGetPaymentNotificationQuery, useGetTaxQuoteLazyQuery, useMeQuery, usePaymentKeyLazyQuery, usePreparePaymentMethodQuery, useReleaseReservationBuyNowLotMutation, useReserveBuyNowLotMutation };
 //# sourceMappingURL=graphqlGenerated.js.map

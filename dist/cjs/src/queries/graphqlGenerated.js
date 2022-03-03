@@ -262,6 +262,33 @@ function useReserveBuyNowLotMutation(baseOptions) {
     const options = Object.assign(Object.assign({}, defaultOptions), baseOptions);
     return Apollo__namespace.useMutation(ReserveBuyNowLotDocument, options);
 }
+const ReleaseReservationBuyNowLotDocument = Apollo.gql `
+    mutation ReleaseReservationBuyNowLot($orgID: UUID1!, $invoiceID: UUID1!) {
+  releaseReservation(orgID: $orgID, invoiceID: $invoiceID)
+}
+    `;
+/**
+ * __useReleaseReservationBuyNowLotMutation__
+ *
+ * To run a mutation, you first call `useReleaseReservationBuyNowLotMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useReleaseReservationBuyNowLotMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [releaseReservationBuyNowLotMutation, { data, loading, error }] = useReleaseReservationBuyNowLotMutation({
+ *   variables: {
+ *      orgID: // value for 'orgID'
+ *      invoiceID: // value for 'invoiceID'
+ *   },
+ * });
+ */
+function useReleaseReservationBuyNowLotMutation(baseOptions) {
+    const options = Object.assign(Object.assign({}, defaultOptions), baseOptions);
+    return Apollo__namespace.useMutation(ReleaseReservationBuyNowLotDocument, options);
+}
 const GetInvoiceDetailsDocument = Apollo.gql `
     query GetInvoiceDetails($invoiceID: UUID1!, $orgID: UUID1!) {
   getInvoiceDetails(invoiceID: $invoiceID, orgID: $orgID) {
@@ -539,6 +566,7 @@ exports.GetTaxQuoteDocument = GetTaxQuoteDocument;
 exports.MeDocument = MeDocument;
 exports.PaymentKeyDocument = PaymentKeyDocument;
 exports.PreparePaymentMethodDocument = PreparePaymentMethodDocument;
+exports.ReleaseReservationBuyNowLotDocument = ReleaseReservationBuyNowLotDocument;
 exports.ReserveBuyNowLotDocument = ReserveBuyNowLotDocument;
 exports.useCreateAuctionInvoiceMutation = useCreateAuctionInvoiceMutation;
 exports.useCreatePaymentMethodMutation = useCreatePaymentMethodMutation;
@@ -551,5 +579,6 @@ exports.useGetTaxQuoteLazyQuery = useGetTaxQuoteLazyQuery;
 exports.useMeQuery = useMeQuery;
 exports.usePaymentKeyLazyQuery = usePaymentKeyLazyQuery;
 exports.usePreparePaymentMethodQuery = usePreparePaymentMethodQuery;
+exports.useReleaseReservationBuyNowLotMutation = useReleaseReservationBuyNowLotMutation;
 exports.useReserveBuyNowLotMutation = useReserveBuyNowLotMutation;
 //# sourceMappingURL=graphqlGenerated.js.map

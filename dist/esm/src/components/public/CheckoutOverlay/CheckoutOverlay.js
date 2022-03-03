@@ -2,7 +2,7 @@ import { __awaiter } from '../../../../node_modules/tslib/tslib.es6.js';
 import { Backdrop, Box, CircularProgress } from '@mui/material';
 import React__default, { useMemo, useRef, useEffect, useCallback } from 'react';
 import { transformRawSavedPaymentMethods, getSavedPaymentMethodAddressIdFromBillingInfo, savedPaymentMethodToBillingInfo } from '../../../domain/circle/circle.utils.js';
-import { useMeQuery, useGetPaymentMethodListQuery, useGetInvoiceDetailsQuery, useDeletePaymentMethodMutation } from '../../../queries/graphqlGenerated.js';
+import { useMeQuery, useGetPaymentMethodListQuery, useGetInvoiceDetailsQuery, useDeletePaymentMethodMutation, useReleaseReservationBuyNowLotMutation } from '../../../queries/graphqlGenerated.js';
 import { AuthenticationView } from '../../../views/Authentication/AuthenticationView.js';
 import { BillingView } from '../../../views/Billing/BillingView.js';
 import { ConfirmationView } from '../../../views/Confirmation/ConfirmationView.js';
@@ -200,11 +200,18 @@ debug, onError, onMarketingOptInChange, // Not implemented yet. Used to let user
         yield refetchPaymentMethods();
         setError(error);
     }), [refetchPaymentMethods, setError]);
+    const [releaseReservationBuyNowLot] = useReleaseReservationBuyNowLotMutation();
     const handleClose = useCallback(() => {
+        releaseReservationBuyNowLot({
+            variables: {
+                orgID,
+                invoiceID,
+            },
+        });
         createInvoiceAndReservationCalledRef.current = false;
         setInvoiceID(null);
         onClose();
-    }, [setInvoiceID, onClose]);
+    }, [releaseReservationBuyNowLot, orgID, invoiceID, setInvoiceID, onClose]);
     const handleFixError = useCallback(() => __awaiter(void 0, void 0, void 0, function* () {
         const at = checkoutError === null || checkoutError === void 0 ? void 0 : checkoutError.at;
         if (at === "reset") {
