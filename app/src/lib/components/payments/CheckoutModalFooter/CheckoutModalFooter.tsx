@@ -1,6 +1,6 @@
 import { Box, Link, Typography, Divider, CircularProgress } from "@mui/material";
 import React, { useCallback, useState } from "react";
-import { DEFAULT_PAYMENT_IMAGE_SRC, SM_MOBILE_MAX_WIDTH } from "../../../config/theme/theme";
+import { CIRCLE_LOGO_IMAGE_SRC, SM_MOBILE_MAX_WIDTH } from "../../../config/theme/theme";
 import { isPromise } from "../../../utils/promiseUtils";
 import { Checkbox } from "../../shared/Checkbox/Checkbox";
 import { ConsentText, ConsentType, CONSENT_ERROR_MESSAGE } from "../../shared/ConsentText/ConsentText";
@@ -178,7 +178,7 @@ export const CheckoutModalFooter: React.FC<CheckoutModalFooterProps> = ({
               Payments powered by
             </Typography>
             <Link href="https://www.circle.com/en/" target="_blank" rel="noopener noreferrer">
-              <Box component="img" src={DEFAULT_PAYMENT_IMAGE_SRC} height={20} />
+              <Box component="img" src={CIRCLE_LOGO_IMAGE_SRC} height={20} />
             </Link>
           </Box>
         </>

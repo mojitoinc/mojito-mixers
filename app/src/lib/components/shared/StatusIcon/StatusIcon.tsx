@@ -2,7 +2,7 @@ export type StatusIconVariant = "loading" | "success" | "error";
 import { Box, BoxProps, SvgIcon } from "@mui/material";
 import { Theme } from "@mui/material/styles";
 import React from "react";
-import { DEFAULT_PURCHASING_IMAGE_SRC, ROUNDED_BORDER_RADIUS } from "../../../config/theme/theme";
+import { DEFAULT_ERROR_IMAGE_SRC, DEFAULT_PURCHASING_IMAGE_SRC, ROUNDED_BORDER_RADIUS } from "../../../config/theme/theme";
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import CheckIcon from '@mui/icons-material/Check';
 import AutorenewIcon from '@mui/icons-material/Autorenew';
@@ -31,7 +31,7 @@ const statusIconConfigs: Record<StatusIconVariant, StatusIconConfig> = {
   error: {
     icon: WarningAmberIcon,
     iconColor: theme => theme.palette.warning.dark,
-    defaultImgSrc: "", // TODO: To be added.
+    defaultImgSrc: DEFAULT_ERROR_IMAGE_SRC,
   },
 };
 
