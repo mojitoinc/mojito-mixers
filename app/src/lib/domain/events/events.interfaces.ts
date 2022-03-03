@@ -1,7 +1,7 @@
 import { CheckoutItem } from "../..";
 
 export interface CheckoutEventData {
-  customerId?: string;
+  customerId: string;
   departmenCategory: "NFT";
   paymentMethod: "ACH" | "CreditCard" | undefined;
   revenue: number;

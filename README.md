@@ -414,7 +414,50 @@ If you don't want this behavior or would like to implement a custom one, you sho
 
 <br />
 
+## Event CallBack
 
+If a callback is passed to the `event` property This will be call every time a new step has been made. 
+
+The callback will return two properties;  the eventType and the eventData.
+
+### Event types:
+
+- `navigate:authentication`
+
+- `navigate:billing`
+
+- `navigate:payment`
+
+- `navigate:purchasing`
+
+- `navigate:confirmation`
+
+- `navigate:error`
+
+- `event:payment`  when clicked on Purchase button.
+
+### Event data
+
+```
+{
+  customerId: string; // empty for now
+  departmenCategory: "NFT";
+  paymentMethod: "ACH" | "CreditCard" | undefined;
+  revenue: number;
+  shippingMethod: "custom wallet" | "multisig wallet";
+  step: number;
+  stepName: string;
+  currency: "USD",
+  fees: number;
+  total: number;
+  products: CheckoutItem[],
+  tax: number;
+  circlePaymentID: string;
+  paymentID: string;
+}
+```
+
+All the properties are nullable
 ## Images
 
 The following images are loaded directly from GitHub to avoid bundling them with the library or forcing users to include them in their repos and add the necessary build setup to load them. They should just work out of the box, no setup required:
