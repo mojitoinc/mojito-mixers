@@ -157,6 +157,10 @@ const App: React.FC = () => {
     Sentry.captureException(error);
   }, []);
 
+  const handleEvent = useCallback((eventType: CheckoutEventType, eventData: Partial<CheckoutEventData>) => {
+    // Handle the data for each step as you need 
+  },)
+
   const handleCatch = useCallback((error: Error, errorInfo?: ErrorInfo) => {
     Sentry.captureException({ error, errorInfo });
   }, []);
@@ -222,6 +226,9 @@ const App: React.FC = () => {
     onLogin: handleLogin,
     isAuthenticated,
     isAuthenticatedLoading: isLoading,
+
+    // Steps Events:
+    onEvent: handleEvent,
 
     // Other Events:
     debug: true,
