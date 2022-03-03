@@ -1,6 +1,6 @@
 import { CheckoutItem } from "../..";
 
-export interface CheckoutDetails {
+export interface CheckoutEventData {
   customerId?: string;
   departmenCategory: "NFT";
   paymentMethod: "ACH" | "CreditCard" | undefined;
@@ -8,9 +8,6 @@ export interface CheckoutDetails {
   shippingMethod: "custom wallet" | "multisig wallet";
   step: number;
   stepName: string;
-}
-
-export interface OrderDetails extends CheckoutDetails {
   currency: "USD",
   fees: number;
   total: number;
@@ -19,3 +16,7 @@ export interface OrderDetails extends CheckoutDetails {
   circlePaymentID: string;
   paymentID: string;
 }
+export type CheckoutModalNavigateType = "navigate:authentication" | "navigate:billing" | "navigate:payment" | "navigate:purchasing" | "navigate:confirmation" | "navigate:error";
+export type CheckoutModalEventType = "event:payment";
+
+export type CheckoutEventType = CheckoutModalNavigateType | CheckoutModalEventType

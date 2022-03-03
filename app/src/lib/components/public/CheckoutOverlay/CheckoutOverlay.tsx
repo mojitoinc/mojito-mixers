@@ -3,7 +3,7 @@ import React, { ErrorInfo, useCallback, useEffect, useMemo, useRef } from "react
 import { getSavedPaymentMethodAddressIdFromBillingInfo, savedPaymentMethodToBillingInfo, transformRawSavedPaymentMethods } from "../../../domain/circle/circle.utils";
 import { UserFormat } from "../../../domain/auth/authentication.interfaces";
 import { PaymentMethod, PaymentType } from "../../../domain/payment/payment.interfaces";
-import { CheckoutDetails, OrderDetails } from "../../../domain/events/events.interfaces";
+import { CheckoutEventData, CheckoutEventType } from "../../../domain/events/events.interfaces";
 import { CheckoutItemInfo } from "../../../domain/product/product.interfaces";
 import { BillingInfo } from "../../../forms/BillingInfoForm";
 import { useDeletePaymentMethodMutation, useGetInvoiceDetailsQuery, useGetPaymentMethodListQuery, useMeQuery } from "../../../queries/graphqlGenerated";
@@ -18,7 +18,7 @@ import { RawSavedPaymentMethod, SavedPaymentMethod } from "../../../domain/circl
 import { Theme, SxProps } from "@mui/material/styles";
 import { continuePlaidOAuthFlow, PlaidFlow } from "../../../hooks/usePlaid";
 import { ConsentType } from "../../shared/ConsentText/ConsentText";
-import { CheckoutModalError, CheckoutModalStepIndex, useCheckoutModalState } from "./CheckoutOverlay.hooks";
+import { CheckoutModalError, CheckoutModalStep, CheckoutModalStepIndex, useCheckoutModalState } from "./CheckoutOverlay.hooks";
 import { DEFAULT_ERROR_AT, ERROR_LOADING_INVOICE, ERROR_LOADING_PAYMENT_METHODS, ERROR_LOADING_USER } from "../../../domain/errors/errors.constants";
 import { FullScreenOverlay } from "../../shared/FullScreenOverlay/FullScreenOverlay";
 import { ProvidersInjectorProps, withProviders } from "../../shared/ProvidersInjector/ProvidersInjector";
@@ -37,9 +37,7 @@ export interface PUICheckoutOverlayProps {
   // Flow:
   guestCheckoutEnabled?: boolean;
   productConfirmationEnabled?: boolean;
-  onCheckoutCompleted?: (checkoutDetails:CheckoutDetails) => void,
-  onOrderCompleted?: (orderDetails:OrderDetails) => void,
-
+  onEvent?: (eventType: CheckoutEventType, eventData: Partial<CheckoutEventData>) => void;
   // Personalization:
   logoSrc: string;
   logoSx?: SxProps<Theme>;
@@ -107,8 +105,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   orgID,
   invoiceID: initialInvoiceID,
   checkoutItems: parentCheckoutItems,
-  onCheckoutCompleted,
-  onOrderCompleted,
+  onEvent,
 
   // Authentication:
   onLogin,
@@ -244,7 +241,6 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     if (!isDialogLoading && open) initModalState();
   }, [isDialogLoading, open, initModalState]);
 
-console.log(selectedPaymentMethod)
   // Data loading error handling:
 
   useEffect(() => {
@@ -253,6 +249,37 @@ console.log(selectedPaymentMethod)
     if (invoiceDetailsError) setError(ERROR_LOADING_INVOICE(invoiceDetailsError));
   }, [meError, paymentMethodsError, invoiceDetailsError, setError]);
 
+  const mapCheckout = useCallback((step:CheckoutModalStep):Partial<CheckoutEventData>=>{
+    const payment = savedPaymentMethods.find(paymentMethod=>paymentMethod.id===selectedPaymentMethod.paymentInfo)
+    return {
+      customerId: "", //empty for now
+      departmenCategory: "NFT",
+      paymentMethod: payment?.type,
+      revenue: subtotal,
+      shippingMethod: walletAddress ? "custom wallet" : "multisig wallet",
+      step: CheckoutModalStepIndex[step],
+      stepName: step,
+      currency: "USD",
+      fees,
+      tax: taxAmount,
+      products: checkoutItems,
+      circlePaymentID,
+      paymentID,
+      total:subtotal + fees
+    }
+  },[savedPaymentMethods, subtotal, walletAddress, fees, taxAmount, checkoutItems, circlePaymentID, paymentID, selectedPaymentMethod.paymentInfo])
+
+  const raisedEvent = useCallback((event:string)=>{
+    const data =  mapCheckout(checkoutStep);
+    if(onEvent){
+      const eventLabel = `${event==="event"?"event:payment":`navigate:${checkoutStep}`}`
+      onEvent(eventLabel as CheckoutEventType,data)
+    }
+  },[checkoutStep, mapCheckout, onEvent]);
+
+  useEffect(() => {
+    raisedEvent("navigate")
+  }, [checkoutStep, raisedEvent]);
 
   // Saved payment method creation-reload-sync:
 
@@ -297,18 +324,6 @@ console.log(selectedPaymentMethod)
 
 
   // Form data / state:
-  const mapCheckout = useCallback(():CheckoutDetails=>{
-    const payment = savedPaymentMethods.find(paymentMethod=>paymentMethod.id===selectedPaymentMethod.paymentInfo)
-    return {
-      customerId: "", //empty for now
-      departmenCategory: "NFT",
-      paymentMethod: payment?.type,
-      revenue: subtotal,
-      shippingMethod: walletAddress ? "custom wallet" : "multisig wallet",
-      step: CheckoutModalStepIndex[checkoutStep],
-      stepName: checkoutStep,
-    }
-  },[subtotal, walletAddress, checkoutStep, savedPaymentMethods, selectedPaymentMethod])
 
   const handleBillingInfoSelected = useCallback((billingInfo: string | BillingInfo) => {
     // If we go back to the billing info step to fix some validation errors or change some data, we preserve the data
@@ -327,25 +342,6 @@ console.log(selectedPaymentMethod)
   }, [setSelectedPaymentMethod]);
 
 
-  // Confirmation Step
-  useEffect(()=>{
-    if(checkoutStep === "confirmation" && onOrderCompleted){
-      const checkoutDetails = mapCheckout();
-      const total = subtotal + fees;
-
-      const orderDetails:OrderDetails = {
-        ...checkoutDetails,
-        currency: "USD",
-        fees,
-        tax: taxAmount,
-        products: checkoutItems,
-        circlePaymentID,
-        paymentID,
-        total: total
-      }
-      onOrderCompleted(orderDetails)
-    }
-  },[checkoutStep, mapCheckout, subtotal, taxAmount, checkoutItems, circlePaymentID, onOrderCompleted, fees, paymentID])
 
   // Delete payment methods:
 
@@ -403,19 +399,23 @@ console.log(selectedPaymentMethod)
 
   // Purchase:
 
+  const handlePaymentAttempted =useCallback(()=>{
+    raisedEvent("event")
+  },[raisedEvent]);
+
   const handlePurchaseSuccess = useCallback(async (nextCirclePaymentIDNumber: string, nextPaymentIdNumber:string) => {
     setPayments(nextCirclePaymentIDNumber,nextPaymentIdNumber);
     // After a successful purchase, a new payment method might have been created, so we reload them:
     await refetchPaymentMethods();
 
-    if(onCheckoutCompleted){
+    // if(onCheckoutCompleted){
 
-      const checkoutDetails = mapCheckout();
-      onCheckoutCompleted(checkoutDetails);
-    }
+    //   const checkoutDetails = mapCheckout();
+    //   onCheckoutCompleted(checkoutDetails);
+    // }
 
     goNext();
-  }, [refetchPaymentMethods, goNext, onCheckoutCompleted, mapCheckout, setPayments]);
+  }, [setPayments, refetchPaymentMethods, goNext]);
 
   const handlePurchaseError = useCallback(async (error: string | CheckoutModalError) => {
     // After a failed purchase, a new payment method might have been created anyway, so we reload them (createPaymentMethod
@@ -560,6 +560,7 @@ console.log(selectedPaymentMethod)
   } else if (checkoutStep === "payment") {
     checkoutStepElement = (
       <PaymentView
+        onPaymentAttempted={handlePaymentAttempted}
         checkoutItems={ checkoutItems }
         taxes={ taxes }
         savedPaymentMethods={ savedPaymentMethods }

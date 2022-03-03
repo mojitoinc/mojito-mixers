@@ -20,6 +20,9 @@ export interface CheckoutModalError {
 }
 
 export type CheckoutModalStep = "authentication" | "billing" | "payment" | "purchasing" | "confirmation" | "error";
+
+// navigate:"billing" | "payment" | "purchasing"->before redirection= event:payment-> after redirect:confirmation
+
 export enum CheckoutModalStepIndex {
   authentication,
   billing,
@@ -217,8 +220,8 @@ export function useCheckoutModalState({
     setPurchaseState((prevPurchasState) => ({ ...prevPurchasState, walletAddress }));
   }, []);
 
-  const setPayments = useCallback((paymentReferenceNumber: string, paymentID: string) => {
-    setPurchaseState((prevPurchasState) => ({ ...prevPurchasState, paymentReferenceNumber, paymentID }));
+  const setPayments = useCallback((circlePaymentID: string, paymentID: string) => {
+    setPurchaseState((prevPurchasState) => ({ ...prevPurchasState, circlePaymentID, paymentID }));
   }, [])
 
 
