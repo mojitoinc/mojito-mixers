@@ -75,7 +75,7 @@ export interface CheckoutModalStateReturn extends CheckoutModalState, PurchaseSt
   setInvoiceID: (invoiceID: string | null) => void;
   setTaxes: (taxes: TaxesState) => void;
   setWalletAddress: (walletAddress: string | null) => void;
-  setPayments: (paymentReferenceNumber: string, paymentID: string) => void;
+  setPayments: (circlePaymentID: string, paymentID: string) => void;
 }
 
 export const CHECKOUT_STEPS: CheckoutModalStep[] = ["authentication", "billing", "payment", "purchasing", "confirmation"];
@@ -208,7 +208,7 @@ export function useCheckoutModalState({
   }, []);
 
   const setInvoiceID = useCallback((invoiceID: string | null) => {
-    setPurchaseState((prevPurchasState) => ({ ...prevPurchasState, invoiceID, paymentReferenceNumber: "", paymentID: "" }));
+    setPurchaseState((prevPurchasState) => ({ ...prevPurchasState, invoiceID, circlePaymentID: "", paymentID: "" }));
   }, []);
 
   const setTaxes = useCallback((taxes: TaxesState) => {
