@@ -1,7 +1,7 @@
 /// <reference types="react" />
 import React$1, { ErrorInfo } from 'react';
 import { Theme, ThemeOptions, SxProps } from '@mui/material/styles';
-export { Theme as CheckoutModalTheme, ThemeOptions as CheckoutModalThemeOptions, ThemeProvider as PUIThemeProvider } from '@mui/material/styles';
+export { Theme as CheckoutModalTheme, ThemeOptions as CheckoutModalThemeOptions } from '@mui/material/styles';
 import { ApolloError, ApolloClient, NormalizedCacheObject } from '@apollo/client';
 
 declare type UserFormat = "username" | "email" | "name";
