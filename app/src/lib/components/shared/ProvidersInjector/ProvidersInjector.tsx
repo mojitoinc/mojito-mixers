@@ -25,7 +25,7 @@ export const ProviderInjector: React.FC<ProvidersInjectorProps> = ({
   themeOptions,
   children,
 }) => {
-  const theme = useMemo(() => parentTheme ?? extendDefaultTheme(themeOptions), [parentTheme, themeOptions])
+  const theme = useMemo(() => parentTheme ?? extendDefaultTheme(themeOptions), [parentTheme, themeOptions]);
 
   useEffect(() => {
     if (parentTheme && themeOptions) {
