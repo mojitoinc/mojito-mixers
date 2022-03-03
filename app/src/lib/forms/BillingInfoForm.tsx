@@ -13,7 +13,7 @@ import { SecondaryButton } from "../components/shared/SecondaryButton/SecondaryB
 import { Box } from "@mui/material";
 import BookIcon from "@mui/icons-material/Book";
 import { EMPTY_OPTION, SelectOption } from "../components/shared/Select/Select";
-import { withRequiredErrorMessage } from "../utils/validationUtils";
+import { withInvalidErrorMessage, withRequiredErrorMessage } from "../utils/validationUtils";
 import { DebugBox } from "../components/payments/DisplayBox/DisplayBox";
 import { CheckoutModalError } from "../components/public/CheckoutOverlay/CheckoutOverlay.hooks";
 import { useFormCheckoutError } from "../hooks/useFormCheckoutError";
@@ -88,6 +88,7 @@ const schema = object()
       .required(withRequiredErrorMessage),
     [PHONE_FIELD]: string()
       .label(FIELD_LABELS[PHONE_FIELD])
+      .matches(/\+(?:[0-9] ?){6,14}[0-9]$/, withInvalidErrorMessage)
       .required(withRequiredErrorMessage),
     [STREET_FIELD]: string()
       .label(FIELD_LABELS[STREET_FIELD])
@@ -104,12 +105,12 @@ const schema = object()
       value: string()
         .label(FIELD_LABELS[STATE_FIELD])
         .required(withRequiredErrorMessage)
-      }),
+    }),
     [COUNTRY_FIELD]: object().shape({
       value: string()
         .label(FIELD_LABELS[COUNTRY_FIELD])
         .required(withRequiredErrorMessage)
-      }),
+    }),
   }).required();
 
 export interface BillingInfoFormProps {
