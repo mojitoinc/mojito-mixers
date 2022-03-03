@@ -81,8 +81,9 @@ const HomePage: React.FC = () => {
   }, []);
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const handleCatch = useCallback((error: Error, errorInfo?: ErrorInfo) => {
+  const handleCatch = useCallback((error: Error, errorInfo?: ErrorInfo): void | true => {
     // console.log(error, errorInfo);
+    // return true;
   }, []);
 
   const handleMarketingOptInChange = useCallback((marketingOptIn: boolean) => {
@@ -409,9 +410,7 @@ const HomePage: React.FC = () => {
         </Stack>
       </Box>
 
-      { /* <CheckoutModalThemeProvider theme={ CUSTOM_THEME }> */}
       <PUICheckout {...checkoutProps} />
-      { /* </CheckoutModalThemeProvider> */}
 
     </Container>
   );
