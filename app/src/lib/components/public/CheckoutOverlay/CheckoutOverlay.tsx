@@ -25,6 +25,7 @@ import { transformCheckoutItemsFromInvoice } from "../../../domain/product/produ
 import { useCreateInvoiceAndReservation } from "../../../hooks/useCreateInvoiceAndReservation";
 import { PUIDictionary } from "../../../domain/dictionary/dictionary.interfaces";
 import { DEFAULT_DICTIONARY } from "../../../domain/dictionary/dictionary.constants";
+import { ApolloError } from "@apollo/client";
 
 export interface PUICheckoutOverlayProps {
   // Modal:
@@ -387,7 +388,11 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     if (orgID && invoiceID) {
       if (debug) console.log(`\n♻️ Releasing reservation invoice ${ invoiceID } (orgID = ${ orgID })...\n`);
 
-      releaseReservationBuyNowLot().catch(() => ({ data: null }));
+      releaseReservationBuyNowLot().then((result) => {
+        if (debug) console.log("  🟢 createAuctionInvoice result", result);
+      }).catch((error: ApolloError | Error) => {
+        if (debug) console.log("  🔴 releaseReservationBuyNowLot error", error);
+      });
     }
 
     if (e) {
