@@ -389,7 +389,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
       if (debug) console.log(`\n♻️ Releasing reservation invoice ${ invoiceID } (orgID = ${ orgID })...\n`);
 
       releaseReservationBuyNowLot().then((result) => {
-        if (debug) console.log("  🟢 createAuctionInvoice result", result);
+        if (debug) console.log("  🟢 releaseReservationBuyNowLot result", result);
       }).catch((error: ApolloError | Error) => {
         if (debug) console.log("  🔴 releaseReservationBuyNowLot error", error);
       });
