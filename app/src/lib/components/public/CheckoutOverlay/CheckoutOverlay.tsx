@@ -2,7 +2,8 @@ import { Backdrop, Box, CircularProgress } from "@mui/material";
 import React, { ErrorInfo, useCallback, useEffect, useMemo, useRef } from "react";
 import { getSavedPaymentMethodAddressIdFromBillingInfo, savedPaymentMethodToBillingInfo, transformRawSavedPaymentMethods } from "../../../domain/circle/circle.utils";
 import { UserFormat } from "../../../domain/auth/authentication.interfaces";
-import { CheckoutDetails, OrderDetails, PaymentMethod, PaymentType } from "../../../domain/payment/payment.interfaces";
+import { PaymentMethod, PaymentType } from "../../../domain/payment/payment.interfaces";
+import { CheckoutDetails, OrderDetails } from "../../../domain/events/events.interfaces";
 import { CheckoutItemInfo } from "../../../domain/product/product.interfaces";
 import { BillingInfo } from "../../../forms/BillingInfoForm";
 import { useDeletePaymentMethodMutation, useGetInvoiceDetailsQuery, useGetPaymentMethodListQuery, useMeQuery } from "../../../queries/graphqlGenerated";
@@ -204,13 +205,14 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
 
   const rawSavedPaymentMethods = paymentMethodsData?.getPaymentMethodList;
   const invoiceItems = invoiceDetailsData?.getInvoiceDetails.items;
+  /// TODO: These two should probably be combined.
   const checkoutItems = useMemo(() => transformCheckoutItemsFromInvoice(parentCheckoutItems, invoiceItems), [parentCheckoutItems, invoiceItems]);
+  const { total: subtotal, fees, taxAmount } = useCheckoutItemsCostTotal(checkoutItems);
   const savedPaymentMethods = useMemo(() => transformRawSavedPaymentMethods(rawSavedPaymentMethods as RawSavedPaymentMethod[]), [rawSavedPaymentMethods]);
-
 
   // Invoice creation & buy now lot reservation:
 
-  const createInvoiceAndReservationCalledRef = useRef(false);
+    const createInvoiceAndReservationCalledRef = useRef(false);
 
   const {
     invoiceAndReservationState,
@@ -218,7 +220,6 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     countdownElementRef,
   } = useCreateInvoiceAndReservation({ orgID, checkoutItems, debug });
 
-  const { total: subtotal, fees, taxAmount } = useCheckoutItemsCostTotal(checkoutItems);
 
   useEffect(() => {
     if (isDialogLoading || invoiceID === null || invoiceID || createInvoiceAndReservationCalledRef.current) return;
