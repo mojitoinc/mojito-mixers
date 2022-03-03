@@ -27,6 +27,7 @@ function useCreateInvoiceAndReservation({ orgID, checkoutItems, debug = false, }
             return;
         }
         countdownElement.textContent = formattedTimeLeft;
+        // TODO: Stop counting down if we get to ConfirmationView (maybe PurchasingView):
     }, countdownStartRef.current === null ? null : RESERVATION_COUNTDOWN_REFRESH_RATE_MS);
     const [createAuctionInvoice] = useCreateAuctionInvoiceMutation();
     const [reserveBuyNowLot] = useReserveBuyNowLotMutation();

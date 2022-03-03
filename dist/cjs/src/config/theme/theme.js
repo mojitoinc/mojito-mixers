@@ -18,9 +18,10 @@ const ROUNDED_BORDER_RADIUS = 1024;
 const BORDER_THICKNESS = 1;
 // Used to cover the saved payment methods with a loader when deleting them:
 const OVERLAY_OPACITY = 0.75;
-// Default images:
+// Images:
 const DEFAULT_PURCHASING_IMAGE_SRC = "https://raw.githubusercontent.com/mojitoinc/mojito-mixers/main/app/src/lib/assets/mojito-loader.gif";
-const DEFAULT_PAYMENT_IMAGE_SRC = "https://raw.githubusercontent.com/mojitoinc/mojito-mixers/main/app/src/lib/assets/circle.png";
+const DEFAULT_ERROR_IMAGE_SRC = "https://raw.githubusercontent.com/mojitoinc/mojito-mixers/main/app/src/lib/assets/mojito-error-loader.gif";
+const CIRCLE_LOGO_IMAGE_SRC = "https://raw.githubusercontent.com/mojitoinc/mojito-mixers/main/app/src/lib/assets/circle.png";
 // Theme merger:
 const extendDefaultTheme = (themeOptions) => {
     const baseTheme = createTheme["default"](Object.assign(Object.assign({}, themeOptions), { palette: themePalette.createPaletteTheme(themeOptions === null || themeOptions === void 0 ? void 0 : themeOptions.palette), typography: themeTypography.createTypographyTheme(typeof (themeOptions === null || themeOptions === void 0 ? void 0 : themeOptions.typography) === "function"
@@ -35,7 +36,8 @@ const MOJITO_LIGHT_THEME = extendDefaultTheme();
 const MOJITO_DARK_THEME = extendDefaultTheme({ palette: { mode: "dark" } });
 
 exports.BORDER_THICKNESS = BORDER_THICKNESS;
-exports.DEFAULT_PAYMENT_IMAGE_SRC = DEFAULT_PAYMENT_IMAGE_SRC;
+exports.CIRCLE_LOGO_IMAGE_SRC = CIRCLE_LOGO_IMAGE_SRC;
+exports.DEFAULT_ERROR_IMAGE_SRC = DEFAULT_ERROR_IMAGE_SRC;
 exports.DEFAULT_PURCHASING_IMAGE_SRC = DEFAULT_PURCHASING_IMAGE_SRC;
 exports.MD_BORDER_RADIUS = MD_BORDER_RADIUS;
 exports.MOJITO_DARK_THEME = MOJITO_DARK_THEME;

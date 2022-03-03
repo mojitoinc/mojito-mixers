@@ -20,7 +20,7 @@ const DEFAULT_DICTIONARY = {
     walletMultiSigTooltip,
     wirePaymentsDisclaimer: [React__default.createElement(React__default.Fragment, null,
             React__default.createElement("strong", null, "Third-party wire transfers cannot be accepted. "),
-            "Your bank account name needs to match with the name you used to register in Marketplace."), React__default.createElement(React__default.Fragment, null,
+            "Your bank account name needs to match with the name you used to create your user account."), React__default.createElement(React__default.Fragment, null,
             "Please note that wire transfers usually take ",
             React__default.createElement("strong", null, "1-3 business days"),
             " to arrive. We do not charge any deposit fee \u2014 however, your bank may charge you a wire transfer fee.")],

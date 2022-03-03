@@ -27,7 +27,7 @@ const statusIconConfigs = {
     error: {
         icon: WarningAmber["default"],
         iconColor: theme => theme.palette.warning.dark,
-        defaultImgSrc: "", // TODO: To be added.
+        defaultImgSrc: theme.DEFAULT_ERROR_IMAGE_SRC,
     },
 };
 const StatusIcon = (_a) => {
