@@ -209,7 +209,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
 
   // Invoice creation & buy now lot reservation:
 
-    const createInvoiceAndReservationCalledRef = useRef(false);
+  const createInvoiceAndReservationCalledRef = useRef(false);
 
   const {
     invoiceAndReservationState,
