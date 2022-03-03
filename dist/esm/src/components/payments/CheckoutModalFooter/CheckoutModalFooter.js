@@ -1,7 +1,7 @@
 import { __awaiter } from '../../../../node_modules/tslib/tslib.es6.js';
 import { Box, CircularProgress, Typography, Link, Divider } from '@mui/material';
 import React__default, { useState, useCallback } from 'react';
-import { SM_MOBILE_MAX_WIDTH, DEFAULT_PAYMENT_IMAGE_SRC } from '../../../config/theme/theme.js';
+import { SM_MOBILE_MAX_WIDTH, CIRCLE_LOGO_IMAGE_SRC } from '../../../config/theme/theme.js';
 import { isPromise } from '../../../utils/promiseUtils.js';
 import { Checkbox } from '../../shared/Checkbox/Checkbox.js';
 import { ConsentText, CONSENT_ERROR_MESSAGE } from '../../shared/ConsentText/ConsentText.js';
@@ -92,7 +92,7 @@ const CheckoutModalFooter = ({ variant, buttonLabel, guestCheckoutEnabled, conse
             React__default.createElement(Box, { display: "flex" },
                 React__default.createElement(Typography, { sx: { maxWidth: SM_MOBILE_MAX_WIDTH, marginRight: 1 }, align: "center" }, "Payments powered by"),
                 React__default.createElement(Link, { href: "https://www.circle.com/en/", target: "_blank", rel: "noopener noreferrer" },
-                    React__default.createElement(Box, { component: "img", src: DEFAULT_PAYMENT_IMAGE_SRC, height: 20 })))))));
+                    React__default.createElement(Box, { component: "img", src: CIRCLE_LOGO_IMAGE_SRC, height: 20 })))))));
 };
 
 export { CheckoutModalFooter };

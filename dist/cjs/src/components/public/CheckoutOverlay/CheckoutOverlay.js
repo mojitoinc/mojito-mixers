@@ -208,11 +208,18 @@ debug, onError, onMarketingOptInChange, // Not implemented yet. Used to let user
         yield refetchPaymentMethods();
         setError(error);
     }), [refetchPaymentMethods, setError]);
+    const [releaseReservationBuyNowLot] = graphqlGenerated.useReleaseReservationBuyNowLotMutation();
     const handleClose = React.useCallback(() => {
+        releaseReservationBuyNowLot({
+            variables: {
+                orgID,
+                invoiceID,
+            },
+        });
         createInvoiceAndReservationCalledRef.current = false;
         setInvoiceID(null);
         onClose();
-    }, [setInvoiceID, onClose]);
+    }, [releaseReservationBuyNowLot, orgID, invoiceID, setInvoiceID, onClose]);
     const handleFixError = React.useCallback(() => tslib_es6.__awaiter(void 0, void 0, void 0, function* () {
         const at = checkoutError === null || checkoutError === void 0 ? void 0 : checkoutError.at;
         if (at === "reset") {

@@ -126,80 +126,90 @@ Once you've built the library using `yarn dist:build`, you can install it in ano
 <br />
 
 
-### Usage:
+## Usage:
 
 ```TSX
 
+import React, { ErrorInfo } from "react";
+
 import {
-  CheckoutModal,
-  CheckoutModalProps,
-  CheckoutModalThemeProvider,
-  continueFlows,
+  PUICheckout,
+  PUICheckoutProps,
+  useOpenCloseCheckoutModal,
 } from "@mojitoinc/mojito-mixers";
 
-const App: React.FC<AppProps> = () => {
+const App: React.FC = () => {
+  const router = useRouter();
   const { profile } = useProfile();
-
-  const [isOpen, setIsOpen] = useState(continueFlows(true).checkoutStep !== "");
-
   const { loginWithPopup, isAuthenticated, isLoading, getIdTokenClaims } = useAuth0();
+  const { isOpen, onOpen, onClose } = useOpenCloseCheckoutModal();
 
-  const handleOpen = useCallback(() => {
-    setOpen(true);
-  }, []);
-
-  const handleClose = useCallback(() => {
-    setOpen(false);
-  }, []);
-
-  const handleError = useCallback((error: ApolloError | Error | string) => {
-    // Log to Sentry or something else.
-  }, []);
-
-  const handleMarketingOptInChange = useCallback((marketingOptIn: boolean) => {
-    // Subscribe / unsubscribe
+  const handleGoToCollection = useCallback(() => {
+    router.push("/profile/collection");
   }, []);
 
   const handleLogin = useCallback(async () => {
     await loginWithPopup({ prompt: "login" });
     await getIdTokenClaims();
   }, [loginWithPopup, getIdTokenClaims]);
+
+  const handleError = useCallback((error: CheckoutModalError) => {
+    Sentry.captureException(error);
+  }, []);
+
+  const handleCatch = useCallback((error: Error, errorInfo?: ErrorInfo) => {
+    Sentry.captureException({ error, errorInfo });
+  }, []);
+
+  const handleMarketingOptInChange = useCallback((marketingOptIn: boolean) => {
+    // Subscribe / unsubscribe
+  }, []);
+
+  useEffect(() => {
+    // Open the modal automatically:
+    onOpen();
+  }, [onOpen])
   
-  const checkoutModalProps: CheckoutModalProps = {
+  const checkoutModalProps: PUICheckoutProps = {
+    // ProviderInjector:
+    uri: config.MOJITO_API_URL,
+
     // Modal:
-    open,
-    onClose: handleClose,
+    open: isOpen,
+    onClose,
 
     // Flow:
     guestCheckoutEnabled: false,
     productConfirmationEnabled: false,
 
     // Personalization:
-    // These two options, `theme` and `themeOptions`, merge the provided styles with the default ones:
-    theme: YOUR_CUSTOM_THEME,
-    // themeOptions: { ... },
+    // These two options, `theme` (replace default theme) and `themeOptions` (merge with default theme) are optional and 
+    // can't be defined at the same time:
+    // theme: YOUR_CUSTOM_THEME,
+    themeOptions: YOUR_CUSTOM_THEME_OPTIONS,
     logoSrc: "https://...",
     logoSx: { ... },
+    loaderImageSrc: "https://...",
     purchasingImageSrc: "https://...",
     purchasingMessages: ["...", "...", "..."],
     errorImageSrc: "https://...",
     userFormat: "email",
     acceptedPaymentTypes: ["CreditCard", "ACH"],
-    customTexts: {
-      wirePaymentsDisclaimer: <p>Lorem ipsum...</p>,
-      purchaseInstructions: <p>Lorem ipsum...</p>
+    dictionary: {
+      walletInfo: <p>Lorem ipsum...</p>,
     },
 
     // Legal:
-    consentType: "disclaimer",
+    consentType: "circle",
     privacyHref: "https://...",
     termsOfUseHref: "https://...",
 
     // Data:
-    orgID: "<ORG_ID>, usually profile.userOrgs[0].organizationId || """,
+    orgID: "<ORG_ID>", // Usually profile.userOrgs[0].organizationId
+    invoiceID: "<INVOICE_ID>" // Only required for auction lots"
     checkoutItem: {
       lotID: "<LOT_IT>",
-      buyNow: "auction",
+      buyNow: "buyNow",
       name: "Lorem ipsum...",
       description: "Lorem ipsum...",
       price: 0,
@@ -216,32 +226,77 @@ const App: React.FC<AppProps> = () => {
     // Other Events:
     debug: true,
     onError: handleError,
+    onCatch: handleCatch,
     onMarketingOptInChange: handleMarketingOptInChange,
   };
 
-  return <CheckoutModal { ...checkoutModalProps } />;
+  return <PUICheckout { ...checkoutModalProps } />;
 };
 ```
 
 <br />
 
 
-### Theming 
+### Credit Card payments with 3DS
 
-You can use the `theme` or `themeOptions` props to pass a custom theme or theme options object, both of which will get
-merged with the default theme (this hasn't been implemented yet, though).
-
-If you want to completely override the theme and make sure your custom theme doesn't get merged with the default one,
-you can use `CheckoutModalThemeProvider`. Make sure you import it from `@mojitoinc/mojito-mixers`.
+Additionally, when using 3DS for Credit Card payments you need to add a `/e/success/` and a `/e/error/` (TODO: review this) page with the
+following logic to be able to resume 3DS's flow when users are redirected back to your app:
 
 ```TSX
-<CheckoutModalThemeProvider theme={ YOUR_CUSTOM_THEME }>
-  <CheckoutModal { ...checkoutModalProps } />
-</CheckoutModalThemeProvider>
+
+// /e/success/:
+
+const CreditCardPaymentSuccessPage: React.FC = () => {
+  const router = useRouter();
+
+  const handleRedirect = useCallback((pathnameOrUrl: string) => {
+    if (pathnameOrUrl && pathnameOrUrl.startsWith("http")) {
+      window.location.replace(pathnameOrUrl);
+    } else {
+      router.replace(pathnameOrUrl || "/");
+    }
+  }, [router]);
+
+  return (
+    <PUISuccess
+      themeOptions={ YOUR_CUSTOM_THEME_OPTIONS }
+      logoSrc="https://..."
+      logoSx={ ... }
+      successImageSrc="https://..."
+      onRedirect={ handleRedirect } />
+  );
+};
+
+export default CreditCardPaymentSuccessPage;
 ```
 
-Note that using MUI's `ThemeProvider` from your project won't work as expected and the modal will not be styled using
-your custom theme. If you want to learn why, read here: https://stackoverflow.com/questions/70710518/
+```TSX
+
+// /e/error/:
+
+const CreditCardPaymentErrorPage: React.FC = () => {
+  const router = useRouter();
+
+  const handleRedirect = useCallback((pathnameOrUrl: string) => {
+    if (pathnameOrUrl && pathnameOrUrl.startsWith("http")) {
+      window.location.replace(pathnameOrUrl);
+    } else {
+      router.replace(pathnameOrUrl || "/");
+    }
+  }, [router]);
+
+  return (
+    <PUIError
+      themeOptions={ YOUR_CUSTOM_THEME_OPTIONS }
+      logoSrc="https://..."
+      logoSx={ ... }
+      errorImageSrc="https://..."
+      onRedirect={ handleRedirect } />
+  );
+};
+
+export default CreditCardPaymentErrorPage;
+```
 
 <br />
 
@@ -250,9 +305,6 @@ your custom theme. If you want to learn why, read here: https://stackoverflow.co
 
 Additionally, when using Plaid for ACH payments you need to add an `/oauth` page with the following logic to be able
 to resume Plaid's OAuth flow when users are redirected back to your app:
-
-<br />
-
 
 ```TSX
 
@@ -271,7 +323,55 @@ const PlaidOAuthPage = () => {
 
   return null;
 };
+
+export default PlaidOAuthPage;
 ```
+
+<br />
+
+
+### Theming 
+
+You can use the `themeOptions` or `theme` props to pass a custom theme or theme options object:
+
+- `themeOptions` (preferred) will merge Mojito's default theme with your custom one.
+
+  ```TSX
+  <PUICheckout themeOptions={ YOUR_CUSTOM_THEME_OPTIONS } { ...checkoutModalProps } />
+  ```
+
+  See [`extendDefaultTheme(...)`](app/src/lib/config/theme/theme.ts).
+
+- `theme` will completely replace Mojito's default theme with the one you provide.
+
+  ```TSX
+  <PUICheckout theme={ YOUR_CUSTOM_THEME } { ...checkoutModalProps } />
+  ```
+
+  See 
+[`ProvidersInjector`](app/src/lib/components/shared/ProvidersInjector/ProvidersInjector.tsx).
+
+- If none is provided, the [default Mojito theme](app/src/lib/config/theme) will be used.
+
+<br />
+
+
+Note that using MUI's `ThemeProvider` from your project won't work as expected and you will end up seeing Mojito's default theme:
+
+```TSX
+<ThemeProvider theme={ YOUR_CUSTOM_THEME }>
+  <PUICheckout { ...checkoutModalProps } />
+</ThemeProvider>
+```
+
+<br />
+
+
+### Dictionary
+
+There are some texts inside the Payment UI that you can customize using `PUICheckout`'s `dictionary` prop (more to come, ideally all texts should be customizable). You can find them all with their respective default values here:
+
+[`app/src/lib/domain/dictionary/dictionary.constants.tsx`](./app/src/lib/domain/dictionary/dictionary.constants.tsx).
 
 <br />
 
@@ -285,6 +385,29 @@ You will have to copy the following file into your project to avoid TypeScript e
 <br />
 
 
+## Error Handling
+
+All components exported by this library are wrapped in a custom [`ErrorBoundary`](https://reactjs.org/docs/error-boundaries.html) so that, in the event of an unexpected error in the library, it doesn't crash your app as well. You can find it here:
+
+[`app/src/lib/components/public/ErrorBoundary/ErrorBoundary.tsx`](./app/src/lib/components/public/ErrorBoundary/ErrorBoundary.tsx).
+
+By default, if an unexpected error occurs, a confirm window/modal will be presented to the users asking them if they want to re-open the Payment UI:
+
+
+<br/>
+<p align="center">
+  <a href="https://github.com/mojitoinc/mojito-mixers/blob/main/screenshots/error-boundary-confirm.png">
+    <img src="./screenshots/error-boundary-confirm.png" />
+  </a>
+</p>
+<br/>
+
+
+If you don't want this behavior or would like to implement a custom one, you should pass a value for `onCatch: (error: Error, errorInfo?: ErrorInfo) => void | true;` prop with a callback. If you want to get notified about unexpected errors but would still like to preserve the default behavior, return `true` from your callback.
+
+<br />
+
+
 ## Images
 
 The following images are loaded directly from GitHub to avoid bundling them with the library or forcing users to include them in their repos and add the necessary build setup to load them. They should just work out of the box, no setup required:
@@ -292,55 +415,74 @@ The following images are loaded directly from GitHub to avoid bundling them with
 - `PurchasingView`'s default loader image.
 - `ErrorView`'s default error image.
 - `PaymentView`'s Circle logo image.
- 
+
+<br/>
+
 
 **`PurchaseView`'s default loader image:**
 
-<p>
+<br/>
+<p align="center">
   <a href="https://github.com/mojitoinc/mojito-mixers/blob/main/app/src/lib/assets/mojito-loader.gif">
-    <img src="./app/src/lib/assets/mojito-loader.gif" width="128">
+    <img src="./app/src/lib/assets/mojito-loader.gif" width="128" />
   </a>
 </p>
+<br/>
 
 
     > Repo: https://github.com/mojitoinc/mojito-mixers/blob/main/app/src/lib/assets/mojito-loader.gif (add `?raw=true` to get the CDN URL below)
 
     > CDN URL: https://raw.githubusercontent.com/mojitoinc/mojito-mixers/main/app/src/lib/assets/mojito-loader.gif
 
-   
+<br/>
+
+
 **`ErrorView`'s default error image:**
 
-<p>
+<br/>
+<p align="center">
   <a href="https://github.com/mojitoinc/mojito-mixers/blob/main/app/src/lib/assets/mojito-error-loader.gif">
-    <img src="./app/src/lib/assets/mojito-error-loader.gif" width="128">
+    <img src="./app/src/lib/assets/mojito-error-loader.gif" width="128" />
   </a>
 </p>
+<br/>
+
 
     > Repo: https://github.com/mojitoinc/mojito-mixers/blob/main/app/src/lib/assets/mojito-error-loader.gif (add `?raw=true` to get the CDN URL below)
 
     > CDN URL: https://raw.githubusercontent.com/mojitoinc/mojito-mixers/main/app/src/lib/assets/mojito-error-loader.gif
 
+<br/>
+
 
 Alternative static version:
 
-<p>
+<br/>
+<p align="center">
   <a href="https://github.com/mojitoinc/mojito-mixers/blob/main/app/src/lib/assets/mojito-error-loader-static.png">
-    <img src="./app/src/lib/assets/mojito-error-loader-static.png" width="128">
+    <img src="./app/src/lib/assets/mojito-error-loader-static.png" width="128" />
   </a>
 </p>
+<br/>
+
 
     > Repo: https://github.com/mojitoinc/mojito-mixers/blob/main/app/src/lib/assets/mojito-error-loader-static.png (add `?raw=true` to get the CDN URL below)
 
     > CDN URL: https://raw.githubusercontent.com/mojitoinc/mojito-mixers/main/app/src/lib/assets/mojito-error-loader-static.png
 
-    
+<br/>
+
+
 **`PaymentView`'s Circle logo image:**
 
-<p>
+<br/>
+<p align="center">
   <a href="https://raw.githubusercontent.com/mojitoinc/mojito-mixers/main/app/src/lib/assets/circle.png">
-    <img src="./app/src/lib/assets/circle.png" height="20">
+    <img src="./app/src/lib/assets/circle.png" height="20" />
   </a>
 </p>
+<br/>
+
 
     > Repo: https://github.com/mojitoinc/mojito-mixers/blob/main/app/src/lib/assets/circle.png (add `?raw=true` to get the CDN URL below)
 

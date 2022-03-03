@@ -100,7 +100,7 @@ const CheckoutModalFooter = ({ variant, buttonLabel, guestCheckoutEnabled, conse
             React__default["default"].createElement(material.Box, { display: "flex" },
                 React__default["default"].createElement(material.Typography, { sx: { maxWidth: theme.SM_MOBILE_MAX_WIDTH, marginRight: 1 }, align: "center" }, "Payments powered by"),
                 React__default["default"].createElement(material.Link, { href: "https://www.circle.com/en/", target: "_blank", rel: "noopener noreferrer" },
-                    React__default["default"].createElement(material.Box, { component: "img", src: theme.DEFAULT_PAYMENT_IMAGE_SRC, height: 20 })))))));
+                    React__default["default"].createElement(material.Box, { component: "img", src: theme.CIRCLE_LOGO_IMAGE_SRC, height: 20 })))))));
 };
 
 exports.CheckoutModalFooter = CheckoutModalFooter;

@@ -11,7 +11,6 @@ var plaid_utils = require('./domain/plaid/plaid.utils.js');
 var usePlaid = require('./hooks/usePlaid.js');
 var CheckoutOverlay_utils = require('./components/public/CheckoutOverlay/CheckoutOverlay.utils.js');
 var theme = require('./config/theme/theme.js');
-var system = require('@mui/system');
 
 if (process.env.NODE_ENV === "development")
     console.log("\n👨‍💻 PUI development mode.\n\n");
@@ -31,8 +30,4 @@ exports.persistReceivedRedirectUri3DS = CheckoutOverlay_utils.persistReceivedRed
 exports.MOJITO_DARK_THEME = theme.MOJITO_DARK_THEME;
 exports.MOJITO_LIGHT_THEME = theme.MOJITO_LIGHT_THEME;
 exports.extendDefaultTheme = theme.extendDefaultTheme;
-Object.defineProperty(exports, 'PUIThemeProvider', {
-	enumerable: true,
-	get: function () { return system.ThemeProvider; }
-});
 //# sourceMappingURL=index.js.map
