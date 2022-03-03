@@ -30,7 +30,7 @@ export const DEFAULT_DICTIONARY: PUIDictionary = {
 
   wirePaymentsDisclaimer: [<>
     <strong>Third-party wire transfers cannot be accepted. </strong>
-    Your bank account name needs to match with the name you used to register in Marketplace.
+    Your bank account name needs to match with the name you used to create your user account.
   </>, <>
     Please note that wire transfers usually take <strong>1-3 business days</strong> to arrive. We
     do not charge any deposit fee — however, your bank may charge you a wire transfer fee.
