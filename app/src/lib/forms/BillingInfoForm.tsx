@@ -88,7 +88,7 @@ const schema = object()
       .required(withRequiredErrorMessage),
     [PHONE_FIELD]: string()
       .label(FIELD_LABELS[PHONE_FIELD])
-      .matches(/^[1-9]\d{1,14}$/, withInvalidErrorMessage)
+      .matches(/^\+?[1-9]\d{1,14}$/, withInvalidErrorMessage)
       .required(withRequiredErrorMessage),
     [STREET_FIELD]: string()
       .label(FIELD_LABELS[STREET_FIELD])
