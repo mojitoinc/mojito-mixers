@@ -81,6 +81,7 @@ const schema = object()
   .shape({
     [FULL_NAME_FIELD]: string()
       .label(FIELD_LABELS[FULL_NAME_FIELD])
+      .matches(/^[^\s].+(\s.+)+[^\s]$/, withInvalidErrorMessage)
       .required(withRequiredErrorMessage),
     [EMAIL_FIELD]: string()
       .label(FIELD_LABELS[EMAIL_FIELD])
