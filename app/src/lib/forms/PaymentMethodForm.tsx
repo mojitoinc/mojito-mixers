@@ -1,6 +1,6 @@
 import { Control, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { boolean, object, string, TestContext } from "yup";
+import { boolean, object, string } from "yup";
 import { ObjectShape } from "yup/lib/object";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
@@ -104,8 +104,7 @@ const PAYMENT_TYPE_FORM_DATA: Record<PaymentType, PaymentTypeFormData> = {
           then: (schema) =>
             schema.required().test({
               name: "is-valid-cvv-or-cid-number",
-              test: (value?: string, context?: TestContext) =>
-                getCVCIsValid(value, context?.parent?.cardNumber),
+              test: getCVCIsValid,
               message: withInvalidErrorMessage
             })
         }),

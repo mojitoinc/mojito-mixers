@@ -18,6 +18,9 @@ declare module "react-payment-inputs" {
   }
 
   export function usePaymentInputs(): UsePaymentInputsReturn;
+  export function getCVCError(cvc?: string): string;
+  export function getCardNumberError(cardNumber?: string): string;
+  export function getExpiryDateError(expiryDate?: string): string;
 }
 
 declare module "react-payment-inputs/images" {
