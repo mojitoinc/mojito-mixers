@@ -8,18 +8,26 @@ import { BUILT_IN_ERRORS } from "../errors/errors.constants";
 
 const countryPrefixes = customList('countryCode', '{countryCallingCode}');
 
-export function formatPhoneAsE123(phoneNumber: string, countryCode: string) {
-  const countryPrefix = countryPrefixes[countryCode] || "";
+export function getPhonePrefix(countryCode: string, withPlus = true) {
+  const prefix = countryPrefixes[countryCode];
 
+  return prefix ? `${ withPlus ? "+" : "" }${ prefix }` : "";
+}
+
+export function phoneHasPrefix(phone: string) {
+  return phone.startsWith("+") || phone.startsWith("00")
+}
+
+export function formatPhoneAsE123(phoneNumber: string, countryCode: string) {
   const parsedPhoneNumber = phoneNumber.replace(/[()-\s]/g, "");
 
-  if (parsedPhoneNumber.startsWith("+") || parsedPhoneNumber.startsWith("00")) {
+  if (phoneHasPrefix(parsedPhoneNumber)) {
     // The user already included the country prefix, so we respect their preference:
     return parsedPhoneNumber.replace(/^00/, "+");
   }
 
   // Otherwise, we add it based on the country code:
-  return `+${ countryPrefix }${ parsedPhoneNumber }`;
+  return `${ getPhonePrefix(countryCode) }${ parsedPhoneNumber }`;
 }
 
 export function transformRawSavedPaymentMethods(rawSavedPaymentMethods: RawSavedPaymentMethod[] = []): SavedPaymentMethod[] {
