@@ -83,7 +83,7 @@ export function createComponentsTheme({ typography, palette, spacing, breakpoint
           },
         },
         input: {
-          fontSize: "16px",
+          ...typography.subtitle1,
 
           "&.Mui-disabled": {
             cursor: "not-allowed",
