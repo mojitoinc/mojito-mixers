@@ -200,18 +200,47 @@ debug, onError, onMarketingOptInChange, // Not implemented yet. Used to let user
         yield refetchPaymentMethods();
         setError(error);
     }), [refetchPaymentMethods, setError]);
-    const [releaseReservationBuyNowLot] = useReleaseReservationBuyNowLotMutation();
+    const [releaseReservationBuyNowLot] = useReleaseReservationBuyNowLotMutation({
+        variables: {
+            orgID,
+            invoiceID,
+        },
+    });
+    const handleBeforeUnload = useCallback((e) => {
+        if (orgID && invoiceID) {
+            if (debug)
+                console.log(`\n♻️ Releasing reservation invoice ${invoiceID} (orgID = ${orgID})...\n`);
+            releaseReservationBuyNowLot().then((result) => {
+                if (debug)
+                    console.log("  🟢 releaseReservationBuyNowLot result", result);
+            }).catch((error) => {
+                if (debug)
+                    console.log("  🔴 releaseReservationBuyNowLot error", error);
+            });
+        }
+        if (e) {
+            // TODO: We might want to implement close tab confirmations at some point:
+            // If you prevent default behavior in Mozilla Firefox prompt will always be shown:
+            // e.preventDefault();
+            // Chrome requires returnValue to be set:
+            // e.returnValue = '';
+            // The absence of a returnValue property on the event will guarantee the browser unload happens:
+            delete e['returnValue'];
+        }
+    }, [orgID, invoiceID, debug, releaseReservationBuyNowLot]);
+    useEffect(() => {
+        window.addEventListener('beforeunload', handleBeforeUnload);
+        return () => {
+            window.removeEventListener('beforeunload', handleBeforeUnload);
+        };
+    }, [handleBeforeUnload]);
     const handleClose = useCallback(() => {
-        releaseReservationBuyNowLot({
-            variables: {
-                orgID,
-                invoiceID,
-            },
-        });
+        window.removeEventListener('beforeunload', handleBeforeUnload);
+        handleBeforeUnload();
         createInvoiceAndReservationCalledRef.current = false;
         setInvoiceID(null);
         onClose();
-    }, [releaseReservationBuyNowLot, orgID, invoiceID, setInvoiceID, onClose]);
+    }, [handleBeforeUnload, setInvoiceID, onClose]);
     const handleFixError = useCallback(() => __awaiter(void 0, void 0, void 0, function* () {
         const at = checkoutError === null || checkoutError === void 0 ? void 0 : checkoutError.at;
         if (at === "reset") {
