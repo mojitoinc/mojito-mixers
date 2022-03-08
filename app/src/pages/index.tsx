@@ -77,7 +77,7 @@ const HomePage: React.FC = () => {
   }, []);
 
   const handleEvent = useCallback((eventType: CheckoutEventType, eventData: CheckoutEventData) => {
-    console.log(`🎯 ${ eventType }`, eventData);
+    if (window.location.hostname !== "localhost") console.log(`🎯 ${ eventType }`, eventData);
   }, []);
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

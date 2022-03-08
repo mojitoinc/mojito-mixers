@@ -477,7 +477,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     };
   }, [handleBeforeUnload]);
 
-  const handleClose = useCallback((close = true) => {
+  const handleClose = useCallback(() => {
     window.removeEventListener('beforeunload', handleBeforeUnload);
 
     handleBeforeUnload();
@@ -486,17 +486,17 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
 
     setInvoiceID(null);
 
-    if (close) onClose();
+    onClose();
   }, [handleBeforeUnload, setInvoiceID, onClose]);
 
   useEffect(() => {
     if (checkoutError?.at !== "reset") return;
 
-    handleClose(false);
-  }, [checkoutError, handleClose]);
+    handleBeforeUnload();
+  }, [checkoutError, handleBeforeUnload]);
 
 
-  console.log("checkoutStep =", checkoutStep);
+  // console.log("checkoutStep =", checkoutStep);
 
 
   // Error handling:
