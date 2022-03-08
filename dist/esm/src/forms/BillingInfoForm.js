@@ -9,14 +9,15 @@ import { CheckoutModalFooter } from '../components/payments/CheckoutModalFooter/
 import { InputGroupLabel } from '../components/shared/InputGroupLabel/InputGroupLabel.js';
 import { ControlledTextField } from '../components/shared/TextField/TextField.js';
 import { SecondaryButton } from '../components/shared/SecondaryButton/SecondaryButton.js';
-import { Box } from '@mui/material';
+import { Box, InputAdornment, Typography } from '@mui/material';
 import default_1 from '../../node_modules/@mui/icons-material/Book.js';
 import { EMPTY_OPTION } from '../components/shared/Select/Select.js';
-import { withRequiredErrorMessage } from '../utils/validationUtils.js';
+import { withRequiredErrorMessage, withFullNameErrorMessage, withPhoneErrorMessage } from '../utils/validationUtils.js';
 import { DebugBox } from '../components/payments/DisplayBox/DisplayBox.js';
 import { useFormCheckoutError } from '../hooks/useFormCheckoutError.js';
 import { TaxesMessagesBox } from '../components/shared/TaxesMessagesBox/TaxesMessagesBox.js';
 import { FormErrorsBox } from '../components/shared/FormErrorsBox/FormErrorsBox.js';
+import { formatPhoneAsE123, phoneHasPrefix, getPhonePrefix } from '../domain/circle/circle.utils.js';
 import Grid from '../../node_modules/@mui/material/Grid/Grid.js';
 
 const FULL_NAME_FIELD = "fullName";
@@ -56,14 +57,34 @@ const schema = object()
     .shape({
     [FULL_NAME_FIELD]: string()
         .label(FIELD_LABELS[FULL_NAME_FIELD])
-        .required(withRequiredErrorMessage),
+        .required(withRequiredErrorMessage)
+        .test({
+        name: "is-valid-full-name",
+        test: (value) => {
+            if (!value)
+                return false;
+            return /(. .)/.test(value);
+        },
+        message: withFullNameErrorMessage,
+    }),
     [EMAIL_FIELD]: string()
         .label(FIELD_LABELS[EMAIL_FIELD])
-        .email()
-        .required(withRequiredErrorMessage),
+        .required(withRequiredErrorMessage)
+        .email(),
     [PHONE_FIELD]: string()
         .label(FIELD_LABELS[PHONE_FIELD])
-        .required(withRequiredErrorMessage),
+        .required(withRequiredErrorMessage)
+        .test({
+        name: "is-valid-phone-number",
+        test: (value, context) => {
+            var _a;
+            if (!value)
+                return false;
+            const formattedPhoneNumber = formatPhoneAsE123(value || "", ((_a = context.parent.country) === null || _a === void 0 ? void 0 : _a.value) || "");
+            return /\+(?:[0-9] ?){6,14}[0-9]$/.test(formattedPhoneNumber);
+        },
+        message: withPhoneErrorMessage,
+    }),
     [STREET_FIELD]: string()
         .label(FIELD_LABELS[STREET_FIELD])
         .required(withRequiredErrorMessage),
@@ -94,7 +115,7 @@ defaultValues, checkoutError, taxes, onTaxInfoChange, onSaved, onClose, onSubmit
         reValidateMode: "onChange",
         resolver: o(schema),
     });
-    const [street, zip, city, state, country] = watch([STREET_FIELD, ZIP_CODE_FIELD, CITY_FIELD, STATE_FIELD, COUNTRY_FIELD]);
+    const [phone, street, zip, city, state, country] = watch([PHONE_FIELD, STREET_FIELD, ZIP_CODE_FIELD, CITY_FIELD, STATE_FIELD, COUNTRY_FIELD]);
     useEffect(() => {
         onTaxInfoChange({
             [STREET_FIELD]: street,
@@ -118,7 +139,13 @@ defaultValues, checkoutError, taxes, onTaxInfoChange, onSaved, onClose, onSubmit
         React__default.createElement(InputGroupLabel, { sx: { m: 0, pt: 2 } }, "Information"),
         React__default.createElement(ControlledTextField, { name: FULL_NAME_FIELD, control: control, label: FIELD_LABELS[FULL_NAME_FIELD] }),
         React__default.createElement(ControlledTextField, { name: EMAIL_FIELD, control: control, label: FIELD_LABELS[EMAIL_FIELD] }),
-        React__default.createElement(ControlledTextField, { name: PHONE_FIELD, control: control, label: FIELD_LABELS[PHONE_FIELD] }),
+        React__default.createElement(ControlledTextField, { name: PHONE_FIELD, control: control, label: FIELD_LABELS[PHONE_FIELD], InputProps: selectedCountryCode && !phoneHasPrefix(phone) ? {
+                startAdornment: (React__default.createElement(InputAdornment, { position: "start" },
+                    React__default.createElement(Typography, { variant: "subtitle1", component: "span", sx: { pointerEvents: "none" } }, getPhonePrefix(`${selectedCountryCode}`)))),
+            } : undefined }),
+        debug && phone && (React__default.createElement(DebugBox, null,
+            "Debug: ",
+            formatPhoneAsE123(phone || "", `${selectedCountryCode}`))),
         React__default.createElement(InputGroupLabel, { sx: { m: 0, pt: 2 } }, "Address"),
         React__default.createElement(ControlledTextField, { name: STREET_FIELD, control: control, label: FIELD_LABELS[STREET_FIELD] }),
         React__default.createElement(ControlledTextField, { name: APARTMENT_FIELD, control: control, label: FIELD_LABELS[APARTMENT_FIELD] }),

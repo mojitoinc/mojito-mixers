@@ -1,6 +1,8 @@
 import { BillingInfo } from "../../forms/BillingInfoForm";
 import { CircleFieldError, RawSavedPaymentMethod, SavedPaymentMethod, SavedPaymentMethodBillingInfo } from "./circle.interfaces";
 import { ApolloError } from "@apollo/client";
+export declare function getPhonePrefix(countryCode: string, withPlus?: boolean): string;
+export declare function phoneHasPrefix(phone: string): boolean;
 export declare function formatPhoneAsE123(phoneNumber: string, countryCode: string): string;
 export declare function transformRawSavedPaymentMethods(rawSavedPaymentMethods?: RawSavedPaymentMethod[]): SavedPaymentMethod[];
 export declare function getSavedPaymentMethodAddressId({ billingDetails, metadata }: SavedPaymentMethodBillingInfo): string;

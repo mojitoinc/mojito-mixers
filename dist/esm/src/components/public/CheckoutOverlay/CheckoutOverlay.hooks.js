@@ -4,6 +4,15 @@ import { isValidWalletAddress } from '../../../domain/wallet/wallet.utils.js';
 import { resetStepperProgress } from '../../payments/CheckoutStepper/CheckoutStepper.js';
 import { continueFlows } from './CheckoutOverlay.utils.js';
 
+var CheckoutModalStepIndex;
+(function (CheckoutModalStepIndex) {
+    CheckoutModalStepIndex[CheckoutModalStepIndex["authentication"] = 0] = "authentication";
+    CheckoutModalStepIndex[CheckoutModalStepIndex["billing"] = 1] = "billing";
+    CheckoutModalStepIndex[CheckoutModalStepIndex["payment"] = 2] = "payment";
+    CheckoutModalStepIndex[CheckoutModalStepIndex["purchasing"] = 3] = "purchasing";
+    CheckoutModalStepIndex[CheckoutModalStepIndex["confirmation"] = 4] = "confirmation";
+    CheckoutModalStepIndex[CheckoutModalStepIndex["error"] = 5] = "error";
+})(CheckoutModalStepIndex || (CheckoutModalStepIndex = {}));
 const CHECKOUT_STEPS = ["authentication", "billing", "payment", "purchasing", "confirmation"];
 const WALLET_ADDRESS_FIELD_STEPS = ["billing", "payment"];
 function useCheckoutModalState({ invoiceID: initialInvoiceID = null, productConfirmationEnabled, isAuthenticated, onError, }) {
@@ -17,11 +26,12 @@ function useCheckoutModalState({ invoiceID: initialInvoiceID = null, productConf
         paymentInfo: "",
         cvv: "",
     });
-    const [{ invoiceID, taxes, walletAddress, paymentReferenceNumber, }, setPurchaseState] = useState({
+    const [{ invoiceID, taxes, walletAddress, circlePaymentID, paymentID, }, setPurchaseState] = useState({
         invoiceID: initialInvoiceID || null,
         taxes: { status: "incomplete" },
         walletAddress: null,
-        paymentReferenceNumber: "",
+        circlePaymentID: "",
+        paymentID: ""
     });
     const initModalState = useCallback(() => {
         // Make sure the progress tracker in BillingView and PaymentView is properly animated:
@@ -49,7 +59,8 @@ function useCheckoutModalState({ invoiceID: initialInvoiceID = null, productConf
             invoiceID: savedFlow.invoiceID || "",
             taxes: { status: "incomplete" },
             walletAddress: null,
-            paymentReferenceNumber: savedFlow.paymentReferenceNumber || "",
+            circlePaymentID: savedFlow.circlePaymentID || "",
+            paymentID: savedFlow.paymentID || ""
         });
     }, [startAt]);
     const goBack = useCallback(() => {
@@ -100,16 +111,16 @@ function useCheckoutModalState({ invoiceID: initialInvoiceID = null, productConf
         }));
     }, []);
     const setInvoiceID = useCallback((invoiceID) => {
-        setPurchaseState(({ taxes, walletAddress }) => ({ invoiceID, taxes, walletAddress, paymentReferenceNumber: "" }));
+        setPurchaseState((prevPurchasState) => (Object.assign(Object.assign({}, prevPurchasState), { invoiceID, circlePaymentID: "", paymentID: "" })));
     }, []);
     const setTaxes = useCallback((taxes) => {
-        setPurchaseState(({ invoiceID, walletAddress, paymentReferenceNumber }) => ({ invoiceID, taxes, walletAddress, paymentReferenceNumber }));
+        setPurchaseState((prevPurchasState) => (Object.assign(Object.assign({}, prevPurchasState), { taxes })));
     }, []);
     const setWalletAddress = useCallback((walletAddress) => {
-        setPurchaseState(({ invoiceID, taxes, paymentReferenceNumber }) => ({ invoiceID, taxes, walletAddress, paymentReferenceNumber }));
+        setPurchaseState((prevPurchasState) => (Object.assign(Object.assign({}, prevPurchasState), { walletAddress })));
     }, []);
-    const setPaymentReferenceNumber = useCallback((paymentReferenceNumber) => {
-        setPurchaseState(({ invoiceID, taxes, walletAddress }) => ({ invoiceID, taxes, walletAddress, paymentReferenceNumber }));
+    const setPayments = useCallback((circlePaymentID, paymentID) => {
+        setPurchaseState((prevPurchasState) => (Object.assign(Object.assign({}, prevPurchasState), { circlePaymentID, paymentID })));
     }, []);
     return {
         // CheckoutModalState:
@@ -132,10 +143,11 @@ function useCheckoutModalState({ invoiceID: initialInvoiceID = null, productConf
         setTaxes,
         walletAddress,
         setWalletAddress,
-        paymentReferenceNumber,
-        setPaymentReferenceNumber,
+        circlePaymentID,
+        paymentID,
+        setPayments,
     };
 }
 
-export { CHECKOUT_STEPS, useCheckoutModalState };
+export { CHECKOUT_STEPS, CheckoutModalStepIndex, useCheckoutModalState };
 //# sourceMappingURL=CheckoutOverlay.hooks.js.map

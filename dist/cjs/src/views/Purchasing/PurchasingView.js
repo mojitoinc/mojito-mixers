@@ -52,7 +52,7 @@ const PurchasingView = ({ purchasingImageSrc, purchasingMessages: customPurchasi
         fullPayment();
     }, [fullPayment]);
     React.useEffect(() => {
-        const { paymentStatus, paymentReferenceNumber, paymentError } = fullPaymentState;
+        const { paymentStatus, circlePaymentID, paymentID, paymentError } = fullPaymentState;
         if (paymentStatus === "processing") {
             onDialogBlocked(true);
             return;
@@ -69,7 +69,8 @@ const PurchasingView = ({ purchasingImageSrc, purchasingMessages: customPurchasi
             checkoutInfoPersistedRef.current = true;
             CheckoutOverlay_utils.persistCheckoutModalInfo({
                 invoiceID,
-                paymentReferenceNumber,
+                circlePaymentID,
+                paymentID,
                 billingInfo,
                 paymentInfo,
             });
@@ -78,7 +79,7 @@ const PurchasingView = ({ purchasingImageSrc, purchasingMessages: customPurchasi
             location.href = redirectURL;
             return;
         }
-        onPurchaseSuccess(paymentReferenceNumber);
+        onPurchaseSuccess(circlePaymentID, paymentID);
     }, [
         fullPaymentState,
         hasWaited,

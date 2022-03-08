@@ -11,12 +11,13 @@ import { CheckoutModalHeader } from '../../payments/CheckoutModalHeader/Checkout
 import { PurchasingView } from '../../../views/Purchasing/PurchasingView.js';
 import { ErrorView } from '../../../views/Error/ErrorView.js';
 import { continuePlaidOAuthFlow, PlaidFlow } from '../../../hooks/usePlaid.js';
-import { useCheckoutModalState } from './CheckoutOverlay.hooks.js';
+import { useCheckoutModalState, CheckoutModalStepIndex } from './CheckoutOverlay.hooks.js';
 import { ERROR_LOADING_USER, ERROR_LOADING_PAYMENT_METHODS, ERROR_LOADING_INVOICE, DEFAULT_ERROR_AT } from '../../../domain/errors/errors.constants.js';
 import { FullScreenOverlay } from '../../shared/FullScreenOverlay/FullScreenOverlay.js';
 import { withProviders } from '../../shared/ProvidersInjector/ProvidersInjector.js';
 import { transformCheckoutItemsFromInvoice } from '../../../domain/product/product.utils.js';
 import { useCreateInvoiceAndReservation } from '../../../hooks/useCreateInvoiceAndReservation.js';
+import { useCheckoutItemsCostTotal } from '../../../hooks/useCheckoutItemCostTotal.js';
 import { DEFAULT_DICTIONARY } from '../../../domain/dictionary/dictionary.constants.js';
 
 const PUICheckoutOverlay = ({ 
@@ -34,7 +35,7 @@ orgID, invoiceID: initialInvoiceID, checkoutItems: parentCheckoutItems,
 // Authentication:
 onLogin, isAuthenticated, isAuthenticatedLoading, 
 // Other Events:
-debug, onError, onMarketingOptInChange, // Not implemented yet. Used to let user subscribe / unsubscribe to marketing updates.
+debug, onEvent, onError, onMarketingOptInChange, // Not implemented yet. Used to let user subscribe / unsubscribe to marketing updates.
  }) => {
     var _a;
     // TODO: This should end up being in a context + hook to avoid prop drilling and it should be memoized:
@@ -52,7 +53,7 @@ debug, onError, onMarketingOptInChange, // Not implemented yet. Used to let user
     // SelectedPaymentMethod:
     selectedPaymentMethod, setSelectedPaymentMethod, 
     // PurchaseState:
-    invoiceID, setInvoiceID, taxes, setTaxes, walletAddress, setWalletAddress, paymentReferenceNumber, setPaymentReferenceNumber, } = useCheckoutModalState({
+    invoiceID, setInvoiceID, taxes, setTaxes, walletAddress, setWalletAddress, paymentID, circlePaymentID, setPayments, } = useCheckoutModalState({
         invoiceID: initialInvoiceID,
         productConfirmationEnabled,
         isAuthenticated,
@@ -69,9 +70,11 @@ debug, onError, onMarketingOptInChange, // Not implemented yet. Used to let user
     const isPlaidFlowLoading = continuePlaidOAuthFlow();
     // Payment methods and checkout items / invoice items transforms:
     const rawSavedPaymentMethods = paymentMethodsData === null || paymentMethodsData === void 0 ? void 0 : paymentMethodsData.getPaymentMethodList;
+    const savedPaymentMethods = useMemo(() => transformRawSavedPaymentMethods(rawSavedPaymentMethods), [rawSavedPaymentMethods]);
+    // TODO: These should probably be combined.
     const invoiceItems = invoiceDetailsData === null || invoiceDetailsData === void 0 ? void 0 : invoiceDetailsData.getInvoiceDetails.items;
     const checkoutItems = useMemo(() => transformCheckoutItemsFromInvoice(parentCheckoutItems, invoiceItems), [parentCheckoutItems, invoiceItems]);
-    const savedPaymentMethods = useMemo(() => transformRawSavedPaymentMethods(rawSavedPaymentMethods), [rawSavedPaymentMethods]);
+    const { total: subtotal, fees, taxAmount } = useCheckoutItemsCostTotal(checkoutItems);
     // Invoice creation & buy now lot reservation:
     const createInvoiceAndReservationCalledRef = useRef(false);
     const { invoiceAndReservationState, createInvoiceAndReservation, countdownElementRef, } = useCreateInvoiceAndReservation({ orgID, checkoutItems, debug });
@@ -103,6 +106,43 @@ debug, onError, onMarketingOptInChange, // Not implemented yet. Used to let user
         if (invoiceDetailsError)
             setError(ERROR_LOADING_INVOICE(invoiceDetailsError));
     }, [meError, paymentMethodsError, invoiceDetailsError, setError]);
+    const triggerAnalyticsEventFunction = (eventType) => {
+        if (!onEvent)
+            return;
+        const paymentInfo = selectedPaymentMethod.paymentInfo;
+        let paymentType = undefined;
+        if (typeof paymentInfo === "string") {
+            const payment = savedPaymentMethods.find(({ id }) => id === paymentInfo);
+            paymentType = payment === null || payment === void 0 ? void 0 : payment.type;
+        }
+        else {
+            paymentType = paymentInfo.type;
+        }
+        onEvent(eventType, {
+            // Location:
+            step: CheckoutModalStepIndex[checkoutStep],
+            stepName: checkoutStep,
+            // Purchase:
+            departmentCategory: "NFT",
+            paymentType,
+            shippingMethod: walletAddress ? "custom wallet" : "multisig wallet",
+            checkoutItems,
+            // Payment:
+            currency: "USD",
+            revenue: subtotal + fees,
+            fees,
+            tax: taxAmount,
+            total: subtotal + fees + taxAmount,
+            // Order:
+            circlePaymentID,
+            paymentID,
+        });
+    };
+    const triggerAnalyticsEventRef = useRef(triggerAnalyticsEventFunction);
+    triggerAnalyticsEventRef.current = triggerAnalyticsEventFunction;
+    useEffect(() => {
+        setTimeout(() => triggerAnalyticsEventRef.current(`navigate:${checkoutStep}`));
+    }, [checkoutStep]);
     // Saved payment method creation-reload-sync:
     useEffect(() => {
         if (savedPaymentMethods.length === 0)
@@ -188,13 +228,15 @@ debug, onError, onMarketingOptInChange, // Not implemented yet. Used to let user
         yield refetchPaymentMethods({ orgID });
     }), [checkoutStep, deletePaymentMethod, orgID, refetchPaymentMethods, savedPaymentMethods, setSelectedPaymentMethod]);
     // Purchase:
-    const handlePurchaseSuccess = useCallback((nextPaymentReferenceNumber) => __awaiter(void 0, void 0, void 0, function* () {
-        setPaymentReferenceNumber(nextPaymentReferenceNumber);
+    const handlePurchaseSuccess = useCallback((nextCirclePaymentID, nextPaymentID) => __awaiter(void 0, void 0, void 0, function* () {
+        setPayments(nextCirclePaymentID, nextPaymentID);
+        setTimeout(() => triggerAnalyticsEventRef.current("event:paymentSuccess"));
         // After a successful purchase, a new payment method might have been created, so we reload them:
         yield refetchPaymentMethods();
         goNext();
-    }), [refetchPaymentMethods, setPaymentReferenceNumber, goNext]);
+    }), [setPayments, refetchPaymentMethods, goNext]);
     const handlePurchaseError = useCallback((error) => __awaiter(void 0, void 0, void 0, function* () {
+        setTimeout(() => triggerAnalyticsEventRef.current("event:paymentError"));
         // After a failed purchase, a new payment method might have been created anyway, so we reload them (createPaymentMethod
         // works but createPayment fails):
         yield refetchPaymentMethods();
@@ -313,7 +355,7 @@ debug, onError, onMarketingOptInChange, // Not implemented yet. Used to let user
     }
     else if (checkoutStep === "confirmation") {
         headerVariant = "logoOnly";
-        checkoutStepElement = (React__default.createElement(ConfirmationView, { checkoutItems: checkoutItems, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethod: selectedPaymentMethod, paymentReferenceNumber: paymentReferenceNumber, onGoToCollection: onGoToCollection, onNext: handleClose, dictionary: dictionary }));
+        checkoutStepElement = (React__default.createElement(ConfirmationView, { checkoutItems: checkoutItems, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethod: selectedPaymentMethod, circlePaymentID: circlePaymentID, onGoToCollection: onGoToCollection, onNext: handleClose, dictionary: dictionary }));
     }
     else {
         // !checkoutStep or

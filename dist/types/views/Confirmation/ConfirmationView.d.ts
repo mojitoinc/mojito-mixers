@@ -7,7 +7,7 @@ export interface ConfirmationViewProps {
     checkoutItems: CheckoutItem[];
     savedPaymentMethods: SavedPaymentMethod[];
     selectedPaymentMethod: SelectedPaymentMethod;
-    paymentReferenceNumber: string;
+    circlePaymentID: string;
     onGoToCollection?: () => void;
     onNext: () => void;
     dictionary: PUIDictionary;

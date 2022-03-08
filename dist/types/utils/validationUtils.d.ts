@@ -9,3 +9,9 @@ export declare const withTypeErrorMessageFor: (type: string) => ({ label: fieldL
 export declare const withInvalidErrorMessage: ({ label: fieldLabel }: {
     label: string;
 }) => string;
+export declare const withFullNameErrorMessage: ({ label: fieldLabel }: {
+    label: string;
+}) => string;
+export declare const withPhoneErrorMessage: ({ label: fieldLabel }: {
+    label: string;
+}) => string;
