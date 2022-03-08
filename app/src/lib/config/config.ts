@@ -18,6 +18,8 @@ export const PURCHASING_MESSAGES_DEFAULT = [
   "Shaking things up!",
 ];
 
+export const CIRCLE_MAX_EXPECTED_PAYMENT_CREATION_PROCESSING_TIME = 15000;
+
 export const PAYMENT_NOTIFICATION_INTERVAL_MS = 1500; // Polling interval for GetPaymentNotificationQuery.
 
 
