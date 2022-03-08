@@ -417,10 +417,10 @@ If you don't want this behavior or would like to implement a custom one, you sho
 
 ## Event CallBack
 
-The `event` prop can be used to get updates about the progress of the user using the Payment UI, which can be useful for analytics:
+The `onEvent` prop can be used to get updates about the progress of the user using the Payment UI, which can be useful for analytics:
 
 ```TSX
-    (eventType: CheckoutEventType, eventData: Partial<CheckoutEventData>) => void;
+onEvent?: (eventType: CheckoutEventType, eventData: CheckoutEventData) => void
 ```
 
 <br />
