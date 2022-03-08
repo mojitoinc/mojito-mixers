@@ -220,8 +220,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     invoiceAndReservationState,
     createInvoiceAndReservation,
     countdownElementRef,
-  } = useCreateInvoiceAndReservation({ orgID, checkoutItems, debug });
-
+  } = useCreateInvoiceAndReservation({ orgID, checkoutItems, stop: checkoutStep === "confirmation", debug });
 
   useEffect(() => {
     if (isDialogLoading || invoiceID === null || invoiceID || createInvoiceAndReservationCalledRef.current) return;
@@ -233,6 +232,9 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
 
   useEffect(() => {
     if (invoiceAndReservationState.error) {
+      // TODO: It would be great if we can keep track of the reservation expiration without changing the displayed error
+      // if there's already once, so when clicking the action button for that one, on top of calling its respective error
+      // handling code, we re-create the reservation:
       setError(invoiceAndReservationState.error);
     } else if (invoiceAndReservationState.invoiceID) {
       setInvoiceID(invoiceAndReservationState.invoiceID);
@@ -437,6 +439,11 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
 
   // Release reserve:
 
+  const lastReleasedReservationID = useRef("");
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const handleBeforeUnloadRef = useRef((e?: BeforeUnloadEvent) => { /* Do nothing */ });
+
   const [releaseReservationBuyNowLot] = useReleaseReservationBuyNowLotMutation({
     variables: {
       orgID,
@@ -444,11 +451,13 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     },
   });
 
-  const handleBeforeUnload = useCallback((e?: BeforeUnloadEvent) => {
-    if (orgID && invoiceID) {
+  const handleBeforeUnload = handleBeforeUnloadRef.current = useCallback((e?: BeforeUnloadEvent) => {
+    if (orgID && invoiceID && invoiceID !== lastReleasedReservationID.current) {
       if (debug) console.log(`\n♻️ Releasing reservation invoice ${ invoiceID } (orgID = ${ orgID })...\n`);
 
       releaseReservationBuyNowLot().then((result) => {
+        lastReleasedReservationID.current = invoiceID;
+
         if (debug) console.log("  🟢 releaseReservationBuyNowLot result", result);
       }).catch((error: ApolloError | Error) => {
         if (debug) console.log("  🔴 releaseReservationBuyNowLot error", error);
@@ -470,6 +479,10 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   }, [orgID, invoiceID, debug, releaseReservationBuyNowLot]);
 
   useEffect(() => {
+    if (checkoutError?.at === "reset") handleBeforeUnloadRef.current();
+  }, [checkoutError]);
+
+  useEffect(() => {
     window.addEventListener('beforeunload', handleBeforeUnload);
 
     return () => {
@@ -488,15 +501,6 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
 
     onClose();
   }, [handleBeforeUnload, setInvoiceID, onClose]);
-
-  useEffect(() => {
-    if (checkoutError?.at !== "reset") return;
-
-    handleBeforeUnload();
-  }, [checkoutError, handleBeforeUnload]);
-
-
-  // console.log("checkoutStep =", checkoutStep);
 
 
   // Error handling:
