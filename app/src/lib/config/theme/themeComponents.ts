@@ -55,7 +55,7 @@ export function createComponentsTheme({ typography, palette, spacing, breakpoint
           lineHeight: "24px", // 18px accounting for 0.75 scale.
           fontWeight: 500,
           color: palette.grey[500],
-          marginLeft: "4px",
+          // marginLeft: "4px",
 
           "&.Mui-focused": {
             color: palette.grey[500],
