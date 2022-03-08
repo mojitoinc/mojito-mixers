@@ -31,6 +31,11 @@ const reduceSelectOptionsToMap = (
   return optionsMap;
 };
 
+const UNAVAILABLE_COUNTRIES = ["RU"];
+
+const countryIsAvailable = (country: RawCountry) =>
+  !UNAVAILABLE_COUNTRIES.includes(country.countryShortCode);
+
 export function useCountryOptions(countryCode?: string | number) {
   const { result: country, getCountryList } = useCountryRegion(countryCode);
 
@@ -41,7 +46,9 @@ export function useCountryOptions(countryCode?: string | number) {
 
     const options: SelectOption[] = country
       ? country.regions.map(mapRegionToSelectOption)
-      : getCountryList().map(mapCountryToSelectOption);
+      : getCountryList()
+          .filter(countryIsAvailable)
+          .map(mapCountryToSelectOption);
 
     const optionsMap: Record<string, SelectOption> = options.reduce(reduceSelectOptionsToMap, {});
 

@@ -6,6 +6,7 @@ import { useMeQuery } from "../services/graphql/generated";
 import { PLAYGROUND_PARAGRAPHS_ARRAY, PLAYGROUND_AUTH_PRESET, PLAYGROUND_NO_AUTH_PRESET, PLAYGROUND_PRIVACY_HREF, PLAYGROUND_TERMS_OF_USE_HREF, PLAYGROUND_USER_FORMAT, PLAYGROUND_PURCHASING_IMAGE_SRC, PLAYGROUND_ERROR_IMAGE_SRC, PLAYGROUND_LOGOS_SRC, PLAYGROUND_LOGOS_SX, PLAYGROUND_LOADER_IMAGE_SRC, PLAYGROUND_MOCKED_AUCTION_LOT, PLAYGROUND_MOCKED_BUY_NOW_LOT, PLAYGROUND_THEMES } from "../utils/playground/playground.constants";
 import { PlaygroundFormData } from "../utils/playground/playground.interfaces";
 import { config } from "../utils/config/config.constants";
+import { CheckoutEventData, CheckoutEventType } from "../lib/domain/events/events.interfaces";
 
 const DEFAULT_FORM_VALUES: PlaygroundFormData = {
   // Organization:
@@ -73,6 +74,10 @@ const HomePage: React.FC = () => {
   const handleGoToCollection = useCallback(() => {
     console.log("Go to Collection Page.");
     // router.push("/collection");
+  }, []);
+
+  const handleEvent = useCallback((eventType: CheckoutEventType, eventData: CheckoutEventData) => {
+    console.log(`🎯 ${ eventType }`, eventData);
   }, []);
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -201,6 +206,7 @@ const HomePage: React.FC = () => {
 
     // Other Events:
     debug: true,
+    onEvent: handleEvent,
     onError: handleError,
     onCatch: handleCatch,
     onMarketingOptInChange: handleMarketingOptInChange,

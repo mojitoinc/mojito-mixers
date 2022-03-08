@@ -157,12 +157,16 @@ const App: React.FC = () => {
     Sentry.captureException(error);
   }, []);
 
+  const handleEvent = useCallback((eventType: CheckoutEventType, eventData: CheckoutEventData) => {
+    // Handle the data for each step or action as needed.
+  }, []);
+
   const handleCatch = useCallback((error: Error, errorInfo?: ErrorInfo) => {
     Sentry.captureException({ error, errorInfo });
   }, []);
 
   const handleMarketingOptInChange = useCallback((marketingOptIn: boolean) => {
-    // Subscribe / unsubscribe
+    // Subscribe / unsubscribe.
   }, []);
 
   useEffect(() => {
@@ -225,6 +229,7 @@ const App: React.FC = () => {
 
     // Other Events:
     debug: true,
+    onEvent: handleEvent,
     onError: handleError,
     onCatch: handleCatch,
     onMarketingOptInChange: handleMarketingOptInChange,
@@ -404,6 +409,72 @@ By default, if an unexpected error occurs, a confirm window/modal will be presen
 
 
 If you don't want this behavior or would like to implement a custom one, you should pass a value for `onCatch: (error: Error, errorInfo?: ErrorInfo) => void | true;` prop with a callback. If you want to get notified about unexpected errors but would still like to preserve the default behavior, return `true` from your callback.
+
+<br />
+
+
+## `onEvent` callback prop:
+
+The `onEvent` callback prop can be used to get updates about the progress of the user using the Payment UI, which can be useful for analytics:
+
+```TSX
+onEvent?: (eventType: CheckoutEventType, eventData: CheckoutEventData) => void;
+```
+
+<br />
+
+
+### `eventType: CheckoutEventType` values:
+
+Events triggered when the user sees a specific view:
+
+- `navigate:authentication`
+- `navigate:billing`
+- `navigate:payment`
+- `navigate:purchasing`
+- `navigate:confirmation`
+- `navigate:error`
+
+Events triggered when the user performs a specific action:
+
+- `event:paymentSuccess`: The "Purchase" button in the Payment view has been clicked and the payment has been made successfully.
+- `event:paymentError`: The "Purchase" button in the Payment view has been clicked and the payment has been attempted, but it failed.
+
+<br />
+
+
+### `eventData: Partial<CheckoutEventData>` props:
+
+All events will provide this data, but notice some properties are optional, as they might not be available for all steps:
+
+```TSX
+interface CheckoutEventData {
+  // auth0ID: string; // Not added, already on the parent.
+  // checkoutType: string; // Not added, already on the parent.
+  // customerId: string; // Not added, already on the parent.
+
+  // Location:
+  step: number;
+  stepName: string;
+
+  // Purchase:
+  departmentCategory: "NFT";
+  paymentType?: PaymentType; // "CreditCard" | "ACH" | "Wire" | "Crypto"
+  shippingMethod: ShippingMethod; // "custom wallet" | "multisig wallet"
+  checkoutItems: CheckoutItem[]; // Provided as this might be a mix of the checkoutItems prop and some additional data from the invoice.
+
+  // Payment:
+  currency: "USD";
+  revenue: number; // Revenue (subtotal) associated with the transaction, excluding shipping and taxes.
+  fees: number;
+  tax?: number;
+  total: number; // Total value of the order with discounts, taxes and fees.
+
+  // Order:
+  circlePaymentID?: string; // Can be used as orderID.
+  paymentID?: string; // Can be used as orderID.
+}
+```
 
 <br />
 

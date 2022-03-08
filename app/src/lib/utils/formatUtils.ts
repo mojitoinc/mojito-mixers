@@ -35,3 +35,10 @@ export function formatTimeLeft(start: number, total: number) {
 export function formatTaxRate(taxRate: number): string {
   return `${ (Math.round(taxRate * 100) / 100).toFixed(2).replace(/\.00$/, "") } %`;
 }
+
+/**
+ * Remove duplicate, leading or trailing spaces:
+ */
+export function fullTrim(str: string): string {
+  return str.replace(/\s+/g, " ").trim()
+}

@@ -9,9 +9,10 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { alpha, Box, CircularProgress, Typography } from "@mui/material";
 import { ConsentType } from "../ConsentText/ConsentText";
 import { OVERLAY_OPACITY } from "../../../config/theme/theme";
+import { getCVCIsValid } from "../../../domain/payment/payment.utils";
 
-function validateCvv(isCvvRequired: boolean, cvv: string) {
-  return !isCvvRequired || cvv.length === 3 || cvv.length === 4;
+export function validateCvv(isCvvRequired: boolean, cvv: string) {
+  return !isCvvRequired || getCVCIsValid(cvv);
 }
 
 interface SavedPaymentDetailsSelectorState {

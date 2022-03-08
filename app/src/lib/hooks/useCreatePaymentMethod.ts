@@ -5,6 +5,7 @@ import { FetchResult, MutationResult } from "@apollo/client";
 import { PaymentMethod } from "../domain/payment/payment.interfaces";
 import { useEncryptCardData } from "./useEncryptCard";
 import { formatPhoneAsE123 } from "../domain/circle/circle.utils";
+import { fullTrim } from "../utils/formatUtils";
 
 
 export interface ExtendedCreatePaymentMethodOptions {
@@ -34,13 +35,13 @@ export function useCreatePaymentMethod(): [
 
     // Using CreditCardBillingDetails as it's more restrictive than AchBillingDetails (address 2 is required instead of optional):
     const billingDetails : CreditCardBillingDetails = {
-      name: billingInfo.fullName,
-      city: billingInfo.city,
+      name: fullTrim(billingInfo.fullName),
+      city: fullTrim(billingInfo.city),
       country: `${ billingInfo.country.value }`,
-      address1: billingInfo.street || "",
-      address2: billingInfo.apartment || "",
+      address1: fullTrim(billingInfo.street || ""),
+      address2: fullTrim(billingInfo.apartment || ""),
       district: `${ billingInfo.state.value || billingInfo.state.label }`,
-      postalCode: billingInfo.zipCode,
+      postalCode: fullTrim(billingInfo.zipCode),
     };
 
     if (paymentInfo.type === PaymentType.CreditCard) {

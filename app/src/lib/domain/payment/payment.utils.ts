@@ -1,5 +1,5 @@
 import images from "react-payment-inputs/images";
-import { CreditCardNetwork, getCardNumberError, getCVCError, getExpiryDateError } from "react-payment-inputs";
+import { CreditCardNetwork, getCardNumberError, getExpiryDateError } from "react-payment-inputs";
 
 
 export function standaloneGetCardImageProps(network = "") {
@@ -20,4 +20,4 @@ export const getCardNumberIsValid = (cardNumber?: string) => !getCardNumberError
 
 export const getExpiryDateIsvalid = (expiryDate?: string) => !getExpiryDateError(expiryDate);
 
-export const getCVCIsValid = (cvc?: string) => !getCVCError(cvc);
+export const getCVCIsValid = (cvc?: string) => !!cvc && (cvc.length === 3 || cvc.length === 4);

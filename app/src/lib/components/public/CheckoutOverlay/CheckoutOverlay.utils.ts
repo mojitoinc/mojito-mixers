@@ -11,7 +11,8 @@ const debug = false;
 export interface CheckoutModalInfo {
   url?: string;
   invoiceID: string;
-  paymentReferenceNumber: string;
+  circlePaymentID: string;
+  paymentID: string;
   billingInfo: string | BillingInfo;
   paymentInfo: string | PaymentMethod;
   timestamp?: number;
@@ -28,7 +29,8 @@ export interface CheckoutModalState3DS extends CheckoutModalInfo {
 const FALLBACK_MODAL_STATE: CheckoutModalState3DS = {
   url: "",
   invoiceID: "",
-  paymentReferenceNumber: "",
+  circlePaymentID: "",
+  paymentID: "",
   billingInfo: "",
   paymentInfo: "",
   continue3DSFlow: false,
@@ -56,11 +58,11 @@ export function persistReceivedRedirectUri3DS(receivedRedirectUri: string) {
 }
 
 export function persistCheckoutModalInfoUsed(used = true) {
-  localStorage.setItem(THREEDS_FLOW_STATE_USED_KEY, `${ used }`);
+  localStorage.setItem(THREEDS_FLOW_STATE_USED_KEY, `${used}`);
 }
 
 export function clearPersistedInfo(isExpired?: boolean) {
-  if (debug) console.log(`💾 Clearing ${ isExpired ? "expired " : "" }state (3DS)...`);
+  if (debug) console.log(`💾 Clearing ${isExpired ? "expired " : ""}state (3DS)...`);
 
   if (process.browser) {
     localStorage.removeItem(THREEDS_FLOW_INFO_KEY);
@@ -99,7 +101,8 @@ export function getCheckoutModalState(): CheckoutModalState3DS {
   const {
     url = "",
     invoiceID = "",
-    paymentReferenceNumber = "",
+    circlePaymentID = "",
+    paymentID = "",
     billingInfo = "",
     paymentInfo = "",
     timestamp,
@@ -110,7 +113,7 @@ export function getCheckoutModalState(): CheckoutModalState3DS {
 
   // In dev, this works fine even if there's nothing in localStorage, which helps with testing across some other domain and localhost:
   const hasLocalhostOrigin = process.env.NODE_ENV === "development" && window.location.hostname !== "localhost";
-  const continue3DSFlow = hasLocalhostOrigin || !!(url && invoiceID && paymentReferenceNumber && billingInfo && paymentInfo && receivedRedirectUri);
+  const continue3DSFlow = hasLocalhostOrigin || !!(url && invoiceID && circlePaymentID && paymentID && billingInfo && paymentInfo && receivedRedirectUri);
 
   if ((continue3DSFlow && savedStateUsed) || (!continue3DSFlow && localStorage.getItem(THREEDS_FLOW_INFO_KEY)) || isExpired(timestamp)) {
     return clearPersistedInfo(isExpired(timestamp));
@@ -124,7 +127,8 @@ export function getCheckoutModalState(): CheckoutModalState3DS {
     invoiceID,
 
     // The reference number of the payment:
-    paymentReferenceNumber,
+    circlePaymentID,
+    paymentID,
 
     // The billing & payment info selected / entered before starting the 3DS flow:
     billingInfo,
@@ -160,9 +164,10 @@ export interface ContinueFlowsReturn {
   checkoutStep: CheckoutModalStep | "";
   checkoutError?: CheckoutModalError;
   invoiceID: string;
+  circlePaymentID: string;
+  paymentID: string;
   billingInfo: string | BillingInfo;
   paymentInfo: string | PaymentMethod;
-  paymentReferenceNumber: string;
 }
 
 export function continueFlows(noClear = false) {
@@ -171,9 +176,10 @@ export function continueFlows(noClear = false) {
   const continueFlowsReturn: ContinueFlowsReturn = {
     checkoutStep: "",
     invoiceID: "",
+    circlePaymentID: "",
+    paymentID: "",
     billingInfo: "",
     paymentInfo: "",
-    paymentReferenceNumber: "",
   };
 
   if (continue3DSFlow) {
@@ -185,9 +191,10 @@ export function continueFlows(noClear = false) {
     }
 
     continueFlowsReturn.invoiceID = savedCheckoutModalState.invoiceID;
+    continueFlowsReturn.circlePaymentID = savedCheckoutModalState.circlePaymentID;
+    continueFlowsReturn.paymentID = savedCheckoutModalState.paymentID;
     continueFlowsReturn.billingInfo = savedCheckoutModalState.billingInfo;
     continueFlowsReturn.paymentInfo = savedCheckoutModalState.paymentInfo;
-    continueFlowsReturn.paymentReferenceNumber = savedCheckoutModalState.paymentReferenceNumber;
   } else if (continueOAuthFlow) {
     if (debug) console.log("💾 Continue Plaid OAuth Flow...", INITIAL_PLAID_OAUTH_FLOW_STATE);
 
