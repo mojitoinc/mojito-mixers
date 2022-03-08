@@ -1,3 +1,7 @@
+// Debug Mode:
+export const COUNTER_EXPIRATION_MS = 1000;
+export const COUNTER_CLICKS_NEEDED = 16;
+
 // Invoice / Reservation:
 export const RESERVATION_COUNTDOWN_FROM_MIN = 15;
 export const RESERVATION_COUNTDOWN_FROM_MS = RESERVATION_COUNTDOWN_FROM_MIN * 60 * 1000;
@@ -13,6 +17,8 @@ export const PURCHASING_MESSAGES_DEFAULT = [
   "Adding rum, lime juice and ice.",
   "Shaking things up!",
 ];
+
+export const CIRCLE_MAX_EXPECTED_PAYMENT_CREATION_PROCESSING_TIME = 15000;
 
 export const PAYMENT_NOTIFICATION_INTERVAL_MS = 1500; // Polling interval for GetPaymentNotificationQuery.
 

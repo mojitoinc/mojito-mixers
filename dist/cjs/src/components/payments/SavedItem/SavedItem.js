@@ -22,6 +22,13 @@ const DEFAULT_SAVED_ITEM_LABELS = {
     delete: "Delete",
     select: "Use Info",
 };
+const DISPLAY_BOX_SX = {
+    display: "flex",
+    flexDirection: {
+        xs: "column",
+        sm: "row"
+    },
+};
 const SavedItem = ({ children, id, variant = "stacked", labels: customLabels = {}, disabled, active, status, onEdit, onDelete, onPick, cvvError, onCvvChange, boxProps, }) => {
     const labels = Object.assign(Object.assign({}, DEFAULT_SAVED_ITEM_LABELS), customLabels);
     const hasControls = active || onEdit || onDelete || onPick;
@@ -53,7 +60,7 @@ const SavedItem = ({ children, id, variant = "stacked", labels: customLabels = {
     else if (onPick) {
         mainControlElement = (React__default["default"].createElement(SecondaryButton.SecondaryButton, { onClick: handleClick, disabled: disabledSelect, "data-action": "pick" }, labels.select));
     }
-    return (React__default["default"].createElement(DisplayBox.DisplayBox, Object.assign({}, boxProps),
+    return (React__default["default"].createElement(DisplayBox.DisplayBox, Object.assign({}, boxProps, { sx: Object.assign(Object.assign({}, DISPLAY_BOX_SX), boxProps === null || boxProps === void 0 ? void 0 : boxProps.sx) }),
         variant === "stacked" ? (React__default["default"].createElement(Box["default"], { sx: { flex: 1, pb: 2 } }, children)) : (React__default["default"].createElement(material.Stack, { direction: "row", spacing: 2, sx: { flex: 1, pb: { xs: 2, sm: 0 }, alignItems: "center" } }, children)),
         hasControls && (React__default["default"].createElement(material.Stack, { direction: variant === "stacked" ? { xs: "row", sm: "column" } : "row", spacing: 1, sx: {
                 // display: "flex",

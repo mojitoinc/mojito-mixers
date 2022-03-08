@@ -4,8 +4,8 @@ import { OutlinedSecondaryButton } from '../../shared/OutlinedSecondaryButton/Ou
 import default_1 from '../../../../node_modules/@mui/icons-material/ChevronLeft.js';
 import { NBSP } from '../../../utils/formatUtils.js';
 import { getFormattedUser } from './CheckoutModalHeader.utils.js';
-import React__default from 'react';
-import { RESERVATION_COUNTDOWN_FROM_MIN } from '../../../config/config.js';
+import React__default, { useRef, useCallback } from 'react';
+import { COUNTER_CLICKS_NEEDED, RESERVATION_COUNTDOWN_FROM_MIN, COUNTER_EXPIRATION_MS } from '../../../config/config.js';
 
 const CHECKOUT_MODAL_TITLE = {
     anonymous: "Checkout",
@@ -39,14 +39,34 @@ const COUNTDOWN_SX = {
     justifyContent: "flex-start",
     alignItems: "center",
 };
-const CheckoutModalHeader = ({ variant, countdownElementRef, title: customTitle, logoSrc, logoSx, user, userFormat, onLoginClicked, onPrevClicked, }) => {
+const CheckoutModalHeader = ({ variant, countdownElementRef, title: customTitle, logoSrc, logoSx, user, userFormat, onLoginClicked, onPrevClicked, setDebug, }) => {
     const title = customTitle || CHECKOUT_MODAL_TITLE[variant] || NBSP;
     const displayUsername = getFormattedUser(variant, user, userFormat);
     const showControls = CHECKOUT_MODAL_CONTROLS[variant] || false;
+    const clickCounterRef = useRef(0);
+    const clickTimestampRef = useRef(0);
+    const handleLogoClick = useCallback(() => {
+        if (!setDebug)
+            return;
+        const counter = clickCounterRef.current;
+        const timestamp = clickTimestampRef.current;
+        const now = Date.now();
+        const elapsed = now - timestamp;
+        const nextCounter = elapsed > COUNTER_EXPIRATION_MS || counter === COUNTER_CLICKS_NEEDED ? 1 : counter + 1;
+        clickTimestampRef.current = now;
+        clickCounterRef.current = nextCounter;
+        if (nextCounter === COUNTER_CLICKS_NEEDED) {
+            setDebug((prevValue) => {
+                const nextValue = !prevValue;
+                console.log(`\n🐞 DEBUG MODE ${nextValue ? "ENABLED" : "DISABLED"}!\n\n`);
+                return nextValue;
+            });
+        }
+    }, [setDebug]);
     return (React__default.createElement(Box, null,
         React__default.createElement(Stack, { spacing: 2, direction: "row", sx: { justifyContent: "space-between", alignItems: "center", py: 2 } },
             React__default.createElement(Typography, { variant: "h5", id: "checkout-modal-header-title" }, title),
-            React__default.createElement(Box, { component: "img", src: logoSrc, sx: Object.assign({ maxHeight: "32px", maxWidth: { xs: "180px", sm: "240px" } }, logoSx) })),
+            React__default.createElement(Box, { component: "img", src: logoSrc, onClick: setDebug ? handleLogoClick : undefined, sx: Object.assign({ maxHeight: "32px", maxWidth: { xs: "180px", sm: "240px" } }, logoSx) })),
         React__default.createElement(Divider, null),
         showControls ? (React__default.createElement(React__default.Fragment, null,
             React__default.createElement(Stack, { spacing: 2, direction: "row", sx: { justifyContent: "space-between", alignItems: "center", py: 2 } },

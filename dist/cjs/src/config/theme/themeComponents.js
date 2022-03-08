@@ -51,7 +51,7 @@ function createComponentsTheme({ typography, palette, spacing, breakpoints }) {
                     lineHeight: "24px",
                     fontWeight: 500,
                     color: palette.grey[500],
-                    marginLeft: "4px",
+                    // marginLeft: "4px",
                     "&.Mui-focused": {
                         color: palette.grey[500],
                     },
@@ -73,12 +73,9 @@ function createComponentsTheme({ typography, palette, spacing, breakpoints }) {
                         border: 0,
                     },
                 },
-                input: {
-                    fontSize: "16px",
-                    "&.Mui-disabled": {
+                input: Object.assign(Object.assign({}, typography.subtitle1), { "&.Mui-disabled": {
                         cursor: "not-allowed",
-                    },
-                },
+                    } }),
             },
         },
         MuiFilledInput: {

@@ -11,29 +11,19 @@ function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'defau
 
 var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 
-const DISPLAY_BOX_PROPS = {
+const DISPLAY_BOX_SX = {
     p: 2,
     m: 0,
-    border: 1,
     borderRadius: `${theme.SM_BORDER_RADIUS}px`,
     backgroundColor: theme => theme.palette.grey["50"],
-    borderColor: theme => theme.palette.grey["100"],
+    border: theme => `1px solid ${theme.palette.grey["100"]}`,
     color: theme => theme.palette.grey["800"],
-    display: "flex",
-    flexDirection: {
-        xs: "column",
-        sm: "row"
-    },
 };
 const DisplayBox = (_a) => {
     var { sx } = _a, props = tslib_es6.__rest(_a, ["sx"]);
-    return (React__default["default"].createElement(material.Box, Object.assign({}, props, { sx: Object.assign(Object.assign({}, DISPLAY_BOX_PROPS), sx) })));
-};
-const DebugBox = (_a) => {
-    var { sx } = _a, props = tslib_es6.__rest(_a, ["sx"]);
-    return (React__default["default"].createElement(DisplayBox, Object.assign({}, props, { component: "pre", sx: Object.assign(Object.assign({}, sx), { overflow: "scroll", whiteSpace: "pre-wrap" }) })));
+    return (React__default["default"].createElement(material.Box, Object.assign({}, props, { sx: Object.assign(Object.assign({}, DISPLAY_BOX_SX), sx) })));
 };
 
-exports.DebugBox = DebugBox;
+exports.DISPLAY_BOX_SX = DISPLAY_BOX_SX;
 exports.DisplayBox = DisplayBox;
 //# sourceMappingURL=DisplayBox.js.map

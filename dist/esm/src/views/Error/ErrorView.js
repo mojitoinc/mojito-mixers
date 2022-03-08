@@ -2,7 +2,7 @@ import React__default from 'react';
 import { Box, Typography } from '@mui/material';
 import { CheckoutModalFooter } from '../../components/payments/CheckoutModalFooter/CheckoutModalFooter.js';
 import { parseSentences } from '../../utils/formatUtils.js';
-import { DebugBox } from '../../components/payments/DisplayBox/DisplayBox.js';
+import { DebugBox } from '../../components/payments/DebugBox/DebugBox.js';
 import { XS_MOBILE_MAX_WIDTH } from '../../config/theme/theme.js';
 import { StatusIcon } from '../../components/shared/StatusIcon/StatusIcon.js';
 import { DEFAULT_ERROR_AT } from '../../domain/errors/errors.constants.js';

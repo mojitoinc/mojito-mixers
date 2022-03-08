@@ -18,5 +18,6 @@ export type { PaymentType } from "./domain/payment/payment.interfaces";
 export type { CheckoutItem } from "./domain/product/product.interfaces";
 export type { CircleFieldErrorAt, CircleFieldErrors } from "./domain/circle/circle.utils";
 export type { PUIDictionary, PUIDictionaryKeys, PUIDictionarySingleLine, PUIDictionaryMultiLine } from "./domain/dictionary/dictionary.interfaces";
+export type { CheckoutEventType, CheckoutEventData } from "./domain/events/events.interfaces";
 
 if (process.env.NODE_ENV === "development") console.log("\n👨‍💻 PUI development mode.\n\n");

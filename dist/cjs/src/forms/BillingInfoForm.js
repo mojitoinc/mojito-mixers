@@ -17,10 +17,11 @@ var material = require('@mui/material');
 var Book = require('../../node_modules/@mui/icons-material/Book.js');
 var Select = require('../components/shared/Select/Select.js');
 var validationUtils = require('../utils/validationUtils.js');
-var DisplayBox = require('../components/payments/DisplayBox/DisplayBox.js');
+var DebugBox = require('../components/payments/DebugBox/DebugBox.js');
 var useFormCheckoutError = require('../hooks/useFormCheckoutError.js');
 var TaxesMessagesBox = require('../components/shared/TaxesMessagesBox/TaxesMessagesBox.js');
 var FormErrorsBox = require('../components/shared/FormErrorsBox/FormErrorsBox.js');
+var circle_utils = require('../domain/circle/circle.utils.js');
 var Grid = require('../../node_modules/@mui/material/Grid/Grid.js');
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
@@ -64,14 +65,34 @@ const schema = yup.object()
     .shape({
     [FULL_NAME_FIELD]: yup.string()
         .label(FIELD_LABELS[FULL_NAME_FIELD])
-        .required(validationUtils.withRequiredErrorMessage),
+        .required(validationUtils.withRequiredErrorMessage)
+        .test({
+        name: "is-valid-full-name",
+        test: (value) => {
+            if (!value)
+                return false;
+            return /(. .)/.test(value);
+        },
+        message: validationUtils.withFullNameErrorMessage,
+    }),
     [EMAIL_FIELD]: yup.string()
         .label(FIELD_LABELS[EMAIL_FIELD])
-        .email()
-        .required(validationUtils.withRequiredErrorMessage),
+        .required(validationUtils.withRequiredErrorMessage)
+        .email(),
     [PHONE_FIELD]: yup.string()
         .label(FIELD_LABELS[PHONE_FIELD])
-        .required(validationUtils.withRequiredErrorMessage),
+        .required(validationUtils.withRequiredErrorMessage)
+        .test({
+        name: "is-valid-phone-number",
+        test: (value, context) => {
+            var _a;
+            if (!value)
+                return false;
+            const formattedPhoneNumber = circle_utils.formatPhoneAsE123(value || "", ((_a = context.parent.country) === null || _a === void 0 ? void 0 : _a.value) || "");
+            return /\+(?:[0-9] ?){6,14}[0-9]$/.test(formattedPhoneNumber);
+        },
+        message: validationUtils.withPhoneErrorMessage,
+    }),
     [STREET_FIELD]: yup.string()
         .label(FIELD_LABELS[STREET_FIELD])
         .required(validationUtils.withRequiredErrorMessage),
@@ -102,7 +123,7 @@ defaultValues, checkoutError, taxes, onTaxInfoChange, onSaved, onClose, onSubmit
         reValidateMode: "onChange",
         resolver: yup$1.yupResolver(schema),
     });
-    const [street, zip, city, state, country] = watch([STREET_FIELD, ZIP_CODE_FIELD, CITY_FIELD, STATE_FIELD, COUNTRY_FIELD]);
+    const [phone, street, zip, city, state, country] = watch([PHONE_FIELD, STREET_FIELD, ZIP_CODE_FIELD, CITY_FIELD, STATE_FIELD, COUNTRY_FIELD]);
     React.useEffect(() => {
         onTaxInfoChange({
             [STREET_FIELD]: street,
@@ -126,7 +147,11 @@ defaultValues, checkoutError, taxes, onTaxInfoChange, onSaved, onClose, onSubmit
         React__default["default"].createElement(InputGroupLabel.InputGroupLabel, { sx: { m: 0, pt: 2 } }, "Information"),
         React__default["default"].createElement(TextField.ControlledTextField, { name: FULL_NAME_FIELD, control: control, label: FIELD_LABELS[FULL_NAME_FIELD] }),
         React__default["default"].createElement(TextField.ControlledTextField, { name: EMAIL_FIELD, control: control, label: FIELD_LABELS[EMAIL_FIELD] }),
-        React__default["default"].createElement(TextField.ControlledTextField, { name: PHONE_FIELD, control: control, label: FIELD_LABELS[PHONE_FIELD] }),
+        React__default["default"].createElement(TextField.ControlledTextField, { name: PHONE_FIELD, control: control, label: FIELD_LABELS[PHONE_FIELD], InputProps: selectedCountryCode && !circle_utils.phoneHasPrefix(phone) ? {
+                startAdornment: (React__default["default"].createElement(material.InputAdornment, { position: "start" },
+                    React__default["default"].createElement(material.Typography, { variant: "subtitle1", component: "span", sx: { pointerEvents: "none" } }, circle_utils.getPhonePrefix(`${selectedCountryCode}`)))),
+            } : undefined }),
+        debug && phone && (React__default["default"].createElement(DebugBox.DebugBox, { compact: true, sx: { mt: 1 } }, circle_utils.formatPhoneAsE123(phone || "", `${selectedCountryCode}`))),
         React__default["default"].createElement(InputGroupLabel.InputGroupLabel, { sx: { m: 0, pt: 2 } }, "Address"),
         React__default["default"].createElement(TextField.ControlledTextField, { name: STREET_FIELD, control: control, label: FIELD_LABELS[STREET_FIELD] }),
         React__default["default"].createElement(TextField.ControlledTextField, { name: APARTMENT_FIELD, control: control, label: FIELD_LABELS[APARTMENT_FIELD] }),
@@ -148,7 +173,7 @@ defaultValues, checkoutError, taxes, onTaxInfoChange, onSaved, onClose, onSubmit
                 React__default["default"].createElement(TextField.ControlledTextField, { name: ZIP_CODE_FIELD, control: control, label: FIELD_LABELS[ZIP_CODE_FIELD] }))),
         checkoutErrorMessage && React__default["default"].createElement(FormErrorsBox.FormErrorsBox, { error: checkoutErrorMessage, sx: { mt: 5 } }),
         formState.isSubmitted && React__default["default"].createElement(TaxesMessagesBox.TaxesMessagesBox, { sx: { mt: 5 }, taxes: taxes, variant: "form" }),
-        debug && (React__default["default"].createElement(DisplayBox.DebugBox, { sx: { mt: 5 } },
+        debug && (React__default["default"].createElement(DebugBox.DebugBox, { sx: { mt: 5 } },
             JSON.stringify(watch(), null, 2),
             "\n\n",
             JSON.stringify(formState.errors, null, 2))),

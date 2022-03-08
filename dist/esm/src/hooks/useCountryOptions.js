@@ -13,6 +13,8 @@ const reduceSelectOptionsToMap = (optionsMap, selectOption) => {
     optionsMap[selectOption.value] = selectOption;
     return optionsMap;
 };
+const UNAVAILABLE_COUNTRIES = ["RU"];
+const countryIsAvailable = (country) => !UNAVAILABLE_COUNTRIES.includes(country.countryShortCode);
 function useCountryOptions(countryCode) {
     const { result: country, getCountryList } = useCountryRegion(countryCode);
     return useMemo(() => {
@@ -22,7 +24,9 @@ function useCountryOptions(countryCode) {
             return { options: [], optionsMap: {} };
         const options = country
             ? country.regions.map(mapRegionToSelectOption)
-            : getCountryList().map(mapCountryToSelectOption);
+            : getCountryList()
+                .filter(countryIsAvailable)
+                .map(mapCountryToSelectOption);
         const optionsMap = options.reduce(reduceSelectOptionsToMap, {});
         return { options, optionsMap };
         // getCountryList is not memoized. Adding it as a dependency makes this function always run, so we exclude it:
