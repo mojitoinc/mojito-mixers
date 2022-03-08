@@ -437,7 +437,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   }, [refetchPaymentMethods, setError]);
 
 
-  // Release reserve:
+  // Release reservation:
 
   const lastReleasedReservationID = useRef("");
 
