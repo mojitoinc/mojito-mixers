@@ -19,7 +19,7 @@ export interface PurchasingViewProps {
   invoiceID: string;
   savedPaymentMethods: SavedPaymentMethod[];
   selectedPaymentMethod: SelectedPaymentMethod;
-  onPurchaseSuccess: (paymentReferenceNumber: string) => void;
+  onPurchaseSuccess: (circlePaymentID: string, paymentID: string) => void;
   onPurchaseError: (error: string | CheckoutModalError) => void;
   onDialogBlocked: (blocked: boolean) => void;
   debug?: boolean;
@@ -77,7 +77,7 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
   }, [fullPayment]);
 
   useEffect(() => {
-    const { paymentStatus, paymentReferenceNumber, paymentError } = fullPaymentState;
+    const { paymentStatus, circlePaymentID, paymentID, paymentError } = fullPaymentState;
 
     if (paymentStatus === "processing") {
       onDialogBlocked(true);
@@ -100,7 +100,8 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
 
       persistCheckoutModalInfo({
         invoiceID,
-        paymentReferenceNumber,
+        circlePaymentID,
+        paymentID,
         billingInfo,
         paymentInfo,
       });
@@ -112,7 +113,7 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
       return;
     }
 
-    onPurchaseSuccess(paymentReferenceNumber);
+    onPurchaseSuccess(circlePaymentID, paymentID);
   }, [
     fullPaymentState,
     hasWaited,
@@ -140,10 +141,10 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
 
       <StatusIcon
         variant="loading"
-        imgSrc={ purchasingImageSrc }
+        imgSrc={purchasingImageSrc}
         sx={{ mt: 5 }} />
 
-      { purchasingMessage ? <Typography variant="body2" sx={{ textAlign: "center", mt: 1.5 }}>{ purchasingMessage }</Typography> : null }
+      {purchasingMessage ? <Typography variant="body2" sx={{ textAlign: "center", mt: 1.5 }}>{purchasingMessage}</Typography> : null}
 
       <Box sx={{ maxWidth: XS_MOBILE_MAX_WIDTH, mx: "auto", my: 5 }}>
         <Typography variant="body2" sx={{ textAlign: "center", mb: 1.5 }}>Hang tight! We are currently processing your payment.</Typography>

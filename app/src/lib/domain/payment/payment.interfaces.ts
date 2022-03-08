@@ -1,4 +1,4 @@
-export type PaymentType = "CreditCard" |  "ACH" | "Wire" | "Crypto";
+export type PaymentType = "CreditCard" | "ACH" | "Wire" | "Crypto";
 
 export type PaymentStatus = "processed" | "processing" | "error";
 
@@ -33,3 +33,5 @@ export interface PaymentDetails {
   cardNumber: string;
   referenceNumber: string;
 }
+
+

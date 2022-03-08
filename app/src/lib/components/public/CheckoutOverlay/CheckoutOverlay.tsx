@@ -1,8 +1,9 @@
 import { Backdrop, Box, CircularProgress } from "@mui/material";
-import React, { ErrorInfo, useCallback, useEffect, useMemo, useRef } from "react";
+import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import { getSavedPaymentMethodAddressIdFromBillingInfo, savedPaymentMethodToBillingInfo, transformRawSavedPaymentMethods } from "../../../domain/circle/circle.utils";
 import { UserFormat } from "../../../domain/auth/authentication.interfaces";
 import { PaymentMethod, PaymentType } from "../../../domain/payment/payment.interfaces";
+import { CheckoutEventData, CheckoutEventType } from "../../../domain/events/events.interfaces";
 import { CheckoutItemInfo } from "../../../domain/product/product.interfaces";
 import { BillingInfo } from "../../../forms/BillingInfoForm";
 import { useDeletePaymentMethodMutation, useGetInvoiceDetailsQuery, useGetPaymentMethodListQuery, useMeQuery, useReleaseReservationBuyNowLotMutation } from "../../../queries/graphqlGenerated";
@@ -17,12 +18,13 @@ import { RawSavedPaymentMethod, SavedPaymentMethod } from "../../../domain/circl
 import { Theme, SxProps } from "@mui/material/styles";
 import { continuePlaidOAuthFlow, PlaidFlow } from "../../../hooks/usePlaid";
 import { ConsentType } from "../../shared/ConsentText/ConsentText";
-import { CheckoutModalError, useCheckoutModalState } from "./CheckoutOverlay.hooks";
+import { CheckoutModalError, CheckoutModalStepIndex, useCheckoutModalState } from "./CheckoutOverlay.hooks";
 import { DEFAULT_ERROR_AT, ERROR_LOADING_INVOICE, ERROR_LOADING_PAYMENT_METHODS, ERROR_LOADING_USER } from "../../../domain/errors/errors.constants";
 import { FullScreenOverlay } from "../../shared/FullScreenOverlay/FullScreenOverlay";
 import { ProvidersInjectorProps, withProviders } from "../../shared/ProvidersInjector/ProvidersInjector";
 import { transformCheckoutItemsFromInvoice } from "../../../domain/product/product.utils";
 import { useCreateInvoiceAndReservation } from "../../../hooks/useCreateInvoiceAndReservation";
+import { useCheckoutItemsCostTotal } from "../../../hooks/useCheckoutItemCostTotal";
 import { PUIDictionary } from "../../../domain/dictionary/dictionary.interfaces";
 import { DEFAULT_DICTIONARY } from "../../../domain/dictionary/dictionary.constants";
 import { ApolloError } from "@apollo/client";
@@ -66,8 +68,8 @@ export interface PUICheckoutOverlayProps {
 
   // Other Events:
   debug?: boolean;
+  onEvent?: (eventType: CheckoutEventType, eventData: CheckoutEventData) => void;
   onError?: (error: CheckoutModalError) => void;
-  onCatch?: (error: Error, errorInfo?: ErrorInfo) => void | true;
   onMarketingOptInChange?: (marketingOptIn: boolean) => void;
  }
 
@@ -112,6 +114,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
 
   // Other Events:
   debug,
+  onEvent,
   onError,
   onMarketingOptInChange, // Not implemented yet. Used to let user subscribe / unsubscribe to marketing updates.
 }) => {
@@ -140,7 +143,6 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     variables: { orgID },
   });
 
-
   // Get everything related to Payment UI routing, error and state handling, including resuming Plaid / 3DS flows:
 
   const {
@@ -166,8 +168,9 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     setTaxes,
     walletAddress,
     setWalletAddress,
-    paymentReferenceNumber,
-    setPaymentReferenceNumber,
+    paymentID,
+    circlePaymentID,
+    setPayments,
   } = useCheckoutModalState({
     invoiceID: initialInvoiceID,
     productConfirmationEnabled,
@@ -199,9 +202,12 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   // Payment methods and checkout items / invoice items transforms:
 
   const rawSavedPaymentMethods = paymentMethodsData?.getPaymentMethodList;
+  const savedPaymentMethods = useMemo(() => transformRawSavedPaymentMethods(rawSavedPaymentMethods as RawSavedPaymentMethod[]), [rawSavedPaymentMethods]);
+
+  // TODO: These should probably be combined.
   const invoiceItems = invoiceDetailsData?.getInvoiceDetails.items;
   const checkoutItems = useMemo(() => transformCheckoutItemsFromInvoice(parentCheckoutItems, invoiceItems), [parentCheckoutItems, invoiceItems]);
-  const savedPaymentMethods = useMemo(() => transformRawSavedPaymentMethods(rawSavedPaymentMethods as RawSavedPaymentMethod[]), [rawSavedPaymentMethods]);
+  const { total: subtotal, fees, taxAmount } = useCheckoutItemsCostTotal(checkoutItems);
 
 
   // Invoice creation & buy now lot reservation:
@@ -213,6 +219,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     createInvoiceAndReservation,
     countdownElementRef,
   } = useCreateInvoiceAndReservation({ orgID, checkoutItems, debug });
+
 
   useEffect(() => {
     if (isDialogLoading || invoiceID === null || invoiceID || createInvoiceAndReservationCalledRef.current) return;
@@ -237,7 +244,6 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     if (!isDialogLoading && open) initModalState();
   }, [isDialogLoading, open, initModalState]);
 
-
   // Data loading error handling:
 
   useEffect(() => {
@@ -246,6 +252,52 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     if (invoiceDetailsError) setError(ERROR_LOADING_INVOICE(invoiceDetailsError));
   }, [meError, paymentMethodsError, invoiceDetailsError, setError]);
 
+  const triggerAnalyticsEventFunction = (eventType: CheckoutEventType) => {
+    if (!onEvent) return;
+
+    const paymentInfo = selectedPaymentMethod.paymentInfo;
+
+    let paymentType: PaymentType | undefined = undefined;
+
+    if (typeof paymentInfo === "string") {
+      const payment = savedPaymentMethods.find(({ id }) => id === paymentInfo);
+
+      paymentType = payment?.type;
+    } else {
+      paymentType = paymentInfo.type;
+    }
+
+    onEvent(eventType, {
+      // Location:
+      step: CheckoutModalStepIndex[checkoutStep],
+      stepName: checkoutStep,
+
+      // Purchase:
+      departmentCategory: "NFT",
+      paymentType,
+      shippingMethod: walletAddress ? "custom wallet" : "multisig wallet",
+      checkoutItems,
+
+      // Payment:
+      currency: "USD",
+      revenue: subtotal + fees,
+      fees,
+      tax: taxAmount,
+      total: subtotal + fees + taxAmount,
+
+      // Order:
+      circlePaymentID,
+      paymentID,
+    });
+  };
+
+  const triggerAnalyticsEventRef = useRef(triggerAnalyticsEventFunction);
+
+  triggerAnalyticsEventRef.current = triggerAnalyticsEventFunction;
+
+  useEffect(() => {
+    setTimeout(() => triggerAnalyticsEventRef.current(`navigate:${ checkoutStep }`));
+  }, [checkoutStep]);
 
   // Saved payment method creation-reload-sync:
 
@@ -360,16 +412,20 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
 
   // Purchase:
 
-  const handlePurchaseSuccess = useCallback(async (nextPaymentReferenceNumber: string) => {
-    setPaymentReferenceNumber(nextPaymentReferenceNumber);
+  const handlePurchaseSuccess = useCallback(async (nextCirclePaymentID: string, nextPaymentID:string) => {
+    setPayments(nextCirclePaymentID, nextPaymentID);
+
+    setTimeout(() => triggerAnalyticsEventRef.current("event:paymentSuccess"));
 
     // After a successful purchase, a new payment method might have been created, so we reload them:
     await refetchPaymentMethods();
 
     goNext();
-  }, [refetchPaymentMethods, setPaymentReferenceNumber, goNext]);
+  }, [setPayments, refetchPaymentMethods, goNext]);
 
   const handlePurchaseError = useCallback(async (error: string | CheckoutModalError) => {
+    setTimeout(() => triggerAnalyticsEventRef.current("event:paymentError"));
+
     // After a failed purchase, a new payment method might have been created anyway, so we reload them (createPaymentMethod
     // works but createPayment fails):
     await refetchPaymentMethods();
@@ -600,7 +656,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
         checkoutItems={ checkoutItems }
         savedPaymentMethods={ savedPaymentMethods }
         selectedPaymentMethod={ selectedPaymentMethod }
-        paymentReferenceNumber={ paymentReferenceNumber }
+        circlePaymentID={ circlePaymentID }
         onGoToCollection={ onGoToCollection }
         onNext={ handleClose }
         dictionary={ dictionary } />

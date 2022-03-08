@@ -15,7 +15,7 @@ import { PUIDictionary } from "../../../domain/dictionary/dictionary.interfaces"
 
 export interface PurchaseConfirmationBillingDetailsProps {
   checkoutItems: CheckoutItem[];
-  paymentReferenceNumber: string;
+  circlePaymentID: string;
   selectedPaymentMethodBillingInfo: SavedPaymentMethodBillingInfo;
   selectedPaymentMethodPaymentInfo: PaymentMethod | SavedPaymentMethod;
   dictionary: PUIDictionary;
@@ -23,7 +23,7 @@ export interface PurchaseConfirmationBillingDetailsProps {
 
 export const PurchaseConfirmationBillingDetails: React.FC<PurchaseConfirmationBillingDetailsProps> = ({
   checkoutItems,
-  paymentReferenceNumber,
+  circlePaymentID,
   selectedPaymentMethodBillingInfo,
   selectedPaymentMethodPaymentInfo,
   dictionary
@@ -90,12 +90,12 @@ export const PurchaseConfirmationBillingDetails: React.FC<PurchaseConfirmationBi
 
         <ReadOnlyField
           label="Reference No."
-          value={ paymentReferenceNumber || "-" }
-          InputProps={ paymentReferenceNumber ? {
+          value={ circlePaymentID || "-" }
+          InputProps={ circlePaymentID ? {
             endAdornment: (
               <CopyButton
                 label="Reference No."
-                value={ paymentReferenceNumber }
+                value={ circlePaymentID }
                 size="small" />
             ),
           } : undefined } />

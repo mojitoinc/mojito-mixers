@@ -148,54 +148,54 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
       spacing={8.75}
     >
       <Stack sx={{ display: 'flex', flex: 1, overflow: "hidden" }}>
-        <CheckoutStepper progress={ 100 } />
+        <CheckoutStepper progress={100} />
 
         <BillingInfoItem
-          data={ selectedPaymentMethodBillingInfo }
+          data={selectedPaymentMethodBillingInfo}
           additionalProps={{ onEdit: onPrev, disabled: isDeleting, boxProps: billingInfoItemBoxProps }} />
 
         <Divider sx={{ mt: 2.5 }} />
 
-        { showSaved ? (
+        {showSaved ? (
           <SavedPaymentDetailsSelector
-            showLoader={ isDeleting }
-            savedPaymentMethods={ savedPaymentMethods }
-            selectedPaymentMethodId={ typeof selectedPaymentInfo === "string" ? selectedPaymentInfo : undefined }
-            onNew={ handleShowForm }
-            onDelete={ handleSavedPaymentMethodDeleted }
-            onPick={ onPaymentInfoSelected }
-            onCvvSelected={ onCvvSelected }
-            onNext={ onNext }
-            onClose={ onClose }
-            onAttemptSubmit={ handleFormAttemptSubmit }
-            consentType={ consentType }
-            privacyHref={ privacyHref }
-            termsOfUseHref={ termsOfUseHref } />
+            showLoader={isDeleting}
+            savedPaymentMethods={savedPaymentMethods}
+            selectedPaymentMethodId={typeof selectedPaymentInfo === "string" ? selectedPaymentInfo : undefined}
+            onNew={handleShowForm}
+            onDelete={handleSavedPaymentMethodDeleted}
+            onPick={onPaymentInfoSelected}
+            onCvvSelected={onCvvSelected}
+            onNext={onNext}
+            onClose={onClose}
+            onAttemptSubmit={handleFormAttemptSubmit}
+            consentType={consentType}
+            privacyHref={privacyHref}
+            termsOfUseHref={termsOfUseHref} />
         ) : (
           <PaymentMethodForm
             acceptedPaymentTypes={acceptedPaymentTypes}
-            defaultValues={ typeof selectedPaymentInfo === "string" ? undefined : selectedPaymentInfo }
-            checkoutError={ checkoutError }
-            onPlaidLinkClicked={ onPlaidLinkClicked }
-            onSaved={ savedPaymentMethods.length > 0 ? handleShowSaved : undefined }
-            onClose={ onClose }
-            onSubmit={ handleSubmit }
-            onAttemptSubmit={ handleFormAttemptSubmit }
-            consentType={ consentType }
-            privacyHref={ privacyHref }
-            termsOfUseHref={ termsOfUseHref }
-            dictionary={ dictionary }
-            debug={ debug } />
-        ) }
+            defaultValues={typeof selectedPaymentInfo === "string" ? undefined : selectedPaymentInfo}
+            checkoutError={checkoutError}
+            onPlaidLinkClicked={onPlaidLinkClicked}
+            onSaved={savedPaymentMethods.length > 0 ? handleShowSaved : undefined}
+            onClose={onClose}
+            onSubmit={handleSubmit}
+            onAttemptSubmit={handleFormAttemptSubmit}
+            consentType={consentType}
+            privacyHref={privacyHref}
+            termsOfUseHref={termsOfUseHref}
+            dictionary={dictionary}
+            debug={debug} />
+        )}
       </Stack>
 
       <CheckoutDeliveryAndItemCostBreakdown
-        checkoutItems={ checkoutItems }
-        taxes={ taxes }
-        validatePersonalDeliveryAddress={ formSubmitAttempted }
-        walletAddress={ walletAddress }
-        onWalletAddressChange={ onWalletAddressChange }
-        dictionary={ dictionary } />
+        checkoutItems={checkoutItems}
+        taxes={taxes}
+        validatePersonalDeliveryAddress={formSubmitAttempted}
+        walletAddress={walletAddress}
+        onWalletAddressChange={onWalletAddressChange}
+        dictionary={dictionary} />
     </Stack>
   );
 };

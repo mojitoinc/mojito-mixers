@@ -14,7 +14,7 @@ export interface ConfirmationViewProps {
   checkoutItems: CheckoutItem[];
   savedPaymentMethods: SavedPaymentMethod[];
   selectedPaymentMethod: SelectedPaymentMethod;
-  paymentReferenceNumber: string;
+  circlePaymentID: string;
   onGoToCollection?: () => void;
   onNext: () => void;
   dictionary: PUIDictionary;
@@ -24,7 +24,7 @@ export const ConfirmationView: React.FC<ConfirmationViewProps> = ({
   checkoutItems,
   savedPaymentMethods,
   selectedPaymentMethod,
-  paymentReferenceNumber,
+  circlePaymentID,
   onGoToCollection,
   onNext,
   dictionary,
@@ -69,7 +69,7 @@ export const ConfirmationView: React.FC<ConfirmationViewProps> = ({
 
       <PurchaseConfirmationBillingDetails
         checkoutItems={ checkoutItems }
-        paymentReferenceNumber={ paymentReferenceNumber }
+        circlePaymentID={ circlePaymentID }
         selectedPaymentMethodBillingInfo={ selectedPaymentMethodBillingInfo }
         selectedPaymentMethodPaymentInfo={ selectedPaymentMethodPaymentInfo }
         dictionary={ dictionary } />
