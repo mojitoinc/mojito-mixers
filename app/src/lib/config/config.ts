@@ -1,3 +1,7 @@
+// Debug Mode:
+export const COUNTER_EXPIRATION_MS = 1000;
+export const COUNTER_CLICKS_NEEDED = 16;
+
 // Invoice / Reservation:
 export const RESERVATION_COUNTDOWN_FROM_MIN = 15;
 export const RESERVATION_COUNTDOWN_FROM_MS = RESERVATION_COUNTDOWN_FROM_MIN * 60 * 1000;

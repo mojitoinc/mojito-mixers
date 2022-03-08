@@ -1,5 +1,5 @@
 import { Backdrop, Box, CircularProgress } from "@mui/material";
-import React, { useCallback, useEffect, useMemo, useRef } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { getSavedPaymentMethodAddressIdFromBillingInfo, savedPaymentMethodToBillingInfo, transformRawSavedPaymentMethods } from "../../../domain/circle/circle.utils";
 import { UserFormat } from "../../../domain/auth/authentication.interfaces";
 import { PaymentMethod, PaymentType } from "../../../domain/payment/payment.interfaces";
@@ -113,11 +113,13 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   isAuthenticatedLoading,
 
   // Other Events:
-  debug,
+  debug: initialDebug,
   onEvent,
   onError,
   onMarketingOptInChange, // Not implemented yet. Used to let user subscribe / unsubscribe to marketing updates.
 }) => {
+  const [debug, setDebug] = useState(!!initialDebug);
+
   // TODO: This should end up being in a context + hook to avoid prop drilling and it should be memoized:
   const dictionary = {
     ...DEFAULT_DICTIONARY,
@@ -678,7 +680,8 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
       user={ meData?.me?.user }
       userFormat={ userFormat }
       onLoginClicked={ onLogin }
-      onPrevClicked={ checkoutStep === "authentication" ? handleClose : goBack } />
+      onPrevClicked={ checkoutStep === "authentication" ? handleClose : goBack }
+      setDebug={ setDebug } />
   );
 
   return (

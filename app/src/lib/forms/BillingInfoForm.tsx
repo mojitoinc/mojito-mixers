@@ -14,7 +14,7 @@ import { Box, InputAdornment, Typography } from "@mui/material";
 import BookIcon from "@mui/icons-material/Book";
 import { EMPTY_OPTION, SelectOption } from "../components/shared/Select/Select";
 import { withFullNameErrorMessage, withPhoneErrorMessage, withRequiredErrorMessage } from "../utils/validationUtils";
-import { DebugBox } from "../components/payments/DisplayBox/DisplayBox";
+import { DebugBox } from "../components/payments/DebugBox/DebugBox";
 import { CheckoutModalError } from "../components/public/CheckoutOverlay/CheckoutOverlay.hooks";
 import { useFormCheckoutError } from "../hooks/useFormCheckoutError";
 import { TaxesMessagesBox } from "../components/shared/TaxesMessagesBox/TaxesMessagesBox";
@@ -233,7 +233,7 @@ export const BillingInfoForm: React.FC<BillingInfoFormProps> = ({
       />
 
       { debug && phone && (
-        <DebugBox>Debug: { formatPhoneAsE123(phone || "", `${ selectedCountryCode }`) }</DebugBox>
+        <DebugBox compact sx={{ mt: 1 }}>{ formatPhoneAsE123(phone || "", `${ selectedCountryCode }`) }</DebugBox>
       ) }
 
       <InputGroupLabel sx={{ m: 0, pt: 2 }}>Address</InputGroupLabel>

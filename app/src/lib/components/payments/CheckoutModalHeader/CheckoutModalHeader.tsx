@@ -7,8 +7,8 @@ import { NBSP } from "../../../utils/formatUtils";
 import { UserFormat } from "../../../domain/auth/authentication.interfaces";
 import { getFormattedUser } from "./CheckoutModalHeader.utils";
 import { User } from "../../../queries/graphqlGenerated";
-import React from "react";
-import { RESERVATION_COUNTDOWN_FROM_MIN } from "../../../config/config";
+import React, { useRef, useCallback, Dispatch, SetStateAction } from "react";
+import { COUNTER_CLICKS_NEEDED, COUNTER_EXPIRATION_MS, RESERVATION_COUNTDOWN_FROM_MIN } from "../../../config/config";
 
 export type CheckoutModalHeaderVariant = "anonymous" | "guest" | "loggedIn" | "logoOnly" | "purchasing" | "error";
 
@@ -40,6 +40,7 @@ export interface CheckoutModalHeaderProps {
   userFormat?: UserFormat;
   onLoginClicked?: () => void;
   onPrevClicked?: () => void;
+  setDebug?: Dispatch<SetStateAction<boolean>>;
 }
 
 const COUNTDOWN_CONTAINER_SX: SxProps<Theme> = {
@@ -70,10 +71,37 @@ export const CheckoutModalHeader: React.FC<CheckoutModalHeaderProps> = ({
   userFormat,
   onLoginClicked,
   onPrevClicked,
+  setDebug,
 }) => {
   const title = customTitle || CHECKOUT_MODAL_TITLE[variant] || NBSP;
   const displayUsername = getFormattedUser(variant, user, userFormat);
   const showControls = CHECKOUT_MODAL_CONTROLS[variant] || false;
+
+  const clickCounterRef = useRef(0);
+  const clickTimestampRef = useRef(0);
+
+  const handleLogoClick = useCallback(() => {
+    if (!setDebug) return;
+
+    const counter = clickCounterRef.current;
+    const timestamp = clickTimestampRef.current;
+    const now = Date.now();
+    const elapsed = now - timestamp;
+    const nextCounter = elapsed > COUNTER_EXPIRATION_MS || counter === COUNTER_CLICKS_NEEDED ? 1 : counter + 1;
+
+    clickTimestampRef.current = now;
+    clickCounterRef.current = nextCounter;
+
+    if (nextCounter === COUNTER_CLICKS_NEEDED) {
+      setDebug((prevValue) => {
+        const nextValue = !prevValue;
+
+        console.log(`\n🐞 DEBUG MODE ${ nextValue ? "ENABLED" : "DISABLED" }!\n\n`);
+
+        return nextValue;
+      });
+    }
+  }, [setDebug]);
 
   return (
     <Box>
@@ -83,6 +111,7 @@ export const CheckoutModalHeader: React.FC<CheckoutModalHeaderProps> = ({
         <Box
           component="img"
           src={ logoSrc }
+          onClick={ setDebug ? handleLogoClick : undefined }
           sx={{
             maxHeight: "32px",
             maxWidth: { xs: "180px", sm: "240px" },

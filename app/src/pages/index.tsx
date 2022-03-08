@@ -205,7 +205,7 @@ const HomePage: React.FC = () => {
     isAuthenticatedLoading,
 
     // Other Events:
-    debug: true,
+    debug: false,
     onEvent: handleEvent,
     onError: handleError,
     onCatch: handleCatch,
