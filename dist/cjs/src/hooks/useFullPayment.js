@@ -4,6 +4,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 var tslib_es6 = require('../../node_modules/tslib/tslib.es6.js');
 var React = require('react');
+var config = require('../config/config.js');
 var circle_utils = require('../domain/circle/circle.utils.js');
 var errors_constants = require('../domain/errors/errors.constants.js');
 var graphqlGenerated = require('../queries/graphqlGenerated.js');
@@ -11,7 +12,6 @@ var promiseUtils = require('../utils/promiseUtils.js');
 var useCreatePaymentMethod = require('./useCreatePaymentMethod.js');
 var useEncryptCard = require('./useEncryptCard.js');
 
-const CIRCLE_MAX_EXPECTED_PAYMENT_CREATION_PROCESSING_TIME = 5000;
 function useFullPayment({ orgID, invoiceID, savedPaymentMethods, selectedPaymentMethod, debug = false, }) {
     const [paymentState, setPaymentState] = React.useState({
         paymentStatus: "processing",
@@ -139,7 +139,7 @@ function useFullPayment({ orgID, invoiceID, savedPaymentMethods, selectedPayment
                 },
             };
         }
-        const paymentMethodStatusWaitTime = Math.max(CIRCLE_MAX_EXPECTED_PAYMENT_CREATION_PROCESSING_TIME - (Date.now() - paymentMethodCreatedAt), 0);
+        const paymentMethodStatusWaitTime = Math.max(config.CIRCLE_MAX_EXPECTED_PAYMENT_CREATION_PROCESSING_TIME - (Date.now() - paymentMethodCreatedAt), 0);
         if (paymentMethodStatusWaitTime)
             yield promiseUtils.wait(paymentMethodStatusWaitTime);
         const makePaymentResult = yield makePayment({
