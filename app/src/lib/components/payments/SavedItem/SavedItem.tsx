@@ -7,6 +7,7 @@ import React, { useCallback } from "react";
 import { ThemeColors } from "../../../domain/mui/mui.interfaces";
 import { DisplayBox } from "../DisplayBox/DisplayBox";
 import { InlineField } from "../../shared/InlineField/InlineField";
+import { Theme, SxProps } from "@mui/material/styles";
 
 export interface SavedItemLabels {
   active?: string;
@@ -45,6 +46,14 @@ const DEFAULT_SAVED_ITEM_LABELS: Required<SavedItemLabels> = {
   edit: "Edit Info",
   delete: "Delete",
   select: "Use Info",
+};
+
+const DISPLAY_BOX_SX: SxProps<Theme> = {
+  display: "flex",
+  flexDirection: {
+    xs: "column",
+    sm: "row"
+  },
 };
 
 export const SavedItem: React.FC<SavedItemProps> = ({
@@ -106,7 +115,7 @@ export const SavedItem: React.FC<SavedItemProps> = ({
   }
 
   return (
-    <DisplayBox { ...boxProps }>
+    <DisplayBox { ...boxProps } sx={{ ...DISPLAY_BOX_SX, ...boxProps?.sx }}>
 
       { variant === "stacked" ? (
         <Box sx={{ flex: 1, pb: 2 }}>
