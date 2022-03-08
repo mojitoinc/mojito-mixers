@@ -227,11 +227,9 @@ const App: React.FC = () => {
     isAuthenticated,
     isAuthenticatedLoading: isLoading,
 
-    // Steps Events:
-    onEvent: handleEvent,
-
     // Other Events:
     debug: true,
+    onEvent: handleEvent,
     onError: handleError,
     onCatch: handleCatch,
     onMarketingOptInChange: handleMarketingOptInChange,
@@ -420,7 +418,7 @@ If you don't want this behavior or would like to implement a custom one, you sho
 The `onEvent` prop can be used to get updates about the progress of the user using the Payment UI, which can be useful for analytics:
 
 ```TSX
-onEvent?: (eventType: CheckoutEventType, eventData: CheckoutEventData) => void
+onEvent?: (eventType: CheckoutEventType, eventData: CheckoutEventData) => void;
 ```
 
 <br />

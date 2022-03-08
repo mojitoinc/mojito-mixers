@@ -1,5 +1,5 @@
 import { Backdrop, Box, CircularProgress } from "@mui/material";
-import React, { ErrorInfo, useCallback, useEffect, useMemo, useRef } from "react";
+import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import { getSavedPaymentMethodAddressIdFromBillingInfo, savedPaymentMethodToBillingInfo, transformRawSavedPaymentMethods } from "../../../domain/circle/circle.utils";
 import { UserFormat } from "../../../domain/auth/authentication.interfaces";
 import { PaymentMethod, PaymentType } from "../../../domain/payment/payment.interfaces";
@@ -70,7 +70,6 @@ export interface PUICheckoutOverlayProps {
   debug?: boolean;
   onEvent?: (eventType: CheckoutEventType, eventData: CheckoutEventData) => void;
   onError?: (error: CheckoutModalError) => void;
-  onCatch?: (error: Error, errorInfo?: ErrorInfo) => void | true;
   onMarketingOptInChange?: (marketingOptIn: boolean) => void;
  }
 
@@ -107,7 +106,6 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   orgID,
   invoiceID: initialInvoiceID,
   checkoutItems: parentCheckoutItems,
-  onEvent,
 
   // Authentication:
   onLogin,
@@ -116,6 +114,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
 
   // Other Events:
   debug,
+  onEvent,
   onError,
   onMarketingOptInChange, // Not implemented yet. Used to let user subscribe / unsubscribe to marketing updates.
 }) => {
