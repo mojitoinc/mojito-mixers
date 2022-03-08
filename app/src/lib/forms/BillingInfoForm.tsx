@@ -10,16 +10,17 @@ import { CheckoutModalFooter } from "../components/payments/CheckoutModalFooter/
 import { InputGroupLabel } from "../components/shared/InputGroupLabel/InputGroupLabel";
 import { ControlledTextField } from "../components/shared/TextField/TextField";
 import { SecondaryButton } from "../components/shared/SecondaryButton/SecondaryButton";
-import { Box } from "@mui/material";
+import { Box, InputAdornment, Typography } from "@mui/material";
 import BookIcon from "@mui/icons-material/Book";
 import { EMPTY_OPTION, SelectOption } from "../components/shared/Select/Select";
-import { withRequiredErrorMessage } from "../utils/validationUtils";
+import { withFullNameErrorMessage, withPhoneErrorMessage, withRequiredErrorMessage } from "../utils/validationUtils";
 import { DebugBox } from "../components/payments/DisplayBox/DisplayBox";
 import { CheckoutModalError } from "../components/public/CheckoutOverlay/CheckoutOverlay.hooks";
 import { useFormCheckoutError } from "../hooks/useFormCheckoutError";
 import { TaxesMessagesBox } from "../components/shared/TaxesMessagesBox/TaxesMessagesBox";
 import { TaxesState } from "../views/Billing/BillingView";
 import { FormErrorsBox } from "../components/shared/FormErrorsBox/FormErrorsBox";
+import { formatPhoneAsE123, getPhonePrefix, phoneHasPrefix } from "../domain/circle/circle.utils";
 
 const FULL_NAME_FIELD = "fullName";
 const EMAIL_FIELD = "email";
@@ -81,14 +82,34 @@ const schema = object()
   .shape({
     [FULL_NAME_FIELD]: string()
       .label(FIELD_LABELS[FULL_NAME_FIELD])
-      .required(withRequiredErrorMessage),
+      .required(withRequiredErrorMessage)
+      .test({
+        name: "is-valid-full-name",
+        test: (value) => {
+          if (!value) return false;
+
+          return /(. .)/.test(value);
+        },
+        message: withFullNameErrorMessage,
+      }),
     [EMAIL_FIELD]: string()
       .label(FIELD_LABELS[EMAIL_FIELD])
-      .email()
-      .required(withRequiredErrorMessage),
+      .required(withRequiredErrorMessage)
+      .email(),
     [PHONE_FIELD]: string()
       .label(FIELD_LABELS[PHONE_FIELD])
-      .required(withRequiredErrorMessage),
+      .required(withRequiredErrorMessage)
+      .test({
+        name: "is-valid-phone-number",
+        test: (value, context) => {
+          if (!value) return false;
+
+          const formattedPhoneNumber = formatPhoneAsE123(value || "", context.parent.country?.value || "");
+
+          return /\+(?:[0-9] ?){6,14}[0-9]$/.test(formattedPhoneNumber);
+        },
+        message: withPhoneErrorMessage,
+      }),
     [STREET_FIELD]: string()
       .label(FIELD_LABELS[STREET_FIELD])
       .required(withRequiredErrorMessage),
@@ -104,12 +125,12 @@ const schema = object()
       value: string()
         .label(FIELD_LABELS[STATE_FIELD])
         .required(withRequiredErrorMessage)
-      }),
+    }),
     [COUNTRY_FIELD]: object().shape({
       value: string()
         .label(FIELD_LABELS[COUNTRY_FIELD])
         .required(withRequiredErrorMessage)
-      }),
+    }),
   }).required();
 
 export interface BillingInfoFormProps {
@@ -152,7 +173,7 @@ export const BillingInfoForm: React.FC<BillingInfoFormProps> = ({
     resolver: yupResolver(schema),
   });
 
-  const [street, zip, city, state, country] = watch([STREET_FIELD, ZIP_CODE_FIELD, CITY_FIELD, STATE_FIELD, COUNTRY_FIELD]);
+  const [phone, street, zip, city, state, country] = watch([PHONE_FIELD, STREET_FIELD, ZIP_CODE_FIELD, CITY_FIELD, STATE_FIELD, COUNTRY_FIELD]);
 
   useEffect(() => {
     onTaxInfoChange({
@@ -202,7 +223,18 @@ export const BillingInfoForm: React.FC<BillingInfoFormProps> = ({
         name={PHONE_FIELD}
         control={control}
         label={FIELD_LABELS[PHONE_FIELD]}
+        InputProps={ selectedCountryCode && !phoneHasPrefix(phone) ? {
+          startAdornment: (
+            <InputAdornment position="start">
+              <Typography variant="subtitle1" component="span" sx={{ pointerEvents: "none" }}>{ getPhonePrefix(`${ selectedCountryCode }`) }</Typography>
+            </InputAdornment>
+          ),
+        } : undefined}
       />
+
+      { debug && phone && (
+        <DebugBox>Debug: { formatPhoneAsE123(phone || "", `${ selectedCountryCode }`) }</DebugBox>
+      ) }
 
       <InputGroupLabel sx={{ m: 0, pt: 2 }}>Address</InputGroupLabel>
 
