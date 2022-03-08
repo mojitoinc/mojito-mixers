@@ -157,16 +157,16 @@ const App: React.FC = () => {
     Sentry.captureException(error);
   }, []);
 
-  const handleEvent = useCallback((eventType: CheckoutEventType, eventData: Partial<CheckoutEventData>) => {
-    // Handle the data for each step as you need 
-  },)
+  const handleEvent = useCallback((eventType: CheckoutEventType, eventData: CheckoutEventData) => {
+    // Handle the data for each step or action as needed.
+  }, []);
 
   const handleCatch = useCallback((error: Error, errorInfo?: ErrorInfo) => {
     Sentry.captureException({ error, errorInfo });
   }, []);
 
   const handleMarketingOptInChange = useCallback((marketingOptIn: boolean) => {
-    // Subscribe / unsubscribe
+    // Subscribe / unsubscribe.
   }, []);
 
   useEffect(() => {
