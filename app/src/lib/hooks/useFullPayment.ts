@@ -18,6 +18,7 @@ export interface UseFullPaymentOptions {
   invoiceID: string;
   savedPaymentMethods: SavedPaymentMethod[];
   selectedPaymentMethod: SelectedPaymentMethod;
+  walletAddress: string | null;
   debug?: boolean;
 }
 
@@ -33,6 +34,7 @@ export function useFullPayment({
   invoiceID,
   savedPaymentMethods,
   selectedPaymentMethod,
+  walletAddress,
   debug = false,
 }: UseFullPaymentOptions): [FullPaymentState, () => Promise<void>] {
   const [paymentState, setPaymentState] = useState<FullPaymentState>({
@@ -169,8 +171,9 @@ export function useFullPayment({
       });
     }
 
-
-    let metadata: CreatePaymentMetadataInput | undefined;
+    const metadata: Partial<CreatePaymentMetadataInput> = walletAddress ? {
+      destinationAddress: walletAddress,
+    } : { };
 
     if (cvv) {
       const encryptCardDataResult = await encryptCardData({
@@ -191,11 +194,9 @@ export function useFullPayment({
 
       const { keyID, encryptedCardData } = encryptCardDataResult;
 
-      metadata = {
-        creditCardData: {
-          keyID,
-          encryptedData: encryptedCardData,
-        },
+      metadata.creditCardData = {
+        keyID,
+        encryptedData: encryptedCardData,
       };
     }
 
@@ -207,7 +208,7 @@ export function useFullPayment({
       variables: {
         paymentMethodID,
         invoiceID,
-        metadata,
+        metadata: Object.keys(metadata).length > 0 ? (metadata as CreatePaymentMetadataInput) : undefined,
       },
     }).catch((error: ApolloError | Error) => {
       mutationError = error;
@@ -240,6 +241,7 @@ export function useFullPayment({
     invoiceID,
     savedPaymentMethods,
     selectedPaymentMethod,
+    walletAddress,
     debug,
     setError,
     encryptCardData,

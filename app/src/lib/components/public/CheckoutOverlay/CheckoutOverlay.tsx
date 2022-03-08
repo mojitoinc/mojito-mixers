@@ -643,6 +643,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
         invoiceID={ invoiceID }
         savedPaymentMethods={ savedPaymentMethods }
         selectedPaymentMethod={ selectedPaymentMethod }
+        walletAddress={ walletAddress }
         onPurchaseSuccess={ handlePurchaseSuccess }
         onPurchaseError={ handlePurchaseError }
         onDialogBlocked={ setIsDialogBlocked }
