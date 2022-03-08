@@ -18,7 +18,7 @@ import { RawSavedPaymentMethod, SavedPaymentMethod } from "../../../domain/circl
 import { Theme, SxProps } from "@mui/material/styles";
 import { continuePlaidOAuthFlow, PlaidFlow } from "../../../hooks/usePlaid";
 import { ConsentType } from "../../shared/ConsentText/ConsentText";
-import { CheckoutModalError, CheckoutModalStep, CheckoutModalStepIndex, useCheckoutModalState } from "./CheckoutOverlay.hooks";
+import { CheckoutModalError, CheckoutModalStepIndex, useCheckoutModalState } from "./CheckoutOverlay.hooks";
 import { DEFAULT_ERROR_AT, ERROR_LOADING_INVOICE, ERROR_LOADING_PAYMENT_METHODS, ERROR_LOADING_USER } from "../../../domain/errors/errors.constants";
 import { FullScreenOverlay } from "../../shared/FullScreenOverlay/FullScreenOverlay";
 import { ProvidersInjectorProps, withProviders } from "../../shared/ProvidersInjector/ProvidersInjector";
@@ -38,7 +38,7 @@ export interface PUICheckoutOverlayProps {
   // Flow:
   guestCheckoutEnabled?: boolean;
   productConfirmationEnabled?: boolean;
-  onEvent?: (eventType: CheckoutEventType, eventData: Partial<CheckoutEventData>) => void;
+
   // Personalization:
   logoSrc: string;
   logoSx?: SxProps<Theme>;
@@ -68,6 +68,7 @@ export interface PUICheckoutOverlayProps {
 
   // Other Events:
   debug?: boolean;
+  onEvent?: (eventType: CheckoutEventType, eventData: CheckoutEventData) => void;
   onError?: (error: CheckoutModalError) => void;
   onCatch?: (error: Error, errorInfo?: ErrorInfo) => void | true;
   onMarketingOptInChange?: (marketingOptIn: boolean) => void;
@@ -202,11 +203,13 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   // Payment methods and checkout items / invoice items transforms:
 
   const rawSavedPaymentMethods = paymentMethodsData?.getPaymentMethodList;
+  const savedPaymentMethods = useMemo(() => transformRawSavedPaymentMethods(rawSavedPaymentMethods as RawSavedPaymentMethod[]), [rawSavedPaymentMethods]);
+
+  // TODO: These should probably be combined.
   const invoiceItems = invoiceDetailsData?.getInvoiceDetails.items;
-  /// TODO: These two should probably be combined.
   const checkoutItems = useMemo(() => transformCheckoutItemsFromInvoice(parentCheckoutItems, invoiceItems), [parentCheckoutItems, invoiceItems]);
   const { total: subtotal, fees, taxAmount } = useCheckoutItemsCostTotal(checkoutItems);
-  const savedPaymentMethods = useMemo(() => transformRawSavedPaymentMethods(rawSavedPaymentMethods as RawSavedPaymentMethod[]), [rawSavedPaymentMethods]);
+
 
   // Invoice creation & buy now lot reservation:
 
@@ -250,37 +253,60 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     if (invoiceDetailsError) setError(ERROR_LOADING_INVOICE(invoiceDetailsError));
   }, [meError, paymentMethodsError, invoiceDetailsError, setError]);
 
-  const mapCheckout = useCallback((step:CheckoutModalStep):Partial<CheckoutEventData>=>{
-    const payment = savedPaymentMethods.find(paymentMethod=>paymentMethod.id===selectedPaymentMethod.paymentInfo)
-    return {
-      customerId: "", //empty for now
-      departmenCategory: "NFT",
-      paymentMethod: payment?.type,
-      revenue: subtotal,
+  const triggerAnalyticsEvent = useCallback((eventType: CheckoutEventType) => {
+    if (!onEvent) return;
+
+    const paymentInfo = selectedPaymentMethod.paymentInfo;
+
+    let paymentType: PaymentType | undefined = undefined;
+
+    if (typeof paymentInfo === "string") {
+      const payment = savedPaymentMethods.find(({ id }) => id === paymentInfo);
+
+      paymentType = payment?.type;
+    } else {
+      paymentType = paymentInfo.type;
+    }
+
+    onEvent(eventType, {
+      // Location:
+      step: CheckoutModalStepIndex[checkoutStep],
+      stepName: checkoutStep,
+
+      // Purchase:
+      departmentCategory: "NFT",
+      paymentType,
       shippingMethod: walletAddress ? "custom wallet" : "multisig wallet",
-      step: CheckoutModalStepIndex[step],
-      stepName: step,
+      checkoutItems,
+
+      // Payment:
       currency: "USD",
+      revenue: subtotal + fees,
       fees,
       tax: taxAmount,
-      products: checkoutItems,
+      total: subtotal + fees + taxAmount,
+
+      // Order:
       circlePaymentID,
       paymentID,
-      total:subtotal + fees
-    }
-  },[savedPaymentMethods, subtotal, walletAddress, fees, taxAmount, checkoutItems, circlePaymentID, paymentID, selectedPaymentMethod.paymentInfo])
-
-  const raisedEvent = useCallback((event:string)=>{
-    const data =  mapCheckout(checkoutStep);
-    if(onEvent){
-      const eventLabel = `${event==="event"?"event:payment":`navigate:${checkoutStep}`}`
-      onEvent(eventLabel as CheckoutEventType,data)
-    }
-  },[checkoutStep, mapCheckout, onEvent]);
+    });
+  },[
+    onEvent,
+    savedPaymentMethods,
+    selectedPaymentMethod.paymentInfo,
+    checkoutStep,
+    walletAddress,
+    checkoutItems,
+    subtotal,
+    fees,
+    taxAmount,
+    circlePaymentID,
+    paymentID,
+  ]);
 
   useEffect(() => {
-    raisedEvent("navigate")
-  }, [checkoutStep, raisedEvent]);
+    triggerAnalyticsEvent(`navigate:${ checkoutStep }`)
+  }, [checkoutStep, triggerAnalyticsEvent]);
 
   // Saved payment method creation-reload-sync:
 
@@ -396,16 +422,13 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   }, [checkoutStep, deletePaymentMethod, orgID, refetchPaymentMethods, savedPaymentMethods, setSelectedPaymentMethod]);
 
 
-
-
   // Purchase:
 
-  const handlePaymentAttempted =useCallback(()=>{
-    raisedEvent("event")
-  },[raisedEvent]);
+  const handlePurchaseSuccess = useCallback(async (nextCirclePaymentID: string, nextPaymentID:string) => {
+    setPayments(nextCirclePaymentID, nextPaymentID);
 
-  const handlePurchaseSuccess = useCallback(async (nextCirclePaymentIDNumber: string, nextPaymentIdNumber:string) => {
-    setPayments(nextCirclePaymentIDNumber,nextPaymentIdNumber);
+    triggerAnalyticsEvent("event:paymentSuccess");
+
     // After a successful purchase, a new payment method might have been created, so we reload them:
     await refetchPaymentMethods();
 
@@ -416,15 +439,17 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     // }
 
     goNext();
-  }, [setPayments, refetchPaymentMethods, goNext]);
+  }, [setPayments, triggerAnalyticsEvent, refetchPaymentMethods, goNext]);
 
   const handlePurchaseError = useCallback(async (error: string | CheckoutModalError) => {
+    triggerAnalyticsEvent("event:paymentError");
+
     // After a failed purchase, a new payment method might have been created anyway, so we reload them (createPaymentMethod
     // works but createPayment fails):
     await refetchPaymentMethods();
 
     setError(error);
-  }, [refetchPaymentMethods, setError]);
+  }, [triggerAnalyticsEvent, refetchPaymentMethods, setError]);
 
   const [releaseReservationBuyNowLot] = useReleaseReservationBuyNowLotMutation({
     variables: {
@@ -605,7 +630,6 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   } else if (checkoutStep === "payment") {
     checkoutStepElement = (
       <PaymentView
-        onPaymentAttempted={handlePaymentAttempted}
         checkoutItems={ checkoutItems }
         taxes={ taxes }
         savedPaymentMethods={ savedPaymentMethods }

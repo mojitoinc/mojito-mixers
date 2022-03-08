@@ -1,22 +1,35 @@
-import { CheckoutItem } from "../..";
+import { PaymentType } from "../payment/payment.interfaces";
+import { CheckoutItem } from "../product/product.interfaces";
+
+type ShippingMethod = "custom wallet" | "multisig wallet";
 
 export interface CheckoutEventData {
-  customerId: string;
-  departmenCategory: "NFT";
-  paymentMethod: "ACH" | "CreditCard" | undefined;
-  revenue: number;
-  shippingMethod: "custom wallet" | "multisig wallet";
+  // auth0ID: string; // Not added, already on the parent.
+  // checkoutType: string; // Not added, already on the parent.
+  // customerId: string; // Not added, already on the parent.
+
+  // Location:
   step: number;
   stepName: string;
-  currency: "USD",
-  fees: number;
-  total: number;
-  products: CheckoutItem[],
-  tax: number;
-  circlePaymentID: string;
-  paymentID: string;
-}
-export type CheckoutModalNavigateType = "navigate:authentication" | "navigate:billing" | "navigate:payment" | "navigate:purchasing" | "navigate:confirmation" | "navigate:error";
-export type CheckoutModalEventType = "event:payment";
 
-export type CheckoutEventType = CheckoutModalNavigateType | CheckoutModalEventType
+  // Purchase:
+  departmentCategory: "NFT";
+  paymentType?: PaymentType;
+  shippingMethod: ShippingMethod;
+  checkoutItems: CheckoutItem[]; // Provided as this might be a mix of the checkoutItems prop and some additional data from the invoice.
+
+  // Payment:
+  currency: "USD";
+  revenue: number; // Revenue (subtotal) associated with the transaction, excluding shipping and taxes.
+  fees: number;
+  tax?: number;
+  total: number; // Total value of the order with discounts, taxes and fees.
+
+  // Order:
+  circlePaymentID?: string; // Can be used as orderID.
+  paymentID?: string; // Can be used as orderID.
+}
+
+export type CheckoutModalNavigateType = "navigate:authentication" | "navigate:billing" | "navigate:payment" | "navigate:purchasing" | "navigate:confirmation" | "navigate:error";
+export type CheckoutModalEventType = "event:paymentSuccess" | "event:paymentError";
+export type CheckoutEventType = CheckoutModalNavigateType | CheckoutModalEventType;

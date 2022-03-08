@@ -248,8 +248,8 @@ export function useCheckoutModalState({
     setTaxes,
     walletAddress,
     setWalletAddress,
-    setPayments,
     circlePaymentID,
     paymentID,
+    setPayments,
   };
 }

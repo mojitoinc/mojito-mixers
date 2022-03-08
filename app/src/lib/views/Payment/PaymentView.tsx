@@ -36,7 +36,6 @@ export interface PaymentViewProps {
   onCvvSelected: (cvv: string) => void;
   onSavedPaymentMethodDeleted: (savedPaymentMethodId: string) => void;
   onWalletAddressChange: (walletAddress: string | null) => void;
-  onPaymentAttempted: () => void;
   onNext: () => void;
   onPrev: () => void;
   onClose: () => void;
@@ -59,7 +58,6 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
   onCvvSelected,
   onSavedPaymentMethodDeleted,
   onWalletAddressChange,
-  onPaymentAttempted,
   onNext,
   onPrev,
   onClose,
@@ -117,12 +115,7 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
     setViewState({ isDeleting: false, showSaved: remainingPaymentMethods > 0 });
   }, [onSavedPaymentMethodDeleted, savedPaymentMethods.length]);
 
-  const handleFormAttemptSubmit = useCallback(() => {
-    onPaymentAttempted()
-    setFormSubmitAttempted(true)
-  }, [onPaymentAttempted]);
-
-
+  const handleFormAttemptSubmit = useCallback(() => setFormSubmitAttempted(true), []);
 
   useEffect(() => {
     if (!selectedPaymentMethodBillingInfo) onPrev();

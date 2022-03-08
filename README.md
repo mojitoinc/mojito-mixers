@@ -414,50 +414,72 @@ If you don't want this behavior or would like to implement a custom one, you sho
 
 <br />
 
+
 ## Event CallBack
 
-If a callback is passed to the `event` property This will be call every time a new step has been made. 
+The `event` prop can be used to get updates about the progress of the user using the Payment UI, which can be useful for analytics:
 
-The callback will return two properties;  the eventType and the eventData.
+```TSX
+    (eventType: CheckoutEventType, eventData: Partial<CheckoutEventData>) => void;
+```
 
-### Event types:
+<br />
+
+
+### `eventType: CheckoutEventType` values:
+
+Events triggered when the user sees a specific view:
 
 - `navigate:authentication`
-
 - `navigate:billing`
-
 - `navigate:payment`
-
 - `navigate:purchasing`
-
 - `navigate:confirmation`
-
 - `navigate:error`
 
-- `event:payment`  when clicked on Purchase button.
+Events triggered when the user performs a specific action:
 
-### Event data
+- `event:payment`: The "Purchase" button in the Payment view has been clicked and the payment has been made.
 
-```
-{
-  customerId: string; // empty for now
-  departmenCategory: "NFT";
-  paymentMethod: "ACH" | "CreditCard" | undefined;
-  revenue: number;
-  shippingMethod: "custom wallet" | "multisig wallet";
+<br />
+
+
+### `eventData: Partial<CheckoutEventData>` props:
+
+All events will provide this data, but notice some properties are optional, as they might not be available for all steps:
+
+```TSX
+interface CheckoutEventData {
+  // auth0ID: string; // Not added, already on the parent.
+  // checkoutType: string; // Not added, already on the parent.
+  // customerId: string; // Not added, already on the parent.
+
+  // Location:
   step: number;
   stepName: string;
-  currency: "USD",
+
+  // Purchase:
+  departmentCategory: "NFT";
+  paymentType?: PaymentType;
+  shippingMethod: ShippingMethod;
+  checkoutItems: CheckoutItem[]; // Provided as this might be a mix of the checkoutItems prop and some additional data from the invoice.
+
+  // Payment:
+  currency: "USD";
+  revenue: number; // Revenue (subtotal) associated with the transaction, excluding shipping and taxes.
   fees: number;
-  total: number;
-  products: CheckoutItem[],
-  tax: number;
-  circlePaymentID: string;
-  paymentID: string;
+  tax?: number;
+  total: number; // Total value of the order with discounts, taxes and fees.
+
+  // Order:
+  circlePaymentID?: string; // Can be used as orderID.
+  paymentID?: string; // Can be used as orderID.
 }
 ```
 
-All the properties are nullable
+<br />
+
+
 ## Images
 
 The following images are loaded directly from GitHub to avoid bundling them with the library or forcing users to include them in their repos and add the necessary build setup to load them. They should just work out of the box, no setup required:

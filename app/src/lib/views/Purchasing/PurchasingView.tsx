@@ -101,9 +101,9 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
       persistCheckoutModalInfo({
         invoiceID,
         circlePaymentID,
+        paymentID,
         billingInfo,
         paymentInfo,
-        paymentID
       });
 
       if (debug) console.log("Redirecting to 3DS...");

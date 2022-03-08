@@ -102,9 +102,9 @@ export function getCheckoutModalState(): CheckoutModalState3DS {
     url = "",
     invoiceID = "",
     circlePaymentID = "",
+    paymentID = "",
     billingInfo = "",
     paymentInfo = "",
-    paymentID = "",
     timestamp,
   } = savedPlaidInfo || {};
 
@@ -113,7 +113,7 @@ export function getCheckoutModalState(): CheckoutModalState3DS {
 
   // In dev, this works fine even if there's nothing in localStorage, which helps with testing across some other domain and localhost:
   const hasLocalhostOrigin = process.env.NODE_ENV === "development" && window.location.hostname !== "localhost";
-  const continue3DSFlow = hasLocalhostOrigin || !!(url && invoiceID && circlePaymentID && billingInfo && paymentInfo && receivedRedirectUri);
+  const continue3DSFlow = hasLocalhostOrigin || !!(url && invoiceID && circlePaymentID && paymentID && billingInfo && paymentInfo && receivedRedirectUri);
 
   if ((continue3DSFlow && savedStateUsed) || (!continue3DSFlow && localStorage.getItem(THREEDS_FLOW_INFO_KEY)) || isExpired(timestamp)) {
     return clearPersistedInfo(isExpired(timestamp));
@@ -129,6 +129,7 @@ export function getCheckoutModalState(): CheckoutModalState3DS {
     // The reference number of the payment:
     circlePaymentID,
     paymentID,
+
     // The billing & payment info selected / entered before starting the 3DS flow:
     billingInfo,
     paymentInfo,
@@ -163,10 +164,10 @@ export interface ContinueFlowsReturn {
   checkoutStep: CheckoutModalStep | "";
   checkoutError?: CheckoutModalError;
   invoiceID: string;
-  billingInfo: string | BillingInfo;
-  paymentInfo: string | PaymentMethod;
   circlePaymentID: string;
   paymentID: string;
+  billingInfo: string | BillingInfo;
+  paymentInfo: string | PaymentMethod;
 }
 
 export function continueFlows(noClear = false) {
@@ -175,10 +176,10 @@ export function continueFlows(noClear = false) {
   const continueFlowsReturn: ContinueFlowsReturn = {
     checkoutStep: "",
     invoiceID: "",
+    circlePaymentID: "",
+    paymentID: "",
     billingInfo: "",
     paymentInfo: "",
-    circlePaymentID: "",
-    paymentID: ""
   };
 
   if (continue3DSFlow) {
@@ -190,10 +191,10 @@ export function continueFlows(noClear = false) {
     }
 
     continueFlowsReturn.invoiceID = savedCheckoutModalState.invoiceID;
-    continueFlowsReturn.billingInfo = savedCheckoutModalState.billingInfo;
-    continueFlowsReturn.paymentInfo = savedCheckoutModalState.paymentInfo;
     continueFlowsReturn.circlePaymentID = savedCheckoutModalState.circlePaymentID;
     continueFlowsReturn.paymentID = savedCheckoutModalState.paymentID;
+    continueFlowsReturn.billingInfo = savedCheckoutModalState.billingInfo;
+    continueFlowsReturn.paymentInfo = savedCheckoutModalState.paymentInfo;
   } else if (continueOAuthFlow) {
     if (debug) console.log("💾 Continue Plaid OAuth Flow...", INITIAL_PLAID_OAUTH_FLOW_STATE);
 
