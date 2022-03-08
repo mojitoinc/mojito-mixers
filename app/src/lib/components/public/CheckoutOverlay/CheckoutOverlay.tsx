@@ -253,7 +253,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   }, [meError, paymentMethodsError, invoiceDetailsError, setError]);
 
   const triggerAnalyticsEventFunction = (eventType: CheckoutEventType) => {
-    if (!onEvent) return;
+    if (!onEvent && !open) return;
 
     const paymentInfo = selectedPaymentMethod.paymentInfo;
 
