@@ -1,5 +1,6 @@
 import { __awaiter } from '../../node_modules/tslib/tslib.es6.js';
 import { useState, useCallback } from 'react';
+import { CIRCLE_MAX_EXPECTED_PAYMENT_CREATION_PROCESSING_TIME } from '../config/config.js';
 import { savedPaymentMethodToBillingInfo, parseCircleError } from '../domain/circle/circle.utils.js';
 import { ERROR_PURCHASE_NO_ITEMS, ERROR_PURCHASE_SELECTED_PAYMENT_METHOD, ERROR_PURCHASE_CREATING_PAYMENT_METHOD, ERROR_PURCHASE_CVV, ERROR_PURCHASE_PAYING } from '../domain/errors/errors.constants.js';
 import { useCreatePaymentMutation } from '../queries/graphqlGenerated.js';
@@ -7,7 +8,6 @@ import { wait } from '../utils/promiseUtils.js';
 import { useCreatePaymentMethod } from './useCreatePaymentMethod.js';
 import { useEncryptCardData } from './useEncryptCard.js';
 
-const CIRCLE_MAX_EXPECTED_PAYMENT_CREATION_PROCESSING_TIME = 5000;
 function useFullPayment({ orgID, invoiceID, savedPaymentMethods, selectedPaymentMethod, debug = false, }) {
     const [paymentState, setPaymentState] = useState({
         paymentStatus: "processing",
