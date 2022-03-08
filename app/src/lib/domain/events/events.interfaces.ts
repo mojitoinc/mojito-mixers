@@ -14,8 +14,8 @@ export interface CheckoutEventData {
 
   // Purchase:
   departmentCategory: "NFT";
-  paymentType?: PaymentType;
-  shippingMethod: ShippingMethod;
+  paymentType?: PaymentType; // "CreditCard" | "ACH" | "Wire" | "Crypto"
+  shippingMethod: ShippingMethod; // "custom wallet" | "multisig wallet"
   checkoutItems: CheckoutItem[]; // Provided as this might be a mix of the checkoutItems prop and some additional data from the invoice.
 
   // Payment:

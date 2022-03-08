@@ -439,7 +439,8 @@ Events triggered when the user sees a specific view:
 
 Events triggered when the user performs a specific action:
 
-- `event:payment`: The "Purchase" button in the Payment view has been clicked and the payment has been made.
+- `event:paymentSuccess`: The "Purchase" button in the Payment view has been clicked and the payment has been made successfully.
+- `event:paymentError`: The "Purchase" button in the Payment view has been clicked and the payment has been attempted, but it failed.
 
 <br />
 
@@ -460,8 +461,8 @@ interface CheckoutEventData {
 
   // Purchase:
   departmentCategory: "NFT";
-  paymentType?: PaymentType;
-  shippingMethod: ShippingMethod;
+  paymentType?: PaymentType; // "CreditCard" | "ACH" | "Wire" | "Crypto"
+  shippingMethod: ShippingMethod; // "custom wallet" | "multisig wallet"
   checkoutItems: CheckoutItem[]; // Provided as this might be a mix of the checkoutItems prop and some additional data from the invoice.
 
   // Payment:

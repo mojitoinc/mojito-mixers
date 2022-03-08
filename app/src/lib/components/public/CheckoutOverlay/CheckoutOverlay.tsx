@@ -253,7 +253,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     if (invoiceDetailsError) setError(ERROR_LOADING_INVOICE(invoiceDetailsError));
   }, [meError, paymentMethodsError, invoiceDetailsError, setError]);
 
-  const triggerAnalyticsEvent = useCallback((eventType: CheckoutEventType) => {
+  const triggerAnalyticsEventFunction = (eventType: CheckoutEventType) => {
     if (!onEvent) return;
 
     const paymentInfo = selectedPaymentMethod.paymentInfo;
@@ -290,23 +290,15 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
       circlePaymentID,
       paymentID,
     });
-  },[
-    onEvent,
-    savedPaymentMethods,
-    selectedPaymentMethod.paymentInfo,
-    checkoutStep,
-    walletAddress,
-    checkoutItems,
-    subtotal,
-    fees,
-    taxAmount,
-    circlePaymentID,
-    paymentID,
-  ]);
+  };
+
+  const triggerAnalyticsEventRef = useRef(triggerAnalyticsEventFunction);
+
+  triggerAnalyticsEventRef.current = triggerAnalyticsEventFunction;
 
   useEffect(() => {
-    triggerAnalyticsEvent(`navigate:${ checkoutStep }`)
-  }, [checkoutStep, triggerAnalyticsEvent]);
+    setTimeout(() => triggerAnalyticsEventRef.current(`navigate:${ checkoutStep }`));
+  }, [checkoutStep]);
 
   // Saved payment method creation-reload-sync:
 
@@ -349,7 +341,6 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   }, [savedPaymentMethods, setSelectedPaymentMethod]);
 
 
-
   // Form data / state:
 
   const handleBillingInfoSelected = useCallback((billingInfo: string | BillingInfo) => {
@@ -359,7 +350,6 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     setSelectedPaymentMethod(({ paymentInfo }) => ({ billingInfo, paymentInfo: typeof paymentInfo === "object" ? paymentInfo : "", cvv: "" }));
   }, [setSelectedPaymentMethod]);
 
-
   const handlePaymentInfoSelected = useCallback((paymentInfo: string | PaymentMethod) => {
     setSelectedPaymentMethod(({ billingInfo }) => ({ billingInfo, paymentInfo, cvv: "" }));
   }, [setSelectedPaymentMethod]);
@@ -367,7 +357,6 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   const handleCvvSelected = useCallback((cvv: string) => {
     setSelectedPaymentMethod(({ billingInfo, paymentInfo }) => ({ billingInfo, paymentInfo, cvv }));
   }, [setSelectedPaymentMethod]);
-
 
 
   // Delete payment methods:
@@ -427,29 +416,23 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   const handlePurchaseSuccess = useCallback(async (nextCirclePaymentID: string, nextPaymentID:string) => {
     setPayments(nextCirclePaymentID, nextPaymentID);
 
-    triggerAnalyticsEvent("event:paymentSuccess");
+    setTimeout(() => triggerAnalyticsEventRef.current("event:paymentSuccess"));
 
     // After a successful purchase, a new payment method might have been created, so we reload them:
     await refetchPaymentMethods();
 
-    // if(onCheckoutCompleted){
-
-    //   const checkoutDetails = mapCheckout();
-    //   onCheckoutCompleted(checkoutDetails);
-    // }
-
     goNext();
-  }, [setPayments, triggerAnalyticsEvent, refetchPaymentMethods, goNext]);
+  }, [setPayments, refetchPaymentMethods, goNext]);
 
   const handlePurchaseError = useCallback(async (error: string | CheckoutModalError) => {
-    triggerAnalyticsEvent("event:paymentError");
+    setTimeout(() => triggerAnalyticsEventRef.current("event:paymentError"));
 
     // After a failed purchase, a new payment method might have been created anyway, so we reload them (createPaymentMethod
     // works but createPayment fails):
     await refetchPaymentMethods();
 
     setError(error);
-  }, [triggerAnalyticsEvent, refetchPaymentMethods, setError]);
+  }, [refetchPaymentMethods, setError]);
 
   const [releaseReservationBuyNowLot] = useReleaseReservationBuyNowLotMutation({
     variables: {
