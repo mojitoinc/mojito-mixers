@@ -17,7 +17,7 @@ var material = require('@mui/material');
 var Book = require('../../node_modules/@mui/icons-material/Book.js');
 var Select = require('../components/shared/Select/Select.js');
 var validationUtils = require('../utils/validationUtils.js');
-var DisplayBox = require('../components/payments/DisplayBox/DisplayBox.js');
+var DebugBox = require('../components/payments/DebugBox/DebugBox.js');
 var useFormCheckoutError = require('../hooks/useFormCheckoutError.js');
 var TaxesMessagesBox = require('../components/shared/TaxesMessagesBox/TaxesMessagesBox.js');
 var FormErrorsBox = require('../components/shared/FormErrorsBox/FormErrorsBox.js');
@@ -151,9 +151,7 @@ defaultValues, checkoutError, taxes, onTaxInfoChange, onSaved, onClose, onSubmit
                 startAdornment: (React__default["default"].createElement(material.InputAdornment, { position: "start" },
                     React__default["default"].createElement(material.Typography, { variant: "subtitle1", component: "span", sx: { pointerEvents: "none" } }, circle_utils.getPhonePrefix(`${selectedCountryCode}`)))),
             } : undefined }),
-        debug && phone && (React__default["default"].createElement(DisplayBox.DebugBox, null,
-            "Debug: ",
-            circle_utils.formatPhoneAsE123(phone || "", `${selectedCountryCode}`))),
+        debug && phone && (React__default["default"].createElement(DebugBox.DebugBox, { compact: true, sx: { mt: 1 } }, circle_utils.formatPhoneAsE123(phone || "", `${selectedCountryCode}`))),
         React__default["default"].createElement(InputGroupLabel.InputGroupLabel, { sx: { m: 0, pt: 2 } }, "Address"),
         React__default["default"].createElement(TextField.ControlledTextField, { name: STREET_FIELD, control: control, label: FIELD_LABELS[STREET_FIELD] }),
         React__default["default"].createElement(TextField.ControlledTextField, { name: APARTMENT_FIELD, control: control, label: FIELD_LABELS[APARTMENT_FIELD] }),
@@ -175,7 +173,7 @@ defaultValues, checkoutError, taxes, onTaxInfoChange, onSaved, onClose, onSubmit
                 React__default["default"].createElement(TextField.ControlledTextField, { name: ZIP_CODE_FIELD, control: control, label: FIELD_LABELS[ZIP_CODE_FIELD] }))),
         checkoutErrorMessage && React__default["default"].createElement(FormErrorsBox.FormErrorsBox, { error: checkoutErrorMessage, sx: { mt: 5 } }),
         formState.isSubmitted && React__default["default"].createElement(TaxesMessagesBox.TaxesMessagesBox, { sx: { mt: 5 }, taxes: taxes, variant: "form" }),
-        debug && (React__default["default"].createElement(DisplayBox.DebugBox, { sx: { mt: 5 } },
+        debug && (React__default["default"].createElement(DebugBox.DebugBox, { sx: { mt: 5 } },
             JSON.stringify(watch(), null, 2),
             "\n\n",
             JSON.stringify(formState.errors, null, 2))),

@@ -13,7 +13,7 @@ import { Box, InputAdornment, Typography } from '@mui/material';
 import default_1 from '../../node_modules/@mui/icons-material/Book.js';
 import { EMPTY_OPTION } from '../components/shared/Select/Select.js';
 import { withRequiredErrorMessage, withFullNameErrorMessage, withPhoneErrorMessage } from '../utils/validationUtils.js';
-import { DebugBox } from '../components/payments/DisplayBox/DisplayBox.js';
+import { DebugBox } from '../components/payments/DebugBox/DebugBox.js';
 import { useFormCheckoutError } from '../hooks/useFormCheckoutError.js';
 import { TaxesMessagesBox } from '../components/shared/TaxesMessagesBox/TaxesMessagesBox.js';
 import { FormErrorsBox } from '../components/shared/FormErrorsBox/FormErrorsBox.js';
@@ -143,9 +143,7 @@ defaultValues, checkoutError, taxes, onTaxInfoChange, onSaved, onClose, onSubmit
                 startAdornment: (React__default.createElement(InputAdornment, { position: "start" },
                     React__default.createElement(Typography, { variant: "subtitle1", component: "span", sx: { pointerEvents: "none" } }, getPhonePrefix(`${selectedCountryCode}`)))),
             } : undefined }),
-        debug && phone && (React__default.createElement(DebugBox, null,
-            "Debug: ",
-            formatPhoneAsE123(phone || "", `${selectedCountryCode}`))),
+        debug && phone && (React__default.createElement(DebugBox, { compact: true, sx: { mt: 1 } }, formatPhoneAsE123(phone || "", `${selectedCountryCode}`))),
         React__default.createElement(InputGroupLabel, { sx: { m: 0, pt: 2 } }, "Address"),
         React__default.createElement(ControlledTextField, { name: STREET_FIELD, control: control, label: FIELD_LABELS[STREET_FIELD] }),
         React__default.createElement(ControlledTextField, { name: APARTMENT_FIELD, control: control, label: FIELD_LABELS[APARTMENT_FIELD] }),
