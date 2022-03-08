@@ -13,7 +13,7 @@ import { SecondaryButton } from "../components/shared/SecondaryButton/SecondaryB
 import { Box, InputAdornment, Typography } from "@mui/material";
 import BookIcon from "@mui/icons-material/Book";
 import { EMPTY_OPTION, SelectOption } from "../components/shared/Select/Select";
-import { withInvalidErrorMessage, withRequiredErrorMessage } from "../utils/validationUtils";
+import { withFullNameErrorMessage, withPhoneErrorMessage, withRequiredErrorMessage } from "../utils/validationUtils";
 import { DebugBox } from "../components/payments/DisplayBox/DisplayBox";
 import { CheckoutModalError } from "../components/public/CheckoutOverlay/CheckoutOverlay.hooks";
 import { useFormCheckoutError } from "../hooks/useFormCheckoutError";
@@ -82,13 +82,23 @@ const schema = object()
   .shape({
     [FULL_NAME_FIELD]: string()
       .label(FIELD_LABELS[FULL_NAME_FIELD])
-      .required(withRequiredErrorMessage),
+      .required(withRequiredErrorMessage)
+      .test({
+        name: "is-valid-full-name",
+        test: (value) => {
+          if (!value) return false;
+
+          return /(. .)/.test(value);
+        },
+        message: withFullNameErrorMessage,
+      }),
     [EMAIL_FIELD]: string()
       .label(FIELD_LABELS[EMAIL_FIELD])
-      .email()
-      .required(withRequiredErrorMessage),
+      .required(withRequiredErrorMessage)
+      .email(),
     [PHONE_FIELD]: string()
       .label(FIELD_LABELS[PHONE_FIELD])
+      .required(withRequiredErrorMessage)
       .test({
         name: "is-valid-phone-number",
         test: (value, context) => {
@@ -98,9 +108,8 @@ const schema = object()
 
           return /\+(?:[0-9] ?){6,14}[0-9]$/.test(formattedPhoneNumber);
         },
-        message: withInvalidErrorMessage,
-      })
-      .required(withRequiredErrorMessage),
+        message: withPhoneErrorMessage,
+      }),
     [STREET_FIELD]: string()
       .label(FIELD_LABELS[STREET_FIELD])
       .required(withRequiredErrorMessage),
@@ -214,7 +223,6 @@ export const BillingInfoForm: React.FC<BillingInfoFormProps> = ({
         name={PHONE_FIELD}
         control={control}
         label={FIELD_LABELS[PHONE_FIELD]}
-        helperText={ debug && phone ? `Debug: ${ formatPhoneAsE123(phone || "", `${ selectedCountryCode }`) }` : undefined }
         InputProps={ selectedCountryCode && !phoneHasPrefix(phone) ? {
           startAdornment: (
             <InputAdornment position="start">
@@ -223,6 +231,10 @@ export const BillingInfoForm: React.FC<BillingInfoFormProps> = ({
           ),
         } : undefined}
       />
+
+      { debug && phone && (
+        <DebugBox>Debug: { formatPhoneAsE123(phone || "", `${ selectedCountryCode }`) }</DebugBox>
+      ) }
 
       <InputGroupLabel sx={{ m: 0, pt: 2 }}>Address</InputGroupLabel>
 
