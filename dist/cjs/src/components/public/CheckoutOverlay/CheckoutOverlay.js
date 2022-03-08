@@ -43,9 +43,10 @@ orgID, invoiceID: initialInvoiceID, checkoutItems: parentCheckoutItems,
 // Authentication:
 onLogin, isAuthenticated, isAuthenticatedLoading, 
 // Other Events:
-debug, onEvent, onError, onMarketingOptInChange, // Not implemented yet. Used to let user subscribe / unsubscribe to marketing updates.
+debug: initialDebug, onEvent, onError, onMarketingOptInChange, // Not implemented yet. Used to let user subscribe / unsubscribe to marketing updates.
  }) => {
     var _a;
+    const [debug, setDebug] = React.useState(!!initialDebug);
     // TODO: This should end up being in a context + hook to avoid prop drilling and it should be memoized:
     const dictionary = Object.assign(Object.assign({}, dictionary_constants.DEFAULT_DICTIONARY), parentDictionary);
     // First, get user data and saved payment methods:
@@ -372,7 +373,7 @@ debug, onEvent, onError, onMarketingOptInChange, // Not implemented yet. Used to
         // some other kind of indeterminate / incorrect state:
         return null;
     }
-    const headerElement = (React__default["default"].createElement(CheckoutModalHeader.CheckoutModalHeader, { variant: headerVariant, countdownElementRef: countdownElementRef, logoSrc: logoSrc, logoSx: logoSx, user: (_a = meData === null || meData === void 0 ? void 0 : meData.me) === null || _a === void 0 ? void 0 : _a.user, userFormat: userFormat, onLoginClicked: onLogin, onPrevClicked: checkoutStep === "authentication" ? handleClose : goBack }));
+    const headerElement = (React__default["default"].createElement(CheckoutModalHeader.CheckoutModalHeader, { variant: headerVariant, countdownElementRef: countdownElementRef, logoSrc: logoSrc, logoSx: logoSx, user: (_a = meData === null || meData === void 0 ? void 0 : meData.me) === null || _a === void 0 ? void 0 : _a.user, userFormat: userFormat, onLoginClicked: onLogin, onPrevClicked: checkoutStep === "authentication" ? handleClose : goBack, setDebug: setDebug }));
     return (React__default["default"].createElement(FullScreenOverlay.FullScreenOverlay, { centered: checkoutStep === "purchasing" || checkoutStep === "error", open: open, onClose: handleClose, isDialogBlocked: isDialogBlocked, contentKey: checkoutStep, header: headerElement, children: checkoutStepElement }));
 };
 const PUICheckout = ProvidersInjector.withProviders(PUICheckoutOverlay);

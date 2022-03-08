@@ -1,7 +1,7 @@
 import { Theme, SxProps } from "@mui/material/styles";
 import { UserFormat } from "../../../domain/auth/authentication.interfaces";
 import { User } from "../../../queries/graphqlGenerated";
-import React from "react";
+import React, { Dispatch, SetStateAction } from "react";
 export declare type CheckoutModalHeaderVariant = "anonymous" | "guest" | "loggedIn" | "logoOnly" | "purchasing" | "error";
 export interface CheckoutModalHeaderProps {
     variant: CheckoutModalHeaderVariant;
@@ -13,5 +13,6 @@ export interface CheckoutModalHeaderProps {
     userFormat?: UserFormat;
     onLoginClicked?: () => void;
     onPrevClicked?: () => void;
+    setDebug?: Dispatch<SetStateAction<boolean>>;
 }
 export declare const CheckoutModalHeader: React.FC<CheckoutModalHeaderProps>;
