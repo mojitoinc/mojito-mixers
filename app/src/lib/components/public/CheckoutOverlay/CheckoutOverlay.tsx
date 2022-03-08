@@ -220,8 +220,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     invoiceAndReservationState,
     createInvoiceAndReservation,
     countdownElementRef,
-  } = useCreateInvoiceAndReservation({ orgID, checkoutItems, debug });
-
+  } = useCreateInvoiceAndReservation({ orgID, checkoutItems, stop: checkoutStep === "confirmation", debug });
 
   useEffect(() => {
     if (isDialogLoading || invoiceID === null || invoiceID || createInvoiceAndReservationCalledRef.current) return;
@@ -233,6 +232,9 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
 
   useEffect(() => {
     if (invoiceAndReservationState.error) {
+      // TODO: It would be great if we can keep track of the reservation expiration without changing the displayed error
+      // if there's already once, so when clicking the action button for that one, on top of calling its respective error
+      // handling code, we re-create the reservation:
       setError(invoiceAndReservationState.error);
     } else if (invoiceAndReservationState.invoiceID) {
       setInvoiceID(invoiceAndReservationState.invoiceID);
@@ -254,7 +256,10 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     if (invoiceDetailsError) setError(ERROR_LOADING_INVOICE(invoiceDetailsError));
   }, [meError, paymentMethodsError, invoiceDetailsError, setError]);
 
-  const triggerAnalyticsEventFunction = (eventType: CheckoutEventType) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const triggerAnalyticsEventRef = useRef((eventType: CheckoutEventType) => { /* Do nothing */ });
+
+  triggerAnalyticsEventRef.current = (eventType: CheckoutEventType) => {
     if (!onEvent || !open) return;
 
     const paymentInfo = selectedPaymentMethod.paymentInfo;
@@ -292,10 +297,6 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
       paymentID,
     });
   };
-
-  const triggerAnalyticsEventRef = useRef(triggerAnalyticsEventFunction);
-
-  triggerAnalyticsEventRef.current = triggerAnalyticsEventFunction;
 
   useEffect(() => {
     setTimeout(() => triggerAnalyticsEventRef.current(`navigate:${ checkoutStep }`));
@@ -435,6 +436,14 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     setError(error);
   }, [refetchPaymentMethods, setError]);
 
+
+  // Release reservation:
+
+  const lastReleasedReservationID = useRef("");
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const handleBeforeUnloadRef = useRef((e?: BeforeUnloadEvent) => { /* Do nothing */ });
+
   const [releaseReservationBuyNowLot] = useReleaseReservationBuyNowLotMutation({
     variables: {
       orgID,
@@ -442,11 +451,13 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     },
   });
 
-  const handleBeforeUnload = useCallback((e?: BeforeUnloadEvent) => {
-    if (orgID && invoiceID) {
+  const handleBeforeUnload = handleBeforeUnloadRef.current = useCallback((e?: BeforeUnloadEvent) => {
+    if (orgID && invoiceID && invoiceID !== lastReleasedReservationID.current) {
       if (debug) console.log(`\n♻️ Releasing reservation invoice ${ invoiceID } (orgID = ${ orgID })...\n`);
 
       releaseReservationBuyNowLot().then((result) => {
+        lastReleasedReservationID.current = invoiceID;
+
         if (debug) console.log("  🟢 releaseReservationBuyNowLot result", result);
       }).catch((error: ApolloError | Error) => {
         if (debug) console.log("  🔴 releaseReservationBuyNowLot error", error);
@@ -468,6 +479,10 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   }, [orgID, invoiceID, debug, releaseReservationBuyNowLot]);
 
   useEffect(() => {
+    if (checkoutError?.at === "reset") handleBeforeUnloadRef.current();
+  }, [checkoutError]);
+
+  useEffect(() => {
     window.addEventListener('beforeunload', handleBeforeUnload);
 
     return () => {
@@ -487,35 +502,36 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     onClose();
   }, [handleBeforeUnload, setInvoiceID, onClose]);
 
+
+  // Error handling:
+
   const handleFixError = useCallback(async (): Promise<false> => {
     const at = checkoutError?.at;
 
     if (at === "reset") {
-      goTo();
-
       await Promise.allSettled([
         meRefetch(),
         refetchPaymentMethods(),
         createInvoiceAndReservation(),
       ]);
 
-      return false;
+      goTo();
+    } else {
+      // After an error, all data is reloaded in case the issue was caused by stale/cached data or in case a new payment
+      // method has been created despite the error:
+      await Promise.allSettled([
+        meRefetch(),
+        refetchPaymentMethods(),
+        refetchInvoiceDetails(),
+      ]);
+
+      if (at !== "purchasing") {
+        // If we are redirecting users to the PurchasingView again, we keep the CVV to be able to re-try the purchase:
+        setSelectedPaymentMethod((prevSelectedPaymentMethod) => ({ ...prevSelectedPaymentMethod, cvv: "" }));
+      }
+
+      goTo(at || DEFAULT_ERROR_AT, checkoutError);
     }
-
-    // After an error, all data is reloaded in case the issue was caused by stale/cached data or in case a new payment
-    // method has been created despite the error:
-    await Promise.allSettled([
-      meRefetch(),
-      refetchPaymentMethods(),
-      refetchInvoiceDetails(),
-    ]);
-
-    if (at !== "purchasing") {
-      // If we are redirecting users to the PurchasingView again, we keep the CVV to be able to re-try the purchase:
-      setSelectedPaymentMethod((prevSelectedPaymentMethod) => ({ ...prevSelectedPaymentMethod, cvv: "" }));
-    }
-
-    goTo(at || DEFAULT_ERROR_AT, checkoutError);
 
     // This function is used as a CheckoutModalFooter's onSubmitClicked, so we want that to show a loader on the submit
     // button when clicked but do not remove it once the Promise is resolved, as we are moving to another view and
