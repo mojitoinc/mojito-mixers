@@ -17,7 +17,8 @@ function createTypographyTheme(typographyOptions = {}) {
             fontWeight: 600,
         },
         subtitle1: {
-            // Item prize:
+            // Item price and input values:
+            fontFamily: "IBM Plex Sans, sans-serif",
             fontSize: "16px",
         },
         subtitle2: {

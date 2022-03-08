@@ -1,19 +1,25 @@
 import { __rest } from '../../../node_modules/tslib/tslib.es6.js';
 import countryRegionData from '../../../node_modules/country-region-data/dist/data-umd.js';
 import { customList } from 'country-codes-list';
-import { formatSentence } from '../../utils/formatUtils.js';
+import { fullTrim, formatSentence } from '../../utils/formatUtils.js';
 import { BUILT_IN_ERRORS } from '../errors/errors.constants.js';
 
 const countryPrefixes = customList('countryCode', '{countryCallingCode}');
+function getPhonePrefix(countryCode, withPlus = true) {
+    const prefix = countryPrefixes[countryCode];
+    return prefix ? `${withPlus ? "+" : ""}${prefix}` : "";
+}
+function phoneHasPrefix(phone) {
+    return phone.startsWith("+") || phone.startsWith("00");
+}
 function formatPhoneAsE123(phoneNumber, countryCode) {
-    const countryPrefix = countryPrefixes[countryCode] || "";
     const parsedPhoneNumber = phoneNumber.replace(/[()-\s]/g, "");
-    if (parsedPhoneNumber.startsWith("+") || parsedPhoneNumber.startsWith("00")) {
+    if (phoneHasPrefix(parsedPhoneNumber)) {
         // The user already included the country prefix, so we respect their preference:
         return parsedPhoneNumber.replace(/^00/, "+");
     }
     // Otherwise, we add it based on the country code:
-    return `+${countryPrefix}${parsedPhoneNumber}`;
+    return `${getPhonePrefix(countryCode)}${parsedPhoneNumber}`;
 }
 function transformRawSavedPaymentMethods(rawSavedPaymentMethods = []) {
     return rawSavedPaymentMethods.map((_a) => {
@@ -61,11 +67,9 @@ function getSavedPaymentMethodAddressId({ billingDetails, metadata }) {
         metadata.email,
         formatPhoneAsE123(metadata.phoneNumber, `${billingDetails.country.value}`),
     ].map((value = "") => {
-        return value
-            // Duplicate, leading or trailing spaces don't make a value different:
-            .replace(/\s+/g, ' ').trim()
-            // Casing doesn't make a value different:
-            .toUpperCase();
+        // - Duplicate, leading or trailing spaces don't make a value different.
+        // - Casing doesn't make a value different.
+        return fullTrim(value).toUpperCase();
     }).join("|");
 }
 // TODO: Change interface of the form to closely resemble this one:
@@ -178,5 +182,5 @@ function parseCircleError(error) {
     };
 }
 
-export { billingInfoToSavedPaymentMethodBillingInfo, formatPhoneAsE123, getSavedPaymentMethodAddressId, getSavedPaymentMethodAddressIdFromBillingInfo, isCircleFieldError, isCircleFieldErrorArray, parseCircleError, savedPaymentMethodToBillingInfo, transformRawSavedPaymentMethods };
+export { billingInfoToSavedPaymentMethodBillingInfo, formatPhoneAsE123, getPhonePrefix, getSavedPaymentMethodAddressId, getSavedPaymentMethodAddressIdFromBillingInfo, isCircleFieldError, isCircleFieldErrorArray, parseCircleError, phoneHasPrefix, savedPaymentMethodToBillingInfo, transformRawSavedPaymentMethods };
 //# sourceMappingURL=circle.utils.js.map

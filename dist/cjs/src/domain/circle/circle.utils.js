@@ -9,15 +9,21 @@ var formatUtils = require('../../utils/formatUtils.js');
 var errors_constants = require('../errors/errors.constants.js');
 
 const countryPrefixes = countryCodesList.customList('countryCode', '{countryCallingCode}');
+function getPhonePrefix(countryCode, withPlus = true) {
+    const prefix = countryPrefixes[countryCode];
+    return prefix ? `${withPlus ? "+" : ""}${prefix}` : "";
+}
+function phoneHasPrefix(phone) {
+    return phone.startsWith("+") || phone.startsWith("00");
+}
 function formatPhoneAsE123(phoneNumber, countryCode) {
-    const countryPrefix = countryPrefixes[countryCode] || "";
     const parsedPhoneNumber = phoneNumber.replace(/[()-\s]/g, "");
-    if (parsedPhoneNumber.startsWith("+") || parsedPhoneNumber.startsWith("00")) {
+    if (phoneHasPrefix(parsedPhoneNumber)) {
         // The user already included the country prefix, so we respect their preference:
         return parsedPhoneNumber.replace(/^00/, "+");
     }
     // Otherwise, we add it based on the country code:
-    return `+${countryPrefix}${parsedPhoneNumber}`;
+    return `${getPhonePrefix(countryCode)}${parsedPhoneNumber}`;
 }
 function transformRawSavedPaymentMethods(rawSavedPaymentMethods = []) {
     return rawSavedPaymentMethods.map((_a) => {
@@ -65,11 +71,9 @@ function getSavedPaymentMethodAddressId({ billingDetails, metadata }) {
         metadata.email,
         formatPhoneAsE123(metadata.phoneNumber, `${billingDetails.country.value}`),
     ].map((value = "") => {
-        return value
-            // Duplicate, leading or trailing spaces don't make a value different:
-            .replace(/\s+/g, ' ').trim()
-            // Casing doesn't make a value different:
-            .toUpperCase();
+        // - Duplicate, leading or trailing spaces don't make a value different.
+        // - Casing doesn't make a value different.
+        return formatUtils.fullTrim(value).toUpperCase();
     }).join("|");
 }
 // TODO: Change interface of the form to closely resemble this one:
@@ -184,11 +188,13 @@ function parseCircleError(error) {
 
 exports.billingInfoToSavedPaymentMethodBillingInfo = billingInfoToSavedPaymentMethodBillingInfo;
 exports.formatPhoneAsE123 = formatPhoneAsE123;
+exports.getPhonePrefix = getPhonePrefix;
 exports.getSavedPaymentMethodAddressId = getSavedPaymentMethodAddressId;
 exports.getSavedPaymentMethodAddressIdFromBillingInfo = getSavedPaymentMethodAddressIdFromBillingInfo;
 exports.isCircleFieldError = isCircleFieldError;
 exports.isCircleFieldErrorArray = isCircleFieldErrorArray;
 exports.parseCircleError = parseCircleError;
+exports.phoneHasPrefix = phoneHasPrefix;
 exports.savedPaymentMethodToBillingInfo = savedPaymentMethodToBillingInfo;
 exports.transformRawSavedPaymentMethods = transformRawSavedPaymentMethods;
 //# sourceMappingURL=circle.utils.js.map

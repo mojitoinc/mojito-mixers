@@ -5,7 +5,7 @@ import { CheckoutItem } from "../../../domain/product/product.interfaces";
 import { PUIDictionary } from "../../../domain/dictionary/dictionary.interfaces";
 export interface PurchaseConfirmationBillingDetailsProps {
     checkoutItems: CheckoutItem[];
-    paymentReferenceNumber: string;
+    circlePaymentID: string;
     selectedPaymentMethodBillingInfo: SavedPaymentMethodBillingInfo;
     selectedPaymentMethodPaymentInfo: PaymentMethod | SavedPaymentMethod;
     dictionary: PUIDictionary;
