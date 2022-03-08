@@ -254,7 +254,10 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     if (invoiceDetailsError) setError(ERROR_LOADING_INVOICE(invoiceDetailsError));
   }, [meError, paymentMethodsError, invoiceDetailsError, setError]);
 
-  const triggerAnalyticsEventFunction = (eventType: CheckoutEventType) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const triggerAnalyticsEventRef = useRef((eventType: CheckoutEventType) => { /* Do nothing */ });
+
+  triggerAnalyticsEventRef.current = (eventType: CheckoutEventType) => {
     if (!onEvent) return;
 
     const paymentInfo = selectedPaymentMethod.paymentInfo;
@@ -292,10 +295,6 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
       paymentID,
     });
   };
-
-  const triggerAnalyticsEventRef = useRef(triggerAnalyticsEventFunction);
-
-  triggerAnalyticsEventRef.current = triggerAnalyticsEventFunction;
 
   useEffect(() => {
     setTimeout(() => triggerAnalyticsEventRef.current(`navigate:${ checkoutStep }`));
@@ -435,6 +434,9 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     setError(error);
   }, [refetchPaymentMethods, setError]);
 
+
+  // Release reserve:
+
   const [releaseReservationBuyNowLot] = useReleaseReservationBuyNowLotMutation({
     variables: {
       orgID,
@@ -475,7 +477,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     };
   }, [handleBeforeUnload]);
 
-  const handleClose = useCallback(() => {
+  const handleClose = useCallback((close = true) => {
     window.removeEventListener('beforeunload', handleBeforeUnload);
 
     handleBeforeUnload();
@@ -484,38 +486,48 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
 
     setInvoiceID(null);
 
-    onClose();
+    if (close) onClose();
   }, [handleBeforeUnload, setInvoiceID, onClose]);
+
+  useEffect(() => {
+    if (checkoutError?.at !== "reset") return;
+
+    handleClose(false);
+  }, [checkoutError, handleClose]);
+
+
+  console.log("checkoutStep =", checkoutStep);
+
+
+  // Error handling:
 
   const handleFixError = useCallback(async (): Promise<false> => {
     const at = checkoutError?.at;
 
     if (at === "reset") {
-      goTo();
-
       await Promise.allSettled([
         meRefetch(),
         refetchPaymentMethods(),
         createInvoiceAndReservation(),
       ]);
 
-      return false;
+      goTo();
+    } else {
+      // After an error, all data is reloaded in case the issue was caused by stale/cached data or in case a new payment
+      // method has been created despite the error:
+      await Promise.allSettled([
+        meRefetch(),
+        refetchPaymentMethods(),
+        refetchInvoiceDetails(),
+      ]);
+
+      if (at !== "purchasing") {
+        // If we are redirecting users to the PurchasingView again, we keep the CVV to be able to re-try the purchase:
+        setSelectedPaymentMethod((prevSelectedPaymentMethod) => ({ ...prevSelectedPaymentMethod, cvv: "" }));
+      }
+
+      goTo(at || DEFAULT_ERROR_AT, checkoutError);
     }
-
-    // After an error, all data is reloaded in case the issue was caused by stale/cached data or in case a new payment
-    // method has been created despite the error:
-    await Promise.allSettled([
-      meRefetch(),
-      refetchPaymentMethods(),
-      refetchInvoiceDetails(),
-    ]);
-
-    if (at !== "purchasing") {
-      // If we are redirecting users to the PurchasingView again, we keep the CVV to be able to re-try the purchase:
-      setSelectedPaymentMethod((prevSelectedPaymentMethod) => ({ ...prevSelectedPaymentMethod, cvv: "" }));
-    }
-
-    goTo(at || DEFAULT_ERROR_AT, checkoutError);
 
     // This function is used as a CheckoutModalFooter's onSubmitClicked, so we want that to show a loader on the submit
     // button when clicked but do not remove it once the Promise is resolved, as we are moving to another view and
