@@ -76,6 +76,10 @@ const HomePage: React.FC = () => {
     // router.push("/collection");
   }, []);
 
+  const handleEvent = useCallback((eventType: CheckoutEventType, eventData: CheckoutEventData) => {
+    console.log(`🎯 ${ eventType }`, eventData);
+  }, []);
+
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleError = useCallback((error: CheckoutModalError) => {
     // console.log(error);
@@ -199,12 +203,10 @@ const HomePage: React.FC = () => {
     onLogin: handleLogin,
     isAuthenticated,
     isAuthenticatedLoading,
-    // Steps Events:
-    onEvent:(eventType: CheckoutEventType, eventData: Partial<CheckoutEventData>) => {
-      console.log(eventType,eventData);
-    },
+
     // Other Events:
     debug: true,
+    onEvent: handleEvent,
     onError: handleError,
     onCatch: handleCatch,
     onMarketingOptInChange: handleMarketingOptInChange,
