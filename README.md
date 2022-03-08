@@ -413,9 +413,9 @@ If you don't want this behavior or would like to implement a custom one, you sho
 <br />
 
 
-## Event CallBack
+## `onEvent` callback prop:
 
-The `onEvent` prop can be used to get updates about the progress of the user using the Payment UI, which can be useful for analytics:
+The `onEvent` callback prop can be used to get updates about the progress of the user using the Payment UI, which can be useful for analytics:
 
 ```TSX
 onEvent?: (eventType: CheckoutEventType, eventData: CheckoutEventData) => void;
