@@ -1,12 +1,12 @@
 import { Box, Link, Typography, Divider, CircularProgress } from "@mui/material";
 import React, { useCallback, useState } from "react";
 import { CIRCLE_LOGO_IMAGE_SRC, SM_MOBILE_MAX_WIDTH } from "../../../config/theme/theme";
-import { useDictionary } from "../../../hooks/useDictionary";
 import { isPromise } from "../../../utils/promiseUtils";
 import { Checkbox } from "../../shared/Checkbox/Checkbox";
 import { ConsentText, ConsentType, CONSENT_ERROR_MESSAGE } from "../../shared/ConsentText/ConsentText";
 import { PrimaryButton } from "../../shared/PrimaryButton/PrimaryButton";
 import { ICONS_BY_VARIANT, LABELS_BY_VARIANT } from "./CheckoutModalFooter.constants";
+import { useDictionary } from "../../../hooks/useDictionary";
 
 interface CheckoutModalFooterConsentState {
   isFormSubmitted: boolean;

@@ -7,7 +7,6 @@ import { TextField } from "../../shared/TextField/TextField";
 import { withInvalidErrorMessage } from "../../../utils/validationUtils";
 import { isValidWalletAddress } from "../../../domain/wallet/wallet.utils";
 import { ChangeEvent, useCallback } from "react";
-import { PUIDictionary } from "../../../domain/dictionary/dictionary.interfaces";
 import { useDictionary } from "../../../hooks/useDictionary";
 
 export interface DeliveryWalletSelectorProps {
