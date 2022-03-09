@@ -28,6 +28,7 @@ import { useCheckoutItemsCostTotal } from "../../../hooks/useCheckoutItemCostTot
 import { PUIDictionary } from "../../../domain/dictionary/dictionary.interfaces";
 import { DEFAULT_DICTIONARY } from "../../../domain/dictionary/dictionary.constants";
 import { ApolloError } from "@apollo/client";
+import { Wallet } from "../../payments/DeliveryWallet/DeliveryWalletDetails";
 
 export interface PUICheckoutOverlayProps {
   // Modal:
@@ -682,6 +683,8 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
         savedPaymentMethods={ savedPaymentMethods }
         selectedPaymentMethod={ selectedPaymentMethod }
         circlePaymentID={ circlePaymentID }
+        walletAddress={ walletAddress || "" }
+        wallets={ meData?.me?.wallets as Wallet[] || undefined }
         onGoToCollection={ onGoToCollection }
         onNext={ handleClose }
         dictionary={ dictionary } />

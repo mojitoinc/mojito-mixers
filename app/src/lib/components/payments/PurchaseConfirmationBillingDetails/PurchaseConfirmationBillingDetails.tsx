@@ -9,14 +9,15 @@ import { CheckoutItemCostPurchase } from "../CheckoutItemCost/Purchase/CheckoutI
 import { PAYMENT_TYPE_LABEL } from "./PurchaseConfirmationBillingDetails.constants";
 import { getFormattedPaymentMethod } from "./PurchaseConfirmationBillingDetails.utils";
 import CheckIcon from "@mui/icons-material/Check";
-import DeliveryWalletDetails from "../DeliveryWallet/DeliveryWalletDetails";
+import DeliveryWalletDetails, { Wallet } from "../DeliveryWallet/DeliveryWalletDetails";
 import { CopyButton } from "../../shared/CopyButton/CopyButton";
 import { PUIDictionary } from "../../../domain/dictionary/dictionary.interfaces";
 
 export interface PurchaseConfirmationBillingDetailsProps {
   checkoutItems: CheckoutItem[];
   circlePaymentID: string;
-  walletAddress?: string;
+  walletAddress: string;
+  wallets?: Wallet[];
   selectedPaymentMethodBillingInfo: SavedPaymentMethodBillingInfo;
   selectedPaymentMethodPaymentInfo: PaymentMethod | SavedPaymentMethod;
   dictionary: PUIDictionary;
@@ -26,6 +27,7 @@ export const PurchaseConfirmationBillingDetails: React.FC<PurchaseConfirmationBi
   checkoutItems,
   circlePaymentID,
   walletAddress,
+  wallets,
   selectedPaymentMethodBillingInfo,
   selectedPaymentMethodPaymentInfo,
   dictionary
@@ -109,6 +111,7 @@ export const PurchaseConfirmationBillingDetails: React.FC<PurchaseConfirmationBi
 
       <DeliveryWalletDetails
         walletAddress={ walletAddress }
+        wallets={ wallets }
         dictionary={ dictionary } />
     </Box>
   );

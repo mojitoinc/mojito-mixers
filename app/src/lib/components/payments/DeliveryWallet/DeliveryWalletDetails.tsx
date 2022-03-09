@@ -3,18 +3,28 @@ import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { CopyButton } from "../../shared/CopyButton/CopyButton";
 import { ReadOnlyWalletAddress } from "../../shared/ReadOnlyField/ReadOnlyField";
 import { PUIDictionary } from "../../../domain/dictionary/dictionary.interfaces";
-import React from "react";
+import React, { useMemo } from "react";
+
+export interface Wallet {
+  id: string;
+  name: string;
+  address: string;
+}
 
 export interface DeliveryWalletDetailsProps {
-  walletAddress?: string;
-  isMultiSig?: boolean;
+  walletAddress: string;
+  wallets?: Wallet[];
   dictionary: PUIDictionary;
 }
 const DeliveryWalletDetails: React.FC<DeliveryWalletDetailsProps> = ({
-  isMultiSig = true,
   walletAddress,
+  wallets,
   dictionary,
 }) => {
+  const isMultiSig = useMemo(() => {
+    return wallets && wallets.some(({ address }) => address === walletAddress);
+  }, [walletAddress, wallets]);
+
   return (
     <Box pt={2}>
       <Typography variant="body1">Once minted, items will be delivered to:</Typography>

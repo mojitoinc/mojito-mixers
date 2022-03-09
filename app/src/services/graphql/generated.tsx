@@ -592,6 +592,8 @@ export type Mutation = {
   marketplaceUpdateTheme: Marketplace;
   mintTokens: Scalars['String'];
   nftContractAddAdmin: Scalars['String'];
+  nftContractExtensionPause: Scalars['String'];
+  nftContractExtensionUnpause: Scalars['String'];
   nftContractRegisterExtensionProvenance: NftContract;
   nftDeployContract: NftContract;
   orgCreateMarketplace: Marketplace;
@@ -772,6 +774,18 @@ export type MutationMintTokensArgs = {
 
 export type MutationNftContractAddAdminArgs = {
   address: Scalars['String'];
+  nftContractId: Scalars['UUID1'];
+};
+
+
+export type MutationNftContractExtensionPauseArgs = {
+  extensionAddress: Scalars['String'];
+  nftContractId: Scalars['UUID1'];
+};
+
+
+export type MutationNftContractExtensionUnpauseArgs = {
+  extensionAddress: Scalars['String'];
   nftContractId: Scalars['UUID1'];
 };
 
@@ -1517,7 +1531,7 @@ export type GetInvoiceDetailsQuery = { __typename?: 'Query', getInvoiceDetails: 
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MeQuery = { __typename?: 'Query', me?: { __typename?: 'CurrentUser', id: any, user: { __typename?: 'User', id: any, username: string, name?: string | null, email?: string | null }, userOrgs: Array<{ __typename?: 'UserOrganization', organization: { __typename?: 'Organization', id: any, name: string } }> } | null };
+export type MeQuery = { __typename?: 'Query', me?: { __typename?: 'CurrentUser', id: any, user: { __typename?: 'User', id: any, username: string, name?: string | null, email?: string | null }, userOrgs: Array<{ __typename?: 'UserOrganization', organization: { __typename?: 'Organization', id: any, name: string } }>, wallets?: Array<{ __typename?: 'Wallet', id: any, name: string, address?: any | null }> | null } | null };
 
 export type PaymentKeyQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -1813,6 +1827,11 @@ export const MeDocument = gql`
         id
         name
       }
+    }
+    wallets {
+      id
+      name
+      address
     }
   }
 }
