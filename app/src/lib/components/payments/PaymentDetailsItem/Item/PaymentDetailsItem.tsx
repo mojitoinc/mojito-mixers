@@ -44,6 +44,8 @@ export const PaymentDetailsItem: React.FC<PaymentDetailsItemProps> = ({
   if (savedPaymentMethod.status === "pending") {
     disabled = disabled || "selectOnly";
 
+    // TODO: Should there be a way to re-fetch to see if payment methods in "pending" state move to "complete"?
+
     status = {
       label: "Awaiting Approval",
       tooltip: "Sorry, this payment method is awaiting approval and can't be used yet. Please, try again later.",
