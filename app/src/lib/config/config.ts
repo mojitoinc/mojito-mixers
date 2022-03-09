@@ -18,9 +18,10 @@ export const PURCHASING_MESSAGES_DEFAULT = [
   "Shaking things up!",
 ];
 
-export const CIRCLE_MAX_EXPECTED_PAYMENT_CREATION_PROCESSING_TIME = process.browser && window.location.hostname === "localhost" ? 5000 : 15000;
-
-export const PAYMENT_NOTIFICATION_INTERVAL_MS = 1500; // Polling interval for GetPaymentNotificationQuery.
+export const PAYMENT_CREATION_INTERVAL_MS = 5000; // (5 sec) Polling interval for GetPaymentMethodStatus.
+export const PAYMENT_CREATION_MAX_WAIT_MS = 120000; // (2 min) Max. wait time for GetPaymentMethodStatus (to get status === "complete").
+export const PAYMENT_CREATION_MIN_WAIT_MS = 5000; // (5/15 sec) Min. time a user would be stuck in the PurchasingView.
+export const PAYMENT_NOTIFICATION_INTERVAL_MS = 2500; // (2.5 sec) Polling interval for GetPaymentNotificationQuery in PurchasingView.
 
 
 // Plaid:

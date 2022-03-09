@@ -2,6 +2,7 @@ import { SelectOption } from "../../components/shared/Select/Select";
 import { CreditCardBillingDetails, CreditCardMetadata, AchBillingDetails, AchMetadata } from "../../queries/graphqlGenerated";
 import { PaymentType } from "../payment/payment.interfaces";
 
+// TODO: Rename to PaymentMethodStatus
 export type PaymentStatus = "pending" | "complete" | "failed";
 
 export interface RawSavedPaymentMethodCC {

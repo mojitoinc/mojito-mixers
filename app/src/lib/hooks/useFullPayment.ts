@@ -1,7 +1,7 @@
 import { ApolloError } from "@apollo/client";
 import { useState, useCallback } from "react";
 import { CheckoutModalError, SelectedPaymentMethod } from "../components/public/CheckoutOverlay/CheckoutOverlay.hooks";
-import { CIRCLE_MAX_EXPECTED_PAYMENT_CREATION_PROCESSING_TIME } from "../config/config";
+import { PAYMENT_CREATION_MIN_WAIT_MS } from "../config/config";
 import { SavedPaymentMethod } from "../domain/circle/circle.interfaces";
 import { parseCircleError, savedPaymentMethodToBillingInfo } from "../domain/circle/circle.utils";
 import { ERROR_PURCHASE_CREATING_PAYMENT_METHOD, ERROR_PURCHASE_CVV, ERROR_PURCHASE_NO_ITEMS, ERROR_PURCHASE_PAYING, ERROR_PURCHASE_SELECTED_PAYMENT_METHOD } from "../domain/errors/errors.constants";
@@ -52,7 +52,7 @@ export function useFullPayment({
   }, []);
 
   const [encryptCardData] = useEncryptCardData();
-  const [createPaymentMethod] = useCreatePaymentMethod();
+  const [createPaymentMethod] = useCreatePaymentMethod({ debug });
   const [makePayment] = useCreatePaymentMutation();
 
   const fullPayment = useCallback(async () => {
@@ -136,7 +136,7 @@ export function useFullPayment({
 
         const circleFieldErrors = parseCircleError(error);
 
-        if (debug) console.log("    🔴 createPaymentMethod error", error, circleFieldErrors);
+        if (debug) console.log("      🔴 createPaymentMethod error", error, circleFieldErrors);
 
         if (circleFieldErrors) {
           checkoutError = {
@@ -151,7 +151,7 @@ export function useFullPayment({
       paymentMethodCreatedAt = Date.now();
 
       if (createPaymentMethodResult && !createPaymentMethodResult.errors) {
-        if (debug) console.log("    🟢 createPaymentMethod result", createPaymentMethodResult);
+        if (debug) console.log("      🟢 createPaymentMethod result", createPaymentMethodResult);
 
         paymentMethodID = createPaymentMethodResult.data?.createPaymentMethod?.id || "";
       }
@@ -199,9 +199,9 @@ export function useFullPayment({
       };
     }
 
-    const paymentMethodStatusWaitTime = Math.max(CIRCLE_MAX_EXPECTED_PAYMENT_CREATION_PROCESSING_TIME - (Date.now() - paymentMethodCreatedAt), 0);
+    const paymentMethodStatusWaitTime = Math.max(PAYMENT_CREATION_MIN_WAIT_MS - (Date.now() - paymentMethodCreatedAt), 0);
 
-    if (paymentMethodStatusWaitTime) await wait(paymentMethodStatusWaitTime);
+    if (paymentMethodStatusWaitTime > 0) await wait(paymentMethodStatusWaitTime);
 
     const makePaymentResult = await makePayment({
       variables: {

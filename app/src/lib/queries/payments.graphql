@@ -76,12 +76,15 @@ mutation CreatePaymentMethod(
   createPaymentMethod(orgID: $orgID, input: $input) {
     ... on ACHPaymentMethodOutput {
       id
+      status
     }
     ... on CreditCardPaymentMethodOutput {
       id
+      status
     }
     ... on WirePaymentMethodOutput {
       id
+      status
     }
   }
 }
@@ -131,6 +134,25 @@ query PreparePaymentMethod {
   preparePaymentMethod(paymentMethodType: ACH) {
     ... on ACHPaymentMethodPrepareStatementOutput {
       linkToken
+    }
+  }
+}
+
+query GetPaymentMethodStatus(
+  $paymentMethodID: UUID1!
+) {
+  getPaymentMethod(paymentMethodID: $paymentMethodID) {
+    ... on ACHPaymentMethodOutput {
+      id
+      status
+    }
+    ... on CreditCardPaymentMethodOutput {
+      id
+      status
+    }
+    ... on WirePaymentMethodOutput {
+      id
+      status
     }
   }
 }
