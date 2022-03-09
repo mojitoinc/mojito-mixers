@@ -33,10 +33,17 @@ function formatTimeLeft(start, total) {
 function formatTaxRate(taxRate) {
     return `${(Math.round(taxRate * 100) / 100).toFixed(2).replace(/\.00$/, "")} %`;
 }
+/**
+ * Remove duplicate, leading or trailing spaces:
+ */
+function fullTrim(str) {
+    return str.replace(/\s+/g, " ").trim();
+}
 
 exports.NBSP = NBSP;
 exports.formatSentence = formatSentence;
 exports.formatTaxRate = formatTaxRate;
 exports.formatTimeLeft = formatTimeLeft;
+exports.fullTrim = fullTrim;
 exports.parseSentences = parseSentences;
 //# sourceMappingURL=formatUtils.js.map

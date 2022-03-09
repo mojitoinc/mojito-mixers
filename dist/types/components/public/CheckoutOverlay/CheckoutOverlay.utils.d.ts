@@ -4,7 +4,8 @@ import { CheckoutModalError, CheckoutModalStep } from "./CheckoutOverlay.hooks";
 export interface CheckoutModalInfo {
     url?: string;
     invoiceID: string;
-    paymentReferenceNumber: string;
+    circlePaymentID: string;
+    paymentID: string;
     billingInfo: string | BillingInfo;
     paymentInfo: string | PaymentMethod;
     timestamp?: number;
@@ -26,8 +27,9 @@ export interface ContinueFlowsReturn {
     checkoutStep: CheckoutModalStep | "";
     checkoutError?: CheckoutModalError;
     invoiceID: string;
+    circlePaymentID: string;
+    paymentID: string;
     billingInfo: string | BillingInfo;
     paymentInfo: string | PaymentMethod;
-    paymentReferenceNumber: string;
 }
 export declare function continueFlows(noClear?: boolean): ContinueFlowsReturn;

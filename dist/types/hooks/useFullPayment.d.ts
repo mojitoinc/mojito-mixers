@@ -10,7 +10,8 @@ export interface UseFullPaymentOptions {
 }
 export interface FullPaymentState {
     paymentStatus: PaymentStatus;
-    paymentReferenceNumber: string;
+    circlePaymentID: string;
+    paymentID: string;
     paymentError?: string | CheckoutModalError;
 }
 export declare function useFullPayment({ orgID, invoiceID, savedPaymentMethods, selectedPaymentMethod, debug, }: UseFullPaymentOptions): [FullPaymentState, () => Promise<void>];

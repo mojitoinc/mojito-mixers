@@ -1,5 +1,6 @@
 import { __awaiter } from '../../node_modules/tslib/tslib.es6.js';
 import { useState, useCallback } from 'react';
+import { CIRCLE_MAX_EXPECTED_PAYMENT_CREATION_PROCESSING_TIME } from '../config/config.js';
 import { savedPaymentMethodToBillingInfo, parseCircleError } from '../domain/circle/circle.utils.js';
 import { ERROR_PURCHASE_NO_ITEMS, ERROR_PURCHASE_SELECTED_PAYMENT_METHOD, ERROR_PURCHASE_CREATING_PAYMENT_METHOD, ERROR_PURCHASE_CVV, ERROR_PURCHASE_PAYING } from '../domain/errors/errors.constants.js';
 import { useCreatePaymentMutation } from '../queries/graphqlGenerated.js';
@@ -7,16 +8,17 @@ import { wait } from '../utils/promiseUtils.js';
 import { useCreatePaymentMethod } from './useCreatePaymentMethod.js';
 import { useEncryptCardData } from './useEncryptCard.js';
 
-const CIRCLE_MAX_EXPECTED_PAYMENT_CREATION_PROCESSING_TIME = 5000;
 function useFullPayment({ orgID, invoiceID, savedPaymentMethods, selectedPaymentMethod, debug = false, }) {
     const [paymentState, setPaymentState] = useState({
         paymentStatus: "processing",
-        paymentReferenceNumber: "",
+        circlePaymentID: "",
+        paymentID: ""
     });
     const setError = useCallback((paymentError) => {
         setPaymentState({
             paymentStatus: "error",
-            paymentReferenceNumber: "",
+            circlePaymentID: "",
+            paymentID: "",
             paymentError,
         });
     }, []);
@@ -24,7 +26,7 @@ function useFullPayment({ orgID, invoiceID, savedPaymentMethods, selectedPayment
     const [createPaymentMethod] = useCreatePaymentMethod();
     const [makePayment] = useCreatePaymentMutation();
     const fullPayment = useCallback(() => __awaiter(this, void 0, void 0, function* () {
-        var _a, _b, _c, _d;
+        var _a, _b, _c, _d, _e, _f;
         const { billingInfo: selectedBillingInfo, paymentInfo: selectedPaymentInfo, } = selectedPaymentMethod;
         let cvv = "";
         if (typeof selectedPaymentInfo === "string") {
@@ -44,10 +46,12 @@ function useFullPayment({ orgID, invoiceID, savedPaymentMethods, selectedPayment
         }
         setPaymentState({
             paymentStatus: "processing",
-            paymentReferenceNumber: "",
+            circlePaymentID: "",
+            paymentID: "",
         });
         let paymentMethodID = "";
         let circlePaymentID = "";
+        let paymentID = "";
         let mutationError = undefined;
         let checkoutError = undefined;
         let paymentMethodCreatedAt = 0;
@@ -149,6 +153,7 @@ function useFullPayment({ orgID, invoiceID, savedPaymentMethods, selectedPayment
             if (debug)
                 console.log("    🟢 makePayment result", makePaymentResult);
             circlePaymentID = ((_d = (_c = makePaymentResult.data) === null || _c === void 0 ? void 0 : _c.createPayment) === null || _d === void 0 ? void 0 : _d.circlePaymentID) || "";
+            paymentID = ((_f = (_e = makePaymentResult.data) === null || _e === void 0 ? void 0 : _e.createPayment) === null || _f === void 0 ? void 0 : _f.id) || "";
         }
         if (!circlePaymentID) {
             setError(ERROR_PURCHASE_PAYING(mutationError));
@@ -157,7 +162,8 @@ function useFullPayment({ orgID, invoiceID, savedPaymentMethods, selectedPayment
         // TODO: Error handling and automatic retry:
         setPaymentState({
             paymentStatus: "processed",
-            paymentReferenceNumber: circlePaymentID,
+            circlePaymentID,
+            paymentID
         });
     }), [
         orgID,

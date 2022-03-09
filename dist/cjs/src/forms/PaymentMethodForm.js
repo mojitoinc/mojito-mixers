@@ -6,6 +6,7 @@ var tslib_es6 = require('../../node_modules/tslib/tslib.es6.js');
 var reactHookForm = require('react-hook-form');
 var yup$1 = require('../../node_modules/@hookform/resolvers/yup/dist/yup.mjs.js');
 var yup = require('yup');
+var material = require('@mui/material');
 var Book = require('../../node_modules/@mui/icons-material/Book.js');
 var React = require('react');
 var CheckoutModalFooter = require('../components/payments/CheckoutModalFooter/CheckoutModalFooter.js');
@@ -18,14 +19,12 @@ var SecondaryButton = require('../components/shared/SecondaryButton/SecondaryBut
 var PaymentMethodSelector = require('../components/shared/PaymentMethodSelector/PaymentMethodSelector.js');
 var validationUtils = require('../utils/validationUtils.js');
 var payment_utils = require('../domain/payment/payment.utils.js');
-var material = require('@mui/material');
 var DisplayBox = require('../components/payments/DisplayBox/DisplayBox.js');
+var DebugBox = require('../components/payments/DebugBox/DebugBox.js');
 var Checkbox = require('../components/shared/Checkbox/Checkbox.js');
 var ConsentText = require('../components/shared/ConsentText/ConsentText.js');
 var FormErrorsBox = require('../components/shared/FormErrorsBox/FormErrorsBox.js');
 var useFormCheckoutError = require('../hooks/useFormCheckoutError.js');
-var Grid = require('../../node_modules/@mui/material/Grid/Grid.js');
-var Box = require('../../node_modules/@mui/material/Box/Box.js');
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
@@ -89,13 +88,13 @@ const PAYMENT_TYPE_FORM_DATA = {
         },
         fields: ({ control, consentType, privacyHref, termsOfUseHref }) => (React__default["default"].createElement(React__default["default"].Fragment, null,
             React__default["default"].createElement(CardNumberField.ControlledCardNumberField, { name: "cardNumber", control: control, label: FIELD_LABELS.cardNumber }),
-            React__default["default"].createElement(Grid["default"], { container: true, columnSpacing: 2, direction: {
+            React__default["default"].createElement(material.Grid, { container: true, columnSpacing: 2, direction: {
                     xs: "column",
                     sm: "row"
                 } },
-                React__default["default"].createElement(Grid["default"], { item: true, sm: 6, zeroMinWidth: true },
+                React__default["default"].createElement(material.Grid, { item: true, sm: 6, zeroMinWidth: true },
                     React__default["default"].createElement(CardExpiryDateField.ControlledCardExpiryDateField, { name: "expiryDate", control: control, label: FIELD_LABELS.expiryDate })),
-                React__default["default"].createElement(Grid["default"], { item: true, sm: 6 },
+                React__default["default"].createElement(material.Grid, { item: true, sm: 6 },
                     React__default["default"].createElement(CardSecureCodeField.ControlledCardSecureCodeField, { name: "secureCode", control: control, label: FIELD_LABELS.secureCode }))),
             React__default["default"].createElement(TextField.ControlledTextField, { name: "nameOnCard", control: control, label: FIELD_LABELS.nameOnCard }),
             consentType === "checkbox" && (React__default["default"].createElement(Checkbox.ControlledCheckbox, { name: "consent", control: control, label: React__default["default"].createElement(React__default["default"].Fragment, null,
@@ -138,7 +137,7 @@ const PAYMENT_TYPE_FORM_DATA = {
             consentType === "checkbox" && (React__default["default"].createElement(Checkbox.ControlledCheckbox, { name: "consent", control: control, label: React__default["default"].createElement(React__default["default"].Fragment, null,
                     "I ",
                     React__default["default"].createElement(ConsentText.ConsentText, { privacyHref: privacyHref, termsOfUseHref: termsOfUseHref })) })),
-            React__default["default"].createElement(DisplayBox.DisplayBox, { sx: { mt: 1.5, flexDirection: "column" } }, dictionary.wirePaymentsDisclaimer.map((line, i) => (React__default["default"].createElement(material.Typography, { key: i, variant: "body1", sx: i === 0 ? undefined : { mt: 1.5 } }, line)))))),
+            React__default["default"].createElement(DisplayBox.DisplayBox, { sx: { mt: 1.5 } }, dictionary.wirePaymentsDisclaimer.map((line, i) => (React__default["default"].createElement(material.Typography, { key: i, variant: "body1", sx: i === 0 ? undefined : { mt: 1.5 } }, line)))))),
     },
     Crypto: {
         defaultValues: (consentType) => ({
@@ -147,7 +146,7 @@ const PAYMENT_TYPE_FORM_DATA = {
         }),
         schemaShape: {},
         fields: ({ control, consentType, privacyHref, termsOfUseHref }) => (React__default["default"].createElement(React__default["default"].Fragment, null,
-            React__default["default"].createElement(DisplayBox.DisplayBox, { sx: { mt: 1.5, mb: consentType === "checkbox" ? 1 : 0, flexDirection: "column" } },
+            React__default["default"].createElement(DisplayBox.DisplayBox, { sx: { mt: 1.5, mb: consentType === "checkbox" ? 1 : 0 } },
                 React__default["default"].createElement(material.Typography, { variant: "body1" }, "Not supported yet.")),
             consentType === "checkbox" && (React__default["default"].createElement(Checkbox.ControlledCheckbox, { name: "consent", control: control, label: React__default["default"].createElement(React__default["default"].Fragment, null,
                     "I ",
@@ -189,14 +188,14 @@ const PaymentMethodForm = ({ acceptedPaymentTypes, defaultValues: parentDefaultV
         }
     }), [onAttemptSubmit, selectedPaymentMethod, onPlaidLinkClicked, submitForm, trigger]);
     return (React__default["default"].createElement("form", { onSubmit: handleFormSubmit },
-        onSaved && (React__default["default"].createElement(Box["default"], { sx: { my: 2.5 } },
+        onSaved && (React__default["default"].createElement(material.Box, { sx: { my: 2.5 } },
             React__default["default"].createElement(SecondaryButton.SecondaryButton, { onClick: onSaved, startIcon: React__default["default"].createElement(Book["default"], null) }, "Use Saved Payment Method"))),
         acceptedPaymentTypes.length > 1 ? (React__default["default"].createElement(React__default["default"].Fragment, null,
             React__default["default"].createElement(InputGroupLabel.InputGroupLabel, { sx: { m: 0, pt: 2, pb: 1.5 } }, "Payment Method"),
             React__default["default"].createElement(PaymentMethodSelector.PaymentMethodSelector, { selectedPaymentMethod: selectedPaymentMethod, onPaymentMethodChange: handleSelectedPaymentMethodChange, paymentMethods: acceptedPaymentTypes }))) : (null),
         React__default["default"].createElement(Fields, { control: control, consentType: consentType, privacyHref: privacyHref, termsOfUseHref: termsOfUseHref, dictionary: dictionary }),
         checkoutErrorMessage && React__default["default"].createElement(FormErrorsBox.FormErrorsBox, { error: checkoutErrorMessage, sx: { mt: 5 } }),
-        debug && (React__default["default"].createElement(DisplayBox.DebugBox, { sx: { mt: 5 } },
+        debug && (React__default["default"].createElement(DebugBox.DebugBox, { sx: { mt: 5 } },
             JSON.stringify(watch(), null, 2),
             "\n\n",
             JSON.stringify(formState.errors, null, 2))),

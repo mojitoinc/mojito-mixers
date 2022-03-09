@@ -12,6 +12,14 @@ export interface CheckoutModalError {
     errorMessage: string;
 }
 export declare type CheckoutModalStep = "authentication" | "billing" | "payment" | "purchasing" | "confirmation" | "error";
+export declare enum CheckoutModalStepIndex {
+    authentication = 0,
+    billing = 1,
+    payment = 2,
+    purchasing = 3,
+    confirmation = 4,
+    error = 5
+}
 export interface CheckoutModalStateOptions {
     invoiceID?: string | null;
     productConfirmationEnabled?: boolean;
@@ -32,7 +40,8 @@ export interface PurchaseState {
     invoiceID: string | null;
     taxes: TaxesState;
     walletAddress: string | null;
-    paymentReferenceNumber: string;
+    circlePaymentID: string;
+    paymentID: string;
 }
 export interface CheckoutModalStateReturn extends CheckoutModalState, PurchaseState {
     initModalState: () => void;
@@ -46,7 +55,7 @@ export interface CheckoutModalStateReturn extends CheckoutModalState, PurchaseSt
     setInvoiceID: (invoiceID: string | null) => void;
     setTaxes: (taxes: TaxesState) => void;
     setWalletAddress: (walletAddress: string | null) => void;
-    setPaymentReferenceNumber: (paymentReferenceNumber: string) => void;
+    setPayments: (circlePaymentID: string, paymentID: string) => void;
 }
 export declare const CHECKOUT_STEPS: CheckoutModalStep[];
 export declare function useCheckoutModalState({ invoiceID: initialInvoiceID, productConfirmationEnabled, isAuthenticated, onError, }: CheckoutModalStateOptions): CheckoutModalStateReturn;
