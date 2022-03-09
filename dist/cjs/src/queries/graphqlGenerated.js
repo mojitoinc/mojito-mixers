@@ -449,12 +449,15 @@ const CreatePaymentMethodDocument = Apollo.gql `
   createPaymentMethod(orgID: $orgID, input: $input) {
     ... on ACHPaymentMethodOutput {
       id
+      status
     }
     ... on CreditCardPaymentMethodOutput {
       id
+      status
     }
     ... on WirePaymentMethodOutput {
       id
+      status
     }
   }
 }
@@ -536,6 +539,28 @@ function usePreparePaymentMethodQuery(baseOptions) {
     const options = Object.assign(Object.assign({}, defaultOptions), baseOptions);
     return Apollo__namespace.useQuery(PreparePaymentMethodDocument, options);
 }
+const GetPaymentMethodStatusDocument = Apollo.gql `
+    query GetPaymentMethodStatus($paymentMethodID: UUID1!) {
+  getPaymentMethod(paymentMethodID: $paymentMethodID) {
+    ... on ACHPaymentMethodOutput {
+      id
+      status
+    }
+    ... on CreditCardPaymentMethodOutput {
+      id
+      status
+    }
+    ... on WirePaymentMethodOutput {
+      id
+      status
+    }
+  }
+}
+    `;
+function useGetPaymentMethodStatusLazyQuery(baseOptions) {
+    const options = Object.assign(Object.assign({}, defaultOptions), baseOptions);
+    return Apollo__namespace.useLazyQuery(GetPaymentMethodStatusDocument, options);
+}
 const GetTaxQuoteDocument = Apollo.gql `
     query GetTaxQuote($input: TaxQuoteInput!) {
   getTaxQuote(input: $input) {
@@ -563,6 +588,7 @@ exports.CreatePaymentMethodDocument = CreatePaymentMethodDocument;
 exports.DeletePaymentMethodDocument = DeletePaymentMethodDocument;
 exports.GetInvoiceDetailsDocument = GetInvoiceDetailsDocument;
 exports.GetPaymentMethodListDocument = GetPaymentMethodListDocument;
+exports.GetPaymentMethodStatusDocument = GetPaymentMethodStatusDocument;
 exports.GetPaymentNotificationDocument = GetPaymentNotificationDocument;
 exports.GetTaxQuoteDocument = GetTaxQuoteDocument;
 exports.MeDocument = MeDocument;
@@ -576,6 +602,7 @@ exports.useCreatePaymentMutation = useCreatePaymentMutation;
 exports.useDeletePaymentMethodMutation = useDeletePaymentMethodMutation;
 exports.useGetInvoiceDetailsQuery = useGetInvoiceDetailsQuery;
 exports.useGetPaymentMethodListQuery = useGetPaymentMethodListQuery;
+exports.useGetPaymentMethodStatusLazyQuery = useGetPaymentMethodStatusLazyQuery;
 exports.useGetPaymentNotificationQuery = useGetPaymentNotificationQuery;
 exports.useGetTaxQuoteLazyQuery = useGetTaxQuoteLazyQuery;
 exports.useMeQuery = useMeQuery;

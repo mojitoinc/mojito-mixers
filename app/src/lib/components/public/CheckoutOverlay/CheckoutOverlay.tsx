@@ -459,6 +459,8 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   });
 
   const handleBeforeUnload = handleBeforeUnloadRef.current = useCallback((e?: BeforeUnloadEvent) => {
+    if (paymentID || circlePaymentID) return;
+
     if (orgID && invoiceID && invoiceID !== lastReleasedReservationID.current) {
       if (debug) console.log(`\n♻️ Releasing reservation invoice ${ invoiceID } (orgID = ${ orgID })...\n`);
 
@@ -483,7 +485,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
       // The absence of a returnValue property on the event will guarantee the browser unload happens:
       delete e['returnValue'];
     }
-  }, [orgID, invoiceID, debug, releaseReservationBuyNowLot]);
+  }, [paymentID, circlePaymentID, orgID, invoiceID, debug, releaseReservationBuyNowLot]);
 
   useEffect(() => {
     if (checkoutError?.at === "reset") handleBeforeUnloadRef.current();

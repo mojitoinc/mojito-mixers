@@ -270,6 +270,8 @@ debug: initialDebug, onEvent, onError, onMarketingOptInChange, // Not implemente
         },
     });
     const handleBeforeUnload = handleBeforeUnloadRef.current = React.useCallback((e) => {
+        if (paymentID || circlePaymentID)
+            return;
         if (orgID && invoiceID && invoiceID !== lastReleasedReservationID.current) {
             if (debug)
                 console.log(`\n♻️ Releasing reservation invoice ${invoiceID} (orgID = ${orgID})...\n`);
@@ -291,7 +293,7 @@ debug: initialDebug, onEvent, onError, onMarketingOptInChange, // Not implemente
             // The absence of a returnValue property on the event will guarantee the browser unload happens:
             delete e['returnValue'];
         }
-    }, [orgID, invoiceID, debug, releaseReservationBuyNowLot]);
+    }, [paymentID, circlePaymentID, orgID, invoiceID, debug, releaseReservationBuyNowLot]);
     React.useEffect(() => {
         if ((checkoutError === null || checkoutError === void 0 ? void 0 : checkoutError.at) === "reset")
             handleBeforeUnloadRef.current();

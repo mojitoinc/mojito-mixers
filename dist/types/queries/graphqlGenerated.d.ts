@@ -1418,12 +1418,15 @@ export declare type CreatePaymentMethodMutation = {
     createPaymentMethod: {
         __typename?: 'ACHPaymentMethodOutput';
         id: any;
+        status: string;
     } | {
         __typename?: 'CreditCardPaymentMethodOutput';
         id: any;
+        status: string;
     } | {
         __typename?: 'WirePaymentMethodOutput';
         id: any;
+        status: string;
     };
 };
 export declare type DeletePaymentMethodMutationVariables = Exact<{
@@ -1443,6 +1446,25 @@ export declare type PreparePaymentMethodQuery = {
         __typename?: 'ACHPaymentMethodPrepareStatementOutput';
         linkToken: string;
     } | null;
+};
+export declare type GetPaymentMethodStatusQueryVariables = Exact<{
+    paymentMethodID: Scalars['UUID1'];
+}>;
+export declare type GetPaymentMethodStatusQuery = {
+    __typename?: 'Query';
+    getPaymentMethod: {
+        __typename?: 'ACHPaymentMethodOutput';
+        id: any;
+        status: string;
+    } | {
+        __typename?: 'CreditCardPaymentMethodOutput';
+        id: any;
+        status: string;
+    } | {
+        __typename?: 'WirePaymentMethodOutput';
+        id: any;
+        status: string;
+    };
 };
 export declare type GetTaxQuoteQueryVariables = Exact<{
     input: TaxQuoteInput;
@@ -1776,6 +1798,32 @@ export declare function usePreparePaymentMethodLazyQuery(baseOptions?: Apollo.La
 export declare type PreparePaymentMethodQueryHookResult = ReturnType<typeof usePreparePaymentMethodQuery>;
 export declare type PreparePaymentMethodLazyQueryHookResult = ReturnType<typeof usePreparePaymentMethodLazyQuery>;
 export declare type PreparePaymentMethodQueryResult = Apollo.QueryResult<PreparePaymentMethodQuery, PreparePaymentMethodQueryVariables>;
+export declare const GetPaymentMethodStatusDocument: Apollo.DocumentNode;
+/**
+ * __useGetPaymentMethodStatusQuery__
+ *
+ * To run a query within a React component, call `useGetPaymentMethodStatusQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetPaymentMethodStatusQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetPaymentMethodStatusQuery({
+ *   variables: {
+ *      paymentMethodID: // value for 'paymentMethodID'
+ *   },
+ * });
+ */
+export declare function useGetPaymentMethodStatusQuery(baseOptions: Apollo.QueryHookOptions<GetPaymentMethodStatusQuery, GetPaymentMethodStatusQueryVariables>): Apollo.QueryResult<GetPaymentMethodStatusQuery, Exact<{
+    paymentMethodID: any;
+}>>;
+export declare function useGetPaymentMethodStatusLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetPaymentMethodStatusQuery, GetPaymentMethodStatusQueryVariables>): Apollo.QueryTuple<GetPaymentMethodStatusQuery, Exact<{
+    paymentMethodID: any;
+}>>;
+export declare type GetPaymentMethodStatusQueryHookResult = ReturnType<typeof useGetPaymentMethodStatusQuery>;
+export declare type GetPaymentMethodStatusLazyQueryHookResult = ReturnType<typeof useGetPaymentMethodStatusLazyQuery>;
+export declare type GetPaymentMethodStatusQueryResult = Apollo.QueryResult<GetPaymentMethodStatusQuery, GetPaymentMethodStatusQueryVariables>;
 export declare const GetTaxQuoteDocument: Apollo.DocumentNode;
 /**
  * __useGetTaxQuoteQuery__
