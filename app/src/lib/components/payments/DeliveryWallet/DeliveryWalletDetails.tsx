@@ -6,7 +6,7 @@ import { PUIDictionary } from "../../../domain/dictionary/dictionary.interfaces"
 import React from "react";
 
 export interface DeliveryWalletDetailsProps {
-  walletAddress: string;
+  walletAddress?: string;
   isMultiSig?: boolean;
   dictionary: PUIDictionary;
 }
@@ -19,10 +19,10 @@ const DeliveryWalletDetails: React.FC<DeliveryWalletDetailsProps> = ({
     <Box pt={2}>
       <Typography variant="body1">Once minted, items will be delivered to:</Typography>
 
-      <Box sx={{ display: "flex", justifyContent: "space-between", my: 1, alignItems: "center" }}>
-        <Typography sx={{ fontWeight: "500" }}>Wallet Address</Typography>
+      <Box sx={{ display: "flex", justifyContent: "space-between", mt: 1, mb: walletAddress ? 1 : 0, alignItems: "center" }}>
+        <Typography sx={{ fontWeight: "500" }}>{ walletAddress ? "Wallet Address" : "New MultiSig Wallet" }</Typography>
 
-          { isMultiSig && (
+          { (isMultiSig || !walletAddress) && (
             <Tooltip title={ dictionary.walletMultiSigTooltip }>
               <Chip
                 variant="outlined"
@@ -36,16 +36,18 @@ const DeliveryWalletDetails: React.FC<DeliveryWalletDetailsProps> = ({
           ) }
       </Box>
 
-      <ReadOnlyWalletAddress
-        value={ walletAddress }
-        margin="none"
-        InputProps={{
-          endAdornment: (
-            <CopyButton
-              label="Wallet Address"
-              value={ walletAddress } />
-          ),
-        }} />
+      { walletAddress && (
+        <ReadOnlyWalletAddress
+          value={ walletAddress }
+          margin="none"
+          InputProps={{
+            endAdornment: (
+              <CopyButton
+                label="Wallet Address"
+                value={ walletAddress } />
+            ),
+          }} />
+      ) }
     </Box>
   );
 }

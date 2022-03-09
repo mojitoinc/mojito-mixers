@@ -16,6 +16,7 @@ import { PUIDictionary } from "../../../domain/dictionary/dictionary.interfaces"
 export interface PurchaseConfirmationBillingDetailsProps {
   checkoutItems: CheckoutItem[];
   circlePaymentID: string;
+  walletAddress?: string;
   selectedPaymentMethodBillingInfo: SavedPaymentMethodBillingInfo;
   selectedPaymentMethodPaymentInfo: PaymentMethod | SavedPaymentMethod;
   dictionary: PUIDictionary;
@@ -24,6 +25,7 @@ export interface PurchaseConfirmationBillingDetailsProps {
 export const PurchaseConfirmationBillingDetails: React.FC<PurchaseConfirmationBillingDetailsProps> = ({
   checkoutItems,
   circlePaymentID,
+  walletAddress,
   selectedPaymentMethodBillingInfo,
   selectedPaymentMethodPaymentInfo,
   dictionary
@@ -106,7 +108,7 @@ export const PurchaseConfirmationBillingDetails: React.FC<PurchaseConfirmationBi
         selectedPaymentMethodBillingInfo={ selectedPaymentMethodBillingInfo } />
 
       <DeliveryWalletDetails
-        walletAddress="0xC000A000bC00D3E4c792d2aFDE0000000d000001"
+        walletAddress={ walletAddress }
         dictionary={ dictionary } />
     </Box>
   );

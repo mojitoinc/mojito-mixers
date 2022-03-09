@@ -210,7 +210,11 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   const invoiceItems = invoiceDetailsData?.getInvoiceDetails.items;
   const checkoutItems = useMemo(() => transformCheckoutItemsFromInvoice(parentCheckoutItems, invoiceItems), [parentCheckoutItems, invoiceItems]);
   const { total: subtotal, fees, taxAmount } = useCheckoutItemsCostTotal(checkoutItems);
+  const destinationAddress = (invoiceItems || [])?.[0]?.destinationAddress || null;
 
+  useEffect(() => {
+    if (destinationAddress) setWalletAddress(destinationAddress || null);
+  }, [destinationAddress, setWalletAddress]);
 
   // Invoice creation & buy now lot reservation:
 
@@ -236,9 +240,11 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
       // if there's already once, so when clicking the action button for that one, on top of calling its respective error
       // handling code, we re-create the reservation:
       setError(invoiceAndReservationState.error);
-    } else if (invoiceAndReservationState.invoiceID) {
-      setInvoiceID(invoiceAndReservationState.invoiceID);
+
+      return;
     }
+
+    if (invoiceAndReservationState.invoiceID) setInvoiceID(invoiceAndReservationState.invoiceID);
   }, [invoiceAndReservationState, setError, setInvoiceID]);
 
 
