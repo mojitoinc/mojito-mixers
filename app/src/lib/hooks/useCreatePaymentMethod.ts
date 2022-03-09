@@ -108,7 +108,6 @@ export function useCreatePaymentMethod({
 
     const paymentMethodCreatedAt = lastPaymentMethodStatusCheck = Date.now();
 
-    // TODO: Test that if this throws, useFullPayment still catches it:
     const createPaymentMethodResult = await createPaymentMethodPromise;
     const createPaymentMethodResultData: { id?: string; status?: string } = createPaymentMethodResult.data?.createPaymentMethod || {};
     const paymentMethodID = createPaymentMethodResultData.id;
