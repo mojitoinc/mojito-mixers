@@ -8,7 +8,7 @@ import { wait } from '../utils/promiseUtils.js';
 import { useCreatePaymentMethod } from './useCreatePaymentMethod.js';
 import { useEncryptCardData } from './useEncryptCard.js';
 
-function useFullPayment({ orgID, invoiceID, savedPaymentMethods, selectedPaymentMethod, debug = false, }) {
+function useFullPayment({ orgID, invoiceID, savedPaymentMethods, selectedPaymentMethod, walletAddress, debug = false, }) {
     const [paymentState, setPaymentState] = useState({
         paymentStatus: "processing",
         circlePaymentID: "",
@@ -113,7 +113,9 @@ function useFullPayment({ orgID, invoiceID, savedPaymentMethods, selectedPayment
                 invoiceID,
             });
         }
-        let metadata;
+        const metadata = walletAddress ? {
+            destinationAddress: walletAddress,
+        } : {};
         if (cvv) {
             const encryptCardDataResult = yield encryptCardData({
                 cvv,
@@ -128,11 +130,9 @@ function useFullPayment({ orgID, invoiceID, savedPaymentMethods, selectedPayment
                 return;
             }
             const { keyID, encryptedCardData } = encryptCardDataResult;
-            metadata = {
-                creditCardData: {
-                    keyID,
-                    encryptedData: encryptedCardData,
-                },
+            metadata.creditCardData = {
+                keyID,
+                encryptedData: encryptedCardData,
             };
         }
         const paymentMethodStatusWaitTime = Math.max(CIRCLE_MAX_EXPECTED_PAYMENT_CREATION_PROCESSING_TIME - (Date.now() - paymentMethodCreatedAt), 0);
@@ -142,7 +142,7 @@ function useFullPayment({ orgID, invoiceID, savedPaymentMethods, selectedPayment
             variables: {
                 paymentMethodID,
                 invoiceID,
-                metadata,
+                metadata: Object.keys(metadata).length > 0 ? metadata : undefined,
             },
         }).catch((error) => {
             mutationError = error;
@@ -170,6 +170,7 @@ function useFullPayment({ orgID, invoiceID, savedPaymentMethods, selectedPayment
         invoiceID,
         savedPaymentMethods,
         selectedPaymentMethod,
+        walletAddress,
         debug,
         setError,
         encryptCardData,

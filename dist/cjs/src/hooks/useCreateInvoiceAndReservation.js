@@ -10,7 +10,7 @@ var errors_constants = require('../domain/errors/errors.constants.js');
 var graphqlGenerated = require('../queries/graphqlGenerated.js');
 var formatUtils = require('../utils/formatUtils.js');
 
-function useCreateInvoiceAndReservation({ orgID, checkoutItems, debug = false, }) {
+function useCreateInvoiceAndReservation({ orgID, checkoutItems, stop, debug = false, }) {
     const [invoiceAndReservationState, setInvoiceAndReservationState] = React.useState({});
     const setError = React.useCallback((error) => {
         setInvoiceAndReservationState({
@@ -22,7 +22,7 @@ function useCreateInvoiceAndReservation({ orgID, checkoutItems, debug = false, }
     corre.useThrottledRequestAnimationFrame(() => {
         const countdownStart = countdownStartRef.current;
         const countdownElement = countdownElementRef.current;
-        if (countdownStart === null || countdownElement === null)
+        if (countdownStart === null)
             return;
         const formattedTimeLeft = formatUtils.formatTimeLeft(countdownStart, config.RESERVATION_COUNTDOWN_FROM_MS);
         if (formattedTimeLeft === "00:00") {
@@ -30,9 +30,9 @@ function useCreateInvoiceAndReservation({ orgID, checkoutItems, debug = false, }
             setError(errors_constants.ERROR_INVOICE_TIMEOUT());
             return;
         }
-        countdownElement.textContent = formattedTimeLeft;
-        // TODO: Stop counting down if we get to ConfirmationView (maybe PurchasingView):
-    }, countdownStartRef.current === null ? null : config.RESERVATION_COUNTDOWN_REFRESH_RATE_MS);
+        if (countdownElement)
+            countdownElement.textContent = formattedTimeLeft;
+    }, countdownStartRef.current === null || stop ? null : config.RESERVATION_COUNTDOWN_REFRESH_RATE_MS);
     const [createAuctionInvoice] = graphqlGenerated.useCreateAuctionInvoiceMutation();
     const [reserveBuyNowLot] = graphqlGenerated.useReserveBuyNowLotMutation();
     const createInvoiceAndReservation = React.useCallback(() => tslib_es6.__awaiter(this, void 0, void 0, function* () {
