@@ -28,6 +28,7 @@ import { useCheckoutItemsCostTotal } from "../../../hooks/useCheckoutItemCostTot
 import { PUIDictionary } from "../../../domain/dictionary/dictionary.interfaces";
 import { DEFAULT_DICTIONARY } from "../../../domain/dictionary/dictionary.constants";
 import { ApolloError } from "@apollo/client";
+import { Wallet } from "../../payments/DeliveryWallet/DeliveryWalletDetails";
 
 export interface PUICheckoutOverlayProps {
   // Modal:
@@ -210,7 +211,11 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   const invoiceItems = invoiceDetailsData?.getInvoiceDetails.items;
   const checkoutItems = useMemo(() => transformCheckoutItemsFromInvoice(parentCheckoutItems, invoiceItems), [parentCheckoutItems, invoiceItems]);
   const { total: subtotal, fees, taxAmount } = useCheckoutItemsCostTotal(checkoutItems);
+  const destinationAddress = (invoiceItems || [])?.[0]?.destinationAddress || null;
 
+  useEffect(() => {
+    if (destinationAddress) setWalletAddress(destinationAddress || null);
+  }, [destinationAddress, setWalletAddress]);
 
   // Invoice creation & buy now lot reservation:
 
@@ -236,9 +241,11 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
       // if there's already once, so when clicking the action button for that one, on top of calling its respective error
       // handling code, we re-create the reservation:
       setError(invoiceAndReservationState.error);
-    } else if (invoiceAndReservationState.invoiceID) {
-      setInvoiceID(invoiceAndReservationState.invoiceID);
+
+      return;
     }
+
+    if (invoiceAndReservationState.invoiceID) setInvoiceID(invoiceAndReservationState.invoiceID);
   }, [invoiceAndReservationState, setError, setInvoiceID]);
 
 
@@ -661,6 +668,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
         invoiceID={ invoiceID }
         savedPaymentMethods={ savedPaymentMethods }
         selectedPaymentMethod={ selectedPaymentMethod }
+        walletAddress={ walletAddress }
         onPurchaseSuccess={ handlePurchaseSuccess }
         onPurchaseError={ handlePurchaseError }
         onDialogBlocked={ setIsDialogBlocked }
@@ -675,6 +683,8 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
         savedPaymentMethods={ savedPaymentMethods }
         selectedPaymentMethod={ selectedPaymentMethod }
         circlePaymentID={ circlePaymentID }
+        walletAddress={ walletAddress || "" }
+        wallets={ meData?.me?.wallets as Wallet[] || undefined }
         onGoToCollection={ onGoToCollection }
         onNext={ handleClose }
         dictionary={ dictionary } />
