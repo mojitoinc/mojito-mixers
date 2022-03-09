@@ -72,7 +72,14 @@ export const BillingView: React.FC<BillingViewProps> = ({
 
   const [getTaxQuote] = useGetTaxQuoteLazyQuery();
 
-  const getTaxQuoteTimestampRef = useRef<number>();
+  const getTaxQuoteTimestampRef = useRef<number>(0);
+
+  useEffect(() => {
+    return () => {
+      // To discard the result below that might come after the component has been unmounted:
+      getTaxQuoteTimestampRef.current = 0;
+    };
+  }, [])
 
   const calculateTaxes = useCallback(async (taxInfo: TaxInfo | BillingInfo) => {
     const calledAt = getTaxQuoteTimestampRef.current;

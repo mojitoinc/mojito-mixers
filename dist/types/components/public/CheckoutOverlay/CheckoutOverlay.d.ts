@@ -1,6 +1,7 @@
-import React, { ErrorInfo } from "react";
+import React from "react";
 import { UserFormat } from "../../../domain/auth/authentication.interfaces";
 import { PaymentType } from "../../../domain/payment/payment.interfaces";
+import { CheckoutEventData, CheckoutEventType } from "../../../domain/events/events.interfaces";
 import { CheckoutItemInfo } from "../../../domain/product/product.interfaces";
 import { Theme, SxProps } from "@mui/material/styles";
 import { ConsentType } from "../../shared/ConsentText/ConsentText";
@@ -33,8 +34,8 @@ export interface PUICheckoutOverlayProps {
     isAuthenticated?: boolean;
     isAuthenticatedLoading?: boolean;
     debug?: boolean;
+    onEvent?: (eventType: CheckoutEventType, eventData: CheckoutEventData) => void;
     onError?: (error: CheckoutModalError) => void;
-    onCatch?: (error: Error, errorInfo?: ErrorInfo) => void | true;
     onMarketingOptInChange?: (marketingOptIn: boolean) => void;
 }
 export declare type PUICheckoutProps = PUICheckoutOverlayProps & ProvidersInjectorProps;

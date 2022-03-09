@@ -2,27 +2,41 @@ import { Box, Chip, Tooltip, Typography } from "@mui/material";
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { CopyButton } from "../../shared/CopyButton/CopyButton";
 import { ReadOnlyWalletAddress } from "../../shared/ReadOnlyField/ReadOnlyField";
-import React from "react";
+import React, { useMemo } from "react";
 import { useDictionary } from "../../../hooks/useDictionary";
 
 export interface DeliveryWalletDetailsProps {
   walletAddress: string;
   isMultiSig?: boolean;
 }
+export interface Wallet {
+  id: string;
+  name: string;
+  address: string;
+}
+
+export interface DeliveryWalletDetailsProps {
+  walletAddress: string;
+  wallets?: Wallet[];
+}
 const DeliveryWalletDetails: React.FC<DeliveryWalletDetailsProps> = ({
-  isMultiSig = true,
   walletAddress,
+  wallets,
 }) => {
   const dictionary = useDictionary();
+
+  const isMultiSig = useMemo(() => {
+    return wallets && wallets.some(({ address }) => address === walletAddress);
+  }, [walletAddress, wallets]);
 
   return (
     <Box pt={2}>
       <Typography variant="body1">Once minted, items will be delivered to:</Typography>
 
-      <Box sx={{ display: "flex", justifyContent: "space-between", my: 1, alignItems: "center" }}>
-        <Typography sx={{ fontWeight: "500" }}>Wallet Address</Typography>
+      <Box sx={{ display: "flex", justifyContent: "space-between", mt: 1, mb: walletAddress ? 1 : 0, alignItems: "center" }}>
+        <Typography sx={{ fontWeight: "500" }}>{ walletAddress ? "Wallet Address" : "New MultiSig Wallet" }</Typography>
 
-          { isMultiSig && (
+          { (isMultiSig || !walletAddress) && (
             <Tooltip title={ dictionary.walletMultiSigTooltip }>
               <Chip
                 variant="outlined"
@@ -36,16 +50,18 @@ const DeliveryWalletDetails: React.FC<DeliveryWalletDetailsProps> = ({
           ) }
       </Box>
 
-      <ReadOnlyWalletAddress
-        value={ walletAddress }
-        margin="none"
-        InputProps={{
-          endAdornment: (
-            <CopyButton
-              label="Wallet Address"
-              value={ walletAddress } />
-          ),
-        }} />
+      { walletAddress && (
+        <ReadOnlyWalletAddress
+          value={ walletAddress }
+          margin="none"
+          InputProps={{
+            endAdornment: (
+              <CopyButton
+                label="Wallet Address"
+                value={ walletAddress } />
+            ),
+          }} />
+      ) }
     </Box>
   );
 }

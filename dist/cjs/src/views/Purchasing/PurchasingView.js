@@ -17,13 +17,14 @@ function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'defau
 
 var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 
-const PurchasingView = ({ purchasingImageSrc, purchasingMessages: customPurchasingMessages, orgID, invoiceID, savedPaymentMethods, selectedPaymentMethod, onPurchaseSuccess, onPurchaseError, onDialogBlocked, debug, }) => {
+const PurchasingView = ({ purchasingImageSrc, purchasingMessages: customPurchasingMessages, orgID, invoiceID, savedPaymentMethods, selectedPaymentMethod, walletAddress, onPurchaseSuccess, onPurchaseError, onDialogBlocked, debug, }) => {
     var _a, _b, _c;
     const [fullPaymentState, fullPayment] = useFullPayment.useFullPayment({
         orgID,
         invoiceID,
         savedPaymentMethods,
         selectedPaymentMethod,
+        walletAddress,
         debug,
     });
     const paymentNotificationResult = graphqlGenerated.useGetPaymentNotificationQuery({
@@ -52,7 +53,7 @@ const PurchasingView = ({ purchasingImageSrc, purchasingMessages: customPurchasi
         fullPayment();
     }, [fullPayment]);
     React.useEffect(() => {
-        const { paymentStatus, paymentReferenceNumber, paymentError } = fullPaymentState;
+        const { paymentStatus, circlePaymentID, paymentID, paymentError } = fullPaymentState;
         if (paymentStatus === "processing") {
             onDialogBlocked(true);
             return;
@@ -69,7 +70,8 @@ const PurchasingView = ({ purchasingImageSrc, purchasingMessages: customPurchasi
             checkoutInfoPersistedRef.current = true;
             CheckoutOverlay_utils.persistCheckoutModalInfo({
                 invoiceID,
-                paymentReferenceNumber,
+                circlePaymentID,
+                paymentID,
                 billingInfo,
                 paymentInfo,
             });
@@ -78,7 +80,7 @@ const PurchasingView = ({ purchasingImageSrc, purchasingMessages: customPurchasi
             location.href = redirectURL;
             return;
         }
-        onPurchaseSuccess(paymentReferenceNumber);
+        onPurchaseSuccess(circlePaymentID, paymentID);
     }, [
         fullPaymentState,
         hasWaited,

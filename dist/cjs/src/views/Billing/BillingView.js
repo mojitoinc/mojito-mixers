@@ -32,7 +32,13 @@ const BillingView = ({ checkoutItems, savedPaymentMethods: rawSavedPaymentMethod
     });
     const [formSubmitAttempted, setFormSubmitAttempted] = React.useState(false);
     const [getTaxQuote] = graphqlGenerated.useGetTaxQuoteLazyQuery();
-    const getTaxQuoteTimestampRef = React.useRef();
+    const getTaxQuoteTimestampRef = React.useRef(0);
+    React.useEffect(() => {
+        return () => {
+            // To discard the result below that might come after the component has been unmounted:
+            getTaxQuoteTimestampRef.current = 0;
+        };
+    }, []);
     const calculateTaxes = React.useCallback((taxInfo) => tslib_es6.__awaiter(void 0, void 0, void 0, function* () {
         var _a;
         const calledAt = getTaxQuoteTimestampRef.current;

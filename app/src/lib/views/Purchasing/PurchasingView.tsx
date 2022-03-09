@@ -19,6 +19,7 @@ export interface PurchasingViewProps {
   invoiceID: string;
   savedPaymentMethods: SavedPaymentMethod[];
   selectedPaymentMethod: SelectedPaymentMethod;
+  walletAddress: string | null;
   onPurchaseSuccess: (circlePaymentID: string, paymentID: string) => void;
   onPurchaseError: (error: string | CheckoutModalError) => void;
   onDialogBlocked: (blocked: boolean) => void;
@@ -32,6 +33,7 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
   invoiceID,
   savedPaymentMethods,
   selectedPaymentMethod,
+  walletAddress,
   onPurchaseSuccess,
   onPurchaseError,
   onDialogBlocked,
@@ -42,6 +44,7 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
     invoiceID,
     savedPaymentMethods,
     selectedPaymentMethod,
+    walletAddress,
     debug,
   });
 

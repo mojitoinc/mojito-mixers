@@ -6,7 +6,7 @@ import { ERROR_INVOICE_TIMEOUT, ERROR_PURCHASE_NO_ITEMS, ERROR_PURCHASE_NO_UNITS
 import { useCreateAuctionInvoiceMutation, useReserveBuyNowLotMutation } from '../queries/graphqlGenerated.js';
 import { formatTimeLeft } from '../utils/formatUtils.js';
 
-function useCreateInvoiceAndReservation({ orgID, checkoutItems, debug = false, }) {
+function useCreateInvoiceAndReservation({ orgID, checkoutItems, stop, debug = false, }) {
     const [invoiceAndReservationState, setInvoiceAndReservationState] = useState({});
     const setError = useCallback((error) => {
         setInvoiceAndReservationState({
@@ -18,7 +18,7 @@ function useCreateInvoiceAndReservation({ orgID, checkoutItems, debug = false, }
     useThrottledRequestAnimationFrame(() => {
         const countdownStart = countdownStartRef.current;
         const countdownElement = countdownElementRef.current;
-        if (countdownStart === null || countdownElement === null)
+        if (countdownStart === null)
             return;
         const formattedTimeLeft = formatTimeLeft(countdownStart, RESERVATION_COUNTDOWN_FROM_MS);
         if (formattedTimeLeft === "00:00") {
@@ -26,9 +26,9 @@ function useCreateInvoiceAndReservation({ orgID, checkoutItems, debug = false, }
             setError(ERROR_INVOICE_TIMEOUT());
             return;
         }
-        countdownElement.textContent = formattedTimeLeft;
-        // TODO: Stop counting down if we get to ConfirmationView (maybe PurchasingView):
-    }, countdownStartRef.current === null ? null : RESERVATION_COUNTDOWN_REFRESH_RATE_MS);
+        if (countdownElement)
+            countdownElement.textContent = formattedTimeLeft;
+    }, countdownStartRef.current === null || stop ? null : RESERVATION_COUNTDOWN_REFRESH_RATE_MS);
     const [createAuctionInvoice] = useCreateAuctionInvoiceMutation();
     const [reserveBuyNowLot] = useReserveBuyNowLotMutation();
     const createInvoiceAndReservation = useCallback(() => __awaiter(this, void 0, void 0, function* () {

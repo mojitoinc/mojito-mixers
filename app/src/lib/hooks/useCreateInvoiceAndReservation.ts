@@ -11,6 +11,7 @@ import { formatTimeLeft } from "../utils/formatUtils";
 export interface UseCreateInvoiceAndReservationOptions {
   orgID: string;
   checkoutItems: CheckoutItem[];
+  stop: boolean;
   debug?: boolean;
 }
 
@@ -28,6 +29,7 @@ export interface UseCreateInvoiceAndReservationReturn {
 export function useCreateInvoiceAndReservation({
   orgID,
   checkoutItems,
+  stop,
   debug = false,
 }: UseCreateInvoiceAndReservationOptions): UseCreateInvoiceAndReservationReturn {
   const [invoiceAndReservationState, setInvoiceAndReservationState] = useState<InvoiceAndReservationState>({ });
@@ -45,7 +47,7 @@ export function useCreateInvoiceAndReservation({
     const countdownStart = countdownStartRef.current;
     const countdownElement = countdownElementRef.current;
 
-    if (countdownStart === null || countdownElement === null) return;
+    if (countdownStart === null) return;
 
     const formattedTimeLeft = formatTimeLeft(countdownStart, RESERVATION_COUNTDOWN_FROM_MS);
 
@@ -57,10 +59,9 @@ export function useCreateInvoiceAndReservation({
       return;
     }
 
-    countdownElement.textContent = formattedTimeLeft;
+    if (countdownElement) countdownElement.textContent = formattedTimeLeft;
 
-  // TODO: Stop counting down if we get to ConfirmationView (maybe PurchasingView):
-  }, countdownStartRef.current === null ? null : RESERVATION_COUNTDOWN_REFRESH_RATE_MS);
+  }, countdownStartRef.current === null || stop ? null : RESERVATION_COUNTDOWN_REFRESH_RATE_MS);
 
   const [createAuctionInvoice] = useCreateAuctionInvoiceMutation();
   const [reserveBuyNowLot] = useReserveBuyNowLotMutation();

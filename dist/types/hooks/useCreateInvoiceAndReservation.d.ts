@@ -4,6 +4,7 @@ import { CheckoutItem } from "../domain/product/product.interfaces";
 export interface UseCreateInvoiceAndReservationOptions {
     orgID: string;
     checkoutItems: CheckoutItem[];
+    stop: boolean;
     debug?: boolean;
 }
 export interface InvoiceAndReservationState {
@@ -15,4 +16,4 @@ export interface UseCreateInvoiceAndReservationReturn {
     createInvoiceAndReservation: () => Promise<void>;
     countdownElementRef: React.RefObject<HTMLSpanElement>;
 }
-export declare function useCreateInvoiceAndReservation({ orgID, checkoutItems, debug, }: UseCreateInvoiceAndReservationOptions): UseCreateInvoiceAndReservationReturn;
+export declare function useCreateInvoiceAndReservation({ orgID, checkoutItems, stop, debug, }: UseCreateInvoiceAndReservationOptions): UseCreateInvoiceAndReservationReturn;

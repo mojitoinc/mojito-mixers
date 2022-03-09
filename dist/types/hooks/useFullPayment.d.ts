@@ -6,11 +6,13 @@ export interface UseFullPaymentOptions {
     invoiceID: string;
     savedPaymentMethods: SavedPaymentMethod[];
     selectedPaymentMethod: SelectedPaymentMethod;
+    walletAddress: string | null;
     debug?: boolean;
 }
 export interface FullPaymentState {
     paymentStatus: PaymentStatus;
-    paymentReferenceNumber: string;
+    circlePaymentID: string;
+    paymentID: string;
     paymentError?: string | CheckoutModalError;
 }
-export declare function useFullPayment({ orgID, invoiceID, savedPaymentMethods, selectedPaymentMethod, debug, }: UseFullPaymentOptions): [FullPaymentState, () => Promise<void>];
+export declare function useFullPayment({ orgID, invoiceID, savedPaymentMethods, selectedPaymentMethod, walletAddress, debug, }: UseFullPaymentOptions): [FullPaymentState, () => Promise<void>];

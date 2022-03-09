@@ -15,3 +15,7 @@ export declare function formatTimeLeft(start: number, total: number): string;
  * Returns a formatted tax rate with none or two decimal places.
  */
 export declare function formatTaxRate(taxRate: number): string;
+/**
+ * Remove duplicate, leading or trailing spaces:
+ */
+export declare function fullTrim(str: string): string;

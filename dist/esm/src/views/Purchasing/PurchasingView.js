@@ -9,13 +9,14 @@ import { useGetPaymentNotificationQuery } from '../../queries/graphqlGenerated.j
 import { persistCheckoutModalInfo } from '../../components/public/CheckoutOverlay/CheckoutOverlay.utils.js';
 import { PAYMENT_NOTIFICATION_INTERVAL_MS, PURCHASING_MESSAGES_DEFAULT, PURCHASING_MIN_WAIT_MS, PURCHASING_MESSAGES_INTERVAL_MS } from '../../config/config.js';
 
-const PurchasingView = ({ purchasingImageSrc, purchasingMessages: customPurchasingMessages, orgID, invoiceID, savedPaymentMethods, selectedPaymentMethod, onPurchaseSuccess, onPurchaseError, onDialogBlocked, debug, }) => {
+const PurchasingView = ({ purchasingImageSrc, purchasingMessages: customPurchasingMessages, orgID, invoiceID, savedPaymentMethods, selectedPaymentMethod, walletAddress, onPurchaseSuccess, onPurchaseError, onDialogBlocked, debug, }) => {
     var _a, _b, _c;
     const [fullPaymentState, fullPayment] = useFullPayment({
         orgID,
         invoiceID,
         savedPaymentMethods,
         selectedPaymentMethod,
+        walletAddress,
         debug,
     });
     const paymentNotificationResult = useGetPaymentNotificationQuery({
@@ -44,7 +45,7 @@ const PurchasingView = ({ purchasingImageSrc, purchasingMessages: customPurchasi
         fullPayment();
     }, [fullPayment]);
     useEffect(() => {
-        const { paymentStatus, paymentReferenceNumber, paymentError } = fullPaymentState;
+        const { paymentStatus, circlePaymentID, paymentID, paymentError } = fullPaymentState;
         if (paymentStatus === "processing") {
             onDialogBlocked(true);
             return;
@@ -61,7 +62,8 @@ const PurchasingView = ({ purchasingImageSrc, purchasingMessages: customPurchasi
             checkoutInfoPersistedRef.current = true;
             persistCheckoutModalInfo({
                 invoiceID,
-                paymentReferenceNumber,
+                circlePaymentID,
+                paymentID,
                 billingInfo,
                 paymentInfo,
             });
@@ -70,7 +72,7 @@ const PurchasingView = ({ purchasingImageSrc, purchasingMessages: customPurchasi
             location.href = redirectURL;
             return;
         }
-        onPurchaseSuccess(paymentReferenceNumber);
+        onPurchaseSuccess(circlePaymentID, paymentID);
     }, [
         fullPaymentState,
         hasWaited,

@@ -1,6 +1,7 @@
 import { ApolloError } from "@apollo/client";
 import { useState, useCallback } from "react";
 import { CheckoutModalError, SelectedPaymentMethod } from "../components/public/CheckoutOverlay/CheckoutOverlay.hooks";
+import { CIRCLE_MAX_EXPECTED_PAYMENT_CREATION_PROCESSING_TIME } from "../config/config";
 import { SavedPaymentMethod } from "../domain/circle/circle.interfaces";
 import { parseCircleError, savedPaymentMethodToBillingInfo } from "../domain/circle/circle.utils";
 import { ERROR_PURCHASE_CREATING_PAYMENT_METHOD, ERROR_PURCHASE_CVV, ERROR_PURCHASE_NO_ITEMS, ERROR_PURCHASE_PAYING, ERROR_PURCHASE_SELECTED_PAYMENT_METHOD } from "../domain/errors/errors.constants";
@@ -11,13 +12,12 @@ import { wait } from "../utils/promiseUtils";
 import { useCreatePaymentMethod } from "./useCreatePaymentMethod";
 import { useEncryptCardData } from "./useEncryptCard";
 
-const CIRCLE_MAX_EXPECTED_PAYMENT_CREATION_PROCESSING_TIME = 5000;
-
 export interface UseFullPaymentOptions {
   orgID: string;
   invoiceID: string;
   savedPaymentMethods: SavedPaymentMethod[];
   selectedPaymentMethod: SelectedPaymentMethod;
+  walletAddress: string | null;
   debug?: boolean;
 }
 
@@ -33,6 +33,7 @@ export function useFullPayment({
   invoiceID,
   savedPaymentMethods,
   selectedPaymentMethod,
+  walletAddress,
   debug = false,
 }: UseFullPaymentOptions): [FullPaymentState, () => Promise<void>] {
   const [paymentState, setPaymentState] = useState<FullPaymentState>({
@@ -169,8 +170,9 @@ export function useFullPayment({
       });
     }
 
-
-    let metadata: CreatePaymentMetadataInput | undefined;
+    const metadata: Partial<CreatePaymentMetadataInput> = walletAddress ? {
+      destinationAddress: walletAddress,
+    } : { };
 
     if (cvv) {
       const encryptCardDataResult = await encryptCardData({
@@ -191,11 +193,9 @@ export function useFullPayment({
 
       const { keyID, encryptedCardData } = encryptCardDataResult;
 
-      metadata = {
-        creditCardData: {
-          keyID,
-          encryptedData: encryptedCardData,
-        },
+      metadata.creditCardData = {
+        keyID,
+        encryptedData: encryptedCardData,
       };
     }
 
@@ -207,7 +207,7 @@ export function useFullPayment({
       variables: {
         paymentMethodID,
         invoiceID,
-        metadata,
+        metadata: Object.keys(metadata).length > 0 ? (metadata as CreatePaymentMetadataInput) : undefined,
       },
     }).catch((error: ApolloError | Error) => {
       mutationError = error;
@@ -240,6 +240,7 @@ export function useFullPayment({
     invoiceID,
     savedPaymentMethods,
     selectedPaymentMethod,
+    walletAddress,
     debug,
     setError,
     encryptCardData,

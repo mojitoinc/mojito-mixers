@@ -46,6 +46,26 @@ interface CheckoutItem extends CheckoutItemInfo {
     totalPrice: number;
 }
 
+declare type ShippingMethod = "custom wallet" | "multisig wallet";
+interface CheckoutEventData {
+    step: number;
+    stepName: string;
+    departmentCategory: "NFT";
+    paymentType?: PaymentType;
+    shippingMethod: ShippingMethod;
+    checkoutItems: CheckoutItem[];
+    currency: "USD";
+    revenue: number;
+    fees: number;
+    tax?: number;
+    total: number;
+    circlePaymentID?: string;
+    paymentID?: string;
+}
+declare type CheckoutModalNavigateType = "navigate:authentication" | "navigate:billing" | "navigate:payment" | "navigate:purchasing" | "navigate:confirmation" | "navigate:error";
+declare type CheckoutModalEventType = "event:paymentSuccess" | "event:paymentError";
+declare type CheckoutEventType = CheckoutModalNavigateType | CheckoutModalEventType;
+
 declare type ConsentType = "disclaimer" | "checkbox" | "circle";
 
 interface SelectOption {
@@ -142,8 +162,8 @@ interface PUICheckoutOverlayProps {
     isAuthenticated?: boolean;
     isAuthenticatedLoading?: boolean;
     debug?: boolean;
+    onEvent?: (eventType: CheckoutEventType, eventData: CheckoutEventData) => void;
     onError?: (error: CheckoutModalError) => void;
-    onCatch?: (error: Error, errorInfo?: ErrorInfo) => void | true;
     onMarketingOptInChange?: (marketingOptIn: boolean) => void;
 }
 declare type PUICheckoutProps = PUICheckoutOverlayProps & ProvidersInjectorProps;
@@ -204,7 +224,8 @@ declare function continuePlaidOAuthFlow(): boolean;
 interface CheckoutModalInfo {
     url?: string;
     invoiceID: string;
-    paymentReferenceNumber: string;
+    circlePaymentID: string;
+    paymentID: string;
     billingInfo: string | BillingInfo;
     paymentInfo: string | PaymentMethod;
     timestamp?: number;
@@ -223,9 +244,10 @@ interface ContinueFlowsReturn {
     checkoutStep: CheckoutModalStep | "";
     checkoutError?: CheckoutModalError;
     invoiceID: string;
+    circlePaymentID: string;
+    paymentID: string;
     billingInfo: string | BillingInfo;
     paymentInfo: string | PaymentMethod;
-    paymentReferenceNumber: string;
 }
 declare function continueFlows(noClear?: boolean): ContinueFlowsReturn;
 
@@ -233,4 +255,4 @@ declare const extendDefaultTheme: (themeOptions?: ThemeOptions | undefined) => T
 declare const MOJITO_LIGHT_THEME: Theme;
 declare const MOJITO_DARK_THEME: Theme;
 
-export { CheckoutItem, CheckoutModalError, CheckoutModalErrorAt, CircleFieldErrorAt, CircleFieldErrors, MOJITO_DARK_THEME, MOJITO_LIGHT_THEME, PUICheckout, PUICheckoutProps, PUIDictionary, PUIDictionaryKeys, PUIDictionaryMultiLine, PUIDictionarySingleLine, PUIError, PUIErrorProps, PUIPlaid, PUISuccess, PUISuccessProps$1 as PUISuccessProps, PaymentType, UserFormat, continueCheckout, continueFlows, continuePlaidOAuthFlow, extendDefaultTheme, getCheckoutModalState, getPlaidOAuthFlowState, persistPlaidReceivedRedirectUri, persistReceivedRedirectUri3DS, useOpenCloseCheckoutModal };
+export { CheckoutEventData, CheckoutEventType, CheckoutItem, CheckoutModalError, CheckoutModalErrorAt, CircleFieldErrorAt, CircleFieldErrors, MOJITO_DARK_THEME, MOJITO_LIGHT_THEME, PUICheckout, PUICheckoutProps, PUIDictionary, PUIDictionaryKeys, PUIDictionaryMultiLine, PUIDictionarySingleLine, PUIError, PUIErrorProps, PUIPlaid, PUISuccess, PUISuccessProps$1 as PUISuccessProps, PaymentType, UserFormat, continueCheckout, continueFlows, continuePlaidOAuthFlow, extendDefaultTheme, getCheckoutModalState, getPlaidOAuthFlowState, persistPlaidReceivedRedirectUri, persistReceivedRedirectUri3DS, useOpenCloseCheckoutModal };

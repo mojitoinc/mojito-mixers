@@ -46,17 +46,15 @@ exports.ContractType = void 0;
 (function (ContractType) {
     ContractType["Erc721Creator"] = "ERC721Creator";
     ContractType["Erc1155Creator"] = "ERC1155Creator";
-    ContractType["GenerativeContract"] = "GenerativeContract";
-    ContractType["ZoraContract"] = "ZoraContract";
 })(exports.ContractType || (exports.ContractType = {}));
 exports.ExtensionType = void 0;
 (function (ExtensionType) {
-    ExtensionType["GenartExtension"] = "GenartExtension";
     ExtensionType["ProvenanceExtension"] = "ProvenanceExtension";
 })(exports.ExtensionType || (exports.ExtensionType = {}));
 exports.InvoiceStatus = void 0;
 (function (InvoiceStatus) {
     InvoiceStatus["Canceled"] = "Canceled";
+    InvoiceStatus["Delivered"] = "Delivered";
     InvoiceStatus["Draft"] = "Draft";
     InvoiceStatus["Paid"] = "Paid";
     InvoiceStatus["Pending"] = "Pending";
@@ -293,8 +291,7 @@ const GetInvoiceDetailsDocument = Apollo.gql `
     query GetInvoiceDetails($invoiceID: UUID1!, $orgID: UUID1!) {
   getInvoiceDetails(invoiceID: $invoiceID, orgID: $orgID) {
     items {
-      collectionItemID
-      collectionItemTitle
+      destinationAddress
       units
       unitPrice
       taxes
@@ -339,6 +336,11 @@ const MeDocument = Apollo.gql `
         id
         name
       }
+    }
+    wallets {
+      id
+      name
+      address
     }
   }
 }

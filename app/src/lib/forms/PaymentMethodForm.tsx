@@ -2,8 +2,7 @@ import { Control, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { boolean, object, string, TestContext } from "yup";
 import { ObjectShape } from "yup/lib/object";
-import Grid from "@mui/material/Grid";
-import Box from "@mui/material/Box";
+import { Grid, Box } from "@mui/material";
 import BookIcon from "@mui/icons-material/Book";
 import React, { useCallback, useMemo } from "react";
 import { CheckoutModalFooter} from "../components/payments/CheckoutModalFooter/CheckoutModalFooter";
@@ -28,7 +27,8 @@ import {
   getCVCIsValid
 } from "../domain/payment/payment.utils";
 import { Typography } from "@mui/material";
-import { DebugBox, DisplayBox } from "../components/payments/DisplayBox/DisplayBox";
+import { DisplayBox } from "../components/payments/DisplayBox/DisplayBox";
+import { DebugBox } from "../components/payments/DebugBox/DebugBox";
 import { ControlledCheckbox } from "../components/shared/Checkbox/Checkbox";
 import { ConsentText, ConsentType, CONSENT_ERROR_MESSAGE } from "../components/shared/ConsentText/ConsentText";
 import { CheckoutModalError } from "../components/public/CheckoutOverlay/CheckoutOverlay.hooks";
@@ -211,7 +211,7 @@ const PAYMENT_TYPE_FORM_DATA: Record<PaymentType, PaymentTypeFormData> = {
           label={ <>I <ConsentText privacyHref={ privacyHref } termsOfUseHref={ termsOfUseHref } /></> } />
       ) }
 
-      <DisplayBox sx={{ mt: 1.5, flexDirection: "column" }} >
+      <DisplayBox sx={{ mt: 1.5 }}>
         { dictionary.wirePaymentsDisclaimer.map((line, i) => (
           <Typography key={ i } variant="body1" sx={ i === 0 ? undefined : { mt: 1.5 } }>{ line }</Typography>
         )) }
@@ -225,7 +225,7 @@ const PAYMENT_TYPE_FORM_DATA: Record<PaymentType, PaymentTypeFormData> = {
     }),
     schemaShape: {},
     fields: ({ control, consentType, privacyHref, termsOfUseHref }) => (<>
-      <DisplayBox sx={{ mt: 1.5, mb: consentType === "checkbox" ? 1 : 0, flexDirection: "column" }}>
+      <DisplayBox sx={{ mt: 1.5, mb: consentType === "checkbox" ? 1 : 0 }}>
         <Typography variant="body1">
           Not supported yet.
         </Typography>

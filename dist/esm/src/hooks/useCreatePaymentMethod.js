@@ -3,6 +3,7 @@ import { useCallback } from 'react';
 import { useCreatePaymentMethodMutation, PaymentType } from '../queries/graphqlGenerated.js';
 import { useEncryptCardData } from './useEncryptCard.js';
 import { formatPhoneAsE123 } from '../domain/circle/circle.utils.js';
+import { fullTrim } from '../utils/formatUtils.js';
 
 function useCreatePaymentMethod() {
     const [encryptCardData] = useEncryptCardData();
@@ -16,13 +17,13 @@ function useCreatePaymentMethod() {
         };
         // Using CreditCardBillingDetails as it's more restrictive than AchBillingDetails (address 2 is required instead of optional):
         const billingDetails = {
-            name: billingInfo.fullName,
-            city: billingInfo.city,
+            name: fullTrim(billingInfo.fullName),
+            city: fullTrim(billingInfo.city),
             country: `${billingInfo.country.value}`,
-            address1: billingInfo.street || "",
-            address2: billingInfo.apartment || "",
+            address1: fullTrim(billingInfo.street || ""),
+            address2: fullTrim(billingInfo.apartment || ""),
             district: `${billingInfo.state.value || billingInfo.state.label}`,
-            postalCode: billingInfo.zipCode,
+            postalCode: fullTrim(billingInfo.zipCode),
         };
         if (paymentInfo.type === PaymentType.CreditCard) {
             const { keyID, encryptedCardData } = yield encryptCardData({

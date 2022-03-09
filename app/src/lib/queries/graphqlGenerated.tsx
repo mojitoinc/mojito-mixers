@@ -152,9 +152,7 @@ export enum CollectionType {
 
 export enum ContractType {
   Erc721Creator = 'ERC721Creator',
-  Erc1155Creator = 'ERC1155Creator',
-  GenerativeContract = 'GenerativeContract',
-  ZoraContract = 'ZoraContract'
+  Erc1155Creator = 'ERC1155Creator'
 }
 
 export type CreateMarketplaceBuyNowLotInput = {
@@ -175,6 +173,7 @@ export type CreatePaymentCreditCardMetadataInput = {
 
 export type CreatePaymentMetadataInput = {
   creditCardData: CreatePaymentCreditCardMetadataInput;
+  destinationAddress?: InputMaybe<Scalars['EthAddress']>;
 };
 
 export type CreditCardBillingDetails = {
@@ -278,22 +277,25 @@ export type Erc721Metadata = {
 };
 
 export enum ExtensionType {
-  GenartExtension = 'GenartExtension',
   ProvenanceExtension = 'ProvenanceExtension'
 }
 
 export type InvoiceDetails = {
   __typename?: 'InvoiceDetails';
+  externalPaymentID: Scalars['String'];
   externalUserID: Scalars['String'];
   internalUserID: Scalars['String'];
   invoiceCreatedAt: Scalars['Time'];
   invoiceID: Scalars['UUID1'];
+  invoiceNumber: Scalars['Int'];
   items: Array<Maybe<ItemInvoiceDetail>>;
+  paymentID: Scalars['UUID1'];
   status: InvoiceStatus;
 };
 
 export enum InvoiceStatus {
   Canceled = 'Canceled',
+  Delivered = 'Delivered',
   Draft = 'Draft',
   Paid = 'Paid',
   Pending = 'Pending'
@@ -305,6 +307,7 @@ export type ItemInvoiceDetail = {
   collectionItemID: Scalars['UUID1'];
   collectionItemTitle: Scalars['String'];
   collectionTitle: Scalars['String'];
+  destinationAddress: Scalars['String'];
   overheadPremium: Scalars['Float'];
   saleDate: Scalars['Time'];
   salesTaxRate: Scalars['Float'];
@@ -584,23 +587,22 @@ export type Mutation = {
   deleteToken: Scalars['String'];
   /** Delete an existing API key. */
   deleteUserAPIKey: Scalars['Boolean'];
-  finishDeployment: Scalars['Boolean'];
   importExternalTokenToCollection: Scalars['String'];
   loginWithSignature: Organization;
   marketplaceUpdateTheme: Marketplace;
-  mintGenerativeToken: Scalars['String'];
   mintTokens: Scalars['String'];
   nftContractAddAdmin: Scalars['String'];
+  nftContractExtensionPause: Scalars['String'];
+  nftContractExtensionUnpause: Scalars['String'];
+  nftContractRegisterExtensionProvenance: NftContract;
   nftDeployContract: NftContract;
   orgCreateMarketplace: Marketplace;
   ping: Scalars['String'];
   /** Release reservations held by invoice ID */
   releaseReservation: Scalars['Boolean'];
   reserveMarketplaceBuyNowLot: MarketplaceBuyNowOutput;
-  revealGenerativeToken: Scalars['String'];
   setJwtIssuerDomain: Organization;
   transferToken: Scalars['String'];
-  updateContractGeneBaseURI: Scalars['String'];
   updateMarketplaceAuctionLot: MarketplaceAuctionLot;
   updateMarketplaceCollection: MarketplaceCollection;
   /** Update name of multisig wallet */
@@ -705,7 +707,7 @@ export type MutationCreatePaymentMethodArgs = {
 
 
 export type MutationCreateTokenDraftArgs = {
-  contractId: Scalars['UUID'];
+  contractId: Scalars['UUID1'];
   tokens: Array<TokenDraft>;
 };
 
@@ -747,11 +749,6 @@ export type MutationDeleteUserApiKeyArgs = {
 };
 
 
-export type MutationFinishDeploymentArgs = {
-  transactionInput: TransactionInput;
-};
-
-
 export type MutationImportExternalTokenToCollectionArgs = {
   contractAddress: Scalars['String'];
   marketplaceId: Scalars['UUID1'];
@@ -770,12 +767,6 @@ export type MutationMarketplaceUpdateThemeArgs = {
 };
 
 
-export type MutationMintGenerativeTokenArgs = {
-  contractId: Scalars['UUID'];
-  orgId: Scalars['UUID'];
-};
-
-
 export type MutationMintTokensArgs = {
   tokenIds: Array<Scalars['UUID1']>;
 };
@@ -784,6 +775,24 @@ export type MutationMintTokensArgs = {
 export type MutationNftContractAddAdminArgs = {
   address: Scalars['String'];
   nftContractId: Scalars['UUID1'];
+};
+
+
+export type MutationNftContractExtensionPauseArgs = {
+  extensionAddress: Scalars['String'];
+  nftContractId: Scalars['UUID1'];
+};
+
+
+export type MutationNftContractExtensionUnpauseArgs = {
+  extensionAddress: Scalars['String'];
+  nftContractId: Scalars['UUID1'];
+};
+
+
+export type MutationNftContractRegisterExtensionProvenanceArgs = {
+  contractId: Scalars['UUID1'];
+  maxTokenSupply: Scalars['Int'];
 };
 
 
@@ -809,12 +818,6 @@ export type MutationReserveMarketplaceBuyNowLotArgs = {
 };
 
 
-export type MutationRevealGenerativeTokenArgs = {
-  contractId: Scalars['UUID'];
-  orgId: Scalars['UUID'];
-};
-
-
 export type MutationSetJwtIssuerDomainArgs = {
   domain: Scalars['String'];
   orgId: Scalars['UUID'];
@@ -826,12 +829,6 @@ export type MutationTransferTokenArgs = {
   tokenOnChainId: Scalars['Int'];
   transferTo: Scalars['String'];
   walletId: Scalars['UUID1'];
-};
-
-
-export type MutationUpdateContractGeneBaseUriArgs = {
-  contractId: Scalars['UUID'];
-  orgId: Scalars['UUID'];
 };
 
 
@@ -963,7 +960,7 @@ export type Organization = {
   id: Scalars['UUID1'];
   jwtIssuerDomain?: Maybe<Scalars['String']>;
   marketplaces: Array<Marketplace>;
-  members: Array<User>;
+  members: Array<OrganizationMember>;
   name: Scalars['String'];
   nftContracts?: Maybe<Array<NftContract>>;
   wallets?: Maybe<Array<Wallet>>;
@@ -972,6 +969,16 @@ export type Organization = {
 
 export type OrganizationAssetsArgs = {
   filter?: InputMaybe<AssetFilter>;
+};
+
+export type OrganizationMember = {
+  __typename?: 'OrganizationMember';
+  email?: Maybe<Scalars['String']>;
+  externalId: Scalars['String'];
+  id: Scalars['UUID'];
+  name?: Maybe<Scalars['String']>;
+  role?: Maybe<Scalars['String']>;
+  username: Scalars['String'];
 };
 
 export type Payment = {
@@ -1182,7 +1189,6 @@ export type QueryValidateIpArgs = {
 export type QueryValidatePaymentLimitArgs = {
   collectionID: Scalars['UUID1'];
   itemsCount: Scalars['Int'];
-  paymentType: PaymentType;
 };
 
 
@@ -1290,17 +1296,6 @@ export type TokenDraft = {
   tokenId?: InputMaybe<Scalars['UUID1']>;
 };
 
-export type TransactionInput = {
-  blockHash: Scalars['String'];
-  cumulativeGasUsed: Scalars['Int'];
-  gasUsed: Scalars['Int'];
-  id: Scalars['UUID1'];
-  invoiceItemId: Scalars['UUID1'];
-  transactionType: TransactionType;
-  txIndex: Scalars['Int'];
-  txStatus: TransactionStatus;
-};
-
 export enum TransactionStatus {
   Completed = 'Completed',
   Failed = 'Failed',
@@ -1354,15 +1349,18 @@ export type ValidateIpResponse = {
   ipScreeningId: Scalars['UUID1'];
 };
 
-export type ValidatePaymentLimitOutput = {
-  __typename?: 'ValidatePaymentLimitOutput';
-  creditCardData: ValidatePaymentLimitOutputCreditCardData;
-};
-
-export type ValidatePaymentLimitOutputCreditCardData = {
-  __typename?: 'ValidatePaymentLimitOutputCreditCardData';
+export type ValidatePaymentLimitData = {
+  __typename?: 'ValidatePaymentLimitData';
+  isLimitExceeded: Scalars['Boolean'];
   remainingTotal: Scalars['Int'];
   remainingTransaction: Scalars['Int'];
+};
+
+export type ValidatePaymentLimitOutput = {
+  __typename?: 'ValidatePaymentLimitOutput';
+  ach: ValidatePaymentLimitData;
+  creditCard: ValidatePaymentLimitData;
+  wire: ValidatePaymentLimitData;
 };
 
 export type Wallet = {
@@ -1531,12 +1529,12 @@ export type GetInvoiceDetailsQueryVariables = Exact<{
 }>;
 
 
-export type GetInvoiceDetailsQuery = { __typename?: 'Query', getInvoiceDetails: { __typename?: 'InvoiceDetails', items: Array<{ __typename?: 'ItemInvoiceDetail', collectionItemID: any, collectionItemTitle: string, units: number, unitPrice: number, taxes: number, totalPrice: number } | null> } };
+export type GetInvoiceDetailsQuery = { __typename?: 'Query', getInvoiceDetails: { __typename?: 'InvoiceDetails', items: Array<{ __typename?: 'ItemInvoiceDetail', destinationAddress: string, units: number, unitPrice: number, taxes: number, totalPrice: number } | null> } };
 
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MeQuery = { __typename?: 'Query', me?: { __typename?: 'CurrentUser', id: any, user: { __typename?: 'User', id: any, username: string, name?: string | null, email?: string | null }, userOrgs: Array<{ __typename?: 'UserOrganization', organization: { __typename?: 'Organization', id: any, name: string } }> } | null };
+export type MeQuery = { __typename?: 'Query', me?: { __typename?: 'CurrentUser', id: any, user: { __typename?: 'User', id: any, username: string, name?: string | null, email?: string | null }, userOrgs: Array<{ __typename?: 'UserOrganization', organization: { __typename?: 'Organization', id: any, name: string } }>, wallets?: Array<{ __typename?: 'Wallet', id: any, name: string, address?: any | null }> | null } | null };
 
 export type PaymentKeyQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -1774,8 +1772,7 @@ export const GetInvoiceDetailsDocument = gql`
     query GetInvoiceDetails($invoiceID: UUID1!, $orgID: UUID1!) {
   getInvoiceDetails(invoiceID: $invoiceID, orgID: $orgID) {
     items {
-      collectionItemID
-      collectionItemTitle
+      destinationAddress
       units
       unitPrice
       taxes
@@ -1828,6 +1825,11 @@ export const MeDocument = gql`
         id
         name
       }
+    }
+    wallets {
+      id
+      name
+      address
     }
   }
 }

@@ -3,7 +3,7 @@ import { Box, Typography } from "@mui/material";
 import { CheckoutModalFooter } from "../../components/payments/CheckoutModalFooter/CheckoutModalFooter";
 import { parseSentences } from "../../utils/formatUtils";
 import { CheckoutModalError, CheckoutModalErrorAt } from "../../components/public/CheckoutOverlay/CheckoutOverlay.hooks";
-import { DebugBox } from "../../components/payments/DisplayBox/DisplayBox";
+import { DebugBox } from "../../components/payments/DebugBox/DebugBox";
 import { XS_MOBILE_MAX_WIDTH } from "../../config/theme/theme";
 import { StatusIcon } from "../../components/shared/StatusIcon/StatusIcon";
 import { DEFAULT_ERROR_AT } from "../../domain/errors/errors.constants";

@@ -1,9 +1,12 @@
+export declare const COUNTER_EXPIRATION_MS = 1000;
+export declare const COUNTER_CLICKS_NEEDED = 16;
 export declare const RESERVATION_COUNTDOWN_FROM_MIN = 15;
 export declare const RESERVATION_COUNTDOWN_FROM_MS: number;
 export declare const RESERVATION_COUNTDOWN_REFRESH_RATE_MS = 1000;
 export declare const PURCHASING_MIN_WAIT_MS = 3000;
 export declare const PURCHASING_MESSAGES_INTERVAL_MS = 5000;
 export declare const PURCHASING_MESSAGES_DEFAULT: string[];
+export declare const CIRCLE_MAX_EXPECTED_PAYMENT_CREATION_PROCESSING_TIME: number;
 export declare const PAYMENT_NOTIFICATION_INTERVAL_MS = 1500;
 export declare const PLAID_STORAGE_EXPIRATION_MS: number;
 export declare const PLAID_OAUTH_FLOW_INFO_KEY = "PLAID_OAUTH_FLOW_INFO";

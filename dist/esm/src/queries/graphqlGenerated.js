@@ -23,17 +23,15 @@ var ContractType;
 (function (ContractType) {
     ContractType["Erc721Creator"] = "ERC721Creator";
     ContractType["Erc1155Creator"] = "ERC1155Creator";
-    ContractType["GenerativeContract"] = "GenerativeContract";
-    ContractType["ZoraContract"] = "ZoraContract";
 })(ContractType || (ContractType = {}));
 var ExtensionType;
 (function (ExtensionType) {
-    ExtensionType["GenartExtension"] = "GenartExtension";
     ExtensionType["ProvenanceExtension"] = "ProvenanceExtension";
 })(ExtensionType || (ExtensionType = {}));
 var InvoiceStatus;
 (function (InvoiceStatus) {
     InvoiceStatus["Canceled"] = "Canceled";
+    InvoiceStatus["Delivered"] = "Delivered";
     InvoiceStatus["Draft"] = "Draft";
     InvoiceStatus["Paid"] = "Paid";
     InvoiceStatus["Pending"] = "Pending";
@@ -270,8 +268,7 @@ const GetInvoiceDetailsDocument = gql `
     query GetInvoiceDetails($invoiceID: UUID1!, $orgID: UUID1!) {
   getInvoiceDetails(invoiceID: $invoiceID, orgID: $orgID) {
     items {
-      collectionItemID
-      collectionItemTitle
+      destinationAddress
       units
       unitPrice
       taxes
@@ -316,6 +313,11 @@ const MeDocument = gql `
         id
         name
       }
+    }
+    wallets {
+      id
+      name
+      address
     }
   }
 }

@@ -3,7 +3,7 @@
 Object.defineProperty(exports, '__esModule', { value: true });
 
 const BUILT_IN_ERRORS = ["EvalError", "RangeError", "ReferenceError", "SyntaxError", "TypeError", "URIError", "AggregateError", "InternalError"];
-const DEFAULT_ERROR_AT = "purchasing";
+const DEFAULT_ERROR_AT = "payment";
 function createError(errorMessage, at = DEFAULT_ERROR_AT) {
     return (error) => ({
         error,
