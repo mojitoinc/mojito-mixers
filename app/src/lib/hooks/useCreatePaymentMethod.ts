@@ -6,7 +6,7 @@ import { PaymentMethod } from "../domain/payment/payment.interfaces";
 import { useEncryptCardData } from "./useEncryptCard";
 import { formatPhoneAsE123 } from "../domain/circle/circle.utils";
 import { fullTrim } from "../utils/formatUtils";
-import { PaymentStatus } from "../domain/circle/circle.interfaces";
+import { PaymentMethodStatus } from "../domain/circle/circle.interfaces";
 import { wait } from "../utils/promiseUtils";
 import { PAYMENT_CREATION_INTERVAL_MS, PAYMENT_CREATION_MAX_WAIT_MS } from "../config/config";
 
@@ -112,13 +112,11 @@ export function useCreatePaymentMethod({
     const createPaymentMethodResultData: { id?: string; status?: string } = createPaymentMethodResult.data?.createPaymentMethod || {};
     const paymentMethodID = createPaymentMethodResultData.id;
 
-    let status: PaymentStatus = createPaymentMethodResultData.status as PaymentStatus;
+    let status: PaymentMethodStatus = createPaymentMethodResultData.status as PaymentMethodStatus;
+    let totalWaitTimeSoFar = 0;
 
     if (!paymentMethodID || status === "failed") throw new Error("Payment method could not be saved.");
-
     if (status === "complete") return createPaymentMethodPromise;
-
-    let totalWaitTimeSoFar = 0;
 
     while (totalWaitTimeSoFar < PAYMENT_CREATION_MAX_WAIT_MS && status === "pending") {
       const now = Date.now();
@@ -136,7 +134,7 @@ export function useCreatePaymentMethod({
         variables: { paymentMethodID },
       });
 
-      status = paymentMethodStatusResult.data?.getPaymentMethod.status as PaymentStatus || "failed";
+      status = paymentMethodStatusResult.data?.getPaymentMethod.status as PaymentMethodStatus || "failed";
     }
 
     if (status === "failed") throw new Error("Payment method could not be saved.");
