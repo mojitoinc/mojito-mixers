@@ -18,8 +18,10 @@ const PURCHASING_MESSAGES_DEFAULT = [
     "Adding rum, lime juice and ice.",
     "Shaking things up!",
 ];
-const CIRCLE_MAX_EXPECTED_PAYMENT_CREATION_PROCESSING_TIME = process.browser && window.location.hostname === "localhost" ? 5000 : 15000;
-const PAYMENT_NOTIFICATION_INTERVAL_MS = 1500; // Polling interval for GetPaymentNotificationQuery.
+const PAYMENT_CREATION_INTERVAL_MS = 5000; // (5 sec) Polling interval for GetPaymentMethodStatus.
+const PAYMENT_CREATION_MAX_WAIT_MS = 120000; // (2 min) Max. wait time for GetPaymentMethodStatus (to get status === "complete").
+const PAYMENT_CREATION_MIN_WAIT_MS = 5000; // (5/15 sec) Min. time a user would be stuck in the PurchasingView.
+const PAYMENT_NOTIFICATION_INTERVAL_MS = 2500; // (2.5 sec) Polling interval for GetPaymentNotificationQuery in PurchasingView.
 // Plaid:
 const PLAID_STORAGE_EXPIRATION_MS = 1000 * 60 * 15; // 15 minutes (Plaid requires filling in some data).
 const PLAID_OAUTH_FLOW_INFO_KEY = "PLAID_OAUTH_FLOW_INFO";
@@ -34,9 +36,11 @@ const THREEDS_FLOW_STATE_USED_KEY = "THREEDS_FLOW_STATE_USED";
 const THREEDS_FLOW_URL_SEARCH = "?paymentId=";
 const THREEDS_SUCCESS_REDIRECT_DELAY_MS = 5000; // Success page redirects users automatically after 5 seconds.
 
-exports.CIRCLE_MAX_EXPECTED_PAYMENT_CREATION_PROCESSING_TIME = CIRCLE_MAX_EXPECTED_PAYMENT_CREATION_PROCESSING_TIME;
 exports.COUNTER_CLICKS_NEEDED = COUNTER_CLICKS_NEEDED;
 exports.COUNTER_EXPIRATION_MS = COUNTER_EXPIRATION_MS;
+exports.PAYMENT_CREATION_INTERVAL_MS = PAYMENT_CREATION_INTERVAL_MS;
+exports.PAYMENT_CREATION_MAX_WAIT_MS = PAYMENT_CREATION_MAX_WAIT_MS;
+exports.PAYMENT_CREATION_MIN_WAIT_MS = PAYMENT_CREATION_MIN_WAIT_MS;
 exports.PAYMENT_NOTIFICATION_INTERVAL_MS = PAYMENT_NOTIFICATION_INTERVAL_MS;
 exports.PLAID_OAUTH_FLOW_INFO_KEY = PLAID_OAUTH_FLOW_INFO_KEY;
 exports.PLAID_OAUTH_FLOW_RECEIVED_REDIRECT_URI_KEY = PLAID_OAUTH_FLOW_RECEIVED_REDIRECT_URI_KEY;
