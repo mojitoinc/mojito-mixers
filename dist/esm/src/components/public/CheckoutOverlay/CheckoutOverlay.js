@@ -1,6 +1,6 @@
 import { __awaiter } from '../../../../node_modules/tslib/tslib.es6.js';
 import { Backdrop, Box, CircularProgress } from '@mui/material';
-import React__default, { useState, useMemo, useRef, useEffect, useCallback } from 'react';
+import React__default, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { transformRawSavedPaymentMethods, getSavedPaymentMethodAddressIdFromBillingInfo, savedPaymentMethodToBillingInfo } from '../../../domain/circle/circle.utils.js';
 import { useMeQuery, useGetPaymentMethodListQuery, useGetInvoiceDetailsQuery, useDeletePaymentMethodMutation, useReleaseReservationBuyNowLotMutation } from '../../../queries/graphqlGenerated.js';
 import { AuthenticationView } from '../../../views/Authentication/AuthenticationView.js';
@@ -37,7 +37,7 @@ onLogin, isAuthenticated, isAuthenticatedLoading,
 // Other Events:
 debug: initialDebug, onEvent, onError, onMarketingOptInChange, // Not implemented yet. Used to let user subscribe / unsubscribe to marketing updates.
  }) => {
-    var _a;
+    var _a, _b, _c, _d;
     const [debug, setDebug] = useState(!!initialDebug);
     // TODO: This should end up being in a context + hook to avoid prop drilling and it should be memoized:
     const dictionary = Object.assign(Object.assign({}, DEFAULT_DICTIONARY), parentDictionary);
@@ -76,9 +76,14 @@ debug: initialDebug, onEvent, onError, onMarketingOptInChange, // Not implemente
     const invoiceItems = invoiceDetailsData === null || invoiceDetailsData === void 0 ? void 0 : invoiceDetailsData.getInvoiceDetails.items;
     const checkoutItems = useMemo(() => transformCheckoutItemsFromInvoice(parentCheckoutItems, invoiceItems), [parentCheckoutItems, invoiceItems]);
     const { total: subtotal, fees, taxAmount } = useCheckoutItemsCostTotal(checkoutItems);
+    const destinationAddress = ((_b = (_a = (invoiceItems || [])) === null || _a === void 0 ? void 0 : _a[0]) === null || _b === void 0 ? void 0 : _b.destinationAddress) || null;
+    useEffect(() => {
+        if (destinationAddress)
+            setWalletAddress(destinationAddress || null);
+    }, [destinationAddress, setWalletAddress]);
     // Invoice creation & buy now lot reservation:
     const createInvoiceAndReservationCalledRef = useRef(false);
-    const { invoiceAndReservationState, createInvoiceAndReservation, countdownElementRef, } = useCreateInvoiceAndReservation({ orgID, checkoutItems, debug });
+    const { invoiceAndReservationState, createInvoiceAndReservation, countdownElementRef, } = useCreateInvoiceAndReservation({ orgID, checkoutItems, stop: checkoutStep === "confirmation", debug });
     useEffect(() => {
         if (isDialogLoading || invoiceID === null || invoiceID || createInvoiceAndReservationCalledRef.current)
             return;
@@ -87,11 +92,14 @@ debug: initialDebug, onEvent, onError, onMarketingOptInChange, // Not implemente
     }, [isDialogLoading, invoiceID, createInvoiceAndReservation]);
     useEffect(() => {
         if (invoiceAndReservationState.error) {
+            // TODO: It would be great if we can keep track of the reservation expiration without changing the displayed error
+            // if there's already once, so when clicking the action button for that one, on top of calling its respective error
+            // handling code, we re-create the reservation:
             setError(invoiceAndReservationState.error);
+            return;
         }
-        else if (invoiceAndReservationState.invoiceID) {
+        if (invoiceAndReservationState.invoiceID)
             setInvoiceID(invoiceAndReservationState.invoiceID);
-        }
     }, [invoiceAndReservationState, setError, setInvoiceID]);
     // Init modal state once everything has been loaded:
     useEffect(() => {
@@ -107,8 +115,10 @@ debug: initialDebug, onEvent, onError, onMarketingOptInChange, // Not implemente
         if (invoiceDetailsError)
             setError(ERROR_LOADING_INVOICE(invoiceDetailsError));
     }, [meError, paymentMethodsError, invoiceDetailsError, setError]);
-    const triggerAnalyticsEventFunction = (eventType) => {
-        if (!onEvent)
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const triggerAnalyticsEventRef = useRef((eventType) => { });
+    triggerAnalyticsEventRef.current = (eventType) => {
+        if (!onEvent || !open)
             return;
         const paymentInfo = selectedPaymentMethod.paymentInfo;
         let paymentType = undefined;
@@ -139,8 +149,6 @@ debug: initialDebug, onEvent, onError, onMarketingOptInChange, // Not implemente
             paymentID,
         });
     };
-    const triggerAnalyticsEventRef = useRef(triggerAnalyticsEventFunction);
-    triggerAnalyticsEventRef.current = triggerAnalyticsEventFunction;
     useEffect(() => {
         setTimeout(() => triggerAnalyticsEventRef.current(`navigate:${checkoutStep}`));
     }, [checkoutStep]);
@@ -243,17 +251,22 @@ debug: initialDebug, onEvent, onError, onMarketingOptInChange, // Not implemente
         yield refetchPaymentMethods();
         setError(error);
     }), [refetchPaymentMethods, setError]);
+    // Release reservation:
+    const lastReleasedReservationID = useRef("");
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const handleBeforeUnloadRef = useRef((e) => { });
     const [releaseReservationBuyNowLot] = useReleaseReservationBuyNowLotMutation({
         variables: {
             orgID,
             invoiceID,
         },
     });
-    const handleBeforeUnload = useCallback((e) => {
-        if (orgID && invoiceID) {
+    const handleBeforeUnload = handleBeforeUnloadRef.current = useCallback((e) => {
+        if (orgID && invoiceID && invoiceID !== lastReleasedReservationID.current) {
             if (debug)
                 console.log(`\n♻️ Releasing reservation invoice ${invoiceID} (orgID = ${orgID})...\n`);
             releaseReservationBuyNowLot().then((result) => {
+                lastReleasedReservationID.current = invoiceID;
                 if (debug)
                     console.log("  🟢 releaseReservationBuyNowLot result", result);
             }).catch((error) => {
@@ -272,6 +285,10 @@ debug: initialDebug, onEvent, onError, onMarketingOptInChange, // Not implemente
         }
     }, [orgID, invoiceID, debug, releaseReservationBuyNowLot]);
     useEffect(() => {
+        if ((checkoutError === null || checkoutError === void 0 ? void 0 : checkoutError.at) === "reset")
+            handleBeforeUnloadRef.current();
+    }, [checkoutError]);
+    useEffect(() => {
         window.addEventListener('beforeunload', handleBeforeUnload);
         return () => {
             window.removeEventListener('beforeunload', handleBeforeUnload);
@@ -284,29 +301,31 @@ debug: initialDebug, onEvent, onError, onMarketingOptInChange, // Not implemente
         setInvoiceID(null);
         onClose();
     }, [handleBeforeUnload, setInvoiceID, onClose]);
+    // Error handling:
     const handleFixError = useCallback(() => __awaiter(void 0, void 0, void 0, function* () {
         const at = checkoutError === null || checkoutError === void 0 ? void 0 : checkoutError.at;
         if (at === "reset") {
-            goTo();
             yield Promise.allSettled([
                 meRefetch(),
                 refetchPaymentMethods(),
                 createInvoiceAndReservation(),
             ]);
-            return false;
+            goTo();
         }
-        // After an error, all data is reloaded in case the issue was caused by stale/cached data or in case a new payment
-        // method has been created despite the error:
-        yield Promise.allSettled([
-            meRefetch(),
-            refetchPaymentMethods(),
-            refetchInvoiceDetails(),
-        ]);
-        if (at !== "purchasing") {
-            // If we are redirecting users to the PurchasingView again, we keep the CVV to be able to re-try the purchase:
-            setSelectedPaymentMethod((prevSelectedPaymentMethod) => (Object.assign(Object.assign({}, prevSelectedPaymentMethod), { cvv: "" })));
+        else {
+            // After an error, all data is reloaded in case the issue was caused by stale/cached data or in case a new payment
+            // method has been created despite the error:
+            yield Promise.allSettled([
+                meRefetch(),
+                refetchPaymentMethods(),
+                refetchInvoiceDetails(),
+            ]);
+            if (at !== "purchasing") {
+                // If we are redirecting users to the PurchasingView again, we keep the CVV to be able to re-try the purchase:
+                setSelectedPaymentMethod((prevSelectedPaymentMethod) => (Object.assign(Object.assign({}, prevSelectedPaymentMethod), { cvv: "" })));
+            }
+            goTo(at || DEFAULT_ERROR_AT, checkoutError);
         }
-        goTo(at || DEFAULT_ERROR_AT, checkoutError);
         // This function is used as a CheckoutModalFooter's onSubmitClicked, so we want that to show a loader on the submit
         // button when clicked but do not remove it once the Promise is resolved, as we are moving to another view and
         // CheckoutModalFooter will unmount (so doing this prevents a memory leak issue):
@@ -352,11 +371,11 @@ debug: initialDebug, onEvent, onError, onMarketingOptInChange, // Not implemente
     }
     else if (checkoutStep === "purchasing" && invoiceID) {
         headerVariant = "purchasing";
-        checkoutStepElement = (React__default.createElement(PurchasingView, { purchasingImageSrc: purchasingImageSrc, purchasingMessages: purchasingMessages, orgID: orgID, invoiceID: invoiceID, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethod: selectedPaymentMethod, onPurchaseSuccess: handlePurchaseSuccess, onPurchaseError: handlePurchaseError, onDialogBlocked: setIsDialogBlocked, debug: debug }));
+        checkoutStepElement = (React__default.createElement(PurchasingView, { purchasingImageSrc: purchasingImageSrc, purchasingMessages: purchasingMessages, orgID: orgID, invoiceID: invoiceID, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethod: selectedPaymentMethod, walletAddress: walletAddress, onPurchaseSuccess: handlePurchaseSuccess, onPurchaseError: handlePurchaseError, onDialogBlocked: setIsDialogBlocked, debug: debug }));
     }
     else if (checkoutStep === "confirmation") {
         headerVariant = "logoOnly";
-        checkoutStepElement = (React__default.createElement(ConfirmationView, { checkoutItems: checkoutItems, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethod: selectedPaymentMethod, circlePaymentID: circlePaymentID, onGoToCollection: onGoToCollection, onNext: handleClose, dictionary: dictionary }));
+        checkoutStepElement = (React__default.createElement(ConfirmationView, { checkoutItems: checkoutItems, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethod: selectedPaymentMethod, circlePaymentID: circlePaymentID, walletAddress: walletAddress || "", wallets: ((_c = meData === null || meData === void 0 ? void 0 : meData.me) === null || _c === void 0 ? void 0 : _c.wallets) || undefined, onGoToCollection: onGoToCollection, onNext: handleClose, dictionary: dictionary }));
     }
     else {
         // !checkoutStep or
@@ -365,7 +384,7 @@ debug: initialDebug, onEvent, onError, onMarketingOptInChange, // Not implemente
         // some other kind of indeterminate / incorrect state:
         return null;
     }
-    const headerElement = (React__default.createElement(CheckoutModalHeader, { variant: headerVariant, countdownElementRef: countdownElementRef, logoSrc: logoSrc, logoSx: logoSx, user: (_a = meData === null || meData === void 0 ? void 0 : meData.me) === null || _a === void 0 ? void 0 : _a.user, userFormat: userFormat, onLoginClicked: onLogin, onPrevClicked: checkoutStep === "authentication" ? handleClose : goBack, setDebug: setDebug }));
+    const headerElement = (React__default.createElement(CheckoutModalHeader, { variant: headerVariant, countdownElementRef: countdownElementRef, logoSrc: logoSrc, logoSx: logoSx, user: (_d = meData === null || meData === void 0 ? void 0 : meData.me) === null || _d === void 0 ? void 0 : _d.user, userFormat: userFormat, onLoginClicked: onLogin, onPrevClicked: checkoutStep === "authentication" ? handleClose : goBack, setDebug: setDebug }));
     return (React__default.createElement(FullScreenOverlay, { centered: checkoutStep === "purchasing" || checkoutStep === "error", open: open, onClose: handleClose, isDialogBlocked: isDialogBlocked, contentKey: checkoutStep, header: headerElement, children: checkoutStepElement }));
 };
 const PUICheckout = withProviders(PUICheckoutOverlay);

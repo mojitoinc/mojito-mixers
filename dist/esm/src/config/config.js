@@ -14,7 +14,7 @@ const PURCHASING_MESSAGES_DEFAULT = [
     "Adding rum, lime juice and ice.",
     "Shaking things up!",
 ];
-const CIRCLE_MAX_EXPECTED_PAYMENT_CREATION_PROCESSING_TIME = 15000;
+const CIRCLE_MAX_EXPECTED_PAYMENT_CREATION_PROCESSING_TIME = process.browser && window.location.hostname === "localhost" ? 5000 : 15000;
 const PAYMENT_NOTIFICATION_INTERVAL_MS = 1500; // Polling interval for GetPaymentNotificationQuery.
 // Plaid:
 const PLAID_STORAGE_EXPIRATION_MS = 1000 * 60 * 15; // 15 minutes (Plaid requires filling in some data).

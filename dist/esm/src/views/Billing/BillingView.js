@@ -1,5 +1,5 @@
 import { __awaiter } from '../../../node_modules/tslib/tslib.es6.js';
-import React__default, { useRef, useMemo, useState, useCallback, useEffect } from 'react';
+import React__default, { useRef, useMemo, useState, useEffect, useCallback } from 'react';
 import { Stack } from '@mui/material';
 import { CheckoutDeliveryAndItemCostBreakdown } from '../../components/payments/CheckoutDeliveryAndItemCostBreakdown/CheckoutDeliveryAndItemCostBreakdown.js';
 import { CheckoutStepper } from '../../components/payments/CheckoutStepper/CheckoutStepper.js';
@@ -24,7 +24,13 @@ const BillingView = ({ checkoutItems, savedPaymentMethods: rawSavedPaymentMethod
     });
     const [formSubmitAttempted, setFormSubmitAttempted] = useState(false);
     const [getTaxQuote] = useGetTaxQuoteLazyQuery();
-    const getTaxQuoteTimestampRef = useRef();
+    const getTaxQuoteTimestampRef = useRef(0);
+    useEffect(() => {
+        return () => {
+            // To discard the result below that might come after the component has been unmounted:
+            getTaxQuoteTimestampRef.current = 0;
+        };
+    }, []);
     const calculateTaxes = useCallback((taxInfo) => __awaiter(void 0, void 0, void 0, function* () {
         var _a;
         const calledAt = getTaxQuoteTimestampRef.current;
