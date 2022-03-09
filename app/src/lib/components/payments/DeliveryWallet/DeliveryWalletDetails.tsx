@@ -2,19 +2,19 @@ import { Box, Chip, Tooltip, Typography } from "@mui/material";
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { CopyButton } from "../../shared/CopyButton/CopyButton";
 import { ReadOnlyWalletAddress } from "../../shared/ReadOnlyField/ReadOnlyField";
-import { PUIDictionary } from "../../../domain/dictionary/dictionary.interfaces";
 import React from "react";
+import { useDictionary } from "../../../hooks/useDictionary";
 
 export interface DeliveryWalletDetailsProps {
   walletAddress: string;
   isMultiSig?: boolean;
-  dictionary: PUIDictionary;
 }
 const DeliveryWalletDetails: React.FC<DeliveryWalletDetailsProps> = ({
   isMultiSig = true,
   walletAddress,
-  dictionary,
 }) => {
+  const dictionary = useDictionary();
+
   return (
     <Box pt={2}>
       <Typography variant="body1">Once minted, items will be delivered to:</Typography>

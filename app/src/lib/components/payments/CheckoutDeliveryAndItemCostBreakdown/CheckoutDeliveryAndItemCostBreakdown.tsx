@@ -13,7 +13,6 @@ interface CheckoutDeliveryAndItemCostBreakdownProps {
   validatePersonalDeliveryAddress: boolean;
   walletAddress: string | null;
   onWalletAddressChange: (walletAddress: string | null) => void;
-  dictionary: PUIDictionary;
 }
 
 export const CheckoutDeliveryAndItemCostBreakdown: React.FC<CheckoutDeliveryAndItemCostBreakdownProps> = ({
@@ -22,14 +21,12 @@ export const CheckoutDeliveryAndItemCostBreakdown: React.FC<CheckoutDeliveryAndI
   validatePersonalDeliveryAddress,
   walletAddress,
   onWalletAddressChange,
-  dictionary,
 }) => (
     <Stack sx={{ display: "flex", flex: 1 }}>
       <DeliveryWalletSelector
         validatePersonalAddress={ validatePersonalDeliveryAddress }
         walletAddress={ walletAddress }
-        onWalletAddressChange={ onWalletAddressChange }
-        dictionary={ dictionary } />
+        onWalletAddressChange={ onWalletAddressChange }/>
 
       <Divider sx={{ my: 3.75 }} />
 

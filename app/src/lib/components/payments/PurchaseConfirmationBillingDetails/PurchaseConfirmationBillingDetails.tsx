@@ -11,14 +11,12 @@ import { getFormattedPaymentMethod } from "./PurchaseConfirmationBillingDetails.
 import CheckIcon from "@mui/icons-material/Check";
 import DeliveryWalletDetails from "../DeliveryWallet/DeliveryWalletDetails";
 import { CopyButton } from "../../shared/CopyButton/CopyButton";
-import { PUIDictionary } from "../../../domain/dictionary/dictionary.interfaces";
 
 export interface PurchaseConfirmationBillingDetailsProps {
   checkoutItems: CheckoutItem[];
   circlePaymentID: string;
   selectedPaymentMethodBillingInfo: SavedPaymentMethodBillingInfo;
   selectedPaymentMethodPaymentInfo: PaymentMethod | SavedPaymentMethod;
-  dictionary: PUIDictionary;
 }
 
 export const PurchaseConfirmationBillingDetails: React.FC<PurchaseConfirmationBillingDetailsProps> = ({
@@ -26,7 +24,6 @@ export const PurchaseConfirmationBillingDetails: React.FC<PurchaseConfirmationBi
   circlePaymentID,
   selectedPaymentMethodBillingInfo,
   selectedPaymentMethodPaymentInfo,
-  dictionary
 }) => {
   const {
     isMasked,
@@ -106,8 +103,7 @@ export const PurchaseConfirmationBillingDetails: React.FC<PurchaseConfirmationBi
         selectedPaymentMethodBillingInfo={ selectedPaymentMethodBillingInfo } />
 
       <DeliveryWalletDetails
-        walletAddress="0xC000A000bC00D3E4c792d2aFDE0000000d000001"
-        dictionary={ dictionary } />
+        walletAddress="0xC000A000bC00D3E4c792d2aFDE0000000d000001"/>
     </Box>
   );
 }

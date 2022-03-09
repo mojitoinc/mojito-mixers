@@ -8,7 +8,6 @@ import { SavedPaymentMethod } from "../../domain/circle/circle.interfaces";
 import { billingInfoToSavedPaymentMethodBillingInfo } from "../../domain/circle/circle.utils";
 import { CheckoutItem } from "../../domain/product/product.interfaces";
 import { SelectedPaymentMethod } from "../../components/public/CheckoutOverlay/CheckoutOverlay.hooks";
-import { PUIDictionary } from "../../domain/dictionary/dictionary.interfaces";
 
 export interface ConfirmationViewProps {
   checkoutItems: CheckoutItem[];
@@ -17,7 +16,6 @@ export interface ConfirmationViewProps {
   circlePaymentID: string;
   onGoToCollection?: () => void;
   onNext: () => void;
-  dictionary: PUIDictionary;
 }
 
 export const ConfirmationView: React.FC<ConfirmationViewProps> = ({
@@ -27,7 +25,6 @@ export const ConfirmationView: React.FC<ConfirmationViewProps> = ({
   circlePaymentID,
   onGoToCollection,
   onNext,
-  dictionary,
 }) => {
   const {
     billingInfo: selectedBillingInfo,
@@ -68,21 +65,19 @@ export const ConfirmationView: React.FC<ConfirmationViewProps> = ({
       sx={{ display: "flex" }}>
 
       <PurchaseConfirmationBillingDetails
-        checkoutItems={ checkoutItems }
-        circlePaymentID={ circlePaymentID }
-        selectedPaymentMethodBillingInfo={ selectedPaymentMethodBillingInfo }
-        selectedPaymentMethodPaymentInfo={ selectedPaymentMethodPaymentInfo }
-        dictionary={ dictionary } />
+        checkoutItems={checkoutItems}
+        circlePaymentID={circlePaymentID}
+        selectedPaymentMethodBillingInfo={selectedPaymentMethodBillingInfo}
+        selectedPaymentMethodPaymentInfo={selectedPaymentMethodPaymentInfo}/>
 
       <Stack sx={{ display: "flex", flex: 1 }}>
         <PurchaseConfirmationItemDetails
-          checkoutItems={ checkoutItems }
-          dictionary={ dictionary } />
+          checkoutItems={checkoutItems}/>
 
         <CheckoutModalFooter
           variant="toMarketplace"
-          onSubmitClicked={ onNext }
-          onGoToCollection={ onGoToCollection } />
+          onSubmitClicked={onNext}
+          onGoToCollection={onGoToCollection} />
       </Stack>
 
     </Stack>

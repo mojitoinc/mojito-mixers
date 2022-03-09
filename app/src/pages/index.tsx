@@ -182,12 +182,13 @@ const HomePage: React.FC = () => {
       formValues.paymentWire ? "Wire" : "",
       formValues.paymentCrypto ? "Crypto" : "",
     ].filter(Boolean) as PaymentType[],
-    // dictionary,
+    dictionary: {
+      privacyHref: PLAYGROUND_PRIVACY_HREF,
+      termsOfUseHref: PLAYGROUND_TERMS_OF_USE_HREF
+    },
 
     // Legal:
     consentType: "circle",
-    privacyHref: PLAYGROUND_PRIVACY_HREF,
-    termsOfUseHref: PLAYGROUND_TERMS_OF_USE_HREF,
 
     // Data:
     orgID: (formValues.orgID === "custom" ? formValues.customOrgID : formValues.orgID) || "",

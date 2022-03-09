@@ -9,6 +9,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { alpha, Box, CircularProgress, Typography } from "@mui/material";
 import { ConsentType } from "../ConsentText/ConsentText";
 import { OVERLAY_OPACITY } from "../../../config/theme/theme";
+import { useDictionary } from "../../../hooks/useDictionary";
 
 function validateCvv(isCvvRequired: boolean, cvv: string) {
   return !isCvvRequired || cvv.length === 3 || cvv.length === 4;
@@ -31,8 +32,6 @@ export interface SavedPaymentDetailsSelectorProps {
   onClose: () => void;
   onAttemptSubmit: () => void;
   consentType?: ConsentType;
-  privacyHref?: string;
-  termsOfUseHref?: string;
 }
 
 export const SavedPaymentDetailsSelector: React.FC<SavedPaymentDetailsSelectorProps> = ({
@@ -47,8 +46,6 @@ export const SavedPaymentDetailsSelector: React.FC<SavedPaymentDetailsSelectorPr
   onClose,
   onAttemptSubmit,
   consentType,
-  privacyHref,
-  termsOfUseHref,
 }) => {
   const isCvvRequired = useMemo(() => {
     const selectedPaymentMethod = savedPaymentMethods.find(savedPaymentMethod => savedPaymentMethod.id === selectedPaymentMethodId);
@@ -68,6 +65,7 @@ export const SavedPaymentDetailsSelector: React.FC<SavedPaymentDetailsSelectorPr
     // Reset CVV if user selects a different payment method:
     setSelectorState(({ isFormSubmitted }) => ({ isFormSubmitted, cvv: "" }));
   }, [selectedPaymentMethodId]);
+
 
   const isCvvOk = validateCvv(isCvvRequired, cvv);
   const cvvError = isFormSubmitted && !isCvvOk;
@@ -152,8 +150,6 @@ export const SavedPaymentDetailsSelector: React.FC<SavedPaymentDetailsSelectorPr
     <CheckoutModalFooter
       variant="toConfirmation"
       consentType={ consentType }
-      privacyHref={ privacyHref }
-      termsOfUseHref={ termsOfUseHref }
       onSubmitClicked={ handleNextClicked }
       onCloseClicked={ onClose } />
   </>);

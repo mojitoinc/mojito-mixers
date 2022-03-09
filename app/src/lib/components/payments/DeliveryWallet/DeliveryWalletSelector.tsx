@@ -8,12 +8,12 @@ import { withInvalidErrorMessage } from "../../../utils/validationUtils";
 import { isValidWalletAddress } from "../../../domain/wallet/wallet.utils";
 import { ChangeEvent, useCallback } from "react";
 import { PUIDictionary } from "../../../domain/dictionary/dictionary.interfaces";
+import { useDictionary } from "../../../hooks/useDictionary";
 
 export interface DeliveryWalletSelectorProps {
   validatePersonalAddress: boolean;
   walletAddress: string | null;
   onWalletAddressChange: (walletAddress: string | null) => void;
-  dictionary: PUIDictionary;
 }
 
 const WALLET_ADDRESS_FIELD_LABEL = "Wallet Address";
@@ -22,10 +22,9 @@ const INVALID_WALLET_ADDRESS_MESSAGE = withInvalidErrorMessage({ label: WALLET_A
 export const DeliveryWalletSelector: React.FC<DeliveryWalletSelectorProps> = ({
   validatePersonalAddress,
   walletAddress,
-  onWalletAddressChange,
-  dictionary,
+  onWalletAddressChange
 }) => {
-
+  const dictionary = useDictionary();
   const handleCheckboxChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
     onWalletAddressChange(e.target.checked ? "" : null);
   }, [onWalletAddressChange])

@@ -1,6 +1,7 @@
 import { Box, Link, Typography, Divider, CircularProgress } from "@mui/material";
 import React, { useCallback, useState } from "react";
 import { CIRCLE_LOGO_IMAGE_SRC, SM_MOBILE_MAX_WIDTH } from "../../../config/theme/theme";
+import { useDictionary } from "../../../hooks/useDictionary";
 import { isPromise } from "../../../utils/promiseUtils";
 import { Checkbox } from "../../shared/Checkbox/Checkbox";
 import { ConsentText, ConsentType, CONSENT_ERROR_MESSAGE } from "../../shared/ConsentText/ConsentText";
@@ -20,8 +21,6 @@ export interface CheckoutModalFooterProps {
   buttonLabel?: string;
   guestCheckoutEnabled?: boolean;
   consentType?: ConsentType;
-  privacyHref?: string;
-  termsOfUseHref?: string;
   onGoToCollection?: () => void;
   submitDisabled?: boolean;
   onSubmitClicked?: (canSubmit: boolean) => void | Promise<void | false>;
@@ -33,14 +32,15 @@ export const CheckoutModalFooter: React.FC<CheckoutModalFooterProps> = ({
   buttonLabel,
   guestCheckoutEnabled,
   consentType,
-  privacyHref,
-  termsOfUseHref,
   onGoToCollection,
   submitDisabled,
   onSubmitClicked,
   onCloseClicked,
 }) => {
   // CONSENT:
+  const dictionary = useDictionary();
+  const { privacyHref, termsOfUseHref } = dictionary;
+
   const showConsent = consentType && (privacyHref || termsOfUseHref) && (variant === "toConfirmation" || variant === "toPlaid");
   const consentTextElement = showConsent ? <ConsentText privacyHref={privacyHref} termsOfUseHref={termsOfUseHref} /> : null;
 

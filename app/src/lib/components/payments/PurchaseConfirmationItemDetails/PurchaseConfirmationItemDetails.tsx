@@ -3,17 +3,16 @@ import { Stack, Typography } from "@mui/material";
 
 import { CheckoutItem } from "../../../domain/product/product.interfaces";
 import { CheckoutItemList } from "../CheckoutItemCost/List/CheckoutItemList";
-import { PUIDictionary } from "../../../domain/dictionary/dictionary.interfaces";
+import { useDictionary } from "../../../hooks/useDictionary";
 
 export interface PurchaseConfirmationItemDetailsProps {
   checkoutItems: CheckoutItem[];
-  dictionary: PUIDictionary;
 }
 
 export const PurchaseConfirmationItemDetails: React.FC<PurchaseConfirmationItemDetailsProps> = ({
   checkoutItems,
-  dictionary,
 }) => {
+  const dictionary = useDictionary();
   return (
     <Stack sx={{ display: "flex", flex: 1, pt: 2.5 }}>
       <Typography variant="body2">You purchased</Typography>

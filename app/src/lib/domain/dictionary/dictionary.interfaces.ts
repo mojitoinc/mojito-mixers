@@ -6,8 +6,10 @@ export type PUIDictionary = {
   walletMultiSigTooltip: PUIDictionarySingleLine;
 
   wirePaymentsDisclaimer: PUIDictionaryMultiLine;
-
   purchaseInstructions: PUIDictionaryMultiLine;
+
+  privacyHref?: string;
+  termsOfUseHref?: string;
 };
 
 export type PUIDictionaryKeys = keyof PUIDictionary;
