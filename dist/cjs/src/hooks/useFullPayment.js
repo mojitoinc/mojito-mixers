@@ -27,7 +27,7 @@ function useFullPayment({ orgID, invoiceID, savedPaymentMethods, selectedPayment
         });
     }, []);
     const [encryptCardData] = useEncryptCard.useEncryptCardData();
-    const [createPaymentMethod] = useCreatePaymentMethod.useCreatePaymentMethod();
+    const [createPaymentMethod] = useCreatePaymentMethod.useCreatePaymentMethod({ debug });
     const [makePayment] = graphqlGenerated.useCreatePaymentMutation();
     const fullPayment = React.useCallback(() => tslib_es6.__awaiter(this, void 0, void 0, function* () {
         var _a, _b, _c, _d, _e, _f;
@@ -90,7 +90,7 @@ function useFullPayment({ orgID, invoiceID, savedPaymentMethods, selectedPayment
                 mutationError = error;
                 const circleFieldErrors = circle_utils.parseCircleError(error);
                 if (debug)
-                    console.log("    🔴 createPaymentMethod error", error, circleFieldErrors);
+                    console.log("      🔴 createPaymentMethod error", error, circleFieldErrors);
                 if (circleFieldErrors) {
                     checkoutError = {
                         at: circleFieldErrors.firstAt,
@@ -103,7 +103,7 @@ function useFullPayment({ orgID, invoiceID, savedPaymentMethods, selectedPayment
             paymentMethodCreatedAt = Date.now();
             if (createPaymentMethodResult && !createPaymentMethodResult.errors) {
                 if (debug)
-                    console.log("    🟢 createPaymentMethod result", createPaymentMethodResult);
+                    console.log("      🟢 createPaymentMethod result", createPaymentMethodResult);
                 paymentMethodID = ((_b = (_a = createPaymentMethodResult.data) === null || _a === void 0 ? void 0 : _a.createPaymentMethod) === null || _b === void 0 ? void 0 : _b.id) || "";
             }
         }
@@ -139,8 +139,8 @@ function useFullPayment({ orgID, invoiceID, savedPaymentMethods, selectedPayment
                 encryptedData: encryptedCardData,
             };
         }
-        const paymentMethodStatusWaitTime = Math.max(config.CIRCLE_MAX_EXPECTED_PAYMENT_CREATION_PROCESSING_TIME - (Date.now() - paymentMethodCreatedAt), 0);
-        if (paymentMethodStatusWaitTime)
+        const paymentMethodStatusWaitTime = Math.max(config.PAYMENT_CREATION_MIN_WAIT_MS - (Date.now() - paymentMethodCreatedAt), 0);
+        if (paymentMethodStatusWaitTime > 0)
             yield promiseUtils.wait(paymentMethodStatusWaitTime);
         const makePaymentResult = yield makePayment({
             variables: {

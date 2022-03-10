@@ -1,11 +1,11 @@
 import { SelectOption } from "../../components/shared/Select/Select";
 import { CreditCardBillingDetails, CreditCardMetadata, AchBillingDetails, AchMetadata } from "../../queries/graphqlGenerated";
 import { PaymentType } from "../payment/payment.interfaces";
-export declare type PaymentStatus = "pending" | "complete" | "failed";
+export declare type PaymentMethodStatus = "pending" | "complete" | "failed";
 export interface RawSavedPaymentMethodCC {
     id: string;
     type: "CreditCard";
-    status: PaymentStatus;
+    status: PaymentMethodStatus;
     network: string;
     last4Digit: string;
     billingDetails: CreditCardBillingDetails;
@@ -14,7 +14,7 @@ export interface RawSavedPaymentMethodCC {
 export interface RawSavedPaymentMethodACH {
     id: string;
     type: "ACH";
-    status: PaymentStatus;
+    status: PaymentMethodStatus;
     accountNumber: string;
     billingDetails: AchBillingDetails;
     metadata: AchMetadata;
