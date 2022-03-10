@@ -13,6 +13,7 @@
     "dev": "yarn --cwd app dev",
     "build": "yarn --cwd app  build",
     "export": "yarn --cwd app export",
+    "test": "yarn --cwd app test",
     "start": "yarn --cwd app start",
     "clean": "yarn --cwd app  clean",
     "uninstall": "yarn --cwd app uninstall",
