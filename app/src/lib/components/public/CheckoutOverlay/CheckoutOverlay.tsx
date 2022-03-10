@@ -218,6 +218,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     if (destinationAddress) setWalletAddress(destinationAddress || null);
   }, [destinationAddress, setWalletAddress]);
 
+
   // Invoice creation & buy now lot reservation:
 
   const createInvoiceAndReservationCalledRef = useRef(false);
@@ -256,6 +257,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     if (!isDialogLoading && open) initModalState();
   }, [isDialogLoading, open, initModalState]);
 
+
   // Data loading error handling:
 
   useEffect(() => {
@@ -263,6 +265,9 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     if (paymentMethodsError) setError(ERROR_LOADING_PAYMENT_METHODS(paymentMethodsError));
     if (invoiceDetailsError) setError(ERROR_LOADING_INVOICE(invoiceDetailsError));
   }, [meError, paymentMethodsError, invoiceDetailsError, setError]);
+
+
+  // Analytics:
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const triggerAnalyticsEventRef = useRef((eventType: CheckoutEventType) => { /* Do nothing */ });
@@ -309,6 +314,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   useEffect(() => {
     setTimeout(() => triggerAnalyticsEventRef.current(`navigate:${ checkoutStep }`));
   }, [checkoutStep]);
+
 
   // Saved payment method creation-reload-sync:
 

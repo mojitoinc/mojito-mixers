@@ -22,6 +22,7 @@ const DeliveryWalletDetails: React.FC<DeliveryWalletDetailsProps> = ({
   dictionary,
 }) => {
   const isMultiSig = useMemo(() => {
+    // TODO: We need to filter by network:
     return wallets && wallets.some(({ address }) => address === walletAddress);
   }, [walletAddress, wallets]);
 
