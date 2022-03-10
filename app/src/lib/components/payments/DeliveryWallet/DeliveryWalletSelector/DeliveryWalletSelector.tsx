@@ -1,13 +1,13 @@
 import { Typography } from "@mui/material";
 import React from "react";
-import { DisplayBox } from "../DisplayBox/DisplayBox";
-import { Checkbox } from "../../shared/Checkbox/Checkbox";
-import { InputGroupLabel } from "../../shared/InputGroupLabel/InputGroupLabel";
-import { TextField } from "../../shared/TextField/TextField";
-import { withInvalidErrorMessage } from "../../../utils/validationUtils";
-import { isValidWalletAddress } from "../../../domain/wallet/wallet.utils";
+import { DisplayBox } from "../../DisplayBox/DisplayBox";
+import { Checkbox } from "../../../shared/Checkbox/Checkbox";
+import { InputGroupLabel } from "../../../shared/InputGroupLabel/InputGroupLabel";
+import { TextField } from "../../../shared/TextField/TextField";
+import { withInvalidErrorMessage } from "../../../../utils/validationUtils";
+import { isValidWalletAddress } from "../../../../domain/wallet/wallet.utils";
 import { ChangeEvent, useCallback } from "react";
-import { PUIDictionary } from "../../../domain/dictionary/dictionary.interfaces";
+import { PUIDictionary } from "../../../../domain/dictionary/dictionary.interfaces";
 
 export interface DeliveryWalletSelectorProps {
   validatePersonalAddress: boolean;

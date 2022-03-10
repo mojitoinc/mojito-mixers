@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react'
-import DeliveryWalletDetails, { DeliveryWalletDetailsProps } from '@components/payments/DeliveryWallet/DeliveryWalletDetails'
+import { DeliveryWalletDetails, DeliveryWalletDetailsProps } from './DeliveryWalletDetails'
 describe('render payment components', () => {
 
   Object.defineProperty(navigator, "clipboard", {
