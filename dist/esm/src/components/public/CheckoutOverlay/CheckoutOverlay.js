@@ -19,6 +19,7 @@ import { transformCheckoutItemsFromInvoice } from '../../../domain/product/produ
 import { useCreateInvoiceAndReservation } from '../../../hooks/useCreateInvoiceAndReservation.js';
 import { useCheckoutItemsCostTotal } from '../../../hooks/useCheckoutItemCostTotal.js';
 import { DEFAULT_DICTIONARY } from '../../../domain/dictionary/dictionary.constants.js';
+import { THREEDS_REDIRECT_DELAY_MS } from '../../../config/config.js';
 
 const PUICheckoutOverlay = ({ 
 // Modal:
@@ -237,13 +238,21 @@ debug: initialDebug, onEvent, onError, onMarketingOptInChange, // Not implemente
         yield refetchPaymentMethods({ orgID });
     }), [checkoutStep, deletePaymentMethod, orgID, refetchPaymentMethods, savedPaymentMethods, setSelectedPaymentMethod]);
     // Purchase:
-    const handlePurchaseSuccess = useCallback((nextCirclePaymentID, nextPaymentID) => __awaiter(void 0, void 0, void 0, function* () {
+    const handlePurchaseSuccess = useCallback((nextCirclePaymentID, nextPaymentID, redirectURL) => __awaiter(void 0, void 0, void 0, function* () {
         setPayments(nextCirclePaymentID, nextPaymentID);
         setTimeout(() => triggerAnalyticsEventRef.current("event:paymentSuccess"));
+        if (redirectURL) {
+            setTimeout(() => {
+                if (debug)
+                    console.log(`Redirecting to 3DS = ${redirectURL}`);
+                location.href = redirectURL;
+            }, THREEDS_REDIRECT_DELAY_MS);
+            return;
+        }
         // After a successful purchase, a new payment method might have been created, so we reload them:
         yield refetchPaymentMethods();
         goNext();
-    }), [setPayments, refetchPaymentMethods, goNext]);
+    }), [setPayments, debug, refetchPaymentMethods, goNext]);
     const handlePurchaseError = useCallback((error) => __awaiter(void 0, void 0, void 0, function* () {
         setTimeout(() => triggerAnalyticsEventRef.current("event:paymentError"));
         // After a failed purchase, a new payment method might have been created anyway, so we reload them (createPaymentMethod
