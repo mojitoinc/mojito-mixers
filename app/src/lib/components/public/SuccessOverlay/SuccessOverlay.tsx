@@ -26,7 +26,7 @@ export const PUISuccessOverlay: React.FC<PUISuccessOverlayProps> = ({
   onRedirect,
   ...fullScreenOverlayProps
 }) => {
-  const { purchaseSuccess, url ="" } = getCheckoutModalState();
+  const { purchaseSuccess, url = "" } = getCheckoutModalState();
   const isPathname = isUrlPathname(url);
 
   useLayoutEffect(() => {
