@@ -7,6 +7,7 @@ import { PLAYGROUND_PARAGRAPHS_ARRAY, PLAYGROUND_AUTH_PRESET, PLAYGROUND_NO_AUTH
 import { PlaygroundFormData } from "../utils/playground/playground.interfaces";
 import { config } from "../utils/config/config.constants";
 import { CheckoutEventData, CheckoutEventType } from "../lib/domain/events/events.interfaces";
+import { isLocalhost } from "../lib/domain/url/url.utils";
 
 const DEFAULT_FORM_VALUES: PlaygroundFormData = {
   // Organization:
@@ -77,7 +78,7 @@ const HomePage: React.FC = () => {
   }, []);
 
   const handleEvent = useCallback((eventType: CheckoutEventType, eventData: CheckoutEventData) => {
-    if (window.location.hostname !== "localhost") console.log(`🎯 ${ eventType }`, eventData);
+    if (!isLocalhost()) console.log(`🎯 ${ eventType }`, eventData);
   }, []);
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

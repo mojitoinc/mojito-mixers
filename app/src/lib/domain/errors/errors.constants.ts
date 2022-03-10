@@ -41,6 +41,8 @@ export const ERROR_LOADING_INVOICE = createError("Invoice could not be loaded.",
 
 export const ERROR_PURCHASE = createError("The purchase could not be completed.");
 
+export const ERROR_PURCHASE_TIMEOUT = createError("The purchase could not be completed in time.");
+
 
 // useFullPayment:
 

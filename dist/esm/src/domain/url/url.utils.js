@@ -18,6 +18,11 @@ function getUrlWithSearchParams(url) {
         return url;
     return `${url}${window.location.search}`;
 }
+function isLocalhost() {
+    if (!process.browser)
+        return false;
+    return window.location.hostname === "localhost";
+}
 
-export { getUrlWithSearchParams, getUrlWithoutParams, isUrlPathname, urlToPathnameWhenPossible };
+export { getUrlWithSearchParams, getUrlWithoutParams, isLocalhost, isUrlPathname, urlToPathnameWhenPossible };
 //# sourceMappingURL=url.utils.js.map

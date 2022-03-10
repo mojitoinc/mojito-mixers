@@ -29,6 +29,7 @@ import { PUIDictionary } from "../../../domain/dictionary/dictionary.interfaces"
 import { DEFAULT_DICTIONARY } from "../../../domain/dictionary/dictionary.constants";
 import { ApolloError } from "@apollo/client";
 import { Wallet } from "../../payments/DeliveryWallet/DeliveryWalletDetails";
+import { THREEDS_REDIRECT_DELAY_MS } from "../../../config/config";
 
 export interface PUICheckoutOverlayProps {
   // Modal:
@@ -422,16 +423,26 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
 
   // Purchase:
 
-  const handlePurchaseSuccess = useCallback(async (nextCirclePaymentID: string, nextPaymentID:string) => {
+  const handlePurchaseSuccess = useCallback(async (nextCirclePaymentID: string, nextPaymentID:string, redirectURL: string) => {
     setPayments(nextCirclePaymentID, nextPaymentID);
 
     setTimeout(() => triggerAnalyticsEventRef.current("event:paymentSuccess"));
+
+    if (redirectURL) {
+      setTimeout(() => {
+        if (debug) console.log(`Redirecting to 3DS = ${ redirectURL }`);
+
+        location.href = redirectURL;
+      }, THREEDS_REDIRECT_DELAY_MS);
+
+      return;
+    }
 
     // After a successful purchase, a new payment method might have been created, so we reload them:
     await refetchPaymentMethods();
 
     goNext();
-  }, [setPayments, refetchPaymentMethods, goNext]);
+  }, [setPayments, debug, refetchPaymentMethods, goNext]);
 
   const handlePurchaseError = useCallback(async (error?: string | CheckoutModalError) => {
     setTimeout(() => triggerAnalyticsEventRef.current("event:paymentError"));
