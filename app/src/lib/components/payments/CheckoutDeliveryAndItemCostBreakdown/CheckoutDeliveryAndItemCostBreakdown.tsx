@@ -5,7 +5,6 @@ import { DeliveryWalletSelector } from "../DeliveryWallet/DeliveryWalletSelector
 import { CheckoutItemCostBreakdown } from "../CheckoutItemCost/Breakdown/CheckoutItemCostBreakdown";
 import { CheckoutItem } from "../../../domain/product/product.interfaces";
 import { TaxesState } from "../../../views/Billing/BillingView";
-import { PUIDictionary } from "../../../domain/dictionary/dictionary.interfaces";
 
 interface CheckoutDeliveryAndItemCostBreakdownProps {
   checkoutItems: CheckoutItem[];
@@ -26,7 +25,7 @@ export const CheckoutDeliveryAndItemCostBreakdown: React.FC<CheckoutDeliveryAndI
       <DeliveryWalletSelector
         validatePersonalAddress={ validatePersonalDeliveryAddress }
         walletAddress={ walletAddress }
-        onWalletAddressChange={ onWalletAddressChange }/>
+        onWalletAddressChange={ onWalletAddressChange } />
 
       <Divider sx={{ my: 3.75 }} />
 

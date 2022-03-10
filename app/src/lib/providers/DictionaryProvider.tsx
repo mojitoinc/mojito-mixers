@@ -1,16 +1,18 @@
-import { createContext, FunctionComponent, useContext } from "react";
+import { createContext, FunctionComponent } from "react";
 import { PUIDictionary } from "../domain/dictionary/dictionary.interfaces";
 
 
 export const DictionaryContext = createContext<PUIDictionary>({
-  walletMultiSigTooltip: '',
+  walletMultiSigTooltip: "",
   purchaseInstructions: [],
-  walletInfo: '',
-  wirePaymentsDisclaimer: []
+  walletInfo: "",
+  wirePaymentsDisclaimer: [],
 })
 
 export const DictionaryProvider: FunctionComponent<{ dictionary: PUIDictionary }> = ({ children, dictionary }) => {
-  return <DictionaryContext.Provider value={dictionary}>
-    {children}
-  </DictionaryContext.Provider>
+  return (
+    <DictionaryContext.Provider value={ dictionary }>
+      { children }
+    </DictionaryContext.Provider>
+  );
 }

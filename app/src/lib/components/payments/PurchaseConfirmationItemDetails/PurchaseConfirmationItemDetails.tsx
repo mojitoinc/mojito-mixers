@@ -13,6 +13,7 @@ export const PurchaseConfirmationItemDetails: React.FC<PurchaseConfirmationItemD
   checkoutItems,
 }) => {
   const dictionary = useDictionary();
+
   return (
     <Stack sx={{ display: "flex", flex: 1, pt: 2.5 }}>
       <Typography variant="body2">You purchased</Typography>

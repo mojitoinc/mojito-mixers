@@ -5,10 +5,6 @@ import { ReadOnlyWalletAddress } from "../../shared/ReadOnlyField/ReadOnlyField"
 import React, { useMemo } from "react";
 import { useDictionary } from "../../../hooks/useDictionary";
 
-export interface DeliveryWalletDetailsProps {
-  walletAddress: string;
-  isMultiSig?: boolean;
-}
 export interface Wallet {
   id: string;
   name: string;
@@ -19,6 +15,7 @@ export interface DeliveryWalletDetailsProps {
   walletAddress: string;
   wallets?: Wallet[];
 }
+
 const DeliveryWalletDetails: React.FC<DeliveryWalletDetailsProps> = ({
   walletAddress,
   wallets,

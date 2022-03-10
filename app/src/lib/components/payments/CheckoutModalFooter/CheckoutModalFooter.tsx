@@ -38,9 +38,7 @@ export const CheckoutModalFooter: React.FC<CheckoutModalFooterProps> = ({
   onCloseClicked,
 }) => {
   // CONSENT:
-  const dictionary = useDictionary();
-  const { privacyHref, termsOfUseHref } = dictionary;
-
+  const { privacyHref, termsOfUseHref } = useDictionary();
   const showConsent = consentType && (privacyHref || termsOfUseHref) && (variant === "toConfirmation" || variant === "toPlaid");
   const consentTextElement = showConsent ? <ConsentText privacyHref={privacyHref} termsOfUseHref={termsOfUseHref} /> : null;
 

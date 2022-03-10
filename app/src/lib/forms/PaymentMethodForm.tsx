@@ -279,6 +279,7 @@ export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
   }, []);
 
   const dictionary = useDictionary();
+  const { privacyHref, termsOfUseHref } = dictionary;
 
   const {
     control,
@@ -305,8 +306,6 @@ export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
   const Fields = PAYMENT_TYPE_FORM_DATA[selectedPaymentMethod].fields;
   const submitForm = handleSubmit(onSubmit);
   const checkoutErrorMessage = useFormCheckoutError({ formKey: "payment", checkoutError, fields: FIELD_NAMES, setError, deps: [selectedPaymentMethod] });
-
-  const { privacyHref, termsOfUseHref } = dictionary;
 
   const handleFormSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();

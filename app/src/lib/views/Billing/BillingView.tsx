@@ -252,7 +252,7 @@ export const BillingView: React.FC<BillingViewProps> = ({
         taxes={ taxes }
         validatePersonalDeliveryAddress={ formSubmitAttempted }
         walletAddress={ walletAddress }
-        onWalletAddressChange={ onWalletAddressChange }/>
+        onWalletAddressChange={ onWalletAddressChange } />
     </Stack>
   );
 };
