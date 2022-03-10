@@ -6,7 +6,8 @@ import { CheckoutModalError, CheckoutModalErrorAt } from "../../components/publi
 import { DebugBox } from "../../components/payments/DebugBox/DebugBox";
 import { XS_MOBILE_MAX_WIDTH } from "../../config/theme/theme";
 import { StatusIcon } from "../../components/shared/StatusIcon/StatusIcon";
-import { DEFAULT_ERROR_AT } from "../../domain/errors/errors.constants";
+import { DEFAULT_ERROR_AT, ERROR_GENERIC } from "../../domain/errors/errors.constants";
+import { DEV_EXCEPTION_PREFIX } from "../../domain/errors/exceptions.constants";
 
 const ERROR_ACTION_LABELS: Record<CheckoutModalErrorAt, string> = {
   reset: "Try Again",
@@ -37,6 +38,7 @@ export const ErrorView: React.FC<ErrorViewProps> = ({
 }) => {
   const stringifiedError = debug && error ? JSON.stringify(error, null, "  ") : "{}";
   const debugErrorMessage = stringifiedError === "{}" && error ? error.stack : stringifiedError;
+  const displayMessage = !errorMessage || errorMessage.startsWith(DEV_EXCEPTION_PREFIX) ? ERROR_GENERIC.errorMessage : errorMessage;
 
   return (<>
     <Box>
@@ -47,7 +49,7 @@ export const ErrorView: React.FC<ErrorViewProps> = ({
         sx={{ my: 5 }} />
 
       <Box sx={{ maxWidth: XS_MOBILE_MAX_WIDTH, mx: "auto" }}>
-        { parseSentences(errorMessage).map((sentence) => {
+        { parseSentences(displayMessage).map((sentence) => {
           return <Typography key={ sentence } variant="body2" sx={{ textAlign: "center", mb: 1.5 }}>{ sentence }</Typography>;
         }) }
 

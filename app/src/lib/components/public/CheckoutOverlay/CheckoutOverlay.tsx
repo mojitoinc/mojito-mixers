@@ -433,7 +433,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     goNext();
   }, [setPayments, refetchPaymentMethods, goNext]);
 
-  const handlePurchaseError = useCallback(async (error: string | CheckoutModalError) => {
+  const handlePurchaseError = useCallback(async (error?: string | CheckoutModalError) => {
     setTimeout(() => triggerAnalyticsEventRef.current("event:paymentError"));
 
     // After a failed purchase, a new payment method might have been created anyway, so we reload them (createPaymentMethod

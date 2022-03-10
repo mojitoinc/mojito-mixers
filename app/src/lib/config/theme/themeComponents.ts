@@ -1,6 +1,6 @@
 import { Theme } from "@mui/material/styles";
 import { Components as ComponentsOptions } from "@mui/material/styles/components";
-import { BORDER_THICKNESS, MD_BORDER_RADIUS, SM_BORDER_RADIUS } from "./theme";
+import { BORDER_THICKNESS, MD_BORDER_RADIUS } from "./theme";
 
 /*
 declare module "@mui/material/TextField" {
@@ -76,7 +76,6 @@ export function createComponentsTheme({ typography, palette, spacing, breakpoint
       styleOverrides: {
         root: {
           height: "60px",
-          borderRadius: SM_BORDER_RADIUS,
 
           "&.Mui-disabled::before": {
             border: 0,
@@ -96,6 +95,7 @@ export function createComponentsTheme({ typography, palette, spacing, breakpoint
       styleOverrides: {
         root: {
           border: `${BORDER_THICKNESS}px solid ${palette.grey[200]}`,
+          borderRadius: MD_BORDER_RADIUS,
           background: palette.background.default,
 
           "&:hover": {

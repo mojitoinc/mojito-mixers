@@ -5,13 +5,27 @@ export const BUILT_IN_ERRORS = ["EvalError", "RangeError", "ReferenceError", "Sy
 
 export const DEFAULT_ERROR_AT = "payment";
 
-function createError(errorMessage: string, at: CheckoutModalErrorAt = DEFAULT_ERROR_AT): (error?: ApolloError | Error) => CheckoutModalError {
-  return (error?: ApolloError | Error) => ({
+export interface ErrorCreator {
+  (error?: ApolloError | Error): CheckoutModalError;
+  errorMessage: string;
+}
+
+function createError(errorMessage: string, at: CheckoutModalErrorAt = DEFAULT_ERROR_AT): ErrorCreator {
+  const errorCreator: ErrorCreator = (error?: ApolloError | Error): CheckoutModalError => ({
     error,
     errorMessage,
     at,
   });
+
+  errorCreator.errorMessage = errorMessage;
+
+  return errorCreator;
 }
+
+
+// Generic:
+
+export const ERROR_GENERIC = createError("An unexpected error happened.");
 
 
 // CheckoutModal:

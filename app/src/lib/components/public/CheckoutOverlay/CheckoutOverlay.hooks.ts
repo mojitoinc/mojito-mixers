@@ -2,7 +2,7 @@
 import { ApolloError } from "@apollo/client";
 import { Dispatch, SetStateAction, useState, useCallback } from "react";
 import { CircleFieldErrors } from "../../../domain/circle/circle.utils";
-import { ERROR_PURCHASE } from "../../../domain/errors/errors.constants";
+import { ERROR_GENERIC } from "../../../domain/errors/errors.constants";
 import { PaymentMethod } from "../../../domain/payment/payment.interfaces";
 import { isValidWalletAddress } from "../../../domain/wallet/wallet.utils";
 import { BillingInfo } from "../../../forms/BillingInfoForm";
@@ -64,7 +64,7 @@ export interface CheckoutModalStateReturn extends CheckoutModalState, PurchaseSt
   goBack: () => void;
   goNext: () => void;
   goTo: (checkoutStep?: CheckoutModalStep, error?: null | string | CheckoutModalError) => void;
-  setError: (error: string | CheckoutModalError) => void;
+  setError: (error?: string | CheckoutModalError) => void;
   setIsDialogBlocked: (isDialogBlocked: boolean) => void;
 
   // SelectedPaymentMethod:
@@ -187,8 +187,8 @@ export function useCheckoutModalState({
     });
   }, [startAt]);
 
-  const setError = useCallback((error: string | CheckoutModalError) => {
-    const nextCheckoutError: CheckoutModalError = typeof error === "string" ? { errorMessage: error || ERROR_PURCHASE().errorMessage } : error;
+  const setError = useCallback((error: undefined | string | CheckoutModalError) => {
+    const nextCheckoutError: CheckoutModalError = error ? (typeof error === "string" ? { errorMessage: error } : error) : ERROR_GENERIC();
 
     if (onError) onError(nextCheckoutError);
 
