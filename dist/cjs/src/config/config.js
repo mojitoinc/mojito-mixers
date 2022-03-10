@@ -20,7 +20,7 @@ const PURCHASING_MESSAGES_DEFAULT = [
 ];
 const PAYMENT_CREATION_INTERVAL_MS = 5000; // (5 sec) Polling interval for GetPaymentMethodStatus.
 const PAYMENT_CREATION_MAX_WAIT_MS = 120000; // (2 min) Max. wait time for GetPaymentMethodStatus (to get status === "complete").
-const PAYMENT_CREATION_MIN_WAIT_MS = 5000; // (5/15 sec) Min. time a user would be stuck in the PurchasingView.
+const PAYMENT_CREATION_MIN_WAIT_MS = 5000; // (5 sec) Min. time a user would be stuck in the PurchasingView.
 const PAYMENT_NOTIFICATION_INTERVAL_MS = 2500; // (2.5 sec) Polling interval for GetPaymentNotificationQuery in PurchasingView.
 // Plaid:
 const PLAID_STORAGE_EXPIRATION_MS = 1000 * 60 * 15; // 15 minutes (Plaid requires filling in some data).
@@ -29,6 +29,7 @@ const PLAID_OAUTH_FLOW_RECEIVED_REDIRECT_URI_KEY = "PLAID_OAUTH_FLOW_RECEIVED_RE
 const PLAID_OAUTH_FLOW_STATE_USED_KEY = "PLAID_OAUTH_FLOW_STATE_USED";
 const PLAID_OAUTH_FLOW_URL_SEARCH = "?oauth_state_id=";
 // 3DS:
+const THREEDS_REDIRECT_DELAY_MS = 1000; // (1 sec) Small delay before redirecting users to 3DS' page.
 const THREEDS_STORAGE_EXPIRATION_MS = 1000 * 60 * 7; // 7 minutes (3DS will also ask for some information (in PROD only)).
 const THREEDS_FLOW_INFO_KEY = "THREEDS_FLOW_INFO";
 const THREEDS_FLOW_RECEIVED_REDIRECT_URI_KEY = "THREEDS_FLOW_RECEIVED_REDIRECT_URI";
@@ -57,6 +58,7 @@ exports.THREEDS_FLOW_INFO_KEY = THREEDS_FLOW_INFO_KEY;
 exports.THREEDS_FLOW_RECEIVED_REDIRECT_URI_KEY = THREEDS_FLOW_RECEIVED_REDIRECT_URI_KEY;
 exports.THREEDS_FLOW_STATE_USED_KEY = THREEDS_FLOW_STATE_USED_KEY;
 exports.THREEDS_FLOW_URL_SEARCH = THREEDS_FLOW_URL_SEARCH;
+exports.THREEDS_REDIRECT_DELAY_MS = THREEDS_REDIRECT_DELAY_MS;
 exports.THREEDS_STORAGE_EXPIRATION_MS = THREEDS_STORAGE_EXPIRATION_MS;
 exports.THREEDS_SUCCESS_REDIRECT_DELAY_MS = THREEDS_SUCCESS_REDIRECT_DELAY_MS;
 //# sourceMappingURL=config.js.map
