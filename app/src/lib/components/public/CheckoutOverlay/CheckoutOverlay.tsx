@@ -96,7 +96,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   userFormat,
   acceptedPaymentTypes,
   paymentLimits, // Not implemented yet. Used to show payment limits for some payment types.
-  dictionary: parentDictionary,
+  dictionary,
 
   // Legal:
   consentType,
@@ -118,12 +118,6 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   onMarketingOptInChange, // Not implemented yet. Used to let user subscribe / unsubscribe to marketing updates.
 }) => {
   const [debug, setDebug] = useState(!!initialDebug);
-
-  // TODO: This should end up being in a context + hook to avoid prop drilling and it should be memoized:
-  const dictionary = {
-    ...DEFAULT_DICTIONARY,
-    ...parentDictionary,
-  };
 
   // First, get user data and saved payment methods:
 
