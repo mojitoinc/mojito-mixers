@@ -9,7 +9,7 @@ export interface PurchasingViewProps {
     savedPaymentMethods: SavedPaymentMethod[];
     selectedPaymentMethod: SelectedPaymentMethod;
     walletAddress: string | null;
-    onPurchaseSuccess: (circlePaymentID: string, paymentID: string) => void;
+    onPurchaseSuccess: (circlePaymentID: string, paymentID: string, redirectURL: string) => void;
     onPurchaseError: (error: string | CheckoutModalError) => void;
     onDialogBlocked: (blocked: boolean) => void;
     debug?: boolean;

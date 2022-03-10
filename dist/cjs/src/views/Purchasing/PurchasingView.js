@@ -12,6 +12,7 @@ var StatusIcon = require('../../components/shared/StatusIcon/StatusIcon.js');
 var graphqlGenerated = require('../../queries/graphqlGenerated.js');
 var CheckoutOverlay_utils = require('../../components/public/CheckoutOverlay/CheckoutOverlay.utils.js');
 var config = require('../../config/config.js');
+var url_utils = require('../../domain/url/url.utils.js');
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
@@ -19,6 +20,14 @@ var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 
 const PurchasingView = ({ purchasingImageSrc, purchasingMessages: customPurchasingMessages, orgID, invoiceID, savedPaymentMethods, selectedPaymentMethod, walletAddress, onPurchaseSuccess, onPurchaseError, onDialogBlocked, debug, }) => {
     var _a, _b, _c;
+    const { billingInfo, paymentInfo, cvv } = selectedPaymentMethod;
+    const isCreditCardPayment = cvv || (typeof paymentInfo === "object" && paymentInfo.type === "CreditCard");
+    // Minimum wait time:
+    const [hasWaited, setHasWaited] = React.useState(false);
+    corre.useTimeout(() => {
+        setHasWaited(true);
+    }, config.PURCHASING_MIN_WAIT_MS);
+    // Actual payment mutation & state:
     const [fullPaymentState, fullPayment] = useFullPayment.useFullPayment({
         orgID,
         invoiceID,
@@ -27,25 +36,27 @@ const PurchasingView = ({ purchasingImageSrc, purchasingMessages: customPurchasi
         walletAddress,
         debug,
     });
+    // Load 3DS redirect URL when needed:
+    const [redirectURL, setRedirectURL] = React.useState(isCreditCardPayment ? "" : null);
     const paymentNotificationResult = graphqlGenerated.useGetPaymentNotificationQuery({
-        skip: fullPaymentState.paymentStatus !== "processed",
+        skip: !isCreditCardPayment || !!redirectURL || fullPaymentState.paymentStatus !== "processed",
         pollInterval: config.PAYMENT_NOTIFICATION_INTERVAL_MS,
     });
-    let purchasingMessages = customPurchasingMessages;
-    if (purchasingMessages === false) {
-        purchasingMessages = [];
-    }
-    else if (purchasingMessages === undefined || purchasingMessages.length === 0) {
-        purchasingMessages = config.PURCHASING_MESSAGES_DEFAULT;
-    }
-    const [hasWaited, setHasWaited] = React.useState(false);
-    const [purchasingMessageIndex, setPurchasingMessageIndex] = React.useState(0);
-    const purchasingMessage = purchasingMessages[purchasingMessageIndex];
-    const redirectURL = ((_c = (_b = (_a = paymentNotificationResult.data) === null || _a === void 0 ? void 0 : _a.getPaymentNotification) === null || _b === void 0 ? void 0 : _b.message) === null || _c === void 0 ? void 0 : _c.redirectURL) || "";
-    const { billingInfo, paymentInfo, cvv } = selectedPaymentMethod;
-    const isCreditCardPayment = cvv || (typeof paymentInfo === "object" && paymentInfo.type === "CreditCard");
+    const nextRedirectURL = ((_c = (_b = (_a = paymentNotificationResult.data) === null || _a === void 0 ? void 0 : _a.getPaymentNotification) === null || _b === void 0 ? void 0 : _b.message) === null || _c === void 0 ? void 0 : _c.redirectURL) || "";
+    React.useEffect(() => {
+        if (!isCreditCardPayment)
+            return;
+        setRedirectURL(prevRedirectURL => prevRedirectURL || nextRedirectURL);
+    }, [isCreditCardPayment, nextRedirectURL]);
+    // Triggers for payment mutation and onPurchaseSuccess/onPurchaseError callbacks:
     const fullPaymentCalledRef = React.useRef(false);
-    const checkoutInfoPersistedRef = React.useRef(false);
+    const purchaseSuccessHandledRef = React.useRef(false);
+    corre.useTimeout(() => {
+        if (purchaseSuccessHandledRef.current)
+            return;
+        purchaseSuccessHandledRef.current = true;
+        onPurchaseError(errors_constants.ERROR_PURCHASE_TIMEOUT());
+    }, redirectURL === null ? null : 5000, [onPurchaseError]);
     React.useEffect(() => {
         if (fullPaymentCalledRef.current)
             return;
@@ -58,16 +69,14 @@ const PurchasingView = ({ purchasingImageSrc, purchasingMessages: customPurchasi
             onDialogBlocked(true);
             return;
         }
-        if (!hasWaited)
+        if (!hasWaited || redirectURL === "" || purchaseSuccessHandledRef.current)
             return;
+        purchaseSuccessHandledRef.current = true;
         if (paymentStatus === "error" || paymentError) {
             onPurchaseError(paymentError || errors_constants.ERROR_PURCHASE());
             return;
         }
-        if (isCreditCardPayment && window.location.hostname !== "localhost") {
-            if (!redirectURL || checkoutInfoPersistedRef.current)
-                return;
-            checkoutInfoPersistedRef.current = true;
+        if (redirectURL && !url_utils.isLocalhost()) {
             CheckoutOverlay_utils.persistCheckoutModalInfo({
                 invoiceID,
                 circlePaymentID,
@@ -75,12 +84,8 @@ const PurchasingView = ({ purchasingImageSrc, purchasingMessages: customPurchasi
                 billingInfo,
                 paymentInfo,
             });
-            if (debug)
-                console.log("Redirecting to 3DS...");
-            location.href = redirectURL;
-            return;
         }
-        onPurchaseSuccess(circlePaymentID, paymentID);
+        onPurchaseSuccess(circlePaymentID, paymentID, url_utils.isLocalhost() ? "" : (redirectURL || ""));
     }, [
         fullPaymentState,
         hasWaited,
@@ -94,12 +99,19 @@ const PurchasingView = ({ purchasingImageSrc, purchasingMessages: customPurchasi
         invoiceID,
         debug,
     ]);
-    corre.useTimeout(() => {
-        setHasWaited(true);
-    }, config.PURCHASING_MIN_WAIT_MS);
+    // Purchasing Messages:
+    const [purchasingMessageIndex, setPurchasingMessageIndex] = React.useState(0);
     corre.useInterval(() => {
         setPurchasingMessageIndex(prevWaitMessageIndex => Math.min(prevWaitMessageIndex + 1, config.PURCHASING_MESSAGES_DEFAULT.length - 1));
     }, config.PURCHASING_MESSAGES_INTERVAL_MS);
+    let purchasingMessages = customPurchasingMessages;
+    if (purchasingMessages === false) {
+        purchasingMessages = [];
+    }
+    else if (purchasingMessages === undefined || purchasingMessages.length === 0) {
+        purchasingMessages = config.PURCHASING_MESSAGES_DEFAULT;
+    }
+    const purchasingMessage = purchasingMessages[purchasingMessageIndex];
     return (React__default["default"].createElement(material.Box, null,
         React__default["default"].createElement(StatusIcon.StatusIcon, { variant: "loading", imgSrc: purchasingImageSrc, sx: { mt: 5 } }),
         purchasingMessage ? React__default["default"].createElement(material.Typography, { variant: "body2", sx: { textAlign: "center", mt: 1.5 } }, purchasingMessage) : null,
