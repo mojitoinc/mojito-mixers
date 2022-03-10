@@ -1,6 +1,6 @@
 import { PLAID_OAUTH_FLOW_INFO_KEY, PLAID_OAUTH_FLOW_RECEIVED_REDIRECT_URI_KEY, PLAID_OAUTH_FLOW_STATE_USED_KEY, PLAID_STORAGE_EXPIRATION_MS, PLAID_OAUTH_FLOW_URL_SEARCH } from "../../config/config";
 import { BillingInfo } from "../../forms/BillingInfoForm";
-import { getUrlWithoutParams, urlToPathnameWhenPossible } from "../url/url.utils";
+import { getUrlWithoutParams, isLocalhost, urlToPathnameWhenPossible } from "../url/url.utils";
 
 const debug = false;
 
@@ -98,7 +98,7 @@ export function getPlaidOAuthFlowState(): PlaidOAuthFlowState {
   // const receivedRedirectUri = savedReceivedRedirectUri || window.location.href || "";
 
   // In dev, this works fine even if there's nothing in localStorage, which helps with testing across some other domain and localhost:
-  const hasLocalhostOrigin = process.env.NODE_ENV === "development" && window.location.hostname !== "localhost";
+  const hasLocalhostOrigin = process.env.NODE_ENV === "development" && !isLocalhost();
   const continueOAuthFlow = hasLocalhostOrigin || !!(url && linkToken && selectedBillingInfo && receivedRedirectUri);
 
   if ((continueOAuthFlow && savedStateUsed) || (!continueOAuthFlow && localStorage.getItem(PLAID_OAUTH_FLOW_INFO_KEY)) || isExpired(timestamp)) {

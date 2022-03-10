@@ -11,6 +11,7 @@ import { StatusIcon } from "../../components/shared/StatusIcon/StatusIcon";
 import { useGetPaymentNotificationQuery } from "../../queries/graphqlGenerated";
 import { persistCheckoutModalInfo } from "../../components/public/CheckoutOverlay/CheckoutOverlay.utils";
 import { PAYMENT_NOTIFICATION_INTERVAL_MS, PURCHASING_MESSAGES_DEFAULT, PURCHASING_MIN_WAIT_MS, PURCHASING_MESSAGES_INTERVAL_MS } from "../../config/config";
+import { isLocalhost } from "../../domain/url/url.utils";
 
 export interface PurchasingViewProps {
   purchasingImageSrc?: string;
@@ -122,7 +123,7 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
       return;
     }
 
-    if (redirectURL && window.location.hostname !== "localhost") {
+    if (redirectURL && !isLocalhost()) {
       persistCheckoutModalInfo({
         invoiceID,
         circlePaymentID,
@@ -132,7 +133,7 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
       });
     }
 
-    onPurchaseSuccess(circlePaymentID, paymentID, redirectURL || "");
+    onPurchaseSuccess(circlePaymentID, paymentID, isLocalhost() ? "" : (redirectURL || ""));
   }, [
     fullPaymentState,
     hasWaited,

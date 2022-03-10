@@ -23,3 +23,9 @@ export function getUrlWithSearchParams(url: string): string {
 
   return `${ url }${ window.location.search }`;
 }
+
+export function isLocalhost() {
+  if (!process.browser) return false;
+
+  return window.location.hostname === "localhost";
+}
