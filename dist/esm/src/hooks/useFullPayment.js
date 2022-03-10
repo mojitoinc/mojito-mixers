@@ -1,6 +1,6 @@
 import { __awaiter } from '../../node_modules/tslib/tslib.es6.js';
 import { useState, useCallback } from 'react';
-import { CIRCLE_MAX_EXPECTED_PAYMENT_CREATION_PROCESSING_TIME } from '../config/config.js';
+import { PAYMENT_CREATION_MIN_WAIT_MS } from '../config/config.js';
 import { savedPaymentMethodToBillingInfo, parseCircleError } from '../domain/circle/circle.utils.js';
 import { ERROR_PURCHASE_NO_ITEMS, ERROR_PURCHASE_SELECTED_PAYMENT_METHOD, ERROR_PURCHASE_CREATING_PAYMENT_METHOD, ERROR_PURCHASE_CVV, ERROR_PURCHASE_PAYING } from '../domain/errors/errors.constants.js';
 import { useCreatePaymentMutation } from '../queries/graphqlGenerated.js';
@@ -23,7 +23,7 @@ function useFullPayment({ orgID, invoiceID, savedPaymentMethods, selectedPayment
         });
     }, []);
     const [encryptCardData] = useEncryptCardData();
-    const [createPaymentMethod] = useCreatePaymentMethod();
+    const [createPaymentMethod] = useCreatePaymentMethod({ debug });
     const [makePayment] = useCreatePaymentMutation();
     const fullPayment = useCallback(() => __awaiter(this, void 0, void 0, function* () {
         var _a, _b, _c, _d, _e, _f;
@@ -86,7 +86,7 @@ function useFullPayment({ orgID, invoiceID, savedPaymentMethods, selectedPayment
                 mutationError = error;
                 const circleFieldErrors = parseCircleError(error);
                 if (debug)
-                    console.log("    🔴 createPaymentMethod error", error, circleFieldErrors);
+                    console.log("      🔴 createPaymentMethod error", error, circleFieldErrors);
                 if (circleFieldErrors) {
                     checkoutError = {
                         at: circleFieldErrors.firstAt,
@@ -99,7 +99,7 @@ function useFullPayment({ orgID, invoiceID, savedPaymentMethods, selectedPayment
             paymentMethodCreatedAt = Date.now();
             if (createPaymentMethodResult && !createPaymentMethodResult.errors) {
                 if (debug)
-                    console.log("    🟢 createPaymentMethod result", createPaymentMethodResult);
+                    console.log("      🟢 createPaymentMethod result", createPaymentMethodResult);
                 paymentMethodID = ((_b = (_a = createPaymentMethodResult.data) === null || _a === void 0 ? void 0 : _a.createPaymentMethod) === null || _b === void 0 ? void 0 : _b.id) || "";
             }
         }
@@ -135,8 +135,8 @@ function useFullPayment({ orgID, invoiceID, savedPaymentMethods, selectedPayment
                 encryptedData: encryptedCardData,
             };
         }
-        const paymentMethodStatusWaitTime = Math.max(CIRCLE_MAX_EXPECTED_PAYMENT_CREATION_PROCESSING_TIME - (Date.now() - paymentMethodCreatedAt), 0);
-        if (paymentMethodStatusWaitTime)
+        const paymentMethodStatusWaitTime = Math.max(PAYMENT_CREATION_MIN_WAIT_MS - (Date.now() - paymentMethodCreatedAt), 0);
+        if (paymentMethodStatusWaitTime > 0)
             yield wait(paymentMethodStatusWaitTime);
         const makePaymentResult = yield makePayment({
             variables: {

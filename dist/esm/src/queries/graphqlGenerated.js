@@ -426,12 +426,15 @@ const CreatePaymentMethodDocument = gql `
   createPaymentMethod(orgID: $orgID, input: $input) {
     ... on ACHPaymentMethodOutput {
       id
+      status
     }
     ... on CreditCardPaymentMethodOutput {
       id
+      status
     }
     ... on WirePaymentMethodOutput {
       id
+      status
     }
   }
 }
@@ -513,6 +516,28 @@ function usePreparePaymentMethodQuery(baseOptions) {
     const options = Object.assign(Object.assign({}, defaultOptions), baseOptions);
     return Apollo.useQuery(PreparePaymentMethodDocument, options);
 }
+const GetPaymentMethodStatusDocument = gql `
+    query GetPaymentMethodStatus($paymentMethodID: UUID1!) {
+  getPaymentMethod(paymentMethodID: $paymentMethodID) {
+    ... on ACHPaymentMethodOutput {
+      id
+      status
+    }
+    ... on CreditCardPaymentMethodOutput {
+      id
+      status
+    }
+    ... on WirePaymentMethodOutput {
+      id
+      status
+    }
+  }
+}
+    `;
+function useGetPaymentMethodStatusLazyQuery(baseOptions) {
+    const options = Object.assign(Object.assign({}, defaultOptions), baseOptions);
+    return Apollo.useLazyQuery(GetPaymentMethodStatusDocument, options);
+}
 const GetTaxQuoteDocument = gql `
     query GetTaxQuote($input: TaxQuoteInput!) {
   getTaxQuote(input: $input) {
@@ -534,5 +559,5 @@ function useGetTaxQuoteLazyQuery(baseOptions) {
     return Apollo.useLazyQuery(GetTaxQuoteDocument, options);
 }
 
-export { AuctionBidOrder, AuctionLotStatus, CollectionType, ContractType, CreateAuctionInvoiceDocument, CreatePaymentDocument, CreatePaymentMethodDocument, DeletePaymentMethodDocument, ExtensionType, GetInvoiceDetailsDocument, GetPaymentMethodListDocument, GetPaymentNotificationDocument, GetTaxQuoteDocument, InvoiceStatus, KycStatus, MarketCollectionStatus, MarketplaceCollectionItemStatus, MarketplaceSaleType, MeDocument, PaymentKeyDocument, PaymentStatus, PaymentType, PreparePaymentMethodDocument, ReleaseReservationBuyNowLotDocument, ReserveBuyNowLotDocument, Role, TransactionStatus, TransactionType, WalletParentType, WalletTxType, useCreateAuctionInvoiceMutation, useCreatePaymentMethodMutation, useCreatePaymentMutation, useDeletePaymentMethodMutation, useGetInvoiceDetailsQuery, useGetPaymentMethodListQuery, useGetPaymentNotificationQuery, useGetTaxQuoteLazyQuery, useMeQuery, usePaymentKeyLazyQuery, usePreparePaymentMethodQuery, useReleaseReservationBuyNowLotMutation, useReserveBuyNowLotMutation };
+export { AuctionBidOrder, AuctionLotStatus, CollectionType, ContractType, CreateAuctionInvoiceDocument, CreatePaymentDocument, CreatePaymentMethodDocument, DeletePaymentMethodDocument, ExtensionType, GetInvoiceDetailsDocument, GetPaymentMethodListDocument, GetPaymentMethodStatusDocument, GetPaymentNotificationDocument, GetTaxQuoteDocument, InvoiceStatus, KycStatus, MarketCollectionStatus, MarketplaceCollectionItemStatus, MarketplaceSaleType, MeDocument, PaymentKeyDocument, PaymentStatus, PaymentType, PreparePaymentMethodDocument, ReleaseReservationBuyNowLotDocument, ReserveBuyNowLotDocument, Role, TransactionStatus, TransactionType, WalletParentType, WalletTxType, useCreateAuctionInvoiceMutation, useCreatePaymentMethodMutation, useCreatePaymentMutation, useDeletePaymentMethodMutation, useGetInvoiceDetailsQuery, useGetPaymentMethodListQuery, useGetPaymentMethodStatusLazyQuery, useGetPaymentNotificationQuery, useGetTaxQuoteLazyQuery, useMeQuery, usePaymentKeyLazyQuery, usePreparePaymentMethodQuery, useReleaseReservationBuyNowLotMutation, useReserveBuyNowLotMutation };
 //# sourceMappingURL=graphqlGenerated.js.map
