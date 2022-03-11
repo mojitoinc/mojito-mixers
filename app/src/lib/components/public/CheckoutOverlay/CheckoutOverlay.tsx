@@ -28,7 +28,7 @@ import { useCheckoutItemsCostTotal } from "../../../hooks/useCheckoutItemCostTot
 import { PUIDictionary } from "../../../domain/dictionary/dictionary.interfaces";
 import { DEFAULT_DICTIONARY } from "../../../domain/dictionary/dictionary.constants";
 import { ApolloError } from "@apollo/client";
-import { Wallet } from "../../payments/DeliveryWallet/DeliveryWalletDetails";
+import { Wallet } from "../../payments/DeliveryWallet/DeliveryWalletDetails/DeliveryWalletDetails";
 import { THREEDS_REDIRECT_DELAY_MS } from "../../../config/config";
 
 export interface PUICheckoutOverlayProps {

@@ -1,8 +1,8 @@
 import { Box, Chip, Tooltip, Typography } from "@mui/material";
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import { CopyButton } from "../../shared/CopyButton/CopyButton";
-import { ReadOnlyWalletAddress } from "../../shared/ReadOnlyField/ReadOnlyField";
-import { PUIDictionary } from "../../../domain/dictionary/dictionary.interfaces";
+import { CopyButton } from "../../../shared/CopyButton/CopyButton";
+import { ReadOnlyWalletAddress } from "../../../shared/ReadOnlyField/ReadOnlyField";
+import { PUIDictionary } from "../../../../domain/dictionary/dictionary.interfaces";
 import React, { useMemo } from "react";
 
 export interface Wallet {
@@ -16,7 +16,7 @@ export interface DeliveryWalletDetailsProps {
   wallets?: Wallet[];
   dictionary: PUIDictionary;
 }
-const DeliveryWalletDetails: React.FC<DeliveryWalletDetailsProps> = ({
+export const DeliveryWalletDetails: React.FC<DeliveryWalletDetailsProps> = ({
   walletAddress,
   wallets,
   dictionary,
@@ -62,4 +62,3 @@ const DeliveryWalletDetails: React.FC<DeliveryWalletDetailsProps> = ({
   );
 }
 
-export default DeliveryWalletDetails;

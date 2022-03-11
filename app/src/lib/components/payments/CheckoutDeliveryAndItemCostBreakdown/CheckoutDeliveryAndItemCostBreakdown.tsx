@@ -1,7 +1,7 @@
 import React from "react";
 import { Divider, Stack } from "@mui/material";
 
-import { DeliveryWalletSelector } from "../DeliveryWallet/DeliveryWalletSelector";
+import { DeliveryWalletSelector } from "../DeliveryWallet/DeliveryWalletSelector/DeliveryWalletSelector";
 import { CheckoutItemCostBreakdown } from "../CheckoutItemCost/Breakdown/CheckoutItemCostBreakdown";
 import { CheckoutItem } from "../../../domain/product/product.interfaces";
 import { TaxesState } from "../../../views/Billing/BillingView";

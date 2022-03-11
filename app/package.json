@@ -8,6 +8,8 @@
     "build": "NODE_ENV=production next build",
     "export": "yarn lint && next build && next export",
     "start": "next start",
+    "test": "jest --watch",
+    "test:ci": "jest --ci",
     "clean": "rm -rf build",
     "uninstall": "rm -rf node_modules",
     "deprecated:prettier": "prettier --write --list-different './**/*.{ts,tsx,json,md,graphql}'",
@@ -76,6 +78,9 @@
     "fork-ts-checker-webpack-plugin": "^7.2.1",
     "graphql": "^16.3.0",
     "jest": "^27.5.1",
+    "jest-chain": "^1.1.5",
+    "jest-extended": "^2.0.0",
+    "jest-fetch-mock": "^3.0.3",
     "prettier": "^2.3.2",
     "ts-jest": "^27.0.4",
     "typescript": "^4.6.2"
