@@ -10,7 +10,7 @@ import { XS_MOBILE_MAX_WIDTH } from "../../config/theme/theme";
 import { StatusIcon } from "../../components/shared/StatusIcon/StatusIcon";
 import { useGetPaymentNotificationQuery } from "../../queries/graphqlGenerated";
 import { persistCheckoutModalInfo } from "../../components/public/CheckoutOverlay/CheckoutOverlay.utils";
-import { PAYMENT_NOTIFICATION_INTERVAL_MS, PURCHASING_MESSAGES_DEFAULT, PURCHASING_MIN_WAIT_MS, PURCHASING_MESSAGES_INTERVAL_MS } from "../../config/config";
+import { PAYMENT_NOTIFICATION_INTERVAL_MS, PURCHASING_MESSAGES_DEFAULT, PURCHASING_MIN_WAIT_MS, PURCHASING_MESSAGES_INTERVAL_MS, PAYMENT_CREATION_TIMEOUT_MS } from "../../config/config";
 import { isLocalhost } from "../../domain/url/url.utils";
 
 export interface PurchasingViewProps {
@@ -94,7 +94,7 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
     purchaseSuccessHandledRef.current = true;
 
     onPurchaseError(ERROR_PURCHASE_TIMEOUT());
-  }, redirectURL === null ? null : 5000, [onPurchaseError]);
+  }, redirectURL === null ? null : PAYMENT_CREATION_TIMEOUT_MS, [onPurchaseError]);
 
   useEffect(() => {
     if (fullPaymentCalledRef.current) return;
