@@ -56,7 +56,7 @@ const PurchasingView = ({ purchasingImageSrc, purchasingMessages: customPurchasi
             return;
         purchaseSuccessHandledRef.current = true;
         onPurchaseError(errors_constants.ERROR_PURCHASE_TIMEOUT());
-    }, redirectURL === null ? null : 5000, [onPurchaseError]);
+    }, redirectURL === null ? null : config.PAYMENT_CREATION_TIMEOUT_MS, [onPurchaseError]);
     React.useEffect(() => {
         if (fullPaymentCalledRef.current)
             return;

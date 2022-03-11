@@ -21,6 +21,7 @@ const PURCHASING_MESSAGES_DEFAULT = [
 const PAYMENT_CREATION_INTERVAL_MS = 5000; // (5 sec) Polling interval for GetPaymentMethodStatus.
 const PAYMENT_CREATION_MAX_WAIT_MS = 120000; // (2 min) Max. wait time for GetPaymentMethodStatus (to get status === "complete").
 const PAYMENT_CREATION_MIN_WAIT_MS = 5000; // (5 sec) Min. time a user would be stuck in the PurchasingView.
+const PAYMENT_CREATION_TIMEOUT_MS = PAYMENT_CREATION_MAX_WAIT_MS * 2; // (4 min) Max. time a user would be stuck in the PurchasingView before throwing an error.
 const PAYMENT_NOTIFICATION_INTERVAL_MS = 2500; // (2.5 sec) Polling interval for GetPaymentNotificationQuery in PurchasingView.
 // Plaid:
 const PLAID_STORAGE_EXPIRATION_MS = 1000 * 60 * 15; // 15 minutes (Plaid requires filling in some data).
@@ -42,6 +43,7 @@ exports.COUNTER_EXPIRATION_MS = COUNTER_EXPIRATION_MS;
 exports.PAYMENT_CREATION_INTERVAL_MS = PAYMENT_CREATION_INTERVAL_MS;
 exports.PAYMENT_CREATION_MAX_WAIT_MS = PAYMENT_CREATION_MAX_WAIT_MS;
 exports.PAYMENT_CREATION_MIN_WAIT_MS = PAYMENT_CREATION_MIN_WAIT_MS;
+exports.PAYMENT_CREATION_TIMEOUT_MS = PAYMENT_CREATION_TIMEOUT_MS;
 exports.PAYMENT_NOTIFICATION_INTERVAL_MS = PAYMENT_NOTIFICATION_INTERVAL_MS;
 exports.PLAID_OAUTH_FLOW_INFO_KEY = PLAID_OAUTH_FLOW_INFO_KEY;
 exports.PLAID_OAUTH_FLOW_RECEIVED_REDIRECT_URI_KEY = PLAID_OAUTH_FLOW_RECEIVED_REDIRECT_URI_KEY;
