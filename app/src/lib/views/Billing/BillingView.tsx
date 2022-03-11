@@ -15,6 +15,7 @@ import { TaxQuoteOutput, useGetTaxQuoteLazyQuery } from "../../queries/graphqlGe
 import { useCheckoutItemsCostTotal } from "../../hooks/useCheckoutItemCostTotal";
 import { useThrottledCallback } from "@swyg/corre";
 import { PUIDictionary } from "../../domain/dictionary/dictionary.interfaces";
+import { Wallet } from "../../domain/wallet/wallet.interfaces";
 
 export type TaxStatus = "incomplete" | "loading" | "complete" | "error";
 
@@ -35,6 +36,7 @@ export interface BillingViewProps {
   savedPaymentMethods: SavedPaymentMethod[];
   selectedBillingInfo: string | BillingInfo;
   walletAddress: string | null;
+  wallets?: Wallet[];
   checkoutError?: CheckoutModalError;
   onBillingInfoSelected: (data: string | BillingInfo) => void;
   onTaxesChange: (taxes: TaxesState) => void;
@@ -51,6 +53,7 @@ export const BillingView: React.FC<BillingViewProps> = ({
   savedPaymentMethods: rawSavedPaymentMethods,
   selectedBillingInfo,
   walletAddress,
+  wallets,
   checkoutError,
   onBillingInfoSelected,
   onTaxesChange,
@@ -256,6 +259,7 @@ export const BillingView: React.FC<BillingViewProps> = ({
         taxes={ taxes }
         validatePersonalDeliveryAddress={ formSubmitAttempted }
         walletAddress={ walletAddress }
+        wallets={ wallets }
         onWalletAddressChange={ onWalletAddressChange }
         dictionary={ dictionary } />
     </Stack>

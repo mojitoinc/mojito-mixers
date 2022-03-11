@@ -17,6 +17,7 @@ import { ConsentType } from "../../components/shared/ConsentText/ConsentText";
 import { checkNeedsGenericErrorMessage } from "../../hooks/useFormCheckoutError";
 import { TaxesState } from "../Billing/BillingView";
 import { PUIDictionary } from "../../domain/dictionary/dictionary.interfaces";
+import { Wallet } from "../../domain/wallet/wallet.interfaces";
 
 const billingInfoItemBoxProps: BoxProps = { sx: { mt: 2.5 } };
 
@@ -31,6 +32,7 @@ export interface PaymentViewProps {
   savedPaymentMethods: SavedPaymentMethod[];
   selectedPaymentMethod: SelectedPaymentMethod;
   walletAddress: string | null;
+  wallets?: Wallet[];
   checkoutError?: CheckoutModalError;
   onPaymentInfoSelected: (data: string | PaymentMethod) => void;
   onCvvSelected: (cvv: string) => void;
@@ -53,6 +55,7 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
   savedPaymentMethods: rawSavedPaymentMethods,
   selectedPaymentMethod,
   walletAddress,
+  wallets,
   checkoutError,
   onPaymentInfoSelected,
   onCvvSelected,
@@ -194,6 +197,7 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
         taxes={taxes}
         validatePersonalDeliveryAddress={formSubmitAttempted}
         walletAddress={walletAddress}
+        wallets={ wallets }
         onWalletAddressChange={onWalletAddressChange}
         dictionary={dictionary} />
     </Stack>

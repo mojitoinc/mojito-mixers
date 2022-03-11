@@ -28,7 +28,7 @@ import { useCheckoutItemsCostTotal } from "../../../hooks/useCheckoutItemCostTot
 import { PUIDictionary } from "../../../domain/dictionary/dictionary.interfaces";
 import { DEFAULT_DICTIONARY } from "../../../domain/dictionary/dictionary.constants";
 import { ApolloError } from "@apollo/client";
-import { Wallet } from "../../payments/DeliveryWallet/DeliveryWalletDetails/DeliveryWalletDetails";
+import { Wallet } from "../../../domain/wallet/wallet.interfaces";
 import { THREEDS_REDIRECT_DELAY_MS } from "../../../config/config";
 
 export interface PUICheckoutOverlayProps {
@@ -136,6 +136,8 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     error: meError,
     refetch: meRefetch,
   } = useMeQuery({ skip: !isAuthenticated });
+
+  const wallets = meData?.me?.wallets as Wallet[] || undefined;
 
   const {
     data: paymentMethodsData,
@@ -637,6 +639,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
         savedPaymentMethods={ savedPaymentMethods }
         selectedBillingInfo={ selectedPaymentMethod.billingInfo }
         walletAddress={ walletAddress }
+        wallets={ wallets }
         checkoutError={ checkoutError }
         onBillingInfoSelected={ handleBillingInfoSelected }
         onTaxesChange={ setTaxes }
@@ -655,6 +658,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
         savedPaymentMethods={ savedPaymentMethods }
         selectedPaymentMethod={ selectedPaymentMethod }
         walletAddress={ walletAddress }
+        wallets={ wallets }
         checkoutError={ checkoutError }
         onPaymentInfoSelected={ handlePaymentInfoSelected }
         onCvvSelected={ handleCvvSelected }
@@ -697,7 +701,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
         selectedPaymentMethod={ selectedPaymentMethod }
         circlePaymentID={ circlePaymentID }
         walletAddress={ walletAddress || "" }
-        wallets={ meData?.me?.wallets as Wallet[] || undefined }
+        wallets={ wallets }
         onGoToCollection={ onGoToCollection }
         onNext={ handleClose }
         dictionary={ dictionary } />

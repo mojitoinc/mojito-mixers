@@ -9,7 +9,7 @@ import { billingInfoToSavedPaymentMethodBillingInfo } from "../../domain/circle/
 import { CheckoutItem } from "../../domain/product/product.interfaces";
 import { SelectedPaymentMethod } from "../../components/public/CheckoutOverlay/CheckoutOverlay.hooks";
 import { PUIDictionary } from "../../domain/dictionary/dictionary.interfaces";
-import { Wallet } from "../../components/payments/DeliveryWallet/DeliveryWalletDetails/DeliveryWalletDetails";
+import { Wallet } from "../../domain/wallet/wallet.interfaces";
 
 export interface ConfirmationViewProps {
   checkoutItems: CheckoutItem[];

@@ -4,12 +4,7 @@ import { CopyButton } from "../../../shared/CopyButton/CopyButton";
 import { ReadOnlyWalletAddress } from "../../../shared/ReadOnlyField/ReadOnlyField";
 import { PUIDictionary } from "../../../../domain/dictionary/dictionary.interfaces";
 import React, { useMemo } from "react";
-
-export interface Wallet {
-  id: string;
-  name: string;
-  address: string;
-}
+import { Wallet } from "../../../../domain/wallet/wallet.interfaces";
 
 export interface DeliveryWalletDetailsProps {
   walletAddress: string;

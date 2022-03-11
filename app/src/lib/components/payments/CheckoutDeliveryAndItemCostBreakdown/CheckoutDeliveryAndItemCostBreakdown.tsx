@@ -6,12 +6,14 @@ import { CheckoutItemCostBreakdown } from "../CheckoutItemCost/Breakdown/Checkou
 import { CheckoutItem } from "../../../domain/product/product.interfaces";
 import { TaxesState } from "../../../views/Billing/BillingView";
 import { PUIDictionary } from "../../../domain/dictionary/dictionary.interfaces";
+import { Wallet } from "../../../domain/wallet/wallet.interfaces";
 
 interface CheckoutDeliveryAndItemCostBreakdownProps {
   checkoutItems: CheckoutItem[];
   taxes: TaxesState;
   validatePersonalDeliveryAddress: boolean;
   walletAddress: string | null;
+  wallets?: Wallet[];
   onWalletAddressChange: (walletAddress: string | null) => void;
   dictionary: PUIDictionary;
 }
@@ -21,6 +23,7 @@ export const CheckoutDeliveryAndItemCostBreakdown: React.FC<CheckoutDeliveryAndI
   taxes,
   validatePersonalDeliveryAddress,
   walletAddress,
+  wallets,
   onWalletAddressChange,
   dictionary,
 }) => (
@@ -28,6 +31,7 @@ export const CheckoutDeliveryAndItemCostBreakdown: React.FC<CheckoutDeliveryAndI
       <DeliveryWalletSelector
         validatePersonalAddress={ validatePersonalDeliveryAddress }
         walletAddress={ walletAddress }
+        wallets={ wallets }
         onWalletAddressChange={ onWalletAddressChange }
         dictionary={ dictionary } />
 
