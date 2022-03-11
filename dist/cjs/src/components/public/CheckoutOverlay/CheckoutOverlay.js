@@ -23,6 +23,7 @@ var product_utils = require('../../../domain/product/product.utils.js');
 var useCreateInvoiceAndReservation = require('../../../hooks/useCreateInvoiceAndReservation.js');
 var useCheckoutItemCostTotal = require('../../../hooks/useCheckoutItemCostTotal.js');
 var dictionary_constants = require('../../../domain/dictionary/dictionary.constants.js');
+var config = require('../../../config/config.js');
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
@@ -245,13 +246,21 @@ debug: initialDebug, onEvent, onError, onMarketingOptInChange, // Not implemente
         yield refetchPaymentMethods({ orgID });
     }), [checkoutStep, deletePaymentMethod, orgID, refetchPaymentMethods, savedPaymentMethods, setSelectedPaymentMethod]);
     // Purchase:
-    const handlePurchaseSuccess = React.useCallback((nextCirclePaymentID, nextPaymentID) => tslib_es6.__awaiter(void 0, void 0, void 0, function* () {
+    const handlePurchaseSuccess = React.useCallback((nextCirclePaymentID, nextPaymentID, redirectURL) => tslib_es6.__awaiter(void 0, void 0, void 0, function* () {
         setPayments(nextCirclePaymentID, nextPaymentID);
         setTimeout(() => triggerAnalyticsEventRef.current("event:paymentSuccess"));
+        if (redirectURL) {
+            setTimeout(() => {
+                if (debug)
+                    console.log(`Redirecting to 3DS = ${redirectURL}`);
+                location.href = redirectURL;
+            }, config.THREEDS_REDIRECT_DELAY_MS);
+            return;
+        }
         // After a successful purchase, a new payment method might have been created, so we reload them:
         yield refetchPaymentMethods();
         goNext();
-    }), [setPayments, refetchPaymentMethods, goNext]);
+    }), [setPayments, debug, refetchPaymentMethods, goNext]);
     const handlePurchaseError = React.useCallback((error) => tslib_es6.__awaiter(void 0, void 0, void 0, function* () {
         setTimeout(() => triggerAnalyticsEventRef.current("event:paymentError"));
         // After a failed purchase, a new payment method might have been created anyway, so we reload them (createPaymentMethod

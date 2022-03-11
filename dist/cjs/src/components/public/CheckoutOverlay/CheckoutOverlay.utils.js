@@ -64,7 +64,7 @@ function getCheckoutModalState() {
     const receivedRedirectUri = savedReceivedRedirectUri || (window.location.search.startsWith(config.THREEDS_FLOW_URL_SEARCH) ? window.location.href : undefined);
     // const receivedRedirectUri = savedReceivedRedirectUri || window.location.href || "";
     // In dev, this works fine even if there's nothing in localStorage, which helps with testing across some other domain and localhost:
-    const hasLocalhostOrigin = process.env.NODE_ENV === "development" && window.location.hostname !== "localhost";
+    const hasLocalhostOrigin = process.env.NODE_ENV === "development" && !url_utils.isLocalhost();
     const continue3DSFlow = hasLocalhostOrigin || !!(url && invoiceID && circlePaymentID && paymentID && billingInfo && paymentInfo && receivedRedirectUri);
     if ((continue3DSFlow && savedStateUsed) || (!continue3DSFlow && localStorage.getItem(config.THREEDS_FLOW_INFO_KEY)) || isExpired(timestamp)) {
         return clearPersistedInfo();
