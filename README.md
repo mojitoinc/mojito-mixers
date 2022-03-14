@@ -16,7 +16,7 @@
 
 <p align="center">
   <a href="https://payments-staging.mojito.xyz/" target="_blank">
-    <img src="./app/public/img/og-images/mojito-payment-ui-payment.png" width="1280" />
+    <img src="./app/public/img/og-images/mojito-payment-ui.png" width="1280" />
   </a>
 </p>
 
