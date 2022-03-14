@@ -114,15 +114,15 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
       return;
     }
 
-    if (!hasWaited || redirectURL === "" || purchaseSuccessHandledRef.current) return;
-
-    purchaseSuccessHandledRef.current = true;
-
     if (paymentStatus === "error" || paymentError) {
       onPurchaseError(paymentError || ERROR_PURCHASE());
 
       return;
     }
+
+    if (!hasWaited || redirectURL === "" || purchaseSuccessHandledRef.current) return;
+
+    purchaseSuccessHandledRef.current = true;
 
     if (redirectURL && !isLocalhost()) {
       persistCheckoutModalInfo({

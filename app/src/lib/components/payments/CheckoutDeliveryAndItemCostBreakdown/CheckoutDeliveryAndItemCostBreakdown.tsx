@@ -27,16 +27,16 @@ export const CheckoutDeliveryAndItemCostBreakdown: React.FC<CheckoutDeliveryAndI
   onWalletChange,
   dictionary,
 }) => (
-    <Stack sx={{ display: "flex", width: { xs: "100%", md: "calc(50% - 35px)" } }}>
-      <DeliveryWalletSelector
-        validatePersonalAddress={ validatePersonalDeliveryAddress }
-        wallets={ wallets }
-        wallet={ wallet }
-        onWalletChange={ onWalletChange }
-        dictionary={ dictionary } />
+  <Stack sx={{ display: "flex", width: { xs: "100%", md: "calc(50% - 35px)" } }}>
+    <DeliveryWalletSelector
+      validatePersonalAddress={ validatePersonalDeliveryAddress }
+      wallets={ wallets }
+      wallet={ wallet }
+      onWalletChange={ onWalletChange }
+      dictionary={ dictionary } />
 
-      <Divider sx={{ my: 3.75 }} />
+    <Divider sx={{ my: 3.75 }} />
 
-      <CheckoutItemCostBreakdown checkoutItems={ checkoutItems } taxes={ taxes } />
-    </Stack>
-  );
+    <CheckoutItemCostBreakdown checkoutItems={ checkoutItems } taxes={ taxes } />
+  </Stack>
+);
