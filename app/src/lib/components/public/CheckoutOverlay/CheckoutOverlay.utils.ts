@@ -1,7 +1,7 @@
 import { THREEDS_FLOW_INFO_KEY, THREEDS_FLOW_RECEIVED_REDIRECT_URI_KEY, THREEDS_FLOW_STATE_USED_KEY, THREEDS_STORAGE_EXPIRATION_MS, THREEDS_FLOW_URL_SEARCH } from "../../../config/config";
 import { ERROR_PURCHASE_3DS } from "../../../domain/errors/errors.constants";
 import { PaymentMethod } from "../../../domain/payment/payment.interfaces";
-import { getUrlWithoutParams, urlToPathnameWhenPossible } from "../../../domain/url/url.utils";
+import { getUrlWithoutParams, isLocalhost, urlToPathnameWhenPossible } from "../../../domain/url/url.utils";
 import { BillingInfo } from "../../../forms/BillingInfoForm";
 import { continuePlaidOAuthFlow, INITIAL_PLAID_OAUTH_FLOW_STATE } from "../../../hooks/usePlaid";
 import { CheckoutModalError, CheckoutModalStep } from "./CheckoutOverlay.hooks";
@@ -112,7 +112,7 @@ export function getCheckoutModalState(): CheckoutModalState3DS {
   // const receivedRedirectUri = savedReceivedRedirectUri || window.location.href || "";
 
   // In dev, this works fine even if there's nothing in localStorage, which helps with testing across some other domain and localhost:
-  const hasLocalhostOrigin = process.env.NODE_ENV === "development" && window.location.hostname !== "localhost";
+  const hasLocalhostOrigin = process.env.NODE_ENV === "development" && !isLocalhost();
   const continue3DSFlow = hasLocalhostOrigin || !!(url && invoiceID && circlePaymentID && paymentID && billingInfo && paymentInfo && receivedRedirectUri);
 
   if ((continue3DSFlow && savedStateUsed) || (!continue3DSFlow && localStorage.getItem(THREEDS_FLOW_INFO_KEY)) || isExpired(timestamp)) {

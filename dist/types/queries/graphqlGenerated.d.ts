@@ -138,9 +138,7 @@ export declare enum CollectionType {
 }
 export declare enum ContractType {
     Erc721Creator = "ERC721Creator",
-    Erc1155Creator = "ERC1155Creator",
-    GenerativeContract = "GenerativeContract",
-    ZoraContract = "ZoraContract"
+    Erc1155Creator = "ERC1155Creator"
 }
 export declare type CreateMarketplaceBuyNowLotInput = {
     collectionId: Scalars['UUID1'];
@@ -158,6 +156,7 @@ export declare type CreatePaymentCreditCardMetadataInput = {
 };
 export declare type CreatePaymentMetadataInput = {
     creditCardData: CreatePaymentCreditCardMetadataInput;
+    destinationAddress?: InputMaybe<Scalars['EthAddress']>;
 };
 export declare type CreditCardBillingDetails = {
     address1: Scalars['String'];
@@ -245,20 +244,23 @@ export declare type Erc721Metadata = {
     timestamp?: Maybe<Scalars['Int']>;
 };
 export declare enum ExtensionType {
-    GenartExtension = "GenartExtension",
     ProvenanceExtension = "ProvenanceExtension"
 }
 export declare type InvoiceDetails = {
     __typename?: 'InvoiceDetails';
+    externalPaymentID: Scalars['String'];
     externalUserID: Scalars['String'];
     internalUserID: Scalars['String'];
     invoiceCreatedAt: Scalars['Time'];
     invoiceID: Scalars['UUID1'];
+    invoiceNumber: Scalars['Int'];
     items: Array<Maybe<ItemInvoiceDetail>>;
+    paymentID: Scalars['UUID1'];
     status: InvoiceStatus;
 };
 export declare enum InvoiceStatus {
     Canceled = "Canceled",
+    Delivered = "Delivered",
     Draft = "Draft",
     Paid = "Paid",
     Pending = "Pending"
@@ -269,6 +271,7 @@ export declare type ItemInvoiceDetail = {
     collectionItemID: Scalars['UUID1'];
     collectionItemTitle: Scalars['String'];
     collectionTitle: Scalars['String'];
+    destinationAddress: Scalars['String'];
     overheadPremium: Scalars['Float'];
     saleDate: Scalars['Time'];
     salesTaxRate: Scalars['Float'];
@@ -519,23 +522,22 @@ export declare type Mutation = {
     deleteToken: Scalars['String'];
     /** Delete an existing API key. */
     deleteUserAPIKey: Scalars['Boolean'];
-    finishDeployment: Scalars['Boolean'];
     importExternalTokenToCollection: Scalars['String'];
     loginWithSignature: Organization;
     marketplaceUpdateTheme: Marketplace;
-    mintGenerativeToken: Scalars['String'];
     mintTokens: Scalars['String'];
     nftContractAddAdmin: Scalars['String'];
+    nftContractExtensionPause: Scalars['String'];
+    nftContractExtensionUnpause: Scalars['String'];
+    nftContractRegisterExtensionProvenance: NftContract;
     nftDeployContract: NftContract;
     orgCreateMarketplace: Marketplace;
     ping: Scalars['String'];
     /** Release reservations held by invoice ID */
     releaseReservation: Scalars['Boolean'];
     reserveMarketplaceBuyNowLot: MarketplaceBuyNowOutput;
-    revealGenerativeToken: Scalars['String'];
     setJwtIssuerDomain: Organization;
     transferToken: Scalars['String'];
-    updateContractGeneBaseURI: Scalars['String'];
     updateMarketplaceAuctionLot: MarketplaceAuctionLot;
     updateMarketplaceCollection: MarketplaceCollection;
     /** Update name of multisig wallet */
@@ -608,7 +610,7 @@ export declare type MutationCreatePaymentMethodArgs = {
     orgID: Scalars['UUID1'];
 };
 export declare type MutationCreateTokenDraftArgs = {
-    contractId: Scalars['UUID'];
+    contractId: Scalars['UUID1'];
     tokens: Array<TokenDraft>;
 };
 export declare type MutationCreateUserApiKeyArgs = {
@@ -634,9 +636,6 @@ export declare type MutationDeleteTokenArgs = {
 export declare type MutationDeleteUserApiKeyArgs = {
     keyId: Scalars['UUID1'];
 };
-export declare type MutationFinishDeploymentArgs = {
-    transactionInput: TransactionInput;
-};
 export declare type MutationImportExternalTokenToCollectionArgs = {
     contractAddress: Scalars['String'];
     marketplaceId: Scalars['UUID1'];
@@ -649,16 +648,24 @@ export declare type MutationMarketplaceUpdateThemeArgs = {
     id: Scalars['String'];
     theme: Scalars['String'];
 };
-export declare type MutationMintGenerativeTokenArgs = {
-    contractId: Scalars['UUID'];
-    orgId: Scalars['UUID'];
-};
 export declare type MutationMintTokensArgs = {
     tokenIds: Array<Scalars['UUID1']>;
 };
 export declare type MutationNftContractAddAdminArgs = {
     address: Scalars['String'];
     nftContractId: Scalars['UUID1'];
+};
+export declare type MutationNftContractExtensionPauseArgs = {
+    extensionAddress: Scalars['String'];
+    nftContractId: Scalars['UUID1'];
+};
+export declare type MutationNftContractExtensionUnpauseArgs = {
+    extensionAddress: Scalars['String'];
+    nftContractId: Scalars['UUID1'];
+};
+export declare type MutationNftContractRegisterExtensionProvenanceArgs = {
+    contractId: Scalars['UUID1'];
+    maxTokenSupply: Scalars['Int'];
 };
 export declare type MutationNftDeployContractArgs = {
     input: DeployContractInput;
@@ -674,10 +681,6 @@ export declare type MutationReleaseReservationArgs = {
 export declare type MutationReserveMarketplaceBuyNowLotArgs = {
     input: ReserveMarketplaceBuyNowLotInput;
 };
-export declare type MutationRevealGenerativeTokenArgs = {
-    contractId: Scalars['UUID'];
-    orgId: Scalars['UUID'];
-};
 export declare type MutationSetJwtIssuerDomainArgs = {
     domain: Scalars['String'];
     orgId: Scalars['UUID'];
@@ -687,10 +690,6 @@ export declare type MutationTransferTokenArgs = {
     tokenOnChainId: Scalars['Int'];
     transferTo: Scalars['String'];
     walletId: Scalars['UUID1'];
-};
-export declare type MutationUpdateContractGeneBaseUriArgs = {
-    contractId: Scalars['UUID'];
-    orgId: Scalars['UUID'];
 };
 export declare type MutationUpdateMarketplaceAuctionLotArgs = {
     data: MarketplaceAuctionLotUpdateInput;
@@ -796,13 +795,22 @@ export declare type Organization = {
     id: Scalars['UUID1'];
     jwtIssuerDomain?: Maybe<Scalars['String']>;
     marketplaces: Array<Marketplace>;
-    members: Array<User>;
+    members: Array<OrganizationMember>;
     name: Scalars['String'];
     nftContracts?: Maybe<Array<NftContract>>;
     wallets?: Maybe<Array<Wallet>>;
 };
 export declare type OrganizationAssetsArgs = {
     filter?: InputMaybe<AssetFilter>;
+};
+export declare type OrganizationMember = {
+    __typename?: 'OrganizationMember';
+    email?: Maybe<Scalars['String']>;
+    externalId: Scalars['String'];
+    id: Scalars['UUID'];
+    name?: Maybe<Scalars['String']>;
+    role?: Maybe<Scalars['String']>;
+    username: Scalars['String'];
 };
 export declare type Payment = {
     __typename?: 'Payment';
@@ -961,7 +969,6 @@ export declare type QueryValidateIpArgs = {
 export declare type QueryValidatePaymentLimitArgs = {
     collectionID: Scalars['UUID1'];
     itemsCount: Scalars['Int'];
-    paymentType: PaymentType;
 };
 export declare type QueryWalletArgs = {
     id: Scalars['UUID1'];
@@ -1047,16 +1054,6 @@ export declare type TokenDraft = {
     royaltyBasisPoints?: InputMaybe<Scalars['Int']>;
     tokenId?: InputMaybe<Scalars['UUID1']>;
 };
-export declare type TransactionInput = {
-    blockHash: Scalars['String'];
-    cumulativeGasUsed: Scalars['Int'];
-    gasUsed: Scalars['Int'];
-    id: Scalars['UUID1'];
-    invoiceItemId: Scalars['UUID1'];
-    transactionType: TransactionType;
-    txIndex: Scalars['Int'];
-    txStatus: TransactionStatus;
-};
 export declare enum TransactionStatus {
     Completed = "Completed",
     Failed = "Failed",
@@ -1103,14 +1100,17 @@ export declare type ValidateIpResponse = {
     Success: Scalars['Boolean'];
     ipScreeningId: Scalars['UUID1'];
 };
-export declare type ValidatePaymentLimitOutput = {
-    __typename?: 'ValidatePaymentLimitOutput';
-    creditCardData: ValidatePaymentLimitOutputCreditCardData;
-};
-export declare type ValidatePaymentLimitOutputCreditCardData = {
-    __typename?: 'ValidatePaymentLimitOutputCreditCardData';
+export declare type ValidatePaymentLimitData = {
+    __typename?: 'ValidatePaymentLimitData';
+    isLimitExceeded: Scalars['Boolean'];
     remainingTotal: Scalars['Int'];
     remainingTransaction: Scalars['Int'];
+};
+export declare type ValidatePaymentLimitOutput = {
+    __typename?: 'ValidatePaymentLimitOutput';
+    ach: ValidatePaymentLimitData;
+    creditCard: ValidatePaymentLimitData;
+    wire: ValidatePaymentLimitData;
 };
 export declare type Wallet = {
     __typename?: 'Wallet';
@@ -1303,8 +1303,7 @@ export declare type GetInvoiceDetailsQuery = {
         __typename?: 'InvoiceDetails';
         items: Array<{
             __typename?: 'ItemInvoiceDetail';
-            collectionItemID: any;
-            collectionItemTitle: string;
+            destinationAddress: string;
             units: number;
             unitPrice: number;
             taxes: number;
@@ -1335,6 +1334,12 @@ export declare type MeQuery = {
                 name: string;
             };
         }>;
+        wallets?: Array<{
+            __typename?: 'Wallet';
+            id: any;
+            name: string;
+            address?: any | null;
+        }> | null;
     } | null;
 };
 export declare type PaymentKeyQueryVariables = Exact<{
@@ -1413,12 +1418,15 @@ export declare type CreatePaymentMethodMutation = {
     createPaymentMethod: {
         __typename?: 'ACHPaymentMethodOutput';
         id: any;
+        status: string;
     } | {
         __typename?: 'CreditCardPaymentMethodOutput';
         id: any;
+        status: string;
     } | {
         __typename?: 'WirePaymentMethodOutput';
         id: any;
+        status: string;
     };
 };
 export declare type DeletePaymentMethodMutationVariables = Exact<{
@@ -1438,6 +1446,25 @@ export declare type PreparePaymentMethodQuery = {
         __typename?: 'ACHPaymentMethodPrepareStatementOutput';
         linkToken: string;
     } | null;
+};
+export declare type GetPaymentMethodStatusQueryVariables = Exact<{
+    paymentMethodID: Scalars['UUID1'];
+}>;
+export declare type GetPaymentMethodStatusQuery = {
+    __typename?: 'Query';
+    getPaymentMethod: {
+        __typename?: 'ACHPaymentMethodOutput';
+        id: any;
+        status: string;
+    } | {
+        __typename?: 'CreditCardPaymentMethodOutput';
+        id: any;
+        status: string;
+    } | {
+        __typename?: 'WirePaymentMethodOutput';
+        id: any;
+        status: string;
+    };
 };
 export declare type GetTaxQuoteQueryVariables = Exact<{
     input: TaxQuoteInput;
@@ -1771,6 +1798,32 @@ export declare function usePreparePaymentMethodLazyQuery(baseOptions?: Apollo.La
 export declare type PreparePaymentMethodQueryHookResult = ReturnType<typeof usePreparePaymentMethodQuery>;
 export declare type PreparePaymentMethodLazyQueryHookResult = ReturnType<typeof usePreparePaymentMethodLazyQuery>;
 export declare type PreparePaymentMethodQueryResult = Apollo.QueryResult<PreparePaymentMethodQuery, PreparePaymentMethodQueryVariables>;
+export declare const GetPaymentMethodStatusDocument: Apollo.DocumentNode;
+/**
+ * __useGetPaymentMethodStatusQuery__
+ *
+ * To run a query within a React component, call `useGetPaymentMethodStatusQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetPaymentMethodStatusQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetPaymentMethodStatusQuery({
+ *   variables: {
+ *      paymentMethodID: // value for 'paymentMethodID'
+ *   },
+ * });
+ */
+export declare function useGetPaymentMethodStatusQuery(baseOptions: Apollo.QueryHookOptions<GetPaymentMethodStatusQuery, GetPaymentMethodStatusQueryVariables>): Apollo.QueryResult<GetPaymentMethodStatusQuery, Exact<{
+    paymentMethodID: any;
+}>>;
+export declare function useGetPaymentMethodStatusLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetPaymentMethodStatusQuery, GetPaymentMethodStatusQueryVariables>): Apollo.QueryTuple<GetPaymentMethodStatusQuery, Exact<{
+    paymentMethodID: any;
+}>>;
+export declare type GetPaymentMethodStatusQueryHookResult = ReturnType<typeof useGetPaymentMethodStatusQuery>;
+export declare type GetPaymentMethodStatusLazyQueryHookResult = ReturnType<typeof useGetPaymentMethodStatusLazyQuery>;
+export declare type GetPaymentMethodStatusQueryResult = Apollo.QueryResult<GetPaymentMethodStatusQuery, GetPaymentMethodStatusQueryVariables>;
 export declare const GetTaxQuoteDocument: Apollo.DocumentNode;
 /**
  * __useGetTaxQuoteQuery__

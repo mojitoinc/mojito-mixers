@@ -1,6 +1,7 @@
 import { SavedPaymentMethod } from "../../domain/circle/circle.interfaces";
 import React from "react";
 import { CheckoutModalError, SelectedPaymentMethod } from "../../components/public/CheckoutOverlay/CheckoutOverlay.hooks";
+import { Wallet } from "../../domain/wallet/wallet.interfaces";
 export interface PurchasingViewProps {
     purchasingImageSrc?: string;
     purchasingMessages?: false | string[];
@@ -8,7 +9,8 @@ export interface PurchasingViewProps {
     invoiceID: string;
     savedPaymentMethods: SavedPaymentMethod[];
     selectedPaymentMethod: SelectedPaymentMethod;
-    onPurchaseSuccess: (paymentReferenceNumber: string) => void;
+    wallet: null | string | Wallet;
+    onPurchaseSuccess: (circlePaymentID: string, paymentID: string, redirectURL: string) => void;
     onPurchaseError: (error: string | CheckoutModalError) => void;
     onDialogBlocked: (blocked: boolean) => void;
     debug?: boolean;

@@ -9,13 +9,15 @@ import { CheckoutItemCostPurchase } from "../CheckoutItemCost/Purchase/CheckoutI
 import { PAYMENT_TYPE_LABEL } from "./PurchaseConfirmationBillingDetails.constants";
 import { getFormattedPaymentMethod } from "./PurchaseConfirmationBillingDetails.utils";
 import CheckIcon from "@mui/icons-material/Check";
-import DeliveryWalletDetails from "../DeliveryWallet/DeliveryWalletDetails";
+import { DeliveryWalletDetails } from "../DeliveryWallet/DeliveryWalletDetails/DeliveryWalletDetails";
 import { CopyButton } from "../../shared/CopyButton/CopyButton";
 import { PUIDictionary } from "../../../domain/dictionary/dictionary.interfaces";
+import { Wallet } from "../../../domain/wallet/wallet.interfaces";
 
 export interface PurchaseConfirmationBillingDetailsProps {
   checkoutItems: CheckoutItem[];
   circlePaymentID: string;
+  wallet: null | string | Wallet;
   selectedPaymentMethodBillingInfo: SavedPaymentMethodBillingInfo;
   selectedPaymentMethodPaymentInfo: PaymentMethod | SavedPaymentMethod;
   dictionary: PUIDictionary;
@@ -24,6 +26,7 @@ export interface PurchaseConfirmationBillingDetailsProps {
 export const PurchaseConfirmationBillingDetails: React.FC<PurchaseConfirmationBillingDetailsProps> = ({
   checkoutItems,
   circlePaymentID,
+  wallet,
   selectedPaymentMethodBillingInfo,
   selectedPaymentMethodPaymentInfo,
   dictionary
@@ -106,7 +109,7 @@ export const PurchaseConfirmationBillingDetails: React.FC<PurchaseConfirmationBi
         selectedPaymentMethodBillingInfo={ selectedPaymentMethodBillingInfo } />
 
       <DeliveryWalletDetails
-        walletAddress="0xC000A000bC00D3E4c792d2aFDE0000000d000001"
+        wallet={ wallet }
         dictionary={ dictionary } />
     </Box>
   );

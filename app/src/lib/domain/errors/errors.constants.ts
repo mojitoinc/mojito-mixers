@@ -3,7 +3,7 @@ import { CheckoutModalError, CheckoutModalErrorAt } from "../../components/publi
 
 export const BUILT_IN_ERRORS = ["EvalError", "RangeError", "ReferenceError", "SyntaxError", "TypeError", "URIError", "AggregateError", "InternalError"];
 
-export const DEFAULT_ERROR_AT = "purchasing";
+export const DEFAULT_ERROR_AT = "payment";
 
 function createError(errorMessage: string, at: CheckoutModalErrorAt = DEFAULT_ERROR_AT): (error?: ApolloError | Error) => CheckoutModalError {
   return (error?: ApolloError | Error) => ({
@@ -26,6 +26,8 @@ export const ERROR_LOADING_INVOICE = createError("Invoice could not be loaded.",
 // PurchasingView:
 
 export const ERROR_PURCHASE = createError("The purchase could not be completed.");
+
+export const ERROR_PURCHASE_TIMEOUT = createError("The purchase could not be completed in time.");
 
 
 // useFullPayment:

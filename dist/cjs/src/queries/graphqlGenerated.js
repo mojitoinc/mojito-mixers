@@ -46,17 +46,15 @@ exports.ContractType = void 0;
 (function (ContractType) {
     ContractType["Erc721Creator"] = "ERC721Creator";
     ContractType["Erc1155Creator"] = "ERC1155Creator";
-    ContractType["GenerativeContract"] = "GenerativeContract";
-    ContractType["ZoraContract"] = "ZoraContract";
 })(exports.ContractType || (exports.ContractType = {}));
 exports.ExtensionType = void 0;
 (function (ExtensionType) {
-    ExtensionType["GenartExtension"] = "GenartExtension";
     ExtensionType["ProvenanceExtension"] = "ProvenanceExtension";
 })(exports.ExtensionType || (exports.ExtensionType = {}));
 exports.InvoiceStatus = void 0;
 (function (InvoiceStatus) {
     InvoiceStatus["Canceled"] = "Canceled";
+    InvoiceStatus["Delivered"] = "Delivered";
     InvoiceStatus["Draft"] = "Draft";
     InvoiceStatus["Paid"] = "Paid";
     InvoiceStatus["Pending"] = "Pending";
@@ -293,8 +291,7 @@ const GetInvoiceDetailsDocument = Apollo.gql `
     query GetInvoiceDetails($invoiceID: UUID1!, $orgID: UUID1!) {
   getInvoiceDetails(invoiceID: $invoiceID, orgID: $orgID) {
     items {
-      collectionItemID
-      collectionItemTitle
+      destinationAddress
       units
       unitPrice
       taxes
@@ -339,6 +336,11 @@ const MeDocument = Apollo.gql `
         id
         name
       }
+    }
+    wallets {
+      id
+      name
+      address
     }
   }
 }
@@ -447,12 +449,15 @@ const CreatePaymentMethodDocument = Apollo.gql `
   createPaymentMethod(orgID: $orgID, input: $input) {
     ... on ACHPaymentMethodOutput {
       id
+      status
     }
     ... on CreditCardPaymentMethodOutput {
       id
+      status
     }
     ... on WirePaymentMethodOutput {
       id
+      status
     }
   }
 }
@@ -534,6 +539,28 @@ function usePreparePaymentMethodQuery(baseOptions) {
     const options = Object.assign(Object.assign({}, defaultOptions), baseOptions);
     return Apollo__namespace.useQuery(PreparePaymentMethodDocument, options);
 }
+const GetPaymentMethodStatusDocument = Apollo.gql `
+    query GetPaymentMethodStatus($paymentMethodID: UUID1!) {
+  getPaymentMethod(paymentMethodID: $paymentMethodID) {
+    ... on ACHPaymentMethodOutput {
+      id
+      status
+    }
+    ... on CreditCardPaymentMethodOutput {
+      id
+      status
+    }
+    ... on WirePaymentMethodOutput {
+      id
+      status
+    }
+  }
+}
+    `;
+function useGetPaymentMethodStatusLazyQuery(baseOptions) {
+    const options = Object.assign(Object.assign({}, defaultOptions), baseOptions);
+    return Apollo__namespace.useLazyQuery(GetPaymentMethodStatusDocument, options);
+}
 const GetTaxQuoteDocument = Apollo.gql `
     query GetTaxQuote($input: TaxQuoteInput!) {
   getTaxQuote(input: $input) {
@@ -561,6 +588,7 @@ exports.CreatePaymentMethodDocument = CreatePaymentMethodDocument;
 exports.DeletePaymentMethodDocument = DeletePaymentMethodDocument;
 exports.GetInvoiceDetailsDocument = GetInvoiceDetailsDocument;
 exports.GetPaymentMethodListDocument = GetPaymentMethodListDocument;
+exports.GetPaymentMethodStatusDocument = GetPaymentMethodStatusDocument;
 exports.GetPaymentNotificationDocument = GetPaymentNotificationDocument;
 exports.GetTaxQuoteDocument = GetTaxQuoteDocument;
 exports.MeDocument = MeDocument;
@@ -574,6 +602,7 @@ exports.useCreatePaymentMutation = useCreatePaymentMutation;
 exports.useDeletePaymentMethodMutation = useDeletePaymentMethodMutation;
 exports.useGetInvoiceDetailsQuery = useGetInvoiceDetailsQuery;
 exports.useGetPaymentMethodListQuery = useGetPaymentMethodListQuery;
+exports.useGetPaymentMethodStatusLazyQuery = useGetPaymentMethodStatusLazyQuery;
 exports.useGetPaymentNotificationQuery = useGetPaymentNotificationQuery;
 exports.useGetTaxQuoteLazyQuery = useGetTaxQuoteLazyQuery;
 exports.useMeQuery = useMeQuery;

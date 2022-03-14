@@ -21,7 +21,10 @@ var FullScreenOverlay = require('../../shared/FullScreenOverlay/FullScreenOverla
 var ProvidersInjector = require('../../shared/ProvidersInjector/ProvidersInjector.js');
 var product_utils = require('../../../domain/product/product.utils.js');
 var useCreateInvoiceAndReservation = require('../../../hooks/useCreateInvoiceAndReservation.js');
+var useCheckoutItemCostTotal = require('../../../hooks/useCheckoutItemCostTotal.js');
 var dictionary_constants = require('../../../domain/dictionary/dictionary.constants.js');
+var config = require('../../../config/config.js');
+var WalletAddressSelector = require('../../shared/Select/WalletAddressSelector/WalletAddressSelector.js');
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
@@ -34,7 +37,7 @@ open, onClose, onGoToCollection,
 guestCheckoutEnabled, productConfirmationEnabled, 
 // Personalization:
 logoSrc, logoSx, loaderImageSrc, purchasingImageSrc, purchasingMessages, errorImageSrc, userFormat, acceptedPaymentTypes, paymentLimits, // Not implemented yet. Used to show payment limits for some payment types.
-dictionary: parentDictionary, 
+dictionary: parentDictionary, network, 
 // Legal:
 consentType, privacyHref, termsOfUseHref, 
 // Data:
@@ -42,13 +45,23 @@ orgID, invoiceID: initialInvoiceID, checkoutItems: parentCheckoutItems,
 // Authentication:
 onLogin, isAuthenticated, isAuthenticatedLoading, 
 // Other Events:
-debug, onError, onMarketingOptInChange, // Not implemented yet. Used to let user subscribe / unsubscribe to marketing updates.
+debug: initialDebug, onEvent, onError, onMarketingOptInChange, // Not implemented yet. Used to let user subscribe / unsubscribe to marketing updates.
  }) => {
-    var _a;
+    var _a, _b, _c;
+    const [debug, setDebug] = React.useState(!!initialDebug);
     // TODO: This should end up being in a context + hook to avoid prop drilling and it should be memoized:
     const dictionary = Object.assign(Object.assign({}, dictionary_constants.DEFAULT_DICTIONARY), parentDictionary);
     // First, get user data and saved payment methods:
     const { data: meData, loading: meLoading, error: meError, refetch: meRefetch, } = graphqlGenerated.useMeQuery({ skip: !isAuthenticated });
+    const wallets = React.useMemo(() => {
+        var _a;
+        if (meLoading || !meData)
+            return undefined;
+        const userWallets = ((_a = meData.me) === null || _a === void 0 ? void 0 : _a.wallets) || [];
+        return network
+            ? userWallets.filter(wallet => { var _a; return ((_a = wallet === null || wallet === void 0 ? void 0 : wallet.network) === null || _a === void 0 ? void 0 : _a.id) === network.id; })
+            : userWallets;
+    }, [meLoading, meData, network]);
     const { data: paymentMethodsData, loading: paymentMethodsLoading, error: paymentMethodsError, refetch: refetchPaymentMethods, } = graphqlGenerated.useGetPaymentMethodListQuery({
         skip: !isAuthenticated,
         variables: { orgID },
@@ -60,7 +73,7 @@ debug, onError, onMarketingOptInChange, // Not implemented yet. Used to let user
     // SelectedPaymentMethod:
     selectedPaymentMethod, setSelectedPaymentMethod, 
     // PurchaseState:
-    invoiceID, setInvoiceID, taxes, setTaxes, walletAddress, setWalletAddress, paymentReferenceNumber, setPaymentReferenceNumber, } = CheckoutOverlay_hooks.useCheckoutModalState({
+    invoiceID, setInvoiceID, taxes, setTaxes, wallet, setWalletAddress, paymentID, circlePaymentID, setPayments, } = CheckoutOverlay_hooks.useCheckoutModalState({
         invoiceID: initialInvoiceID,
         productConfirmationEnabled,
         isAuthenticated,
@@ -77,12 +90,21 @@ debug, onError, onMarketingOptInChange, // Not implemented yet. Used to let user
     const isPlaidFlowLoading = usePlaid.continuePlaidOAuthFlow();
     // Payment methods and checkout items / invoice items transforms:
     const rawSavedPaymentMethods = paymentMethodsData === null || paymentMethodsData === void 0 ? void 0 : paymentMethodsData.getPaymentMethodList;
+    const savedPaymentMethods = React.useMemo(() => circle_utils.transformRawSavedPaymentMethods(rawSavedPaymentMethods), [rawSavedPaymentMethods]);
+    // TODO: These should probably be combined.
     const invoiceItems = invoiceDetailsData === null || invoiceDetailsData === void 0 ? void 0 : invoiceDetailsData.getInvoiceDetails.items;
     const checkoutItems = React.useMemo(() => product_utils.transformCheckoutItemsFromInvoice(parentCheckoutItems, invoiceItems), [parentCheckoutItems, invoiceItems]);
-    const savedPaymentMethods = React.useMemo(() => circle_utils.transformRawSavedPaymentMethods(rawSavedPaymentMethods), [rawSavedPaymentMethods]);
+    const { total: subtotal, fees, taxAmount } = useCheckoutItemCostTotal.useCheckoutItemsCostTotal(checkoutItems);
+    const destinationAddress = ((_b = (_a = (invoiceItems || [])) === null || _a === void 0 ? void 0 : _a[0]) === null || _b === void 0 ? void 0 : _b.destinationAddress) || WalletAddressSelector.NEW_WALLET_OPTION.value;
+    React.useEffect(() => {
+        if (!destinationAddress)
+            return;
+        const wallet = (wallets || []).find(({ address }) => address === destinationAddress);
+        setWalletAddress(wallet || destinationAddress);
+    }, [wallets, destinationAddress, setWalletAddress]);
     // Invoice creation & buy now lot reservation:
     const createInvoiceAndReservationCalledRef = React.useRef(false);
-    const { invoiceAndReservationState, createInvoiceAndReservation, countdownElementRef, } = useCreateInvoiceAndReservation.useCreateInvoiceAndReservation({ orgID, checkoutItems, debug });
+    const { invoiceAndReservationState, createInvoiceAndReservation, countdownElementRef, } = useCreateInvoiceAndReservation.useCreateInvoiceAndReservation({ orgID, checkoutItems, stop: checkoutStep === "confirmation", debug });
     React.useEffect(() => {
         if (isDialogLoading || invoiceID === null || invoiceID || createInvoiceAndReservationCalledRef.current)
             return;
@@ -91,11 +113,14 @@ debug, onError, onMarketingOptInChange, // Not implemented yet. Used to let user
     }, [isDialogLoading, invoiceID, createInvoiceAndReservation]);
     React.useEffect(() => {
         if (invoiceAndReservationState.error) {
+            // TODO: It would be great if we can keep track of the reservation expiration without changing the displayed error
+            // if there's already once, so when clicking the action button for that one, on top of calling its respective error
+            // handling code, we re-create the reservation:
             setError(invoiceAndReservationState.error);
+            return;
         }
-        else if (invoiceAndReservationState.invoiceID) {
+        if (invoiceAndReservationState.invoiceID)
             setInvoiceID(invoiceAndReservationState.invoiceID);
-        }
     }, [invoiceAndReservationState, setError, setInvoiceID]);
     // Init modal state once everything has been loaded:
     React.useEffect(() => {
@@ -111,6 +136,43 @@ debug, onError, onMarketingOptInChange, // Not implemented yet. Used to let user
         if (invoiceDetailsError)
             setError(errors_constants.ERROR_LOADING_INVOICE(invoiceDetailsError));
     }, [meError, paymentMethodsError, invoiceDetailsError, setError]);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const triggerAnalyticsEventRef = React.useRef((eventType) => { });
+    triggerAnalyticsEventRef.current = (eventType) => {
+        if (!onEvent || !open)
+            return;
+        const paymentInfo = selectedPaymentMethod.paymentInfo;
+        let paymentType = undefined;
+        if (typeof paymentInfo === "string") {
+            const payment = savedPaymentMethods.find(({ id }) => id === paymentInfo);
+            paymentType = payment === null || payment === void 0 ? void 0 : payment.type;
+        }
+        else {
+            paymentType = paymentInfo.type;
+        }
+        onEvent(eventType, {
+            // Location:
+            step: CheckoutOverlay_hooks.CheckoutModalStepIndex[checkoutStep],
+            stepName: checkoutStep,
+            // Purchase:
+            departmentCategory: "NFT",
+            paymentType,
+            shippingMethod: typeof wallet === "object" ? "multisig wallet" : "custom wallet",
+            checkoutItems,
+            // Payment:
+            currency: "USD",
+            revenue: subtotal + fees,
+            fees,
+            tax: taxAmount,
+            total: subtotal + fees + taxAmount,
+            // Order:
+            circlePaymentID,
+            paymentID,
+        });
+    };
+    React.useEffect(() => {
+        setTimeout(() => triggerAnalyticsEventRef.current(`navigate:${checkoutStep}`));
+    }, [checkoutStep]);
     // Saved payment method creation-reload-sync:
     React.useEffect(() => {
         if (savedPaymentMethods.length === 0)
@@ -196,29 +258,46 @@ debug, onError, onMarketingOptInChange, // Not implemented yet. Used to let user
         yield refetchPaymentMethods({ orgID });
     }), [checkoutStep, deletePaymentMethod, orgID, refetchPaymentMethods, savedPaymentMethods, setSelectedPaymentMethod]);
     // Purchase:
-    const handlePurchaseSuccess = React.useCallback((nextPaymentReferenceNumber) => tslib_es6.__awaiter(void 0, void 0, void 0, function* () {
-        setPaymentReferenceNumber(nextPaymentReferenceNumber);
+    const handlePurchaseSuccess = React.useCallback((nextCirclePaymentID, nextPaymentID, redirectURL) => tslib_es6.__awaiter(void 0, void 0, void 0, function* () {
+        setPayments(nextCirclePaymentID, nextPaymentID);
+        setTimeout(() => triggerAnalyticsEventRef.current("event:paymentSuccess"));
+        if (redirectURL) {
+            setTimeout(() => {
+                if (debug)
+                    console.log(`Redirecting to 3DS = ${redirectURL}`);
+                location.href = redirectURL;
+            }, config.THREEDS_REDIRECT_DELAY_MS);
+            return;
+        }
         // After a successful purchase, a new payment method might have been created, so we reload them:
         yield refetchPaymentMethods();
         goNext();
-    }), [refetchPaymentMethods, setPaymentReferenceNumber, goNext]);
+    }), [setPayments, debug, refetchPaymentMethods, goNext]);
     const handlePurchaseError = React.useCallback((error) => tslib_es6.__awaiter(void 0, void 0, void 0, function* () {
+        setTimeout(() => triggerAnalyticsEventRef.current("event:paymentError"));
         // After a failed purchase, a new payment method might have been created anyway, so we reload them (createPaymentMethod
         // works but createPayment fails):
         yield refetchPaymentMethods();
         setError(error);
     }), [refetchPaymentMethods, setError]);
+    // Release reservation:
+    const lastReleasedReservationID = React.useRef("");
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const handleBeforeUnloadRef = React.useRef((e) => { });
     const [releaseReservationBuyNowLot] = graphqlGenerated.useReleaseReservationBuyNowLotMutation({
         variables: {
             orgID,
             invoiceID,
         },
     });
-    const handleBeforeUnload = React.useCallback((e) => {
-        if (orgID && invoiceID) {
+    const handleBeforeUnload = handleBeforeUnloadRef.current = React.useCallback((e) => {
+        if (paymentID || circlePaymentID)
+            return;
+        if (orgID && invoiceID && invoiceID !== lastReleasedReservationID.current) {
             if (debug)
                 console.log(`\n♻️ Releasing reservation invoice ${invoiceID} (orgID = ${orgID})...\n`);
             releaseReservationBuyNowLot().then((result) => {
+                lastReleasedReservationID.current = invoiceID;
                 if (debug)
                     console.log("  🟢 releaseReservationBuyNowLot result", result);
             }).catch((error) => {
@@ -235,7 +314,11 @@ debug, onError, onMarketingOptInChange, // Not implemented yet. Used to let user
             // The absence of a returnValue property on the event will guarantee the browser unload happens:
             delete e['returnValue'];
         }
-    }, [orgID, invoiceID, debug, releaseReservationBuyNowLot]);
+    }, [paymentID, circlePaymentID, orgID, invoiceID, debug, releaseReservationBuyNowLot]);
+    React.useEffect(() => {
+        if ((checkoutError === null || checkoutError === void 0 ? void 0 : checkoutError.at) === "reset")
+            handleBeforeUnloadRef.current();
+    }, [checkoutError]);
     React.useEffect(() => {
         window.addEventListener('beforeunload', handleBeforeUnload);
         return () => {
@@ -249,29 +332,31 @@ debug, onError, onMarketingOptInChange, // Not implemented yet. Used to let user
         setInvoiceID(null);
         onClose();
     }, [handleBeforeUnload, setInvoiceID, onClose]);
+    // Error handling:
     const handleFixError = React.useCallback(() => tslib_es6.__awaiter(void 0, void 0, void 0, function* () {
         const at = checkoutError === null || checkoutError === void 0 ? void 0 : checkoutError.at;
         if (at === "reset") {
-            goTo();
             yield Promise.allSettled([
                 meRefetch(),
                 refetchPaymentMethods(),
                 createInvoiceAndReservation(),
             ]);
-            return false;
+            goTo();
         }
-        // After an error, all data is reloaded in case the issue was caused by stale/cached data or in case a new payment
-        // method has been created despite the error:
-        yield Promise.allSettled([
-            meRefetch(),
-            refetchPaymentMethods(),
-            refetchInvoiceDetails(),
-        ]);
-        if (at !== "purchasing") {
-            // If we are redirecting users to the PurchasingView again, we keep the CVV to be able to re-try the purchase:
-            setSelectedPaymentMethod((prevSelectedPaymentMethod) => (Object.assign(Object.assign({}, prevSelectedPaymentMethod), { cvv: "" })));
+        else {
+            // After an error, all data is reloaded in case the issue was caused by stale/cached data or in case a new payment
+            // method has been created despite the error:
+            yield Promise.allSettled([
+                meRefetch(),
+                refetchPaymentMethods(),
+                refetchInvoiceDetails(),
+            ]);
+            if (at !== "purchasing") {
+                // If we are redirecting users to the PurchasingView again, we keep the CVV to be able to re-try the purchase:
+                setSelectedPaymentMethod((prevSelectedPaymentMethod) => (Object.assign(Object.assign({}, prevSelectedPaymentMethod), { cvv: "" })));
+            }
+            goTo(at || errors_constants.DEFAULT_ERROR_AT, checkoutError);
         }
-        goTo(at || errors_constants.DEFAULT_ERROR_AT, checkoutError);
         // This function is used as a CheckoutModalFooter's onSubmitClicked, so we want that to show a loader on the submit
         // button when clicked but do not remove it once the Promise is resolved, as we are moving to another view and
         // CheckoutModalFooter will unmount (so doing this prevents a memory leak issue):
@@ -310,18 +395,18 @@ debug, onError, onMarketingOptInChange, // Not implemented yet. Used to let user
         checkoutStepElement = (React__default["default"].createElement(AuthenticationView.AuthenticationView, { checkoutItems: checkoutItems, taxes: taxes, isAuthenticated: isAuthenticated, guestCheckoutEnabled: guestCheckoutEnabled, onGuestClicked: goNext, onCloseClicked: handleClose }));
     }
     else if (checkoutStep === "billing") {
-        checkoutStepElement = (React__default["default"].createElement(BillingView.BillingView, { checkoutItems: checkoutItems, savedPaymentMethods: savedPaymentMethods, selectedBillingInfo: selectedPaymentMethod.billingInfo, walletAddress: walletAddress, checkoutError: checkoutError, onBillingInfoSelected: handleBillingInfoSelected, onTaxesChange: setTaxes, onSavedPaymentMethodDeleted: handleSavedPaymentMethodDeleted, onWalletAddressChange: setWalletAddress, onNext: goNext, onClose: handleClose, dictionary: dictionary, debug: debug }));
+        checkoutStepElement = (React__default["default"].createElement(BillingView.BillingView, { checkoutItems: checkoutItems, savedPaymentMethods: savedPaymentMethods, selectedBillingInfo: selectedPaymentMethod.billingInfo, wallet: wallet, wallets: wallets, checkoutError: checkoutError, onBillingInfoSelected: handleBillingInfoSelected, onTaxesChange: setTaxes, onSavedPaymentMethodDeleted: handleSavedPaymentMethodDeleted, onWalletChange: setWalletAddress, onNext: goNext, onClose: handleClose, dictionary: dictionary, debug: debug }));
     }
     else if (checkoutStep === "payment") {
-        checkoutStepElement = (React__default["default"].createElement(PaymentView.PaymentView, { checkoutItems: checkoutItems, taxes: taxes, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethod: selectedPaymentMethod, walletAddress: walletAddress, checkoutError: checkoutError, onPaymentInfoSelected: handlePaymentInfoSelected, onCvvSelected: handleCvvSelected, onSavedPaymentMethodDeleted: handleSavedPaymentMethodDeleted, onWalletAddressChange: setWalletAddress, onNext: goNext, onPrev: goBack, onClose: handleClose, acceptedPaymentTypes: acceptedPaymentTypes, consentType: consentType, privacyHref: privacyHref, termsOfUseHref: termsOfUseHref, dictionary: dictionary, debug: debug }));
+        checkoutStepElement = (React__default["default"].createElement(PaymentView.PaymentView, { checkoutItems: checkoutItems, taxes: taxes, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethod: selectedPaymentMethod, wallet: wallet, wallets: wallets, checkoutError: checkoutError, onPaymentInfoSelected: handlePaymentInfoSelected, onCvvSelected: handleCvvSelected, onSavedPaymentMethodDeleted: handleSavedPaymentMethodDeleted, onWalletChange: setWalletAddress, onNext: goNext, onPrev: goBack, onClose: handleClose, acceptedPaymentTypes: acceptedPaymentTypes, consentType: consentType, privacyHref: privacyHref, termsOfUseHref: termsOfUseHref, dictionary: dictionary, debug: debug }));
     }
     else if (checkoutStep === "purchasing" && invoiceID) {
         headerVariant = "purchasing";
-        checkoutStepElement = (React__default["default"].createElement(PurchasingView.PurchasingView, { purchasingImageSrc: purchasingImageSrc, purchasingMessages: purchasingMessages, orgID: orgID, invoiceID: invoiceID, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethod: selectedPaymentMethod, onPurchaseSuccess: handlePurchaseSuccess, onPurchaseError: handlePurchaseError, onDialogBlocked: setIsDialogBlocked, debug: debug }));
+        checkoutStepElement = (React__default["default"].createElement(PurchasingView.PurchasingView, { purchasingImageSrc: purchasingImageSrc, purchasingMessages: purchasingMessages, orgID: orgID, invoiceID: invoiceID, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethod: selectedPaymentMethod, wallet: wallet, onPurchaseSuccess: handlePurchaseSuccess, onPurchaseError: handlePurchaseError, onDialogBlocked: setIsDialogBlocked, debug: debug }));
     }
     else if (checkoutStep === "confirmation") {
         headerVariant = "logoOnly";
-        checkoutStepElement = (React__default["default"].createElement(ConfirmationView.ConfirmationView, { checkoutItems: checkoutItems, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethod: selectedPaymentMethod, paymentReferenceNumber: paymentReferenceNumber, onGoToCollection: onGoToCollection, onNext: handleClose, dictionary: dictionary }));
+        checkoutStepElement = (React__default["default"].createElement(ConfirmationView.ConfirmationView, { checkoutItems: checkoutItems, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethod: selectedPaymentMethod, circlePaymentID: circlePaymentID, wallet: wallet, onGoToCollection: onGoToCollection, onNext: handleClose, dictionary: dictionary }));
     }
     else {
         // !checkoutStep or
@@ -330,7 +415,7 @@ debug, onError, onMarketingOptInChange, // Not implemented yet. Used to let user
         // some other kind of indeterminate / incorrect state:
         return null;
     }
-    const headerElement = (React__default["default"].createElement(CheckoutModalHeader.CheckoutModalHeader, { variant: headerVariant, countdownElementRef: countdownElementRef, logoSrc: logoSrc, logoSx: logoSx, user: (_a = meData === null || meData === void 0 ? void 0 : meData.me) === null || _a === void 0 ? void 0 : _a.user, userFormat: userFormat, onLoginClicked: onLogin, onPrevClicked: checkoutStep === "authentication" ? handleClose : goBack }));
+    const headerElement = (React__default["default"].createElement(CheckoutModalHeader.CheckoutModalHeader, { variant: headerVariant, countdownElementRef: countdownElementRef, logoSrc: logoSrc, logoSx: logoSx, user: (_c = meData === null || meData === void 0 ? void 0 : meData.me) === null || _c === void 0 ? void 0 : _c.user, userFormat: userFormat, onLoginClicked: onLogin, onPrevClicked: checkoutStep === "authentication" ? handleClose : goBack, setDebug: setDebug }));
     return (React__default["default"].createElement(FullScreenOverlay.FullScreenOverlay, { centered: checkoutStep === "purchasing" || checkoutStep === "error", open: open, onClose: handleClose, isDialogBlocked: isDialogBlocked, contentKey: checkoutStep, header: headerElement, children: checkoutStepElement }));
 };
 const PUICheckout = ProvidersInjector.withProviders(PUICheckoutOverlay);

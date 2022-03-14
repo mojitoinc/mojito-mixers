@@ -1,12 +1,14 @@
-import React, { ErrorInfo } from "react";
+import React from "react";
 import { UserFormat } from "../../../domain/auth/authentication.interfaces";
 import { PaymentType } from "../../../domain/payment/payment.interfaces";
+import { CheckoutEventData, CheckoutEventType } from "../../../domain/events/events.interfaces";
 import { CheckoutItemInfo } from "../../../domain/product/product.interfaces";
 import { Theme, SxProps } from "@mui/material/styles";
 import { ConsentType } from "../../shared/ConsentText/ConsentText";
 import { CheckoutModalError } from "./CheckoutOverlay.hooks";
 import { ProvidersInjectorProps } from "../../shared/ProvidersInjector/ProvidersInjector";
 import { PUIDictionary } from "../../../domain/dictionary/dictionary.interfaces";
+import { Network } from "../../../domain/network/network.interfaces";
 export interface PUICheckoutOverlayProps {
     open: boolean;
     onClose: () => void;
@@ -23,6 +25,7 @@ export interface PUICheckoutOverlayProps {
     acceptedPaymentTypes: PaymentType[];
     paymentLimits?: Partial<Record<PaymentType, number>>;
     dictionary?: Partial<PUIDictionary>;
+    network?: Network;
     consentType?: ConsentType;
     privacyHref?: string;
     termsOfUseHref?: string;
@@ -33,8 +36,8 @@ export interface PUICheckoutOverlayProps {
     isAuthenticated?: boolean;
     isAuthenticatedLoading?: boolean;
     debug?: boolean;
+    onEvent?: (eventType: CheckoutEventType, eventData: CheckoutEventData) => void;
     onError?: (error: CheckoutModalError) => void;
-    onCatch?: (error: Error, errorInfo?: ErrorInfo) => void | true;
     onMarketingOptInChange?: (marketingOptIn: boolean) => void;
 }
 export declare type PUICheckoutProps = PUICheckoutOverlayProps & ProvidersInjectorProps;

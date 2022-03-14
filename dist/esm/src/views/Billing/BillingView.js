@@ -1,5 +1,5 @@
 import { __awaiter } from '../../../node_modules/tslib/tslib.es6.js';
-import React__default, { useRef, useMemo, useState, useCallback, useEffect } from 'react';
+import React__default, { useRef, useMemo, useState, useEffect, useCallback } from 'react';
 import { Stack } from '@mui/material';
 import { CheckoutDeliveryAndItemCostBreakdown } from '../../components/payments/CheckoutDeliveryAndItemCostBreakdown/CheckoutDeliveryAndItemCostBreakdown.js';
 import { CheckoutStepper } from '../../components/payments/CheckoutStepper/CheckoutStepper.js';
@@ -12,7 +12,7 @@ import { useGetTaxQuoteLazyQuery } from '../../queries/graphqlGenerated.js';
 import { useCheckoutItemsCostTotal } from '../../hooks/useCheckoutItemCostTotal.js';
 import { useThrottledCallback } from '@swyg/corre';
 
-const BillingView = ({ checkoutItems, savedPaymentMethods: rawSavedPaymentMethods, selectedBillingInfo, walletAddress, checkoutError, onBillingInfoSelected, onTaxesChange, onSavedPaymentMethodDeleted, onWalletAddressChange, onNext, onClose, dictionary, debug, }) => {
+const BillingView = ({ checkoutItems, savedPaymentMethods: rawSavedPaymentMethods, selectedBillingInfo, wallets, wallet, checkoutError, onBillingInfoSelected, onTaxesChange, onSavedPaymentMethodDeleted, onWalletChange, onNext, onClose, dictionary, debug, }) => {
     const savedPaymentMethodAddressIdRef = useRef("");
     const savedPaymentMethods = useMemo(() => distinctBy(rawSavedPaymentMethods, "addressId"), [rawSavedPaymentMethods]);
     const { total: subtotal, fees } = useCheckoutItemsCostTotal(checkoutItems);
@@ -24,7 +24,13 @@ const BillingView = ({ checkoutItems, savedPaymentMethods: rawSavedPaymentMethod
     });
     const [formSubmitAttempted, setFormSubmitAttempted] = useState(false);
     const [getTaxQuote] = useGetTaxQuoteLazyQuery();
-    const getTaxQuoteTimestampRef = useRef();
+    const getTaxQuoteTimestampRef = useRef(0);
+    useEffect(() => {
+        return () => {
+            // To discard the result below that might come after the component has been unmounted:
+            getTaxQuoteTimestampRef.current = 0;
+        };
+    }, []);
     const calculateTaxes = useCallback((taxInfo) => __awaiter(void 0, void 0, void 0, function* () {
         var _a;
         const calledAt = getTaxQuoteTimestampRef.current;
@@ -130,14 +136,14 @@ const BillingView = ({ checkoutItems, savedPaymentMethods: rawSavedPaymentMethod
             sm: "column",
             md: "row",
         }, spacing: 8.75 },
-        React__default.createElement(Stack, { sx: { display: 'flex', flex: 1, overflow: "hidden" } },
+        React__default.createElement(Stack, { sx: { display: "flex", overflow: "hidden", width: { xs: "100%", md: "calc(50% - 35px)" } } },
             React__default.createElement(CheckoutStepper, { progress: 50 }),
             showSaved ? (React__default.createElement(SavedBillingDetailsSelector, { showLoader: isDeleting, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethodAddressId: typeof selectedBillingInfo === "string" ? selectedBillingInfo : undefined, taxes: taxes, onNew: handleShowForm, onEdit: handleShowForm, onDelete: handleSavedPaymentMethodDeleted, onPick: onBillingInfoSelected, onNext: onNext, onClose: onClose, onAttemptSubmit: handleFormAttemptSubmit })) : (React__default.createElement(BillingInfoForm
             // variant="loggedIn"
             , { 
                 // variant="loggedIn"
                 defaultValues: typeof selectedBillingInfo === "string" ? undefined : selectedBillingInfo, checkoutError: checkoutError, taxes: taxes, onTaxInfoChange: handleTaxInfoChange, onSaved: savedPaymentMethods.length > 0 ? handleShowSaved : undefined, onClose: onClose, onSubmit: handleSubmit, onAttemptSubmit: handleFormAttemptSubmit, debug: debug }))),
-        React__default.createElement(CheckoutDeliveryAndItemCostBreakdown, { checkoutItems: checkoutItems, taxes: taxes, validatePersonalDeliveryAddress: formSubmitAttempted, walletAddress: walletAddress, onWalletAddressChange: onWalletAddressChange, dictionary: dictionary })));
+        React__default.createElement(CheckoutDeliveryAndItemCostBreakdown, { checkoutItems: checkoutItems, taxes: taxes, validatePersonalDeliveryAddress: formSubmitAttempted, wallets: wallets, wallet: wallet, onWalletChange: onWalletChange, dictionary: dictionary })));
 };
 
 export { BillingView };

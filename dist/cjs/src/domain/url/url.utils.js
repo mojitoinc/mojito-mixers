@@ -22,9 +22,15 @@ function getUrlWithSearchParams(url) {
         return url;
     return `${url}${window.location.search}`;
 }
+function isLocalhost() {
+    if (!process.browser)
+        return false;
+    return window.location.hostname === "localhost";
+}
 
 exports.getUrlWithSearchParams = getUrlWithSearchParams;
 exports.getUrlWithoutParams = getUrlWithoutParams;
+exports.isLocalhost = isLocalhost;
 exports.isUrlPathname = isUrlPathname;
 exports.urlToPathnameWhenPossible = urlToPathnameWhenPossible;
 //# sourceMappingURL=url.utils.js.map

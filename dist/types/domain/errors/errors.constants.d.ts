@@ -1,11 +1,12 @@
 import { ApolloError } from "@apollo/client";
 import { CheckoutModalError } from "../../components/public/CheckoutOverlay/CheckoutOverlay.hooks";
 export declare const BUILT_IN_ERRORS: string[];
-export declare const DEFAULT_ERROR_AT = "purchasing";
+export declare const DEFAULT_ERROR_AT = "payment";
 export declare const ERROR_LOADING_USER: (error?: ApolloError | Error | undefined) => CheckoutModalError;
 export declare const ERROR_LOADING_PAYMENT_METHODS: (error?: ApolloError | Error | undefined) => CheckoutModalError;
 export declare const ERROR_LOADING_INVOICE: (error?: ApolloError | Error | undefined) => CheckoutModalError;
 export declare const ERROR_PURCHASE: (error?: ApolloError | Error | undefined) => CheckoutModalError;
+export declare const ERROR_PURCHASE_TIMEOUT: (error?: ApolloError | Error | undefined) => CheckoutModalError;
 export declare const ERROR_PURCHASE_NO_ITEMS: (error?: ApolloError | Error | undefined) => CheckoutModalError;
 export declare const ERROR_PURCHASE_NO_UNITS: (error?: ApolloError | Error | undefined) => CheckoutModalError;
 export declare const ERROR_PURCHASE_LOADING_ITEMS: (error?: ApolloError | Error | undefined) => CheckoutModalError;

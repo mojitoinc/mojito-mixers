@@ -51,7 +51,7 @@ function createComponentsTheme({ typography, palette, spacing, breakpoints }) {
                     lineHeight: "24px",
                     fontWeight: 500,
                     color: palette.grey[500],
-                    marginLeft: "4px",
+                    // marginLeft: "4px",
                     "&.Mui-focused": {
                         color: palette.grey[500],
                     },
@@ -68,22 +68,20 @@ function createComponentsTheme({ typography, palette, spacing, breakpoints }) {
             styleOverrides: {
                 root: {
                     height: "60px",
-                    borderRadius: theme.SM_BORDER_RADIUS,
+                    borderRadius: theme.MD_BORDER_RADIUS,
                     "&.Mui-disabled::before": {
                         border: 0,
                     },
                 },
-                input: {
-                    fontSize: "16px",
-                    "&.Mui-disabled": {
+                input: Object.assign(Object.assign({}, typography.subtitle1), { "&.Mui-disabled": {
                         cursor: "not-allowed",
-                    },
-                },
+                    } }),
             },
         },
         MuiFilledInput: {
             styleOverrides: {
                 root: {
+                    borderRadius: theme.MD_BORDER_RADIUS,
                     border: `${theme.BORDER_THICKNESS}px solid ${palette.grey[200]}`,
                     background: palette.background.default,
                     "&:hover": {

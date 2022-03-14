@@ -1,6 +1,6 @@
 import { __awaiter } from '../../../../node_modules/tslib/tslib.es6.js';
 import { Backdrop, Box, CircularProgress } from '@mui/material';
-import React__default, { useMemo, useRef, useEffect, useCallback } from 'react';
+import React__default, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { transformRawSavedPaymentMethods, getSavedPaymentMethodAddressIdFromBillingInfo, savedPaymentMethodToBillingInfo } from '../../../domain/circle/circle.utils.js';
 import { useMeQuery, useGetPaymentMethodListQuery, useGetInvoiceDetailsQuery, useDeletePaymentMethodMutation, useReleaseReservationBuyNowLotMutation } from '../../../queries/graphqlGenerated.js';
 import { AuthenticationView } from '../../../views/Authentication/AuthenticationView.js';
@@ -11,13 +11,16 @@ import { CheckoutModalHeader } from '../../payments/CheckoutModalHeader/Checkout
 import { PurchasingView } from '../../../views/Purchasing/PurchasingView.js';
 import { ErrorView } from '../../../views/Error/ErrorView.js';
 import { continuePlaidOAuthFlow, PlaidFlow } from '../../../hooks/usePlaid.js';
-import { useCheckoutModalState } from './CheckoutOverlay.hooks.js';
+import { useCheckoutModalState, CheckoutModalStepIndex } from './CheckoutOverlay.hooks.js';
 import { ERROR_LOADING_USER, ERROR_LOADING_PAYMENT_METHODS, ERROR_LOADING_INVOICE, DEFAULT_ERROR_AT } from '../../../domain/errors/errors.constants.js';
 import { FullScreenOverlay } from '../../shared/FullScreenOverlay/FullScreenOverlay.js';
 import { withProviders } from '../../shared/ProvidersInjector/ProvidersInjector.js';
 import { transformCheckoutItemsFromInvoice } from '../../../domain/product/product.utils.js';
 import { useCreateInvoiceAndReservation } from '../../../hooks/useCreateInvoiceAndReservation.js';
+import { useCheckoutItemsCostTotal } from '../../../hooks/useCheckoutItemCostTotal.js';
 import { DEFAULT_DICTIONARY } from '../../../domain/dictionary/dictionary.constants.js';
+import { THREEDS_REDIRECT_DELAY_MS } from '../../../config/config.js';
+import { NEW_WALLET_OPTION } from '../../shared/Select/WalletAddressSelector/WalletAddressSelector.js';
 
 const PUICheckoutOverlay = ({ 
 // Modal:
@@ -26,7 +29,7 @@ open, onClose, onGoToCollection,
 guestCheckoutEnabled, productConfirmationEnabled, 
 // Personalization:
 logoSrc, logoSx, loaderImageSrc, purchasingImageSrc, purchasingMessages, errorImageSrc, userFormat, acceptedPaymentTypes, paymentLimits, // Not implemented yet. Used to show payment limits for some payment types.
-dictionary: parentDictionary, 
+dictionary: parentDictionary, network, 
 // Legal:
 consentType, privacyHref, termsOfUseHref, 
 // Data:
@@ -34,13 +37,23 @@ orgID, invoiceID: initialInvoiceID, checkoutItems: parentCheckoutItems,
 // Authentication:
 onLogin, isAuthenticated, isAuthenticatedLoading, 
 // Other Events:
-debug, onError, onMarketingOptInChange, // Not implemented yet. Used to let user subscribe / unsubscribe to marketing updates.
+debug: initialDebug, onEvent, onError, onMarketingOptInChange, // Not implemented yet. Used to let user subscribe / unsubscribe to marketing updates.
  }) => {
-    var _a;
+    var _a, _b, _c;
+    const [debug, setDebug] = useState(!!initialDebug);
     // TODO: This should end up being in a context + hook to avoid prop drilling and it should be memoized:
     const dictionary = Object.assign(Object.assign({}, DEFAULT_DICTIONARY), parentDictionary);
     // First, get user data and saved payment methods:
     const { data: meData, loading: meLoading, error: meError, refetch: meRefetch, } = useMeQuery({ skip: !isAuthenticated });
+    const wallets = useMemo(() => {
+        var _a;
+        if (meLoading || !meData)
+            return undefined;
+        const userWallets = ((_a = meData.me) === null || _a === void 0 ? void 0 : _a.wallets) || [];
+        return network
+            ? userWallets.filter(wallet => { var _a; return ((_a = wallet === null || wallet === void 0 ? void 0 : wallet.network) === null || _a === void 0 ? void 0 : _a.id) === network.id; })
+            : userWallets;
+    }, [meLoading, meData, network]);
     const { data: paymentMethodsData, loading: paymentMethodsLoading, error: paymentMethodsError, refetch: refetchPaymentMethods, } = useGetPaymentMethodListQuery({
         skip: !isAuthenticated,
         variables: { orgID },
@@ -52,7 +65,7 @@ debug, onError, onMarketingOptInChange, // Not implemented yet. Used to let user
     // SelectedPaymentMethod:
     selectedPaymentMethod, setSelectedPaymentMethod, 
     // PurchaseState:
-    invoiceID, setInvoiceID, taxes, setTaxes, walletAddress, setWalletAddress, paymentReferenceNumber, setPaymentReferenceNumber, } = useCheckoutModalState({
+    invoiceID, setInvoiceID, taxes, setTaxes, wallet, setWalletAddress, paymentID, circlePaymentID, setPayments, } = useCheckoutModalState({
         invoiceID: initialInvoiceID,
         productConfirmationEnabled,
         isAuthenticated,
@@ -69,12 +82,21 @@ debug, onError, onMarketingOptInChange, // Not implemented yet. Used to let user
     const isPlaidFlowLoading = continuePlaidOAuthFlow();
     // Payment methods and checkout items / invoice items transforms:
     const rawSavedPaymentMethods = paymentMethodsData === null || paymentMethodsData === void 0 ? void 0 : paymentMethodsData.getPaymentMethodList;
+    const savedPaymentMethods = useMemo(() => transformRawSavedPaymentMethods(rawSavedPaymentMethods), [rawSavedPaymentMethods]);
+    // TODO: These should probably be combined.
     const invoiceItems = invoiceDetailsData === null || invoiceDetailsData === void 0 ? void 0 : invoiceDetailsData.getInvoiceDetails.items;
     const checkoutItems = useMemo(() => transformCheckoutItemsFromInvoice(parentCheckoutItems, invoiceItems), [parentCheckoutItems, invoiceItems]);
-    const savedPaymentMethods = useMemo(() => transformRawSavedPaymentMethods(rawSavedPaymentMethods), [rawSavedPaymentMethods]);
+    const { total: subtotal, fees, taxAmount } = useCheckoutItemsCostTotal(checkoutItems);
+    const destinationAddress = ((_b = (_a = (invoiceItems || [])) === null || _a === void 0 ? void 0 : _a[0]) === null || _b === void 0 ? void 0 : _b.destinationAddress) || NEW_WALLET_OPTION.value;
+    useEffect(() => {
+        if (!destinationAddress)
+            return;
+        const wallet = (wallets || []).find(({ address }) => address === destinationAddress);
+        setWalletAddress(wallet || destinationAddress);
+    }, [wallets, destinationAddress, setWalletAddress]);
     // Invoice creation & buy now lot reservation:
     const createInvoiceAndReservationCalledRef = useRef(false);
-    const { invoiceAndReservationState, createInvoiceAndReservation, countdownElementRef, } = useCreateInvoiceAndReservation({ orgID, checkoutItems, debug });
+    const { invoiceAndReservationState, createInvoiceAndReservation, countdownElementRef, } = useCreateInvoiceAndReservation({ orgID, checkoutItems, stop: checkoutStep === "confirmation", debug });
     useEffect(() => {
         if (isDialogLoading || invoiceID === null || invoiceID || createInvoiceAndReservationCalledRef.current)
             return;
@@ -83,11 +105,14 @@ debug, onError, onMarketingOptInChange, // Not implemented yet. Used to let user
     }, [isDialogLoading, invoiceID, createInvoiceAndReservation]);
     useEffect(() => {
         if (invoiceAndReservationState.error) {
+            // TODO: It would be great if we can keep track of the reservation expiration without changing the displayed error
+            // if there's already once, so when clicking the action button for that one, on top of calling its respective error
+            // handling code, we re-create the reservation:
             setError(invoiceAndReservationState.error);
+            return;
         }
-        else if (invoiceAndReservationState.invoiceID) {
+        if (invoiceAndReservationState.invoiceID)
             setInvoiceID(invoiceAndReservationState.invoiceID);
-        }
     }, [invoiceAndReservationState, setError, setInvoiceID]);
     // Init modal state once everything has been loaded:
     useEffect(() => {
@@ -103,6 +128,43 @@ debug, onError, onMarketingOptInChange, // Not implemented yet. Used to let user
         if (invoiceDetailsError)
             setError(ERROR_LOADING_INVOICE(invoiceDetailsError));
     }, [meError, paymentMethodsError, invoiceDetailsError, setError]);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const triggerAnalyticsEventRef = useRef((eventType) => { });
+    triggerAnalyticsEventRef.current = (eventType) => {
+        if (!onEvent || !open)
+            return;
+        const paymentInfo = selectedPaymentMethod.paymentInfo;
+        let paymentType = undefined;
+        if (typeof paymentInfo === "string") {
+            const payment = savedPaymentMethods.find(({ id }) => id === paymentInfo);
+            paymentType = payment === null || payment === void 0 ? void 0 : payment.type;
+        }
+        else {
+            paymentType = paymentInfo.type;
+        }
+        onEvent(eventType, {
+            // Location:
+            step: CheckoutModalStepIndex[checkoutStep],
+            stepName: checkoutStep,
+            // Purchase:
+            departmentCategory: "NFT",
+            paymentType,
+            shippingMethod: typeof wallet === "object" ? "multisig wallet" : "custom wallet",
+            checkoutItems,
+            // Payment:
+            currency: "USD",
+            revenue: subtotal + fees,
+            fees,
+            tax: taxAmount,
+            total: subtotal + fees + taxAmount,
+            // Order:
+            circlePaymentID,
+            paymentID,
+        });
+    };
+    useEffect(() => {
+        setTimeout(() => triggerAnalyticsEventRef.current(`navigate:${checkoutStep}`));
+    }, [checkoutStep]);
     // Saved payment method creation-reload-sync:
     useEffect(() => {
         if (savedPaymentMethods.length === 0)
@@ -188,29 +250,46 @@ debug, onError, onMarketingOptInChange, // Not implemented yet. Used to let user
         yield refetchPaymentMethods({ orgID });
     }), [checkoutStep, deletePaymentMethod, orgID, refetchPaymentMethods, savedPaymentMethods, setSelectedPaymentMethod]);
     // Purchase:
-    const handlePurchaseSuccess = useCallback((nextPaymentReferenceNumber) => __awaiter(void 0, void 0, void 0, function* () {
-        setPaymentReferenceNumber(nextPaymentReferenceNumber);
+    const handlePurchaseSuccess = useCallback((nextCirclePaymentID, nextPaymentID, redirectURL) => __awaiter(void 0, void 0, void 0, function* () {
+        setPayments(nextCirclePaymentID, nextPaymentID);
+        setTimeout(() => triggerAnalyticsEventRef.current("event:paymentSuccess"));
+        if (redirectURL) {
+            setTimeout(() => {
+                if (debug)
+                    console.log(`Redirecting to 3DS = ${redirectURL}`);
+                location.href = redirectURL;
+            }, THREEDS_REDIRECT_DELAY_MS);
+            return;
+        }
         // After a successful purchase, a new payment method might have been created, so we reload them:
         yield refetchPaymentMethods();
         goNext();
-    }), [refetchPaymentMethods, setPaymentReferenceNumber, goNext]);
+    }), [setPayments, debug, refetchPaymentMethods, goNext]);
     const handlePurchaseError = useCallback((error) => __awaiter(void 0, void 0, void 0, function* () {
+        setTimeout(() => triggerAnalyticsEventRef.current("event:paymentError"));
         // After a failed purchase, a new payment method might have been created anyway, so we reload them (createPaymentMethod
         // works but createPayment fails):
         yield refetchPaymentMethods();
         setError(error);
     }), [refetchPaymentMethods, setError]);
+    // Release reservation:
+    const lastReleasedReservationID = useRef("");
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const handleBeforeUnloadRef = useRef((e) => { });
     const [releaseReservationBuyNowLot] = useReleaseReservationBuyNowLotMutation({
         variables: {
             orgID,
             invoiceID,
         },
     });
-    const handleBeforeUnload = useCallback((e) => {
-        if (orgID && invoiceID) {
+    const handleBeforeUnload = handleBeforeUnloadRef.current = useCallback((e) => {
+        if (paymentID || circlePaymentID)
+            return;
+        if (orgID && invoiceID && invoiceID !== lastReleasedReservationID.current) {
             if (debug)
                 console.log(`\n♻️ Releasing reservation invoice ${invoiceID} (orgID = ${orgID})...\n`);
             releaseReservationBuyNowLot().then((result) => {
+                lastReleasedReservationID.current = invoiceID;
                 if (debug)
                     console.log("  🟢 releaseReservationBuyNowLot result", result);
             }).catch((error) => {
@@ -227,7 +306,11 @@ debug, onError, onMarketingOptInChange, // Not implemented yet. Used to let user
             // The absence of a returnValue property on the event will guarantee the browser unload happens:
             delete e['returnValue'];
         }
-    }, [orgID, invoiceID, debug, releaseReservationBuyNowLot]);
+    }, [paymentID, circlePaymentID, orgID, invoiceID, debug, releaseReservationBuyNowLot]);
+    useEffect(() => {
+        if ((checkoutError === null || checkoutError === void 0 ? void 0 : checkoutError.at) === "reset")
+            handleBeforeUnloadRef.current();
+    }, [checkoutError]);
     useEffect(() => {
         window.addEventListener('beforeunload', handleBeforeUnload);
         return () => {
@@ -241,29 +324,31 @@ debug, onError, onMarketingOptInChange, // Not implemented yet. Used to let user
         setInvoiceID(null);
         onClose();
     }, [handleBeforeUnload, setInvoiceID, onClose]);
+    // Error handling:
     const handleFixError = useCallback(() => __awaiter(void 0, void 0, void 0, function* () {
         const at = checkoutError === null || checkoutError === void 0 ? void 0 : checkoutError.at;
         if (at === "reset") {
-            goTo();
             yield Promise.allSettled([
                 meRefetch(),
                 refetchPaymentMethods(),
                 createInvoiceAndReservation(),
             ]);
-            return false;
+            goTo();
         }
-        // After an error, all data is reloaded in case the issue was caused by stale/cached data or in case a new payment
-        // method has been created despite the error:
-        yield Promise.allSettled([
-            meRefetch(),
-            refetchPaymentMethods(),
-            refetchInvoiceDetails(),
-        ]);
-        if (at !== "purchasing") {
-            // If we are redirecting users to the PurchasingView again, we keep the CVV to be able to re-try the purchase:
-            setSelectedPaymentMethod((prevSelectedPaymentMethod) => (Object.assign(Object.assign({}, prevSelectedPaymentMethod), { cvv: "" })));
+        else {
+            // After an error, all data is reloaded in case the issue was caused by stale/cached data or in case a new payment
+            // method has been created despite the error:
+            yield Promise.allSettled([
+                meRefetch(),
+                refetchPaymentMethods(),
+                refetchInvoiceDetails(),
+            ]);
+            if (at !== "purchasing") {
+                // If we are redirecting users to the PurchasingView again, we keep the CVV to be able to re-try the purchase:
+                setSelectedPaymentMethod((prevSelectedPaymentMethod) => (Object.assign(Object.assign({}, prevSelectedPaymentMethod), { cvv: "" })));
+            }
+            goTo(at || DEFAULT_ERROR_AT, checkoutError);
         }
-        goTo(at || DEFAULT_ERROR_AT, checkoutError);
         // This function is used as a CheckoutModalFooter's onSubmitClicked, so we want that to show a loader on the submit
         // button when clicked but do not remove it once the Promise is resolved, as we are moving to another view and
         // CheckoutModalFooter will unmount (so doing this prevents a memory leak issue):
@@ -302,18 +387,18 @@ debug, onError, onMarketingOptInChange, // Not implemented yet. Used to let user
         checkoutStepElement = (React__default.createElement(AuthenticationView, { checkoutItems: checkoutItems, taxes: taxes, isAuthenticated: isAuthenticated, guestCheckoutEnabled: guestCheckoutEnabled, onGuestClicked: goNext, onCloseClicked: handleClose }));
     }
     else if (checkoutStep === "billing") {
-        checkoutStepElement = (React__default.createElement(BillingView, { checkoutItems: checkoutItems, savedPaymentMethods: savedPaymentMethods, selectedBillingInfo: selectedPaymentMethod.billingInfo, walletAddress: walletAddress, checkoutError: checkoutError, onBillingInfoSelected: handleBillingInfoSelected, onTaxesChange: setTaxes, onSavedPaymentMethodDeleted: handleSavedPaymentMethodDeleted, onWalletAddressChange: setWalletAddress, onNext: goNext, onClose: handleClose, dictionary: dictionary, debug: debug }));
+        checkoutStepElement = (React__default.createElement(BillingView, { checkoutItems: checkoutItems, savedPaymentMethods: savedPaymentMethods, selectedBillingInfo: selectedPaymentMethod.billingInfo, wallet: wallet, wallets: wallets, checkoutError: checkoutError, onBillingInfoSelected: handleBillingInfoSelected, onTaxesChange: setTaxes, onSavedPaymentMethodDeleted: handleSavedPaymentMethodDeleted, onWalletChange: setWalletAddress, onNext: goNext, onClose: handleClose, dictionary: dictionary, debug: debug }));
     }
     else if (checkoutStep === "payment") {
-        checkoutStepElement = (React__default.createElement(PaymentView, { checkoutItems: checkoutItems, taxes: taxes, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethod: selectedPaymentMethod, walletAddress: walletAddress, checkoutError: checkoutError, onPaymentInfoSelected: handlePaymentInfoSelected, onCvvSelected: handleCvvSelected, onSavedPaymentMethodDeleted: handleSavedPaymentMethodDeleted, onWalletAddressChange: setWalletAddress, onNext: goNext, onPrev: goBack, onClose: handleClose, acceptedPaymentTypes: acceptedPaymentTypes, consentType: consentType, privacyHref: privacyHref, termsOfUseHref: termsOfUseHref, dictionary: dictionary, debug: debug }));
+        checkoutStepElement = (React__default.createElement(PaymentView, { checkoutItems: checkoutItems, taxes: taxes, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethod: selectedPaymentMethod, wallet: wallet, wallets: wallets, checkoutError: checkoutError, onPaymentInfoSelected: handlePaymentInfoSelected, onCvvSelected: handleCvvSelected, onSavedPaymentMethodDeleted: handleSavedPaymentMethodDeleted, onWalletChange: setWalletAddress, onNext: goNext, onPrev: goBack, onClose: handleClose, acceptedPaymentTypes: acceptedPaymentTypes, consentType: consentType, privacyHref: privacyHref, termsOfUseHref: termsOfUseHref, dictionary: dictionary, debug: debug }));
     }
     else if (checkoutStep === "purchasing" && invoiceID) {
         headerVariant = "purchasing";
-        checkoutStepElement = (React__default.createElement(PurchasingView, { purchasingImageSrc: purchasingImageSrc, purchasingMessages: purchasingMessages, orgID: orgID, invoiceID: invoiceID, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethod: selectedPaymentMethod, onPurchaseSuccess: handlePurchaseSuccess, onPurchaseError: handlePurchaseError, onDialogBlocked: setIsDialogBlocked, debug: debug }));
+        checkoutStepElement = (React__default.createElement(PurchasingView, { purchasingImageSrc: purchasingImageSrc, purchasingMessages: purchasingMessages, orgID: orgID, invoiceID: invoiceID, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethod: selectedPaymentMethod, wallet: wallet, onPurchaseSuccess: handlePurchaseSuccess, onPurchaseError: handlePurchaseError, onDialogBlocked: setIsDialogBlocked, debug: debug }));
     }
     else if (checkoutStep === "confirmation") {
         headerVariant = "logoOnly";
-        checkoutStepElement = (React__default.createElement(ConfirmationView, { checkoutItems: checkoutItems, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethod: selectedPaymentMethod, paymentReferenceNumber: paymentReferenceNumber, onGoToCollection: onGoToCollection, onNext: handleClose, dictionary: dictionary }));
+        checkoutStepElement = (React__default.createElement(ConfirmationView, { checkoutItems: checkoutItems, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethod: selectedPaymentMethod, circlePaymentID: circlePaymentID, wallet: wallet, onGoToCollection: onGoToCollection, onNext: handleClose, dictionary: dictionary }));
     }
     else {
         // !checkoutStep or
@@ -322,7 +407,7 @@ debug, onError, onMarketingOptInChange, // Not implemented yet. Used to let user
         // some other kind of indeterminate / incorrect state:
         return null;
     }
-    const headerElement = (React__default.createElement(CheckoutModalHeader, { variant: headerVariant, countdownElementRef: countdownElementRef, logoSrc: logoSrc, logoSx: logoSx, user: (_a = meData === null || meData === void 0 ? void 0 : meData.me) === null || _a === void 0 ? void 0 : _a.user, userFormat: userFormat, onLoginClicked: onLogin, onPrevClicked: checkoutStep === "authentication" ? handleClose : goBack }));
+    const headerElement = (React__default.createElement(CheckoutModalHeader, { variant: headerVariant, countdownElementRef: countdownElementRef, logoSrc: logoSrc, logoSx: logoSx, user: (_c = meData === null || meData === void 0 ? void 0 : meData.me) === null || _c === void 0 ? void 0 : _c.user, userFormat: userFormat, onLoginClicked: onLogin, onPrevClicked: checkoutStep === "authentication" ? handleClose : goBack, setDebug: setDebug }));
     return (React__default.createElement(FullScreenOverlay, { centered: checkoutStep === "purchasing" || checkoutStep === "error", open: open, onClose: handleClose, isDialogBlocked: isDialogBlocked, contentKey: checkoutStep, header: headerElement, children: checkoutStepElement }));
 };
 const PUICheckout = withProviders(PUICheckoutOverlay);

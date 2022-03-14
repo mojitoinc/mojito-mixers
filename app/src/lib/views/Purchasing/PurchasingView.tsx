@@ -5,12 +5,14 @@ import React from "react";
 import { Box, Typography } from "@mui/material";
 import { useTimeout, useInterval } from "@swyg/corre";
 import { CheckoutModalError, SelectedPaymentMethod } from "../../components/public/CheckoutOverlay/CheckoutOverlay.hooks";
-import { ERROR_PURCHASE } from "../../domain/errors/errors.constants";
+import { ERROR_PURCHASE, ERROR_PURCHASE_TIMEOUT } from "../../domain/errors/errors.constants";
 import { XS_MOBILE_MAX_WIDTH } from "../../config/theme/theme";
 import { StatusIcon } from "../../components/shared/StatusIcon/StatusIcon";
 import { useGetPaymentNotificationQuery } from "../../queries/graphqlGenerated";
 import { persistCheckoutModalInfo } from "../../components/public/CheckoutOverlay/CheckoutOverlay.utils";
-import { PAYMENT_NOTIFICATION_INTERVAL_MS, PURCHASING_MESSAGES_DEFAULT, PURCHASING_MIN_WAIT_MS, PURCHASING_MESSAGES_INTERVAL_MS } from "../../config/config";
+import { PAYMENT_NOTIFICATION_INTERVAL_MS, PURCHASING_MESSAGES_DEFAULT, PURCHASING_MIN_WAIT_MS, PURCHASING_MESSAGES_INTERVAL_MS, PAYMENT_CREATION_TIMEOUT_MS } from "../../config/config";
+import { isLocalhost } from "../../domain/url/url.utils";
+import { Wallet } from "../../domain/wallet/wallet.interfaces";
 
 export interface PurchasingViewProps {
   purchasingImageSrc?: string;
@@ -19,7 +21,8 @@ export interface PurchasingViewProps {
   invoiceID: string;
   savedPaymentMethods: SavedPaymentMethod[];
   selectedPaymentMethod: SelectedPaymentMethod;
-  onPurchaseSuccess: (circlePaymentID: string, paymentID: string) => void;
+  wallet: null | string | Wallet;
+  onPurchaseSuccess: (circlePaymentID: string, paymentID: string, redirectURL: string) => void;
   onPurchaseError: (error: string | CheckoutModalError) => void;
   onDialogBlocked: (blocked: boolean) => void;
   debug?: boolean;
@@ -32,41 +35,67 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
   invoiceID,
   savedPaymentMethods,
   selectedPaymentMethod,
+  wallet,
   onPurchaseSuccess,
   onPurchaseError,
   onDialogBlocked,
   debug,
 }) => {
+  const { billingInfo, paymentInfo, cvv } = selectedPaymentMethod;
+  const isCreditCardPayment = cvv || (typeof paymentInfo === "object" && paymentInfo.type === "CreditCard");
+
+
+  // Minimum wait time:
+
+  const [hasWaited, setHasWaited] = useState(false);
+
+  useTimeout(() => {
+    setHasWaited(true);
+  }, PURCHASING_MIN_WAIT_MS);
+
+
+  // Actual payment mutation & state:
+
   const [fullPaymentState, fullPayment] = useFullPayment({
     orgID,
     invoiceID,
     savedPaymentMethods,
     selectedPaymentMethod,
+    wallet,
     debug,
   });
 
+
+  // Load 3DS redirect URL when needed:
+
+  const [redirectURL, setRedirectURL] = useState(isCreditCardPayment ? "" : null);
+
   const paymentNotificationResult = useGetPaymentNotificationQuery({
-    skip: fullPaymentState.paymentStatus !== "processed",
+    skip: !isCreditCardPayment || !!redirectURL || fullPaymentState.paymentStatus !== "processed",
     pollInterval: PAYMENT_NOTIFICATION_INTERVAL_MS,
   });
 
-  let purchasingMessages = customPurchasingMessages;
+  const nextRedirectURL = paymentNotificationResult.data?.getPaymentNotification?.message?.redirectURL || "";
 
-  if (purchasingMessages === false) {
-    purchasingMessages = []
-  } else if (purchasingMessages === undefined || purchasingMessages.length === 0) {
-    purchasingMessages = PURCHASING_MESSAGES_DEFAULT;
-  }
+  useEffect(() => {
+    if (!isCreditCardPayment) return;
 
-  const [hasWaited, setHasWaited] = useState(false);
-  const [purchasingMessageIndex, setPurchasingMessageIndex] = useState(0);
-  const purchasingMessage = purchasingMessages[purchasingMessageIndex];
-  const redirectURL = paymentNotificationResult.data?.getPaymentNotification?.message?.redirectURL || "";
-  const { billingInfo, paymentInfo, cvv } = selectedPaymentMethod;
-  const isCreditCardPayment = cvv || (typeof paymentInfo === "object" && paymentInfo.type === "CreditCard");
+    setRedirectURL(prevRedirectURL => prevRedirectURL || nextRedirectURL);
+  }, [isCreditCardPayment, nextRedirectURL]);
+
+
+  // Triggers for payment mutation and onPurchaseSuccess/onPurchaseError callbacks:
 
   const fullPaymentCalledRef = useRef(false);
-  const checkoutInfoPersistedRef = useRef(false);
+  const purchaseSuccessHandledRef = useRef(false);
+
+  useTimeout(() => {
+    if (purchaseSuccessHandledRef.current) return;
+
+    purchaseSuccessHandledRef.current = true;
+
+    onPurchaseError(ERROR_PURCHASE_TIMEOUT());
+  }, redirectURL === null ? null : PAYMENT_CREATION_TIMEOUT_MS, [onPurchaseError]);
 
   useEffect(() => {
     if (fullPaymentCalledRef.current) return;
@@ -85,19 +114,17 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
       return;
     }
 
-    if (!hasWaited) return;
-
     if (paymentStatus === "error" || paymentError) {
       onPurchaseError(paymentError || ERROR_PURCHASE());
 
       return;
     }
 
-    if (isCreditCardPayment && window.location.hostname !== "localhost") {
-      if (!redirectURL || checkoutInfoPersistedRef.current) return;
+    if (!hasWaited || redirectURL === "" || purchaseSuccessHandledRef.current) return;
 
-      checkoutInfoPersistedRef.current = true;
+    purchaseSuccessHandledRef.current = true;
 
+    if (redirectURL && !isLocalhost()) {
       persistCheckoutModalInfo({
         invoiceID,
         circlePaymentID,
@@ -105,15 +132,9 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
         billingInfo,
         paymentInfo,
       });
-
-      if (debug) console.log("Redirecting to 3DS...");
-
-      location.href = redirectURL;
-
-      return;
     }
 
-    onPurchaseSuccess(circlePaymentID, paymentID);
+    onPurchaseSuccess(circlePaymentID, paymentID, isLocalhost() ? "" : (redirectURL || ""));
   }, [
     fullPaymentState,
     hasWaited,
@@ -128,13 +149,24 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
     debug,
   ]);
 
-  useTimeout(() => {
-    setHasWaited(true);
-  }, PURCHASING_MIN_WAIT_MS);
+
+  // Purchasing Messages:
+
+  const [purchasingMessageIndex, setPurchasingMessageIndex] = useState(0);
 
   useInterval(() => {
     setPurchasingMessageIndex(prevWaitMessageIndex => Math.min(prevWaitMessageIndex + 1, PURCHASING_MESSAGES_DEFAULT.length - 1));
   }, PURCHASING_MESSAGES_INTERVAL_MS);
+
+  let purchasingMessages = customPurchasingMessages;
+
+  if (purchasingMessages === false) {
+    purchasingMessages = []
+  } else if (purchasingMessages === undefined || purchasingMessages.length === 0) {
+    purchasingMessages = PURCHASING_MESSAGES_DEFAULT;
+  }
+
+  const purchasingMessage = purchasingMessages[purchasingMessageIndex];
 
   return (
     <Box>

@@ -3,7 +3,7 @@
 Object.defineProperty(exports, '__esModule', { value: true });
 
 const BUILT_IN_ERRORS = ["EvalError", "RangeError", "ReferenceError", "SyntaxError", "TypeError", "URIError", "AggregateError", "InternalError"];
-const DEFAULT_ERROR_AT = "purchasing";
+const DEFAULT_ERROR_AT = "payment";
 function createError(errorMessage, at = DEFAULT_ERROR_AT) {
     return (error) => ({
         error,
@@ -17,6 +17,7 @@ const ERROR_LOADING_PAYMENT_METHODS = createError("Payment methods could not be 
 const ERROR_LOADING_INVOICE = createError("Invoice could not be loaded.", "billing");
 // PurchasingView:
 const ERROR_PURCHASE = createError("The purchase could not be completed.");
+const ERROR_PURCHASE_TIMEOUT = createError("The purchase could not be completed in time.");
 // useFullPayment:
 const ERROR_PURCHASE_NO_ITEMS = createError("No items to purchase.");
 const ERROR_PURCHASE_NO_UNITS = createError("No units to purchase.");
@@ -45,4 +46,5 @@ exports.ERROR_PURCHASE_NO_ITEMS = ERROR_PURCHASE_NO_ITEMS;
 exports.ERROR_PURCHASE_NO_UNITS = ERROR_PURCHASE_NO_UNITS;
 exports.ERROR_PURCHASE_PAYING = ERROR_PURCHASE_PAYING;
 exports.ERROR_PURCHASE_SELECTED_PAYMENT_METHOD = ERROR_PURCHASE_SELECTED_PAYMENT_METHOD;
+exports.ERROR_PURCHASE_TIMEOUT = ERROR_PURCHASE_TIMEOUT;
 //# sourceMappingURL=errors.constants.js.map

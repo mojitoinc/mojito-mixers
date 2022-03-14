@@ -2,6 +2,7 @@ import { __awaiter } from '../../node_modules/tslib/tslib.es6.js';
 import { useForm } from 'react-hook-form';
 import { yupResolver as o } from '../../node_modules/@hookform/resolvers/yup/dist/yup.mjs.js';
 import { string, object, boolean } from 'yup';
+import { Grid, Typography, Box } from '@mui/material';
 import default_1 from '../../node_modules/@mui/icons-material/Book.js';
 import React__default, { useMemo, useCallback } from 'react';
 import { CheckoutModalFooter } from '../components/payments/CheckoutModalFooter/CheckoutModalFooter.js';
@@ -14,14 +15,12 @@ import { SecondaryButton } from '../components/shared/SecondaryButton/SecondaryB
 import { PaymentMethodSelector } from '../components/shared/PaymentMethodSelector/PaymentMethodSelector.js';
 import { withInvalidErrorMessage, requireSchemaWhenKeyIs } from '../utils/validationUtils.js';
 import { getCardNumberIsValid, getExpiryDateIsvalid, getCVCIsValid } from '../domain/payment/payment.utils.js';
-import { Typography } from '@mui/material';
-import { DisplayBox, DebugBox } from '../components/payments/DisplayBox/DisplayBox.js';
+import { DisplayBox } from '../components/payments/DisplayBox/DisplayBox.js';
+import { DebugBox } from '../components/payments/DebugBox/DebugBox.js';
 import { ControlledCheckbox } from '../components/shared/Checkbox/Checkbox.js';
 import { ConsentText, CONSENT_ERROR_MESSAGE } from '../components/shared/ConsentText/ConsentText.js';
 import { FormErrorsBox } from '../components/shared/FormErrorsBox/FormErrorsBox.js';
 import { useFormCheckoutError } from '../hooks/useFormCheckoutError.js';
-import Grid from '../../node_modules/@mui/material/Grid/Grid.js';
-import Box from '../../node_modules/@mui/material/Box/Box.js';
 
 const FIELD_LABELS = {
     cardNumber: "Card Number",
@@ -130,7 +129,7 @@ const PAYMENT_TYPE_FORM_DATA = {
             consentType === "checkbox" && (React__default.createElement(ControlledCheckbox, { name: "consent", control: control, label: React__default.createElement(React__default.Fragment, null,
                     "I ",
                     React__default.createElement(ConsentText, { privacyHref: privacyHref, termsOfUseHref: termsOfUseHref })) })),
-            React__default.createElement(DisplayBox, { sx: { mt: 1.5, flexDirection: "column" } }, dictionary.wirePaymentsDisclaimer.map((line, i) => (React__default.createElement(Typography, { key: i, variant: "body1", sx: i === 0 ? undefined : { mt: 1.5 } }, line)))))),
+            React__default.createElement(DisplayBox, { sx: { mt: 1.5 } }, dictionary.wirePaymentsDisclaimer.map((line, i) => (React__default.createElement(Typography, { key: i, variant: "body1", sx: i === 0 ? undefined : { mt: 1.5 } }, line)))))),
     },
     Crypto: {
         defaultValues: (consentType) => ({
@@ -139,7 +138,7 @@ const PAYMENT_TYPE_FORM_DATA = {
         }),
         schemaShape: {},
         fields: ({ control, consentType, privacyHref, termsOfUseHref }) => (React__default.createElement(React__default.Fragment, null,
-            React__default.createElement(DisplayBox, { sx: { mt: 1.5, mb: consentType === "checkbox" ? 1 : 0, flexDirection: "column" } },
+            React__default.createElement(DisplayBox, { sx: { mt: 1.5, mb: consentType === "checkbox" ? 1 : 0 } },
                 React__default.createElement(Typography, { variant: "body1" }, "Not supported yet.")),
             consentType === "checkbox" && (React__default.createElement(ControlledCheckbox, { name: "consent", control: control, label: React__default.createElement(React__default.Fragment, null,
                     "I ",

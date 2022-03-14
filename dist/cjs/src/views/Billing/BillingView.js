@@ -20,7 +20,7 @@ function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'defau
 
 var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 
-const BillingView = ({ checkoutItems, savedPaymentMethods: rawSavedPaymentMethods, selectedBillingInfo, walletAddress, checkoutError, onBillingInfoSelected, onTaxesChange, onSavedPaymentMethodDeleted, onWalletAddressChange, onNext, onClose, dictionary, debug, }) => {
+const BillingView = ({ checkoutItems, savedPaymentMethods: rawSavedPaymentMethods, selectedBillingInfo, wallets, wallet, checkoutError, onBillingInfoSelected, onTaxesChange, onSavedPaymentMethodDeleted, onWalletChange, onNext, onClose, dictionary, debug, }) => {
     const savedPaymentMethodAddressIdRef = React.useRef("");
     const savedPaymentMethods = React.useMemo(() => arrayUtils.distinctBy(rawSavedPaymentMethods, "addressId"), [rawSavedPaymentMethods]);
     const { total: subtotal, fees } = useCheckoutItemCostTotal.useCheckoutItemsCostTotal(checkoutItems);
@@ -32,7 +32,13 @@ const BillingView = ({ checkoutItems, savedPaymentMethods: rawSavedPaymentMethod
     });
     const [formSubmitAttempted, setFormSubmitAttempted] = React.useState(false);
     const [getTaxQuote] = graphqlGenerated.useGetTaxQuoteLazyQuery();
-    const getTaxQuoteTimestampRef = React.useRef();
+    const getTaxQuoteTimestampRef = React.useRef(0);
+    React.useEffect(() => {
+        return () => {
+            // To discard the result below that might come after the component has been unmounted:
+            getTaxQuoteTimestampRef.current = 0;
+        };
+    }, []);
     const calculateTaxes = React.useCallback((taxInfo) => tslib_es6.__awaiter(void 0, void 0, void 0, function* () {
         var _a;
         const calledAt = getTaxQuoteTimestampRef.current;
@@ -138,14 +144,14 @@ const BillingView = ({ checkoutItems, savedPaymentMethods: rawSavedPaymentMethod
             sm: "column",
             md: "row",
         }, spacing: 8.75 },
-        React__default["default"].createElement(material.Stack, { sx: { display: 'flex', flex: 1, overflow: "hidden" } },
+        React__default["default"].createElement(material.Stack, { sx: { display: "flex", overflow: "hidden", width: { xs: "100%", md: "calc(50% - 35px)" } } },
             React__default["default"].createElement(CheckoutStepper.CheckoutStepper, { progress: 50 }),
             showSaved ? (React__default["default"].createElement(SavedBillingDetailsSelector.SavedBillingDetailsSelector, { showLoader: isDeleting, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethodAddressId: typeof selectedBillingInfo === "string" ? selectedBillingInfo : undefined, taxes: taxes, onNew: handleShowForm, onEdit: handleShowForm, onDelete: handleSavedPaymentMethodDeleted, onPick: onBillingInfoSelected, onNext: onNext, onClose: onClose, onAttemptSubmit: handleFormAttemptSubmit })) : (React__default["default"].createElement(BillingInfoForm.BillingInfoForm
             // variant="loggedIn"
             , { 
                 // variant="loggedIn"
                 defaultValues: typeof selectedBillingInfo === "string" ? undefined : selectedBillingInfo, checkoutError: checkoutError, taxes: taxes, onTaxInfoChange: handleTaxInfoChange, onSaved: savedPaymentMethods.length > 0 ? handleShowSaved : undefined, onClose: onClose, onSubmit: handleSubmit, onAttemptSubmit: handleFormAttemptSubmit, debug: debug }))),
-        React__default["default"].createElement(CheckoutDeliveryAndItemCostBreakdown.CheckoutDeliveryAndItemCostBreakdown, { checkoutItems: checkoutItems, taxes: taxes, validatePersonalDeliveryAddress: formSubmitAttempted, walletAddress: walletAddress, onWalletAddressChange: onWalletAddressChange, dictionary: dictionary })));
+        React__default["default"].createElement(CheckoutDeliveryAndItemCostBreakdown.CheckoutDeliveryAndItemCostBreakdown, { checkoutItems: checkoutItems, taxes: taxes, validatePersonalDeliveryAddress: formSubmitAttempted, wallets: wallets, wallet: wallet, onWalletChange: onWalletChange, dictionary: dictionary })));
 };
 
 exports.BillingView = BillingView;

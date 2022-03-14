@@ -13,5 +13,10 @@ query Me {
         name
       }
     }
+    wallets {
+      id
+      name
+      address
+    }
   }
 }

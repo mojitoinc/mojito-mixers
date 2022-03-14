@@ -1,23 +1,25 @@
 import { ApolloError } from "@apollo/client";
 import { useState, useCallback } from "react";
 import { CheckoutModalError, SelectedPaymentMethod } from "../components/public/CheckoutOverlay/CheckoutOverlay.hooks";
+import { PAYMENT_CREATION_MIN_WAIT_MS } from "../config/config";
 import { SavedPaymentMethod } from "../domain/circle/circle.interfaces";
 import { parseCircleError, savedPaymentMethodToBillingInfo } from "../domain/circle/circle.utils";
 import { ERROR_PURCHASE_CREATING_PAYMENT_METHOD, ERROR_PURCHASE_CVV, ERROR_PURCHASE_NO_ITEMS, ERROR_PURCHASE_PAYING, ERROR_PURCHASE_SELECTED_PAYMENT_METHOD } from "../domain/errors/errors.constants";
 import { PaymentStatus } from "../domain/payment/payment.interfaces";
+import { Wallet } from "../domain/wallet/wallet.interfaces";
+import { filterSpecialWalletAddressValues } from "../domain/wallet/wallet.utils";
 import { BillingInfo } from "../forms/BillingInfoForm";
 import { CreatePaymentMetadataInput, useCreatePaymentMutation } from "../queries/graphqlGenerated";
 import { wait } from "../utils/promiseUtils";
 import { useCreatePaymentMethod } from "./useCreatePaymentMethod";
 import { useEncryptCardData } from "./useEncryptCard";
 
-const CIRCLE_MAX_EXPECTED_PAYMENT_CREATION_PROCESSING_TIME = 5000;
-
 export interface UseFullPaymentOptions {
   orgID: string;
   invoiceID: string;
   savedPaymentMethods: SavedPaymentMethod[];
   selectedPaymentMethod: SelectedPaymentMethod;
+  wallet: null | string | Wallet;
   debug?: boolean;
 }
 
@@ -33,6 +35,7 @@ export function useFullPayment({
   invoiceID,
   savedPaymentMethods,
   selectedPaymentMethod,
+  wallet,
   debug = false,
 }: UseFullPaymentOptions): [FullPaymentState, () => Promise<void>] {
   const [paymentState, setPaymentState] = useState<FullPaymentState>({
@@ -51,7 +54,7 @@ export function useFullPayment({
   }, []);
 
   const [encryptCardData] = useEncryptCardData();
-  const [createPaymentMethod] = useCreatePaymentMethod();
+  const [createPaymentMethod] = useCreatePaymentMethod({ debug });
   const [makePayment] = useCreatePaymentMutation();
 
   const fullPayment = useCallback(async () => {
@@ -135,7 +138,7 @@ export function useFullPayment({
 
         const circleFieldErrors = parseCircleError(error);
 
-        if (debug) console.log("    🔴 createPaymentMethod error", error, circleFieldErrors);
+        if (debug) console.log("      🔴 createPaymentMethod error", error, circleFieldErrors);
 
         if (circleFieldErrors) {
           checkoutError = {
@@ -150,7 +153,7 @@ export function useFullPayment({
       paymentMethodCreatedAt = Date.now();
 
       if (createPaymentMethodResult && !createPaymentMethodResult.errors) {
-        if (debug) console.log("    🟢 createPaymentMethod result", createPaymentMethodResult);
+        if (debug) console.log("      🟢 createPaymentMethod result", createPaymentMethodResult);
 
         paymentMethodID = createPaymentMethodResult.data?.createPaymentMethod?.id || "";
       }
@@ -169,8 +172,15 @@ export function useFullPayment({
       });
     }
 
+    let destinationAddress = "";
 
-    let metadata: CreatePaymentMetadataInput | undefined;
+    if (typeof wallet === "object") {
+      destinationAddress = wallet?.address || "";
+    } else {
+      destinationAddress = filterSpecialWalletAddressValues(wallet);
+    }
+
+    const metadata: Partial<CreatePaymentMetadataInput> = destinationAddress ? { destinationAddress } : { };
 
     if (cvv) {
       const encryptCardDataResult = await encryptCardData({
@@ -191,23 +201,21 @@ export function useFullPayment({
 
       const { keyID, encryptedCardData } = encryptCardDataResult;
 
-      metadata = {
-        creditCardData: {
-          keyID,
-          encryptedData: encryptedCardData,
-        },
+      metadata.creditCardData = {
+        keyID,
+        encryptedData: encryptedCardData,
       };
     }
 
-    const paymentMethodStatusWaitTime = Math.max(CIRCLE_MAX_EXPECTED_PAYMENT_CREATION_PROCESSING_TIME - (Date.now() - paymentMethodCreatedAt), 0);
+    const paymentMethodStatusWaitTime = Math.max(PAYMENT_CREATION_MIN_WAIT_MS - (Date.now() - paymentMethodCreatedAt), 0);
 
-    if (paymentMethodStatusWaitTime) await wait(paymentMethodStatusWaitTime);
+    if (paymentMethodStatusWaitTime > 0) await wait(paymentMethodStatusWaitTime);
 
     const makePaymentResult = await makePayment({
       variables: {
         paymentMethodID,
         invoiceID,
-        metadata,
+        metadata: Object.keys(metadata).length > 0 ? (metadata as CreatePaymentMetadataInput) : undefined,
       },
     }).catch((error: ApolloError | Error) => {
       mutationError = error;
@@ -240,6 +248,7 @@ export function useFullPayment({
     invoiceID,
     savedPaymentMethods,
     selectedPaymentMethod,
+    wallet,
     debug,
     setError,
     encryptCardData,

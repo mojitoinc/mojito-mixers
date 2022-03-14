@@ -1,12 +1,13 @@
 import { THREEDS_FLOW_RECEIVED_REDIRECT_URI_KEY, THREEDS_FLOW_INFO_KEY, THREEDS_FLOW_STATE_USED_KEY, THREEDS_FLOW_URL_SEARCH, THREEDS_STORAGE_EXPIRATION_MS } from '../../../config/config.js';
 import { ERROR_PURCHASE_3DS } from '../../../domain/errors/errors.constants.js';
-import { urlToPathnameWhenPossible, getUrlWithoutParams } from '../../../domain/url/url.utils.js';
+import { isLocalhost, urlToPathnameWhenPossible, getUrlWithoutParams } from '../../../domain/url/url.utils.js';
 import { continuePlaidOAuthFlow, INITIAL_PLAID_OAUTH_FLOW_STATE } from '../../../hooks/usePlaid.js';
 
 const FALLBACK_MODAL_STATE = {
     url: "",
     invoiceID: "",
-    paymentReferenceNumber: "",
+    circlePaymentID: "",
+    paymentID: "",
     billingInfo: "",
     paymentInfo: "",
     continue3DSFlow: false,
@@ -55,12 +56,12 @@ function getCheckoutModalState() {
     }
     catch (err) {
     }
-    const { url = "", invoiceID = "", paymentReferenceNumber = "", billingInfo = "", paymentInfo = "", timestamp, } = savedPlaidInfo || {};
+    const { url = "", invoiceID = "", circlePaymentID = "", paymentID = "", billingInfo = "", paymentInfo = "", timestamp, } = savedPlaidInfo || {};
     const receivedRedirectUri = savedReceivedRedirectUri || (window.location.search.startsWith(THREEDS_FLOW_URL_SEARCH) ? window.location.href : undefined);
     // const receivedRedirectUri = savedReceivedRedirectUri || window.location.href || "";
     // In dev, this works fine even if there's nothing in localStorage, which helps with testing across some other domain and localhost:
-    const hasLocalhostOrigin = process.env.NODE_ENV === "development" && window.location.hostname !== "localhost";
-    const continue3DSFlow = hasLocalhostOrigin || !!(url && invoiceID && paymentReferenceNumber && billingInfo && paymentInfo && receivedRedirectUri);
+    const hasLocalhostOrigin = process.env.NODE_ENV === "development" && !isLocalhost();
+    const continue3DSFlow = hasLocalhostOrigin || !!(url && invoiceID && circlePaymentID && paymentID && billingInfo && paymentInfo && receivedRedirectUri);
     if ((continue3DSFlow && savedStateUsed) || (!continue3DSFlow && localStorage.getItem(THREEDS_FLOW_INFO_KEY)) || isExpired(timestamp)) {
         return clearPersistedInfo();
     }
@@ -70,7 +71,8 @@ function getCheckoutModalState() {
         // The invoiceID we need to re-load the products and units:
         invoiceID,
         // The reference number of the payment:
-        paymentReferenceNumber,
+        circlePaymentID,
+        paymentID,
         // The billing & payment info selected / entered before starting the 3DS flow:
         billingInfo,
         paymentInfo,
@@ -99,9 +101,10 @@ function continueFlows(noClear = false) {
     const continueFlowsReturn = {
         checkoutStep: "",
         invoiceID: "",
+        circlePaymentID: "",
+        paymentID: "",
         billingInfo: "",
         paymentInfo: "",
-        paymentReferenceNumber: "",
     };
     if (continue3DSFlow) {
         if (savedCheckoutModalState.purchaseSuccess) {
@@ -112,9 +115,10 @@ function continueFlows(noClear = false) {
             continueFlowsReturn.checkoutError = ERROR_PURCHASE_3DS();
         }
         continueFlowsReturn.invoiceID = savedCheckoutModalState.invoiceID;
+        continueFlowsReturn.circlePaymentID = savedCheckoutModalState.circlePaymentID;
+        continueFlowsReturn.paymentID = savedCheckoutModalState.paymentID;
         continueFlowsReturn.billingInfo = savedCheckoutModalState.billingInfo;
         continueFlowsReturn.paymentInfo = savedCheckoutModalState.paymentInfo;
-        continueFlowsReturn.paymentReferenceNumber = savedCheckoutModalState.paymentReferenceNumber;
     }
     else if (continueOAuthFlow) {
         continueFlowsReturn.checkoutStep = "purchasing";

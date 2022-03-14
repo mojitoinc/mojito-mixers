@@ -1,4 +1,4 @@
-import { SM_BORDER_RADIUS, BORDER_THICKNESS, MD_BORDER_RADIUS } from './theme.js';
+import { MD_BORDER_RADIUS, BORDER_THICKNESS } from './theme.js';
 
 /*
 declare module "@mui/material/TextField" {
@@ -47,7 +47,7 @@ function createComponentsTheme({ typography, palette, spacing, breakpoints }) {
                     lineHeight: "24px",
                     fontWeight: 500,
                     color: palette.grey[500],
-                    marginLeft: "4px",
+                    // marginLeft: "4px",
                     "&.Mui-focused": {
                         color: palette.grey[500],
                     },
@@ -64,22 +64,20 @@ function createComponentsTheme({ typography, palette, spacing, breakpoints }) {
             styleOverrides: {
                 root: {
                     height: "60px",
-                    borderRadius: SM_BORDER_RADIUS,
+                    borderRadius: MD_BORDER_RADIUS,
                     "&.Mui-disabled::before": {
                         border: 0,
                     },
                 },
-                input: {
-                    fontSize: "16px",
-                    "&.Mui-disabled": {
+                input: Object.assign(Object.assign({}, typography.subtitle1), { "&.Mui-disabled": {
                         cursor: "not-allowed",
-                    },
-                },
+                    } }),
             },
         },
         MuiFilledInput: {
             styleOverrides: {
                 root: {
+                    borderRadius: MD_BORDER_RADIUS,
                     border: `${BORDER_THICKNESS}px solid ${palette.grey[200]}`,
                     background: palette.background.default,
                     "&:hover": {
