@@ -27,7 +27,7 @@ export const Select: React.FC<SelectProps> = ({
   options = [],
   helperText,
   error,
-  margin,
+  margin = "normal",
   ...props
 }) => (
   <FormControl fullWidth margin={ margin } variant="filled" disabled={ disabled } error={ error }>
