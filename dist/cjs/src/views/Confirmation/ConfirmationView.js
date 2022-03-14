@@ -13,7 +13,7 @@ function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'defau
 
 var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 
-const ConfirmationView = ({ checkoutItems, savedPaymentMethods, selectedPaymentMethod, circlePaymentID, walletAddress, wallets, onGoToCollection, onNext, dictionary, }) => {
+const ConfirmationView = ({ checkoutItems, savedPaymentMethods, selectedPaymentMethod, circlePaymentID, wallet, onGoToCollection, onNext, dictionary, }) => {
     const { billingInfo: selectedBillingInfo, paymentInfo: selectedPaymentInfo, } = selectedPaymentMethod;
     const { selectedPaymentMethodBillingInfo, selectedPaymentMethodPaymentInfo, } = React.useMemo(() => {
         if (typeof selectedPaymentInfo === "string") {
@@ -37,7 +37,7 @@ const ConfirmationView = ({ checkoutItems, savedPaymentMethods, selectedPaymentM
             sm: "column",
             md: "row",
         }, spacing: 8.75, sx: { display: "flex" } },
-        React__default["default"].createElement(PurchaseConfirmationBillingDetails.PurchaseConfirmationBillingDetails, { checkoutItems: checkoutItems, circlePaymentID: circlePaymentID, walletAddress: walletAddress, wallets: wallets, selectedPaymentMethodBillingInfo: selectedPaymentMethodBillingInfo, selectedPaymentMethodPaymentInfo: selectedPaymentMethodPaymentInfo, dictionary: dictionary }),
+        React__default["default"].createElement(PurchaseConfirmationBillingDetails.PurchaseConfirmationBillingDetails, { checkoutItems: checkoutItems, circlePaymentID: circlePaymentID, wallet: wallet, selectedPaymentMethodBillingInfo: selectedPaymentMethodBillingInfo, selectedPaymentMethodPaymentInfo: selectedPaymentMethodPaymentInfo, dictionary: dictionary }),
         React__default["default"].createElement(material.Stack, { sx: { display: "flex", flex: 1 } },
             React__default["default"].createElement(PurchaseConfirmationItemDetails.PurchaseConfirmationItemDetails, { checkoutItems: checkoutItems, dictionary: dictionary }),
             React__default["default"].createElement(CheckoutModalFooter.CheckoutModalFooter, { variant: "toMarketplace", onSubmitClicked: onNext, onGoToCollection: onGoToCollection }))));

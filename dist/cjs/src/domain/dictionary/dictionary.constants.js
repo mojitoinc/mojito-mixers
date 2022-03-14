@@ -18,6 +18,8 @@ const multiSigElement = (React__default["default"].createElement(material.Toolti
     React__default["default"].createElement(material.Link, { sx: { color: "text.primary" } }, "MultiSig")));
 const DEFAULT_DICTIONARY = {
     walletInfo: React__default["default"].createElement(React__default["default"].Fragment, null,
+        React__default["default"].createElement(material.Typography, { sx: { fontWeight: "500" }, component: "strong" }, "This is where your NFT(s) will be delivered after the sale is over."),
+        " ",
         "We will cover gas cost for minting and delivery on both ",
         multiSigElement,
         " and self-hosted wallets. Your items will be delivered to your ",

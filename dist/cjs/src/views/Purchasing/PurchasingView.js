@@ -18,7 +18,7 @@ function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'defau
 
 var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 
-const PurchasingView = ({ purchasingImageSrc, purchasingMessages: customPurchasingMessages, orgID, invoiceID, savedPaymentMethods, selectedPaymentMethod, walletAddress, onPurchaseSuccess, onPurchaseError, onDialogBlocked, debug, }) => {
+const PurchasingView = ({ purchasingImageSrc, purchasingMessages: customPurchasingMessages, orgID, invoiceID, savedPaymentMethods, selectedPaymentMethod, wallet, onPurchaseSuccess, onPurchaseError, onDialogBlocked, debug, }) => {
     var _a, _b, _c;
     const { billingInfo, paymentInfo, cvv } = selectedPaymentMethod;
     const isCreditCardPayment = cvv || (typeof paymentInfo === "object" && paymentInfo.type === "CreditCard");
@@ -33,7 +33,7 @@ const PurchasingView = ({ purchasingImageSrc, purchasingMessages: customPurchasi
         invoiceID,
         savedPaymentMethods,
         selectedPaymentMethod,
-        walletAddress,
+        wallet,
         debug,
     });
     // Load 3DS redirect URL when needed:
@@ -69,13 +69,13 @@ const PurchasingView = ({ purchasingImageSrc, purchasingMessages: customPurchasi
             onDialogBlocked(true);
             return;
         }
-        if (!hasWaited || redirectURL === "" || purchaseSuccessHandledRef.current)
-            return;
-        purchaseSuccessHandledRef.current = true;
         if (paymentStatus === "error" || paymentError) {
             onPurchaseError(paymentError || errors_constants.ERROR_PURCHASE());
             return;
         }
+        if (!hasWaited || redirectURL === "" || purchaseSuccessHandledRef.current)
+            return;
+        purchaseSuccessHandledRef.current = true;
         if (redirectURL && !url_utils.isLocalhost()) {
             CheckoutOverlay_utils.persistCheckoutModalInfo({
                 invoiceID,

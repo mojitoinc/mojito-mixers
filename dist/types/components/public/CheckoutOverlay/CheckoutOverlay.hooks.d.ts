@@ -2,6 +2,7 @@ import { ApolloError } from "@apollo/client";
 import { Dispatch, SetStateAction } from "react";
 import { CircleFieldErrors } from "../../../domain/circle/circle.utils";
 import { PaymentMethod } from "../../../domain/payment/payment.interfaces";
+import { Wallet } from "../../../domain/wallet/wallet.interfaces";
 import { BillingInfo } from "../../../forms/BillingInfoForm";
 import { TaxesState } from "../../../views/Billing/BillingView";
 export declare type CheckoutModalErrorAt = "reset" | "authentication" | "billing" | "payment" | "purchasing";
@@ -39,7 +40,7 @@ export interface SelectedPaymentMethod {
 export interface PurchaseState {
     invoiceID: string | null;
     taxes: TaxesState;
-    walletAddress: string | null;
+    wallet: null | string | Wallet;
     circlePaymentID: string;
     paymentID: string;
 }
@@ -54,7 +55,7 @@ export interface CheckoutModalStateReturn extends CheckoutModalState, PurchaseSt
     setSelectedPaymentMethod: Dispatch<SetStateAction<SelectedPaymentMethod>>;
     setInvoiceID: (invoiceID: string | null) => void;
     setTaxes: (taxes: TaxesState) => void;
-    setWalletAddress: (walletAddress: string | null) => void;
+    setWalletAddress: (wallet: null | string | Wallet) => void;
     setPayments: (circlePaymentID: string, paymentID: string) => void;
 }
 export declare const CHECKOUT_STEPS: CheckoutModalStep[];

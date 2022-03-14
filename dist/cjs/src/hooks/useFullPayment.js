@@ -7,12 +7,13 @@ var React = require('react');
 var config = require('../config/config.js');
 var circle_utils = require('../domain/circle/circle.utils.js');
 var errors_constants = require('../domain/errors/errors.constants.js');
+var wallet_utils = require('../domain/wallet/wallet.utils.js');
 var graphqlGenerated = require('../queries/graphqlGenerated.js');
 var promiseUtils = require('../utils/promiseUtils.js');
 var useCreatePaymentMethod = require('./useCreatePaymentMethod.js');
 var useEncryptCard = require('./useEncryptCard.js');
 
-function useFullPayment({ orgID, invoiceID, savedPaymentMethods, selectedPaymentMethod, walletAddress, debug = false, }) {
+function useFullPayment({ orgID, invoiceID, savedPaymentMethods, selectedPaymentMethod, wallet, debug = false, }) {
     const [paymentState, setPaymentState] = React.useState({
         paymentStatus: "processing",
         circlePaymentID: "",
@@ -117,9 +118,14 @@ function useFullPayment({ orgID, invoiceID, savedPaymentMethods, selectedPayment
                 invoiceID,
             });
         }
-        const metadata = walletAddress ? {
-            destinationAddress: walletAddress,
-        } : {};
+        let destinationAddress = "";
+        if (typeof wallet === "object") {
+            destinationAddress = (wallet === null || wallet === void 0 ? void 0 : wallet.address) || "";
+        }
+        else {
+            destinationAddress = wallet_utils.filterSpecialWalletAddressValues(wallet);
+        }
+        const metadata = destinationAddress ? { destinationAddress } : {};
         if (cvv) {
             const encryptCardDataResult = yield encryptCardData({
                 cvv,
@@ -174,7 +180,7 @@ function useFullPayment({ orgID, invoiceID, savedPaymentMethods, selectedPayment
         invoiceID,
         savedPaymentMethods,
         selectedPaymentMethod,
-        walletAddress,
+        wallet,
         debug,
         setError,
         encryptCardData,
