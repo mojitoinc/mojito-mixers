@@ -6,17 +6,17 @@ describe("render payment components", () => {
 
   Object.defineProperty(navigator, "clipboard", {
     value: {
-      writeText: () => { console.debug("Copied!") },
+      writeText: () => { /* Do nothing */ },
     },
   });
 
   const customWalletLabel = "Once minted,";
   const walletAddress = "0xb794f5ea0ba39494ce839613fffba74279579268";
 
-  let walletDetails: DeliveryWalletSelectorProps;
+  let deliveryWalletSelectorProps: DeliveryWalletSelectorProps;
 
   beforeAll(() => {
-    walletDetails = {
+    deliveryWalletSelectorProps = {
       dictionary: {
         walletInfo: "",
         walletMultiSigTooltip: "",
@@ -30,14 +30,14 @@ describe("render payment components", () => {
   });
 
   it("render wallet selector with new wallet option", async () => {
-    render(<DeliveryWalletSelector { ...walletDetails } />);
+    render(<DeliveryWalletSelector { ...deliveryWalletSelectorProps } />);
 
     expect(screen.queryByText(NEW_WALLET_OPTION.label, { exact: false })).toBeInTheDocument();
     expect(screen.queryByText(customWalletLabel, { exact: false })).not.toBeInTheDocument();
   });
 
   it("render wallet selector with custom wallet option", async () => {
-    render(<DeliveryWalletSelector { ...walletDetails } wallet={ walletAddress } />);
+    render(<DeliveryWalletSelector { ...deliveryWalletSelectorProps } wallet={ walletAddress } />);
 
     expect(screen.queryByText(CUSTOM_WALLET_OPTION.label, { exact: false })).toBeInTheDocument();
     expect(screen.queryByText(customWalletLabel, { exact: false })).toBeInTheDocument();
@@ -51,7 +51,7 @@ describe("render payment components", () => {
       network: { id: "1", name: "Test Network" },
     };
 
-    render(<DeliveryWalletSelector { ...walletDetails } wallet={ walletAddress } wallets={ [TEST_WALLET] } />);
+    render(<DeliveryWalletSelector { ...deliveryWalletSelectorProps } wallet={ walletAddress } wallets={ [TEST_WALLET] } />);
 
     expect(screen.getByText(walletAddress, { exact: false })).toBeInTheDocument();
     expect(screen.queryByText(customWalletLabel, { exact: false })).not.toBeInTheDocument();

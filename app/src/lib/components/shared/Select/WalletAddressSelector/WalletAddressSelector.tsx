@@ -88,10 +88,7 @@ export const WalletAddressSelector: React.FC<WalletAddressSelectorProps> = ({
   useEffect(() => {
     if (wallets === undefined || wallet !== null) return;
 
-    setTimeout(() => {
-      onSelectWallet(wallets[0] || NEW_WALLET_OPTION.value);
-
-    }, 5000)
+    onSelectWallet(wallets[0] || NEW_WALLET_OPTION.value);
   }, [wallets, wallet, onSelectWallet]);
 
 
