@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { DeliveryWalletDetails, DeliveryWalletDetailsProps } from "./DeliveryWalletDetails";
 
-describe("render payment components", () => {
+describe("DeliveryWalletDetails", () => {
 
   Object.defineProperty(navigator, "clipboard", {
     value: {
@@ -32,7 +32,7 @@ describe("render payment components", () => {
 
     button.click();
 
-    expect(screen.queryByText(walletAddress)).toBeInTheDocument();
-    expect(screen.getByText("Copied", { exact: false })).toBeInTheDocument();
+    expect(screen.getByDisplayValue(walletAddress)).toBeInTheDocument();
+    expect(screen.queryByText("Copied", { exact: false })).toBeInTheDocument();
   })
 })

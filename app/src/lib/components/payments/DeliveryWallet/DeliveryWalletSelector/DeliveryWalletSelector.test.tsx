@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react";
 import { CUSTOM_WALLET_OPTION, NEW_WALLET_OPTION } from "../../../shared/Select/WalletAddressSelector/WalletAddressSelector";
 import { DeliveryWalletSelector, DeliveryWalletSelectorProps } from "./DeliveryWalletSelector";
 
-describe("render payment components", () => {
+describe("DeliveryWalletSelector", () => {
 
   Object.defineProperty(navigator, "clipboard", {
     value: {
@@ -30,7 +30,7 @@ describe("render payment components", () => {
   });
 
   it("render wallet selector with new wallet option", async () => {
-    render(<DeliveryWalletSelector { ...deliveryWalletSelectorProps } />);
+    render(<DeliveryWalletSelector { ...deliveryWalletSelectorProps } wallet="<NEW>" />);
 
     expect(screen.queryByText(NEW_WALLET_OPTION.label, { exact: false })).toBeInTheDocument();
     expect(screen.queryByText(customWalletLabel, { exact: false })).not.toBeInTheDocument();
@@ -51,7 +51,7 @@ describe("render payment components", () => {
       network: { id: "1", name: "Test Network" },
     };
 
-    render(<DeliveryWalletSelector { ...deliveryWalletSelectorProps } wallet={ walletAddress } wallets={ [TEST_WALLET] } />);
+    render(<DeliveryWalletSelector { ...deliveryWalletSelectorProps } wallet={ TEST_WALLET } wallets={ [TEST_WALLET] } />);
 
     expect(screen.getByText(walletAddress, { exact: false })).toBeInTheDocument();
     expect(screen.queryByText(customWalletLabel, { exact: false })).not.toBeInTheDocument();
