@@ -24,6 +24,7 @@ var useCreateInvoiceAndReservation = require('../../../hooks/useCreateInvoiceAnd
 var useCheckoutItemCostTotal = require('../../../hooks/useCheckoutItemCostTotal.js');
 var dictionary_constants = require('../../../domain/dictionary/dictionary.constants.js');
 var config = require('../../../config/config.js');
+var WalletAddressSelector = require('../../shared/Select/WalletAddressSelector/WalletAddressSelector.js');
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
@@ -36,7 +37,7 @@ open, onClose, onGoToCollection,
 guestCheckoutEnabled, productConfirmationEnabled, 
 // Personalization:
 logoSrc, logoSx, loaderImageSrc, purchasingImageSrc, purchasingMessages, errorImageSrc, userFormat, acceptedPaymentTypes, paymentLimits, // Not implemented yet. Used to show payment limits for some payment types.
-dictionary: parentDictionary, 
+dictionary: parentDictionary, network, 
 // Legal:
 consentType, privacyHref, termsOfUseHref, 
 // Data:
@@ -46,12 +47,21 @@ onLogin, isAuthenticated, isAuthenticatedLoading,
 // Other Events:
 debug: initialDebug, onEvent, onError, onMarketingOptInChange, // Not implemented yet. Used to let user subscribe / unsubscribe to marketing updates.
  }) => {
-    var _a, _b, _c, _d;
+    var _a, _b, _c;
     const [debug, setDebug] = React.useState(!!initialDebug);
     // TODO: This should end up being in a context + hook to avoid prop drilling and it should be memoized:
     const dictionary = Object.assign(Object.assign({}, dictionary_constants.DEFAULT_DICTIONARY), parentDictionary);
     // First, get user data and saved payment methods:
     const { data: meData, loading: meLoading, error: meError, refetch: meRefetch, } = graphqlGenerated.useMeQuery({ skip: !isAuthenticated });
+    const wallets = React.useMemo(() => {
+        var _a;
+        if (meLoading || !meData)
+            return undefined;
+        const userWallets = ((_a = meData.me) === null || _a === void 0 ? void 0 : _a.wallets) || [];
+        return network
+            ? userWallets.filter(wallet => { var _a; return ((_a = wallet === null || wallet === void 0 ? void 0 : wallet.network) === null || _a === void 0 ? void 0 : _a.id) === network.id; })
+            : userWallets;
+    }, [meLoading, meData, network]);
     const { data: paymentMethodsData, loading: paymentMethodsLoading, error: paymentMethodsError, refetch: refetchPaymentMethods, } = graphqlGenerated.useGetPaymentMethodListQuery({
         skip: !isAuthenticated,
         variables: { orgID },
@@ -63,7 +73,7 @@ debug: initialDebug, onEvent, onError, onMarketingOptInChange, // Not implemente
     // SelectedPaymentMethod:
     selectedPaymentMethod, setSelectedPaymentMethod, 
     // PurchaseState:
-    invoiceID, setInvoiceID, taxes, setTaxes, walletAddress, setWalletAddress, paymentID, circlePaymentID, setPayments, } = CheckoutOverlay_hooks.useCheckoutModalState({
+    invoiceID, setInvoiceID, taxes, setTaxes, wallet, setWalletAddress, paymentID, circlePaymentID, setPayments, } = CheckoutOverlay_hooks.useCheckoutModalState({
         invoiceID: initialInvoiceID,
         productConfirmationEnabled,
         isAuthenticated,
@@ -85,11 +95,13 @@ debug: initialDebug, onEvent, onError, onMarketingOptInChange, // Not implemente
     const invoiceItems = invoiceDetailsData === null || invoiceDetailsData === void 0 ? void 0 : invoiceDetailsData.getInvoiceDetails.items;
     const checkoutItems = React.useMemo(() => product_utils.transformCheckoutItemsFromInvoice(parentCheckoutItems, invoiceItems), [parentCheckoutItems, invoiceItems]);
     const { total: subtotal, fees, taxAmount } = useCheckoutItemCostTotal.useCheckoutItemsCostTotal(checkoutItems);
-    const destinationAddress = ((_b = (_a = (invoiceItems || [])) === null || _a === void 0 ? void 0 : _a[0]) === null || _b === void 0 ? void 0 : _b.destinationAddress) || null;
+    const destinationAddress = ((_b = (_a = (invoiceItems || [])) === null || _a === void 0 ? void 0 : _a[0]) === null || _b === void 0 ? void 0 : _b.destinationAddress) || WalletAddressSelector.NEW_WALLET_OPTION.value;
     React.useEffect(() => {
-        if (destinationAddress)
-            setWalletAddress(destinationAddress || null);
-    }, [destinationAddress, setWalletAddress]);
+        if (!destinationAddress)
+            return;
+        const wallet = (wallets || []).find(({ address }) => address === destinationAddress);
+        setWalletAddress(wallet || destinationAddress);
+    }, [wallets, destinationAddress, setWalletAddress]);
     // Invoice creation & buy now lot reservation:
     const createInvoiceAndReservationCalledRef = React.useRef(false);
     const { invoiceAndReservationState, createInvoiceAndReservation, countdownElementRef, } = useCreateInvoiceAndReservation.useCreateInvoiceAndReservation({ orgID, checkoutItems, stop: checkoutStep === "confirmation", debug });
@@ -145,7 +157,7 @@ debug: initialDebug, onEvent, onError, onMarketingOptInChange, // Not implemente
             // Purchase:
             departmentCategory: "NFT",
             paymentType,
-            shippingMethod: walletAddress ? "custom wallet" : "multisig wallet",
+            shippingMethod: typeof wallet === "object" ? "multisig wallet" : "custom wallet",
             checkoutItems,
             // Payment:
             currency: "USD",
@@ -383,18 +395,18 @@ debug: initialDebug, onEvent, onError, onMarketingOptInChange, // Not implemente
         checkoutStepElement = (React__default["default"].createElement(AuthenticationView.AuthenticationView, { checkoutItems: checkoutItems, taxes: taxes, isAuthenticated: isAuthenticated, guestCheckoutEnabled: guestCheckoutEnabled, onGuestClicked: goNext, onCloseClicked: handleClose }));
     }
     else if (checkoutStep === "billing") {
-        checkoutStepElement = (React__default["default"].createElement(BillingView.BillingView, { checkoutItems: checkoutItems, savedPaymentMethods: savedPaymentMethods, selectedBillingInfo: selectedPaymentMethod.billingInfo, walletAddress: walletAddress, checkoutError: checkoutError, onBillingInfoSelected: handleBillingInfoSelected, onTaxesChange: setTaxes, onSavedPaymentMethodDeleted: handleSavedPaymentMethodDeleted, onWalletAddressChange: setWalletAddress, onNext: goNext, onClose: handleClose, dictionary: dictionary, debug: debug }));
+        checkoutStepElement = (React__default["default"].createElement(BillingView.BillingView, { checkoutItems: checkoutItems, savedPaymentMethods: savedPaymentMethods, selectedBillingInfo: selectedPaymentMethod.billingInfo, wallet: wallet, wallets: wallets, checkoutError: checkoutError, onBillingInfoSelected: handleBillingInfoSelected, onTaxesChange: setTaxes, onSavedPaymentMethodDeleted: handleSavedPaymentMethodDeleted, onWalletChange: setWalletAddress, onNext: goNext, onClose: handleClose, dictionary: dictionary, debug: debug }));
     }
     else if (checkoutStep === "payment") {
-        checkoutStepElement = (React__default["default"].createElement(PaymentView.PaymentView, { checkoutItems: checkoutItems, taxes: taxes, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethod: selectedPaymentMethod, walletAddress: walletAddress, checkoutError: checkoutError, onPaymentInfoSelected: handlePaymentInfoSelected, onCvvSelected: handleCvvSelected, onSavedPaymentMethodDeleted: handleSavedPaymentMethodDeleted, onWalletAddressChange: setWalletAddress, onNext: goNext, onPrev: goBack, onClose: handleClose, acceptedPaymentTypes: acceptedPaymentTypes, consentType: consentType, privacyHref: privacyHref, termsOfUseHref: termsOfUseHref, dictionary: dictionary, debug: debug }));
+        checkoutStepElement = (React__default["default"].createElement(PaymentView.PaymentView, { checkoutItems: checkoutItems, taxes: taxes, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethod: selectedPaymentMethod, wallet: wallet, wallets: wallets, checkoutError: checkoutError, onPaymentInfoSelected: handlePaymentInfoSelected, onCvvSelected: handleCvvSelected, onSavedPaymentMethodDeleted: handleSavedPaymentMethodDeleted, onWalletChange: setWalletAddress, onNext: goNext, onPrev: goBack, onClose: handleClose, acceptedPaymentTypes: acceptedPaymentTypes, consentType: consentType, privacyHref: privacyHref, termsOfUseHref: termsOfUseHref, dictionary: dictionary, debug: debug }));
     }
     else if (checkoutStep === "purchasing" && invoiceID) {
         headerVariant = "purchasing";
-        checkoutStepElement = (React__default["default"].createElement(PurchasingView.PurchasingView, { purchasingImageSrc: purchasingImageSrc, purchasingMessages: purchasingMessages, orgID: orgID, invoiceID: invoiceID, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethod: selectedPaymentMethod, walletAddress: walletAddress, onPurchaseSuccess: handlePurchaseSuccess, onPurchaseError: handlePurchaseError, onDialogBlocked: setIsDialogBlocked, debug: debug }));
+        checkoutStepElement = (React__default["default"].createElement(PurchasingView.PurchasingView, { purchasingImageSrc: purchasingImageSrc, purchasingMessages: purchasingMessages, orgID: orgID, invoiceID: invoiceID, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethod: selectedPaymentMethod, wallet: wallet, onPurchaseSuccess: handlePurchaseSuccess, onPurchaseError: handlePurchaseError, onDialogBlocked: setIsDialogBlocked, debug: debug }));
     }
     else if (checkoutStep === "confirmation") {
         headerVariant = "logoOnly";
-        checkoutStepElement = (React__default["default"].createElement(ConfirmationView.ConfirmationView, { checkoutItems: checkoutItems, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethod: selectedPaymentMethod, circlePaymentID: circlePaymentID, walletAddress: walletAddress || "", wallets: ((_c = meData === null || meData === void 0 ? void 0 : meData.me) === null || _c === void 0 ? void 0 : _c.wallets) || undefined, onGoToCollection: onGoToCollection, onNext: handleClose, dictionary: dictionary }));
+        checkoutStepElement = (React__default["default"].createElement(ConfirmationView.ConfirmationView, { checkoutItems: checkoutItems, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethod: selectedPaymentMethod, circlePaymentID: circlePaymentID, wallet: wallet, onGoToCollection: onGoToCollection, onNext: handleClose, dictionary: dictionary }));
     }
     else {
         // !checkoutStep or
@@ -403,7 +415,7 @@ debug: initialDebug, onEvent, onError, onMarketingOptInChange, // Not implemente
         // some other kind of indeterminate / incorrect state:
         return null;
     }
-    const headerElement = (React__default["default"].createElement(CheckoutModalHeader.CheckoutModalHeader, { variant: headerVariant, countdownElementRef: countdownElementRef, logoSrc: logoSrc, logoSx: logoSx, user: (_d = meData === null || meData === void 0 ? void 0 : meData.me) === null || _d === void 0 ? void 0 : _d.user, userFormat: userFormat, onLoginClicked: onLogin, onPrevClicked: checkoutStep === "authentication" ? handleClose : goBack, setDebug: setDebug }));
+    const headerElement = (React__default["default"].createElement(CheckoutModalHeader.CheckoutModalHeader, { variant: headerVariant, countdownElementRef: countdownElementRef, logoSrc: logoSrc, logoSx: logoSx, user: (_c = meData === null || meData === void 0 ? void 0 : meData.me) === null || _c === void 0 ? void 0 : _c.user, userFormat: userFormat, onLoginClicked: onLogin, onPrevClicked: checkoutStep === "authentication" ? handleClose : goBack, setDebug: setDebug }));
     return (React__default["default"].createElement(FullScreenOverlay.FullScreenOverlay, { centered: checkoutStep === "purchasing" || checkoutStep === "error", open: open, onClose: handleClose, isDialogBlocked: isDialogBlocked, contentKey: checkoutStep, header: headerElement, children: checkoutStepElement }));
 };
 const PUICheckout = ProvidersInjector.withProviders(PUICheckoutOverlay);

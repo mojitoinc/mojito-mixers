@@ -2,15 +2,16 @@ import { Select as MuiSelect, SelectProps as MuiSelectProps, InputLabel, MenuIte
 import { SelectIcon } from "../Icons/Icons";
 import React from "react";
 
-export interface SelectOption {
-  value: string | number;
+export interface SelectOption<V = string | number> {
+  value: V;
   label: string;
 };
 
-export interface SelectProps extends MuiSelectProps<string | number> {
+export interface SelectProps extends Omit<MuiSelectProps<string | number>, "margin"> {
   label: React.ReactNode;
   options: SelectOption[];
   helperText?: string;
+  margin?: "none" | "dense" | "normal";
 };
 
 export const EMPTY_OPTION: SelectOption = {
@@ -26,6 +27,7 @@ export const Select: React.FC<SelectProps> = ({
   options = [],
   helperText,
   error,
+  margin = "normal",
   ...props
 }) => {
 

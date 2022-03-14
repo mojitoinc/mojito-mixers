@@ -6,17 +6,19 @@ import { CheckoutModalError, SelectedPaymentMethod } from "../../components/publ
 import { ConsentType } from "../../components/shared/ConsentText/ConsentText";
 import { TaxesState } from "../Billing/BillingView";
 import { PUIDictionary } from "../../domain/dictionary/dictionary.interfaces";
+import { Wallet } from "../../domain/wallet/wallet.interfaces";
 export interface PaymentViewProps {
     checkoutItems: CheckoutItem[];
     taxes: TaxesState;
     savedPaymentMethods: SavedPaymentMethod[];
     selectedPaymentMethod: SelectedPaymentMethod;
-    walletAddress: string | null;
+    wallets?: Wallet[];
+    wallet: null | string | Wallet;
     checkoutError?: CheckoutModalError;
     onPaymentInfoSelected: (data: string | PaymentMethod) => void;
     onCvvSelected: (cvv: string) => void;
     onSavedPaymentMethodDeleted: (savedPaymentMethodId: string) => void;
-    onWalletAddressChange: (walletAddress: string | null) => void;
+    onWalletChange: (wallet: null | string | Wallet) => void;
     onNext: () => void;
     onPrev: () => void;
     onClose: () => void;

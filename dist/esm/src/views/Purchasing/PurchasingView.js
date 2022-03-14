@@ -7,10 +7,10 @@ import { XS_MOBILE_MAX_WIDTH } from '../../config/theme/theme.js';
 import { StatusIcon } from '../../components/shared/StatusIcon/StatusIcon.js';
 import { useGetPaymentNotificationQuery } from '../../queries/graphqlGenerated.js';
 import { persistCheckoutModalInfo } from '../../components/public/CheckoutOverlay/CheckoutOverlay.utils.js';
-import { PURCHASING_MIN_WAIT_MS, PAYMENT_NOTIFICATION_INTERVAL_MS, PURCHASING_MESSAGES_DEFAULT, PURCHASING_MESSAGES_INTERVAL_MS } from '../../config/config.js';
+import { PURCHASING_MIN_WAIT_MS, PAYMENT_NOTIFICATION_INTERVAL_MS, PAYMENT_CREATION_TIMEOUT_MS, PURCHASING_MESSAGES_DEFAULT, PURCHASING_MESSAGES_INTERVAL_MS } from '../../config/config.js';
 import { isLocalhost } from '../../domain/url/url.utils.js';
 
-const PurchasingView = ({ purchasingImageSrc, purchasingMessages: customPurchasingMessages, orgID, invoiceID, savedPaymentMethods, selectedPaymentMethod, walletAddress, onPurchaseSuccess, onPurchaseError, onDialogBlocked, debug, }) => {
+const PurchasingView = ({ purchasingImageSrc, purchasingMessages: customPurchasingMessages, orgID, invoiceID, savedPaymentMethods, selectedPaymentMethod, wallet, onPurchaseSuccess, onPurchaseError, onDialogBlocked, debug, }) => {
     var _a, _b, _c;
     const { billingInfo, paymentInfo, cvv } = selectedPaymentMethod;
     const isCreditCardPayment = cvv || (typeof paymentInfo === "object" && paymentInfo.type === "CreditCard");
@@ -25,7 +25,7 @@ const PurchasingView = ({ purchasingImageSrc, purchasingMessages: customPurchasi
         invoiceID,
         savedPaymentMethods,
         selectedPaymentMethod,
-        walletAddress,
+        wallet,
         debug,
     });
     // Load 3DS redirect URL when needed:
@@ -48,7 +48,7 @@ const PurchasingView = ({ purchasingImageSrc, purchasingMessages: customPurchasi
             return;
         purchaseSuccessHandledRef.current = true;
         onPurchaseError(ERROR_PURCHASE_TIMEOUT());
-    }, redirectURL === null ? null : 5000, [onPurchaseError]);
+    }, redirectURL === null ? null : PAYMENT_CREATION_TIMEOUT_MS, [onPurchaseError]);
     useEffect(() => {
         if (fullPaymentCalledRef.current)
             return;
@@ -61,13 +61,13 @@ const PurchasingView = ({ purchasingImageSrc, purchasingMessages: customPurchasi
             onDialogBlocked(true);
             return;
         }
-        if (!hasWaited || redirectURL === "" || purchaseSuccessHandledRef.current)
-            return;
-        purchaseSuccessHandledRef.current = true;
         if (paymentStatus === "error" || paymentError) {
             onPurchaseError(paymentError || ERROR_PURCHASE());
             return;
         }
+        if (!hasWaited || redirectURL === "" || purchaseSuccessHandledRef.current)
+            return;
+        purchaseSuccessHandledRef.current = true;
         if (redirectURL && !isLocalhost()) {
             persistCheckoutModalInfo({
                 invoiceID,

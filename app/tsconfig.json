@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "baseUrl": "./app/src",
+    "baseUrl": "src",
     "target": "es5",
     "lib": [
       "dom",
@@ -20,36 +20,37 @@
     "isolatedModules": true,
     "paths": {
       "@components/*": [
-        "components/*"
+        "lib/components/*"
       ],
       "@services/*": [
         "services/*"
       ],
       "@views/*": [
-        "views/*"
+        "lib/views/*"
       ],
       "@enums/*": [
-        "domain/enums/*"
+        "lib/domain/enums/*"
       ],
       "@interfaces/*": [
-        "domain/interfaces/*"
+        "lib/domain/interfaces/*"
       ],
       "@constants/*": [
-        "domain/constants/*"
+        "lib/domain/constants/*"
       ],
       "@hooks/*": [
-        "utils/hooks/*"
+        "lib/utils/hooks/*"
       ],
       "@lib/*": [
         "lib/*"
-      ],
+      ]
     },
     "incremental": true
   },
   "include": [
     "next-env.d.ts",
     "**/*.ts",
-    "**/*.tsx"
+    "**/*.tsx",
+    "types.d.ts"
   ],
   "exclude": [
     "node_modules",

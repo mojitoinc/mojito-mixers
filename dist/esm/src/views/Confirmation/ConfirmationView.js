@@ -5,7 +5,7 @@ import { PurchaseConfirmationBillingDetails } from '../../components/payments/Pu
 import { PurchaseConfirmationItemDetails } from '../../components/payments/PurchaseConfirmationItemDetails/PurchaseConfirmationItemDetails.js';
 import { billingInfoToSavedPaymentMethodBillingInfo } from '../../domain/circle/circle.utils.js';
 
-const ConfirmationView = ({ checkoutItems, savedPaymentMethods, selectedPaymentMethod, circlePaymentID, walletAddress, wallets, onGoToCollection, onNext, dictionary, }) => {
+const ConfirmationView = ({ checkoutItems, savedPaymentMethods, selectedPaymentMethod, circlePaymentID, wallet, onGoToCollection, onNext, dictionary, }) => {
     const { billingInfo: selectedBillingInfo, paymentInfo: selectedPaymentInfo, } = selectedPaymentMethod;
     const { selectedPaymentMethodBillingInfo, selectedPaymentMethodPaymentInfo, } = useMemo(() => {
         if (typeof selectedPaymentInfo === "string") {
@@ -29,7 +29,7 @@ const ConfirmationView = ({ checkoutItems, savedPaymentMethods, selectedPaymentM
             sm: "column",
             md: "row",
         }, spacing: 8.75, sx: { display: "flex" } },
-        React__default.createElement(PurchaseConfirmationBillingDetails, { checkoutItems: checkoutItems, circlePaymentID: circlePaymentID, walletAddress: walletAddress, wallets: wallets, selectedPaymentMethodBillingInfo: selectedPaymentMethodBillingInfo, selectedPaymentMethodPaymentInfo: selectedPaymentMethodPaymentInfo, dictionary: dictionary }),
+        React__default.createElement(PurchaseConfirmationBillingDetails, { checkoutItems: checkoutItems, circlePaymentID: circlePaymentID, wallet: wallet, selectedPaymentMethodBillingInfo: selectedPaymentMethodBillingInfo, selectedPaymentMethodPaymentInfo: selectedPaymentMethodPaymentInfo, dictionary: dictionary }),
         React__default.createElement(Stack, { sx: { display: "flex", flex: 1 } },
             React__default.createElement(PurchaseConfirmationItemDetails, { checkoutItems: checkoutItems, dictionary: dictionary }),
             React__default.createElement(CheckoutModalFooter, { variant: "toMarketplace", onSubmitClicked: onNext, onGoToCollection: onGoToCollection }))));

@@ -1,29 +1,21 @@
 import { Box, Chip, Tooltip, Typography } from "@mui/material";
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import { CopyButton } from "../../shared/CopyButton/CopyButton";
-import { ReadOnlyWalletAddress } from "../../shared/ReadOnlyField/ReadOnlyField";
-import { PUIDictionary } from "../../../domain/dictionary/dictionary.interfaces";
-import React, { useMemo } from "react";
-
-export interface Wallet {
-  id: string;
-  name: string;
-  address: string;
-}
+import { CopyButton } from "../../../shared/CopyButton/CopyButton";
+import { ReadOnlyWalletAddress } from "../../../shared/ReadOnlyField/ReadOnlyField";
+import { PUIDictionary } from "../../../../domain/dictionary/dictionary.interfaces";
+import React from "react";
+import { Wallet } from "../../../../domain/wallet/wallet.interfaces";
 
 export interface DeliveryWalletDetailsProps {
-  walletAddress: string;
-  wallets?: Wallet[];
+  wallet: null | string | Wallet;
   dictionary: PUIDictionary;
 }
-const DeliveryWalletDetails: React.FC<DeliveryWalletDetailsProps> = ({
-  walletAddress,
-  wallets,
+export const DeliveryWalletDetails: React.FC<DeliveryWalletDetailsProps> = ({
+  wallet,
   dictionary,
 }) => {
-  const isMultiSig = useMemo(() => {
-    return wallets && wallets.some(({ address }) => address === walletAddress);
-  }, [walletAddress, wallets]);
+  const walletAddress = (typeof wallet === "object" ? wallet?.address : wallet) || "";
+  const isMultiSig = typeof wallet === "object" || !walletAddress;
 
   return (
     <Box pt={2}>
@@ -32,7 +24,7 @@ const DeliveryWalletDetails: React.FC<DeliveryWalletDetailsProps> = ({
       <Box sx={{ display: "flex", justifyContent: "space-between", mt: 1, mb: walletAddress ? 1 : 0, alignItems: "center" }}>
         <Typography sx={{ fontWeight: "500" }}>{ walletAddress ? "Wallet Address" : "New MultiSig Wallet" }</Typography>
 
-          { (isMultiSig || !walletAddress) && (
+          { isMultiSig && (
             <Tooltip title={ dictionary.walletMultiSigTooltip }>
               <Chip
                 variant="outlined"
@@ -62,4 +54,3 @@ const DeliveryWalletDetails: React.FC<DeliveryWalletDetailsProps> = ({
   );
 }
 
-export default DeliveryWalletDetails;

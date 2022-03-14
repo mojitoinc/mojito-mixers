@@ -16,7 +16,7 @@
 
 <p align="center">
   <a href="https://payments-staging.mojito.xyz/" target="_blank">
-    <img src="./app/public/img/og-images/mojito-payment-ui-payment.png" width="1280" />
+    <img src="./app/public/img/og-images/mojito-payment-ui.png" width="1280" />
   </a>
 </p>
 
@@ -377,6 +377,32 @@ Note that using MUI's `ThemeProvider` from your project won't work as expected a
 There are some texts inside the Payment UI that you can customize using `PUICheckout`'s `dictionary` prop (more to come, ideally all texts should be customizable). You can find them all with their respective default values here:
 
 [`app/src/lib/domain/dictionary/dictionary.constants.tsx`](./app/src/lib/domain/dictionary/dictionary.constants.tsx).
+
+<br />
+
+
+### (Secret) Debug Mode
+
+If you quickly click the logo in the top-right corner 16 times, the debug mode will be enabled (toggled, actually), even in production and regardless of
+the initial value you passed for the `debug` prop.
+
+The debug mode will, among logging/displaying some other less relevant pieces of data:
+
+<br />
+
+
+- Show form values and errors as JSON below the form:
+
+  ![Debug form phone input](./screenshots/debug-phone.png)
+
+  ![Debug form values and errors](./screenshots/debug-form-values.png)
+
+<br />
+
+
+- Show additional logging information for the most relevant queries/mutation being made:
+
+  ![Debug GraphQL queries/mutations log](./screenshots/graphql-logs.png)
 
 <br />
 
