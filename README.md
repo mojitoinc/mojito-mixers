@@ -381,6 +381,32 @@ There are some texts inside the Payment UI that you can customize using `PUIChec
 <br />
 
 
+### (Secret) Debug Mode
+
+If you quickly click the logo in the top-right corner 16 times, the debug mode will be enabled (toggled, actually), even in production and regardless of
+the initial value you passed for the `debug` prop.
+
+The debug mode will, among logging/displaying some other less relevant pieces of data:
+
+<br />
+
+
+- Show form values and errors as JSON below the form:
+
+  ![Debug form phone input](./screenshots/debug-phone.png)
+
+  ![Debug form values and errors](./screenshots/debug-form-values.png)
+
+<br />
+
+
+- Show additional logging information for the most relevant queries/mutation being made:
+
+  ![Debug GraphQL queries/mutations log](./screenshots/graphql-logs.png)
+
+<br />
+
+
 ## TypeScript Support
 
 You will have to copy the following file into your project to avoid TypeScript errors when using custom props in MUI's theme:
