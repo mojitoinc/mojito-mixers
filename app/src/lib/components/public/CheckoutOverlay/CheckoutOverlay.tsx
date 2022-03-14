@@ -30,6 +30,7 @@ import { DEFAULT_DICTIONARY } from "../../../domain/dictionary/dictionary.consta
 import { ApolloError } from "@apollo/client";
 import { Wallet } from "../../../domain/wallet/wallet.interfaces";
 import { THREEDS_REDIRECT_DELAY_MS } from "../../../config/config";
+import { Network } from "../../../domain/network/network.interfaces";
 
 export interface PUICheckoutOverlayProps {
   // Modal:
@@ -52,6 +53,7 @@ export interface PUICheckoutOverlayProps {
   acceptedPaymentTypes: PaymentType[];
   paymentLimits?: Partial<Record<PaymentType, number>>;
   dictionary?: Partial<PUIDictionary>,
+  network?: Network,
 
   // Legal:
   consentType?: ConsentType;
@@ -98,6 +100,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   acceptedPaymentTypes,
   paymentLimits, // Not implemented yet. Used to show payment limits for some payment types.
   dictionary: parentDictionary,
+  network,
 
   // Legal:
   consentType,
@@ -137,7 +140,14 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     refetch: meRefetch,
   } = useMeQuery({ skip: !isAuthenticated });
 
-  const wallets = meData?.me?.wallets as Wallet[] || undefined;
+  const userWallets = meData?.me?.wallets as Wallet[] || undefined;
+
+  const availableWallets = useMemo(
+    () => network
+      ? userWallets?.filter(wallet => wallet?.network?.id === network.id)
+      : userWallets,
+    [network, userWallets]
+  );
 
   const {
     data: paymentMethodsData,
@@ -639,7 +649,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
         savedPaymentMethods={ savedPaymentMethods }
         selectedBillingInfo={ selectedPaymentMethod.billingInfo }
         walletAddress={ walletAddress }
-        wallets={ wallets }
+        wallets={ availableWallets }
         checkoutError={ checkoutError }
         onBillingInfoSelected={ handleBillingInfoSelected }
         onTaxesChange={ setTaxes }
@@ -658,7 +668,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
         savedPaymentMethods={ savedPaymentMethods }
         selectedPaymentMethod={ selectedPaymentMethod }
         walletAddress={ walletAddress }
-        wallets={ wallets }
+        wallets={ availableWallets }
         checkoutError={ checkoutError }
         onPaymentInfoSelected={ handlePaymentInfoSelected }
         onCvvSelected={ handleCvvSelected }
@@ -701,7 +711,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
         selectedPaymentMethod={ selectedPaymentMethod }
         circlePaymentID={ circlePaymentID }
         walletAddress={ walletAddress || "" }
-        wallets={ wallets }
+        wallets={ availableWallets }
         onGoToCollection={ onGoToCollection }
         onNext={ handleClose }
         dictionary={ dictionary } />
