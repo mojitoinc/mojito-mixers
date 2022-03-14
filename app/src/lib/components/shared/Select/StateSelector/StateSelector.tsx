@@ -9,7 +9,7 @@ import {
 import { SelectChangeEvent } from "@mui/material/Select";
 import { useCountryOptions } from "../../../../hooks/useCountryOptions";
 
-export interface StateSelectorProps extends Omit<SelectProps,  "value" | "options"> {
+export interface StateSelectorProps extends Omit<SelectProps, "value" | "options"> {
   value: SelectOption;
   onSelectState: (selectedOption: SelectOption) => void;
   countryCode: string | number;
@@ -47,12 +47,17 @@ export const StateSelector: React.FC<StateSelectorProps> = ({
   useEffect(() => {
     const { value: selectedValue, label: selectedLabel } = value;
 
+
     if (
       (selectedValue && selectedLabel) ||
       (!selectedValue && !selectedLabel) ||
       options.length === 0
-    )
+    ) {
+      if (!countryCode && value.value !== '') {
+        onSelectState(EMPTY_OPTION)
+      }
       return;
+    }
 
     const option = selectedValue
       ? optionsMap[selectedValue]
@@ -92,6 +97,8 @@ export const ControlledStateSelector: React.FC<ControlledStateSelectorProps> = (
         <StateSelector
           id={name}
           name={name}
+          //autocomplete property is getting passed since it is necessary to pass a 'region' value in order to be recognized by the chrome's autofill feature
+          autoComplete="region"
           label={label}
           onSelectState={onChange}
           fullWidth
