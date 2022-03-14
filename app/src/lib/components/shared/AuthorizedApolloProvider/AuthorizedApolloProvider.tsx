@@ -5,9 +5,11 @@ import {
   InMemoryCache,
   createHttpLink,
   NormalizedCacheObject,
+  Context,
 } from "@apollo/client";
 import { setContext } from "@apollo/client/link/context";
 import { useAuth0 } from "@auth0/auth0-react";
+import { isLocalhost } from "../../../domain/url/url.utils";
 
 const cache = new InMemoryCache();
 
@@ -33,12 +35,16 @@ export const AuthorizedApolloProvider: React.FC<AuthorizedApolloProviderProps> =
     const authLink = setContext(async (_, { headers }) => {
       const token = await getIdTokenClaims();
 
-      return {
+      const context: Context = {
         headers: {
           ...headers,
           authorization: token ? `Bearer ${ token.__raw }` : "",
         },
       };
+
+      if (isLocalhost()) context.headers["origin-overwrite"] = window.location.origin;
+
+      return context;
     });
 
     const link = authLink.concat(httpLink);
