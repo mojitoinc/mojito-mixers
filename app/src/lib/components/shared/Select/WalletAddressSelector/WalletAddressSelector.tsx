@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 import {
   Select,
   SelectOption,
@@ -6,55 +6,103 @@ import {
 } from "../../Select/Select";
 import { SelectChangeEvent } from "@mui/material/Select";
 import { Wallet } from "../../../../domain/wallet/wallet.interfaces";
-
-export interface WalletAddressSelectorProps
-  extends Omit<SelectProps, "value" | "options"> {
-  wallets: Wallet[];
-  selectedAddress: string | null;
-  onSelectAddress: (walletAddress: string | null) => void;
-}
+import { isNewWalletAddress, isSpecialWalletAddressValue } from "../../../../domain/wallet/wallet.utils";
 
 const mapWalletAddressToSelectOption = (wallet: Wallet) => ({
-  value: wallet.address,
-  label: `${wallet.name} (${wallet.address})`,
+  value: wallet.id,
+  label: `${ wallet.name } (${ wallet.address })`,
 });
 
-const reduceSelectOptionsToMap = (
-  optionsMap: Record<string, SelectOption>,
-  selectOption: SelectOption,
-) => {
-  optionsMap[selectOption.value] = selectOption;
-  return optionsMap;
+const reduceWalletsByID = (walletsMap: Record<string, Wallet>, wallet: Wallet) => {
+  walletsMap[wallet.id] = wallet;
+
+  return walletsMap;
 };
 
-const NO_WALLET_OPTION = {
+const reduceWalletsByAddress = (walletsMap: Record<string, Wallet>, wallet: Wallet) => {
+  walletsMap[wallet.address] = wallet;
+
+  return walletsMap;
+};
+
+export const NEW_WALLET_OPTION: SelectOption<string> = {
+  value: "<NEW>",
+  label: "Create a new wallet for me"
+};
+
+export const CUSTOM_WALLET_OPTION: SelectOption<string> = {
   value: "",
-  label: "Create new MultiSig wallet"
+  label: "I already have a wallet (such as Metamask or Rainbow)",
+};
+
+export interface WalletAddressSelectorProps extends Omit<SelectProps, "value" | "options"> {
+  wallets?: Wallet[];
+  wallet: null | string | Wallet;
+  onSelectWallet: (wallet: null | string | Wallet) => void;
 }
 
 export const WalletAddressSelector: React.FC<WalletAddressSelectorProps> = ({
   label,
   wallets,
-  selectedAddress,
-  onSelectAddress,
+  wallet,
+  onSelectWallet,
+  disabled: parentDisabled,
+  error,
+  helperText,
   ...props
 }) => {
-  const options: SelectOption[] = [NO_WALLET_OPTION, ...wallets.map(mapWalletAddressToSelectOption)];
-  const optionsMap: Record<string, SelectOption> = options.reduce(reduceSelectOptionsToMap, {});
+  const { options, walletsByID, walletsByAddress } = useMemo(() => {
+    const options: SelectOption[] = [NEW_WALLET_OPTION, CUSTOM_WALLET_OPTION, ...(wallets || []).map(mapWalletAddressToSelectOption)];
+    const walletsByID: Record<string, Wallet> = (wallets || []).reduce(reduceWalletsByID, {});
+    const walletsByAddress: Record<string, Wallet> = (wallets || []).reduce(reduceWalletsByAddress, {});
 
-  const handleChange = useCallback(
-    (e: SelectChangeEvent<string | number>) => {
-      onSelectAddress(e.target.value as string);
-    },
-    [onSelectAddress]
-  );
+    return { options, walletsByID, walletsByAddress };
+  }, [wallets]);
 
-  // If the selected option can't be found among the available ones, we reset the field:
+  const handleChange = useCallback((e: SelectChangeEvent<string | number>) => {
+    const value = e.target.value as string;
+    const maybeWallet = walletsByID[value];
+
+    onSelectWallet(maybeWallet || value);
+  }, [onSelectWallet, walletsByID]);
+
+
+  // Filter out incorrect values or select MultiSig option if manually entered:
+
   useEffect(() => {
-    if (!selectedAddress) return;
+    if (typeof wallet === "string") {
+      const maybeWallet = walletsByAddress[wallet];
 
-    if (!optionsMap[selectedAddress]) onSelectAddress(null);
-  }, [optionsMap, selectedAddress, onSelectAddress]);
+      // Check if the manually entered value matches a MultiSig wallet:
+      if (maybeWallet) onSelectWallet(maybeWallet);
+
+      return;
+    }
+
+    if (wallet && !walletsByID[wallet.id]) onSelectWallet(NEW_WALLET_OPTION.value);
+  }, [wallet, walletsByID, walletsByAddress, onSelectWallet]);
+
+
+  // Init (first-load only):
+
+  useEffect(() => {
+    if (wallets === undefined || wallet !== null) return;
+
+    setTimeout(() => {
+      onSelectWallet(wallets[0] || NEW_WALLET_OPTION.value);
+
+    }, 5000)
+  }, [wallets, wallet, onSelectWallet]);
+
+
+  // Select display value:
+
+  const selectValue = typeof wallet === "string"
+    ? (isSpecialWalletAddressValue(wallet) ? wallet : CUSTOM_WALLET_OPTION.value)
+    : (wallet?.id || NEW_WALLET_OPTION.value);
+
+  const disabled = parentDisabled || wallets === undefined || wallet === null;
+  const showError = !isNewWalletAddress(wallet);
 
   return (
     <Select
@@ -62,7 +110,10 @@ export const WalletAddressSelector: React.FC<WalletAddressSelectorProps> = ({
       label={label}
       options={options}
       onChange={handleChange}
-      value={selectedAddress as string}
+      value={ selectValue }
+      disabled={ disabled }
+      error={ showError ? error : undefined }
+      helperText={ showError ? helperText : undefined}
       displayEmpty
     />
   );

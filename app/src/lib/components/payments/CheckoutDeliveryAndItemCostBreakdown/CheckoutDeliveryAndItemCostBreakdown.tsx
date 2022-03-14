@@ -12,9 +12,9 @@ interface CheckoutDeliveryAndItemCostBreakdownProps {
   checkoutItems: CheckoutItem[];
   taxes: TaxesState;
   validatePersonalDeliveryAddress: boolean;
-  walletAddress: string | null;
   wallets?: Wallet[];
-  onWalletAddressChange: (walletAddress: string | null) => void;
+  wallet: null | string | Wallet;
+  onWalletChange: (wallet: null | string | Wallet) => void;
   dictionary: PUIDictionary;
 }
 
@@ -22,17 +22,17 @@ export const CheckoutDeliveryAndItemCostBreakdown: React.FC<CheckoutDeliveryAndI
   checkoutItems,
   taxes,
   validatePersonalDeliveryAddress,
-  walletAddress,
   wallets,
-  onWalletAddressChange,
+  wallet,
+  onWalletChange,
   dictionary,
 }) => (
-    <Stack sx={{ display: "flex", flex: 1 }}>
+    <Stack sx={{ display: "flex", width: { xs: "100%", md: "calc(50% - 35px)" } }}>
       <DeliveryWalletSelector
         validatePersonalAddress={ validatePersonalDeliveryAddress }
-        walletAddress={ walletAddress }
         wallets={ wallets }
-        onWalletAddressChange={ onWalletAddressChange }
+        wallet={ wallet }
+        onWalletChange={ onWalletChange }
         dictionary={ dictionary } />
 
       <Divider sx={{ my: 3.75 }} />

@@ -31,6 +31,7 @@ import { ApolloError } from "@apollo/client";
 import { Wallet } from "../../../domain/wallet/wallet.interfaces";
 import { THREEDS_REDIRECT_DELAY_MS } from "../../../config/config";
 import { Network } from "../../../domain/network/network.interfaces";
+import { NEW_WALLET_OPTION } from "../../shared/Select/WalletAddressSelector/WalletAddressSelector";
 
 export interface PUICheckoutOverlayProps {
   // Modal:
@@ -140,14 +141,15 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     refetch: meRefetch,
   } = useMeQuery({ skip: !isAuthenticated });
 
-  const userWallets = meData?.me?.wallets as Wallet[] || undefined;
+  const wallets = useMemo(() => {
+    if (meLoading || !meData) return undefined;
 
-  const availableWallets = useMemo(
-    () => network
-      ? userWallets?.filter(wallet => wallet?.network?.id === network.id)
-      : userWallets,
-    [network, userWallets]
-  );
+    const userWallets = meData.me?.wallets as Wallet[] || [];
+
+    return network
+      ? userWallets.filter(wallet => wallet?.network?.id === network.id)
+      : userWallets;
+  }, [meLoading, meData, network]);
 
   const {
     data: paymentMethodsData,
@@ -182,7 +184,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     setInvoiceID,
     taxes,
     setTaxes,
-    walletAddress,
+    wallet,
     setWalletAddress,
     paymentID,
     circlePaymentID,
@@ -224,11 +226,16 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   const invoiceItems = invoiceDetailsData?.getInvoiceDetails.items;
   const checkoutItems = useMemo(() => transformCheckoutItemsFromInvoice(parentCheckoutItems, invoiceItems), [parentCheckoutItems, invoiceItems]);
   const { total: subtotal, fees, taxAmount } = useCheckoutItemsCostTotal(checkoutItems);
-  const destinationAddress = (invoiceItems || [])?.[0]?.destinationAddress || null;
+  const destinationAddress = (invoiceItems || [])?.[0]?.destinationAddress || NEW_WALLET_OPTION.value;
 
   useEffect(() => {
-    if (destinationAddress) setWalletAddress(destinationAddress || null);
-  }, [destinationAddress, setWalletAddress]);
+    if (!destinationAddress) return;
+
+    const wallet = (wallets || []).find(({ address }) => address === destinationAddress);
+
+    setWalletAddress(wallet || destinationAddress);
+  }, [wallets, destinationAddress, setWalletAddress]);
+
 
   // Invoice creation & buy now lot reservation:
 
@@ -302,7 +309,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
       // Purchase:
       departmentCategory: "NFT",
       paymentType,
-      shippingMethod: walletAddress ? "custom wallet" : "multisig wallet",
+      shippingMethod: typeof wallet === "object" ? "multisig wallet" : "custom wallet",
       checkoutItems,
 
       // Payment:
@@ -648,13 +655,13 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
         checkoutItems={ checkoutItems }
         savedPaymentMethods={ savedPaymentMethods }
         selectedBillingInfo={ selectedPaymentMethod.billingInfo }
-        walletAddress={ walletAddress }
-        wallets={ availableWallets }
+        wallet={ wallet }
+        wallets={ wallets }
         checkoutError={ checkoutError }
         onBillingInfoSelected={ handleBillingInfoSelected }
         onTaxesChange={ setTaxes }
         onSavedPaymentMethodDeleted={ handleSavedPaymentMethodDeleted }
-        onWalletAddressChange={ setWalletAddress }
+        onWalletChange={ setWalletAddress }
         onNext={ goNext }
         onClose={ handleClose }
         dictionary={ dictionary }
@@ -667,13 +674,13 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
         taxes={ taxes }
         savedPaymentMethods={ savedPaymentMethods }
         selectedPaymentMethod={ selectedPaymentMethod }
-        walletAddress={ walletAddress }
-        wallets={ availableWallets }
+        wallet={ wallet }
+        wallets={ wallets }
         checkoutError={ checkoutError }
         onPaymentInfoSelected={ handlePaymentInfoSelected }
         onCvvSelected={ handleCvvSelected }
         onSavedPaymentMethodDeleted={ handleSavedPaymentMethodDeleted }
-        onWalletAddressChange={ setWalletAddress }
+        onWalletChange={ setWalletAddress }
         onNext={ goNext }
         onPrev={ goBack }
         onClose={ handleClose }
@@ -695,7 +702,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
         invoiceID={ invoiceID }
         savedPaymentMethods={ savedPaymentMethods }
         selectedPaymentMethod={ selectedPaymentMethod }
-        walletAddress={ walletAddress }
+        wallet={ wallet }
         onPurchaseSuccess={ handlePurchaseSuccess }
         onPurchaseError={ handlePurchaseError }
         onDialogBlocked={ setIsDialogBlocked }
@@ -710,8 +717,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
         savedPaymentMethods={ savedPaymentMethods }
         selectedPaymentMethod={ selectedPaymentMethod }
         circlePaymentID={ circlePaymentID }
-        walletAddress={ walletAddress || "" }
-        wallets={ availableWallets }
+        wallet={ wallet }
         onGoToCollection={ onGoToCollection }
         onNext={ handleClose }
         dictionary={ dictionary } />
