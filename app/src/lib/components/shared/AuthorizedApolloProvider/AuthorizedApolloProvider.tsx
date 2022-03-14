@@ -42,7 +42,7 @@ export const AuthorizedApolloProvider: React.FC<AuthorizedApolloProviderProps> =
         },
       };
 
-      if (isLocalhost()) context.headers["origin-overwrite"] = window.location.origin;
+      if (isLocalhost()) context.headers["origin-overwrite"] = "https://payments-staging.mojito.xyz/";
 
       return context;
     });
