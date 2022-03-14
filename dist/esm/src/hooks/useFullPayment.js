@@ -3,12 +3,13 @@ import { useState, useCallback } from 'react';
 import { PAYMENT_CREATION_MIN_WAIT_MS } from '../config/config.js';
 import { savedPaymentMethodToBillingInfo, parseCircleError } from '../domain/circle/circle.utils.js';
 import { ERROR_PURCHASE_NO_ITEMS, ERROR_PURCHASE_SELECTED_PAYMENT_METHOD, ERROR_PURCHASE_CREATING_PAYMENT_METHOD, ERROR_PURCHASE_CVV, ERROR_PURCHASE_PAYING } from '../domain/errors/errors.constants.js';
+import { filterSpecialWalletAddressValues } from '../domain/wallet/wallet.utils.js';
 import { useCreatePaymentMutation } from '../queries/graphqlGenerated.js';
 import { wait } from '../utils/promiseUtils.js';
 import { useCreatePaymentMethod } from './useCreatePaymentMethod.js';
 import { useEncryptCardData } from './useEncryptCard.js';
 
-function useFullPayment({ orgID, invoiceID, savedPaymentMethods, selectedPaymentMethod, walletAddress, debug = false, }) {
+function useFullPayment({ orgID, invoiceID, savedPaymentMethods, selectedPaymentMethod, wallet, debug = false, }) {
     const [paymentState, setPaymentState] = useState({
         paymentStatus: "processing",
         circlePaymentID: "",
@@ -113,9 +114,14 @@ function useFullPayment({ orgID, invoiceID, savedPaymentMethods, selectedPayment
                 invoiceID,
             });
         }
-        const metadata = walletAddress ? {
-            destinationAddress: walletAddress,
-        } : {};
+        let destinationAddress = "";
+        if (typeof wallet === "object") {
+            destinationAddress = (wallet === null || wallet === void 0 ? void 0 : wallet.address) || "";
+        }
+        else {
+            destinationAddress = filterSpecialWalletAddressValues(wallet);
+        }
+        const metadata = destinationAddress ? { destinationAddress } : {};
         if (cvv) {
             const encryptCardDataResult = yield encryptCardData({
                 cvv,
@@ -170,7 +176,7 @@ function useFullPayment({ orgID, invoiceID, savedPaymentMethods, selectedPayment
         invoiceID,
         savedPaymentMethods,
         selectedPaymentMethod,
-        walletAddress,
+        wallet,
         debug,
         setError,
         encryptCardData,

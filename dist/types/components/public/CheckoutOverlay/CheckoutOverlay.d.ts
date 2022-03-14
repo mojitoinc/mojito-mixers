@@ -8,6 +8,7 @@ import { ConsentType } from "../../shared/ConsentText/ConsentText";
 import { CheckoutModalError } from "./CheckoutOverlay.hooks";
 import { ProvidersInjectorProps } from "../../shared/ProvidersInjector/ProvidersInjector";
 import { PUIDictionary } from "../../../domain/dictionary/dictionary.interfaces";
+import { Network } from "../../../domain/network/network.interfaces";
 export interface PUICheckoutOverlayProps {
     open: boolean;
     onClose: () => void;
@@ -24,6 +25,7 @@ export interface PUICheckoutOverlayProps {
     acceptedPaymentTypes: PaymentType[];
     paymentLimits?: Partial<Record<PaymentType, number>>;
     dictionary?: Partial<PUIDictionary>;
+    network?: Network;
     consentType?: ConsentType;
     privacyHref?: string;
     termsOfUseHref?: string;

@@ -1,5 +1,5 @@
 import React__default from 'react';
-import { Link, Tooltip } from '@mui/material';
+import { Link, Tooltip, Typography } from '@mui/material';
 
 const walletMultiSigTooltip = React__default.createElement(React__default.Fragment, null,
     "If you don\u2019t already have a wallet, we will create a ",
@@ -10,6 +10,8 @@ const multiSigElement = (React__default.createElement(Tooltip, { title: walletMu
     React__default.createElement(Link, { sx: { color: "text.primary" } }, "MultiSig")));
 const DEFAULT_DICTIONARY = {
     walletInfo: React__default.createElement(React__default.Fragment, null,
+        React__default.createElement(Typography, { sx: { fontWeight: "500" }, component: "strong" }, "This is where your NFT(s) will be delivered after the sale is over."),
+        " ",
         "We will cover gas cost for minting and delivery on both ",
         multiSigElement,
         " and self-hosted wallets. Your items will be delivered to your ",

@@ -8,8 +8,8 @@ const EMPTY_OPTION = {
     value: "",
 };
 const Select = (_a) => {
-    var { id, label, required, disabled, options = [], helperText, error } = _a, props = __rest(_a, ["id", "label", "required", "disabled", "options", "helperText", "error"]);
-    return (React__default.createElement(FormControl, { fullWidth: true, margin: "normal", variant: "filled", disabled: disabled, error: error },
+    var { id, label, required, disabled, options = [], helperText, error, margin } = _a, props = __rest(_a, ["id", "label", "required", "disabled", "options", "helperText", "error", "margin"]);
+    return (React__default.createElement(FormControl, { fullWidth: true, margin: margin, variant: "filled", disabled: disabled, error: error },
         React__default.createElement(InputLabel, { required: required, htmlFor: id, disabled: disabled, shrink: true }, label),
         React__default.createElement(Select$1, Object.assign({ id: id, disabled: disabled, IconComponent: SelectIcon, disableUnderline: true }, props), options.map(({ value, label }) => (React__default.createElement(MenuItem, { key: label, value: value }, label)))),
         helperText && React__default.createElement(FormHelperText, null, helperText)));

@@ -68,8 +68,8 @@ declare type CheckoutEventType = CheckoutModalNavigateType | CheckoutModalEventT
 
 declare type ConsentType = "disclaimer" | "checkbox" | "circle";
 
-interface SelectOption {
-    value: string | number;
+interface SelectOption<V = string | number> {
+    value: V;
     label: string;
 }
 
@@ -82,6 +82,11 @@ declare type PUIDictionary = {
     purchaseInstructions: PUIDictionaryMultiLine;
 };
 declare type PUIDictionaryKeys = keyof PUIDictionary;
+
+interface Network {
+    id: string;
+    name: string;
+}
 
 declare const FULL_NAME_FIELD = "fullName";
 declare const EMAIL_FIELD = "email";
@@ -152,6 +157,7 @@ interface PUICheckoutOverlayProps {
     acceptedPaymentTypes: PaymentType[];
     paymentLimits?: Partial<Record<PaymentType, number>>;
     dictionary?: Partial<PUIDictionary>;
+    network?: Network;
     consentType?: ConsentType;
     privacyHref?: string;
     termsOfUseHref?: string;
