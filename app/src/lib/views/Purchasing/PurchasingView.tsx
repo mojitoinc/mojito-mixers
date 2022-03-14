@@ -12,6 +12,7 @@ import { useGetPaymentNotificationQuery } from "../../queries/graphqlGenerated";
 import { persistCheckoutModalInfo } from "../../components/public/CheckoutOverlay/CheckoutOverlay.utils";
 import { PAYMENT_NOTIFICATION_INTERVAL_MS, PURCHASING_MESSAGES_DEFAULT, PURCHASING_MIN_WAIT_MS, PURCHASING_MESSAGES_INTERVAL_MS, PAYMENT_CREATION_TIMEOUT_MS } from "../../config/config";
 import { isLocalhost } from "../../domain/url/url.utils";
+import { Wallet } from "../../domain/wallet/wallet.interfaces";
 
 export interface PurchasingViewProps {
   purchasingImageSrc?: string;
@@ -20,7 +21,7 @@ export interface PurchasingViewProps {
   invoiceID: string;
   savedPaymentMethods: SavedPaymentMethod[];
   selectedPaymentMethod: SelectedPaymentMethod;
-  walletAddress: string | null;
+  wallet: null | string | Wallet;
   onPurchaseSuccess: (circlePaymentID: string, paymentID: string, redirectURL: string) => void;
   onPurchaseError: (error: string | CheckoutModalError) => void;
   onDialogBlocked: (blocked: boolean) => void;
@@ -34,7 +35,7 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
   invoiceID,
   savedPaymentMethods,
   selectedPaymentMethod,
-  walletAddress,
+  wallet,
   onPurchaseSuccess,
   onPurchaseError,
   onDialogBlocked,
@@ -60,7 +61,7 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
     invoiceID,
     savedPaymentMethods,
     selectedPaymentMethod,
-    walletAddress,
+    wallet,
     debug,
   });
 
@@ -113,15 +114,15 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
       return;
     }
 
-    if (!hasWaited || redirectURL === "" || purchaseSuccessHandledRef.current) return;
-
-    purchaseSuccessHandledRef.current = true;
-
     if (paymentStatus === "error" || paymentError) {
       onPurchaseError(paymentError || ERROR_PURCHASE());
 
       return;
     }
+
+    if (!hasWaited || redirectURL === "" || purchaseSuccessHandledRef.current) return;
+
+    purchaseSuccessHandledRef.current = true;
 
     if (redirectURL && !isLocalhost()) {
       persistCheckoutModalInfo({

@@ -6,13 +6,15 @@ import { CheckoutItemCostBreakdown } from "../CheckoutItemCost/Breakdown/Checkou
 import { CheckoutItem } from "../../../domain/product/product.interfaces";
 import { TaxesState } from "../../../views/Billing/BillingView";
 import { PUIDictionary } from "../../../domain/dictionary/dictionary.interfaces";
+import { Wallet } from "../../../domain/wallet/wallet.interfaces";
 
 interface CheckoutDeliveryAndItemCostBreakdownProps {
   checkoutItems: CheckoutItem[];
   taxes: TaxesState;
   validatePersonalDeliveryAddress: boolean;
-  walletAddress: string | null;
-  onWalletAddressChange: (walletAddress: string | null) => void;
+  wallets?: Wallet[];
+  wallet: null | string | Wallet;
+  onWalletChange: (wallet: null | string | Wallet) => void;
   dictionary: PUIDictionary;
 }
 
@@ -20,19 +22,21 @@ export const CheckoutDeliveryAndItemCostBreakdown: React.FC<CheckoutDeliveryAndI
   checkoutItems,
   taxes,
   validatePersonalDeliveryAddress,
-  walletAddress,
-  onWalletAddressChange,
+  wallets,
+  wallet,
+  onWalletChange,
   dictionary,
 }) => (
-    <Stack sx={{ display: "flex", flex: 1 }}>
-      <DeliveryWalletSelector
-        validatePersonalAddress={ validatePersonalDeliveryAddress }
-        walletAddress={ walletAddress }
-        onWalletAddressChange={ onWalletAddressChange }
-        dictionary={ dictionary } />
+  <Stack sx={{ display: "flex", width: { xs: "100%", md: "calc(50% - 35px)" } }}>
+    <DeliveryWalletSelector
+      validatePersonalAddress={ validatePersonalDeliveryAddress }
+      wallets={ wallets }
+      wallet={ wallet }
+      onWalletChange={ onWalletChange }
+      dictionary={ dictionary } />
 
-      <Divider sx={{ my: 3.75 }} />
+    <Divider sx={{ my: 3.75 }} />
 
-      <CheckoutItemCostBreakdown checkoutItems={ checkoutItems } taxes={ taxes } />
-    </Stack>
-  );
+    <CheckoutItemCostBreakdown checkoutItems={ checkoutItems } taxes={ taxes } />
+  </Stack>
+);

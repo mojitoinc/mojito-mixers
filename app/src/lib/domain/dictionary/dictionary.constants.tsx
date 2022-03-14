@@ -1,5 +1,5 @@
 import React from "react";
-import { Link, Tooltip } from "@mui/material";
+import { Link, Tooltip, Typography } from "@mui/material";
 import { PUIDictionary, PUIDictionarySingleLine } from "./dictionary.interfaces";
 
 const walletMultiSigTooltip: PUIDictionarySingleLine = <>
@@ -21,9 +21,11 @@ const multiSigElement = (
 
 export const DEFAULT_DICTIONARY: PUIDictionary = {
   walletInfo: <>
-    We will cover gas cost for minting and delivery on both { multiSigElement } and self-hosted wallets.
-    Your items will be delivered to your { multiSigElement } wallet by default.
-    If you do not have a Mojito { multiSigElement } wallet yet, we will automatically create one for you.
+    <Typography sx={{ fontWeight: "500" }} component="strong">This is where your NFT(s) will be delivered after the sale is over.</Typography>{ " " }
+    We will cover gas cost for minting and delivery on both { multiSigElement } and
+    self-hosted wallets. Your items will be delivered to your { multiSigElement } wallet
+    by default. If you do not have a Mojito { multiSigElement } wallet yet,
+    we will automatically create one for you.
   </>,
 
   walletMultiSigTooltip,
