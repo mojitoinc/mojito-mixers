@@ -52,6 +52,9 @@ export function persistedInfoCleanUp() {
 function isExpired(timestamp) {
     return timestamp !== undefined && Date.now() - timestamp > config.THREEDS_STORAGE_EXPIRATION_MS;
 }
+function isInitiallyOpen() {
+    return continueFlows(true).checkoutStep !== "";
+}
 function getCheckoutModalState() {
     if (!process.browser)
         return FALLBACK_MODAL_STATE;
@@ -150,6 +153,7 @@ exports.clearPersistedInfo = clearPersistedInfo;
 exports.continueCheckout = continueCheckout;
 exports.continueFlows = continueFlows;
 exports.getCheckoutModalState = getCheckoutModalState;
+exports.isInitiallyOpen = isInitiallyOpen;
 exports.persistCheckoutModalInfo = persistCheckoutModalInfo;
 exports.persistReceivedRedirectUri3DS = persistReceivedRedirectUri3DS;
 //# sourceMappingURL=CheckoutOverlay.utils.js.map
