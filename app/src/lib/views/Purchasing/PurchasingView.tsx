@@ -70,18 +70,26 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
 
   const [redirectURL, setRedirectURL] = useState(isCreditCardPayment ? "" : null);
 
+  const skipPaymentNotificationRedirect = !isCreditCardPayment || !!redirectURL || fullPaymentState.paymentStatus !== "processed";
+
   const paymentNotificationResult = useGetPaymentNotificationQuery({
-    skip: !isCreditCardPayment || !!redirectURL || fullPaymentState.paymentStatus !== "processed",
+    skip: skipPaymentNotificationRedirect,
     pollInterval: PAYMENT_NOTIFICATION_INTERVAL_MS,
   });
 
   const nextRedirectURL = paymentNotificationResult.data?.getPaymentNotification?.message?.redirectURL || "";
 
   useEffect(() => {
-    if (!isCreditCardPayment) return;
+    if (skipPaymentNotificationRedirect) return;
 
-    setRedirectURL(prevRedirectURL => prevRedirectURL || nextRedirectURL);
-  }, [isCreditCardPayment, nextRedirectURL]);
+    setRedirectURL((prevRedirectURL) => {
+      const redirectURL = prevRedirectURL || nextRedirectURL;
+
+      if (debug) console.log(`  👀 getPaymentNotificationQuery`, { redirectURL });
+
+      return redirectURL;
+    });
+  }, [skipPaymentNotificationRedirect, nextRedirectURL, debug]);
 
 
   // Triggers for payment mutation and onPurchaseSuccess/onPurchaseError callbacks:
