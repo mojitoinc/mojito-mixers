@@ -1497,6 +1497,13 @@ export type CreatePaymentMutationVariables = Exact<{
 
 export type CreatePaymentMutation = { __typename?: 'Mutation', createPayment: { __typename?: 'Payment', id: any, invoiceID: any, circlePaymentID: string, status: PaymentStatus, userID: any } };
 
+export type CollectionItemByIdQueryVariables = Exact<{
+  id: Scalars['UUID1'];
+}>;
+
+
+export type CollectionItemByIdQuery = { __typename?: 'Query', collectionItemById?: { __typename?: 'MarketplaceCollectionItem', id: any, collectionId: any } | null };
+
 export type CreateAuctionInvoiceMutationVariables = Exact<{
   orgID: Scalars['UUID1'];
   lotID: Scalars['UUID1'];
@@ -1526,7 +1533,7 @@ export type GetInvoiceDetailsQueryVariables = Exact<{
 }>;
 
 
-export type GetInvoiceDetailsQuery = { __typename?: 'Query', getInvoiceDetails: { __typename?: 'InvoiceDetails', items: Array<{ __typename?: 'ItemInvoiceDetail', destinationAddress: string, units: number, unitPrice: number, taxes: number, totalPrice: number } | null> } };
+export type GetInvoiceDetailsQuery = { __typename?: 'Query', getInvoiceDetails: { __typename?: 'InvoiceDetails', items: Array<{ __typename?: 'ItemInvoiceDetail', collectionItemID: any, destinationAddress: string, units: number, unitPrice: number, taxes: number, totalPrice: number } | null> } };
 
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -1572,6 +1579,14 @@ export type GetPaymentMethodStatusQueryVariables = Exact<{
 
 
 export type GetPaymentMethodStatusQuery = { __typename?: 'Query', getPaymentMethod: { __typename?: 'ACHPaymentMethodOutput', id: any, status: string } | { __typename?: 'CreditCardPaymentMethodOutput', id: any, status: string } | { __typename?: 'WirePaymentMethodOutput', id: any, status: string } };
+
+export type ValidatePaymentLimitQueryVariables = Exact<{
+  collectionId: Scalars['UUID1'];
+  itemsCount: Scalars['Int'];
+}>;
+
+
+export type ValidatePaymentLimitQuery = { __typename?: 'Query', validatePaymentLimit: { __typename?: 'ValidatePaymentLimitOutput', ach: { __typename?: 'ValidatePaymentLimitData', remainingTotal: number, isLimitExceeded: boolean, remainingTransaction: number }, wire: { __typename?: 'ValidatePaymentLimitData', remainingTotal: number, isLimitExceeded: boolean, remainingTransaction: number }, creditCard: { __typename?: 'ValidatePaymentLimitData', remainingTotal: number, isLimitExceeded: boolean, remainingTransaction: number } } };
 
 export type GetTaxQuoteQueryVariables = Exact<{
   input: TaxQuoteInput;
@@ -1662,6 +1677,42 @@ export function useCreatePaymentMutation(baseOptions?: Apollo.MutationHookOption
 export type CreatePaymentMutationHookResult = ReturnType<typeof useCreatePaymentMutation>;
 export type CreatePaymentMutationResult = Apollo.MutationResult<CreatePaymentMutation>;
 export type CreatePaymentMutationOptions = Apollo.BaseMutationOptions<CreatePaymentMutation, CreatePaymentMutationVariables>;
+export const CollectionItemByIdDocument = gql`
+    query CollectionItemById($id: UUID1!) {
+  collectionItemById(id: $id) {
+    id
+    collectionId
+  }
+}
+    `;
+
+/**
+ * __useCollectionItemByIdQuery__
+ *
+ * To run a query within a React component, call `useCollectionItemByIdQuery` and pass it any options that fit your needs.
+ * When your component renders, `useCollectionItemByIdQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useCollectionItemByIdQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useCollectionItemByIdQuery(baseOptions: Apollo.QueryHookOptions<CollectionItemByIdQuery, CollectionItemByIdQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<CollectionItemByIdQuery, CollectionItemByIdQueryVariables>(CollectionItemByIdDocument, options);
+      }
+export function useCollectionItemByIdLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<CollectionItemByIdQuery, CollectionItemByIdQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<CollectionItemByIdQuery, CollectionItemByIdQueryVariables>(CollectionItemByIdDocument, options);
+        }
+export type CollectionItemByIdQueryHookResult = ReturnType<typeof useCollectionItemByIdQuery>;
+export type CollectionItemByIdLazyQueryHookResult = ReturnType<typeof useCollectionItemByIdLazyQuery>;
+export type CollectionItemByIdQueryResult = Apollo.QueryResult<CollectionItemByIdQuery, CollectionItemByIdQueryVariables>;
 export const CreateAuctionInvoiceDocument = gql`
     mutation CreateAuctionInvoice($orgID: UUID1!, $lotID: UUID1!) {
   createAuctionLotInvoice(orgID: $orgID, lotID: $lotID) {
@@ -1781,6 +1832,7 @@ export const GetInvoiceDetailsDocument = gql`
     query GetInvoiceDetails($invoiceID: UUID1!, $orgID: UUID1!) {
   getInvoiceDetails(invoiceID: $invoiceID, orgID: $orgID) {
     items {
+      collectionItemID
       destinationAddress
       units
       unitPrice
@@ -2140,6 +2192,56 @@ export function useGetPaymentMethodStatusLazyQuery(baseOptions?: Apollo.LazyQuer
 export type GetPaymentMethodStatusQueryHookResult = ReturnType<typeof useGetPaymentMethodStatusQuery>;
 export type GetPaymentMethodStatusLazyQueryHookResult = ReturnType<typeof useGetPaymentMethodStatusLazyQuery>;
 export type GetPaymentMethodStatusQueryResult = Apollo.QueryResult<GetPaymentMethodStatusQuery, GetPaymentMethodStatusQueryVariables>;
+export const ValidatePaymentLimitDocument = gql`
+    query ValidatePaymentLimit($collectionId: UUID1!, $itemsCount: Int!) {
+  validatePaymentLimit(collectionID: $collectionId, itemsCount: $itemsCount) {
+    ach {
+      remainingTotal
+      isLimitExceeded
+      remainingTransaction
+    }
+    wire {
+      remainingTotal
+      isLimitExceeded
+      remainingTransaction
+    }
+    creditCard {
+      remainingTotal
+      isLimitExceeded
+      remainingTransaction
+    }
+  }
+}
+    `;
+
+/**
+ * __useValidatePaymentLimitQuery__
+ *
+ * To run a query within a React component, call `useValidatePaymentLimitQuery` and pass it any options that fit your needs.
+ * When your component renders, `useValidatePaymentLimitQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useValidatePaymentLimitQuery({
+ *   variables: {
+ *      collectionId: // value for 'collectionId'
+ *      itemsCount: // value for 'itemsCount'
+ *   },
+ * });
+ */
+export function useValidatePaymentLimitQuery(baseOptions: Apollo.QueryHookOptions<ValidatePaymentLimitQuery, ValidatePaymentLimitQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<ValidatePaymentLimitQuery, ValidatePaymentLimitQueryVariables>(ValidatePaymentLimitDocument, options);
+      }
+export function useValidatePaymentLimitLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ValidatePaymentLimitQuery, ValidatePaymentLimitQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<ValidatePaymentLimitQuery, ValidatePaymentLimitQueryVariables>(ValidatePaymentLimitDocument, options);
+        }
+export type ValidatePaymentLimitQueryHookResult = ReturnType<typeof useValidatePaymentLimitQuery>;
+export type ValidatePaymentLimitLazyQueryHookResult = ReturnType<typeof useValidatePaymentLimitLazyQuery>;
+export type ValidatePaymentLimitQueryResult = Apollo.QueryResult<ValidatePaymentLimitQuery, ValidatePaymentLimitQueryVariables>;
 export const GetTaxQuoteDocument = gql`
     query GetTaxQuote($input: TaxQuoteInput!) {
   getTaxQuote(input: $input) {
