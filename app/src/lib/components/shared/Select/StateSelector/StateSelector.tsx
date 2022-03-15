@@ -25,12 +25,9 @@ export const StateSelector: React.FC<StateSelectorProps> = ({
 }) => {
   const { options, optionsMap } = useCountryOptions(countryCode);
 
-  const handleChange = useCallback(
-    (e: SelectChangeEvent<string | number>) => {
-      onSelectState(optionsMap[e.target.value]);
-    },
-    [optionsMap, onSelectState]
-  );
+  const handleChange = useCallback((e: SelectChangeEvent<string | number>) => {
+    onSelectState(optionsMap[e.target.value]);
+  }, [optionsMap, onSelectState]);
 
   const isDisabled = disabled || !countryCode || options.length === 0;
 
@@ -47,17 +44,7 @@ export const StateSelector: React.FC<StateSelectorProps> = ({
   useEffect(() => {
     const { value: selectedValue, label: selectedLabel } = value;
 
-
-    if (
-      (selectedValue && selectedLabel) ||
-      (!selectedValue && !selectedLabel) ||
-      options.length === 0
-    ) {
-      if (!countryCode && value.value !== '') {
-        onSelectState(EMPTY_OPTION)
-      }
-      return;
-    }
+    if ((selectedValue && selectedLabel) || (!selectedValue && !selectedLabel) || options.length === 0) return;
 
     const option = selectedValue
       ? optionsMap[selectedValue]
@@ -66,15 +53,18 @@ export const StateSelector: React.FC<StateSelectorProps> = ({
     setTimeout(() => onSelectState(option || EMPTY_OPTION));
   }, [value, optionsMap, options, onSelectState, countryCode]);
 
+  const selectedValue = value.value;
+
   return (
     <Select
-      {...props}
-      label={label}
-      options={options}
-      onChange={handleChange}
-      value={value.value}
-      disabled={isDisabled}
-    />
+      { ...props }
+      // See https://developers.google.com/web/updates/2015/06/checkout-faster-with-autofill:
+      autoComplete={ props.autoComplete || "state" }
+      label={ label }
+      options={ options }
+      onChange={ handleChange }
+      value={ optionsMap[selectedValue] ? selectedValue : ""}
+      disabled={ isDisabled } />
   );
 };
 
@@ -97,8 +87,6 @@ export const ControlledStateSelector: React.FC<ControlledStateSelectorProps> = (
         <StateSelector
           id={name}
           name={name}
-          //autocomplete property is getting passed since it is necessary to pass a 'region' value in order to be recognized by the chrome's autofill feature
-          autoComplete="region"
           label={label}
           onSelectState={onChange}
           fullWidth

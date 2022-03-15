@@ -42,7 +42,7 @@ export function useCountryOptions(countryCode?: string | number) {
   return useMemo(() => {
     // useCountryRegion seems to return null as the result (country) when countryCode changes. It takes an additional
     // render to get the right value, thus this check:
-    if (countryCode === "" || (country && !countryCode)) return { options: [], optionsMap: {} };
+    if (countryCode === "" || (countryCode && !country)) return { options: [], optionsMap: {} };
 
     const options: SelectOption[] = country
       ? country.regions.map(mapRegionToSelectOption)
