@@ -83,6 +83,10 @@ function isExpired(timestamp?: number) {
   return timestamp !== undefined && Date.now() - timestamp > THREEDS_STORAGE_EXPIRATION_MS;
 }
 
+export function isInitiallyOpen() {
+  return continueFlows(true).checkoutStep !== "";
+}
+
 export function getCheckoutModalState(): CheckoutModalState3DS {
   if (!process.browser) return FALLBACK_MODAL_STATE;
 

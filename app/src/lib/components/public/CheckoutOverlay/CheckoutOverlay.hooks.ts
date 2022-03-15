@@ -9,7 +9,7 @@ import { isValidWalletAddress } from "../../../domain/wallet/wallet.utils";
 import { BillingInfo } from "../../../forms/BillingInfoForm";
 import { TaxesState } from "../../../views/Billing/BillingView";
 import { resetStepperProgress } from "../../payments/CheckoutStepper/CheckoutStepper";
-import { clearPersistedInfo, continueFlows } from "./CheckoutOverlay.utils";
+import { continueFlows } from "./CheckoutOverlay.utils";
 
 export type CheckoutModalErrorAt = "reset" | "authentication" | "billing" | "payment" | "purchasing";
 
@@ -127,14 +127,15 @@ export function useCheckoutModalState({
     // modal is re-opened, we need to reset its state, taking into account if we need to resume a Plaid OAuth flow:s
     const savedFlow = continueFlows();
 
-    if (savedFlow.flowType === "3DS") {
-      clearPersistedInfo();
-    } else if (savedFlow.flowType === "Plaid") {
-      // This is handled in PaymentView.tsx, in the usePlaid() hook call.
-      // clearPlaidInfo();
-    } else if (savedFlow.checkoutStep !== "") {
-      // TODO: Clear both as this is some kind of indeterminate / error state?
-    }
+    // if (savedFlow.flowType === "3DS") {
+    //   continueCheckout() already calls clearPersistedInfo().
+    //   clearPersistedInfo();
+    // } else if (savedFlow.flowType === "Plaid") {
+    //   This is handled in PaymentView.tsx, in the usePlaid() hook call.
+    //   clearPlaidInfo();
+    // } else if (savedFlow.checkoutStep !== "") {
+    //   TODO: Clear both as this is some kind of indeterminate / error state?
+    // }
 
     setCheckoutModalState({
       checkoutStep: savedFlow.checkoutStep || startAt,
