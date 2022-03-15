@@ -53,8 +53,8 @@ export interface PUICheckoutOverlayProps {
   userFormat: UserFormat;
   acceptedPaymentTypes: PaymentType[];
   paymentLimits?: Partial<Record<PaymentType, number>>;
-  dictionary?: Partial<PUIDictionary>,
-  network?: Network,
+  dictionary?: Partial<PUIDictionary>;
+  network?: Network;
 
   // Legal:
   consentType?: ConsentType;
