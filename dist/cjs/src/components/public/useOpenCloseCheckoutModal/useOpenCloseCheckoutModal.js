@@ -5,11 +5,10 @@ Object.defineProperty(exports, '__esModule', { value: true });
 var React = require('react');
 var CheckoutOverlay_utils = require('../CheckoutOverlay/CheckoutOverlay.utils.js');
 
-const initiallyOpen = CheckoutOverlay_utils.continueFlows(true).checkoutStep !== "";
 function useOpenCloseCheckoutModal() {
     const [isOpen, setIsOpen] = React.useState(false);
     React.useEffect(() => {
-        setIsOpen(initiallyOpen);
+        setIsOpen(CheckoutOverlay_utils.isInitiallyOpen());
     }, []);
     const onOpen = React.useCallback(() => {
         setIsOpen(true);

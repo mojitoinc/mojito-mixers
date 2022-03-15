@@ -48,6 +48,9 @@ export function persistedInfoCleanUp() {
 function isExpired(timestamp) {
     return timestamp !== undefined && Date.now() - timestamp > THREEDS_STORAGE_EXPIRATION_MS;
 }
+function isInitiallyOpen() {
+    return continueFlows(true).checkoutStep !== "";
+}
 function getCheckoutModalState() {
     if (!process.browser)
         return FALLBACK_MODAL_STATE;
@@ -142,5 +145,5 @@ function continueFlows(noClear = false) {
     return continueFlowsReturn;
 }
 
-export { clearPersistedInfo, continueCheckout, continueFlows, getCheckoutModalState, persistCheckoutModalInfo, persistReceivedRedirectUri3DS };
+export { clearPersistedInfo, continueCheckout, continueFlows, getCheckoutModalState, isInitiallyOpen, persistCheckoutModalInfo, persistReceivedRedirectUri3DS };
 //# sourceMappingURL=CheckoutOverlay.utils.js.map
