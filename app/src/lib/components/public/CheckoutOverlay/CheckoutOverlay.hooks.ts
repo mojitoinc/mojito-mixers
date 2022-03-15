@@ -4,6 +4,7 @@ import { Dispatch, SetStateAction, useState, useCallback } from "react";
 import { CircleFieldErrors } from "../../../domain/circle/circle.utils";
 import { ERROR_PURCHASE } from "../../../domain/errors/errors.constants";
 import { PaymentMethod } from "../../../domain/payment/payment.interfaces";
+import { Wallet } from "../../../domain/wallet/wallet.interfaces";
 import { isValidWalletAddress } from "../../../domain/wallet/wallet.utils";
 import { BillingInfo } from "../../../forms/BillingInfoForm";
 import { TaxesState } from "../../../views/Billing/BillingView";
@@ -53,7 +54,7 @@ export interface SelectedPaymentMethod {
 export interface PurchaseState {
   invoiceID: string | null;
   taxes: TaxesState;
-  walletAddress: string | null;
+  wallet: null | string | Wallet;
   circlePaymentID: string;
   paymentID: string;
 }
@@ -74,7 +75,7 @@ export interface CheckoutModalStateReturn extends CheckoutModalState, PurchaseSt
   // PurchaseState (+ inherited stuff):
   setInvoiceID: (invoiceID: string | null) => void;
   setTaxes: (taxes: TaxesState) => void;
-  setWalletAddress: (walletAddress: string | null) => void;
+  setWalletAddress: (wallet: null | string | Wallet) => void;
   setPayments: (circlePaymentID: string, paymentID: string) => void;
 }
 
@@ -108,13 +109,13 @@ export function useCheckoutModalState({
   const [{
     invoiceID,
     taxes,
-    walletAddress,
+    wallet,
     circlePaymentID,
     paymentID,
   }, setPurchaseState] = useState<PurchaseState>({
     invoiceID: initialInvoiceID || null,
     taxes: { status: "incomplete" },
-    walletAddress: null,
+    wallet: null,
     circlePaymentID: "",
     paymentID: ""
   });
@@ -150,7 +151,7 @@ export function useCheckoutModalState({
     setPurchaseState({
       invoiceID: savedFlow.invoiceID || "",
       taxes: { status: "incomplete" },
-      walletAddress: null,
+      wallet: null,
       circlePaymentID: savedFlow.circlePaymentID || "",
       paymentID: savedFlow.paymentID || ""
     });
@@ -165,14 +166,14 @@ export function useCheckoutModalState({
   }, []);
 
   const goNext = useCallback(() => {
-    if (!isValidWalletAddress(walletAddress) && WALLET_ADDRESS_FIELD_STEPS.includes(checkoutStep)) return;
+    if (!isValidWalletAddress(wallet) && WALLET_ADDRESS_FIELD_STEPS.includes(checkoutStep)) return;
 
     setCheckoutModalState(({ checkoutStep, checkoutError }) => ({
       checkoutStep: CHECKOUT_STEPS[Math.min(CHECKOUT_STEPS.indexOf(checkoutStep) + 1, CHECKOUT_STEPS.length - 1)],
       checkoutError,
       isDialogBlocked: false,
     }));
-  }, [checkoutStep, walletAddress]);
+  }, [checkoutStep, wallet]);
 
   const goTo = useCallback((checkoutStep: CheckoutModalStep = startAt, error?: null | string | CheckoutModalError) => {
     setCheckoutModalState((prevCheckoutModalState) => {
@@ -208,19 +209,19 @@ export function useCheckoutModalState({
   }, []);
 
   const setInvoiceID = useCallback((invoiceID: string | null) => {
-    setPurchaseState((prevPurchasState) => ({ ...prevPurchasState, invoiceID, circlePaymentID: "", paymentID: "" }));
+    setPurchaseState((prevPurchaseState) => ({ ...prevPurchaseState, invoiceID, circlePaymentID: "", paymentID: "" }));
   }, []);
 
   const setTaxes = useCallback((taxes: TaxesState) => {
-    setPurchaseState((prevPurchasState) => ({ ...prevPurchasState, taxes }));
+    setPurchaseState((prevPurchaseState) => ({ ...prevPurchaseState, taxes }));
   }, []);
 
-  const setWalletAddress = useCallback((walletAddress: string | null) => {
-    setPurchaseState((prevPurchasState) => ({ ...prevPurchasState, walletAddress }));
+  const setWalletAddress = useCallback((wallet: null | string | Wallet) => {
+    setPurchaseState((prevPurchaseState) => ({ ...prevPurchaseState, wallet }));
   }, []);
 
   const setPayments = useCallback((circlePaymentID: string, paymentID: string) => {
-    setPurchaseState((prevPurchasState) => ({ ...prevPurchasState, circlePaymentID, paymentID }));
+    setPurchaseState((prevPurchaseState) => ({ ...prevPurchaseState, circlePaymentID, paymentID }));
   }, [])
 
 
@@ -246,7 +247,7 @@ export function useCheckoutModalState({
     setInvoiceID,
     taxes,
     setTaxes,
-    walletAddress,
+    wallet,
     setWalletAddress,
     circlePaymentID,
     paymentID,

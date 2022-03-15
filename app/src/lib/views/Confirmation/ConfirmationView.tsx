@@ -9,15 +9,14 @@ import { billingInfoToSavedPaymentMethodBillingInfo } from "../../domain/circle/
 import { CheckoutItem } from "../../domain/product/product.interfaces";
 import { SelectedPaymentMethod } from "../../components/public/CheckoutOverlay/CheckoutOverlay.hooks";
 import { PUIDictionary } from "../../domain/dictionary/dictionary.interfaces";
-import { Wallet } from "../../components/payments/DeliveryWallet/DeliveryWalletDetails";
+import { Wallet } from "../../domain/wallet/wallet.interfaces";
 
 export interface ConfirmationViewProps {
   checkoutItems: CheckoutItem[];
   savedPaymentMethods: SavedPaymentMethod[];
   selectedPaymentMethod: SelectedPaymentMethod;
   circlePaymentID: string;
-  walletAddress: string;
-  wallets?: Wallet[];
+  wallet: null | string | Wallet;
   onGoToCollection?: () => void;
   onNext: () => void;
 }
@@ -27,8 +26,7 @@ export const ConfirmationView: React.FC<ConfirmationViewProps> = ({
   savedPaymentMethods,
   selectedPaymentMethod,
   circlePaymentID,
-  walletAddress,
-  wallets,
+  wallet,
   onGoToCollection,
   onNext,
 }) => {
@@ -73,8 +71,7 @@ export const ConfirmationView: React.FC<ConfirmationViewProps> = ({
       <PurchaseConfirmationBillingDetails
         checkoutItems={ checkoutItems }
         circlePaymentID={ circlePaymentID }
-        walletAddress={ walletAddress }
-        wallets={ wallets }
+        wallet={ wallet }
         selectedPaymentMethodBillingInfo={ selectedPaymentMethodBillingInfo }
         selectedPaymentMethodPaymentInfo={ selectedPaymentMethodPaymentInfo } />
 

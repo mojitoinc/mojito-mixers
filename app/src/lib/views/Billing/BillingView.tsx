@@ -14,6 +14,7 @@ import { checkNeedsGenericErrorMessage } from "../../hooks/useFormCheckoutError"
 import { TaxQuoteOutput, useGetTaxQuoteLazyQuery } from "../../queries/graphqlGenerated";
 import { useCheckoutItemsCostTotal } from "../../hooks/useCheckoutItemCostTotal";
 import { useThrottledCallback } from "@swyg/corre";
+import { Wallet } from "../../domain/wallet/wallet.interfaces";
 
 export type TaxStatus = "incomplete" | "loading" | "complete" | "error";
 
@@ -33,12 +34,13 @@ export interface BillingViewProps {
   checkoutItems: CheckoutItem[];
   savedPaymentMethods: SavedPaymentMethod[];
   selectedBillingInfo: string | BillingInfo;
-  walletAddress: string | null;
+  wallets?: Wallet[];
+  wallet: null | string | Wallet;
   checkoutError?: CheckoutModalError;
   onBillingInfoSelected: (data: string | BillingInfo) => void;
   onTaxesChange: (taxes: TaxesState) => void;
   onSavedPaymentMethodDeleted: (savedPaymentMethodId: string) => Promise<void>;
-  onWalletAddressChange: (personalWalletAddress: string | null) => void;
+  onWalletChange: (wallet: null | string | Wallet) => void;
   onNext: () => void;
   onClose: () => void;
   debug?: boolean;
@@ -48,12 +50,13 @@ export const BillingView: React.FC<BillingViewProps> = ({
   checkoutItems,
   savedPaymentMethods: rawSavedPaymentMethods,
   selectedBillingInfo,
-  walletAddress,
+  wallets,
+  wallet,
   checkoutError,
   onBillingInfoSelected,
   onTaxesChange,
   onSavedPaymentMethodDeleted,
-  onWalletAddressChange,
+  onWalletChange,
   onNext,
   onClose,
   debug,
@@ -216,7 +219,7 @@ export const BillingView: React.FC<BillingViewProps> = ({
       }}
       spacing={8.75}
     >
-      <Stack sx={{ display: 'flex', flex: 1, overflow: "hidden" }}>
+      <Stack sx={{ display: "flex", overflow: "hidden", width: { xs: "100%", md: "calc(50% - 35px)" } }}>
         <CheckoutStepper progress={ 50 } />
 
           { showSaved ? (
@@ -251,8 +254,9 @@ export const BillingView: React.FC<BillingViewProps> = ({
         checkoutItems={ checkoutItems }
         taxes={ taxes }
         validatePersonalDeliveryAddress={ formSubmitAttempted }
-        walletAddress={ walletAddress }
-        onWalletAddressChange={ onWalletAddressChange } />
+        wallets={ wallets }
+        wallet={ wallet }
+        onWalletChange={ onWalletChange } />
     </Stack>
   );
 };

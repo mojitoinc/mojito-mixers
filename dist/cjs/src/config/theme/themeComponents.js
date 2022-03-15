@@ -68,7 +68,7 @@ function createComponentsTheme({ typography, palette, spacing, breakpoints }) {
             styleOverrides: {
                 root: {
                     height: "60px",
-                    borderRadius: theme.SM_BORDER_RADIUS,
+                    borderRadius: theme.MD_BORDER_RADIUS,
                     "&.Mui-disabled::before": {
                         border: 0,
                     },
@@ -81,6 +81,7 @@ function createComponentsTheme({ typography, palette, spacing, breakpoints }) {
         MuiFilledInput: {
             styleOverrides: {
                 root: {
+                    borderRadius: theme.MD_BORDER_RADIUS,
                     border: `${theme.BORDER_THICKNESS}px solid ${palette.grey[200]}`,
                     background: palette.background.default,
                     "&:hover": {

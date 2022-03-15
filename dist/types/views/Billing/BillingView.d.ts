@@ -4,6 +4,7 @@ import { CheckoutItem } from "../../domain/product/product.interfaces";
 import { BillingInfo } from "../../forms/BillingInfoForm";
 import { CheckoutModalError } from "../../components/public/CheckoutOverlay/CheckoutOverlay.hooks";
 import { PUIDictionary } from "../../domain/dictionary/dictionary.interfaces";
+import { Wallet } from "../../domain/wallet/wallet.interfaces";
 export declare type TaxStatus = "incomplete" | "loading" | "complete" | "error";
 export interface TaxesState {
     status: TaxStatus;
@@ -14,12 +15,13 @@ export interface BillingViewProps {
     checkoutItems: CheckoutItem[];
     savedPaymentMethods: SavedPaymentMethod[];
     selectedBillingInfo: string | BillingInfo;
-    walletAddress: string | null;
+    wallets?: Wallet[];
+    wallet: null | string | Wallet;
     checkoutError?: CheckoutModalError;
     onBillingInfoSelected: (data: string | BillingInfo) => void;
     onTaxesChange: (taxes: TaxesState) => void;
     onSavedPaymentMethodDeleted: (savedPaymentMethodId: string) => Promise<void>;
-    onWalletAddressChange: (personalWalletAddress: string | null) => void;
+    onWalletChange: (wallet: null | string | Wallet) => void;
     onNext: () => void;
     onClose: () => void;
     dictionary: PUIDictionary;
