@@ -17,12 +17,6 @@ describe("DeliveryWalletSelector", () => {
 
   beforeAll(() => {
     deliveryWalletSelectorProps = {
-      dictionary: {
-        walletInfo: "",
-        walletMultiSigTooltip: "",
-        purchaseInstructions: [],
-        wirePaymentsDisclaimer: [],
-      },
       wallet: "",
       onWalletChange: () => { /* Do nothing */ },
       validatePersonalAddress: false

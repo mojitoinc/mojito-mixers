@@ -15,12 +15,6 @@ describe("DeliveryWalletDetails", () => {
 
   beforeAll(() => {
     deliveryWalletDetailsProps = {
-      dictionary: {
-        purchaseInstructions: [],
-        walletInfo: [],
-        walletMultiSigTooltip: "",
-        wirePaymentsDisclaimer: []
-      },
       wallet: walletAddress,
     };
   });
