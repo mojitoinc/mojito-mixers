@@ -6,7 +6,7 @@ import { PaymentMethod, PaymentType } from "../../../domain/payment/payment.inte
 import { CheckoutEventData, CheckoutEventType } from "../../../domain/events/events.interfaces";
 import { CheckoutItemInfo } from "../../../domain/product/product.interfaces";
 import { BillingInfo } from "../../../forms/BillingInfoForm";
-import { useDeletePaymentMethodMutation, useGetInvoiceDetailsQuery, useGetPaymentMethodListQuery, useMeQuery, useReleaseReservationBuyNowLotMutation } from "../../../queries/graphqlGenerated";
+import { useDeletePaymentMethodMutation, useGetInvoiceDetailsQuery, useCollectionItemByIdQuery, useValidatePaymentLimitQuery, useGetPaymentMethodListQuery, useMeQuery, useReleaseReservationBuyNowLotMutation } from "../../../queries/graphqlGenerated";
 import { AuthenticationView } from "../../../views/Authentication/AuthenticationView";
 import { BillingView } from "../../../views/Billing/BillingView";
 import { ConfirmationView } from "../../../views/Confirmation/ConfirmationView";
@@ -239,6 +239,30 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     variables: { invoiceID },
   });
 
+  // TODO: Extend this to support multiple items
+  const firstInvoiceItem = invoiceDetailsData?.getInvoiceDetails?.items[0];
+  const collectionItemId = firstInvoiceItem?.collectionItemID;
+
+  const { data: collectionItemData } = useCollectionItemByIdQuery({
+    skip: !collectionItemId,
+    variables: {
+      id: collectionItemId,
+    },
+  });
+
+  const collectionId = collectionItemData?.collectionItemById?.collectionId;
+
+  const { data: paymentLimitData } = useValidatePaymentLimitQuery({
+    skip: !collectionId,
+    variables: {
+      collectionId,
+      itemsCount: firstInvoiceItem?.units || 0,
+    },
+  });
+
+  useEffect(() => {
+    if (debug) console.log({ paymentLimitData });
+  }, [debug, paymentLimitData]);
 
   // Modal loading state:
 
