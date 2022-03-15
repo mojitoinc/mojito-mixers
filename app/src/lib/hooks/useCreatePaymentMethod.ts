@@ -124,7 +124,7 @@ export function useCreatePaymentMethod({
 
       totalWaitTimeSoFar = now - paymentMethodCreatedAt;
 
-      if (debug) console.log(`    👀 getPaymentMethodStatus (${ totalWaitTimeSoFar / 1000 | 0 } / ${ PAYMENT_CREATION_MAX_WAIT_MS / 1000 | 0 } sec.)`, { paymentMethodID  });
+      if (debug) console.log(`    👀 getPaymentMethodStatus (${ totalWaitTimeSoFar / 1000 | 0 } / ${ PAYMENT_CREATION_MAX_WAIT_MS / 1000 | 0 } sec.)`, { paymentMethodID });
 
       if (paymentMethodStatusWaitTime > 0) await wait(paymentMethodStatusWaitTime);
 
