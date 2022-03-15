@@ -1,12 +1,12 @@
 import { THREEDS_FLOW_INFO_KEY, THREEDS_FLOW_RECEIVED_REDIRECT_URI_KEY, THREEDS_FLOW_STATE_USED_KEY, THREEDS_STORAGE_EXPIRATION_MS, THREEDS_FLOW_URL_SEARCH } from "../../../config/config";
 import { ERROR_PURCHASE_3DS } from "../../../domain/errors/errors.constants";
 import { PaymentMethod } from "../../../domain/payment/payment.interfaces";
-import { getUrlWithoutParams, isLocalhost, urlToPathnameWhenPossible } from "../../../domain/url/url.utils";
+import { getUrlWithoutParams, isLocalhost, isLocalhostOrStaging, urlToPathnameWhenPossible } from "../../../domain/url/url.utils";
 import { BillingInfo } from "../../../forms/BillingInfoForm";
 import { continuePlaidOAuthFlow, INITIAL_PLAID_OAUTH_FLOW_STATE } from "../../../hooks/usePlaid";
 import { CheckoutModalError, CheckoutModalStep } from "./CheckoutOverlay.hooks";
 
-const debug = false;
+const debug = isLocalhostOrStaging();
 
 export interface CheckoutModalInfo {
   url?: string;
@@ -160,7 +160,10 @@ export function continueCheckout(noClear = false): [boolean, CheckoutModalState3
   return [continue3DSFlow, savedCheckoutModalState];
 }
 
+export type FlowType = "" | "3DS" | "Plaid";
+
 export interface ContinueFlowsReturn {
+  flowType: FlowType;
   checkoutStep: CheckoutModalStep | "";
   checkoutError?: CheckoutModalError;
   invoiceID: string;
@@ -174,6 +177,7 @@ export function continueFlows(noClear = false) {
   const [continue3DSFlow, savedCheckoutModalState] = continueCheckout(noClear);
   const continueOAuthFlow = continuePlaidOAuthFlow();
   const continueFlowsReturn: ContinueFlowsReturn = {
+    flowType: "",
     checkoutStep: "",
     invoiceID: "",
     circlePaymentID: "",
@@ -190,6 +194,7 @@ export function continueFlows(noClear = false) {
       continueFlowsReturn.checkoutError = ERROR_PURCHASE_3DS();
     }
 
+    continueFlowsReturn.flowType = "3DS";
     continueFlowsReturn.invoiceID = savedCheckoutModalState.invoiceID;
     continueFlowsReturn.circlePaymentID = savedCheckoutModalState.circlePaymentID;
     continueFlowsReturn.paymentID = savedCheckoutModalState.paymentID;
@@ -198,6 +203,7 @@ export function continueFlows(noClear = false) {
   } else if (continueOAuthFlow) {
     if (debug) console.log("💾 Continue Plaid OAuth Flow...", INITIAL_PLAID_OAUTH_FLOW_STATE);
 
+    continueFlowsReturn.flowType = "Plaid";
     continueFlowsReturn.checkoutStep = "purchasing";
     continueFlowsReturn.billingInfo = INITIAL_PLAID_OAUTH_FLOW_STATE.selectedBillingInfo;
     // continueFlowsReturn.paymentInfo = INITIAL_PLAID_OAUTH_FLOW_STATE.paymentInfo;
