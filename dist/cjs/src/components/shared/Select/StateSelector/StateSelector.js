@@ -30,16 +30,17 @@ const StateSelector = (_a) => {
     // If the selected option only has one property set, we try to find a match:
     React.useEffect(() => {
         const { value: selectedValue, label: selectedLabel } = value;
-        if ((selectedValue && selectedLabel) ||
-            (!selectedValue && !selectedLabel) ||
-            options.length === 0)
+        if ((selectedValue && selectedLabel) || (!selectedValue && !selectedLabel) || options.length === 0)
             return;
         const option = selectedValue
             ? optionsMap[selectedValue]
             : options.find((option) => option.label === selectedLabel);
         setTimeout(() => onSelectState(option || Select.EMPTY_OPTION));
     }, [value, optionsMap, options, onSelectState, countryCode]);
-    return (React__default["default"].createElement(Select.Select, Object.assign({}, props, { label: label, options: options, onChange: handleChange, value: value.value, disabled: isDisabled })));
+    const selectedValue = value.value;
+    return (React__default["default"].createElement(Select.Select, Object.assign({}, props, { 
+        // See https://developers.google.com/web/updates/2015/06/checkout-faster-with-autofill:
+        autoComplete: props.autoComplete || "state", label: label, options: options, onChange: handleChange, value: optionsMap[selectedValue] ? selectedValue : "", disabled: isDisabled })));
 };
 const ControlledStateSelector = ({ name, control, label, countryCode, }) => (React__default["default"].createElement(reactHookForm.Controller, { name: name, control: control, render: (_a) => {
         var _b;

@@ -7,11 +7,12 @@ import { CheckoutModalFooter } from '../../payments/CheckoutModalFooter/Checkout
 import React__default, { useMemo, useState, useEffect, useCallback } from 'react';
 import { Box, alpha, CircularProgress, Typography } from '@mui/material';
 import { OVERLAY_OPACITY } from '../../../config/theme/theme.js';
+import { getCVCIsValid } from '../../../domain/payment/payment.utils.js';
 
 function validateCvv(isCvvRequired, cvv) {
-    return !isCvvRequired || cvv.length === 3 || cvv.length === 4;
+    return !isCvvRequired || getCVCIsValid(cvv);
 }
-const SavedPaymentDetailsSelector = ({ showLoader, savedPaymentMethods, selectedPaymentMethodId, onNew, onDelete, onPick, onCvvSelected, onNext, onClose, onAttemptSubmit, consentType, privacyHref, termsOfUseHref, }) => {
+const SavedPaymentDetailsSelector = ({ showLoader, savedPaymentMethods, selectedPaymentMethodId, onNew, onDelete, onPick, onCvvSelected, onNext, onClose, onAttemptSubmit, consentType, }) => {
     const isCvvRequired = useMemo(() => {
         const selectedPaymentMethod = savedPaymentMethods.find(savedPaymentMethod => savedPaymentMethod.id === selectedPaymentMethodId);
         return (selectedPaymentMethod === null || selectedPaymentMethod === void 0 ? void 0 : selectedPaymentMethod.type) === "CreditCard";
@@ -65,8 +66,8 @@ const SavedPaymentDetailsSelector = ({ showLoader, savedPaymentMethods, selected
             cvvError && (React__default.createElement(Typography, { variant: "caption", component: "p", sx: { mt: 2, color: theme => theme.palette.warning.dark } }, "You must enter a valid CVV number.")),
             React__default.createElement(SecondaryButton, { onClick: onNew, startIcon: React__default.createElement(default_1, null), sx: { mt: 2.5 }, disabled: showLoader }, "Add New Payment Method"),
             isFormSubmitted && !selectedPaymentMethodId && (React__default.createElement(Typography, { variant: "caption", component: "p", sx: { mt: 2, color: theme => theme.palette.warning.dark } }, "You must select a saved and approved payment method or create a new one."))),
-        React__default.createElement(CheckoutModalFooter, { variant: "toConfirmation", consentType: consentType, privacyHref: privacyHref, termsOfUseHref: termsOfUseHref, onSubmitClicked: handleNextClicked, onCloseClicked: onClose })));
+        React__default.createElement(CheckoutModalFooter, { variant: "toConfirmation", consentType: consentType, onSubmitClicked: handleNextClicked, onCloseClicked: onClose })));
 };
 
-export { SavedPaymentDetailsSelector };
+export { SavedPaymentDetailsSelector, validateCvv };
 //# sourceMappingURL=SavedPaymentDetailsSelector.js.map

@@ -11,13 +11,15 @@ var Checkbox = require('../../shared/Checkbox/Checkbox.js');
 var ConsentText = require('../../shared/ConsentText/ConsentText.js');
 var PrimaryButton = require('../../shared/PrimaryButton/PrimaryButton.js');
 var CheckoutModalFooter_constants = require('./CheckoutModalFooter.constants.js');
+var useDictionary = require('../../../hooks/useDictionary.js');
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
 var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 
-const CheckoutModalFooter = ({ variant, buttonLabel, guestCheckoutEnabled, consentType, privacyHref, termsOfUseHref, onGoToCollection, submitDisabled, onSubmitClicked, onCloseClicked, }) => {
+const CheckoutModalFooter = ({ variant, buttonLabel, guestCheckoutEnabled, consentType, onGoToCollection, submitDisabled, onSubmitClicked, onCloseClicked, }) => {
     // CONSENT:
+    const { privacyHref, termsOfUseHref } = useDictionary.useDictionary();
     const showConsent = consentType && (privacyHref || termsOfUseHref) && (variant === "toConfirmation" || variant === "toPlaid");
     const consentTextElement = showConsent ? React__default["default"].createElement(ConsentText.ConsentText, { privacyHref: privacyHref, termsOfUseHref: termsOfUseHref }) : null;
     const [{ isFormSubmitted, isFormLoading, isConsentChecked, }, setConsentState] = React.useState({

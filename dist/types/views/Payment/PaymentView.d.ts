@@ -5,7 +5,6 @@ import { SavedPaymentMethod } from "../../domain/circle/circle.interfaces";
 import { CheckoutModalError, SelectedPaymentMethod } from "../../components/public/CheckoutOverlay/CheckoutOverlay.hooks";
 import { ConsentType } from "../../components/shared/ConsentText/ConsentText";
 import { TaxesState } from "../Billing/BillingView";
-import { PUIDictionary } from "../../domain/dictionary/dictionary.interfaces";
 import { Wallet } from "../../domain/wallet/wallet.interfaces";
 export interface PaymentViewProps {
     checkoutItems: CheckoutItem[];
@@ -24,9 +23,6 @@ export interface PaymentViewProps {
     onClose: () => void;
     acceptedPaymentTypes: PaymentType[];
     consentType?: ConsentType;
-    privacyHref?: string;
-    termsOfUseHref?: string;
-    dictionary: PUIDictionary;
     debug?: boolean;
 }
 export declare const PaymentView: React.FC<PaymentViewProps>;

@@ -7,7 +7,7 @@ import { XS_MOBILE_MAX_WIDTH } from '../../config/theme/theme.js';
 import { StatusIcon } from '../../components/shared/StatusIcon/StatusIcon.js';
 import { useGetPaymentNotificationQuery } from '../../queries/graphqlGenerated.js';
 import { persistCheckoutModalInfo } from '../../components/public/CheckoutOverlay/CheckoutOverlay.utils.js';
-import { PURCHASING_MIN_WAIT_MS, PAYMENT_NOTIFICATION_INTERVAL_MS, PAYMENT_CREATION_TIMEOUT_MS, PURCHASING_MESSAGES_DEFAULT, PURCHASING_MESSAGES_INTERVAL_MS } from '../../config/config.js';
+import { PURCHASING_MIN_WAIT_MS, PAYMENT_CREATION_TIMEOUT_MS, PURCHASING_MESSAGES_DEFAULT, PURCHASING_MESSAGES_INTERVAL_MS, PAYMENT_NOTIFICATION_INTERVAL_MS } from '../../config/config.js';
 import { isLocalhost } from '../../domain/url/url.utils.js';
 
 const PurchasingView = ({ purchasingImageSrc, purchasingMessages: customPurchasingMessages, orgID, invoiceID, savedPaymentMethods, selectedPaymentMethod, wallet, onPurchaseSuccess, onPurchaseError, onDialogBlocked, debug, }) => {
@@ -30,16 +30,22 @@ const PurchasingView = ({ purchasingImageSrc, purchasingMessages: customPurchasi
     });
     // Load 3DS redirect URL when needed:
     const [redirectURL, setRedirectURL] = useState(isCreditCardPayment ? "" : null);
+    const skipPaymentNotificationRedirect = !isCreditCardPayment || !!redirectURL || fullPaymentState.paymentStatus !== "processed";
     const paymentNotificationResult = useGetPaymentNotificationQuery({
-        skip: !isCreditCardPayment || !!redirectURL || fullPaymentState.paymentStatus !== "processed",
+        skip: skipPaymentNotificationRedirect,
         pollInterval: PAYMENT_NOTIFICATION_INTERVAL_MS,
     });
     const nextRedirectURL = ((_c = (_b = (_a = paymentNotificationResult.data) === null || _a === void 0 ? void 0 : _a.getPaymentNotification) === null || _b === void 0 ? void 0 : _b.message) === null || _c === void 0 ? void 0 : _c.redirectURL) || "";
     useEffect(() => {
-        if (!isCreditCardPayment)
+        if (skipPaymentNotificationRedirect)
             return;
-        setRedirectURL(prevRedirectURL => prevRedirectURL || nextRedirectURL);
-    }, [isCreditCardPayment, nextRedirectURL]);
+        setRedirectURL((prevRedirectURL) => {
+            const redirectURL = prevRedirectURL || nextRedirectURL;
+            if (debug)
+                console.log(`  👀 getPaymentNotificationQuery`, { redirectURL });
+            return redirectURL;
+        });
+    }, [skipPaymentNotificationRedirect, nextRedirectURL, debug]);
     // Triggers for payment mutation and onPurchaseSuccess/onPurchaseError callbacks:
     const fullPaymentCalledRef = useRef(false);
     const purchaseSuccessHandledRef = useRef(false);

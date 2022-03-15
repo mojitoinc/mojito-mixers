@@ -6,12 +6,14 @@ import { TextField } from '../../../shared/TextField/TextField.js';
 import { withInvalidErrorMessage } from '../../../../utils/validationUtils.js';
 import { isValidWalletAddress, isNewWalletAddress } from '../../../../domain/wallet/wallet.utils.js';
 import { WalletAddressSelector } from '../../../shared/Select/WalletAddressSelector/WalletAddressSelector.js';
+import { useDictionary } from '../../../../hooks/useDictionary.js';
 
 const WALLET_ADDRESS_FIELD_LABEL = "Wallet Address";
 const INVALID_WALLET_ADDRESS_MESSAGE = withInvalidErrorMessage({
     label: WALLET_ADDRESS_FIELD_LABEL,
 });
-const DeliveryWalletSelector = ({ validatePersonalAddress, wallets, wallet, onWalletChange, dictionary, }) => {
+const DeliveryWalletSelector = ({ validatePersonalAddress, wallets, wallet, onWalletChange, }) => {
+    const dictionary = useDictionary();
     const handleInputChange = useCallback((e) => {
         onWalletChange(e.target.value);
     }, [onWalletChange]);

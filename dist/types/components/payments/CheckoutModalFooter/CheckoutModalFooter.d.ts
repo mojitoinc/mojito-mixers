@@ -6,8 +6,6 @@ export interface CheckoutModalFooterProps {
     buttonLabel?: string;
     guestCheckoutEnabled?: boolean;
     consentType?: ConsentType;
-    privacyHref?: string;
-    termsOfUseHref?: string;
     onGoToCollection?: () => void;
     submitDisabled?: boolean;
     onSubmitClicked?: (canSubmit: boolean) => void | Promise<void | false>;

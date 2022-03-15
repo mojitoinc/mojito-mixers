@@ -17,7 +17,7 @@ function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'defau
 
 var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 
-const PurchaseConfirmationBillingDetails = ({ checkoutItems, circlePaymentID, wallet, selectedPaymentMethodBillingInfo, selectedPaymentMethodPaymentInfo, dictionary }) => {
+const PurchaseConfirmationBillingDetails = ({ checkoutItems, circlePaymentID, wallet, selectedPaymentMethodBillingInfo, selectedPaymentMethodPaymentInfo, }) => {
     const { isMasked, paymentType, displayValue, network, } = PurchaseConfirmationBillingDetails_utils.getFormattedPaymentMethod(selectedPaymentMethodPaymentInfo);
     const icon = network ? React__default["default"].createElement(Icons.CreditCardIcon, { network: network }) : null;
     return (React__default["default"].createElement(material.Box, { sx: { display: 'flex', flexDirection: 'column', flex: 1, position: "relative" } },
@@ -43,7 +43,7 @@ const PurchaseConfirmationBillingDetails = ({ checkoutItems, circlePaymentID, wa
                     endAdornment: (React__default["default"].createElement(CopyButton.CopyButton, { label: "Reference No.", value: circlePaymentID, size: "small" })),
                 } : undefined })),
         React__default["default"].createElement(CheckoutItemCostPurchase.CheckoutItemCostPurchase, { checkoutItems: checkoutItems, selectedPaymentMethodBillingInfo: selectedPaymentMethodBillingInfo }),
-        React__default["default"].createElement(DeliveryWalletDetails.DeliveryWalletDetails, { wallet: wallet, dictionary: dictionary })));
+        React__default["default"].createElement(DeliveryWalletDetails.DeliveryWalletDetails, { wallet: wallet })));
 };
 
 exports.PurchaseConfirmationBillingDetails = PurchaseConfirmationBillingDetails;

@@ -27,10 +27,16 @@ function isLocalhost() {
         return false;
     return window.location.hostname === "localhost";
 }
+function isLocalhostOrStaging() {
+    if (!process.browser)
+        return false;
+    return isLocalhost() || /\.staging\./.test(window.location.origin.replace(/[/\-.]/g, "."));
+}
 
 exports.getUrlWithSearchParams = getUrlWithSearchParams;
 exports.getUrlWithoutParams = getUrlWithoutParams;
 exports.isLocalhost = isLocalhost;
+exports.isLocalhostOrStaging = isLocalhostOrStaging;
 exports.isUrlPathname = isUrlPathname;
 exports.urlToPathnameWhenPossible = urlToPathnameWhenPossible;
 //# sourceMappingURL=url.utils.js.map
