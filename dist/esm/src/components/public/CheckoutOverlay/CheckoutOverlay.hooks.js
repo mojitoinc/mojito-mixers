@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react';
 import { ERROR_PURCHASE } from '../../../domain/errors/errors.constants.js';
 import { isValidWalletAddress } from '../../../domain/wallet/wallet.utils.js';
 import { resetStepperProgress } from '../../payments/CheckoutStepper/CheckoutStepper.js';
-import { continueFlows } from './CheckoutOverlay.utils.js';
+import { continueFlows, clearPersistedInfo } from './CheckoutOverlay.utils.js';
 
 var CheckoutModalStepIndex;
 (function (CheckoutModalStepIndex) {
@@ -39,10 +39,11 @@ function useCheckoutModalState({ invoiceID: initialInvoiceID = null, productConf
         // Once authentication has loaded, we know if we need to skip the product confirmation step or not. Also, when the
         // modal is re-opened, we need to reset its state, taking into account if we need to resume a Plaid OAuth flow:s
         const savedFlow = continueFlows();
-        // if (savedFlow.checkoutStep !== "") {
-        //   clearPersistedInfo();
-        //   clearPlaidInfo();
-        // }
+        if (savedFlow.flowType === "3DS") {
+            clearPersistedInfo();
+        }
+        else if (savedFlow.flowType === "Plaid") ;
+        else if (savedFlow.checkoutStep !== "") ;
         setCheckoutModalState({
             checkoutStep: savedFlow.checkoutStep || startAt,
             checkoutError: savedFlow.checkoutError,

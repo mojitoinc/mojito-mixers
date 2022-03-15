@@ -10,6 +10,7 @@ var TextField = require('../../../shared/TextField/TextField.js');
 var validationUtils = require('../../../../utils/validationUtils.js');
 var wallet_utils = require('../../../../domain/wallet/wallet.utils.js');
 var WalletAddressSelector = require('../../../shared/Select/WalletAddressSelector/WalletAddressSelector.js');
+var useDictionary = require('../../../../hooks/useDictionary.js');
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
@@ -19,7 +20,8 @@ const WALLET_ADDRESS_FIELD_LABEL = "Wallet Address";
 const INVALID_WALLET_ADDRESS_MESSAGE = validationUtils.withInvalidErrorMessage({
     label: WALLET_ADDRESS_FIELD_LABEL,
 });
-const DeliveryWalletSelector = ({ validatePersonalAddress, wallets, wallet, onWalletChange, dictionary, }) => {
+const DeliveryWalletSelector = ({ validatePersonalAddress, wallets, wallet, onWalletChange, }) => {
+    const dictionary = useDictionary.useDictionary();
     const handleInputChange = React.useCallback((e) => {
         onWalletChange(e.target.value);
     }, [onWalletChange]);

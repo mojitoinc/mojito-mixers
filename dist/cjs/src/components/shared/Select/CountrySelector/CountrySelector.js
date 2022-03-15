@@ -30,21 +30,24 @@ const CountrySelector = (_a) => {
     // If the selected option only has one property set, we try to find a match:
     React.useEffect(() => {
         const { value: selectedValue, label: selectedLabel } = value;
-        if ((selectedValue && selectedLabel) || (!selectedValue && !selectedLabel))
+        if ((selectedValue && selectedLabel) || (!selectedValue && !selectedLabel) || options.length === 0)
             return;
         const option = selectedValue
             ? optionsMap[selectedValue]
             : options.find((option) => option.label === selectedLabel);
         setTimeout(() => onSelectCountry(option || Select.EMPTY_OPTION));
     }, [value, optionsMap, options, onSelectCountry]);
-    return (React__default["default"].createElement(Select.Select, Object.assign({}, props, { label: label, options: options, onChange: handleChange, value: value.value, disabled: isDisabled })));
+    const selectedValue = value.value;
+    return (React__default["default"].createElement(Select.Select, Object.assign({}, props, { 
+        // See https://developers.google.com/web/updates/2015/06/checkout-faster-with-autofill:
+        autoComplete: props.autoComplete || "country", label: label, options: options, onChange: handleChange, value: optionsMap[selectedValue] ? selectedValue : "", disabled: isDisabled })));
 };
 const ControlledCountrySelector = ({ name, control, label, }) => (React__default["default"].createElement(reactHookForm.Controller, { name: name, control: control, render: (_a) => {
         var _b;
         var _c = _a.field, { name, onChange, ref } = _c, field = tslib_es6.__rest(_c, ["name", "onChange", "ref"]), { fieldState } = _a;
         const error = fieldState === null || fieldState === void 0 ? void 0 : fieldState.error;
         const fieldError = error ? (error.hasOwnProperty("message") ? error.message : (_b = error.value) === null || _b === void 0 ? void 0 : _b.message) || "" : "";
-        return (React__default["default"].createElement(CountrySelector, Object.assign({ id: name, name: name, label: label, onSelectCountry: onChange, fullWidth: true, inputRef: ref, error: !!fieldError, helperText: fieldError }, field)));
+        return (React__default["default"].createElement(CountrySelector, Object.assign({ id: name, name: name, autoComplete: "country", label: label, onSelectCountry: onChange, fullWidth: true, inputRef: ref, error: !!fieldError, helperText: fieldError }, field)));
     } }));
 
 exports.ControlledCountrySelector = ControlledCountrySelector;

@@ -3,7 +3,6 @@ import { SavedPaymentMethod } from "../../domain/circle/circle.interfaces";
 import { CheckoutItem } from "../../domain/product/product.interfaces";
 import { BillingInfo } from "../../forms/BillingInfoForm";
 import { CheckoutModalError } from "../../components/public/CheckoutOverlay/CheckoutOverlay.hooks";
-import { PUIDictionary } from "../../domain/dictionary/dictionary.interfaces";
 import { Wallet } from "../../domain/wallet/wallet.interfaces";
 export declare type TaxStatus = "incomplete" | "loading" | "complete" | "error";
 export interface TaxesState {
@@ -24,7 +23,6 @@ export interface BillingViewProps {
     onWalletChange: (wallet: null | string | Wallet) => void;
     onNext: () => void;
     onClose: () => void;
-    dictionary: PUIDictionary;
     debug?: boolean;
 }
 export declare const BillingView: React.FC<BillingViewProps>;

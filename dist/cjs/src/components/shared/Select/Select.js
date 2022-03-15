@@ -17,9 +17,13 @@ const EMPTY_OPTION = {
 };
 const Select = (_a) => {
     var { id, label, required, disabled, options = [], helperText, error, margin = "normal" } = _a, props = tslib_es6.__rest(_a, ["id", "label", "required", "disabled", "options", "helperText", "error", "margin"]);
-    return (React__default["default"].createElement(material.FormControl, { fullWidth: true, margin: margin, variant: "filled", disabled: disabled, error: error },
+    const theme = material.useTheme();
+    const matches = material.useMediaQuery(theme.breakpoints.down('sm'));
+    const selectOptions = matches ? [EMPTY_OPTION, ...options] : options;
+    const mapOption = ({ value, label }) => matches ? (React__default["default"].createElement("option", { key: label, value: value }, label)) : (React__default["default"].createElement(material.MenuItem, { key: label, value: value }, label));
+    return (React__default["default"].createElement(material.FormControl, { fullWidth: true, margin: "normal", variant: "filled", disabled: disabled, error: error },
         React__default["default"].createElement(material.InputLabel, { required: required, htmlFor: id, disabled: disabled, shrink: true }, label),
-        React__default["default"].createElement(material.Select, Object.assign({ id: id, disabled: disabled, IconComponent: Icons.SelectIcon, disableUnderline: true }, props), options.map(({ value, label }) => (React__default["default"].createElement(material.MenuItem, { key: label, value: value }, label)))),
+        React__default["default"].createElement(material.Select, Object.assign({}, props, { id: id, disabled: disabled, native: matches, IconComponent: Icons.SelectIcon, disableUnderline: true, autoComplete: props.autoComplete || props.name }), selectOptions.map(mapOption)),
         helperText && React__default["default"].createElement(material.FormHelperText, null, helperText)));
 };
 

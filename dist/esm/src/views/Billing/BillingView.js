@@ -12,7 +12,7 @@ import { useGetTaxQuoteLazyQuery } from '../../queries/graphqlGenerated.js';
 import { useCheckoutItemsCostTotal } from '../../hooks/useCheckoutItemCostTotal.js';
 import { useThrottledCallback } from '@swyg/corre';
 
-const BillingView = ({ checkoutItems, savedPaymentMethods: rawSavedPaymentMethods, selectedBillingInfo, wallets, wallet, checkoutError, onBillingInfoSelected, onTaxesChange, onSavedPaymentMethodDeleted, onWalletChange, onNext, onClose, dictionary, debug, }) => {
+const BillingView = ({ checkoutItems, savedPaymentMethods: rawSavedPaymentMethods, selectedBillingInfo, wallets, wallet, checkoutError, onBillingInfoSelected, onTaxesChange, onSavedPaymentMethodDeleted, onWalletChange, onNext, onClose, debug, }) => {
     const savedPaymentMethodAddressIdRef = useRef("");
     const savedPaymentMethods = useMemo(() => distinctBy(rawSavedPaymentMethods, "addressId"), [rawSavedPaymentMethods]);
     const { total: subtotal, fees } = useCheckoutItemsCostTotal(checkoutItems);
@@ -143,7 +143,7 @@ const BillingView = ({ checkoutItems, savedPaymentMethods: rawSavedPaymentMethod
             , { 
                 // variant="loggedIn"
                 defaultValues: typeof selectedBillingInfo === "string" ? undefined : selectedBillingInfo, checkoutError: checkoutError, taxes: taxes, onTaxInfoChange: handleTaxInfoChange, onSaved: savedPaymentMethods.length > 0 ? handleShowSaved : undefined, onClose: onClose, onSubmit: handleSubmit, onAttemptSubmit: handleFormAttemptSubmit, debug: debug }))),
-        React__default.createElement(CheckoutDeliveryAndItemCostBreakdown, { checkoutItems: checkoutItems, taxes: taxes, validatePersonalDeliveryAddress: formSubmitAttempted, wallets: wallets, wallet: wallet, onWalletChange: onWalletChange, dictionary: dictionary })));
+        React__default.createElement(CheckoutDeliveryAndItemCostBreakdown, { checkoutItems: checkoutItems, taxes: taxes, validatePersonalDeliveryAddress: formSubmitAttempted, wallets: wallets, wallet: wallet, onWalletChange: onWalletChange })));
 };
 
 export { BillingView };

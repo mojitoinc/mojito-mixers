@@ -1,6 +1,7 @@
 import { PLAID_OAUTH_FLOW_RECEIVED_REDIRECT_URI_KEY, PLAID_OAUTH_FLOW_INFO_KEY, PLAID_OAUTH_FLOW_STATE_USED_KEY, PLAID_OAUTH_FLOW_URL_SEARCH, PLAID_STORAGE_EXPIRATION_MS } from '../../config/config.js';
-import { isLocalhost, urlToPathnameWhenPossible, getUrlWithoutParams } from '../url/url.utils.js';
+import { isLocalhostOrStaging, isLocalhost, urlToPathnameWhenPossible, getUrlWithoutParams } from '../url/url.utils.js';
 
+const debug = isLocalhostOrStaging();
 const FALLBACK_PLAID_OAUTH_FLOW_STATE = {
     url: "",
     linkToken: "",
@@ -15,6 +16,8 @@ function persistPlaidInfo(info) {
         localStorage.setItem(PLAID_OAUTH_FLOW_INFO_KEY, JSON.stringify(Object.assign(Object.assign({}, info), { url: info.url || getUrlWithoutParams(), timestamp: info.timestamp || Date.now() })));
     }
     catch (err) {
+        if (debug)
+            console.log(err);
     }
 }
 function persistPlaidReceivedRedirectUri(receivedRedirectUri) {
@@ -24,6 +27,8 @@ function persistPlaidOAuthStateUsed(used = true) {
     localStorage.setItem(PLAID_OAUTH_FLOW_STATE_USED_KEY, `${used}`);
 }
 function clearPlaidInfo(isExpired) {
+    if (debug)
+        console.log(`💾 Clearing ${isExpired ? "expired " : ""}state (Plaid)...`);
     if (process.browser) {
         localStorage.removeItem(PLAID_OAUTH_FLOW_INFO_KEY);
         localStorage.removeItem(PLAID_OAUTH_FLOW_RECEIVED_REDIRECT_URI_KEY);
@@ -52,6 +57,8 @@ function getPlaidOAuthFlowState() {
         savedStateUsed = localStorage.getItem(PLAID_OAUTH_FLOW_STATE_USED_KEY) === "true" || false;
     }
     catch (err) {
+        if (debug)
+            console.log(err);
     }
     const { url = "", linkToken = "", selectedBillingInfo = "", timestamp, } = savedPlaidInfo || {};
     const receivedRedirectUri = savedReceivedRedirectUri || (window.location.search.startsWith(PLAID_OAUTH_FLOW_URL_SEARCH) ? window.location.href : undefined);

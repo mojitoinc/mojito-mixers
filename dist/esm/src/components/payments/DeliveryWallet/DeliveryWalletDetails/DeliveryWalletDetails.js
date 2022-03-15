@@ -3,8 +3,10 @@ import default_1 from '../../../../../node_modules/@mui/icons-material/InfoOutli
 import { CopyButton } from '../../../shared/CopyButton/CopyButton.js';
 import { ReadOnlyWalletAddress } from '../../../shared/ReadOnlyField/ReadOnlyField.js';
 import React__default from 'react';
+import { useDictionary } from '../../../../hooks/useDictionary.js';
 
-const DeliveryWalletDetails = ({ wallet, dictionary, }) => {
+const DeliveryWalletDetails = ({ wallet, }) => {
+    const dictionary = useDictionary();
     const walletAddress = (typeof wallet === "object" ? wallet === null || wallet === void 0 ? void 0 : wallet.address : wallet) || "";
     const isMultiSig = typeof wallet === "object" || !walletAddress;
     return (React__default.createElement(Box, { pt: 2 },

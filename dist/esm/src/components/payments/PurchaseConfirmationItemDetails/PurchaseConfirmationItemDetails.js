@@ -1,8 +1,10 @@
 import React__default from 'react';
 import { Stack, Typography } from '@mui/material';
 import { CheckoutItemList } from '../CheckoutItemCost/List/CheckoutItemList.js';
+import { useDictionary } from '../../../hooks/useDictionary.js';
 
-const PurchaseConfirmationItemDetails = ({ checkoutItems, dictionary, }) => {
+const PurchaseConfirmationItemDetails = ({ checkoutItems, }) => {
+    const dictionary = useDictionary();
     return (React__default.createElement(Stack, { sx: { display: "flex", flex: 1, pt: 2.5 } },
         React__default.createElement(Typography, { variant: "body2" }, "You purchased"),
         React__default.createElement(CheckoutItemList, { sx: { mt: 3 }, checkoutItems: checkoutItems }),

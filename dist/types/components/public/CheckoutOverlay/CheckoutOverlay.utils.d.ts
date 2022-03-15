@@ -23,7 +23,9 @@ export declare function persistCheckoutModalInfoUsed(used?: boolean): void;
 export declare function clearPersistedInfo(isExpired?: boolean): CheckoutModalState3DS;
 export declare function getCheckoutModalState(): CheckoutModalState3DS;
 export declare function continueCheckout(noClear?: boolean): [boolean, CheckoutModalState3DS];
+export declare type FlowType = "" | "3DS" | "Plaid";
 export interface ContinueFlowsReturn {
+    flowType: FlowType;
     checkoutStep: CheckoutModalStep | "";
     checkoutError?: CheckoutModalError;
     invoiceID: string;

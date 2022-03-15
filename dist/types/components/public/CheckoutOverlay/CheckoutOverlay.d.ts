@@ -27,8 +27,6 @@ export interface PUICheckoutOverlayProps {
     dictionary?: Partial<PUIDictionary>;
     network?: Network;
     consentType?: ConsentType;
-    privacyHref?: string;
-    termsOfUseHref?: string;
     orgID: string;
     invoiceID?: string;
     checkoutItems: CheckoutItemInfo[];

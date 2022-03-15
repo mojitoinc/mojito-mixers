@@ -9,7 +9,7 @@ import default_1 from '../../../../node_modules/@mui/icons-material/Check.js';
 import { DeliveryWalletDetails } from '../DeliveryWallet/DeliveryWalletDetails/DeliveryWalletDetails.js';
 import { CopyButton } from '../../shared/CopyButton/CopyButton.js';
 
-const PurchaseConfirmationBillingDetails = ({ checkoutItems, circlePaymentID, wallet, selectedPaymentMethodBillingInfo, selectedPaymentMethodPaymentInfo, dictionary }) => {
+const PurchaseConfirmationBillingDetails = ({ checkoutItems, circlePaymentID, wallet, selectedPaymentMethodBillingInfo, selectedPaymentMethodPaymentInfo, }) => {
     const { isMasked, paymentType, displayValue, network, } = getFormattedPaymentMethod(selectedPaymentMethodPaymentInfo);
     const icon = network ? React__default.createElement(CreditCardIcon, { network: network }) : null;
     return (React__default.createElement(Box, { sx: { display: 'flex', flexDirection: 'column', flex: 1, position: "relative" } },
@@ -35,7 +35,7 @@ const PurchaseConfirmationBillingDetails = ({ checkoutItems, circlePaymentID, wa
                     endAdornment: (React__default.createElement(CopyButton, { label: "Reference No.", value: circlePaymentID, size: "small" })),
                 } : undefined })),
         React__default.createElement(CheckoutItemCostPurchase, { checkoutItems: checkoutItems, selectedPaymentMethodBillingInfo: selectedPaymentMethodBillingInfo }),
-        React__default.createElement(DeliveryWalletDetails, { wallet: wallet, dictionary: dictionary })));
+        React__default.createElement(DeliveryWalletDetails, { wallet: wallet })));
 };
 
 export { PurchaseConfirmationBillingDetails };

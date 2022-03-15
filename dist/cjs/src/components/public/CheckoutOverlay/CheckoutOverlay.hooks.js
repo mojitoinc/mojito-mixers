@@ -43,10 +43,11 @@ function useCheckoutModalState({ invoiceID: initialInvoiceID = null, productConf
         // Once authentication has loaded, we know if we need to skip the product confirmation step or not. Also, when the
         // modal is re-opened, we need to reset its state, taking into account if we need to resume a Plaid OAuth flow:s
         const savedFlow = CheckoutOverlay_utils.continueFlows();
-        // if (savedFlow.checkoutStep !== "") {
-        //   clearPersistedInfo();
-        //   clearPlaidInfo();
-        // }
+        if (savedFlow.flowType === "3DS") {
+            CheckoutOverlay_utils.clearPersistedInfo();
+        }
+        else if (savedFlow.flowType === "Plaid") ;
+        else if (savedFlow.checkoutStep !== "") ;
         setCheckoutModalState({
             checkoutStep: savedFlow.checkoutStep || startAt,
             checkoutError: savedFlow.checkoutError,

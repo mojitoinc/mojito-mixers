@@ -7,9 +7,11 @@ import { Checkbox } from '../../shared/Checkbox/Checkbox.js';
 import { ConsentText, CONSENT_ERROR_MESSAGE } from '../../shared/ConsentText/ConsentText.js';
 import { PrimaryButton } from '../../shared/PrimaryButton/PrimaryButton.js';
 import { LABELS_BY_VARIANT, ICONS_BY_VARIANT } from './CheckoutModalFooter.constants.js';
+import { useDictionary } from '../../../hooks/useDictionary.js';
 
-const CheckoutModalFooter = ({ variant, buttonLabel, guestCheckoutEnabled, consentType, privacyHref, termsOfUseHref, onGoToCollection, submitDisabled, onSubmitClicked, onCloseClicked, }) => {
+const CheckoutModalFooter = ({ variant, buttonLabel, guestCheckoutEnabled, consentType, onGoToCollection, submitDisabled, onSubmitClicked, onCloseClicked, }) => {
     // CONSENT:
+    const { privacyHref, termsOfUseHref } = useDictionary();
     const showConsent = consentType && (privacyHref || termsOfUseHref) && (variant === "toConfirmation" || variant === "toPlaid");
     const consentTextElement = showConsent ? React__default.createElement(ConsentText, { privacyHref: privacyHref, termsOfUseHref: termsOfUseHref }) : null;
     const [{ isFormSubmitted, isFormLoading, isConsentChecked, }, setConsentState] = useState({

@@ -3,6 +3,7 @@ import React__default, { useMemo } from 'react';
 import { InMemoryCache, createHttpLink, ApolloClient, ApolloProvider } from '@apollo/client';
 import { setContext } from '../../../../node_modules/@apollo/client/link/context/index.js';
 import { useAuth0 } from '@auth0/auth0-react';
+import { isLocalhost } from '../../../domain/url/url.utils.js';
 
 const cache = new InMemoryCache();
 const AuthorizedApolloProvider = ({ apolloClient: parentApolloClient, uri, children, }) => {
@@ -15,9 +16,12 @@ const AuthorizedApolloProvider = ({ apolloClient: parentApolloClient, uri, child
         const httpLink = createHttpLink({ uri });
         const authLink = setContext((_, { headers }) => __awaiter(void 0, void 0, void 0, function* () {
             const token = yield getIdTokenClaims();
-            return {
+            const context = {
                 headers: Object.assign(Object.assign({}, headers), { authorization: token ? `Bearer ${token.__raw}` : "" }),
             };
+            if (isLocalhost())
+                context.headers["origin-overwrite"] = "https://payments-staging.mojito.xyz/";
+            return context;
         }));
         const link = authLink.concat(httpLink);
         return new ApolloClient({ uri, link, cache });

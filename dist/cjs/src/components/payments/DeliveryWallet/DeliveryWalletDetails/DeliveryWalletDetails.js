@@ -7,12 +7,14 @@ var InfoOutlined = require('../../../../../node_modules/@mui/icons-material/Info
 var CopyButton = require('../../../shared/CopyButton/CopyButton.js');
 var ReadOnlyField = require('../../../shared/ReadOnlyField/ReadOnlyField.js');
 var React = require('react');
+var useDictionary = require('../../../../hooks/useDictionary.js');
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
 var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 
-const DeliveryWalletDetails = ({ wallet, dictionary, }) => {
+const DeliveryWalletDetails = ({ wallet, }) => {
+    const dictionary = useDictionary.useDictionary();
     const walletAddress = (typeof wallet === "object" ? wallet === null || wallet === void 0 ? void 0 : wallet.address : wallet) || "";
     const isMultiSig = typeof wallet === "object" || !walletAddress;
     return (React__default["default"].createElement(material.Box, { pt: 2 },

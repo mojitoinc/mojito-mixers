@@ -73,16 +73,6 @@ interface SelectOption<V = string | number> {
     label: string;
 }
 
-declare type PUIDictionarySingleLine = string | React.ReactFragment;
-declare type PUIDictionaryMultiLine = PUIDictionarySingleLine[];
-declare type PUIDictionary = {
-    walletInfo: PUIDictionarySingleLine;
-    walletMultiSigTooltip: PUIDictionarySingleLine;
-    wirePaymentsDisclaimer: PUIDictionaryMultiLine;
-    purchaseInstructions: PUIDictionaryMultiLine;
-};
-declare type PUIDictionaryKeys = keyof PUIDictionary;
-
 interface Network {
     id: string;
     name: string;
@@ -141,6 +131,18 @@ interface ThemeProviderProps extends CommonProviderProps {
 }
 declare type ProvidersInjectorProps = ThemeProviderProps & AuthorizedApolloProviderProps;
 
+declare type PUIDictionarySingleLine = string | React.ReactFragment;
+declare type PUIDictionaryMultiLine = PUIDictionarySingleLine[];
+declare type PUIDictionary = {
+    walletInfo: PUIDictionarySingleLine;
+    walletMultiSigTooltip: PUIDictionarySingleLine;
+    wirePaymentsDisclaimer: PUIDictionaryMultiLine;
+    purchaseInstructions: PUIDictionaryMultiLine;
+    privacyHref?: string;
+    termsOfUseHref?: string;
+};
+declare type PUIDictionaryKeys = keyof PUIDictionary;
+
 interface PUICheckoutOverlayProps {
     open: boolean;
     onClose: () => void;
@@ -159,8 +161,6 @@ interface PUICheckoutOverlayProps {
     dictionary?: Partial<PUIDictionary>;
     network?: Network;
     consentType?: ConsentType;
-    privacyHref?: string;
-    termsOfUseHref?: string;
     orgID: string;
     invoiceID?: string;
     checkoutItems: CheckoutItemInfo[];
@@ -246,7 +246,9 @@ interface CheckoutModalState3DS extends CheckoutModalInfo {
 declare function persistReceivedRedirectUri3DS(receivedRedirectUri: string): void;
 declare function getCheckoutModalState(): CheckoutModalState3DS;
 declare function continueCheckout(noClear?: boolean): [boolean, CheckoutModalState3DS];
+declare type FlowType = "" | "3DS" | "Plaid";
 interface ContinueFlowsReturn {
+    flowType: FlowType;
     checkoutStep: CheckoutModalStep | "";
     checkoutError?: CheckoutModalError;
     invoiceID: string;

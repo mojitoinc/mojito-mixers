@@ -130,6 +130,7 @@ export declare enum AuctionLotStatus {
 export declare type BidFilterInput = {
     marketplaceAuctionLotId?: InputMaybe<Scalars['UUID']>;
     order?: InputMaybe<AuctionBidOrder>;
+    returnDeleted?: InputMaybe<Scalars['Boolean']>;
     userId?: InputMaybe<Scalars['UUID']>;
 };
 export declare enum CollectionType {
@@ -248,6 +249,7 @@ export declare enum ExtensionType {
 }
 export declare type InvoiceDetails = {
     __typename?: 'InvoiceDetails';
+    billingAddress?: Maybe<InvoiceDetailsBillingAddress>;
     externalPaymentID: Scalars['String'];
     externalUserID: Scalars['String'];
     internalUserID: Scalars['String'];
@@ -257,6 +259,15 @@ export declare type InvoiceDetails = {
     items: Array<Maybe<ItemInvoiceDetail>>;
     paymentID: Scalars['UUID1'];
     status: InvoiceStatus;
+    userName: Scalars['String'];
+};
+export declare type InvoiceDetailsBillingAddress = {
+    __typename?: 'InvoiceDetailsBillingAddress';
+    city: Scalars['String'];
+    country: Scalars['String'];
+    postalCode: Scalars['String'];
+    state: Scalars['String'];
+    street1: Scalars['String'];
 };
 export declare enum InvoiceStatus {
     Canceled = "Canceled",
@@ -306,6 +317,7 @@ export declare type MarketplaceAuctionBid = {
     buyersPremium: Scalars['Float'];
     createdAt: Scalars['Time'];
     currentBid: Scalars['Float'];
+    deletedAt?: Maybe<Scalars['Time']>;
     finalPrice: Scalars['Float'];
     id: Scalars['UUID'];
     isCurrent: Scalars['Boolean'];
