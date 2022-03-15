@@ -6,16 +6,15 @@ import { TextField } from "../../../shared/TextField/TextField";
 import { withInvalidErrorMessage } from "../../../../utils/validationUtils";
 import { isNewWalletAddress, isValidWalletAddress } from "../../../../domain/wallet/wallet.utils";
 import { useCallback } from "react";
-import { PUIDictionary } from "../../../../domain/dictionary/dictionary.interfaces";
 import { WalletAddressSelector } from "../../../shared/Select/WalletAddressSelector/WalletAddressSelector";
 import { Wallet } from "../../../../domain/wallet/wallet.interfaces";
+import { useDictionary } from "../../../../hooks/useDictionary";
 
 export interface DeliveryWalletSelectorProps {
   validatePersonalAddress: boolean;
   wallets?: Wallet[];
   wallet: null | string | Wallet;
   onWalletChange: (wallet: null | string | Wallet) => void;
-  dictionary: PUIDictionary;
 }
 
 const WALLET_ADDRESS_FIELD_LABEL = "Wallet Address";
@@ -29,8 +28,9 @@ export const DeliveryWalletSelector: React.FC<DeliveryWalletSelectorProps> = ({
   wallets,
   wallet,
   onWalletChange,
-  dictionary,
 }) => {
+  const dictionary = useDictionary();
+
   const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     onWalletChange(e.target.value);
   }, [onWalletChange]);

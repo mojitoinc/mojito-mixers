@@ -14,7 +14,6 @@ import { checkNeedsGenericErrorMessage } from "../../hooks/useFormCheckoutError"
 import { TaxQuoteOutput, useGetTaxQuoteLazyQuery } from "../../queries/graphqlGenerated";
 import { useCheckoutItemsCostTotal } from "../../hooks/useCheckoutItemCostTotal";
 import { useThrottledCallback } from "@swyg/corre";
-import { PUIDictionary } from "../../domain/dictionary/dictionary.interfaces";
 import { Wallet } from "../../domain/wallet/wallet.interfaces";
 
 export type TaxStatus = "incomplete" | "loading" | "complete" | "error";
@@ -44,7 +43,6 @@ export interface BillingViewProps {
   onWalletChange: (wallet: null | string | Wallet) => void;
   onNext: () => void;
   onClose: () => void;
-  dictionary: PUIDictionary;
   debug?: boolean;
 }
 
@@ -61,14 +59,12 @@ export const BillingView: React.FC<BillingViewProps> = ({
   onWalletChange,
   onNext,
   onClose,
-  dictionary,
   debug,
 }) => {
   const savedPaymentMethodAddressIdRef = useRef<string>("");
   const savedPaymentMethods = useMemo(() => distinctBy(rawSavedPaymentMethods, "addressId"), [rawSavedPaymentMethods]);
   const { total: subtotal, fees } = useCheckoutItemsCostTotal(checkoutItems);
   const total = subtotal + fees;
-
   const [{ isDeleting, showSaved, taxes }, setViewState] = useState<BillingViewState>({
     isDeleting: false,
     showSaved: savedPaymentMethods.length > 0 && typeof selectedBillingInfo === "string" && !checkNeedsGenericErrorMessage("billing", checkoutError),
@@ -260,8 +256,7 @@ export const BillingView: React.FC<BillingViewProps> = ({
         validatePersonalDeliveryAddress={ formSubmitAttempted }
         wallets={ wallets }
         wallet={ wallet }
-        onWalletChange={ onWalletChange }
-        dictionary={ dictionary } />
+        onWalletChange={ onWalletChange } />
     </Stack>
   );
 };

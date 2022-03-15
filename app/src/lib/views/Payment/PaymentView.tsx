@@ -16,7 +16,6 @@ import { usePlaid } from "../../hooks/usePlaid";
 import { ConsentType } from "../../components/shared/ConsentText/ConsentText";
 import { checkNeedsGenericErrorMessage } from "../../hooks/useFormCheckoutError";
 import { TaxesState } from "../Billing/BillingView";
-import { PUIDictionary } from "../../domain/dictionary/dictionary.interfaces";
 import { Wallet } from "../../domain/wallet/wallet.interfaces";
 
 const billingInfoItemBoxProps: BoxProps = { sx: { mt: 2.5 } };
@@ -43,9 +42,6 @@ export interface PaymentViewProps {
   onClose: () => void;
   acceptedPaymentTypes: PaymentType[];
   consentType?: ConsentType;
-  privacyHref?: string;
-  termsOfUseHref?: string;
-  dictionary: PUIDictionary;
   debug?: boolean;
 }
 
@@ -66,9 +62,6 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
   onClose,
   acceptedPaymentTypes,
   consentType,
-  privacyHref,
-  termsOfUseHref,
-  dictionary,
   debug,
 }) => {
   const {
@@ -171,9 +164,7 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
             onNext={onNext}
             onClose={onClose}
             onAttemptSubmit={handleFormAttemptSubmit}
-            consentType={consentType}
-            privacyHref={privacyHref}
-            termsOfUseHref={termsOfUseHref} />
+            consentType={consentType} />
         ) : (
           <PaymentMethodForm
             acceptedPaymentTypes={acceptedPaymentTypes}
@@ -185,21 +176,17 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
             onSubmit={handleSubmit}
             onAttemptSubmit={handleFormAttemptSubmit}
             consentType={consentType}
-            privacyHref={privacyHref}
-            termsOfUseHref={termsOfUseHref}
-            dictionary={dictionary}
             debug={debug} />
         )}
       </Stack>
 
       <CheckoutDeliveryAndItemCostBreakdown
-        checkoutItems={checkoutItems}
-        taxes={taxes}
-        validatePersonalDeliveryAddress={formSubmitAttempted}
+        checkoutItems={ checkoutItems }
+        taxes={ taxes }
+        validatePersonalDeliveryAddress={ formSubmitAttempted }
         wallets={ wallets }
         wallet={ wallet }
-        onWalletChange={onWalletChange}
-        dictionary={dictionary} />
+        onWalletChange={onWalletChange} />
     </Stack>
   );
 };

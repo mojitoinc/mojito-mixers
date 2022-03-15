@@ -19,7 +19,6 @@ export interface ConfirmationViewProps {
   wallet: null | string | Wallet;
   onGoToCollection?: () => void;
   onNext: () => void;
-  dictionary: PUIDictionary;
 }
 
 export const ConfirmationView: React.FC<ConfirmationViewProps> = ({
@@ -30,7 +29,6 @@ export const ConfirmationView: React.FC<ConfirmationViewProps> = ({
   wallet,
   onGoToCollection,
   onNext,
-  dictionary,
 }) => {
   const {
     billingInfo: selectedBillingInfo,
@@ -75,18 +73,16 @@ export const ConfirmationView: React.FC<ConfirmationViewProps> = ({
         circlePaymentID={ circlePaymentID }
         wallet={ wallet }
         selectedPaymentMethodBillingInfo={ selectedPaymentMethodBillingInfo }
-        selectedPaymentMethodPaymentInfo={ selectedPaymentMethodPaymentInfo }
-        dictionary={ dictionary } />
+        selectedPaymentMethodPaymentInfo={ selectedPaymentMethodPaymentInfo } />
 
       <Stack sx={{ display: "flex", flex: 1 }}>
         <PurchaseConfirmationItemDetails
-          checkoutItems={ checkoutItems }
-          dictionary={ dictionary } />
+          checkoutItems={checkoutItems}/>
 
         <CheckoutModalFooter
           variant="toMarketplace"
-          onSubmitClicked={ onNext }
-          onGoToCollection={ onGoToCollection } />
+          onSubmitClicked={onNext}
+          onGoToCollection={onGoToCollection} />
       </Stack>
 
     </Stack>

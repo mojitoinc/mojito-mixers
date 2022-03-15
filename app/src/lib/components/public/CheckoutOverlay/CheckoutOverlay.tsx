@@ -26,8 +26,8 @@ import { transformCheckoutItemsFromInvoice } from "../../../domain/product/produ
 import { useCreateInvoiceAndReservation } from "../../../hooks/useCreateInvoiceAndReservation";
 import { useCheckoutItemsCostTotal } from "../../../hooks/useCheckoutItemCostTotal";
 import { PUIDictionary } from "../../../domain/dictionary/dictionary.interfaces";
-import { DEFAULT_DICTIONARY } from "../../../domain/dictionary/dictionary.constants";
 import { ApolloError } from "@apollo/client";
+import { DictionaryProvider } from "../../../providers/DictionaryProvider";
 import { Wallet } from "../../../domain/wallet/wallet.interfaces";
 import { THREEDS_REDIRECT_DELAY_MS } from "../../../config/config";
 import { Network } from "../../../domain/network/network.interfaces";
@@ -53,13 +53,11 @@ export interface PUICheckoutOverlayProps {
   userFormat: UserFormat;
   acceptedPaymentTypes: PaymentType[];
   paymentLimits?: Partial<Record<PaymentType, number>>;
-  dictionary?: Partial<PUIDictionary>,
-  network?: Network,
+  dictionary?: Partial<PUIDictionary>;
+  network?: Network;
 
   // Legal:
   consentType?: ConsentType;
-  privacyHref?: string;
-  termsOfUseHref?: string;
 
   // Data:
   orgID: string;
@@ -100,13 +98,11 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   userFormat,
   acceptedPaymentTypes,
   paymentLimits, // Not implemented yet. Used to show payment limits for some payment types.
-  dictionary: parentDictionary,
+  dictionary,
   network,
 
   // Legal:
   consentType,
-  privacyHref,
-  termsOfUseHref,
 
   // Data:
   orgID,
@@ -125,12 +121,6 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   onMarketingOptInChange, // Not implemented yet. Used to let user subscribe / unsubscribe to marketing updates.
 }) => {
   const [debug, setDebug] = useState(!!initialDebug);
-
-  // TODO: This should end up being in a context + hook to avoid prop drilling and it should be memoized:
-  const dictionary = {
-    ...DEFAULT_DICTIONARY,
-    ...parentDictionary,
-  };
 
   // First, get user data and saved payment methods:
 
@@ -664,7 +654,6 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
         onWalletChange={ setWalletAddress }
         onNext={ goNext }
         onClose={ handleClose }
-        dictionary={ dictionary }
         debug={ debug } />
     );
   } else if (checkoutStep === "payment") {
@@ -686,9 +675,6 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
         onClose={ handleClose }
         acceptedPaymentTypes={ acceptedPaymentTypes }
         consentType={ consentType }
-        privacyHref={ privacyHref }
-        termsOfUseHref={ termsOfUseHref }
-        dictionary={ dictionary }
         debug={ debug } />
     );
   } else if (checkoutStep === "purchasing" && invoiceID) {
@@ -719,8 +705,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
         circlePaymentID={ circlePaymentID }
         wallet={ wallet }
         onGoToCollection={ onGoToCollection }
-        onNext={ handleClose }
-        dictionary={ dictionary } />
+        onNext={ handleClose } />
     );
   } else {
     // !checkoutStep or
@@ -744,14 +729,16 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   );
 
   return (
-    <FullScreenOverlay
-      centered={ checkoutStep === "purchasing" || checkoutStep === "error" }
-      open={ open }
-      onClose={ handleClose }
-      isDialogBlocked={ isDialogBlocked }
-      contentKey={ checkoutStep }
-      header={ headerElement }
-      children={ checkoutStepElement } />
+    <DictionaryProvider dictionary={ dictionary }>
+      <FullScreenOverlay
+        centered={ checkoutStep === "purchasing" || checkoutStep === "error" }
+        open={ open }
+        onClose={ handleClose }
+        isDialogBlocked={ isDialogBlocked }
+        contentKey={ checkoutStep }
+        header={ headerElement }
+        children={ checkoutStepElement } />
+    </DictionaryProvider>
   );
 };
 

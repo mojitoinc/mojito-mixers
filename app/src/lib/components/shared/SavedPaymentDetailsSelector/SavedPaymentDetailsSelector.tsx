@@ -32,8 +32,6 @@ export interface SavedPaymentDetailsSelectorProps {
   onClose: () => void;
   onAttemptSubmit: () => void;
   consentType?: ConsentType;
-  privacyHref?: string;
-  termsOfUseHref?: string;
 }
 
 export const SavedPaymentDetailsSelector: React.FC<SavedPaymentDetailsSelectorProps> = ({
@@ -48,8 +46,6 @@ export const SavedPaymentDetailsSelector: React.FC<SavedPaymentDetailsSelectorPr
   onClose,
   onAttemptSubmit,
   consentType,
-  privacyHref,
-  termsOfUseHref,
 }) => {
   const isCvvRequired = useMemo(() => {
     const selectedPaymentMethod = savedPaymentMethods.find(savedPaymentMethod => savedPaymentMethod.id === selectedPaymentMethodId);
@@ -69,6 +65,7 @@ export const SavedPaymentDetailsSelector: React.FC<SavedPaymentDetailsSelectorPr
     // Reset CVV if user selects a different payment method:
     setSelectorState(({ isFormSubmitted }) => ({ isFormSubmitted, cvv: "" }));
   }, [selectedPaymentMethodId]);
+
 
   const isCvvOk = validateCvv(isCvvRequired, cvv);
   const cvvError = isFormSubmitted && !isCvvOk;
@@ -153,8 +150,6 @@ export const SavedPaymentDetailsSelector: React.FC<SavedPaymentDetailsSelectorPr
     <CheckoutModalFooter
       variant="toConfirmation"
       consentType={ consentType }
-      privacyHref={ privacyHref }
-      termsOfUseHref={ termsOfUseHref }
       onSubmitClicked={ handleNextClicked }
       onCloseClicked={ onClose } />
   </>);

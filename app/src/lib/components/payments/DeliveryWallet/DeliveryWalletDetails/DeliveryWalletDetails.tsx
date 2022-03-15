@@ -2,18 +2,17 @@ import { Box, Chip, Tooltip, Typography } from "@mui/material";
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { CopyButton } from "../../../shared/CopyButton/CopyButton";
 import { ReadOnlyWalletAddress } from "../../../shared/ReadOnlyField/ReadOnlyField";
-import { PUIDictionary } from "../../../../domain/dictionary/dictionary.interfaces";
 import React from "react";
 import { Wallet } from "../../../../domain/wallet/wallet.interfaces";
+import { useDictionary } from "../../../../hooks/useDictionary";
 
 export interface DeliveryWalletDetailsProps {
   wallet: null | string | Wallet;
-  dictionary: PUIDictionary;
 }
 export const DeliveryWalletDetails: React.FC<DeliveryWalletDetailsProps> = ({
   wallet,
-  dictionary,
 }) => {
+  const dictionary = useDictionary();
   const walletAddress = (typeof wallet === "object" ? wallet?.address : wallet) || "";
   const isMultiSig = typeof wallet === "object" || !walletAddress;
 

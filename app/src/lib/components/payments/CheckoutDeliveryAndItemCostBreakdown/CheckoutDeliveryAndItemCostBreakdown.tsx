@@ -5,7 +5,6 @@ import { DeliveryWalletSelector } from "../DeliveryWallet/DeliveryWalletSelector
 import { CheckoutItemCostBreakdown } from "../CheckoutItemCost/Breakdown/CheckoutItemCostBreakdown";
 import { CheckoutItem } from "../../../domain/product/product.interfaces";
 import { TaxesState } from "../../../views/Billing/BillingView";
-import { PUIDictionary } from "../../../domain/dictionary/dictionary.interfaces";
 import { Wallet } from "../../../domain/wallet/wallet.interfaces";
 
 interface CheckoutDeliveryAndItemCostBreakdownProps {
@@ -15,7 +14,6 @@ interface CheckoutDeliveryAndItemCostBreakdownProps {
   wallets?: Wallet[];
   wallet: null | string | Wallet;
   onWalletChange: (wallet: null | string | Wallet) => void;
-  dictionary: PUIDictionary;
 }
 
 export const CheckoutDeliveryAndItemCostBreakdown: React.FC<CheckoutDeliveryAndItemCostBreakdownProps> = ({
@@ -25,15 +23,13 @@ export const CheckoutDeliveryAndItemCostBreakdown: React.FC<CheckoutDeliveryAndI
   wallets,
   wallet,
   onWalletChange,
-  dictionary,
 }) => (
   <Stack sx={{ display: "flex", width: { xs: "100%", md: "calc(50% - 35px)" } }}>
     <DeliveryWalletSelector
       validatePersonalAddress={ validatePersonalDeliveryAddress }
       wallets={ wallets }
       wallet={ wallet }
-      onWalletChange={ onWalletChange }
-      dictionary={ dictionary } />
+      onWalletChange={ onWalletChange } />
 
     <Divider sx={{ my: 3.75 }} />
 

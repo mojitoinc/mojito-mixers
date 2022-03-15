@@ -35,6 +35,7 @@ import { CheckoutModalError } from "../components/public/CheckoutOverlay/Checkou
 import { FormErrorsBox } from "../components/shared/FormErrorsBox/FormErrorsBox";
 import { useFormCheckoutError } from "../hooks/useFormCheckoutError";
 import { PUIDictionary } from "../domain/dictionary/dictionary.interfaces";
+import { useDictionary } from "../hooks/useDictionary";
 
 interface PaymentTypeFormProps {
   control: Control<PaymentMethod & { consent: boolean }>;
@@ -249,9 +250,6 @@ export interface PaymentMethodFormProps {
   onSubmit: (data: PaymentMethod) => void;
   onAttemptSubmit: () => void;
   consentType?: ConsentType;
-  privacyHref?: string;
-  termsOfUseHref?: string;
-  dictionary: PUIDictionary;
   debug?: boolean;
 }
 
@@ -265,9 +263,6 @@ export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
   onSubmit,
   onAttemptSubmit,
   consentType,
-  privacyHref,
-  termsOfUseHref,
-  dictionary,
   debug = false
 }) => {
   const defaultPaymentType = acceptedPaymentTypes[0] || "CreditCard";
@@ -281,6 +276,9 @@ export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
       ...Object.values(PAYMENT_TYPE_FORM_DATA).reduce((objectShape, { schemaShape }) => ({ ...objectShape, ...schemaShape }), {} as ObjectShape),
     });
   }, []);
+
+  const dictionary = useDictionary();
+  const { privacyHref, termsOfUseHref } = dictionary;
 
   const {
     control,
@@ -354,8 +352,8 @@ export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
         control={ control }
         consentType={ consentType }
         privacyHref={ privacyHref }
-        termsOfUseHref={ termsOfUseHref }
-        dictionary={ dictionary } />
+        dictionary={dictionary}
+        termsOfUseHref={ termsOfUseHref }/>
 
       { checkoutErrorMessage && <FormErrorsBox error={ checkoutErrorMessage } sx={{ mt: 5 }} /> }
 
@@ -370,8 +368,6 @@ export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
       <CheckoutModalFooter
         variant={ selectedPaymentMethod === "ACH" ? "toPlaid" : "toConfirmation" }
         consentType={ consentType === "checkbox" ? undefined : consentType }
-        privacyHref={ privacyHref }
-        termsOfUseHref={ termsOfUseHref }
         submitDisabled={ selectedPaymentMethod === "Crypto" }
         onCloseClicked={ onClose } />
     </form>

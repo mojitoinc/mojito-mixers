@@ -6,6 +6,7 @@ import { Checkbox } from "../../shared/Checkbox/Checkbox";
 import { ConsentText, ConsentType, CONSENT_ERROR_MESSAGE } from "../../shared/ConsentText/ConsentText";
 import { PrimaryButton } from "../../shared/PrimaryButton/PrimaryButton";
 import { ICONS_BY_VARIANT, LABELS_BY_VARIANT } from "./CheckoutModalFooter.constants";
+import { useDictionary } from "../../../hooks/useDictionary";
 
 interface CheckoutModalFooterConsentState {
   isFormSubmitted: boolean;
@@ -20,8 +21,6 @@ export interface CheckoutModalFooterProps {
   buttonLabel?: string;
   guestCheckoutEnabled?: boolean;
   consentType?: ConsentType;
-  privacyHref?: string;
-  termsOfUseHref?: string;
   onGoToCollection?: () => void;
   submitDisabled?: boolean;
   onSubmitClicked?: (canSubmit: boolean) => void | Promise<void | false>;
@@ -33,14 +32,13 @@ export const CheckoutModalFooter: React.FC<CheckoutModalFooterProps> = ({
   buttonLabel,
   guestCheckoutEnabled,
   consentType,
-  privacyHref,
-  termsOfUseHref,
   onGoToCollection,
   submitDisabled,
   onSubmitClicked,
   onCloseClicked,
 }) => {
   // CONSENT:
+  const { privacyHref, termsOfUseHref } = useDictionary();
   const showConsent = consentType && (privacyHref || termsOfUseHref) && (variant === "toConfirmation" || variant === "toPlaid");
   const consentTextElement = showConsent ? <ConsentText privacyHref={privacyHref} termsOfUseHref={termsOfUseHref} /> : null;
 
