@@ -1,7 +1,8 @@
 import { __rest } from '../../../../node_modules/tslib/tslib.es6.js';
-import { useTheme, useMediaQuery, FormControl, InputLabel, Select as Select$1, FormHelperText, MenuItem } from '@mui/material';
+import { useMediaQuery, FormControl, InputLabel, Select as Select$1, FormHelperText, MenuItem } from '@mui/material';
 import { SelectIcon } from '../Icons/Icons.js';
 import React__default from 'react';
+import useTheme from '../../../../node_modules/@mui/material/styles/useTheme.js';
 
 const EMPTY_OPTION = {
     label: "",

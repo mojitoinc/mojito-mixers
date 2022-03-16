@@ -6,6 +6,7 @@ var tslib_es6 = require('../../../../node_modules/tslib/tslib.es6.js');
 var material = require('@mui/material');
 var Icons = require('../Icons/Icons.js');
 var React = require('react');
+var useTheme = require('../../../../node_modules/@mui/material/styles/useTheme.js');
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
@@ -17,7 +18,7 @@ const EMPTY_OPTION = {
 };
 const Select = (_a) => {
     var { id, label, required, disabled, options = [], helperText, error, margin = "normal" } = _a, props = tslib_es6.__rest(_a, ["id", "label", "required", "disabled", "options", "helperText", "error", "margin"]);
-    const theme = material.useTheme();
+    const theme = useTheme["default"]();
     const matches = material.useMediaQuery(theme.breakpoints.down('sm'));
     const selectOptions = matches ? [EMPTY_OPTION, ...options] : options;
     const mapOption = ({ value, label }) => matches ? (React__default["default"].createElement("option", { key: label, value: value }, label)) : (React__default["default"].createElement(material.MenuItem, { key: label, value: value }, label));

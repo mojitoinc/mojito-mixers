@@ -1,6 +1,6 @@
 import React from "react";
 import { CheckoutItem } from "../../../../domain/product/product.interfaces";
-import { SxProps, Theme } from "@mui/system";
+import { SxProps, Theme } from "@mui/material/styles";
 interface CheckoutItemListProps {
     sx?: SxProps<Theme>;
     checkoutItems: CheckoutItem[];
