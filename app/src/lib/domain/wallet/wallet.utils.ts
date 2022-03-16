@@ -1,4 +1,4 @@
-import { NEW_WALLET_OPTION } from "../../components/shared/Select/WalletAddressSelector/WalletAddressSelector";
+import { NEW_WALLET_OPTION } from "./wallet.constants";
 import { Wallet } from "./wallet.interfaces";
 
 export const ADDRESS_REGEXP = /^0x[a-fA-F0-9]{40}$/;
