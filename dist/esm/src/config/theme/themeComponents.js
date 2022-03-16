@@ -1,4 +1,4 @@
-import { MD_BORDER_RADIUS, BORDER_THICKNESS } from './theme.js';
+import { MD_BORDER_RADIUS, BORDER_THICKNESS } from './themeConstants.js';
 
 /*
 declare module "@mui/material/TextField" {

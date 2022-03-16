@@ -2,7 +2,7 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-var WalletAddressSelector = require('../../components/shared/Select/WalletAddressSelector/WalletAddressSelector.js');
+var wallet_constants = require('./wallet.constants.js');
 
 const ADDRESS_REGEXP = /^0x[a-fA-F0-9]{40}$/;
 const SPECIAL_ADDRESS_REGEXP = /^<.+>$/;
@@ -11,13 +11,13 @@ function isValidWalletAddress(wallet) {
         return false;
     if (typeof wallet === "object")
         return ADDRESS_REGEXP.test(wallet.address);
-    return wallet === WalletAddressSelector.NEW_WALLET_OPTION.value || ADDRESS_REGEXP.test(wallet);
+    return wallet === wallet_constants.NEW_WALLET_OPTION.value || ADDRESS_REGEXP.test(wallet);
 }
 function isSpecialWalletAddressValue(walletAddress) {
     return SPECIAL_ADDRESS_REGEXP.test(walletAddress);
 }
 function isNewWalletAddress(wallet) {
-    return typeof wallet === "string" && wallet !== WalletAddressSelector.NEW_WALLET_OPTION.value;
+    return typeof wallet === "string" && wallet !== wallet_constants.NEW_WALLET_OPTION.value;
 }
 function filterSpecialWalletAddressValues(walletAddress) {
     return walletAddress.trim().replace(SPECIAL_ADDRESS_REGEXP, "");

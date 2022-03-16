@@ -10,7 +10,7 @@ var BillingInfoItem = require('../../payments/BillingInfo/Item/BillingInfoItem.j
 var SecondaryButton = require('../SecondaryButton/SecondaryButton.js');
 var CheckoutModalFooter = require('../../payments/CheckoutModalFooter/CheckoutModalFooter.js');
 var material = require('@mui/material');
-var theme = require('../../../config/theme/theme.js');
+var themeConstants = require('../../../config/theme/themeConstants.js');
 var TaxesMessagesBox = require('../TaxesMessagesBox/TaxesMessagesBox.js');
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
@@ -32,7 +32,7 @@ const SavedBillingDetailsSelector = ({ showLoader, savedPaymentMethods, selected
                     display: "flex",
                     justifyContent: "center",
                     alignItems: "center",
-                    background: theme$1 => material.alpha(theme$1.palette.background.default, theme.OVERLAY_OPACITY),
+                    background: theme => material.alpha(theme.palette.background.default, themeConstants.OVERLAY_OPACITY),
                     zIndex: 100,
                 } },
                 React__default["default"].createElement(material.CircularProgress, { color: "secondary" }))) : null,

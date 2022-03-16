@@ -2,7 +2,7 @@ import { styled } from '@mui/material';
 import { CardNumberField } from '../CardNumberField/CardNumberField.js';
 import { TextField } from '../TextField/TextField.js';
 import React__default from 'react';
-import { SM_BORDER_RADIUS } from '../../../config/theme/theme.js';
+import { SM_BORDER_RADIUS } from '../../../config/theme/themeConstants.js';
 
 const ReadOnlyField = styled((props) => (React__default.createElement(TextField, Object.assign({ variant: "standard", disabled: true }, props))))(({ theme: { palette, typography } }) => ({
     "& .MuiInputLabel-root": {

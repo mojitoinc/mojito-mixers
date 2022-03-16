@@ -1,7 +1,7 @@
 import { __rest } from '../../../../node_modules/tslib/tslib.es6.js';
 import { Box } from '@mui/material';
 import React__default from 'react';
-import { ROUNDED_BORDER_RADIUS, DEFAULT_PURCHASING_IMAGE_SRC, DEFAULT_ERROR_IMAGE_SRC } from '../../../config/theme/theme.js';
+import { ROUNDED_BORDER_RADIUS, DEFAULT_PURCHASING_IMAGE_SRC, DEFAULT_ERROR_IMAGE_SRC } from '../../../config/theme/themeConstants.js';
 import default_1$2 from '../../../../node_modules/@mui/icons-material/WarningAmber.js';
 import default_1$1 from '../../../../node_modules/@mui/icons-material/Check.js';
 import default_1 from '../../../../node_modules/@mui/icons-material/Autorenew.js';

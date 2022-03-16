@@ -1,7 +1,7 @@
 import { __rest } from '../../../../node_modules/tslib/tslib.es6.js';
 import { Box, Typography } from '@mui/material';
 import React__default from 'react';
-import { SM_BORDER_RADIUS } from '../../../config/theme/theme.js';
+import { SM_BORDER_RADIUS } from '../../../config/theme/themeConstants.js';
 
 const DEBUG_BOX_OUTER_SX = {
     position: "relative",

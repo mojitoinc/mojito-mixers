@@ -6,7 +6,7 @@ import { PaymentDetailsItem } from '../../payments/PaymentDetailsItem/Item/Payme
 import { CheckoutModalFooter } from '../../payments/CheckoutModalFooter/CheckoutModalFooter.js';
 import React__default, { useMemo, useState, useEffect, useCallback } from 'react';
 import { Box, alpha, CircularProgress, Typography } from '@mui/material';
-import { OVERLAY_OPACITY } from '../../../config/theme/theme.js';
+import { OVERLAY_OPACITY } from '../../../config/theme/themeConstants.js';
 import { getCVCIsValid } from '../../../domain/payment/payment.utils.js';
 
 function validateCvv(isCvvRequired, cvv) {

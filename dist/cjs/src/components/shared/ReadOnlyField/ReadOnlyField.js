@@ -6,7 +6,7 @@ var material = require('@mui/material');
 var CardNumberField = require('../CardNumberField/CardNumberField.js');
 var TextField = require('../TextField/TextField.js');
 var React = require('react');
-var theme = require('../../../config/theme/theme.js');
+var themeConstants = require('../../../config/theme/themeConstants.js');
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
@@ -21,7 +21,7 @@ const ReadOnlyField = material.styled((props) => (React__default["default"].crea
             background: palette.grey[50],
             padding: 8,
             height: "40px",
-            borderRadius: theme.SM_BORDER_RADIUS,
+            borderRadius: themeConstants.SM_BORDER_RADIUS,
             marginTop: 24,
         },
     },
@@ -38,7 +38,7 @@ const ReadOnlyCardField = material.styled((props) => (React__default["default"].
             background: palette.grey[50],
             padding: 8,
             height: "40px",
-            borderRadius: theme.SM_BORDER_RADIUS,
+            borderRadius: themeConstants.SM_BORDER_RADIUS,
             marginTop: 24,
         },
     },
@@ -55,7 +55,7 @@ const ReadOnlyWalletAddress = material.styled((props) => (React__default["defaul
             background: palette.grey[50],
             padding: 8,
             height: "60px",
-            borderRadius: theme.SM_BORDER_RADIUS,
+            borderRadius: themeConstants.SM_BORDER_RADIUS,
         },
     },
     "& .MuiInputBase-input": {

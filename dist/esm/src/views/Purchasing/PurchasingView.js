@@ -3,7 +3,7 @@ import { useFullPayment } from '../../hooks/useFullPayment.js';
 import { Box, Typography } from '@mui/material';
 import { useTimeout, useInterval } from '@swyg/corre';
 import { ERROR_PURCHASE_TIMEOUT, ERROR_PURCHASE } from '../../domain/errors/errors.constants.js';
-import { XS_MOBILE_MAX_WIDTH } from '../../config/theme/theme.js';
+import { XS_MOBILE_MAX_WIDTH } from '../../config/theme/themeConstants.js';
 import { StatusIcon } from '../../components/shared/StatusIcon/StatusIcon.js';
 import { useGetPaymentNotificationQuery } from '../../queries/graphqlGenerated.js';
 import { persistCheckoutModalInfo } from '../../components/public/CheckoutOverlay/CheckoutOverlay.utils.js';

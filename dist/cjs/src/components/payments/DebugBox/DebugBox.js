@@ -5,7 +5,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 var tslib_es6 = require('../../../../node_modules/tslib/tslib.es6.js');
 var material = require('@mui/material');
 var React = require('react');
-var theme = require('../../../config/theme/theme.js');
+var themeConstants = require('../../../config/theme/themeConstants.js');
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
@@ -14,7 +14,7 @@ var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 const DEBUG_BOX_OUTER_SX = {
     position: "relative",
     m: 0,
-    borderRadius: `${theme.SM_BORDER_RADIUS}px`,
+    borderRadius: `${themeConstants.SM_BORDER_RADIUS}px`,
     backgroundColor: theme => theme.palette.grey["50"],
     border: theme => `1px solid ${theme.palette.grey["100"]}`,
     color: theme => theme.palette.grey["800"],
@@ -37,7 +37,7 @@ const DEBUG_LABEL_COMPACT_SX = {
     position: "absolute",
     top: 0,
     right: 0,
-    borderBottomLeftRadius: `${theme.SM_BORDER_RADIUS}px`,
+    borderBottomLeftRadius: `${themeConstants.SM_BORDER_RADIUS}px`,
     px: 0.5,
     borderLeft: theme => `1px solid ${theme.palette.grey["100"]}`,
     borderBottom: theme => `1px solid ${theme.palette.grey["100"]}`,

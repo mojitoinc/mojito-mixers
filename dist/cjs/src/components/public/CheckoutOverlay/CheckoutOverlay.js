@@ -24,7 +24,7 @@ var useCreateInvoiceAndReservation = require('../../../hooks/useCreateInvoiceAnd
 var useCheckoutItemCostTotal = require('../../../hooks/useCheckoutItemCostTotal.js');
 var DictionaryProvider = require('../../../providers/DictionaryProvider.js');
 var config = require('../../../config/config.js');
-var WalletAddressSelector = require('../../shared/Select/WalletAddressSelector/WalletAddressSelector.js');
+var wallet_constants = require('../../../domain/wallet/wallet.constants.js');
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
@@ -93,7 +93,7 @@ debug: initialDebug, onEvent, onError, onMarketingOptInChange, // Not implemente
     const invoiceItems = invoiceDetailsData === null || invoiceDetailsData === void 0 ? void 0 : invoiceDetailsData.getInvoiceDetails.items;
     const checkoutItems = React.useMemo(() => product_utils.transformCheckoutItemsFromInvoice(parentCheckoutItems, invoiceItems), [parentCheckoutItems, invoiceItems]);
     const { total: subtotal, fees, taxAmount } = useCheckoutItemCostTotal.useCheckoutItemsCostTotal(checkoutItems);
-    const destinationAddress = ((_b = (_a = (invoiceItems || [])) === null || _a === void 0 ? void 0 : _a[0]) === null || _b === void 0 ? void 0 : _b.destinationAddress) || WalletAddressSelector.NEW_WALLET_OPTION.value;
+    const destinationAddress = ((_b = (_a = (invoiceItems || [])) === null || _a === void 0 ? void 0 : _a[0]) === null || _b === void 0 ? void 0 : _b.destinationAddress) || wallet_constants.NEW_WALLET_OPTION.value;
     React.useEffect(() => {
         if (!destinationAddress)
             return;
