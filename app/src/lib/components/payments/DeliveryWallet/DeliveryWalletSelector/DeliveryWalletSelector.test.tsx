@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import { CUSTOM_WALLET_OPTION, NEW_WALLET_OPTION } from "../../../shared/Select/WalletAddressSelector/WalletAddressSelector";
+import { CUSTOM_WALLET_OPTION, NEW_WALLET_OPTION } from "../../../../domain/wallet/wallet.constants";
 import { DeliveryWalletSelector, DeliveryWalletSelectorProps } from "./DeliveryWalletSelector";
 
 describe("DeliveryWalletSelector", () => {
