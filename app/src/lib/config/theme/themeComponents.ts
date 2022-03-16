@@ -1,6 +1,6 @@
 import { Theme } from "@mui/material/styles";
 import { Components as ComponentsOptions } from "@mui/material/styles/components";
-import { BORDER_THICKNESS, MD_BORDER_RADIUS } from "./theme";
+import { BORDER_THICKNESS, MD_BORDER_RADIUS } from "./themeConstants";
 
 /*
 declare module "@mui/material/TextField" {

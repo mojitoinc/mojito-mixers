@@ -31,7 +31,7 @@ import { DictionaryProvider } from "../../../providers/DictionaryProvider";
 import { Wallet } from "../../../domain/wallet/wallet.interfaces";
 import { THREEDS_REDIRECT_DELAY_MS } from "../../../config/config";
 import { Network } from "../../../domain/network/network.interfaces";
-import { NEW_WALLET_OPTION } from "../../shared/Select/WalletAddressSelector/WalletAddressSelector";
+import { NEW_WALLET_OPTION } from "../../../domain/wallet/wallet.constants";
 
 export interface PUICheckoutOverlayProps {
   // Modal:

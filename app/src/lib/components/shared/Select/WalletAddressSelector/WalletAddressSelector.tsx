@@ -7,6 +7,7 @@ import {
 import { SelectChangeEvent } from "@mui/material/Select";
 import { Wallet } from "../../../../domain/wallet/wallet.interfaces";
 import { isNewWalletAddress, isSpecialWalletAddressValue } from "../../../../domain/wallet/wallet.utils";
+import { CUSTOM_WALLET_OPTION, NEW_WALLET_OPTION } from "../../../../domain/wallet/wallet.constants";
 
 const mapWalletAddressToSelectOption = (wallet: Wallet) => ({
   value: wallet.id,
@@ -23,16 +24,6 @@ const reduceWalletsByAddress = (walletsMap: Record<string, Wallet>, wallet: Wall
   walletsMap[wallet.address] = wallet;
 
   return walletsMap;
-};
-
-export const NEW_WALLET_OPTION: SelectOption<string> = {
-  value: "<NEW>",
-  label: "Create a new wallet for me"
-};
-
-export const CUSTOM_WALLET_OPTION: SelectOption<string> = {
-  value: "",
-  label: "I already have a wallet (such as Metamask or Rainbow)",
 };
 
 export interface WalletAddressSelectorProps extends Omit<SelectProps, "value" | "options"> {

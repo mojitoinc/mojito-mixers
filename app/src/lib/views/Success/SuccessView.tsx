@@ -2,7 +2,7 @@
 import { Box, Typography } from "@mui/material";
 import React from "react";
 import { StatusIcon } from "../../components/shared/StatusIcon/StatusIcon";
-import { XS_MOBILE_MAX_WIDTH } from "../../config/theme/theme";
+import { XS_MOBILE_MAX_WIDTH } from "../../config/theme/themeConstants";
 
 export interface SuccessViewProps {
   successImageSrc?: string;

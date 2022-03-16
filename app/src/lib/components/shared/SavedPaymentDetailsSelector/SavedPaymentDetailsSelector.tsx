@@ -8,7 +8,7 @@ import { SavedPaymentMethod } from "../../../domain/circle/circle.interfaces";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { alpha, Box, CircularProgress, Typography } from "@mui/material";
 import { ConsentType } from "../ConsentText/ConsentText";
-import { OVERLAY_OPACITY } from "../../../config/theme/theme";
+import { OVERLAY_OPACITY } from "../../../config/theme/themeConstants";
 import { getCVCIsValid } from "../../../domain/payment/payment.utils";
 
 export function validateCvv(isCvvRequired: boolean, cvv: string) {

@@ -123,6 +123,22 @@ Once you've built the library using `yarn dist:build`, you can install it in ano
     "@mojitoinc/mojito-mixers": "file:../mojito-mixers"
     "@mojitoinc/mojito-mixers": "git+ssh://git@github.com/mojitoinc/mojito-mixers"
 
+Also, make sure you install the following dependencies:
+
+    react
+    react-dom
+    @mui/material
+
+<br />
+
+And also, keep in mind:
+
+`@emotion/styled` is needed as stated in [MUI's docs](https://mui.com/guides/interoperability/):
+
+  > ⚠️ Keep `@emotion/styled` as a dependency of your project. Even if you never use it explicitly, it's a peer dependency of `@mui/material`.
+
+`@emotion/react` is not needed.
+
 <br />
 
 
