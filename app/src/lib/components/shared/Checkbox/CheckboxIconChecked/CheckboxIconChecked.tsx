@@ -1,5 +1,6 @@
-import { SvgIcon, useTheme } from "@mui/material";
+import { SvgIcon } from "@mui/material";
 import React from "react";
+import { useTheme } from "@mui/material/styles";
 
 export interface CheckboxIconCheckedProps {
   error?: boolean;

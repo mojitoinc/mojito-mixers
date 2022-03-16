@@ -1,7 +1,8 @@
-import { SvgIcon, SvgIconProps, Theme } from "@mui/material";
+import { SvgIcon, SvgIconProps } from "@mui/material";
 import { SxProps } from "@mui/system";
 import { standaloneGetCardImageProps } from "../../../domain/payment/payment.utils";
 import React from "react";
+import { Theme } from "@mui/material/styles";
 
 export const CREDIT_CARD_ICON_SX: SxProps<Theme> = { width: "35px", height: "24px" };
 

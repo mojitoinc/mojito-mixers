@@ -1,3 +1,4 @@
+
 export { PUICheckout } from "./components/public/CheckoutOverlay/CheckoutOverlay";
 export { PUISuccess } from "./components/public/SuccessOverlay/SuccessOverlay";
 export { PUIError } from "./components/public/ErrorOverlay/ErrorOverlay";
@@ -20,4 +21,10 @@ export type { CircleFieldErrorAt, CircleFieldErrors } from "./domain/circle/circ
 export type { PUIDictionary, PUIDictionaryKeys, PUIDictionarySingleLine, PUIDictionaryMultiLine } from "./domain/dictionary/dictionary.interfaces";
 export type { CheckoutEventType, CheckoutEventData } from "./domain/events/events.interfaces";
 
-if (process.env.NODE_ENV === "development") console.log("\n👨‍💻 PUI development mode.\n\n");
+if (process.env.NODE_ENV === "development" && process.browser) {
+  console.log("\n👨‍💻 PUI development mode.\n\n");
+
+  // (window as any)._React = React;
+  // (window as any)._ThemeProvider = ThemeProvider;
+}
+
