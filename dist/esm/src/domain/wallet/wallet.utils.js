@@ -1,4 +1,4 @@
-import { NEW_WALLET_OPTION } from '../../components/shared/Select/WalletAddressSelector/WalletAddressSelector.js';
+import { NEW_WALLET_OPTION } from './wallet.constants.js';
 
 const ADDRESS_REGEXP = /^0x[a-fA-F0-9]{40}$/;
 const SPECIAL_ADDRESS_REGEXP = /^<.+>$/;

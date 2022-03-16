@@ -5,7 +5,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 var tslib_es6 = require('../../../../node_modules/tslib/tslib.es6.js');
 var material = require('@mui/material');
 var React = require('react');
-var theme = require('../../../config/theme/theme.js');
+var themeConstants = require('../../../config/theme/themeConstants.js');
 var promiseUtils = require('../../../utils/promiseUtils.js');
 var Checkbox = require('../../shared/Checkbox/Checkbox.js');
 var ConsentText = require('../../shared/ConsentText/ConsentText.js');
@@ -93,16 +93,16 @@ const CheckoutModalFooter = ({ variant, buttonLabel, guestCheckoutEnabled, conse
             React__default["default"].createElement(material.Link, { sx: { color: "text.primary" }, href: "", onClick: handleCancelClicked }, "Cancel and Return to Marketplace"))),
         showConsent && consentType === "disclaimer" && (React__default["default"].createElement(React__default["default"].Fragment, null,
             React__default["default"].createElement(material.Divider, { sx: { my: 5, width: "100%" } }),
-            React__default["default"].createElement(material.Typography, { sx: { maxWidth: theme.SM_MOBILE_MAX_WIDTH }, align: "center" },
+            React__default["default"].createElement(material.Typography, { sx: { maxWidth: themeConstants.SM_MOBILE_MAX_WIDTH }, align: "center" },
                 "By placing an order you affirm that you ",
                 consentTextElement,
                 "."))),
         showConsent && consentType === "circle" && (React__default["default"].createElement(React__default["default"].Fragment, null,
             React__default["default"].createElement(material.Divider, { sx: { my: 5, width: "100%" } }),
             React__default["default"].createElement(material.Box, { display: "flex" },
-                React__default["default"].createElement(material.Typography, { sx: { maxWidth: theme.SM_MOBILE_MAX_WIDTH, marginRight: 1 }, align: "center" }, "Payments powered by"),
+                React__default["default"].createElement(material.Typography, { sx: { maxWidth: themeConstants.SM_MOBILE_MAX_WIDTH, marginRight: 1 }, align: "center" }, "Payments powered by"),
                 React__default["default"].createElement(material.Link, { href: "https://www.circle.com/en/", target: "_blank", rel: "noopener noreferrer" },
-                    React__default["default"].createElement(material.Box, { component: "img", src: theme.CIRCLE_LOGO_IMAGE_SRC, height: 20 })))))));
+                    React__default["default"].createElement(material.Box, { component: "img", src: themeConstants.CIRCLE_LOGO_IMAGE_SRC, height: 20 })))))));
 };
 
 exports.CheckoutModalFooter = CheckoutModalFooter;

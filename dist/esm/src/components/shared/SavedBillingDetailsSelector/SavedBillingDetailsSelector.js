@@ -6,7 +6,7 @@ import { BillingInfoItem } from '../../payments/BillingInfo/Item/BillingInfoItem
 import { SecondaryButton } from '../SecondaryButton/SecondaryButton.js';
 import { CheckoutModalFooter } from '../../payments/CheckoutModalFooter/CheckoutModalFooter.js';
 import { Box, alpha, CircularProgress } from '@mui/material';
-import { OVERLAY_OPACITY } from '../../../config/theme/theme.js';
+import { OVERLAY_OPACITY } from '../../../config/theme/themeConstants.js';
 import { TaxesMessagesBox } from '../TaxesMessagesBox/TaxesMessagesBox.js';
 
 const SavedBillingDetailsSelector = ({ showLoader, savedPaymentMethods, selectedPaymentMethodAddressId, taxes, onNew, onEdit, onDelete, onPick, onNext, onClose, onAttemptSubmit, }) => {

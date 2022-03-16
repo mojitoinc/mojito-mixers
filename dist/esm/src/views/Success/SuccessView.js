@@ -1,7 +1,7 @@
 import { Box, Typography } from '@mui/material';
 import React__default from 'react';
 import { StatusIcon } from '../../components/shared/StatusIcon/StatusIcon.js';
-import { XS_MOBILE_MAX_WIDTH } from '../../config/theme/theme.js';
+import { XS_MOBILE_MAX_WIDTH } from '../../config/theme/themeConstants.js';
 
 const SuccessView = ({ successImageSrc, }) => {
     return (React__default.createElement(Box, null,

@@ -2,6 +2,7 @@ import { __rest } from '../../../../../node_modules/tslib/tslib.es6.js';
 import React__default, { useMemo, useCallback, useEffect } from 'react';
 import { Select } from '../Select.js';
 import { isSpecialWalletAddressValue, isNewWalletAddress } from '../../../../domain/wallet/wallet.utils.js';
+import { NEW_WALLET_OPTION, CUSTOM_WALLET_OPTION } from '../../../../domain/wallet/wallet.constants.js';
 
 const mapWalletAddressToSelectOption = (wallet) => ({
     value: wallet.id,
@@ -14,14 +15,6 @@ const reduceWalletsByID = (walletsMap, wallet) => {
 const reduceWalletsByAddress = (walletsMap, wallet) => {
     walletsMap[wallet.address] = wallet;
     return walletsMap;
-};
-const NEW_WALLET_OPTION = {
-    value: "<NEW>",
-    label: "Create a new wallet for me"
-};
-const CUSTOM_WALLET_OPTION = {
-    value: "",
-    label: "I already have a wallet (such as Metamask or Rainbow)",
 };
 const WalletAddressSelector = (_a) => {
     var { label, wallets, wallet, onSelectWallet, disabled: parentDisabled, error, helperText } = _a, props = __rest(_a, ["label", "wallets", "wallet", "onSelectWallet", "disabled", "error", "helperText"]);
@@ -63,5 +56,5 @@ const WalletAddressSelector = (_a) => {
     return (React__default.createElement(Select, Object.assign({}, props, { label: label, options: options, onChange: handleChange, value: selectValue, disabled: disabled, error: showError ? error : undefined, helperText: showError ? helperText : undefined, displayEmpty: true })));
 };
 
-export { CUSTOM_WALLET_OPTION, NEW_WALLET_OPTION, WalletAddressSelector };
+export { WalletAddressSelector };
 //# sourceMappingURL=WalletAddressSelector.js.map

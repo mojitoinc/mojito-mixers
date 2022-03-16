@@ -2,7 +2,7 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-var theme = require('./theme.js');
+var themeConstants = require('./themeConstants.js');
 
 /*
 declare module "@mui/material/TextField" {
@@ -68,7 +68,7 @@ function createComponentsTheme({ typography, palette, spacing, breakpoints }) {
             styleOverrides: {
                 root: {
                     height: "60px",
-                    borderRadius: theme.MD_BORDER_RADIUS,
+                    borderRadius: themeConstants.MD_BORDER_RADIUS,
                     "&.Mui-disabled::before": {
                         border: 0,
                     },
@@ -81,8 +81,8 @@ function createComponentsTheme({ typography, palette, spacing, breakpoints }) {
         MuiFilledInput: {
             styleOverrides: {
                 root: {
-                    borderRadius: theme.MD_BORDER_RADIUS,
-                    border: `${theme.BORDER_THICKNESS}px solid ${palette.grey[200]}`,
+                    borderRadius: themeConstants.MD_BORDER_RADIUS,
+                    border: `${themeConstants.BORDER_THICKNESS}px solid ${palette.grey[200]}`,
                     background: palette.background.default,
                     "&:hover": {
                         background: palette.background.default,
@@ -147,12 +147,12 @@ function createComponentsTheme({ typography, palette, spacing, breakpoints }) {
             },
             styleOverrides: {
                 root: {
-                    borderRadius: theme.MD_BORDER_RADIUS,
+                    borderRadius: themeConstants.MD_BORDER_RADIUS,
                     boxSizing: "border-box",
                     fontSize: "12px",
                     "&.Mui-disabled": {
                         background: palette.grey["50"],
-                        border: `${theme.BORDER_THICKNESS}px solid ${palette.grey[100]}`,
+                        border: `${themeConstants.BORDER_THICKNESS}px solid ${palette.grey[100]}`,
                         cursor: "not-allowed",
                         pointerEvents: "auto",
                     },
@@ -175,7 +175,7 @@ function createComponentsTheme({ typography, palette, spacing, breakpoints }) {
                 },
                 containedPrimary: {
                     background: ((_a = palette.gradients) === null || _a === void 0 ? void 0 : _a.action) || palette.primary.light,
-                    border: `${theme.BORDER_THICKNESS}px solid ${palette.primary.main}`,
+                    border: `${themeConstants.BORDER_THICKNESS}px solid ${palette.primary.main}`,
                     color: palette.text.primary,
                     minWidth: "200px !important",
                 },
@@ -204,7 +204,7 @@ function createComponentsTheme({ typography, palette, spacing, breakpoints }) {
                     minHeight: 42,
                     minWidth: spacing(5.5),
                     border: 0,
-                    borderRadius: theme.MD_BORDER_RADIUS,
+                    borderRadius: themeConstants.MD_BORDER_RADIUS,
                     [breakpoints.up("sm")]: {
                         padding: spacing(0, 2),
                         minWidth: spacing(14),
@@ -230,8 +230,8 @@ function createComponentsTheme({ typography, palette, spacing, breakpoints }) {
                 root: {
                     background: ((_d = palette.gradients) === null || _d === void 0 ? void 0 : _d.stepperReverse) || palette.primary.light,
                     backgroundOrigin: "border-box",
-                    border: `${theme.BORDER_THICKNESS}px solid transparent`,
-                    borderRadius: theme.MD_BORDER_RADIUS + theme.BORDER_THICKNESS,
+                    border: `${themeConstants.BORDER_THICKNESS}px solid transparent`,
+                    borderRadius: themeConstants.MD_BORDER_RADIUS + themeConstants.BORDER_THICKNESS,
                 },
             },
         },
@@ -244,7 +244,7 @@ function createComponentsTheme({ typography, palette, spacing, breakpoints }) {
                 },
                 sizeSmall: {
                     height: "30px",
-                    borderRadius: theme.MD_BORDER_RADIUS,
+                    borderRadius: themeConstants.MD_BORDER_RADIUS,
                     fontSize: 12,
                     fontWeight: 500,
                 },

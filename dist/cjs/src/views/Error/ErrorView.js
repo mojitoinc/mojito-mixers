@@ -7,7 +7,7 @@ var material = require('@mui/material');
 var CheckoutModalFooter = require('../../components/payments/CheckoutModalFooter/CheckoutModalFooter.js');
 var formatUtils = require('../../utils/formatUtils.js');
 var DebugBox = require('../../components/payments/DebugBox/DebugBox.js');
-var theme = require('../../config/theme/theme.js');
+var themeConstants = require('../../config/theme/themeConstants.js');
 var StatusIcon = require('../../components/shared/StatusIcon/StatusIcon.js');
 var errors_constants = require('../../domain/errors/errors.constants.js');
 
@@ -28,7 +28,7 @@ const ErrorView = ({ checkoutError: { error, errorMessage, at = errors_constants
     return (React__default["default"].createElement(React__default["default"].Fragment, null,
         React__default["default"].createElement(material.Box, null,
             React__default["default"].createElement(StatusIcon.StatusIcon, { variant: "error", imgSrc: errorImageSrc, sx: { my: 5 } }),
-            React__default["default"].createElement(material.Box, { sx: { maxWidth: theme.XS_MOBILE_MAX_WIDTH, mx: "auto" } },
+            React__default["default"].createElement(material.Box, { sx: { maxWidth: themeConstants.XS_MOBILE_MAX_WIDTH, mx: "auto" } },
                 formatUtils.parseSentences(errorMessage).map((sentence) => {
                     return React__default["default"].createElement(material.Typography, { key: sentence, variant: "body2", sx: { textAlign: "center", mb: 1.5 } }, sentence);
                 }),

@@ -7,7 +7,7 @@ var useFullPayment = require('../../hooks/useFullPayment.js');
 var material = require('@mui/material');
 var corre = require('@swyg/corre');
 var errors_constants = require('../../domain/errors/errors.constants.js');
-var theme = require('../../config/theme/theme.js');
+var themeConstants = require('../../config/theme/themeConstants.js');
 var StatusIcon = require('../../components/shared/StatusIcon/StatusIcon.js');
 var graphqlGenerated = require('../../queries/graphqlGenerated.js');
 var CheckoutOverlay_utils = require('../../components/public/CheckoutOverlay/CheckoutOverlay.utils.js');
@@ -121,7 +121,7 @@ const PurchasingView = ({ purchasingImageSrc, purchasingMessages: customPurchasi
     return (React__default["default"].createElement(material.Box, null,
         React__default["default"].createElement(StatusIcon.StatusIcon, { variant: "loading", imgSrc: purchasingImageSrc, sx: { mt: 5 } }),
         purchasingMessage ? React__default["default"].createElement(material.Typography, { variant: "body2", sx: { textAlign: "center", mt: 1.5 } }, purchasingMessage) : null,
-        React__default["default"].createElement(material.Box, { sx: { maxWidth: theme.XS_MOBILE_MAX_WIDTH, mx: "auto", my: 5 } },
+        React__default["default"].createElement(material.Box, { sx: { maxWidth: themeConstants.XS_MOBILE_MAX_WIDTH, mx: "auto", my: 5 } },
             React__default["default"].createElement(material.Typography, { variant: "body2", sx: { textAlign: "center", mb: 1.5 } }, "Hang tight! We are currently processing your payment."),
             React__default["default"].createElement(material.Typography, { variant: "body2", sx: { textAlign: "center" } }, "Please, don't close or reload the page..."))));
 };

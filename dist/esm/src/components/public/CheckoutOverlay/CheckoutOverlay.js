@@ -20,7 +20,7 @@ import { useCreateInvoiceAndReservation } from '../../../hooks/useCreateInvoiceA
 import { useCheckoutItemsCostTotal } from '../../../hooks/useCheckoutItemCostTotal.js';
 import { DictionaryProvider } from '../../../providers/DictionaryProvider.js';
 import { THREEDS_REDIRECT_DELAY_MS } from '../../../config/config.js';
-import { NEW_WALLET_OPTION } from '../../shared/Select/WalletAddressSelector/WalletAddressSelector.js';
+import { NEW_WALLET_OPTION } from '../../../domain/wallet/wallet.constants.js';
 
 const PUICheckoutOverlay = ({ 
 // Modal:

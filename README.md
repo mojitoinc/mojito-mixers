@@ -129,8 +129,6 @@ Also, make sure you install the following dependencies:
     react-dom
     @mui/material
 
-<br />
-
 And also, keep in mind:
 
 `@emotion/styled` is needed as stated in [MUI's docs](https://mui.com/guides/interoperability/):
