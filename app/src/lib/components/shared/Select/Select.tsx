@@ -1,6 +1,7 @@
-import { Select as MuiSelect, SelectProps as MuiSelectProps, InputLabel, MenuItem, FormControl, FormHelperText, useMediaQuery, useTheme } from "@mui/material";
+import { Select as MuiSelect, SelectProps as MuiSelectProps, InputLabel, MenuItem, FormControl, FormHelperText, useMediaQuery } from "@mui/material";
 import { SelectIcon } from "../Icons/Icons";
 import React from "react";
+import { useTheme } from "@mui/material/styles";
 
 export interface SelectOption<V = string | number> {
   value: V;

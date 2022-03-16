@@ -1,8 +1,9 @@
-import { Box, SxProps, Theme, Tooltip, Typography } from "@mui/material";
+import { Box, Tooltip, Typography } from "@mui/material";
 import React from "react";
 import { formatTaxRate } from "../../../../utils/formatUtils";
 import { TaxesState } from "../../../../views/Billing/BillingView";
 import { Number } from "../../../shared/Number/Number";
+import { SxProps, Theme } from "@mui/material/styles";
 
 const TAX_RATE_PLACEHOLDER_SX: SxProps<Theme> = {
   background: theme => theme.palette.grey[100],

@@ -1,6 +1,7 @@
-import { Theme, Typography, TypographyProps } from "@mui/material";
+import { Typography, TypographyProps } from "@mui/material";
 import { SystemStyleObject } from "@mui/system";
 import React from "react";
+import { Theme } from "@mui/material/styles";
 
 export const InputGroupLabel: React.FC<TypographyProps> = ({
   sx,

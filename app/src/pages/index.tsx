@@ -169,7 +169,24 @@ const HomePage: React.FC = () => {
 
     // Personalization:
     theme: PLAYGROUND_THEMES[formValues.theme],
-    // themeOptions: {},
+
+    /*
+    themeOptions: {
+      palette: {
+        primary: {
+          main: "#FF0000",
+        },
+
+        gradients: {
+          stepper: "linear-gradient(to right, #FF0000 0%, #FFFFFF 100%)",
+          stepperReverse: "linear-gradient(to left, #FF0000 0%, #FFFFFF 100%)",
+          action: "linear-gradient(270deg, #FF00FF -50%, #FFFFFF 100%)",
+          actionReverse: "linear-gradient(270deg, #FF00FF -50%, #FFFFFF 100%)",
+        },
+      },
+    },
+    */
+
     logoSrc: PLAYGROUND_LOGOS_SRC[formValues.theme],
     logoSx: PLAYGROUND_LOGOS_SX[formValues.theme],
     loaderImageSrc: formValues.customImages ? PLAYGROUND_LOADER_IMAGE_SRC : "",
