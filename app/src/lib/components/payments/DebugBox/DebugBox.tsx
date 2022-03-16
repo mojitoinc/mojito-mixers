@@ -1,7 +1,7 @@
 import { Theme, SxProps } from "@mui/material/styles";
 import { Box, BoxProps, Typography } from "@mui/material";
 import React from "react";
-import { SM_BORDER_RADIUS } from "../../../config/theme/theme";
+import { SM_BORDER_RADIUS } from "../../../config/theme/themeConstants";
 
 const DEBUG_BOX_OUTER_SX: SxProps<Theme> = {
   position: "relative",

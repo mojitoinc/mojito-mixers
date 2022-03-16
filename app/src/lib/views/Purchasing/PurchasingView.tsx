@@ -6,7 +6,7 @@ import { Box, Typography } from "@mui/material";
 import { useTimeout, useInterval } from "@swyg/corre";
 import { CheckoutModalError, SelectedPaymentMethod } from "../../components/public/CheckoutOverlay/CheckoutOverlay.hooks";
 import { ERROR_PURCHASE, ERROR_PURCHASE_TIMEOUT } from "../../domain/errors/errors.constants";
-import { XS_MOBILE_MAX_WIDTH } from "../../config/theme/theme";
+import { XS_MOBILE_MAX_WIDTH } from "../../config/theme/themeConstants";
 import { StatusIcon } from "../../components/shared/StatusIcon/StatusIcon";
 import { useGetPaymentNotificationQuery } from "../../queries/graphqlGenerated";
 import { persistCheckoutModalInfo } from "../../components/public/CheckoutOverlay/CheckoutOverlay.utils";
