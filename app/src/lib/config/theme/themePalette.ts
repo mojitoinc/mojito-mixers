@@ -13,7 +13,7 @@ const MOJITO_LIGHT_PALETTE: PaletteOptions = {
 
   text: {
     primary: "#000000",
-    secondary: "#000000",
+    secondary: "#FF0000",
     disabled: "#D9D9D9",
   },
 

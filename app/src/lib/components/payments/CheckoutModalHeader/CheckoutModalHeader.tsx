@@ -9,6 +9,7 @@ import { getFormattedUser } from "./CheckoutModalHeader.utils";
 import { User } from "../../../queries/graphqlGenerated";
 import React, { useRef, useCallback, Dispatch, SetStateAction } from "react";
 import { COUNTER_CLICKS_NEEDED, COUNTER_EXPIRATION_MS, RESERVATION_COUNTDOWN_FROM_MIN } from "../../../config/config";
+import { Img } from "../../shared/Img/Img";
 
 export type CheckoutModalHeaderVariant = "anonymous" | "guest" | "loggedIn" | "logoOnly" | "purchasing" | "error";
 
@@ -108,8 +109,7 @@ export const CheckoutModalHeader: React.FC<CheckoutModalHeaderProps> = ({
       <Stack spacing={ 2 } direction="row" sx={{ justifyContent: "space-between", alignItems: "center", py: 2 }}>
         <Typography variant="h5" id="checkout-modal-header-title">{ title }</Typography>
 
-        <Box
-          component="img"
+        <Img
           src={ logoSrc }
           onClick={ setDebug ? handleLogoClick : undefined }
           sx={{

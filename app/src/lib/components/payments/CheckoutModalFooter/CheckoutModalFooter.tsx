@@ -7,6 +7,7 @@ import { ConsentText, ConsentType, CONSENT_ERROR_MESSAGE } from "../../shared/Co
 import { PrimaryButton } from "../../shared/PrimaryButton/PrimaryButton";
 import { ICONS_BY_VARIANT, LABELS_BY_VARIANT } from "./CheckoutModalFooter.constants";
 import { useDictionary } from "../../../hooks/useDictionary";
+import { Img } from "../../shared/Img/Img";
 
 interface CheckoutModalFooterConsentState {
   isFormSubmitted: boolean;
@@ -176,7 +177,7 @@ export const CheckoutModalFooter: React.FC<CheckoutModalFooterProps> = ({
               Payments powered by
             </Typography>
             <Link href="https://www.circle.com/en/" target="_blank" rel="noopener noreferrer">
-              <Box component="img" src={CIRCLE_LOGO_IMAGE_SRC} height={20} />
+              <Img src={CIRCLE_LOGO_IMAGE_SRC} height={20} />
             </Link>
           </Box>
         </>

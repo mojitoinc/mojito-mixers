@@ -3,7 +3,7 @@ import { Container, Typography, Box, Stack, Button, FormControl, FormLabel, Radi
 import { ErrorInfo, useCallback, useEffect, useRef, useState } from "react";
 import { PUICheckout, CheckoutModalError, PUICheckoutProps, PaymentType, useOpenCloseCheckoutModal } from "../lib";
 import { useMeQuery } from "../services/graphql/generated";
-import { PLAYGROUND_PARAGRAPHS_ARRAY, PLAYGROUND_AUTH_PRESET, PLAYGROUND_NO_AUTH_PRESET, PLAYGROUND_PRIVACY_HREF, PLAYGROUND_TERMS_OF_USE_HREF, PLAYGROUND_USER_FORMAT, PLAYGROUND_PURCHASING_IMAGE_SRC, PLAYGROUND_ERROR_IMAGE_SRC, PLAYGROUND_LOGOS_SRC, PLAYGROUND_LOGOS_SX, PLAYGROUND_LOADER_IMAGE_SRC, PLAYGROUND_MOCKED_AUCTION_LOT, PLAYGROUND_MOCKED_BUY_NOW_LOT, PLAYGROUND_THEMES } from "../utils/playground/playground.constants";
+import { PLAYGROUND_PARAGRAPHS_ARRAY, PLAYGROUND_AUTH_PRESET, PLAYGROUND_NO_AUTH_PRESET, PLAYGROUND_PRIVACY_HREF, PLAYGROUND_TERMS_OF_USE_HREF, PLAYGROUND_USER_FORMAT, PLAYGROUND_PURCHASING_IMAGE_SRC, PLAYGROUND_ERROR_IMAGE_SRC, PLAYGROUND_LOGOS_SRC, PLAYGROUND_LOGOS_SX, PLAYGROUND_LOADER_IMAGE_SRC, PLAYGROUND_MOCKED_AUCTION_LOT, PLAYGROUND_MOCKED_BUY_NOW_LOT } from "../utils/playground/playground.constants";
 import { PlaygroundFormData } from "../utils/playground/playground.interfaces";
 import { config } from "../utils/config/config.constants";
 import { CheckoutEventData, CheckoutEventType } from "../lib/domain/events/events.interfaces";
@@ -168,24 +168,22 @@ const HomePage: React.FC = () => {
     productConfirmationEnabled: testPreset.productConfirmationEnabled,
 
     // Personalization:
-    theme: PLAYGROUND_THEMES[formValues.theme],
+    // theme: PLAYGROUND_THEMES[formValues.theme],
 
-    /*
     themeOptions: {
       palette: {
         primary: {
-          main: "#FF0000",
+          main: "#FF00FF",
         },
 
         gradients: {
-          stepper: "linear-gradient(to right, #FF0000 0%, #FFFFFF 100%)",
-          stepperReverse: "linear-gradient(to left, #FF0000 0%, #FFFFFF 100%)",
-          action: "linear-gradient(270deg, #FF00FF -50%, #FFFFFF 100%)",
-          actionReverse: "linear-gradient(270deg, #FF00FF -50%, #FFFFFF 100%)",
+          stepper: "#FF00FF", // magenta
+          stepperReverse: "#FF0000", // red
+          action: "#00FFFF", // cyan
+          actionReverse: "#FF00FF", // magenta
         },
       },
     },
-    */
 
     logoSrc: PLAYGROUND_LOGOS_SRC[formValues.theme],
     logoSx: PLAYGROUND_LOGOS_SX[formValues.theme],
