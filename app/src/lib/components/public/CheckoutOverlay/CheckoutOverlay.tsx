@@ -318,8 +318,8 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   };
 
   useEffect(() => {
-    setTimeout(() => triggerAnalyticsEventRef.current(`navigate:${ checkoutStep }`));
-  }, [checkoutStep]);
+    if (!isDialogInitializing) setTimeout(() => triggerAnalyticsEventRef.current(`navigate:${ checkoutStep }`));
+  }, [isDialogInitializing, checkoutStep]);
 
   // Saved payment method creation-reload-sync:
 
