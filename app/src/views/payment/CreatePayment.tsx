@@ -230,6 +230,7 @@ export const CreatePayment = () => {
     };
 
     const ciphertext = await encrypt(options);
+
     return {
       encryptedData: btoa(ciphertext),
       keyId: keyId,
