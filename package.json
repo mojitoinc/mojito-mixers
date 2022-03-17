@@ -43,7 +43,6 @@
     "react-payment-inputs": "^1.1.9",
     "react-plaid-link": "^3.3.0",
     "react-use-country-region": "^1.0.0",
-    "styled-components": "^5.3.3",
     "ts-deepmerge": "^2.0.1",
     "use-callback-ref": "^1.2.5",
     "uuidv4": "^6.2.12",
