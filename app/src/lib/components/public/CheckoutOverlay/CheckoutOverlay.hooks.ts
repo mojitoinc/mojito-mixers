@@ -60,6 +60,7 @@ export interface PurchaseState {
 
 export interface CheckoutModalStateReturn extends CheckoutModalState, PurchaseState {
   // CheckoutModalState (+ inherited stuff):
+  startAt: CheckoutModalStep;
   initModalState: () => void;
   goBack: () => void;
   goNext: () => void;
@@ -232,6 +233,7 @@ export function useCheckoutModalState({
 
   return {
     // CheckoutModalState:
+    startAt,
     checkoutStep,
     checkoutError,
     isDialogBlocked,

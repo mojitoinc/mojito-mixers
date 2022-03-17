@@ -1,88 +1,15 @@
-import styled from "styled-components";
-import { useState, useMemo, useCallback } from "react";
+import { useState, useCallback } from "react";
 import {
   usePaymentKeyQuery,
   useCreatePaymentMethodMutation,
   useGetPaymentMethodListQuery,
 } from "../../services/graphql/generated";
 import { createMessage, encrypt, readKeys } from "openpgp";
+import { Box, Button, Typography } from "@mui/material";
 import atob from "atob";
 import btoa from "btoa";
-
-const CardInList = styled.div`
-  margin: 5px 0;
-  width: auto;
-  min-width: 40%;
-  padding: 1em;
-  border-radius: 4px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-`;
-
-const PaymentMethodList: React.FC<{ index: number; card: any }> = ({
-  index,
-  card,
-}) => {
-  return (
-    <CardInList>
-      #{index}
-      <p>ID: {card.id}</p>
-      <p>Last 4: {card.last4Digit}</p>
-      <p>Network: {card.network}</p>
-      <p>Type: {card.type}</p>
-    </CardInList>
-  );
-};
-
-const OrgInput = styled.div`
-  display: block;
-  margin: 1em 0;
-  position: relative;
-
-  > input {
-    display: block;
-    position: relative;
-  }
-`;
-
-const PaymentWrapper = styled.div`
-  display: block;
-  position: relative;
-  margin: 2em auto;
-
-  form {
-    input,
-    select {
-      display: block;
-      min-width: 100%;
-      margin: 5px 0;
-    }
-
-    input[type="submit"] {
-      border-radius: 8px;
-      border: none;
-      padding: 6px 12px;
-      cursor: pointer;
-      background-color: #7db66b;
-      color: #fff;
-      font-size: 16px;
-      font-weight: bold;
-    }
-  }
-`;
-
-const Expiration = styled.div`
-  span {
-    display: inline-flex;
-    input {
-      width: 45%;
-    }
-  }
-`;
-
-const SectionTitle = styled.h3`
-  display: block;
-`;
-
+import { fieldsetLabelSx, inputStyle, inputGroupStyle, buttonSx } from "../../components/legacy/legacy-styles.constants";
+import { PaymentMethodListItem } from "../../components/payment/PaymentMethodListItem";
 
 interface PaymentDetails {
   cardNumber: string;
@@ -132,7 +59,7 @@ const emptyValues: PaymentDetails = {
   email: "",
 };
 
-export const CreatePayment = () => {
+export const CreatePayment: React.FC = () => {
   const { data, loading, error } = usePaymentKeyQuery();
 
   const [
@@ -140,59 +67,34 @@ export const CreatePayment = () => {
     { data: mutationData, loading: mutationLoading, error: mutationError },
   ] = useCreatePaymentMethodMutation();
 
-  const prefillValues = () => {
-    setPaymentDetails(defaultValues);
-  };
-
-  const clearValues = () => {
-    setPaymentDetails(emptyValues);
-  };
-
   const [orgId, setOrgId] = useState("");
+  const [paymentDetails, setPaymentDetails] = useState<PaymentDetails>(emptyValues);
 
-  const [paymentDetails, setPaymentDetails] = useState<PaymentDetails>({
-    cardNumber: "",
-    cvv: "",
-    expMonth: 1,
-    expYear: 2022,
-    line1: "",
-    line2: "",
-    city: "",
-    district: "",
-    postalCode: "",
-    country: "",
-    name: "",
-    phoneNumber: "",
-    email: "",
-  });
+  const prefillValues = () => setPaymentDetails(defaultValues);
+  const clearValues = () => setPaymentDetails(emptyValues);
 
   const {
     data: paymentMethodList,
     loading: methodListLoading,
-    error: methodListError,
+    error: paymentMethodListError,
   } = useGetPaymentMethodListQuery({
+    skip: !orgId,
     variables: {
       orgID: orgId,
     },
   });
 
-  const paymentList = useMemo(() => {
-    if (paymentMethodList?.getPaymentMethodList) {
-      return paymentMethodList.getPaymentMethodList;
-    }
-  }, [paymentMethodList]);
+  const paymentList = paymentMethodList?.getPaymentMethodList || [];
 
-  const monthList = [];
-  for (let i = 1; i <= 12; i++) {
-    monthList.push(
-      <option key={i} value={i}>
-        {i}
+  const monthList = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((m) => {
+    return (
+      <option key={m} value={m}>
+        {m}
       </option>
     );
-  }
+  });
 
-  const years = [2021, 2022, 2023, 2024, 2025, 2026];
-  const yearList = years.map((y) => {
+  const yearList = [2022, 2023, 2024, 2025, 2026, 2027, 2028, 2029, 2030].map((y) => {
     return (
       <option key={y} value={y}>
         {y}
@@ -295,138 +197,160 @@ export const CreatePayment = () => {
     }
   }, [createPaymentMethod, data, error, orgId, paymentDetails]);
 
-  return (
-    <>
-      <PaymentWrapper>
-        <h1>Payment</h1>
+  return (<>
+    <Box sx={{ display: "block", position: "relative", margin: "2em auto" }}>
+      <Typography variant="h5">1. Create Payment Method</Typography>
 
-        <OrgInput>
-          {/* TODO: Make a dropdown list of organizations */}
-          <label>Organization ID (required)</label>
-          <input
-            placeholder="Organization ID"
-            value={orgId}
-            onChange={(e) => setOrgId(e.target.value)}
-          />
-        </OrgInput>
+      <form onSubmit={createCard}>
+        <Typography variant="h6" sx={ fieldsetLabelSx }>Organization ID</Typography>
 
-        <h4>Card Details</h4>
-        <form onSubmit={createCard}>
+        { /* TODO: Make a dropdown list of organizations */ }
+        <input
+          style={ inputStyle }
+          type="text"
+          value={orgId}
+          placeholder="Organization ID"
+          name="orgID"
+          onChange={(e) => setOrgId(e.target.value)} />
+
+        <Typography variant="h6" sx={ fieldsetLabelSx }>Billing Information</Typography>
+
+        <input
+          style={ inputStyle }
+          type="text"
+          value={paymentDetails.name}
+          placeholder="Name"
+          name="name"
+          onChange={onChange} />
+
+        <input
+          style={ inputStyle }
+          type="email"
+          placeholder="Email"
+          name="email"
+          value={paymentDetails.email}
+          onChange={onChange} />
+
+        <input
+          style={ inputStyle }
+          type="phone"
+          placeholder="Phone Number"
+          name="phoneNumber"
+          value={paymentDetails.phoneNumber}
+          onChange={onChange} />
+
+        <input
+          style={ inputStyle }
+          type="text"
+          placeholder="Line 1"
+          name="line1"
+          value={paymentDetails.line1}
+          onChange={onChange} />
+
+        <input
+          style={ inputStyle }
+          type="text"
+          placeholder="Line 2"
+          name="line2"
+          value={paymentDetails.line2}
+          onChange={onChange} />
+
+        <input
+          style={ inputStyle }
+          type="text"
+          placeholder="City"
+          name="city"
+          value={paymentDetails.city}
+          onChange={onChange} />
+
+        <input
+          style={ inputStyle }
+          type="text"
+          placeholder="Country"
+          name="country"
+          value={paymentDetails.country}
+          onChange={onChange} />
+
+        <input
+          style={ inputStyle }
+          type="text"
+          placeholder="State"
+          name="district"
+          value={paymentDetails.district}
+          onChange={onChange} />
+
+        <input
+          style={ inputStyle }
+          type="text"
+          placeholder="Postal Code"
+          name="postalCode"
+          value={paymentDetails.postalCode}
+          onChange={onChange} />
+
+        <Typography variant="h6" sx={ fieldsetLabelSx }>Credit Card Information</Typography>
+
+        <Box sx={ inputGroupStyle }>
           <input
-            type="text"
-            value={paymentDetails.name}
-            placeholder="Name"
-            name="name"
-            onChange={onChange}
-          />
-          <input
+            style={ inputStyle }
             type="text"
             placeholder="Card number"
             name="cardNumber"
             value={paymentDetails.cardNumber}
-            onChange={onChange}
-          />
+            onChange={onChange} />
+
           <input
+            style={ inputStyle }
             type="text"
             placeholder="CVV"
             value={paymentDetails.cvv}
             name="cvv"
-            onChange={onChange}
-          />
-          <input
-            type="text"
-            placeholder="Line 1"
-            name="line1"
-            value={paymentDetails.line1}
-            onChange={onChange}
-          />
-          <input
-            type="text"
-            placeholder="Line 2"
-            name="line2"
-            value={paymentDetails.line2}
-            onChange={onChange}
-          />
-          <input
-            type="text"
-            placeholder="City"
-            name="city"
-            value={paymentDetails.city}
-            onChange={onChange}
-          />
-          <input
-            type="text"
-            placeholder="District"
-            name="district"
-            value={paymentDetails.district}
-            onChange={onChange}
-          />
-          <input
-            type="text"
-            placeholder="Postal Code"
-            name="postalCode"
-            value={paymentDetails.postalCode}
-            onChange={onChange}
-          />
-          <input
-            type="text"
-            placeholder="Country"
-            name="country"
-            value={paymentDetails.country}
-            onChange={onChange}
-          />
-          <input
-            type="phone"
-            placeholder="Phone Number"
-            name="phoneNumber"
-            value={paymentDetails.phoneNumber}
-            onChange={onChange}
-          />
-          <input
-            type="email"
-            placeholder="Email"
-            name="email"
-            value={paymentDetails.email}
-            onChange={onChange}
-          />
-          <Expiration>
-            <SectionTitle>Expiration</SectionTitle>
-            <span>
-              <select
-                name="expMonth"
-                value={paymentDetails.expMonth}
-                onChange={onChange}
-              >
-                {monthList}
-              </select>
-              <select
-                name="expYear"
-                value={paymentDetails.expYear}
-                onChange={onChange}
-              >
-                {yearList}
-              </select>
-            </span>
-          </Expiration>
-          <input type="submit" value="Create Payment Method" />
-        </form>
-        <button onClick={prefillValues}>Prefill values</button>
-        <button onClick={clearValues}>Clear values</button>
-      </PaymentWrapper>
-      <div>
-        {methodListLoading && <p>Fetching payment method list...</p>}
-        {methodListLoading && <p>Error fetching payment method list!</p>}
-        {paymentList && (
-          <div>
-            <h4>Cards in Organization</h4>
-            {paymentList.map((card, idx) => {
-              return (
-                <PaymentMethodList key={idx} index={idx + 1} card={card} />
-              );
-            })}
-          </div>
-        )}
-      </div>
-    </>
-  );
+            onChange={onChange} />
+        </Box>
+
+        <Box sx={ inputGroupStyle }>
+          <select
+            style={ inputStyle }
+            placeholder="Exp. Month"
+            name="expMonth"
+            value={paymentDetails.expMonth}
+            onChange={onChange}>
+            {monthList}
+          </select>
+
+          <select
+            style={ inputStyle }
+            placeholder="Exp. Year"
+            name="expYear"
+            value={paymentDetails.expYear}
+            onChange={onChange}>
+            {yearList}
+          </select>
+        </Box>
+
+        <Button type="submit" sx={ buttonSx } variant="contained">Create Payment Method</Button>
+
+        <Box sx={ inputGroupStyle }>
+          <Button onClick={ prefillValues } sx={ buttonSx } variant="contained" color="secondary">Fill Form</Button>
+          <Button onClick={ clearValues } sx={ buttonSx } variant="contained" color="secondary">Clear Form</Button>
+        </Box>
+
+      </form>
+    </Box>
+
+    <div>
+      {methodListLoading && <p>Fetching payment method list...</p>}
+      {methodListLoading && <p>Error fetching payment method list!</p>}
+      {paymentList.length > 0 && (
+        <div>
+          <h4>Cards in Organization</h4>
+          {paymentList.map((card, i) => {
+            return (
+              <PaymentMethodListItem key={ i } index={ i  + 1} card={card} />
+            );
+          })}
+        </div>
+      )}
+    </div>
+
+  </>);
 };

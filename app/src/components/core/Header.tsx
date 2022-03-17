@@ -1,35 +1,31 @@
-import { Container } from "@mui/material";
+import { Box } from "@mui/material";
+import { Theme, SxProps } from "@mui/material/styles";
 import Link from "next/link";
-import styled from "styled-components";
 import { AuthButton } from "../auth/AuthButton";
 
-const HeaderStyled = styled.div`
-  height: 60px;
-  background-color: white;
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  position: relative;
-  color: white;
-  box-shadow: 4px 5px 20px 0 rgb(0 61 33 / 12%);
-  border-radius: 12px;
-  padding: 0 24px;
-  margin-top: 24px;
-`;
+const headerSx: SxProps<Theme> = {
+  backgroundColor: "white",
+  width: "100%",
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  position: "relative",
+  py: 2,
+  mb: 4,
+  boxSizing: "border-box",
+  borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
+};
 
 export function Header() {
   return (
-    <Container>
-      <HeaderStyled>
-        <Link href="/">
-          <a style={{ display: "block" }}>
-            <img src="/img/logos/mojito-light-logo.svg" style={{ height: "32px" }} />
-          </a>
-        </Link>
+    <Box sx={ headerSx } component="header">
+      <AuthButton />
 
-        <AuthButton />
-      </HeaderStyled>
-    </Container>
+      <Link href="/">
+        <a style={{ display: "block" }}>
+          <img src="/img/logos/mojito-light-logo.svg" style={{ display: "block", height: "32px" }} />
+        </a>
+      </Link>
+    </Box>
   );
 }

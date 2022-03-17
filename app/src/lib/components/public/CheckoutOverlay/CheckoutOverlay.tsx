@@ -156,6 +156,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
 
   const {
     // CheckoutModalState:
+    startAt,
     checkoutStep,
     checkoutError,
     isDialogBlocked,
@@ -317,8 +318,8 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   };
 
   useEffect(() => {
-    setTimeout(() => triggerAnalyticsEventRef.current(`navigate:${ checkoutStep }`));
-  }, [checkoutStep]);
+    if (!isDialogInitializing) setTimeout(() => triggerAnalyticsEventRef.current(`navigate:${ checkoutStep }`));
+  }, [isDialogInitializing, checkoutStep]);
 
   // Saved payment method creation-reload-sync:
 
@@ -719,8 +720,9 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
       logoSx={ logoSx }
       user={ meData?.me?.user }
       userFormat={ userFormat }
-      onLoginClicked={ onLogin }
-      onPrevClicked={ checkoutStep === "authentication" ? handleClose : goBack }
+      onLogin={ onLogin }
+      onClose={ checkoutStep === startAt ? handleClose : undefined }
+      onPrev={ checkoutStep === startAt ? undefined : goBack }
       setDebug={ setDebug } />
   );
 

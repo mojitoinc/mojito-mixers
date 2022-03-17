@@ -2,15 +2,8 @@ import {
   useCreateAuctionInvoiceMutation,
 } from "../../services/graphql/generated";
 import { useCallback, useState } from "react";
-import styled from "styled-components";
-
-export const InvoiceWrapper = styled.div`
-input,
-button {
-  display: block;
-  margin: 5px 0;
-}
-`;
+import { buttonSx, fieldsetLabelSx, inputStyle } from "../../components/legacy/legacy-styles.constants";
+import { Box, Button, Typography } from "@mui/material";
 
 export const Invoices: React.FC = () => {
   const [createAuctionInvoiceMutation] = useCreateAuctionInvoiceMutation();
@@ -38,21 +31,31 @@ export const Invoices: React.FC = () => {
   }, [createAuctionInvoiceMutation, orgId, lotId]);
 
   return (
-    <InvoiceWrapper>
-      <h3>Create Invoice</h3>
-      <label>Organization ID</label>
+    <Box sx={{ display: "block", position: "relative", margin: "2em auto" }}>
+      <Typography variant="h5">2. Create Invoice</Typography>
+
+      <Typography variant="h6" sx={ fieldsetLabelSx }>Organization ID</Typography>
+
+      { /* TODO: Make a dropdown list of organizations */ }
       <input
-        placeholder="Org ID"
+        style={ inputStyle }
+        type="text"
         value={orgId}
-        onChange={(e) => setOrgId(e.target.value)}
-      />
-      <label>Lot ID</label>
+        placeholder="Organization ID"
+        name="orgID"
+        onChange={(e) => setOrgId(e.target.value)} />
+
+      <Typography variant="h6" sx={ fieldsetLabelSx }>Lot ID</Typography>
+
       <input
-        placeholder="Lot ID"
+        style={ inputStyle }
+        type="text"
         value={lotId}
-        onChange={(e) => setLotId(e.target.value)}
-      />
-      <button onClick={createInvoice}>Create Invoice</button>
-    </InvoiceWrapper>
+        placeholder="Lot ID"
+        name="lotID"
+        onChange={(e) => setLotId(e.target.value)} />
+
+      <Button onClick={createInvoice} sx={ buttonSx } variant="contained">Create Invoice</Button>
+    </Box>
   );
 };

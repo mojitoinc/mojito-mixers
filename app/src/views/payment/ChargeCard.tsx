@@ -2,7 +2,8 @@ import {
   useCreatePaymentMutation,
 } from "../../services/graphql/generated";
 import { useCallback, useState } from "react";
-import { InvoiceWrapper } from "./Invoices";
+import { Box, Button, Typography } from "@mui/material";
+import { fieldsetLabelSx, inputStyle, buttonSx } from "../../components/legacy/legacy-styles.constants";
 
 export const ChargeCard: React.FC = () => {
   const [createPaymentMutation, { data, loading, error }] =
@@ -31,21 +32,31 @@ export const ChargeCard: React.FC = () => {
   }, [createPaymentMutation, paymentMethodId, invoiceId]);
 
   return (
-    <InvoiceWrapper>
-      <h3>Create Payment</h3>
-      <label>Payment Method ID</label>
+    <Box sx={{ display: "block", position: "relative", margin: "2em auto" }}>
+      <Typography variant="h5">3. Charge Card</Typography>
+
+      <Typography variant="h6" sx={ fieldsetLabelSx }>Payment Method ID</Typography>
+
       <input
-        placeholder="Payment method ID"
+        style={ inputStyle }
+        type="text"
         value={paymentMethodId}
-        onChange={(e) => setPaymentMethodId(e.target.value)}
-      />
-      <label>Invoice ID</label>
+        placeholder="Payment Method ID"
+        name="paymentMethodID"
+        onChange={(e) => setPaymentMethodId(e.target.value)} />
+
+      <Typography variant="h6" sx={ fieldsetLabelSx }>Invoice ID</Typography>
+
       <input
-        placeholder="Invoice ID"
+        style={ inputStyle }
+        type="text"
         value={invoiceId}
-        onChange={(e) => setInvoiceId(e.target.value)}
-      />
-      <button onClick={chargeCard}>Charge Card</button>
-    </InvoiceWrapper>
+        placeholder="Invoice ID"
+        name="invoiceID"
+        onChange={(e) => setInvoiceId(e.target.value)} />
+
+      <Button onClick={chargeCard} sx={ buttonSx } variant="contained">Charge Card</Button>
+
+    </Box>
   );
 };

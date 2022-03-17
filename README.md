@@ -129,11 +129,17 @@ Also, make sure you install the following dependencies:
 
 And also, keep in mind:
 
-`@emotion/styled` is needed as stated in [MUI's docs](https://mui.com/guides/interoperability/):
+- `@emotion/react` is not needed.
 
-  > ⚠️ Keep `@emotion/styled` as a dependency of your project. Even if you never use it explicitly, it's a peer dependency of `@mui/material`.
+- `@emotion/styled` is needed as stated in [MUI's docs](https://mui.com/guides/interoperability/):
 
-`@emotion/react` is not needed.
+    > Keep `@emotion/styled` as a dependency of your project. Even if you never use it explicitly, it's a peer dependency of `@mui/material`.
+
+- `styled-components` is needed as stated in [`react-payment-inputs`' docs](https://github.com/medipass/react-payment-inputs#using-the-built-in-styled-wrapper), but it's not used:
+
+    > Note: <PaymentInputsWrapper> requires styled-components to be installed as a dependency.
+    >
+    > By default, React Payment Inputs does not have built-in styling for it's inputs. However, React Payment Inputs comes with a styled wrapper which combines the card number, expiry & CVC fields...
 
 <br />
 
@@ -421,9 +427,24 @@ The debug mode will, among logging/displaying some other less relevant pieces of
 
 ## TypeScript Support
 
-You will have to copy the following file into your project to avoid TypeScript errors when using custom props in MUI's theme:
+You will have to add the following file into your project to avoid TypeScript errors when using custom props in MUI's theme:
 
-[`app/src/lib/domain/mui/mui.d.ts`](./app/src/lib/domain/mui/mui.d.ts).
+```TSX
+import "@mui/material/styles";
+import { PalettePaymentUI } from "@mojitoinc/mojito-mixers";
+
+declare module "@mui/material/styles" {
+  interface Palette {
+    paymentUI?: PalettePaymentUI;
+  }
+
+  interface PaletteOptions {
+    paymentUI?: PalettePaymentUI;
+  }
+}
+```
+
+You can see an example here: [`app/src/lib/domain/mui/mui.d.ts`](./app/src/lib/domain/mui/mui.d.ts)
 
 <br />
 
