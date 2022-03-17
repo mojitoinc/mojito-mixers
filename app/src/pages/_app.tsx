@@ -9,9 +9,6 @@ import { AuthorizedApolloProvider } from "../lib/components/shared/AuthorizedApo
 import { GlobalStyles } from "@mui/material";
 import { GLOBAL_STYLES } from "../components/core/global-styles.constants";
 import { Container } from "../components/core/Container";
-import styled from "styled-components";
-
-const _ = styled.div``;
 
 const defaultTheme = createTheme();
 
