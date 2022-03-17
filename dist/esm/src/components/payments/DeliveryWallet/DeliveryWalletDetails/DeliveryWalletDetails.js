@@ -4,10 +4,11 @@ import { CopyButton } from '../../../shared/CopyButton/CopyButton.js';
 import { ReadOnlyWalletAddress } from '../../../shared/ReadOnlyField/ReadOnlyField.js';
 import React__default from 'react';
 import { useDictionary } from '../../../../hooks/useDictionary.js';
+import { filterSpecialWalletAddressValues } from '../../../../domain/wallet/wallet.utils.js';
 
 const DeliveryWalletDetails = ({ wallet, }) => {
     const dictionary = useDictionary();
-    const walletAddress = (typeof wallet === "object" ? wallet === null || wallet === void 0 ? void 0 : wallet.address : wallet) || "";
+    const walletAddress = (typeof wallet === "object" ? wallet === null || wallet === void 0 ? void 0 : wallet.address : filterSpecialWalletAddressValues(wallet)) || "";
     const isMultiSig = typeof wallet === "object" || !walletAddress;
     return (React__default.createElement(Box, { pt: 2 },
         React__default.createElement(Typography, { variant: "body1" }, "Once minted, items will be delivered to:"),

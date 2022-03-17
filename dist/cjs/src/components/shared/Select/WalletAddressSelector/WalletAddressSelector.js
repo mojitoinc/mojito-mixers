@@ -60,7 +60,7 @@ const WalletAddressSelector = (_a) => {
         ? (wallet_utils.isSpecialWalletAddressValue(wallet) ? wallet : wallet_constants.CUSTOM_WALLET_OPTION.value)
         : ((wallet === null || wallet === void 0 ? void 0 : wallet.id) || wallet_constants.NEW_WALLET_OPTION.value);
     const disabled = parentDisabled || wallets === undefined || wallet === null;
-    const showError = !wallet_utils.isNewWalletAddress(wallet);
+    const showError = !wallet_utils.isCustomWalletAddress(wallet);
     return (React__default["default"].createElement(Select.Select, Object.assign({}, props, { label: label, options: options, onChange: handleChange, value: selectValue, disabled: disabled, error: showError ? error : undefined, helperText: showError ? helperText : undefined, displayEmpty: true })));
 };
 

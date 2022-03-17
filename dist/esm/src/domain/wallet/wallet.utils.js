@@ -12,12 +12,12 @@ function isValidWalletAddress(wallet) {
 function isSpecialWalletAddressValue(walletAddress) {
     return SPECIAL_ADDRESS_REGEXP.test(walletAddress);
 }
-function isNewWalletAddress(wallet) {
+function isCustomWalletAddress(wallet) {
     return typeof wallet === "string" && wallet !== NEW_WALLET_OPTION.value;
 }
 function filterSpecialWalletAddressValues(walletAddress) {
     return walletAddress.trim().replace(SPECIAL_ADDRESS_REGEXP, "");
 }
 
-export { ADDRESS_REGEXP, SPECIAL_ADDRESS_REGEXP, filterSpecialWalletAddressValues, isNewWalletAddress, isSpecialWalletAddressValue, isValidWalletAddress };
+export { ADDRESS_REGEXP, SPECIAL_ADDRESS_REGEXP, filterSpecialWalletAddressValues, isCustomWalletAddress, isSpecialWalletAddressValue, isValidWalletAddress };
 //# sourceMappingURL=wallet.utils.js.map
