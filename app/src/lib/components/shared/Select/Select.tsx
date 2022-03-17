@@ -48,7 +48,7 @@ export const Select: React.FC<SelectProps> = ({
   );
 
   return (
-    <FormControl fullWidth margin="normal" variant="filled" disabled={disabled} error={error}>
+    <FormControl fullWidth margin={ margin } variant="filled" disabled={disabled} error={error}>
       <InputLabel required={required} htmlFor={id} disabled={disabled} shrink>
         {label}
       </InputLabel>

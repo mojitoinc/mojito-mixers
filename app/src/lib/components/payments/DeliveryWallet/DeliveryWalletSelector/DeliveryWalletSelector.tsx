@@ -48,7 +48,7 @@ export const DeliveryWalletSelector: React.FC<DeliveryWalletSelectorProps> = ({
         Wallet Delivery Address
       </InputGroupLabel>
 
-      <DisplayBox sx={{ border: 0, mb: 0.5 }}>
+      <DisplayBox sx={{ border: 0 }}>
         <Typography sx={{ mb: 1.5 }}>{dictionary.walletInfo}</Typography>
 
         <WalletAddressSelector

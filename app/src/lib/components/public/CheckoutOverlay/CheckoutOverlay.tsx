@@ -1,4 +1,4 @@
-import { Backdrop, Box, CircularProgress } from "@mui/material";
+import { Backdrop, CircularProgress } from "@mui/material";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { getSavedPaymentMethodAddressIdFromBillingInfo, savedPaymentMethodToBillingInfo, transformRawSavedPaymentMethods } from "../../../domain/circle/circle.utils";
 import { UserFormat } from "../../../domain/auth/authentication.interfaces";
@@ -32,6 +32,7 @@ import { Wallet } from "../../../domain/wallet/wallet.interfaces";
 import { THREEDS_REDIRECT_DELAY_MS } from "../../../config/config";
 import { Network } from "../../../domain/network/network.interfaces";
 import { NEW_WALLET_OPTION } from "../../../domain/wallet/wallet.constants";
+import { StatusIcon } from "../../shared/StatusIcon/StatusIcon";
 
 export interface PUICheckoutOverlayProps {
   // Modal:
@@ -594,15 +595,10 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
         open={ open }
         onClick={ handleClose }>
         { loaderImageSrc ? (
-          <Box
-            component="img"
-            src={ loaderImageSrc }
-            sx={{
-              width: 196,
-              height: 196,
-              mx: "auto",
-              mt: 5,
-            }} />
+          <StatusIcon
+            variant="loading"
+            imgSrc={ loaderImageSrc }
+            sx={{ mt: 5 }} />
         ) : (
           <CircularProgress color="primary" />
         ) }

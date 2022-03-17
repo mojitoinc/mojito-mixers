@@ -65,11 +65,9 @@ When testing the purchase flow, you need to make sure to:
 
   You can find them using:
 
-    - **Mojito Manager** - [Dashboard (`orgID`)](https://app.mojito.xyz/dashboard), [Collections (`lotID`)](https://app.mojito.xyz/<path-to-collection>)
+    - **Mojito Mint** - [`https://mint.dev.mojito.xyz/`](https://mint.dev.mojito.xyz/).
 
-    - **Mojito API** - [GraphQL Playground](https://api.dev.mojito.xyz/query)
-
-    - **Contentful API** - [GraphQL Playground](https://graphql.contentful.com/content/v1/spaces/fu9did2d8yaw/environments/staging/explore?access_token=19vUSnF3_8S-OsepxXBcDAI_Ua3GbwSy5c7HNTXB-R0)
+    - **Mojito API GraphQL Playground** - [`https://api.dev.mojito.xyz/query`](https://api.dev.mojito.xyz/query)
 
 - When paying with credit card, use [Circle's](https://developers.circle.com/docs/introducing-circle-apis) [Test card numbers](https://developers.circle.com/docs/test-card-numbers)
 

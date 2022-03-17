@@ -37,7 +37,7 @@ export const CheckoutStepper: React.FC<CheckoutStepperProps> = ({
           position: "relative",
           width: "100%",
           height: 2,
-          background: theme => theme.palette?.gradients?.stepper,
+          background: theme => theme.palette.paymentUI?.progressBar || theme.palette.primary.main,
         }}>
         <Divider sx={{
           borderWidth: 0,
