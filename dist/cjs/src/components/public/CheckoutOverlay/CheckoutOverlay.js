@@ -25,6 +25,7 @@ var useCheckoutItemCostTotal = require('../../../hooks/useCheckoutItemCostTotal.
 var DictionaryProvider = require('../../../providers/DictionaryProvider.js');
 var config = require('../../../config/config.js');
 var wallet_constants = require('../../../domain/wallet/wallet.constants.js');
+var StatusIcon = require('../../shared/StatusIcon/StatusIcon.js');
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
@@ -373,12 +374,7 @@ debug: initialDebug, onEvent, onError, onMarketingOptInChange, // Not implemente
     if ((isDialogInitializing || isPlaidFlowLoading) && (checkoutStep !== "error")) {
         return (React__default["default"].createElement(React__default["default"].Fragment, null,
             isPlaidFlowLoading && React__default["default"].createElement(usePlaid.PlaidFlow, { onSubmit: handlePlaidFlowCompleted }),
-            React__default["default"].createElement(material.Backdrop, { open: open, onClick: handleClose }, loaderImageSrc ? (React__default["default"].createElement(material.Box, { component: "img", src: loaderImageSrc, sx: {
-                    width: 196,
-                    height: 196,
-                    mx: "auto",
-                    mt: 5,
-                } })) : (React__default["default"].createElement(material.CircularProgress, { color: "primary" })))));
+            React__default["default"].createElement(material.Backdrop, { open: open, onClick: handleClose }, loaderImageSrc ? (React__default["default"].createElement(StatusIcon.StatusIcon, { variant: "loading", imgSrc: loaderImageSrc, sx: { mt: 5 } })) : (React__default["default"].createElement(material.CircularProgress, { color: "primary" })))));
     }
     // Normal UI (steps / views):
     let headerVariant = isAuthenticated ? 'loggedIn' : 'guest';

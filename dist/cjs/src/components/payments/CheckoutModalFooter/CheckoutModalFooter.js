@@ -12,6 +12,7 @@ var ConsentText = require('../../shared/ConsentText/ConsentText.js');
 var PrimaryButton = require('../../shared/PrimaryButton/PrimaryButton.js');
 var CheckoutModalFooter_constants = require('./CheckoutModalFooter.constants.js');
 var useDictionary = require('../../../hooks/useDictionary.js');
+var Img = require('../../shared/Img/Img.js');
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
@@ -102,7 +103,7 @@ const CheckoutModalFooter = ({ variant, buttonLabel, guestCheckoutEnabled, conse
             React__default["default"].createElement(material.Box, { display: "flex" },
                 React__default["default"].createElement(material.Typography, { sx: { maxWidth: themeConstants.SM_MOBILE_MAX_WIDTH, marginRight: 1 }, align: "center" }, "Payments powered by"),
                 React__default["default"].createElement(material.Link, { href: "https://www.circle.com/en/", target: "_blank", rel: "noopener noreferrer" },
-                    React__default["default"].createElement(material.Box, { component: "img", src: themeConstants.CIRCLE_LOGO_IMAGE_SRC, height: 20 })))))));
+                    React__default["default"].createElement(Img.Img, { src: themeConstants.CIRCLE_LOGO_IMAGE_SRC, height: 20 })))))));
 };
 
 exports.CheckoutModalFooter = CheckoutModalFooter;

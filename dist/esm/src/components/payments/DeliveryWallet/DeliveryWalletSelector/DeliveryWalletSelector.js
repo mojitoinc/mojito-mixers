@@ -24,7 +24,7 @@ const DeliveryWalletSelector = ({ validatePersonalAddress, wallets, wallet, onWa
     const showAddressError = validatePersonalAddress && !isAddressOk;
     return (React__default.createElement(React__default.Fragment, null,
         React__default.createElement(InputGroupLabel, { sx: { mt: 2.5, mb: 1.5 } }, "Wallet Delivery Address"),
-        React__default.createElement(DisplayBox, { sx: { border: 0, mb: 0.5 } },
+        React__default.createElement(DisplayBox, { sx: { border: 0 } },
             React__default.createElement(Typography, { sx: { mb: 1.5 } }, dictionary.walletInfo),
             React__default.createElement(WalletAddressSelector, { margin: "none", label: "Wallet", wallets: wallets, wallet: wallet, onSelectWallet: handleSelectWallet, error: showAddressError, helperText: showAddressError ? INVALID_WALLET_ADDRESS_MESSAGE : undefined }),
             isNewWalletAddress(wallet) && (React__default.createElement(React__default.Fragment, null,

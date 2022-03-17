@@ -14,7 +14,7 @@ const Select = (_a) => {
     const matches = useMediaQuery(theme.breakpoints.down('sm'));
     const selectOptions = matches ? [EMPTY_OPTION, ...options] : options;
     const mapOption = ({ value, label }) => matches ? (React__default.createElement("option", { key: label, value: value }, label)) : (React__default.createElement(MenuItem, { key: label, value: value }, label));
-    return (React__default.createElement(FormControl, { fullWidth: true, margin: "normal", variant: "filled", disabled: disabled, error: error },
+    return (React__default.createElement(FormControl, { fullWidth: true, margin: margin, variant: "filled", disabled: disabled, error: error },
         React__default.createElement(InputLabel, { required: required, htmlFor: id, disabled: disabled, shrink: true }, label),
         React__default.createElement(Select$1, Object.assign({}, props, { id: id, disabled: disabled, native: matches, IconComponent: SelectIcon, disableUnderline: true, autoComplete: props.autoComplete || props.name }), selectOptions.map(mapOption)),
         helperText && React__default.createElement(FormHelperText, null, helperText)));

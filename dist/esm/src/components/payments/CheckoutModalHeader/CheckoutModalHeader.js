@@ -6,6 +6,7 @@ import { NBSP } from '../../../utils/formatUtils.js';
 import { getFormattedUser } from './CheckoutModalHeader.utils.js';
 import React__default, { useRef, useCallback } from 'react';
 import { COUNTER_CLICKS_NEEDED, RESERVATION_COUNTDOWN_FROM_MIN, COUNTER_EXPIRATION_MS } from '../../../config/config.js';
+import { Img } from '../../shared/Img/Img.js';
 
 const CHECKOUT_MODAL_TITLE = {
     anonymous: "Checkout",
@@ -66,7 +67,7 @@ const CheckoutModalHeader = ({ variant, countdownElementRef, title: customTitle,
     return (React__default.createElement(Box, null,
         React__default.createElement(Stack, { spacing: 2, direction: "row", sx: { justifyContent: "space-between", alignItems: "center", py: 2 } },
             React__default.createElement(Typography, { variant: "h5", id: "checkout-modal-header-title" }, title),
-            React__default.createElement(Box, { component: "img", src: logoSrc, onClick: setDebug ? handleLogoClick : undefined, sx: Object.assign({ maxHeight: "32px", maxWidth: { xs: "180px", sm: "240px" } }, logoSx) })),
+            React__default.createElement(Img, { src: logoSrc, onClick: setDebug ? handleLogoClick : undefined, sx: Object.assign({ maxHeight: "32px", maxWidth: { xs: "180px", sm: "240px" } }, logoSx) })),
         React__default.createElement(Divider, null),
         showControls ? (React__default.createElement(React__default.Fragment, null,
             React__default.createElement(Stack, { spacing: 2, direction: "row", sx: { justifyContent: "space-between", alignItems: "center", py: 2 } },
