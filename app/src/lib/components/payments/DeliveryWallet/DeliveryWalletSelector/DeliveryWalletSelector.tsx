@@ -4,7 +4,7 @@ import { DisplayBox } from "../../DisplayBox/DisplayBox";
 import { InputGroupLabel } from "../../../shared/InputGroupLabel/InputGroupLabel";
 import { TextField } from "../../../shared/TextField/TextField";
 import { withInvalidErrorMessage } from "../../../../utils/validationUtils";
-import { isNewWalletAddress, isValidWalletAddress } from "../../../../domain/wallet/wallet.utils";
+import { isCustomWalletAddress, isValidWalletAddress } from "../../../../domain/wallet/wallet.utils";
 import { useCallback } from "react";
 import { WalletAddressSelector } from "../../../shared/Select/WalletAddressSelector/WalletAddressSelector";
 import { Wallet } from "../../../../domain/wallet/wallet.interfaces";
@@ -60,7 +60,7 @@ export const DeliveryWalletSelector: React.FC<DeliveryWalletSelectorProps> = ({
           error={ showAddressError }
           helperText={ showAddressError ? INVALID_WALLET_ADDRESS_MESSAGE : undefined } />
 
-        { isNewWalletAddress(wallet) && (<>
+        { isCustomWalletAddress(wallet) && (<>
           <Typography variant="body1" sx={{ my: 1.5 }}>
             Once minted, this is where your items will be delivered:
           </Typography>

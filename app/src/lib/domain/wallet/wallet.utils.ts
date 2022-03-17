@@ -17,7 +17,7 @@ export function isSpecialWalletAddressValue(walletAddress: string): boolean {
   return SPECIAL_ADDRESS_REGEXP.test(walletAddress);
 }
 
-export function isNewWalletAddress(wallet: null | string | Wallet) {
+export function isCustomWalletAddress(wallet: null | string | Wallet) {
   return typeof wallet === "string" && wallet !== NEW_WALLET_OPTION.value;
 }
 
