@@ -133,6 +133,7 @@ function useCheckoutModalState({ invoiceID: initialInvoiceID = null, productConf
     }, []);
     return {
         // CheckoutModalState:
+        startAt,
         checkoutStep,
         checkoutError,
         isDialogBlocked,

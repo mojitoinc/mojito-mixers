@@ -68,7 +68,7 @@ debug: initialDebug, onEvent, onError, onMarketingOptInChange, // Not implemente
     // Get everything related to Payment UI routing, error and state handling, including resuming Plaid / 3DS flows:
     const { 
     // CheckoutModalState:
-    checkoutStep, checkoutError, isDialogBlocked, setIsDialogBlocked, initModalState, goBack, goNext, goTo, setError, 
+    startAt, checkoutStep, checkoutError, isDialogBlocked, setIsDialogBlocked, initModalState, goBack, goNext, goTo, setError, 
     // SelectedPaymentMethod:
     selectedPaymentMethod, setSelectedPaymentMethod, 
     // PurchaseState:
@@ -170,8 +170,9 @@ debug: initialDebug, onEvent, onError, onMarketingOptInChange, // Not implemente
         });
     };
     React.useEffect(() => {
-        setTimeout(() => triggerAnalyticsEventRef.current(`navigate:${checkoutStep}`));
-    }, [checkoutStep]);
+        if (!isDialogInitializing)
+            setTimeout(() => triggerAnalyticsEventRef.current(`navigate:${checkoutStep}`));
+    }, [isDialogInitializing, checkoutStep]);
     // Saved payment method creation-reload-sync:
     React.useEffect(() => {
         if (savedPaymentMethods.length === 0)
@@ -409,7 +410,7 @@ debug: initialDebug, onEvent, onError, onMarketingOptInChange, // Not implemente
         // some other kind of indeterminate / incorrect state:
         return null;
     }
-    const headerElement = (React__default["default"].createElement(CheckoutModalHeader.CheckoutModalHeader, { variant: headerVariant, countdownElementRef: countdownElementRef, logoSrc: logoSrc, logoSx: logoSx, user: (_c = meData === null || meData === void 0 ? void 0 : meData.me) === null || _c === void 0 ? void 0 : _c.user, userFormat: userFormat, onLoginClicked: onLogin, onPrevClicked: checkoutStep === "authentication" ? handleClose : goBack, setDebug: setDebug }));
+    const headerElement = (React__default["default"].createElement(CheckoutModalHeader.CheckoutModalHeader, { variant: headerVariant, countdownElementRef: countdownElementRef, logoSrc: logoSrc, logoSx: logoSx, user: (_c = meData === null || meData === void 0 ? void 0 : meData.me) === null || _c === void 0 ? void 0 : _c.user, userFormat: userFormat, onLogin: onLogin, onClose: checkoutStep === startAt ? handleClose : undefined, onPrev: checkoutStep === startAt ? undefined : goBack, setDebug: setDebug }));
     return (React__default["default"].createElement(DictionaryProvider.DictionaryProvider, { dictionary: dictionary },
         React__default["default"].createElement(FullScreenOverlay.FullScreenOverlay, { centered: checkoutStep === "purchasing" || checkoutStep === "error", open: open, onClose: handleClose, isDialogBlocked: isDialogBlocked, contentKey: checkoutStep, header: headerElement, children: checkoutStepElement })));
 };

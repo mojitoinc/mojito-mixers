@@ -18,3 +18,4 @@ export type { CheckoutItem } from "./domain/product/product.interfaces";
 export type { CircleFieldErrorAt, CircleFieldErrors } from "./domain/circle/circle.utils";
 export type { PUIDictionary, PUIDictionaryKeys, PUIDictionarySingleLine, PUIDictionaryMultiLine } from "./domain/dictionary/dictionary.interfaces";
 export type { CheckoutEventType, CheckoutEventData } from "./domain/events/events.interfaces";
+export type { PalettePaymentUI } from "./domain/mui/mui.interfaces";

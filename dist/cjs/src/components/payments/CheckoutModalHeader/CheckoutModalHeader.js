@@ -6,6 +6,7 @@ var material = require('@mui/material');
 var PrimaryButton = require('../../shared/PrimaryButton/PrimaryButton.js');
 var OutlinedSecondaryButton = require('../../shared/OutlinedSecondaryButton/OutlinedSecondaryButton.js');
 var ChevronLeft = require('../../../../node_modules/@mui/icons-material/ChevronLeft.js');
+var Close = require('../../../../node_modules/@mui/icons-material/Close.js');
 var formatUtils = require('../../../utils/formatUtils.js');
 var CheckoutModalHeader_utils = require('./CheckoutModalHeader.utils.js');
 var React = require('react');
@@ -48,7 +49,7 @@ const COUNTDOWN_SX = {
     justifyContent: "flex-start",
     alignItems: "center",
 };
-const CheckoutModalHeader = ({ variant, countdownElementRef, title: customTitle, logoSrc, logoSx, user, userFormat, onLoginClicked, onPrevClicked, setDebug, }) => {
+const CheckoutModalHeader = ({ variant, countdownElementRef, title: customTitle, logoSrc, logoSx, user, userFormat, onLogin, onClose, onPrev, setDebug, }) => {
     const title = customTitle || CHECKOUT_MODAL_TITLE[variant] || formatUtils.NBSP;
     const displayUsername = CheckoutModalHeader_utils.getFormattedUser(variant, user, userFormat);
     const showControls = CHECKOUT_MODAL_CONTROLS[variant] || false;
@@ -79,11 +80,13 @@ const CheckoutModalHeader = ({ variant, countdownElementRef, title: customTitle,
         React__default["default"].createElement(material.Divider, null),
         showControls ? (React__default["default"].createElement(React__default["default"].Fragment, null,
             React__default["default"].createElement(material.Stack, { spacing: 2, direction: "row", sx: { justifyContent: "space-between", alignItems: "center", py: 2 } },
-                (variant === "anonymous" && onLoginClicked) ? (React__default["default"].createElement(React__default["default"].Fragment, null,
+                (variant === "anonymous" && onLogin) ? (React__default["default"].createElement(React__default["default"].Fragment, null,
                     React__default["default"].createElement(material.Typography, { sx: { fontWeight: "500" } }, "Already have an account?"),
-                    React__default["default"].createElement(PrimaryButton.PrimaryButton, { onClick: onLoginClicked }, "Log in"))) : null,
-                (variant !== "anonymous" && onPrevClicked && displayUsername) ? (React__default["default"].createElement(React__default["default"].Fragment, null,
-                    React__default["default"].createElement(OutlinedSecondaryButton.OutlinedSecondaryButton, { onClick: onPrevClicked },
+                    React__default["default"].createElement(PrimaryButton.PrimaryButton, { onClick: onLogin }, "Log in"))) : null,
+                (variant !== "anonymous" && displayUsername) ? (React__default["default"].createElement(React__default["default"].Fragment, null,
+                    onClose && React__default["default"].createElement(OutlinedSecondaryButton.OutlinedSecondaryButton, { onClick: onClose },
+                        React__default["default"].createElement(Close["default"], null)),
+                    onPrev && React__default["default"].createElement(OutlinedSecondaryButton.OutlinedSecondaryButton, { onClick: onPrev },
                         React__default["default"].createElement(ChevronLeft["default"], null)),
                     variant === "loggedIn" && countdownElementRef ? (React__default["default"].createElement(material.Typography, { sx: { fontWeight: "500" } },
                         "Time left: ",

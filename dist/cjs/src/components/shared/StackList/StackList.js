@@ -14,7 +14,7 @@ function StackList({ data, additionalProps: additionalPropsFn,
 // placeholderData,
 component: ItemComponent, itemKey: getItemKey, deps = [], }) {
     const renderedList = React.useMemo(() => {
-        return (React__default["default"].createElement(material.Stack, { component: "ol", spacing: 2 }, data.map((itemData, index) => {
+        return (React__default["default"].createElement(material.Stack, { component: "ol", spacing: 2, sx: { m: 0, p: 0, listStyle: "none" } }, data.map((itemData, index) => {
             const key = `${getItemKey(itemData, index)}`;
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore: This expression is not callable

@@ -45,6 +45,7 @@ export interface PurchaseState {
     paymentID: string;
 }
 export interface CheckoutModalStateReturn extends CheckoutModalState, PurchaseState {
+    startAt: CheckoutModalStep;
     initModalState: () => void;
     goBack: () => void;
     goNext: () => void;
