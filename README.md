@@ -129,11 +129,17 @@ Also, make sure you install the following dependencies:
 
 And also, keep in mind:
 
-`@emotion/styled` is needed as stated in [MUI's docs](https://mui.com/guides/interoperability/):
+- `@emotion/react` is not needed.
 
-  > ⚠️ Keep `@emotion/styled` as a dependency of your project. Even if you never use it explicitly, it's a peer dependency of `@mui/material`.
+- `@emotion/styled` is needed as stated in [MUI's docs](https://mui.com/guides/interoperability/):
 
-`@emotion/react` is not needed.
+    > Keep `@emotion/styled` as a dependency of your project. Even if you never use it explicitly, it's a peer dependency of `@mui/material`.
+
+- `styled-components` is needed as stated in [`react-payment-inputs`' docs](https://github.com/medipass/react-payment-inputs#using-the-built-in-styled-wrapper), but it's not used:
+
+    > Note: <PaymentInputsWrapper> requires styled-components to be installed as a dependency.
+    >
+    > By default, React Payment Inputs does not have built-in styling for it's inputs. However, React Payment Inputs comes with a styled wrapper which combines the card number, expiry & CVC fields...
 
 <br />
 
