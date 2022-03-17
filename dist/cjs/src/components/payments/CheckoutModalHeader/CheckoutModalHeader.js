@@ -10,6 +10,7 @@ var formatUtils = require('../../../utils/formatUtils.js');
 var CheckoutModalHeader_utils = require('./CheckoutModalHeader.utils.js');
 var React = require('react');
 var config = require('../../../config/config.js');
+var Img = require('../../shared/Img/Img.js');
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
@@ -74,7 +75,7 @@ const CheckoutModalHeader = ({ variant, countdownElementRef, title: customTitle,
     return (React__default["default"].createElement(material.Box, null,
         React__default["default"].createElement(material.Stack, { spacing: 2, direction: "row", sx: { justifyContent: "space-between", alignItems: "center", py: 2 } },
             React__default["default"].createElement(material.Typography, { variant: "h5", id: "checkout-modal-header-title" }, title),
-            React__default["default"].createElement(material.Box, { component: "img", src: logoSrc, onClick: setDebug ? handleLogoClick : undefined, sx: Object.assign({ maxHeight: "32px", maxWidth: { xs: "180px", sm: "240px" } }, logoSx) })),
+            React__default["default"].createElement(Img.Img, { src: logoSrc, onClick: setDebug ? handleLogoClick : undefined, sx: Object.assign({ maxHeight: "32px", maxWidth: { xs: "180px", sm: "240px" } }, logoSx) })),
         React__default["default"].createElement(material.Divider, null),
         showControls ? (React__default["default"].createElement(React__default["default"].Fragment, null,
             React__default["default"].createElement(material.Stack, { spacing: 2, direction: "row", sx: { justifyContent: "space-between", alignItems: "center", py: 2 } },

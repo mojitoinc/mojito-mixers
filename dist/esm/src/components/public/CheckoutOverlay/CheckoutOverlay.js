@@ -1,5 +1,5 @@
 import { __awaiter } from '../../../../node_modules/tslib/tslib.es6.js';
-import { Backdrop, Box, CircularProgress } from '@mui/material';
+import { Backdrop, CircularProgress } from '@mui/material';
 import React__default, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { transformRawSavedPaymentMethods, getSavedPaymentMethodAddressIdFromBillingInfo, savedPaymentMethodToBillingInfo } from '../../../domain/circle/circle.utils.js';
 import { useMeQuery, useGetPaymentMethodListQuery, useGetInvoiceDetailsQuery, useDeletePaymentMethodMutation, useReleaseReservationBuyNowLotMutation } from '../../../queries/graphqlGenerated.js';
@@ -21,6 +21,7 @@ import { useCheckoutItemsCostTotal } from '../../../hooks/useCheckoutItemCostTot
 import { DictionaryProvider } from '../../../providers/DictionaryProvider.js';
 import { THREEDS_REDIRECT_DELAY_MS } from '../../../config/config.js';
 import { NEW_WALLET_OPTION } from '../../../domain/wallet/wallet.constants.js';
+import { StatusIcon } from '../../shared/StatusIcon/StatusIcon.js';
 
 const PUICheckoutOverlay = ({ 
 // Modal:
@@ -365,12 +366,7 @@ debug: initialDebug, onEvent, onError, onMarketingOptInChange, // Not implemente
     if ((isDialogInitializing || isPlaidFlowLoading) && (checkoutStep !== "error")) {
         return (React__default.createElement(React__default.Fragment, null,
             isPlaidFlowLoading && React__default.createElement(PlaidFlow, { onSubmit: handlePlaidFlowCompleted }),
-            React__default.createElement(Backdrop, { open: open, onClick: handleClose }, loaderImageSrc ? (React__default.createElement(Box, { component: "img", src: loaderImageSrc, sx: {
-                    width: 196,
-                    height: 196,
-                    mx: "auto",
-                    mt: 5,
-                } })) : (React__default.createElement(CircularProgress, { color: "primary" })))));
+            React__default.createElement(Backdrop, { open: open, onClick: handleClose }, loaderImageSrc ? (React__default.createElement(StatusIcon, { variant: "loading", imgSrc: loaderImageSrc, sx: { mt: 5 } })) : (React__default.createElement(CircularProgress, { color: "primary" })))));
     }
     // Normal UI (steps / views):
     let headerVariant = isAuthenticated ? 'loggedIn' : 'guest';

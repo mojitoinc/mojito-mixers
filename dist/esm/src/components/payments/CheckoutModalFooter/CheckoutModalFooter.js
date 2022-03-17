@@ -8,6 +8,7 @@ import { ConsentText, CONSENT_ERROR_MESSAGE } from '../../shared/ConsentText/Con
 import { PrimaryButton } from '../../shared/PrimaryButton/PrimaryButton.js';
 import { LABELS_BY_VARIANT, ICONS_BY_VARIANT } from './CheckoutModalFooter.constants.js';
 import { useDictionary } from '../../../hooks/useDictionary.js';
+import { Img } from '../../shared/Img/Img.js';
 
 const CheckoutModalFooter = ({ variant, buttonLabel, guestCheckoutEnabled, consentType, onGoToCollection, submitDisabled, onSubmitClicked, onCloseClicked, }) => {
     // CONSENT:
@@ -94,7 +95,7 @@ const CheckoutModalFooter = ({ variant, buttonLabel, guestCheckoutEnabled, conse
             React__default.createElement(Box, { display: "flex" },
                 React__default.createElement(Typography, { sx: { maxWidth: SM_MOBILE_MAX_WIDTH, marginRight: 1 }, align: "center" }, "Payments powered by"),
                 React__default.createElement(Link, { href: "https://www.circle.com/en/", target: "_blank", rel: "noopener noreferrer" },
-                    React__default.createElement(Box, { component: "img", src: CIRCLE_LOGO_IMAGE_SRC, height: 20 })))))));
+                    React__default.createElement(Img, { src: CIRCLE_LOGO_IMAGE_SRC, height: 20 })))))));
 };
 
 export { CheckoutModalFooter };

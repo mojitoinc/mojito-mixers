@@ -1,4 +1,5 @@
 import { MD_BORDER_RADIUS, BORDER_THICKNESS } from './themeConstants.js';
+import { darkenBackground } from './themeUtils.js';
 
 /*
 declare module "@mui/material/TextField" {
@@ -7,8 +8,8 @@ declare module "@mui/material/TextField" {
   }
 }
 */
-function createComponentsTheme({ typography, palette, spacing, breakpoints }) {
-    var _a, _b, _c, _d;
+function createComponentsTheme({ typography, palette, spacing, breakpoints, transitions }) {
+    var _a, _b, _c, _d, _e, _f, _g;
     return {
         // FORMS:
         MuiFormLabel: {
@@ -170,17 +171,21 @@ function createComponentsTheme({ typography, palette, spacing, breakpoints }) {
                     }
                 },
                 containedPrimary: {
-                    background: ((_a = palette.gradients) === null || _a === void 0 ? void 0 : _a.action) || palette.primary.light,
-                    border: `${BORDER_THICKNESS}px solid ${palette.primary.main}`,
-                    color: palette.text.primary,
+                    background: ((_a = palette.paymentUI) === null || _a === void 0 ? void 0 : _a.mainButtonBackground) || palette.primary.main,
+                    border: `${(_c = (_b = palette.paymentUI) === null || _b === void 0 ? void 0 : _b.mainButtonBorderWidth) !== null && _c !== void 0 ? _c : BORDER_THICKNESS}px solid ${palette.primary.main}`,
+                    color: palette.primary.contrastText,
                     minWidth: "200px !important",
+                    transition: transitions.create(["background"]),
+                    "&:hover": {
+                        boxShadow: darkenBackground(((_d = palette.paymentUI) === null || _d === void 0 ? void 0 : _d.mainButtonBackground) || palette.primary.main),
+                    },
                 },
                 containedSecondary: {
                     background: palette.grey[100],
                     color: palette.grey[600],
                     // minWidth: 0,
                     "&:hover": {
-                        background: palette.grey[100],
+                        background: palette.grey[300],
                     },
                 },
                 outlined: {
@@ -201,6 +206,7 @@ function createComponentsTheme({ typography, palette, spacing, breakpoints }) {
                     minWidth: spacing(5.5),
                     border: 0,
                     borderRadius: MD_BORDER_RADIUS,
+                    transition: transitions.create(["background"]),
                     [breakpoints.up("sm")]: {
                         padding: spacing(0, 2),
                         minWidth: spacing(14),
@@ -209,10 +215,10 @@ function createComponentsTheme({ typography, palette, spacing, breakpoints }) {
                         minWidth: spacing(17),
                     },
                     "&.Mui-selected": {
-                        background: ((_b = palette.gradients) === null || _b === void 0 ? void 0 : _b.action) || palette.primary.light,
-                        color: palette.grey["800"],
+                        background: ((_e = palette.paymentUI) === null || _e === void 0 ? void 0 : _e.paymentMethodSelectorBackground) || palette.primary.main,
+                        color: palette.primary.contrastText,
                         "&:hover": {
-                            background: ((_c = palette.gradients) === null || _c === void 0 ? void 0 : _c.action) || palette.primary.light,
+                            background: darkenBackground(((_f = palette.paymentUI) === null || _f === void 0 ? void 0 : _f.paymentMethodSelectorBackground) || palette.primary.main),
                         },
                     },
                     "&:hover": {
@@ -224,7 +230,7 @@ function createComponentsTheme({ typography, palette, spacing, breakpoints }) {
         MuiToggleButtonGroup: {
             styleOverrides: {
                 root: {
-                    background: ((_d = palette.gradients) === null || _d === void 0 ? void 0 : _d.stepperReverse) || palette.primary.light,
+                    background: ((_g = palette.paymentUI) === null || _g === void 0 ? void 0 : _g.paymentMethodSelectorBorder) || palette.primary.main,
                     backgroundOrigin: "border-box",
                     border: `${BORDER_THICKNESS}px solid transparent`,
                     borderRadius: MD_BORDER_RADIUS + BORDER_THICKNESS,
