@@ -77,13 +77,8 @@ export const CheckoutItemCostTotal: React.FC<CheckoutItemCostTotalProps> = ({
     <Box sx={{ display: "flex", flexDirection: "column", mt: { xs: 3, sm: 0.5 } }}>
       { withDetails && (<>
         <Box sx={ ROW_SX }>
-          <Typography>Your purchase</Typography>
+          <Typography>Subtotal</Typography>
           <Typography><Number suffix=" USD">{ total }</Number></Typography>
-        </Box>
-
-        <Box sx={ ROW_SX }>
-          <Typography sx={(theme) => ({ color: theme.palette.grey["500"] })}>Taxes { taxRateElement }</Typography>
-          <Typography>{ taxAmountElement }</Typography>
         </Box>
 
         { fees === null ? null : (
@@ -92,12 +87,17 @@ export const CheckoutItemCostTotal: React.FC<CheckoutItemCostTotalProps> = ({
             <Typography><Number suffix=" USD">{fees}</Number></Typography>
           </Box>
         ) }
-      </>)}
+
+        <Box sx={ ROW_SX }>
+          <Typography sx={(theme) => ({ color: theme.palette.grey["500"] })}>Taxes { taxRateElement }</Typography>
+          <Typography>{ taxAmountElement }</Typography>
+        </Box>
+      </>) }
 
       <Box
         sx={{
           display: "flex",
-          mt: 3,
+          mt: 1,
           flex: 1,
           justifyContent: "space-between",
           alignItems: "center",

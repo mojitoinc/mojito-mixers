@@ -207,7 +207,7 @@ export function createComponentsTheme({ typography, palette, spacing, breakpoint
           transition: transitions.create(["background"]),
 
           "&:hover": {
-            boxShadow: darkenBackground(palette.paymentUI?.mainButtonBackground || palette.primary.main),
+            background: darkenBackground(palette.paymentUI?.mainButtonBackground || palette.primary.main),
           },
         },
         containedSecondary: {

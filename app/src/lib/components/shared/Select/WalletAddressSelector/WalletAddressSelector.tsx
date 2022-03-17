@@ -6,7 +6,7 @@ import {
 } from "../../Select/Select";
 import { SelectChangeEvent } from "@mui/material/Select";
 import { Wallet } from "../../../../domain/wallet/wallet.interfaces";
-import { isNewWalletAddress, isSpecialWalletAddressValue } from "../../../../domain/wallet/wallet.utils";
+import { isCustomWalletAddress, isSpecialWalletAddressValue } from "../../../../domain/wallet/wallet.utils";
 import { CUSTOM_WALLET_OPTION, NEW_WALLET_OPTION } from "../../../../domain/wallet/wallet.constants";
 
 const mapWalletAddressToSelectOption = (wallet: Wallet) => ({
@@ -90,7 +90,7 @@ export const WalletAddressSelector: React.FC<WalletAddressSelectorProps> = ({
     : (wallet?.id || NEW_WALLET_OPTION.value);
 
   const disabled = parentDisabled || wallets === undefined || wallet === null;
-  const showError = !isNewWalletAddress(wallet);
+  const showError = !isCustomWalletAddress(wallet);
 
   return (
     <Select

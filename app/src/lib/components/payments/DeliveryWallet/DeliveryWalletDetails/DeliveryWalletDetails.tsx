@@ -5,6 +5,7 @@ import { ReadOnlyWalletAddress } from "../../../shared/ReadOnlyField/ReadOnlyFie
 import React from "react";
 import { Wallet } from "../../../../domain/wallet/wallet.interfaces";
 import { useDictionary } from "../../../../hooks/useDictionary";
+import { filterSpecialWalletAddressValues } from "../../../../domain/wallet/wallet.utils";
 
 export interface DeliveryWalletDetailsProps {
   wallet: null | string | Wallet;
@@ -13,7 +14,7 @@ export const DeliveryWalletDetails: React.FC<DeliveryWalletDetailsProps> = ({
   wallet,
 }) => {
   const dictionary = useDictionary();
-  const walletAddress = (typeof wallet === "object" ? wallet?.address : wallet) || "";
+  const walletAddress = (typeof wallet === "object" ? wallet?.address : filterSpecialWalletAddressValues(wallet)) || "";
   const isMultiSig = typeof wallet === "object" || !walletAddress;
 
   return (
