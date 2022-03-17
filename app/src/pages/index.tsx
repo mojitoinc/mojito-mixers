@@ -171,16 +171,19 @@ const HomePage: React.FC = () => {
     // theme: PLAYGROUND_THEMES[formValues.theme],
 
     themeOptions: {
+      // Reference App (https://github.com/mojitoinc/mojito-reference-app/) palette:
       palette: {
         primary: {
-          main: "#FF00FF",
+          // main: "#FF00FF", // Magenta
+          // contrastText: "#FFFFFF",
         },
 
-        gradients: {
-          stepper: "#FF00FF", // magenta
-          stepperReverse: "#FF0000", // red
-          action: "#00FFFF", // cyan
-          actionReverse: "#FF00FF", // magenta
+        paymentUI: {
+          // progressBar: "", // Use primary as fallback.
+          // paymentMethodSelectorBorder: "", // Use primary as fallback.
+          // paymentMethodSelectorBackground: "", // Use primary as fallback.
+          // mainButtonBackground: "", // Use primary as fallback.
+          // mainButtonBorderWidth: 0,
         },
       },
     },

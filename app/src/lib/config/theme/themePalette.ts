@@ -2,35 +2,43 @@ import { PaletteOptions } from "@mui/material/styles";
 import mergeOptions from "merge-options";
 
 const MOJITO_LIGHT_PALETTE: PaletteOptions = {
+
   background: {
     default: "#FFFFFF",
     paper: "#FFFFFF",
   },
 
   primary: {
+    // Input borders when focused, focused select options background (lighter shade), link underline:
     main: "#64C538",
+
+    // Primary button text (which might use a gradient background from below anyway):
+    contrastText: "#000000",
   },
 
   text: {
+    // Main text color used for most of the texts we use:
     primary: "#000000",
-    secondary: "#FF0000",
+
+    // Not used:
+    secondary: "#000000",
+
+    // Disabled text (used in disabled inputs):
     disabled: "#D9D9D9",
   },
 
-  gradients: {
-    stepper: "linear-gradient(to right, #FFC7C7 -3%, #98DF77 47%, #41AD46 100%)",
-    stepperReverse: "linear-gradient(to left, #FFC7C7 -3%, #98DF77 47%, #41AD46 100%)",
-    // Simplified gradients:
-    action: "linear-gradient(272.88deg, #FFC5C5 -97.9%, #98DF77 123.11%)",
-    actionReverse: "linear-gradient(272.88deg, #FFC5C5 -97.9%, #98DF77 123.11%)",
-    // Original gradients (Figma):
-    // action: "linear-gradient(to right, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1)), linear-gradient(272.88deg, #FFC5C5 -97.9%, #98DF77 123.11%)",
-    // actionReverse: "linear-gradient(to left, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1)), linear-gradient(272.88deg, #FFC5C5 -97.9%, #98DF77 123.11%)",
+  paymentUI: {
+    progressBar: "linear-gradient(to right, #FFC7C7 -3%, #98DF77 47%, #41AD46 100%)",
+    paymentMethodSelectorBorder: "linear-gradient(to left, #FFC7C7 -3%, #98DF77 47%, #41AD46 100%)",
+    paymentMethodSelectorBackground: "linear-gradient(272.88deg, #FFC5C5 -97.9%, #98DF77 123.11%)",
+    mainButtonBackground: "linear-gradient(272.88deg, #FFC5C5 -97.9%, #98DF77 123.11%)",
   },
+
   info: {
     main: "#0A96B4",
     light: "#55E0FF66",
   },
+
   success: {
     main: "#31A136",
     light: "#E5F2E5",
@@ -75,6 +83,7 @@ const MOJITO_LIGHT_PALETTE: PaletteOptions = {
     // Address box text and primary button text:
     "800": "#292929",
   },
+
 };
 
 // TODO: Not implemented:
