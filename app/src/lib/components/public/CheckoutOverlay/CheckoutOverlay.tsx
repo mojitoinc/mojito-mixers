@@ -156,6 +156,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
 
   const {
     // CheckoutModalState:
+    startAt,
     checkoutStep,
     checkoutError,
     isDialogBlocked,
@@ -719,8 +720,9 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
       logoSx={ logoSx }
       user={ meData?.me?.user }
       userFormat={ userFormat }
-      onLoginClicked={ onLogin }
-      onPrevClicked={ checkoutStep === "authentication" ? handleClose : goBack }
+      onLogin={ onLogin }
+      onClose={ checkoutStep === startAt ? handleClose : undefined }
+      onPrev={ checkoutStep === startAt ? undefined : goBack }
       setDebug={ setDebug } />
   );
 

@@ -1,7 +1,6 @@
-import styled from "styled-components";
+import { Typography } from "@mui/material";
+import React from "react";
 
-const GlobalLoaderStyled = styled.div``;
-
-export function GlobalLoader() {
-  return <GlobalLoaderStyled>Loading...</GlobalLoaderStyled>;
+export const GlobalLoader: React.FC = () => {
+  return <Typography variant="body2">Loading...</Typography>;
 }

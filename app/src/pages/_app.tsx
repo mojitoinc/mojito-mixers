@@ -1,12 +1,14 @@
 import App, { AppContext } from "next/app";
 import { Auth0Provider } from "@auth0/auth0-react";
-import { GlobalLayout } from "../components/core/GlobalLayout";
 import { config } from "../utils/config/config.constants";
 import { AppProps } from "next/app";
 import { Header } from "../components/core/Header";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import Head from "next/head";
 import { AuthorizedApolloProvider } from "../lib/components/shared/AuthorizedApolloProvider/AuthorizedApolloProvider";
+import { GlobalStyles } from "@mui/material";
+import { GLOBAL_STYLES } from "../components/core/global-styles.constants";
+import { Container } from "../components/core/Container";
 
 const defaultTheme = createTheme();
 
@@ -25,10 +27,13 @@ function MyApp({ Component, pageProps }: AppProps) {
 
       <AuthorizedApolloProvider uri={ `${ config.API_HOSTNAME }/query` }>
         <ThemeProvider theme={ defaultTheme }>
-          <GlobalLayout>
+          <GlobalStyles styles={ GLOBAL_STYLES } />
+
+          <Container>
             <Header />
             <Component { ...pageProps } />
-          </GlobalLayout>
+          </Container>
+
         </ThemeProvider>
       </AuthorizedApolloProvider>
     </Auth0Provider>

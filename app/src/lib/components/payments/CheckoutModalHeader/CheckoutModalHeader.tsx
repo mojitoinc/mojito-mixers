@@ -3,6 +3,7 @@ import { Theme, SxProps } from "@mui/material/styles";
 import { PrimaryButton } from "../../shared/PrimaryButton/PrimaryButton";
 import { OutlinedSecondaryButton } from "../../shared/OutlinedSecondaryButton/OutlinedSecondaryButton";
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import CloseIcon from '@mui/icons-material/Close';
 import { NBSP } from "../../../utils/formatUtils";
 import { UserFormat } from "../../../domain/auth/authentication.interfaces";
 import { getFormattedUser } from "./CheckoutModalHeader.utils";
@@ -39,8 +40,9 @@ export interface CheckoutModalHeaderProps {
   logoSx?: SxProps<Theme>;
   user?: User;
   userFormat?: UserFormat;
-  onLoginClicked?: () => void;
-  onPrevClicked?: () => void;
+  onLogin?: () => void;
+  onClose?: () => void;
+  onPrev?: () => void;
   setDebug?: Dispatch<SetStateAction<boolean>>;
 }
 
@@ -70,8 +72,9 @@ export const CheckoutModalHeader: React.FC<CheckoutModalHeaderProps> = ({
   logoSx,
   user,
   userFormat,
-  onLoginClicked,
-  onPrevClicked,
+  onLogin,
+  onClose,
+  onPrev,
   setDebug,
 }) => {
   const title = customTitle || CHECKOUT_MODAL_TITLE[variant] || NBSP;
@@ -123,13 +126,14 @@ export const CheckoutModalHeader: React.FC<CheckoutModalHeaderProps> = ({
 
       { showControls ? (<>
         <Stack spacing={ 2 } direction="row" sx={{ justifyContent: "space-between", alignItems: "center", py: 2 }}>
-          { (variant === "anonymous"  && onLoginClicked) ? (<>
+          { (variant === "anonymous"  && onLogin) ? (<>
               <Typography sx={{ fontWeight: "500" }}>Already have an account?</Typography>
-              <PrimaryButton onClick={ onLoginClicked }>Log in</PrimaryButton>
+              <PrimaryButton onClick={ onLogin }>Log in</PrimaryButton>
           </>) : null }
 
-          { (variant !== "anonymous" && onPrevClicked && displayUsername) ? (<>
-              <OutlinedSecondaryButton onClick={ onPrevClicked }><ChevronLeftIcon /></OutlinedSecondaryButton>
+          { (variant !== "anonymous" && displayUsername) ? (<>
+              { onClose && <OutlinedSecondaryButton onClick={ onClose }><CloseIcon /></OutlinedSecondaryButton> }
+              { onPrev && <OutlinedSecondaryButton onClick={ onPrev }><ChevronLeftIcon /></OutlinedSecondaryButton> }
               { variant === "loggedIn" && countdownElementRef ? (
                 <Typography sx={{ fontWeight: "500" }}>
                   Time left: { " " }

@@ -1,4 +1,3 @@
-import { ViewContainer } from "../../components/core/ViewContainer";
 import { useState } from "react";
 import styled from "styled-components";
 import { CreatePayment } from "./CreatePayment";
@@ -64,16 +63,15 @@ const NavMenu: React.FC<NavMenuProps> = ({
 export const PaymentView: React.FC = () => {
   const [menuTab, setMenuTab] = useState("create");
 
-  return (
-    <ViewContainer>
+  return (<>
       <NavMenu setMenuTab={setMenuTab} activeTab={menuTab} />
-      {menuTab === "create" ? (
+
+      { menuTab === "create" ? (
         <CreatePayment />
       ) : menuTab === "charge" ? (
         <ChargeCard />
       ) : (
         <Invoices />
-      )}
-    </ViewContainer>
-  );
+      ) }
+  </>);
 };
