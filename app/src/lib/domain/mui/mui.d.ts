@@ -1,23 +1,13 @@
 import "@mui/material/styles";
+import { PalettePaymentUI } from "./mui.interfaces";
 
 declare module "@mui/material/styles" {
+
   interface Palette {
-    paymentUI?: {
-      progressBar?: string;
-      paymentMethodSelectorBorder?: string;
-      paymentMethodSelectorBackground?: string;
-      mainButtonBackground?: string;
-      mainButtonBorderWidth?: number;
-    };
+    paymentUI?: PalettePaymentUI;
   }
 
   interface PaletteOptions {
-    paymentUI?: {
-      progressBar?: string;
-      paymentMethodSelectorBorder?: string;
-      paymentMethodSelectorBackground?: string;
-      mainButtonBackground?: string;
-      mainButtonBorderWidth?: number;
-    };
+    paymentUI?: PalettePaymentUI;
   }
 }

@@ -427,9 +427,24 @@ The debug mode will, among logging/displaying some other less relevant pieces of
 
 ## TypeScript Support
 
-You will have to copy the following file into your project to avoid TypeScript errors when using custom props in MUI's theme:
+You will have to add the following file into your project to avoid TypeScript errors when using custom props in MUI's theme:
 
-[`app/src/lib/domain/mui/mui.d.ts`](./app/src/lib/domain/mui/mui.d.ts).
+```TSX
+import "@mui/material/styles";
+import { PalettePaymentUI } from "@mojitoinc/mojito-mixers";
+
+declare module "@mui/material/styles" {
+  interface Palette {
+    paymentUI?: PalettePaymentUI;
+  }
+
+  interface PaletteOptions {
+    paymentUI?: PalettePaymentUI;
+  }
+}
+```
+
+You can see an example here: [`app/src/lib/domain/mui/mui.d.ts`](./app/src/lib/domain/mui/mui.d.ts)
 
 <br />
 
