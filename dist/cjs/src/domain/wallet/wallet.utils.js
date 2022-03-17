@@ -16,7 +16,7 @@ function isValidWalletAddress(wallet) {
 function isSpecialWalletAddressValue(walletAddress) {
     return SPECIAL_ADDRESS_REGEXP.test(walletAddress);
 }
-function isNewWalletAddress(wallet) {
+function isCustomWalletAddress(wallet) {
     return typeof wallet === "string" && wallet !== wallet_constants.NEW_WALLET_OPTION.value;
 }
 function filterSpecialWalletAddressValues(walletAddress) {
@@ -26,7 +26,7 @@ function filterSpecialWalletAddressValues(walletAddress) {
 exports.ADDRESS_REGEXP = ADDRESS_REGEXP;
 exports.SPECIAL_ADDRESS_REGEXP = SPECIAL_ADDRESS_REGEXP;
 exports.filterSpecialWalletAddressValues = filterSpecialWalletAddressValues;
-exports.isNewWalletAddress = isNewWalletAddress;
+exports.isCustomWalletAddress = isCustomWalletAddress;
 exports.isSpecialWalletAddressValue = isSpecialWalletAddressValue;
 exports.isValidWalletAddress = isValidWalletAddress;
 //# sourceMappingURL=wallet.utils.js.map

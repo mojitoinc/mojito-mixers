@@ -177,7 +177,7 @@ function createComponentsTheme({ typography, palette, spacing, breakpoints, tran
                     minWidth: "200px !important",
                     transition: transitions.create(["background"]),
                     "&:hover": {
-                        boxShadow: darkenBackground(((_d = palette.paymentUI) === null || _d === void 0 ? void 0 : _d.mainButtonBackground) || palette.primary.main),
+                        background: darkenBackground(((_d = palette.paymentUI) === null || _d === void 0 ? void 0 : _d.mainButtonBackground) || palette.primary.main),
                     },
                 },
                 containedSecondary: {
