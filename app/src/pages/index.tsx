@@ -204,8 +204,8 @@ const HomePage: React.FC = () => {
 
 
     dictionary: {
-      privacyHref: "https://mojito.xyz/",
-      termsOfUseHref: "https://mojito.xyz/",
+      privacyHref: PLAYGROUND_PRIVACY_HREF,
+      termsOfUseHref: PLAYGROUND_TERMS_OF_USE_HREF,
     },
 
     // Legal:

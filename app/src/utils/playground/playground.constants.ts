@@ -59,6 +59,9 @@ export const PLAYGROUND_ERROR_IMAGE_SRC = "https://media0.giphy.com/media/TqiwHb
 
 export const PLAYGROUND_USER_FORMAT: UserFormat = "email";
 
+export const PLAYGROUND_PRIVACY_HREF = "https://mojito.xyz";
+
+export const PLAYGROUND_TERMS_OF_USE_HREF = "https://mojito.xyz";
 
 // Data
 
