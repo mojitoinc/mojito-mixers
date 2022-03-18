@@ -63,7 +63,6 @@ export const PLAYGROUND_PRIVACY_HREF = "https://mojito.xyz";
 
 export const PLAYGROUND_TERMS_OF_USE_HREF = "https://mojito.xyz";
 
-
 // Data
 
 export const PLAYGROUND_MOCKED_BUY_NOW_LOT: CheckoutItemInfo = {

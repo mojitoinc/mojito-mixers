@@ -21,6 +21,7 @@ import { TaxesMessagesBox } from "../components/shared/TaxesMessagesBox/TaxesMes
 import { TaxesState } from "../views/Billing/BillingView";
 import { FormErrorsBox } from "../components/shared/FormErrorsBox/FormErrorsBox";
 import { formatPhoneAsE123, getPhonePrefix, phoneHasPrefix } from "../domain/circle/circle.utils";
+import { ConsentType } from "../components/shared/ConsentText/ConsentText";
 
 const FULL_NAME_FIELD = "fullName";
 const EMAIL_FIELD = "email";
@@ -143,6 +144,7 @@ export interface BillingInfoFormProps {
   onClose: () => void;
   onSubmit: (data: BillingInfo) => void;
   onAttemptSubmit: () => void;
+  consentType?: ConsentType;
   debug?: boolean;
 }
 
@@ -156,7 +158,8 @@ export const BillingInfoForm: React.FC<BillingInfoFormProps> = ({
   onClose,
   onSubmit,
   onAttemptSubmit,
-  debug
+  consentType,
+  debug,
 }) => {
   const {
     control,
@@ -310,6 +313,7 @@ export const BillingInfoForm: React.FC<BillingInfoFormProps> = ({
 
       <CheckoutModalFooter
         variant="toPayment"
+        consentType={ consentType }
         buttonLabel={ taxesStatus === "loading" ? "Calculating taxes..." : undefined }
         submitDisabled={ taxesStatus === "loading" }
         onCloseClicked={onClose} />

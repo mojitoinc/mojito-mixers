@@ -19,6 +19,8 @@ export const ConsentText: React.FC<ConsentTextProps> = ({
     termsOfUseHref ? <Link color="text.primary" href={ termsOfUseHref } target="_blank">Terms of Use</Link> : null,
   ].filter(Boolean);
 
+  if (linkElements.length === 0) linkElements.push(<>Terms of Use</>);
+
   const lastLinkElementsIndex = linkElements.length - 1;
 
   return (<>

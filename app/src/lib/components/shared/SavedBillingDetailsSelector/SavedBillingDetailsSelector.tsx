@@ -10,6 +10,7 @@ import { alpha, Box, CircularProgress } from "@mui/material";
 import { OVERLAY_OPACITY } from "../../../config/theme/themeConstants";
 import { TaxesState } from "../../../views/Billing/BillingView";
 import { TaxesMessagesBox } from "../TaxesMessagesBox/TaxesMessagesBox";
+import { ConsentType } from "../ConsentText/ConsentText";
 
 export interface SavedBillingDetailsSelectorProps {
   showLoader: boolean;
@@ -23,6 +24,7 @@ export interface SavedBillingDetailsSelectorProps {
   onNext: () => void;
   onClose: () => void;
   onAttemptSubmit: () => void;
+  consentType?: ConsentType;
 }
 
 export const SavedBillingDetailsSelector: React.FC<SavedBillingDetailsSelectorProps> = ({
@@ -37,6 +39,7 @@ export const SavedBillingDetailsSelector: React.FC<SavedBillingDetailsSelectorPr
   onNext,
   onClose,
   onAttemptSubmit,
+  consentType,
 }) => {
   const getPaymentMethodAddressId = useCallback((savedPaymentMethod: SavedPaymentMethod) => savedPaymentMethod.addressId, []);
 
@@ -87,6 +90,7 @@ export const SavedBillingDetailsSelector: React.FC<SavedBillingDetailsSelectorPr
 
     <CheckoutModalFooter
       variant="toPayment"
+      consentType={ consentType }
       buttonLabel={ taxes.status === "loading" ? "Calculating taxes..." : undefined }
       submitDisabled={ taxes.status !== "complete" }
       onSubmitClicked={ handleNextClicked }
