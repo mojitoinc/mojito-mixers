@@ -265,8 +265,8 @@ function useReleaseReservationBuyNowLotMutation(baseOptions) {
     return Apollo.useMutation(ReleaseReservationBuyNowLotDocument, options);
 }
 const GetInvoiceDetailsDocument = gql `
-    query GetInvoiceDetails($invoiceID: UUID1!, $orgID: UUID1!) {
-  getInvoiceDetails(invoiceID: $invoiceID, orgID: $orgID) {
+    query GetInvoiceDetails($invoiceID: UUID1!) {
+  getInvoiceDetails(invoiceID: $invoiceID) {
     items {
       destinationAddress
       units
@@ -290,7 +290,6 @@ const GetInvoiceDetailsDocument = gql `
  * const { data, loading, error } = useGetInvoiceDetailsQuery({
  *   variables: {
  *      invoiceID: // value for 'invoiceID'
- *      orgID: // value for 'orgID'
  *   },
  * });
  */

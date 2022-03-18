@@ -12,7 +12,6 @@ var StatusIcon = require('../../components/shared/StatusIcon/StatusIcon.js');
 var graphqlGenerated = require('../../queries/graphqlGenerated.js');
 var CheckoutOverlay_utils = require('../../components/public/CheckoutOverlay/CheckoutOverlay.utils.js');
 var config = require('../../config/config.js');
-var url_utils = require('../../domain/url/url.utils.js');
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
@@ -82,7 +81,8 @@ const PurchasingView = ({ purchasingImageSrc, purchasingMessages: customPurchasi
         if (!hasWaited || redirectURL === "" || purchaseSuccessHandledRef.current)
             return;
         purchaseSuccessHandledRef.current = true;
-        if (redirectURL && !url_utils.isLocalhost()) {
+        const skipRedirect = config.DEV_SKIP_3DS_IN_LOCALHOST ;
+        if (redirectURL && !skipRedirect) {
             CheckoutOverlay_utils.persistCheckoutModalInfo({
                 invoiceID,
                 circlePaymentID,
@@ -91,7 +91,7 @@ const PurchasingView = ({ purchasingImageSrc, purchasingMessages: customPurchasi
                 paymentInfo,
             });
         }
-        onPurchaseSuccess(circlePaymentID, paymentID, url_utils.isLocalhost() ? "" : (redirectURL || ""));
+        onPurchaseSuccess(circlePaymentID, paymentID, (redirectURL || ""));
     }, [
         fullPaymentState,
         hasWaited,
