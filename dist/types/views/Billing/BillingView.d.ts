@@ -4,6 +4,7 @@ import { CheckoutItem } from "../../domain/product/product.interfaces";
 import { BillingInfo } from "../../forms/BillingInfoForm";
 import { CheckoutModalError } from "../../components/public/CheckoutOverlay/CheckoutOverlay.hooks";
 import { Wallet } from "../../domain/wallet/wallet.interfaces";
+import { ConsentType } from "../../components/shared/ConsentText/ConsentText";
 export declare type TaxStatus = "incomplete" | "loading" | "complete" | "error";
 export interface TaxesState {
     status: TaxStatus;
@@ -23,6 +24,7 @@ export interface BillingViewProps {
     onWalletChange: (wallet: null | string | Wallet) => void;
     onNext: () => void;
     onClose: () => void;
+    consentType?: ConsentType;
     debug?: boolean;
 }
 export declare const BillingView: React.FC<BillingViewProps>;

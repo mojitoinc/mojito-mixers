@@ -109,7 +109,7 @@ const schema = object()
 }).required();
 const BillingInfoForm = ({ 
 // variant,
-defaultValues, checkoutError, taxes, onTaxInfoChange, onSaved, onClose, onSubmit, onAttemptSubmit, debug }) => {
+defaultValues, checkoutError, taxes, onTaxInfoChange, onSaved, onClose, onSubmit, onAttemptSubmit, consentType, debug, }) => {
     const { control, handleSubmit, watch, setError, formState, } = useForm({
         defaultValues: Object.assign(Object.assign({}, EMPTY_FORM_VALUES), defaultValues),
         reValidateMode: "onChange",
@@ -169,7 +169,7 @@ defaultValues, checkoutError, taxes, onTaxInfoChange, onSaved, onClose, onSubmit
             JSON.stringify(watch(), null, 2),
             "\n\n",
             JSON.stringify(formState.errors, null, 2))),
-        React__default.createElement(CheckoutModalFooter, { variant: "toPayment", buttonLabel: taxesStatus === "loading" ? "Calculating taxes..." : undefined, submitDisabled: taxesStatus === "loading", onCloseClicked: onClose })));
+        React__default.createElement(CheckoutModalFooter, { variant: "toPayment", consentType: consentType, buttonLabel: taxesStatus === "loading" ? "Calculating taxes..." : undefined, submitDisabled: taxesStatus === "loading", onCloseClicked: onClose })));
 };
 
 export { BillingInfoForm };
