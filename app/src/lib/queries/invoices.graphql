@@ -32,8 +32,8 @@ mutation ReleaseReservationBuyNowLot($orgID: UUID1!, $invoiceID: UUID1!) {
   releaseReservation(orgID: $orgID, invoiceID: $invoiceID)
 }
 
-query GetInvoiceDetails($invoiceID: UUID1!, $orgID: UUID1!) {
-  getInvoiceDetails(invoiceID: $invoiceID, orgID: $orgID) {
+query GetInvoiceDetails($invoiceID: UUID1!) {
+  getInvoiceDetails(invoiceID: $invoiceID) {
     items {
       destinationAddress
       units
