@@ -15,6 +15,7 @@ import { TaxQuoteOutput, useGetTaxQuoteLazyQuery } from "../../queries/graphqlGe
 import { useCheckoutItemsCostTotal } from "../../hooks/useCheckoutItemCostTotal";
 import { useThrottledCallback } from "@swyg/corre";
 import { Wallet } from "../../domain/wallet/wallet.interfaces";
+import { ConsentType } from "../../components/shared/ConsentText/ConsentText";
 
 export type TaxStatus = "incomplete" | "loading" | "complete" | "error";
 
@@ -43,6 +44,7 @@ export interface BillingViewProps {
   onWalletChange: (wallet: null | string | Wallet) => void;
   onNext: () => void;
   onClose: () => void;
+  consentType?: ConsentType;
   debug?: boolean;
 }
 
@@ -59,6 +61,7 @@ export const BillingView: React.FC<BillingViewProps> = ({
   onWalletChange,
   onNext,
   onClose,
+  consentType,
   debug,
 }) => {
   const savedPaymentMethodAddressIdRef = useRef<string>("");
@@ -234,7 +237,8 @@ export const BillingView: React.FC<BillingViewProps> = ({
               onPick={ onBillingInfoSelected }
               onNext={ onNext }
               onClose={ onClose }
-              onAttemptSubmit={ handleFormAttemptSubmit } />
+              onAttemptSubmit={ handleFormAttemptSubmit }
+              consentType={ consentType === "checkbox" ? undefined : consentType } />
           ) : (
             <BillingInfoForm
               // variant="loggedIn"
@@ -246,6 +250,7 @@ export const BillingView: React.FC<BillingViewProps> = ({
               onClose={ onClose }
               onSubmit={ handleSubmit }
               onAttemptSubmit={ handleFormAttemptSubmit }
+              consentType={ consentType === "checkbox" ? undefined : consentType }
               debug={ debug } />
           ) }
       </Stack>

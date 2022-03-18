@@ -651,6 +651,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
         onWalletChange={ setWalletAddress }
         onNext={ goNext }
         onClose={ handleClose }
+        consentType={ consentType }
         debug={ debug } />
     );
   } else if (checkoutStep === "payment") {

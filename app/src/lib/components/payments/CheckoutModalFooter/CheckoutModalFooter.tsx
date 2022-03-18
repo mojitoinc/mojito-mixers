@@ -28,6 +28,8 @@ export interface CheckoutModalFooterProps {
   onCloseClicked?: () => void;
 }
 
+const VARIANTS_WITH_DISCLAIMER: CheckoutModalFooterVariant[] = ["toPayment", "toPlaid", "toConfirmation"]
+
 export const CheckoutModalFooter: React.FC<CheckoutModalFooterProps> = ({
   variant,
   buttonLabel,
@@ -40,7 +42,7 @@ export const CheckoutModalFooter: React.FC<CheckoutModalFooterProps> = ({
 }) => {
   // CONSENT:
   const { privacyHref, termsOfUseHref } = useDictionary();
-  const showConsent = consentType && (privacyHref || termsOfUseHref) && (variant === "toConfirmation" || variant === "toPlaid");
+  const showConsent = consentType && VARIANTS_WITH_DISCLAIMER.includes(variant);
   const consentTextElement = showConsent ? <ConsentText privacyHref={privacyHref} termsOfUseHref={termsOfUseHref} /> : null;
 
   const [{
@@ -165,7 +167,7 @@ export const CheckoutModalFooter: React.FC<CheckoutModalFooterProps> = ({
         <Divider sx={{ my: 5, width: "100%" }} />
 
         <Typography sx={{ maxWidth: SM_MOBILE_MAX_WIDTH }} align="center">
-          By placing an order you affirm that you {consentTextElement}.
+          By placing an order you affirm that you {consentTextElement}
         </Typography>
       </>)}
 
