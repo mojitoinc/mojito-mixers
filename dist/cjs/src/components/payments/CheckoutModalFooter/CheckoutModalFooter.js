@@ -18,10 +18,11 @@ function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'defau
 
 var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 
+const VARIANTS_WITH_DISCLAIMER = ["toPayment", "toPlaid", "toConfirmation"];
 const CheckoutModalFooter = ({ variant, buttonLabel, guestCheckoutEnabled, consentType, onGoToCollection, submitDisabled, onSubmitClicked, onCloseClicked, }) => {
     // CONSENT:
     const { privacyHref, termsOfUseHref } = useDictionary.useDictionary();
-    const showConsent = consentType && (privacyHref || termsOfUseHref) && (variant === "toConfirmation" || variant === "toPlaid");
+    const showConsent = consentType && VARIANTS_WITH_DISCLAIMER.includes(variant);
     const consentTextElement = showConsent ? React__default["default"].createElement(ConsentText.ConsentText, { privacyHref: privacyHref, termsOfUseHref: termsOfUseHref }) : null;
     const [{ isFormSubmitted, isFormLoading, isConsentChecked, }, setConsentState] = React.useState({
         isFormSubmitted: false,
@@ -96,8 +97,7 @@ const CheckoutModalFooter = ({ variant, buttonLabel, guestCheckoutEnabled, conse
             React__default["default"].createElement(material.Divider, { sx: { my: 5, width: "100%" } }),
             React__default["default"].createElement(material.Typography, { sx: { maxWidth: themeConstants.SM_MOBILE_MAX_WIDTH }, align: "center" },
                 "By placing an order you affirm that you ",
-                consentTextElement,
-                "."))),
+                consentTextElement))),
         showConsent && consentType === "circle" && (React__default["default"].createElement(React__default["default"].Fragment, null,
             React__default["default"].createElement(material.Divider, { sx: { my: 5, width: "100%" } }),
             React__default["default"].createElement(material.Box, { display: "flex" },

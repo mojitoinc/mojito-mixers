@@ -10,10 +10,11 @@ import { LABELS_BY_VARIANT, ICONS_BY_VARIANT } from './CheckoutModalFooter.const
 import { useDictionary } from '../../../hooks/useDictionary.js';
 import { Img } from '../../shared/Img/Img.js';
 
+const VARIANTS_WITH_DISCLAIMER = ["toPayment", "toPlaid", "toConfirmation"];
 const CheckoutModalFooter = ({ variant, buttonLabel, guestCheckoutEnabled, consentType, onGoToCollection, submitDisabled, onSubmitClicked, onCloseClicked, }) => {
     // CONSENT:
     const { privacyHref, termsOfUseHref } = useDictionary();
-    const showConsent = consentType && (privacyHref || termsOfUseHref) && (variant === "toConfirmation" || variant === "toPlaid");
+    const showConsent = consentType && VARIANTS_WITH_DISCLAIMER.includes(variant);
     const consentTextElement = showConsent ? React__default.createElement(ConsentText, { privacyHref: privacyHref, termsOfUseHref: termsOfUseHref }) : null;
     const [{ isFormSubmitted, isFormLoading, isConsentChecked, }, setConsentState] = useState({
         isFormSubmitted: false,
@@ -88,8 +89,7 @@ const CheckoutModalFooter = ({ variant, buttonLabel, guestCheckoutEnabled, conse
             React__default.createElement(Divider, { sx: { my: 5, width: "100%" } }),
             React__default.createElement(Typography, { sx: { maxWidth: SM_MOBILE_MAX_WIDTH }, align: "center" },
                 "By placing an order you affirm that you ",
-                consentTextElement,
-                "."))),
+                consentTextElement))),
         showConsent && consentType === "circle" && (React__default.createElement(React__default.Fragment, null,
             React__default.createElement(Divider, { sx: { my: 5, width: "100%" } }),
             React__default.createElement(Box, { display: "flex" },

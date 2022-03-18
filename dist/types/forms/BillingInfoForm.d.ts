@@ -2,6 +2,7 @@ import React from "react";
 import { SelectOption } from "../components/shared/Select/Select";
 import { CheckoutModalError } from "../components/public/CheckoutOverlay/CheckoutOverlay.hooks";
 import { TaxesState } from "../views/Billing/BillingView";
+import { ConsentType } from "../components/shared/ConsentText/ConsentText";
 declare const FULL_NAME_FIELD = "fullName";
 declare const EMAIL_FIELD = "email";
 declare const PHONE_FIELD = "phone";
@@ -32,6 +33,7 @@ export interface BillingInfoFormProps {
     onClose: () => void;
     onSubmit: (data: BillingInfo) => void;
     onAttemptSubmit: () => void;
+    consentType?: ConsentType;
     debug?: boolean;
 }
 export declare const BillingInfoForm: React.FC<BillingInfoFormProps>;

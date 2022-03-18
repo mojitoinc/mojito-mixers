@@ -117,7 +117,7 @@ const schema = yup.object()
 }).required();
 const BillingInfoForm = ({ 
 // variant,
-defaultValues, checkoutError, taxes, onTaxInfoChange, onSaved, onClose, onSubmit, onAttemptSubmit, debug }) => {
+defaultValues, checkoutError, taxes, onTaxInfoChange, onSaved, onClose, onSubmit, onAttemptSubmit, consentType, debug, }) => {
     const { control, handleSubmit, watch, setError, formState, } = reactHookForm.useForm({
         defaultValues: Object.assign(Object.assign({}, EMPTY_FORM_VALUES), defaultValues),
         reValidateMode: "onChange",
@@ -177,7 +177,7 @@ defaultValues, checkoutError, taxes, onTaxInfoChange, onSaved, onClose, onSubmit
             JSON.stringify(watch(), null, 2),
             "\n\n",
             JSON.stringify(formState.errors, null, 2))),
-        React__default["default"].createElement(CheckoutModalFooter.CheckoutModalFooter, { variant: "toPayment", buttonLabel: taxesStatus === "loading" ? "Calculating taxes..." : undefined, submitDisabled: taxesStatus === "loading", onCloseClicked: onClose })));
+        React__default["default"].createElement(CheckoutModalFooter.CheckoutModalFooter, { variant: "toPayment", consentType: consentType, buttonLabel: taxesStatus === "loading" ? "Calculating taxes..." : undefined, submitDisabled: taxesStatus === "loading", onCloseClicked: onClose })));
 };
 
 exports.BillingInfoForm = BillingInfoForm;
