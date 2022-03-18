@@ -149,6 +149,8 @@ interface PUICheckoutOverlayProps {
     onGoToCollection?: () => void;
     guestCheckoutEnabled?: boolean;
     productConfirmationEnabled?: boolean;
+    vertexEnabled?: boolean;
+    threeDSEnabled?: boolean;
     logoSrc: string;
     logoSx?: SxProps<Theme>;
     loaderImageSrc: string;

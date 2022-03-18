@@ -6,7 +6,7 @@ import default_1 from '../../../../node_modules/@mui/icons-material/Close.js';
 import { NBSP } from '../../../utils/formatUtils.js';
 import { getFormattedUser } from './CheckoutModalHeader.utils.js';
 import React__default, { useRef, useCallback } from 'react';
-import { COUNTER_CLICKS_NEEDED, RESERVATION_COUNTDOWN_FROM_MIN, COUNTER_EXPIRATION_MS } from '../../../config/config.js';
+import { DEV_DEBUG_COUNTER_CLICKS_NEEDED, RESERVATION_COUNTDOWN_FROM_MIN, DEV_DEBUG_COUNTER_EXPIRATION_MS } from '../../../config/config.js';
 import { Img } from '../../shared/Img/Img.js';
 
 const CHECKOUT_MODAL_TITLE = {
@@ -54,10 +54,10 @@ const CheckoutModalHeader = ({ variant, countdownElementRef, title: customTitle,
         const timestamp = clickTimestampRef.current;
         const now = Date.now();
         const elapsed = now - timestamp;
-        const nextCounter = elapsed > COUNTER_EXPIRATION_MS || counter === COUNTER_CLICKS_NEEDED ? 1 : counter + 1;
+        const nextCounter = elapsed > DEV_DEBUG_COUNTER_EXPIRATION_MS || counter === DEV_DEBUG_COUNTER_CLICKS_NEEDED ? 1 : counter + 1;
         clickTimestampRef.current = now;
         clickCounterRef.current = nextCounter;
-        if (nextCounter === COUNTER_CLICKS_NEEDED) {
+        if (nextCounter === DEV_DEBUG_COUNTER_CLICKS_NEEDED) {
             setDebug((prevValue) => {
                 const nextValue = !prevValue;
                 console.log(`\n🐞 DEBUG MODE ${nextValue ? "ENABLED" : "DISABLED"}!\n\n`);

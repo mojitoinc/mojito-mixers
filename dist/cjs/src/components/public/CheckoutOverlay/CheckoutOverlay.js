@@ -35,7 +35,7 @@ const PUICheckoutOverlay = ({
 // Modal:
 open, onClose, onGoToCollection, 
 // Flow:
-guestCheckoutEnabled, productConfirmationEnabled, 
+guestCheckoutEnabled, productConfirmationEnabled, vertexEnabled = true, threeDSEnabled = true, 
 // Personalization:
 logoSrc, logoSx, loaderImageSrc, purchasingImageSrc, purchasingMessages, errorImageSrc, userFormat, acceptedPaymentTypes, paymentLimits, // Not implemented yet. Used to show payment limits for some payment types.
 dictionary, network, 
@@ -81,7 +81,7 @@ debug: initialDebug, onEvent, onError, onMarketingOptInChange, // Not implemente
     // Once we have an invoiceID, load the invoice:
     const { data: invoiceDetailsData, loading: invoiceDetailsLoading, error: invoiceDetailsError, refetch: refetchInvoiceDetails, } = graphqlGenerated.useGetInvoiceDetailsQuery({
         skip: !invoiceID,
-        variables: { orgID, invoiceID },
+        variables: { invoiceID },
     });
     // Modal loading state:
     const isDialogLoading = isAuthenticatedLoading || meLoading || paymentMethodsLoading;

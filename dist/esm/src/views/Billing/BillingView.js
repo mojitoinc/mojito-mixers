@@ -12,7 +12,7 @@ import { useGetTaxQuoteLazyQuery } from '../../queries/graphqlGenerated.js';
 import { useCheckoutItemsCostTotal } from '../../hooks/useCheckoutItemCostTotal.js';
 import { useThrottledCallback } from '@swyg/corre';
 
-const BillingView = ({ checkoutItems, savedPaymentMethods: rawSavedPaymentMethods, selectedBillingInfo, wallets, wallet, checkoutError, onBillingInfoSelected, onTaxesChange, onSavedPaymentMethodDeleted, onWalletChange, onNext, onClose, consentType, debug, }) => {
+const BillingView = ({ threeDSEnabled, checkoutItems, savedPaymentMethods: rawSavedPaymentMethods, selectedBillingInfo, wallets, wallet, checkoutError, onBillingInfoSelected, onTaxesChange, onSavedPaymentMethodDeleted, onWalletChange, onNext, onClose, consentType, debug, }) => {
     const savedPaymentMethodAddressIdRef = useRef("");
     const savedPaymentMethods = useMemo(() => distinctBy(rawSavedPaymentMethods, "addressId"), [rawSavedPaymentMethods]);
     const { total: subtotal, fees } = useCheckoutItemsCostTotal(checkoutItems);

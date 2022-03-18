@@ -62,10 +62,10 @@ const CheckoutModalHeader = ({ variant, countdownElementRef, title: customTitle,
         const timestamp = clickTimestampRef.current;
         const now = Date.now();
         const elapsed = now - timestamp;
-        const nextCounter = elapsed > config.COUNTER_EXPIRATION_MS || counter === config.COUNTER_CLICKS_NEEDED ? 1 : counter + 1;
+        const nextCounter = elapsed > config.DEV_DEBUG_COUNTER_EXPIRATION_MS || counter === config.DEV_DEBUG_COUNTER_CLICKS_NEEDED ? 1 : counter + 1;
         clickTimestampRef.current = now;
         clickCounterRef.current = nextCounter;
-        if (nextCounter === config.COUNTER_CLICKS_NEEDED) {
+        if (nextCounter === config.DEV_DEBUG_COUNTER_CLICKS_NEEDED) {
             setDebug((prevValue) => {
                 const nextValue = !prevValue;
                 console.log(`\n🐞 DEBUG MODE ${nextValue ? "ENABLED" : "DISABLED"}!\n\n`);
