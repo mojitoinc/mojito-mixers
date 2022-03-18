@@ -10,7 +10,7 @@ import { XS_MOBILE_MAX_WIDTH } from "../../config/theme/themeConstants";
 import { StatusIcon } from "../../components/shared/StatusIcon/StatusIcon";
 import { useGetPaymentNotificationQuery } from "../../queries/graphqlGenerated";
 import { persistCheckoutModalInfo } from "../../components/public/CheckoutOverlay/CheckoutOverlay.utils";
-import { PAYMENT_NOTIFICATION_INTERVAL_MS, PURCHASING_MESSAGES_DEFAULT, PURCHASING_MIN_WAIT_MS, PURCHASING_MESSAGES_INTERVAL_MS, PAYMENT_CREATION_TIMEOUT_MS } from "../../config/config";
+import { PAYMENT_NOTIFICATION_INTERVAL_MS, PURCHASING_MESSAGES_DEFAULT, PURCHASING_MIN_WAIT_MS, PURCHASING_MESSAGES_INTERVAL_MS, PAYMENT_CREATION_TIMEOUT_MS, DEV_SKIP_3DS_IN_LOCALHOST } from "../../config/config";
 import { isLocalhost } from "../../domain/url/url.utils";
 import { Wallet } from "../../domain/wallet/wallet.interfaces";
 
@@ -132,7 +132,9 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
 
     purchaseSuccessHandledRef.current = true;
 
-    if (redirectURL && !isLocalhost()) {
+    const skipRedirect = DEV_SKIP_3DS_IN_LOCALHOST && isLocalhost();
+
+    if (redirectURL && !skipRedirect) {
       persistCheckoutModalInfo({
         invoiceID,
         circlePaymentID,
@@ -142,7 +144,7 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
       });
     }
 
-    onPurchaseSuccess(circlePaymentID, paymentID, isLocalhost() ? "" : (redirectURL || ""));
+    onPurchaseSuccess(circlePaymentID, paymentID, skipRedirect ? "" : (redirectURL || ""));
   }, [
     fullPaymentState,
     hasWaited,

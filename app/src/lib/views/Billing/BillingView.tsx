@@ -32,6 +32,7 @@ interface BillingViewState {
 }
 
 export interface BillingViewProps {
+  threeDSEnabled?: boolean;
   checkoutItems: CheckoutItem[];
   savedPaymentMethods: SavedPaymentMethod[];
   selectedBillingInfo: string | BillingInfo;
@@ -49,6 +50,7 @@ export interface BillingViewProps {
 }
 
 export const BillingView: React.FC<BillingViewProps> = ({
+  threeDSEnabled,
   checkoutItems,
   savedPaymentMethods: rawSavedPaymentMethods,
   selectedBillingInfo,

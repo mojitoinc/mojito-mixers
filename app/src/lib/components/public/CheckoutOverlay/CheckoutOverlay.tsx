@@ -43,6 +43,8 @@ export interface PUICheckoutOverlayProps {
   // Flow:
   guestCheckoutEnabled?: boolean;
   productConfirmationEnabled?: boolean;
+  vertexEnabled?: boolean;
+  threeDSEnabled?: boolean;
 
   // Personalization:
   logoSrc: string;
@@ -88,6 +90,8 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   // Flow:
   guestCheckoutEnabled,
   productConfirmationEnabled,
+  vertexEnabled = true,
+  threeDSEnabled = true,
 
   // Personalization:
   logoSrc,
@@ -198,7 +202,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     refetch: refetchInvoiceDetails,
   } = useGetInvoiceDetailsQuery({
     skip: !invoiceID,
-    variables: { orgID, invoiceID },
+    variables: { invoiceID },
   });
 
 
