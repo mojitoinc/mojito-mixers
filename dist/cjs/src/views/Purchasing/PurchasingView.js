@@ -17,7 +17,7 @@ function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'defau
 
 var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 
-const PurchasingView = ({ purchasingImageSrc, purchasingMessages: customPurchasingMessages, orgID, invoiceID, savedPaymentMethods, selectedPaymentMethod, wallet, onPurchaseSuccess, onPurchaseError, onDialogBlocked, debug, }) => {
+const PurchasingView = ({ threeDSEnabled, purchasingImageSrc, purchasingMessages: customPurchasingMessages, orgID, invoiceID, savedPaymentMethods, selectedPaymentMethod, wallet, onPurchaseSuccess, onPurchaseError, onDialogBlocked, debug, }) => {
     var _a, _b, _c;
     const { billingInfo, paymentInfo, cvv } = selectedPaymentMethod;
     const isCreditCardPayment = cvv || (typeof paymentInfo === "object" && paymentInfo.type === "CreditCard");
@@ -36,8 +36,11 @@ const PurchasingView = ({ purchasingImageSrc, purchasingMessages: customPurchasi
         debug,
     });
     // Load 3DS redirect URL when needed:
-    const [redirectURL, setRedirectURL] = React.useState(isCreditCardPayment ? "" : null);
-    const skipPaymentNotificationRedirect = !isCreditCardPayment || !!redirectURL || fullPaymentState.paymentStatus !== "processed";
+    const [redirectURL, setRedirectURL] = React.useState(threeDSEnabled && isCreditCardPayment ? "" : null);
+    const skipPaymentNotificationRedirect = !threeDSEnabled ||
+        !isCreditCardPayment ||
+        !!redirectURL ||
+        fullPaymentState.paymentStatus !== "processed";
     const paymentNotificationResult = graphqlGenerated.useGetPaymentNotificationQuery({
         skip: skipPaymentNotificationRedirect,
         pollInterval: config.PAYMENT_NOTIFICATION_INTERVAL_MS,

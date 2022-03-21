@@ -12,7 +12,7 @@ export interface TaxesState {
     taxAmount?: number;
 }
 export interface BillingViewProps {
-    threeDSEnabled?: boolean;
+    vertexEnabled?: boolean;
     checkoutItems: CheckoutItem[];
     savedPaymentMethods: SavedPaymentMethod[];
     selectedBillingInfo: string | BillingInfo;

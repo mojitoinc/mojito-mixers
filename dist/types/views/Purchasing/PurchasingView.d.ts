@@ -3,6 +3,7 @@ import React from "react";
 import { CheckoutModalError, SelectedPaymentMethod } from "../../components/public/CheckoutOverlay/CheckoutOverlay.hooks";
 import { Wallet } from "../../domain/wallet/wallet.interfaces";
 export interface PurchasingViewProps {
+    threeDSEnabled?: boolean;
     purchasingImageSrc?: string;
     purchasingMessages?: false | string[];
     orgID: string;
