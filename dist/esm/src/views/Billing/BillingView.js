@@ -12,7 +12,7 @@ import { useGetTaxQuoteLazyQuery } from '../../queries/graphqlGenerated.js';
 import { useCheckoutItemsCostTotal } from '../../hooks/useCheckoutItemCostTotal.js';
 import { useThrottledCallback } from '@swyg/corre';
 
-const BillingView = ({ threeDSEnabled, checkoutItems, savedPaymentMethods: rawSavedPaymentMethods, selectedBillingInfo, wallets, wallet, checkoutError, onBillingInfoSelected, onTaxesChange, onSavedPaymentMethodDeleted, onWalletChange, onNext, onClose, consentType, debug, }) => {
+const BillingView = ({ vertexEnabled, checkoutItems, savedPaymentMethods: rawSavedPaymentMethods, selectedBillingInfo, wallets, wallet, checkoutError, onBillingInfoSelected, onTaxesChange, onSavedPaymentMethodDeleted, onWalletChange, onNext, onClose, consentType, debug, }) => {
     const savedPaymentMethodAddressIdRef = useRef("");
     const savedPaymentMethods = useMemo(() => distinctBy(rawSavedPaymentMethods, "addressId"), [rawSavedPaymentMethods]);
     const { total: subtotal, fees } = useCheckoutItemsCostTotal(checkoutItems);
@@ -20,7 +20,7 @@ const BillingView = ({ threeDSEnabled, checkoutItems, savedPaymentMethods: rawSa
     const [{ isDeleting, showSaved, taxes }, setViewState] = useState({
         isDeleting: false,
         showSaved: savedPaymentMethods.length > 0 && typeof selectedBillingInfo === "string" && !checkNeedsGenericErrorMessage("billing", checkoutError),
-        taxes: { status: "incomplete" },
+        taxes: vertexEnabled ? { status: "incomplete" } : { status: "complete", taxRate: 0, taxAmount: 0 },
     });
     const [formSubmitAttempted, setFormSubmitAttempted] = useState(false);
     const [getTaxQuote] = useGetTaxQuoteLazyQuery();
@@ -68,10 +68,12 @@ const BillingView = ({ threeDSEnabled, checkoutItems, savedPaymentMethods: rawSa
         calculateTaxes(taxInfo);
     }, 1000, [calculateTaxes]);
     const handleTaxInfoChange = useCallback((taxInfo) => {
+        if (!vertexEnabled)
+            return;
         setViewState((prevViewState) => prevViewState.taxes.status === "loading" ? prevViewState : (Object.assign(Object.assign({}, prevViewState), { taxes: { status: "loading" } })));
         getTaxQuoteTimestampRef.current = Date.now();
         handleThrottledTaxInfoChange(taxInfo);
-    }, [handleThrottledTaxInfoChange]);
+    }, [vertexEnabled, handleThrottledTaxInfoChange]);
     useEffect(() => {
         if (selectedBillingInfo && showSaved) {
             const savedPaymentMethodData = typeof selectedBillingInfo === "string"

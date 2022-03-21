@@ -9,7 +9,7 @@ import { useGetPaymentNotificationQuery } from '../../queries/graphqlGenerated.j
 import { persistCheckoutModalInfo } from '../../components/public/CheckoutOverlay/CheckoutOverlay.utils.js';
 import { PURCHASING_MIN_WAIT_MS, PAYMENT_CREATION_TIMEOUT_MS, PURCHASING_MESSAGES_DEFAULT, PURCHASING_MESSAGES_INTERVAL_MS, PAYMENT_NOTIFICATION_INTERVAL_MS, DEV_SKIP_3DS_IN_LOCALHOST } from '../../config/config.js';
 
-const PurchasingView = ({ purchasingImageSrc, purchasingMessages: customPurchasingMessages, orgID, invoiceID, savedPaymentMethods, selectedPaymentMethod, wallet, onPurchaseSuccess, onPurchaseError, onDialogBlocked, debug, }) => {
+const PurchasingView = ({ threeDSEnabled, purchasingImageSrc, purchasingMessages: customPurchasingMessages, orgID, invoiceID, savedPaymentMethods, selectedPaymentMethod, wallet, onPurchaseSuccess, onPurchaseError, onDialogBlocked, debug, }) => {
     var _a, _b, _c;
     const { billingInfo, paymentInfo, cvv } = selectedPaymentMethod;
     const isCreditCardPayment = cvv || (typeof paymentInfo === "object" && paymentInfo.type === "CreditCard");
@@ -28,8 +28,11 @@ const PurchasingView = ({ purchasingImageSrc, purchasingMessages: customPurchasi
         debug,
     });
     // Load 3DS redirect URL when needed:
-    const [redirectURL, setRedirectURL] = useState(isCreditCardPayment ? "" : null);
-    const skipPaymentNotificationRedirect = !isCreditCardPayment || !!redirectURL || fullPaymentState.paymentStatus !== "processed";
+    const [redirectURL, setRedirectURL] = useState(threeDSEnabled && isCreditCardPayment ? "" : null);
+    const skipPaymentNotificationRedirect = !threeDSEnabled ||
+        !isCreditCardPayment ||
+        !!redirectURL ||
+        fullPaymentState.paymentStatus !== "processed";
     const paymentNotificationResult = useGetPaymentNotificationQuery({
         skip: skipPaymentNotificationRedirect,
         pollInterval: PAYMENT_NOTIFICATION_INTERVAL_MS,
