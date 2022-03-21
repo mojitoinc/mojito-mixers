@@ -203,6 +203,8 @@ const App: React.FC = () => {
     // Flow:
     guestCheckoutEnabled: false,
     productConfirmationEnabled: false,
+    vertexEnabled: true, // Default already true (requires set up on the backend).
+    threeDSEnabled: true, // Default already true (requires set up on the backend and frontend, see 3DS section below).
 
     // Personalization:
     // These two options, `theme` (replace default theme) and `themeOptions` (merge with default theme) are optional and 
@@ -260,14 +262,33 @@ const App: React.FC = () => {
 <br />
 
 
+### Address Validation & Tax Calculation with Vertex
+
+Id you'd like address to be validated and taxes to be calculated during the checkout process, particularly in the Billing
+Information step, you need a Vertex account.
+
+Alternatively, set the following prop to disable those calls to the backend: `vertexEnabled = false`.
+
+<br />
+
+
 ### Credit Card payments with 3DS
 
-Additionally, when using 3DS for Credit Card payments you need to add a `/e/success/` and a `/e/error/` (TODO: review this) page with the
-following logic to be able to resume 3DS's flow when users are redirected back to your app:
+Additionally, when using 3DS for Credit Card payments you need to add a success and error page into your app. The URL can
+be anything you want as long as you configure that in your 3DS account. In this repo, those pages are:
+
+- `/payments/success` => [app/src/pages/payments/success.tsx](./app/src/pages/payments/success.tsx).
+- `/payments/error` => [app/src/pages/payments/error.tsx](./app/src/pages/payments/error.tsx).
+
+You can just copy-paste those into your project as a starting point, only minor changes are needed there. As you can see,
+most of the logic in those pages is already provided by this library in the
+[`PUISuccess`](./app/src/lib/components/public/SuccessOverlay/SuccessOverlay.tsx) and
+[`PUIError`](app/src/lib/components/public/ErrorOverlay/ErrorOverlay.tsx) components.
+
+If you don't have a 3DS account and just want to disable that step, you can do that with the following prop: `threeDSEnabled = false`.
 
 ```TSX
-
-// /e/success/:
+// /payments/success:
 
 const CreditCardPaymentSuccessPage: React.FC = () => {
   const router = useRouter();
@@ -295,7 +316,7 @@ export default CreditCardPaymentSuccessPage;
 
 ```TSX
 
-// /e/error/:
+// /payments/error:
 
 const CreditCardPaymentErrorPage: React.FC = () => {
   const router = useRouter();

@@ -168,6 +168,8 @@ const HomePage: React.FC = () => {
     // Flow:
     guestCheckoutEnabled: testPreset.guestCheckoutEnabled,
     productConfirmationEnabled: testPreset.productConfirmationEnabled,
+    // vertexEnabled: false,
+    // threeDSEnabled: false,
 
     // Personalization:
     // theme: PLAYGROUND_THEMES[formValues.theme],
