@@ -11,27 +11,27 @@ import { wait } from "../utils/promiseUtils";
 import { PAYMENT_CREATION_INTERVAL_MS, PAYMENT_CREATION_MAX_WAIT_MS } from "../config/config";
 
 export interface CreatePaymentMethodOptions {
+  orgID: string;
   debug?: boolean;
 }
 
 export interface ExtendedCreatePaymentMethodOptions {
-  orgID: string;
   billingInfo: BillingInfo;
   paymentInfo: PaymentMethod;
 }
 
 export function useCreatePaymentMethod({
+  orgID,
   debug,
 }: CreatePaymentMethodOptions): [
-  (orgID: string, billingInfo: BillingInfo, paymentInfo: PaymentMethod) => Promise<FetchResult<CreatePaymentMethodMutation>>,
+  (billingInfo: BillingInfo, paymentInfo: PaymentMethod) => Promise<FetchResult<CreatePaymentMethodMutation>>,
   MutationResult<CreatePaymentMethodMutation>
 ] {
-  const [encryptCardData] = useEncryptCardData();
+  const [encryptCardData] = useEncryptCardData({ orgID });
   const [getPaymentMethodStatus] = useGetPaymentMethodStatusLazyQuery();
   const [createPaymentMethod, createPaymentMethodResult] = useCreatePaymentMethodMutation();
 
   const extendedCreatePaymentMethod = useCallback(async (
-    orgID: string,
     billingInfo: BillingInfo,
     paymentInfo: PaymentMethod,
   ): Promise<FetchResult<CreatePaymentMethodMutation>> => {
