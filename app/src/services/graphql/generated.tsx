@@ -1043,6 +1043,7 @@ export type NftToken = {
   asset?: Maybe<Asset>;
   assetId?: Maybe<Scalars['UUID1']>;
   deployed: Scalars['Boolean'];
+  editions?: Maybe<Scalars['Int']>;
   ethereumTxId?: Maybe<Scalars['String']>;
   id: Scalars['UUID1'];
   metadataArweaveTxId?: Maybe<Scalars['String']>;
@@ -1300,7 +1301,7 @@ export type QueryOrganizationArgs = {
 
 
 export type QueryOrganizationByIdArgs = {
-  id: Scalars['UUID1'];
+  id?: InputMaybe<Scalars['UUID1']>;
 };
 
 

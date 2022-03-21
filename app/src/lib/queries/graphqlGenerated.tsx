@@ -1043,6 +1043,7 @@ export type NftToken = {
   asset?: Maybe<Asset>;
   assetId?: Maybe<Scalars['UUID1']>;
   deployed: Scalars['Boolean'];
+  editions?: Maybe<Scalars['Int']>;
   ethereumTxId?: Maybe<Scalars['String']>;
   id: Scalars['UUID1'];
   metadataArweaveTxId?: Maybe<Scalars['String']>;
@@ -1300,7 +1301,7 @@ export type QueryOrganizationArgs = {
 
 
 export type QueryOrganizationByIdArgs = {
-  id: Scalars['UUID1'];
+  id?: InputMaybe<Scalars['UUID1']>;
 };
 
 
@@ -1624,14 +1625,11 @@ export type GetPaymentNotificationQueryVariables = Exact<{ [key: string]: never;
 
 export type GetPaymentNotificationQuery = { __typename?: 'Query', getPaymentNotification: { __typename?: 'PaymentNotificationOutput', message: { __typename?: 'PaymentNotification3DSMessage', redirectURL: string } } };
 
-/*
 export type CreatePaymentMutationVariables = Exact<{
   paymentMethodID: Scalars['UUID1'];
   invoiceID: Scalars['UUID1'];
 }>;
-*/
 
-export type CreatePaymentMutationVariables = MutationCreatePaymentArgs;
 
 export type CreatePaymentMutation = { __typename?: 'Mutation', createPayment: { __typename?: 'Payment', id: any, invoiceID: any, circlePaymentID: string, status: PaymentStatus, userID: any } };
 
@@ -1757,8 +1755,8 @@ export type GetPaymentNotificationQueryHookResult = ReturnType<typeof useGetPaym
 export type GetPaymentNotificationLazyQueryHookResult = ReturnType<typeof useGetPaymentNotificationLazyQuery>;
 export type GetPaymentNotificationQueryResult = Apollo.QueryResult<GetPaymentNotificationQuery, GetPaymentNotificationQueryVariables>;
 export const CreatePaymentDocument = gql`
-    mutation CreatePayment($paymentMethodID: UUID1!, $invoiceID: UUID1!, $metadata: CreatePaymentMetadataInput) {
-  createPayment(paymentMethodID: $paymentMethodID, invoiceID: $invoiceID, metadata: $metadata) {
+    mutation CreatePayment($paymentMethodID: UUID1!, $invoiceID: UUID1!) {
+  createPayment(paymentMethodID: $paymentMethodID, invoiceID: $invoiceID) {
     id
     invoiceID
     circlePaymentID
