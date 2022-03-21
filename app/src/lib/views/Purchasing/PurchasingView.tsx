@@ -15,6 +15,7 @@ import { isLocalhost } from "../../domain/url/url.utils";
 import { Wallet } from "../../domain/wallet/wallet.interfaces";
 
 export interface PurchasingViewProps {
+  threeDSEnabled?: boolean;
   purchasingImageSrc?: string;
   purchasingMessages?: false | string[];
   orgID: string;
@@ -29,6 +30,7 @@ export interface PurchasingViewProps {
 }
 
 export const PurchasingView: React.FC<PurchasingViewProps> = ({
+  threeDSEnabled,
   purchasingImageSrc,
   purchasingMessages: customPurchasingMessages,
   orgID,
@@ -68,9 +70,13 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
 
   // Load 3DS redirect URL when needed:
 
-  const [redirectURL, setRedirectURL] = useState(isCreditCardPayment ? "" : null);
+  const [redirectURL, setRedirectURL] = useState(threeDSEnabled && isCreditCardPayment ? "" : null);
 
-  const skipPaymentNotificationRedirect = !isCreditCardPayment || !!redirectURL || fullPaymentState.paymentStatus !== "processed";
+  const skipPaymentNotificationRedirect =
+    !threeDSEnabled ||
+    !isCreditCardPayment ||
+    !!redirectURL ||
+    fullPaymentState.paymentStatus !== "processed";
 
   const paymentNotificationResult = useGetPaymentNotificationQuery({
     skip: skipPaymentNotificationRedirect,

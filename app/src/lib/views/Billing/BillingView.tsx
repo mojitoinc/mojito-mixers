@@ -32,7 +32,7 @@ interface BillingViewState {
 }
 
 export interface BillingViewProps {
-  threeDSEnabled?: boolean;
+  vertexEnabled?: boolean;
   checkoutItems: CheckoutItem[];
   savedPaymentMethods: SavedPaymentMethod[];
   selectedBillingInfo: string | BillingInfo;
@@ -50,7 +50,7 @@ export interface BillingViewProps {
 }
 
 export const BillingView: React.FC<BillingViewProps> = ({
-  threeDSEnabled,
+  vertexEnabled,
   checkoutItems,
   savedPaymentMethods: rawSavedPaymentMethods,
   selectedBillingInfo,
@@ -73,7 +73,7 @@ export const BillingView: React.FC<BillingViewProps> = ({
   const [{ isDeleting, showSaved, taxes }, setViewState] = useState<BillingViewState>({
     isDeleting: false,
     showSaved: savedPaymentMethods.length > 0 && typeof selectedBillingInfo === "string" && !checkNeedsGenericErrorMessage("billing", checkoutError),
-    taxes: { status: "incomplete" },
+    taxes: vertexEnabled ? { status: "incomplete" } : { status: "complete", taxRate: 0, taxAmount: 0 },
   });
 
   const [formSubmitAttempted, setFormSubmitAttempted] = useState(false);
@@ -131,6 +131,8 @@ export const BillingView: React.FC<BillingViewProps> = ({
   }, 1000, [calculateTaxes]);
 
   const handleTaxInfoChange = useCallback((taxInfo: Partial<TaxInfo>) => {
+    if (!vertexEnabled) return;
+
     setViewState((prevViewState) => prevViewState.taxes.status === "loading" ? prevViewState : ({ ...prevViewState, taxes: { status: "loading" }}));
 
     getTaxQuoteTimestampRef.current = Date.now();
