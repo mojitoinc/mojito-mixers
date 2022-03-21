@@ -138,7 +138,7 @@ export const BillingView: React.FC<BillingViewProps> = ({
     getTaxQuoteTimestampRef.current = Date.now();
 
     handleThrottledTaxInfoChange(taxInfo);
-  }, [handleThrottledTaxInfoChange]);
+  }, [vertexEnabled, handleThrottledTaxInfoChange]);
 
   useEffect(() => {
     if (selectedBillingInfo && showSaved) {
