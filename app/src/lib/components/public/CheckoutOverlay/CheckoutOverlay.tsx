@@ -298,6 +298,12 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
       paymentType = paymentInfo.type;
     }
 
+    if (!eventType.startsWith("event:") && !eventType.includes(checkoutStep)) {
+      if (debug) console.log(`⚠️ eventType / checkoutStep mismatch: ${ eventType } / ${ checkoutStep }`);
+
+      return;
+    }
+
     onEvent(eventType, {
       // Location:
       step: CheckoutModalStepIndex[checkoutStep],
@@ -323,7 +329,8 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   };
 
   useEffect(() => {
-    if (!isDialogInitializing) setTimeout(() => triggerAnalyticsEventRef.current(`navigate:${ checkoutStep }`));
+    // if (!isDialogInitializing) setTimeout(() => triggerAnalyticsEventRef.current(`navigate:${ checkoutStep }`));
+    if (!isDialogInitializing) triggerAnalyticsEventRef.current(`navigate:${ checkoutStep }`);
   }, [isDialogInitializing, checkoutStep]);
 
   // Saved payment method creation-reload-sync:
