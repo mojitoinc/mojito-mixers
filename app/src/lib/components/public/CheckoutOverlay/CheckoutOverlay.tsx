@@ -6,7 +6,7 @@ import { PaymentMethod, PaymentType } from "../../../domain/payment/payment.inte
 import { CheckoutEventData, CheckoutEventType } from "../../../domain/events/events.interfaces";
 import { CheckoutItemInfo } from "../../../domain/product/product.interfaces";
 import { BillingInfo } from "../../../forms/BillingInfoForm";
-import { useDeletePaymentMethodMutation, useGetInvoiceDetailsQuery, useCollectionItemByIdQuery, useValidatePaymentLimitQuery, useGetPaymentMethodListQuery, useMeQuery, useReleaseReservationBuyNowLotMutation } from "../../../queries/graphqlGenerated";
+import { useDeletePaymentMethodMutation, useGetInvoiceDetailsQuery, useCollectionItemByIdQuery, useValidatePaymentLimitQuery, useGetPaymentMethodListQuery, useMeQuery, useReleaseReservationBuyNowLotMutation, ValidatePaymentLimitOutput } from "../../../queries/graphqlGenerated";
 import { AuthenticationView } from "../../../views/Authentication/AuthenticationView";
 import { BillingView } from "../../../views/Billing/BillingView";
 import { ConfirmationView } from "../../../views/Confirmation/ConfirmationView";
@@ -34,6 +34,7 @@ import { Network } from "../../../domain/network/network.interfaces";
 import { NEW_WALLET_OPTION } from "../../../domain/wallet/wallet.constants";
 import { StatusIcon } from "../../shared/StatusIcon/StatusIcon";
 import { CreditCardNetwork } from "../../../domain/react-payment-inputs/react-payment-inputs.utils";
+import { transformRawRemainingItemLimit } from "@lib/domain/payment/payment.utils";
 
 export interface PUICheckoutOverlayProps {
   // Modal:
@@ -57,7 +58,6 @@ export interface PUICheckoutOverlayProps {
   userFormat: UserFormat;
   acceptedPaymentTypes: PaymentType[];
   acceptedCreditCardNetworks?: CreditCardNetwork[];
-  paymentLimits?: Partial<Record<PaymentType, number>>;
   dictionary?: Partial<PUIDictionary>;
   network?: Network;
 
@@ -107,7 +107,6 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   userFormat,
   acceptedPaymentTypes,
   acceptedCreditCardNetworks,
-  paymentLimits, // Not implemented yet. Used to show payment limits for some payment types.
   dictionary,
   network,
 
@@ -260,9 +259,12 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     },
   });
 
-  useEffect(() => {
-    if (debug) console.log({ paymentLimitData });
-  }, [debug, paymentLimitData]);
+  const rawRemainingItemLimit = paymentLimitData?.validatePaymentLimit;
+
+  const remainingItemsLimits : Record<PaymentType, number> = useMemo(
+    () => transformRawRemainingItemLimit(rawRemainingItemLimit as ValidatePaymentLimitOutput),
+    [rawRemainingItemLimit]
+  );
 
   // Modal loading state:
 
@@ -756,6 +758,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
         acceptedPaymentTypes={ acceptedPaymentTypes }
         acceptedCreditCardNetworks={ acceptedCreditCardNetworks }
         consentType={ consentType }
+        remainingItemsLimits={remainingItemsLimits}
         debug={ debug } />
     );
   } else if (checkoutStep === "purchasing" && invoiceID) {

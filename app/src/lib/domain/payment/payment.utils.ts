@@ -1,6 +1,7 @@
 import images from "react-payment-inputs/images";
 import { getExpiryDateError } from "react-payment-inputs";
 import { CreditCardNetwork, CREDIT_CARD_NETWORKS, getCardTypeByValue } from "../react-payment-inputs/react-payment-inputs.utils";
+import { ValidatePaymentLimitOutput } from "../../queries/graphqlGenerated";
 
 export function getCreditCardNetworkFromNumber(cardNumber: string): "" | CreditCardNetwork  {
   return getCardTypeByValue(cardNumber)?.type || "";
@@ -58,3 +59,10 @@ export const getCvvIsValid = (cvv = "", network: "" | CreditCardNetwork = "", ne
     isCvvValid: !required,
   };
 };
+
+export const transformRawRemainingItemLimit = (rawRemainingItemLimit : ValidatePaymentLimitOutput) => ({
+  CreditCard: rawRemainingItemLimit?.creditCard?.remainingTransaction ?? Infinity,
+  ACH: rawRemainingItemLimit?.ach?.remainingTransaction ?? Infinity,
+  Wire: rawRemainingItemLimit?.wire?.remainingTransaction ?? Infinity,
+  Crypto: Infinity // TODO: Add crypto when added to ValidatePaymentLimitOutput
+});
