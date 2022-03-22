@@ -42,6 +42,7 @@ export interface PaymentViewProps {
   onClose: () => void;
   acceptedPaymentTypes: PaymentType[];
   consentType?: ConsentType;
+  remainingItemsLimits?: Record<PaymentType, number>;
   debug?: boolean;
 }
 
@@ -62,6 +63,7 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
   onClose,
   acceptedPaymentTypes,
   consentType,
+  remainingItemsLimits,
   debug,
 }) => {
   const {
@@ -176,6 +178,7 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
             onSubmit={handleSubmit}
             onAttemptSubmit={handleFormAttemptSubmit}
             consentType={consentType}
+            remainingItemsLimits={remainingItemsLimits}
             debug={debug} />
         )}
       </Stack>
