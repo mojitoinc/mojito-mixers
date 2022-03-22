@@ -8,7 +8,7 @@ import { TaxesState } from "../Billing/BillingView";
 import { Wallet } from "../../domain/wallet/wallet.interfaces";
 export interface PaymentViewProps {
     checkoutItems: CheckoutItem[];
-    taxes: TaxesState;
+    taxes: null | TaxesState;
     savedPaymentMethods: SavedPaymentMethod[];
     selectedPaymentMethod: SelectedPaymentMethod;
     wallets?: Wallet[];

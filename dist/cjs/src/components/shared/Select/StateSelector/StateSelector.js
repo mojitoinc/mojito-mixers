@@ -14,11 +14,21 @@ var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 
 const StateSelector = (_a) => {
     var { label, value, disabled, onSelectState, countryCode } = _a, props = tslib_es6.__rest(_a, ["label", "value", "disabled", "onSelectState", "countryCode"]);
+    const initRef = React.useRef(false);
     const { options, optionsMap } = useCountryOptions.useCountryOptions(countryCode);
     const handleChange = React.useCallback((e) => {
         onSelectState(optionsMap[e.target.value]);
     }, [optionsMap, onSelectState]);
     const isDisabled = disabled || !countryCode || options.length === 0;
+    // If the selected country code changes, we reset the field. Note the useEffect below might not do that, as two
+    // different countries might have states with the same code (eg. Andorra and Anguilla):
+    React.useEffect(() => {
+        if (!initRef.current) {
+            initRef.current = true;
+            return;
+        }
+        onSelectState(Select.EMPTY_OPTION);
+    }, [countryCode, onSelectState]);
     // If the selected option can't be found among the available ones, we reset the field:
     React.useEffect(() => {
         const stateCode = value.value;

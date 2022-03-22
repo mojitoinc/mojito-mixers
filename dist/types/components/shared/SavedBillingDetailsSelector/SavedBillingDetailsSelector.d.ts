@@ -6,7 +6,7 @@ export interface SavedBillingDetailsSelectorProps {
     showLoader: boolean;
     savedPaymentMethods: SavedPaymentMethod[];
     selectedPaymentMethodAddressId?: string;
-    taxes: TaxesState;
+    taxes: null | TaxesState;
     onNew: () => void;
     onEdit: (billingInfoId: string) => void;
     onDelete: (billingInfoId: string) => Promise<void>;

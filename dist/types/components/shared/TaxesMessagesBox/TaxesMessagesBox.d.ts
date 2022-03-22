@@ -4,6 +4,6 @@ import { TaxesState } from "../../../views/Billing/BillingView";
 export declare type TaxesMessagesBoxVariant = "form" | "selector";
 export interface TaxesMessagesBoxProps extends BoxProps {
     variant: TaxesMessagesBoxVariant;
-    taxes: TaxesState;
+    taxes: null | TaxesState;
 }
 export declare const TaxesMessagesBox: React.FC<TaxesMessagesBoxProps>;

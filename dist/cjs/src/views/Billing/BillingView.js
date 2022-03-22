@@ -20,7 +20,7 @@ function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'defau
 
 var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 
-const BillingView = ({ threeDSEnabled, checkoutItems, savedPaymentMethods: rawSavedPaymentMethods, selectedBillingInfo, wallets, wallet, checkoutError, onBillingInfoSelected, onTaxesChange, onSavedPaymentMethodDeleted, onWalletChange, onNext, onClose, consentType, debug, }) => {
+const BillingView = ({ vertexEnabled, checkoutItems, savedPaymentMethods: rawSavedPaymentMethods, selectedBillingInfo, wallets, wallet, checkoutError, onBillingInfoSelected, onTaxesChange, onSavedPaymentMethodDeleted, onWalletChange, onNext, onClose, consentType, debug, }) => {
     const savedPaymentMethodAddressIdRef = React.useRef("");
     const savedPaymentMethods = React.useMemo(() => arrayUtils.distinctBy(rawSavedPaymentMethods, "addressId"), [rawSavedPaymentMethods]);
     const { total: subtotal, fees } = useCheckoutItemCostTotal.useCheckoutItemsCostTotal(checkoutItems);
@@ -28,7 +28,7 @@ const BillingView = ({ threeDSEnabled, checkoutItems, savedPaymentMethods: rawSa
     const [{ isDeleting, showSaved, taxes }, setViewState] = React.useState({
         isDeleting: false,
         showSaved: savedPaymentMethods.length > 0 && typeof selectedBillingInfo === "string" && !useFormCheckoutError.checkNeedsGenericErrorMessage("billing", checkoutError),
-        taxes: { status: "incomplete" },
+        taxes: vertexEnabled ? { status: "incomplete" } : null,
     });
     const [formSubmitAttempted, setFormSubmitAttempted] = React.useState(false);
     const [getTaxQuote] = graphqlGenerated.useGetTaxQuoteLazyQuery();
@@ -69,18 +69,24 @@ const BillingView = ({ threeDSEnabled, checkoutItems, savedPaymentMethods: rawSa
     }), [getTaxQuote, total]);
     const handleThrottledTaxInfoChange = corre.useThrottledCallback((taxInfo) => {
         var _a, _b;
+        if (!vertexEnabled)
+            return;
         if (!taxInfo.street || !taxInfo.city || !taxInfo.zipCode || !((_a = taxInfo.country) === null || _a === void 0 ? void 0 : _a.value) || !((_b = taxInfo.state) === null || _b === void 0 ? void 0 : _b.value)) {
-            setViewState((prevViewState) => prevViewState.taxes.status === "incomplete" ? prevViewState : (Object.assign(Object.assign({}, prevViewState), { taxes: { status: "incomplete" } })));
+            setViewState((prevViewState) => { var _a; return ((_a = prevViewState.taxes) === null || _a === void 0 ? void 0 : _a.status) === "incomplete" ? prevViewState : (Object.assign(Object.assign({}, prevViewState), { taxes: { status: "incomplete" } })); });
             return;
         }
         calculateTaxes(taxInfo);
-    }, 1000, [calculateTaxes]);
+    }, 1000, [calculateTaxes, vertexEnabled]);
     const handleTaxInfoChange = React.useCallback((taxInfo) => {
-        setViewState((prevViewState) => prevViewState.taxes.status === "loading" ? prevViewState : (Object.assign(Object.assign({}, prevViewState), { taxes: { status: "loading" } })));
+        if (!vertexEnabled)
+            return;
+        setViewState((prevViewState) => { var _a; return ((_a = prevViewState.taxes) === null || _a === void 0 ? void 0 : _a.status) === "loading" ? prevViewState : (Object.assign(Object.assign({}, prevViewState), { taxes: { status: "loading" } })); });
         getTaxQuoteTimestampRef.current = Date.now();
         handleThrottledTaxInfoChange(taxInfo);
-    }, [handleThrottledTaxInfoChange]);
+    }, [vertexEnabled, handleThrottledTaxInfoChange]);
     React.useEffect(() => {
+        if (!vertexEnabled)
+            return;
         if (selectedBillingInfo && showSaved) {
             const savedPaymentMethodData = typeof selectedBillingInfo === "string"
                 ? savedPaymentMethods.find(({ addressId }) => addressId === selectedBillingInfo) : null;
@@ -96,9 +102,10 @@ const BillingView = ({ threeDSEnabled, checkoutItems, savedPaymentMethods: rawSa
         else {
             setViewState((prevViewState) => (Object.assign(Object.assign({}, prevViewState), { taxes: { status: selectedBillingInfo ? "loading" : "incomplete" } })));
         }
-    }, [selectedBillingInfo, savedPaymentMethods, showSaved, calculateTaxes]);
+    }, [vertexEnabled, selectedBillingInfo, savedPaymentMethods, showSaved, calculateTaxes]);
     React.useEffect(() => {
-        onTaxesChange(taxes);
+        if (taxes)
+            onTaxesChange(taxes);
     }, [onTaxesChange, taxes]);
     const handleShowForm = React.useCallback((savedPaymentMethodAddressId) => {
         if (savedPaymentMethodAddressId && typeof savedPaymentMethodAddressId === "string") {
@@ -110,22 +117,22 @@ const BillingView = ({ threeDSEnabled, checkoutItems, savedPaymentMethods: rawSa
         else {
             onBillingInfoSelected("");
         }
-        setViewState({ isDeleting: false, showSaved: false, taxes: { status: "loading" } });
-    }, [onBillingInfoSelected, savedPaymentMethods]);
+        setViewState({ isDeleting: false, showSaved: false, taxes: vertexEnabled ? { status: "loading" } : null });
+    }, [onBillingInfoSelected, savedPaymentMethods, vertexEnabled]);
     const handleShowSaved = React.useCallback(() => {
         const savedPaymentMethodAddressId = savedPaymentMethodAddressIdRef.current;
         if (savedPaymentMethodAddressId)
             onBillingInfoSelected(savedPaymentMethodAddressId);
-        setViewState({ isDeleting: false, showSaved: true, taxes: { status: "loading" } });
-    }, [onBillingInfoSelected]);
+        setViewState({ isDeleting: false, showSaved: true, taxes: vertexEnabled ? { status: "loading" } : null });
+    }, [onBillingInfoSelected, vertexEnabled]);
     const handleSubmit = React.useCallback((data) => {
-        if (taxes.status !== "complete")
+        if (taxes && taxes.status !== "complete")
             return;
         const savedPaymentMethodAddressId = circle_utils.getSavedPaymentMethodAddressIdFromBillingInfo(data);
         const savedPaymentMethodData = savedPaymentMethods.find(({ addressId }) => addressId === savedPaymentMethodAddressId);
         onBillingInfoSelected(savedPaymentMethodData ? savedPaymentMethodAddressId : data);
         onNext();
-    }, [savedPaymentMethods, onBillingInfoSelected, onNext, taxes.status]);
+    }, [savedPaymentMethods, onBillingInfoSelected, onNext, taxes]);
     const handleSavedPaymentMethodDeleted = React.useCallback((savedPaymentMethodId) => tslib_es6.__awaiter(void 0, void 0, void 0, function* () {
         setViewState(({ taxes }) => ({ isDeleting: true, showSaved: true, taxes }));
         yield onSavedPaymentMethodDeleted(savedPaymentMethodId);
@@ -151,7 +158,7 @@ const BillingView = ({ threeDSEnabled, checkoutItems, savedPaymentMethods: rawSa
             , { 
                 // variant="loggedIn"
                 defaultValues: typeof selectedBillingInfo === "string" ? undefined : selectedBillingInfo, checkoutError: checkoutError, taxes: taxes, onTaxInfoChange: handleTaxInfoChange, onSaved: savedPaymentMethods.length > 0 ? handleShowSaved : undefined, onClose: onClose, onSubmit: handleSubmit, onAttemptSubmit: handleFormAttemptSubmit, consentType: consentType === "checkbox" ? undefined : consentType, debug: debug }))),
-        React__default["default"].createElement(CheckoutDeliveryAndItemCostBreakdown.CheckoutDeliveryAndItemCostBreakdown, { checkoutItems: checkoutItems, taxes: taxes, validatePersonalDeliveryAddress: formSubmitAttempted, wallets: wallets, wallet: wallet, onWalletChange: onWalletChange })));
+        React__default["default"].createElement(CheckoutDeliveryAndItemCostBreakdown.CheckoutDeliveryAndItemCostBreakdown, { checkoutItems: checkoutItems, taxes: vertexEnabled ? taxes : null, validatePersonalDeliveryAddress: formSubmitAttempted, wallets: wallets, wallet: wallet, onWalletChange: onWalletChange })));
 };
 
 exports.BillingView = BillingView;

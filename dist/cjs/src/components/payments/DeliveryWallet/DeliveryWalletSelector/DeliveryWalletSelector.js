@@ -32,7 +32,7 @@ const DeliveryWalletSelector = ({ validatePersonalAddress, wallets, wallet, onWa
     const showAddressError = validatePersonalAddress && !isAddressOk;
     return (React__default["default"].createElement(React__default["default"].Fragment, null,
         React__default["default"].createElement(InputGroupLabel.InputGroupLabel, { sx: { mt: 2.5, mb: 1.5 } }, "Wallet Delivery Address"),
-        React__default["default"].createElement(DisplayBox.DisplayBox, { sx: { border: 0 } },
+        React__default["default"].createElement(DisplayBox.DisplayBox, null,
             React__default["default"].createElement(material.Typography, { sx: { mb: 1.5 } }, dictionary.walletInfo),
             React__default["default"].createElement(WalletAddressSelector.WalletAddressSelector, { margin: "none", label: "Wallet", wallets: wallets, wallet: wallet, onSelectWallet: handleSelectWallet, error: showAddressError, helperText: showAddressError ? INVALID_WALLET_ADDRESS_MESSAGE : undefined }),
             wallet_utils.isCustomWalletAddress(wallet) && (React__default["default"].createElement(React__default["default"].Fragment, null,

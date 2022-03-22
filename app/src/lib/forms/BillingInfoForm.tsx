@@ -138,7 +138,7 @@ export interface BillingInfoFormProps {
   // variant: BillingInfoFormVariant;
   defaultValues?: BillingInfo;
   checkoutError?: CheckoutModalError;
-  taxes: TaxesState;
+  taxes: null | TaxesState;
   onTaxInfoChange: (taxInfo: Partial<TaxInfo>) => void;
   onSaved?: () => void;
   onClose: () => void;
@@ -188,7 +188,6 @@ export const BillingInfoForm: React.FC<BillingInfoFormProps> = ({
     });
   }, [onTaxInfoChange, street, zip, city, state, country]);
 
-  const taxesStatus = taxes.status;
   const selectedCountryCode = country?.value;
   const submitForm = handleSubmit(onSubmit);
   const checkoutErrorMessage = useFormCheckoutError({ formKey: "billing", checkoutError, fields: FIELD_NAMES, setError });
@@ -314,8 +313,8 @@ export const BillingInfoForm: React.FC<BillingInfoFormProps> = ({
       <CheckoutModalFooter
         variant="toPayment"
         consentType={ consentType }
-        buttonLabel={ taxesStatus === "loading" ? "Calculating taxes..." : undefined }
-        submitDisabled={ taxesStatus === "loading" }
+        buttonLabel={ taxes?.status === "loading" ? "Calculating taxes..." : undefined }
+        submitDisabled={ !!taxes && taxes.status !== "complete" }
         onCloseClicked={onClose} />
     </form>
   );

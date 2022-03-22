@@ -27,7 +27,7 @@ export declare type TaxInfo = Omit<BillingInfo, "fullName" | "email" | "phone" |
 export interface BillingInfoFormProps {
     defaultValues?: BillingInfo;
     checkoutError?: CheckoutModalError;
-    taxes: TaxesState;
+    taxes: null | TaxesState;
     onTaxInfoChange: (taxInfo: Partial<TaxInfo>) => void;
     onSaved?: () => void;
     onClose: () => void;

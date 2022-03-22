@@ -28,7 +28,7 @@ export interface TaxesState {
 interface BillingViewState {
   isDeleting: boolean;
   showSaved: boolean;
-  taxes: TaxesState;
+  taxes: null | TaxesState;
 }
 
 export interface BillingViewProps {
@@ -73,7 +73,7 @@ export const BillingView: React.FC<BillingViewProps> = ({
   const [{ isDeleting, showSaved, taxes }, setViewState] = useState<BillingViewState>({
     isDeleting: false,
     showSaved: savedPaymentMethods.length > 0 && typeof selectedBillingInfo === "string" && !checkNeedsGenericErrorMessage("billing", checkoutError),
-    taxes: vertexEnabled ? { status: "incomplete" } : { status: "complete", taxRate: 0, taxAmount: 0 },
+    taxes: vertexEnabled ? { status: "incomplete" } : null,
   });
 
   const [formSubmitAttempted, setFormSubmitAttempted] = useState(false);
@@ -121,19 +121,21 @@ export const BillingView: React.FC<BillingViewProps> = ({
   }, [getTaxQuote, total]);
 
   const handleThrottledTaxInfoChange = useThrottledCallback((taxInfo: Partial<TaxInfo>) => {
+    if (!vertexEnabled) return;
+
     if (!taxInfo.street || !taxInfo.city || !taxInfo.zipCode || !taxInfo.country?.value || !taxInfo.state?.value) {
-      setViewState((prevViewState) => prevViewState.taxes.status === "incomplete" ? prevViewState : ({ ...prevViewState, taxes: { status: "incomplete" }}));
+      setViewState((prevViewState) => prevViewState.taxes?.status === "incomplete" ? prevViewState : ({ ...prevViewState, taxes: { status: "incomplete" }}));
 
       return;
     }
 
     calculateTaxes(taxInfo as TaxInfo);
-  }, 1000, [calculateTaxes]);
+  }, 1000, [calculateTaxes, vertexEnabled]);
 
   const handleTaxInfoChange = useCallback((taxInfo: Partial<TaxInfo>) => {
     if (!vertexEnabled) return;
 
-    setViewState((prevViewState) => prevViewState.taxes.status === "loading" ? prevViewState : ({ ...prevViewState, taxes: { status: "loading" }}));
+    setViewState((prevViewState) => prevViewState.taxes?.status === "loading" ? prevViewState : ({ ...prevViewState, taxes: { status: "loading" }}));
 
     getTaxQuoteTimestampRef.current = Date.now();
 
@@ -141,6 +143,8 @@ export const BillingView: React.FC<BillingViewProps> = ({
   }, [vertexEnabled, handleThrottledTaxInfoChange]);
 
   useEffect(() => {
+    if (!vertexEnabled) return;
+
     if (selectedBillingInfo && showSaved) {
       const savedPaymentMethodData = typeof selectedBillingInfo === "string"
         ? savedPaymentMethods.find(({ addressId }) => addressId === selectedBillingInfo) : null;
@@ -159,10 +163,10 @@ export const BillingView: React.FC<BillingViewProps> = ({
     } else {
       setViewState((prevViewState) => ({ ...prevViewState, taxes: { status: selectedBillingInfo ? "loading" : "incomplete" } }));
     }
-  }, [selectedBillingInfo, savedPaymentMethods, showSaved, calculateTaxes]);
+  }, [vertexEnabled, selectedBillingInfo, savedPaymentMethods, showSaved, calculateTaxes]);
 
   useEffect(() => {
-    onTaxesChange(taxes);
+    if (taxes) onTaxesChange(taxes);
   }, [onTaxesChange, taxes]);
 
   const handleShowForm = useCallback((savedPaymentMethodAddressId?: string) => {
@@ -176,26 +180,26 @@ export const BillingView: React.FC<BillingViewProps> = ({
       onBillingInfoSelected("");
     }
 
-    setViewState({ isDeleting: false, showSaved: false, taxes: { status: "loading" } });
-  }, [onBillingInfoSelected, savedPaymentMethods]);
+    setViewState({ isDeleting: false, showSaved: false, taxes: vertexEnabled ? { status: "loading" } : null});
+  }, [onBillingInfoSelected, savedPaymentMethods, vertexEnabled]);
 
   const handleShowSaved = useCallback(() => {
     const savedPaymentMethodAddressId = savedPaymentMethodAddressIdRef.current;
 
     if (savedPaymentMethodAddressId) onBillingInfoSelected(savedPaymentMethodAddressId);
 
-    setViewState({ isDeleting: false, showSaved: true, taxes: { status: "loading" } });
-  }, [onBillingInfoSelected]);
+    setViewState({ isDeleting: false, showSaved: true, taxes: vertexEnabled ? { status: "loading" } : null });
+  }, [onBillingInfoSelected, vertexEnabled]);
 
   const handleSubmit = useCallback((data: BillingInfo) => {
-    if (taxes.status !== "complete") return;
+    if (taxes && taxes.status !== "complete") return;
 
     const savedPaymentMethodAddressId = getSavedPaymentMethodAddressIdFromBillingInfo(data);
     const savedPaymentMethodData = savedPaymentMethods.find(({ addressId }) => addressId === savedPaymentMethodAddressId);
 
     onBillingInfoSelected(savedPaymentMethodData ? savedPaymentMethodAddressId : data);
     onNext();
-  }, [savedPaymentMethods, onBillingInfoSelected, onNext, taxes.status]);
+  }, [savedPaymentMethods, onBillingInfoSelected, onNext, taxes]);
 
   const handleSavedPaymentMethodDeleted = useCallback(async (savedPaymentMethodId: string) => {
     setViewState(({ taxes }) => ({ isDeleting: true, showSaved: true, taxes }));
@@ -261,7 +265,7 @@ export const BillingView: React.FC<BillingViewProps> = ({
 
       <CheckoutDeliveryAndItemCostBreakdown
         checkoutItems={ checkoutItems }
-        taxes={ taxes }
+        taxes={ vertexEnabled ? taxes : null }
         validatePersonalDeliveryAddress={ formSubmitAttempted }
         wallets={ wallets }
         wallet={ wallet }
