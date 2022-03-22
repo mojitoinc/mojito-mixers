@@ -33,6 +33,7 @@ import { THREEDS_REDIRECT_DELAY_MS } from "../../../config/config";
 import { Network } from "../../../domain/network/network.interfaces";
 import { NEW_WALLET_OPTION } from "../../../domain/wallet/wallet.constants";
 import { StatusIcon } from "../../shared/StatusIcon/StatusIcon";
+import { CreditCardNetwork } from "react-payment-inputs";
 
 export interface PUICheckoutOverlayProps {
   // Modal:
@@ -55,6 +56,7 @@ export interface PUICheckoutOverlayProps {
   errorImageSrc: string;
   userFormat: UserFormat;
   acceptedPaymentTypes: PaymentType[];
+  acceptedCreditCardNetworks?: CreditCardNetwork[];
   paymentLimits?: Partial<Record<PaymentType, number>>;
   dictionary?: Partial<PUIDictionary>;
   network?: Network;
@@ -102,6 +104,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   errorImageSrc,
   userFormat,
   acceptedPaymentTypes,
+  acceptedCreditCardNetworks,
   paymentLimits, // Not implemented yet. Used to show payment limits for some payment types.
   dictionary,
   network,
@@ -689,6 +692,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
         onPrev={ goBack }
         onClose={ handleClose }
         acceptedPaymentTypes={ acceptedPaymentTypes }
+        acceptedCreditCardNetworks={ acceptedCreditCardNetworks }
         consentType={ consentType }
         debug={ debug } />
     );

@@ -10,6 +10,7 @@ import { alpha, Box, CircularProgress, Typography } from "@mui/material";
 import { ConsentType } from "../ConsentText/ConsentText";
 import { OVERLAY_OPACITY } from "../../../config/theme/themeConstants";
 import { getCVCIsValid } from "../../../domain/payment/payment.utils";
+import { CreditCardNetwork } from "react-payment-inputs";
 
 export function validateCvv(isCvvRequired: boolean, cvv: string) {
   return !isCvvRequired || getCVCIsValid(cvv);
@@ -22,6 +23,7 @@ interface SavedPaymentDetailsSelectorState {
 
 export interface SavedPaymentDetailsSelectorProps {
   showLoader: boolean;
+  acceptedCreditCardNetworks?: CreditCardNetwork[];
   savedPaymentMethods: SavedPaymentMethod[];
   selectedPaymentMethodId?: string;
   onNew: () => void;
@@ -36,6 +38,7 @@ export interface SavedPaymentDetailsSelectorProps {
 
 export const SavedPaymentDetailsSelector: React.FC<SavedPaymentDetailsSelectorProps> = ({
   showLoader,
+  acceptedCreditCardNetworks,
   savedPaymentMethods,
   selectedPaymentMethodId,
   onNew,

@@ -36,6 +36,7 @@ import { FormErrorsBox } from "../components/shared/FormErrorsBox/FormErrorsBox"
 import { useFormCheckoutError } from "../hooks/useFormCheckoutError";
 import { PUIDictionary } from "../domain/dictionary/dictionary.interfaces";
 import { useDictionary } from "../hooks/useDictionary";
+import { CreditCardNetwork } from "react-payment-inputs";
 
 interface PaymentTypeFormProps {
   control: Control<PaymentMethod & { consent: boolean }>;
@@ -242,6 +243,7 @@ const PAYMENT_TYPE_FORM_DATA: Record<PaymentType, PaymentTypeFormData> = {
 
 export interface PaymentMethodFormProps {
   acceptedPaymentTypes: PaymentType[];
+  acceptedCreditCardNetworks?: CreditCardNetwork[];
   defaultValues?: PaymentMethod;
   checkoutError?: CheckoutModalError;
   onPlaidLinkClicked: () => void;
@@ -255,6 +257,7 @@ export interface PaymentMethodFormProps {
 
 export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
   acceptedPaymentTypes,
+  acceptedCreditCardNetworks,
   defaultValues: parentDefaultValues,
   checkoutError,
   onPlaidLinkClicked,
