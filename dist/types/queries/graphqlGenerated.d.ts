@@ -864,6 +864,7 @@ export declare type NftToken = {
     asset?: Maybe<Asset>;
     assetId?: Maybe<Scalars['UUID1']>;
     deployed: Scalars['Boolean'];
+    editions?: Maybe<Scalars['Int']>;
     ethereumTxId?: Maybe<Scalars['String']>;
     id: Scalars['UUID1'];
     metadataArweaveTxId?: Maybe<Scalars['String']>;
@@ -1033,6 +1034,9 @@ export declare type QueryGetPaymentMethodArgs = {
     paymentMethodID: Scalars['UUID1'];
 };
 export declare type QueryGetPaymentMethodListArgs = {
+    orgID: Scalars['UUID1'];
+};
+export declare type QueryGetPaymentPublicKeyArgs = {
     orgID: Scalars['UUID1'];
 };
 export declare type QueryGetPaymentsByUserIdArgs = {
@@ -1456,7 +1460,7 @@ export declare type MeQuery = {
     } | null;
 };
 export declare type PaymentKeyQueryVariables = Exact<{
-    [key: string]: never;
+    orgID: Scalars['UUID1'];
 }>;
 export declare type PaymentKeyQuery = {
     __typename?: 'Query';
@@ -1791,14 +1795,15 @@ export declare const PaymentKeyDocument: Apollo.DocumentNode;
  * @example
  * const { data, loading, error } = usePaymentKeyQuery({
  *   variables: {
+ *      orgID: // value for 'orgID'
  *   },
  * });
  */
-export declare function usePaymentKeyQuery(baseOptions?: Apollo.QueryHookOptions<PaymentKeyQuery, PaymentKeyQueryVariables>): Apollo.QueryResult<PaymentKeyQuery, Exact<{
-    [key: string]: never;
+export declare function usePaymentKeyQuery(baseOptions: Apollo.QueryHookOptions<PaymentKeyQuery, PaymentKeyQueryVariables>): Apollo.QueryResult<PaymentKeyQuery, Exact<{
+    orgID: any;
 }>>;
 export declare function usePaymentKeyLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<PaymentKeyQuery, PaymentKeyQueryVariables>): Apollo.QueryTuple<PaymentKeyQuery, Exact<{
-    [key: string]: never;
+    orgID: any;
 }>>;
 export declare type PaymentKeyQueryHookResult = ReturnType<typeof usePaymentKeyQuery>;
 export declare type PaymentKeyLazyQueryHookResult = ReturnType<typeof usePaymentKeyLazyQuery>;

@@ -150,6 +150,11 @@ debug: initialDebug, onEvent, onError, onMarketingOptInChange, // Not implemente
         else {
             paymentType = paymentInfo.type;
         }
+        if (!eventType.startsWith("event:") && !eventType.includes(checkoutStep)) {
+            if (debug)
+                console.log(`⚠️ eventType / checkoutStep mismatch: ${eventType} / ${checkoutStep}`);
+            return;
+        }
         onEvent(eventType, {
             // Location:
             step: CheckoutOverlay_hooks.CheckoutModalStepIndex[checkoutStep],
@@ -171,8 +176,11 @@ debug: initialDebug, onEvent, onError, onMarketingOptInChange, // Not implemente
         });
     };
     React.useEffect(() => {
+        // Original code (might this be causing the mismatch eventName / checkoutStep issue?):
         if (!isDialogInitializing)
             setTimeout(() => triggerAnalyticsEventRef.current(`navigate:${checkoutStep}`));
+        // Possible fix (might this cause some other issues such as missing data):
+        // if (!isDialogInitializing) triggerAnalyticsEventRef.current(`navigate:${ checkoutStep }`);
     }, [isDialogInitializing, checkoutStep]);
     // Saved payment method creation-reload-sync:
     React.useEffect(() => {

@@ -27,8 +27,8 @@ function useFullPayment({ orgID, invoiceID, savedPaymentMethods, selectedPayment
             paymentError,
         });
     }, []);
-    const [encryptCardData] = useEncryptCard.useEncryptCardData();
-    const [createPaymentMethod] = useCreatePaymentMethod.useCreatePaymentMethod({ debug });
+    const [encryptCardData] = useEncryptCard.useEncryptCardData({ orgID });
+    const [createPaymentMethod] = useCreatePaymentMethod.useCreatePaymentMethod({ orgID, debug });
     const [makePayment] = graphqlGenerated.useCreatePaymentMutation();
     const fullPayment = React.useCallback(() => tslib_es6.__awaiter(this, void 0, void 0, function* () {
         var _a, _b, _c, _d, _e, _f;
@@ -87,7 +87,7 @@ function useFullPayment({ orgID, invoiceID, savedPaymentMethods, selectedPayment
                     selectedPaymentInfo,
                 });
             }
-            const createPaymentMethodResult = yield createPaymentMethod(orgID, selectedBillingInfoData, selectedPaymentInfo).catch((error) => {
+            const createPaymentMethodResult = yield createPaymentMethod(selectedBillingInfoData, selectedPaymentInfo).catch((error) => {
                 mutationError = error;
                 const circleFieldErrors = circle_utils.parseCircleError(error);
                 if (debug)
