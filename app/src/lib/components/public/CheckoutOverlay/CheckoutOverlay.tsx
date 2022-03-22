@@ -329,8 +329,12 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   };
 
   useEffect(() => {
+    // Original code (might this be causing the mismatch eventName / checkoutStep issue?):
     if (!isDialogInitializing) setTimeout(() => triggerAnalyticsEventRef.current(`navigate:${ checkoutStep }`));
+
+    // Possible fix (might this cause some other issues such as missing data):
     // if (!isDialogInitializing) triggerAnalyticsEventRef.current(`navigate:${ checkoutStep }`);
+
   }, [isDialogInitializing, checkoutStep]);
 
   // Saved payment method creation-reload-sync:
