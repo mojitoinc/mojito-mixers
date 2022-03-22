@@ -168,7 +168,7 @@ const HomePage: React.FC = () => {
     // Flow:
     guestCheckoutEnabled: testPreset.guestCheckoutEnabled,
     productConfirmationEnabled: testPreset.productConfirmationEnabled,
-    vertexEnabled: false,
+    // vertexEnabled: false,
     // threeDSEnabled: false,
 
     // Personalization:
