@@ -53,8 +53,8 @@ export function useFullPayment({
     });
   }, []);
 
-  const [encryptCardData] = useEncryptCardData();
-  const [createPaymentMethod] = useCreatePaymentMethod({ debug });
+  const [encryptCardData] = useEncryptCardData({ orgID });
+  const [createPaymentMethod] = useCreatePaymentMethod({ orgID, debug });
   const [makePayment] = useCreatePaymentMutation();
 
   const fullPayment = useCallback(async () => {
@@ -130,7 +130,6 @@ export function useFullPayment({
       }
 
       const createPaymentMethodResult = await createPaymentMethod(
-        orgID,
         selectedBillingInfoData,
         selectedPaymentInfo,
       ).catch((error: ApolloError | Error) => {

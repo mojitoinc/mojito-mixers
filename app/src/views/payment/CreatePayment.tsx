@@ -60,15 +60,22 @@ const emptyValues: PaymentDetails = {
 };
 
 export const CreatePayment: React.FC = () => {
-  const { data, loading, error } = usePaymentKeyQuery();
-
-  const [
-    createPaymentMethod,
-    { data: mutationData, loading: mutationLoading, error: mutationError },
-  ] = useCreatePaymentMethodMutation();
 
   const [orgId, setOrgId] = useState("");
   const [paymentDetails, setPaymentDetails] = useState<PaymentDetails>(emptyValues);
+
+  const { data, loading, error } = usePaymentKeyQuery({
+    skip: !orgId,
+    variables: {
+      orgID: orgId,
+    },
+  });
+
+  const [createPaymentMethod, {
+    data: mutationData,
+    loading: mutationLoading,
+    error: mutationError
+  }] = useCreatePaymentMethodMutation();
 
   const prefillValues = () => setPaymentDetails(defaultValues);
   const clearValues = () => setPaymentDetails(emptyValues);

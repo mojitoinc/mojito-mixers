@@ -1043,6 +1043,7 @@ export type NftToken = {
   asset?: Maybe<Asset>;
   assetId?: Maybe<Scalars['UUID1']>;
   deployed: Scalars['Boolean'];
+  editions?: Maybe<Scalars['Int']>;
   ethereumTxId?: Maybe<Scalars['String']>;
   id: Scalars['UUID1'];
   metadataArweaveTxId?: Maybe<Scalars['String']>;
@@ -1247,6 +1248,11 @@ export type QueryGetPaymentMethodArgs = {
 
 
 export type QueryGetPaymentMethodListArgs = {
+  orgID: Scalars['UUID1'];
+};
+
+
+export type QueryGetPaymentPublicKeyArgs = {
   orgID: Scalars['UUID1'];
 };
 
@@ -1667,7 +1673,9 @@ export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type MeQuery = { __typename?: 'Query', me?: { __typename?: 'CurrentUser', id: any, user: { __typename?: 'User', id: any, username: string, name?: string | null, email?: string | null }, userOrgs: Array<{ __typename?: 'UserOrganization', organization: { __typename?: 'Organization', id: any, name: string } }>, wallets?: Array<{ __typename?: 'Wallet', id: any, name: string, address?: any | null }> | null } | null };
 
-export type PaymentKeyQueryVariables = Exact<{ [key: string]: never; }>;
+export type PaymentKeyQueryVariables = Exact<{
+  orgID: Scalars['UUID1'];
+}>;
 
 
 export type PaymentKeyQuery = { __typename?: 'Query', getPaymentPublicKey: { __typename?: 'PaymentPublicKey', keyID: string, publicKey: string } };
@@ -2004,8 +2012,8 @@ export type MeQueryHookResult = ReturnType<typeof useMeQuery>;
 export type MeLazyQueryHookResult = ReturnType<typeof useMeLazyQuery>;
 export type MeQueryResult = Apollo.QueryResult<MeQuery, MeQueryVariables>;
 export const PaymentKeyDocument = gql`
-    query PaymentKey {
-  getPaymentPublicKey {
+    query PaymentKey($orgID: UUID1!) {
+  getPaymentPublicKey(orgID: $orgID) {
     keyID
     publicKey
   }
@@ -2024,10 +2032,11 @@ export const PaymentKeyDocument = gql`
  * @example
  * const { data, loading, error } = usePaymentKeyQuery({
  *   variables: {
+ *      orgID: // value for 'orgID'
  *   },
  * });
  */
-export function usePaymentKeyQuery(baseOptions?: Apollo.QueryHookOptions<PaymentKeyQuery, PaymentKeyQueryVariables>) {
+export function usePaymentKeyQuery(baseOptions: Apollo.QueryHookOptions<PaymentKeyQuery, PaymentKeyQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
         return Apollo.useQuery<PaymentKeyQuery, PaymentKeyQueryVariables>(PaymentKeyDocument, options);
       }

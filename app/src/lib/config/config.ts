@@ -1,7 +1,7 @@
 // Dev / Debug Stuff:
 export const DEV_DEBUG_COUNTER_EXPIRATION_MS = 1000;
 export const DEV_DEBUG_COUNTER_CLICKS_NEEDED = 16;
-export const DEV_SKIP_3DS_IN_LOCALHOST = false;
+export const DEV_SKIP_3DS_IN_LOCALHOST = true;
 
 // Invoice / Reservation:
 export const RESERVATION_COUNTDOWN_FROM_MIN = 15;
