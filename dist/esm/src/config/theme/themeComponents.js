@@ -9,7 +9,7 @@ declare module "@mui/material/TextField" {
 }
 */
 function createComponentsTheme({ typography, palette, spacing, breakpoints, transitions }) {
-    var _a, _b, _c, _d, _e, _f, _g;
+    var _a, _b, _c, _d, _e;
     return {
         // FORMS:
         MuiFormLabel: {
@@ -152,6 +152,9 @@ function createComponentsTheme({ typography, palette, spacing, breakpoints, tran
                         border: `${BORDER_THICKNESS}px solid ${palette.grey[100]}`,
                         cursor: "not-allowed",
                         pointerEvents: "auto",
+                        "&:hover": {
+                            background: palette.grey["50"],
+                        },
                     },
                 },
                 sizeSmall: {
@@ -172,12 +175,11 @@ function createComponentsTheme({ typography, palette, spacing, breakpoints, tran
                 },
                 containedPrimary: {
                     background: ((_a = palette.paymentUI) === null || _a === void 0 ? void 0 : _a.mainButtonBackground) || palette.primary.main,
-                    border: `${(_c = (_b = palette.paymentUI) === null || _b === void 0 ? void 0 : _b.mainButtonBorderWidth) !== null && _c !== void 0 ? _c : BORDER_THICKNESS}px solid ${palette.primary.main}`,
                     color: palette.primary.contrastText,
                     minWidth: "200px !important",
                     transition: transitions.create(["background"]),
                     "&:hover": {
-                        background: darkenBackground(((_d = palette.paymentUI) === null || _d === void 0 ? void 0 : _d.mainButtonBackground) || palette.primary.main),
+                        background: darkenBackground(((_b = palette.paymentUI) === null || _b === void 0 ? void 0 : _b.mainButtonBackground) || palette.primary.main),
                     },
                 },
                 containedSecondary: {
@@ -215,10 +217,10 @@ function createComponentsTheme({ typography, palette, spacing, breakpoints, tran
                         minWidth: spacing(17),
                     },
                     "&.Mui-selected": {
-                        background: ((_e = palette.paymentUI) === null || _e === void 0 ? void 0 : _e.paymentMethodSelectorBackground) || palette.primary.main,
+                        background: ((_c = palette.paymentUI) === null || _c === void 0 ? void 0 : _c.paymentMethodSelectorBackground) || palette.primary.main,
                         color: palette.primary.contrastText,
                         "&:hover": {
-                            background: darkenBackground(((_f = palette.paymentUI) === null || _f === void 0 ? void 0 : _f.paymentMethodSelectorBackground) || palette.primary.main),
+                            background: darkenBackground(((_d = palette.paymentUI) === null || _d === void 0 ? void 0 : _d.paymentMethodSelectorBackground) || palette.primary.main),
                         },
                     },
                     "&:hover": {
@@ -230,7 +232,7 @@ function createComponentsTheme({ typography, palette, spacing, breakpoints, tran
         MuiToggleButtonGroup: {
             styleOverrides: {
                 root: {
-                    background: ((_g = palette.paymentUI) === null || _g === void 0 ? void 0 : _g.paymentMethodSelectorBorder) || palette.primary.main,
+                    background: ((_e = palette.paymentUI) === null || _e === void 0 ? void 0 : _e.paymentMethodSelectorBorder) || palette.primary.main,
                     backgroundOrigin: "border-box",
                     border: `${BORDER_THICKNESS}px solid transparent`,
                     borderRadius: MD_BORDER_RADIUS + BORDER_THICKNESS,

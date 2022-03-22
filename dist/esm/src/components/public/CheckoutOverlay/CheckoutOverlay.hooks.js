@@ -15,7 +15,7 @@ var CheckoutModalStepIndex;
 })(CheckoutModalStepIndex || (CheckoutModalStepIndex = {}));
 const CHECKOUT_STEPS = ["authentication", "billing", "payment", "purchasing", "confirmation"];
 const WALLET_ADDRESS_FIELD_STEPS = ["billing", "payment"];
-function useCheckoutModalState({ invoiceID: initialInvoiceID = null, productConfirmationEnabled, isAuthenticated, onError, }) {
+function useCheckoutModalState({ invoiceID: initialInvoiceID = null, productConfirmationEnabled, vertexEnabled, isAuthenticated, onError, }) {
     const startAt = !isAuthenticated || productConfirmationEnabled ? "authentication" : "billing";
     const [{ checkoutStep, checkoutError, isDialogBlocked, }, setCheckoutModalState] = useState({
         checkoutStep: startAt,
@@ -28,7 +28,7 @@ function useCheckoutModalState({ invoiceID: initialInvoiceID = null, productConf
     });
     const [{ invoiceID, taxes, wallet, circlePaymentID, paymentID, }, setPurchaseState] = useState({
         invoiceID: initialInvoiceID || null,
-        taxes: { status: "incomplete" },
+        taxes: vertexEnabled ? { status: "incomplete" } : null,
         wallet: null,
         circlePaymentID: "",
         paymentID: ""
@@ -62,12 +62,12 @@ function useCheckoutModalState({ invoiceID: initialInvoiceID = null, productConf
         });
         setPurchaseState({
             invoiceID: savedFlow.invoiceID || "",
-            taxes: { status: "incomplete" },
+            taxes: vertexEnabled ? { status: "incomplete" } : null,
             wallet: null,
             circlePaymentID: savedFlow.circlePaymentID || "",
             paymentID: savedFlow.paymentID || ""
         });
-    }, [startAt]);
+    }, [startAt, vertexEnabled]);
     const goBack = useCallback(() => {
         setCheckoutModalState(({ checkoutStep, checkoutError }) => ({
             checkoutStep: CHECKOUT_STEPS[Math.max(CHECKOUT_STEPS.indexOf(checkoutStep) - 1, 0)],

@@ -8,7 +8,6 @@ const DISPLAY_BOX_SX = {
     m: 0,
     borderRadius: `${SM_BORDER_RADIUS}px`,
     backgroundColor: theme => theme.palette.grey["50"],
-    border: theme => `1px solid ${theme.palette.grey["100"]}`,
     color: theme => theme.palette.grey["800"],
 };
 const DisplayBox = (_a) => {

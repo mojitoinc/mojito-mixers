@@ -4,7 +4,7 @@ import { TaxesState } from "../../../views/Billing/BillingView";
 import { Wallet } from "../../../domain/wallet/wallet.interfaces";
 interface CheckoutDeliveryAndItemCostBreakdownProps {
     checkoutItems: CheckoutItem[];
-    taxes: TaxesState;
+    taxes: null | TaxesState;
     validatePersonalDeliveryAddress: boolean;
     wallets?: Wallet[];
     wallet: null | string | Wallet;
