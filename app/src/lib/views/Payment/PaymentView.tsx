@@ -27,7 +27,7 @@ interface PaymentViewState {
 
 export interface PaymentViewProps {
   checkoutItems: CheckoutItem[];
-  taxes: TaxesState;
+  taxes: null | TaxesState;
   savedPaymentMethods: SavedPaymentMethod[];
   selectedPaymentMethod: SelectedPaymentMethod;
   wallets?: Wallet[];

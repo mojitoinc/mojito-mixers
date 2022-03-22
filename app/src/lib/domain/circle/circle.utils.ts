@@ -32,7 +32,7 @@ export function formatPhoneAsE123(phoneNumber: string, countryCode: string) {
 
 export function transformRawSavedPaymentMethods(rawSavedPaymentMethods: RawSavedPaymentMethod[] = []): SavedPaymentMethod[] {
   return rawSavedPaymentMethods.map(({ billingDetails, metadata, ...rest }) => {
-    if (!billingDetails || !metadata) return null;
+    if (!billingDetails || !metadata || !billingDetails.name || !billingDetails.address1) return null;
 
     // Find country by short code:
     const {

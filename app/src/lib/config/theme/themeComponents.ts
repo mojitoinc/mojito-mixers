@@ -179,6 +179,10 @@ export function createComponentsTheme({ typography, palette, spacing, breakpoint
             border: `${BORDER_THICKNESS}px solid ${palette.grey[100]}`,
             cursor: "not-allowed",
             pointerEvents: "auto",
+
+            "&:hover": {
+              background: palette.grey["50"],
+            },
           },
         },
         sizeSmall: {
@@ -201,7 +205,6 @@ export function createComponentsTheme({ typography, palette, spacing, breakpoint
         },
         containedPrimary: {
           background: palette.paymentUI?.mainButtonBackground || palette.primary.main,
-          border: `${ palette.paymentUI?.mainButtonBorderWidth ?? BORDER_THICKNESS }px solid ${palette.primary.main}`,
           color: palette.primary.contrastText,
           minWidth: "200px !important",
           transition: transitions.create(["background"]),

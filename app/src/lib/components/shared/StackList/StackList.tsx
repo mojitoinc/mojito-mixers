@@ -42,6 +42,7 @@ export function StackList<T extends {} = any, A extends {} = any> ({
           return (
             <ItemComponent
               key={ key }
+              // TODO: Do we need to set the id attribute?
               id={ key }
               index={ index }
               component="li"

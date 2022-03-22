@@ -6,16 +6,16 @@ export type TaxesMessagesBoxVariant = "form" | "selector";
 
 export interface TaxesMessagesBoxProps extends BoxProps {
   variant: TaxesMessagesBoxVariant;
-  taxes: TaxesState;
+  taxes: null | TaxesState;
 }
 
 export const TaxesMessagesBox: React.FC<TaxesMessagesBoxProps> = ({
   variant,
-  taxes: { status },
+  taxes,
   sx,
   ...props
 }) => {
-  if (status !== "error") return null;
+  if (taxes === null || taxes.status !== "error") return null;
 
   return (
     <Box { ...props }>
