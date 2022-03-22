@@ -7,7 +7,8 @@ import { XS_MOBILE_MAX_WIDTH } from '../../config/theme/themeConstants.js';
 import { StatusIcon } from '../../components/shared/StatusIcon/StatusIcon.js';
 import { useGetPaymentNotificationQuery } from '../../queries/graphqlGenerated.js';
 import { persistCheckoutModalInfo } from '../../components/public/CheckoutOverlay/CheckoutOverlay.utils.js';
-import { PURCHASING_MIN_WAIT_MS, PAYMENT_CREATION_TIMEOUT_MS, PURCHASING_MESSAGES_DEFAULT, PURCHASING_MESSAGES_INTERVAL_MS, PAYMENT_NOTIFICATION_INTERVAL_MS, DEV_SKIP_3DS_IN_LOCALHOST } from '../../config/config.js';
+import { PURCHASING_MIN_WAIT_MS, PAYMENT_CREATION_TIMEOUT_MS, PURCHASING_MESSAGES_DEFAULT, PURCHASING_MESSAGES_INTERVAL_MS, PAYMENT_NOTIFICATION_INTERVAL_MS } from '../../config/config.js';
+import { isLocalhost } from '../../domain/url/url.utils.js';
 
 const PurchasingView = ({ threeDSEnabled, purchasingImageSrc, purchasingMessages: customPurchasingMessages, orgID, invoiceID, savedPaymentMethods, selectedPaymentMethod, wallet, onPurchaseSuccess, onPurchaseError, onDialogBlocked, debug, }) => {
     var _a, _b, _c;
@@ -76,7 +77,7 @@ const PurchasingView = ({ threeDSEnabled, purchasingImageSrc, purchasingMessages
         if (!hasWaited || redirectURL === "" || purchaseSuccessHandledRef.current)
             return;
         purchaseSuccessHandledRef.current = true;
-        const skipRedirect = DEV_SKIP_3DS_IN_LOCALHOST ;
+        const skipRedirect = isLocalhost();
         if (redirectURL && !skipRedirect) {
             persistCheckoutModalInfo({
                 invoiceID,
@@ -86,7 +87,7 @@ const PurchasingView = ({ threeDSEnabled, purchasingImageSrc, purchasingMessages
                 paymentInfo,
             });
         }
-        onPurchaseSuccess(circlePaymentID, paymentID, (redirectURL || ""));
+        onPurchaseSuccess(circlePaymentID, paymentID, skipRedirect ? "" : (redirectURL || ""));
     }, [
         fullPaymentState,
         hasWaited,

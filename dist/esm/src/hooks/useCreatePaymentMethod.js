@@ -7,11 +7,11 @@ import { fullTrim } from '../utils/formatUtils.js';
 import { wait } from '../utils/promiseUtils.js';
 import { PAYMENT_CREATION_MAX_WAIT_MS, PAYMENT_CREATION_INTERVAL_MS } from '../config/config.js';
 
-function useCreatePaymentMethod({ debug, }) {
-    const [encryptCardData] = useEncryptCardData();
+function useCreatePaymentMethod({ orgID, debug, }) {
+    const [encryptCardData] = useEncryptCardData({ orgID });
     const [getPaymentMethodStatus] = useGetPaymentMethodStatusLazyQuery();
     const [createPaymentMethod, createPaymentMethodResult] = useCreatePaymentMethodMutation();
-    const extendedCreatePaymentMethod = useCallback((orgID, billingInfo, paymentInfo) => __awaiter(this, void 0, void 0, function* () {
+    const extendedCreatePaymentMethod = useCallback((billingInfo, paymentInfo) => __awaiter(this, void 0, void 0, function* () {
         var _a, _b;
         if (!orgID)
             throw new Error("Missing `orgID`");
@@ -107,7 +107,7 @@ function useCreatePaymentMethod({ debug, }) {
         else if (status === "complete")
             return createPaymentMethodPromise;
         throw new Error("Payment method could not be validated.");
-    }), [debug, encryptCardData, createPaymentMethod, getPaymentMethodStatus]);
+    }), [debug, orgID, encryptCardData, createPaymentMethod, getPaymentMethodStatus]);
     return [extendedCreatePaymentMethod, createPaymentMethodResult];
 }
 
