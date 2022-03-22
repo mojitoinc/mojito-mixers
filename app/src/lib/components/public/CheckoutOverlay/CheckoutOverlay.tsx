@@ -188,6 +188,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   } = useCheckoutModalState({
     invoiceID: initialInvoiceID,
     productConfirmationEnabled,
+    vertexEnabled,
     isAuthenticated,
     onError,
   });

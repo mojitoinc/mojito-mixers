@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 import { Control, Controller, FieldError } from "react-hook-form";
 import {
   EMPTY_OPTION,
@@ -23,6 +23,8 @@ export const StateSelector: React.FC<StateSelectorProps> = ({
   countryCode,
   ...props
 }) => {
+  const initRef = useRef(false);
+
   const { options, optionsMap } = useCountryOptions(countryCode);
 
   const handleChange = useCallback((e: SelectChangeEvent<string | number>) => {
@@ -30,6 +32,18 @@ export const StateSelector: React.FC<StateSelectorProps> = ({
   }, [optionsMap, onSelectState]);
 
   const isDisabled = disabled || !countryCode || options.length === 0;
+
+  // If the selected country code changes, we reset the field. Note the useEffect below might not do that, as two
+  // different countries might have states with the same code (eg. Andorra and Anguilla):
+  useEffect(() => {
+    if (!initRef.current) {
+      initRef.current = true;
+
+      return;
+    }
+
+    onSelectState(EMPTY_OPTION);
+  }, [countryCode, onSelectState]);
 
   // If the selected option can't be found among the available ones, we reset the field:
   useEffect(() => {

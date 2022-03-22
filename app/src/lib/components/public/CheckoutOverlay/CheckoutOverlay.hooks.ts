@@ -34,6 +34,7 @@ export enum CheckoutModalStepIndex {
 export interface CheckoutModalStateOptions {
   invoiceID?: string | null;
   productConfirmationEnabled?: boolean;
+  vertexEnabled?: boolean;
   isAuthenticated?: boolean;
   onError?: (error: CheckoutModalError) => void;
 }
@@ -52,7 +53,7 @@ export interface SelectedPaymentMethod {
 
 export interface PurchaseState {
   invoiceID: string | null;
-  taxes: TaxesState;
+  taxes: null | TaxesState;
   wallet: null | string | Wallet;
   circlePaymentID: string;
   paymentID: string;
@@ -86,6 +87,7 @@ const WALLET_ADDRESS_FIELD_STEPS = ["billing", "payment"];
 export function useCheckoutModalState({
   invoiceID: initialInvoiceID = null,
   productConfirmationEnabled,
+  vertexEnabled,
   isAuthenticated,
   onError,
 }: CheckoutModalStateOptions): CheckoutModalStateReturn {
@@ -114,7 +116,7 @@ export function useCheckoutModalState({
     paymentID,
   }, setPurchaseState] = useState<PurchaseState>({
     invoiceID: initialInvoiceID || null,
-    taxes: { status: "incomplete" },
+    taxes: vertexEnabled ? { status: "incomplete" } : null,
     wallet: null,
     circlePaymentID: "",
     paymentID: ""
@@ -155,12 +157,12 @@ export function useCheckoutModalState({
 
     setPurchaseState({
       invoiceID: savedFlow.invoiceID || "",
-      taxes: { status: "incomplete" },
+      taxes: vertexEnabled ? { status: "incomplete" } : null,
       wallet: null,
       circlePaymentID: savedFlow.circlePaymentID || "",
       paymentID: savedFlow.paymentID || ""
     });
-  }, [startAt]);
+  }, [startAt, vertexEnabled]);
 
   const goBack = useCallback(() => {
     setCheckoutModalState(({ checkoutStep, checkoutError }) => ({
@@ -227,9 +229,7 @@ export function useCheckoutModalState({
 
   const setPayments = useCallback((circlePaymentID: string, paymentID: string) => {
     setPurchaseState((prevPurchaseState) => ({ ...prevPurchaseState, circlePaymentID, paymentID }));
-  }, [])
-
-
+  }, []);
 
   return {
     // CheckoutModalState:

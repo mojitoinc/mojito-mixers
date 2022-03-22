@@ -8,7 +8,7 @@ import { TaxesState } from "../../../../views/Billing/BillingView";
 
 export interface CheckoutItemCostBreakdownProps {
   checkoutItems: CheckoutItem[];
-  taxes: TaxesState;
+  taxes: null | TaxesState;
 }
 
 export const CheckoutItemCostBreakdown: React.FC<CheckoutItemCostBreakdownProps> = ({
