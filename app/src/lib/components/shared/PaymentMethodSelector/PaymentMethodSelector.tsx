@@ -19,7 +19,7 @@ type PaymentMethodOptionProps = {
   icon: JSX.Element;
 };
 
-const PAYMENT_METHOD_OPTION_PROPS: Record<
+export const PAYMENT_METHOD_OPTION_PROPS: Record<
   PaymentType,
   PaymentMethodOptionProps
 > = {
