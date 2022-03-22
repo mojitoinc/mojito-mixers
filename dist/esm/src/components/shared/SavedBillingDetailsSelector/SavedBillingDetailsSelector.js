@@ -38,7 +38,7 @@ const SavedBillingDetailsSelector = ({ showLoader, savedPaymentMethods, selected
                 }), component: BillingInfoItem, itemKey: getPaymentMethodAddressId, deps: [selectedPaymentMethodAddressId, showLoader, onDelete, onPick, onEdit] }),
             React__default.createElement(SecondaryButton, { onClick: onNew, startIcon: React__default.createElement(default_1, null), sx: { mt: 2.5 }, disabled: showLoader }, "Add New Billing Info"),
             React__default.createElement(TaxesMessagesBox, { sx: { mt: 5 }, taxes: taxes, variant: "selector" })),
-        React__default.createElement(CheckoutModalFooter, { variant: "toPayment", consentType: consentType, buttonLabel: taxes.status === "loading" ? "Calculating taxes..." : undefined, submitDisabled: taxes.status !== "complete", onSubmitClicked: handleNextClicked, onCloseClicked: onClose })));
+        React__default.createElement(CheckoutModalFooter, { variant: "toPayment", consentType: consentType, buttonLabel: (taxes === null || taxes === void 0 ? void 0 : taxes.status) === "loading" ? "Calculating taxes..." : undefined, submitDisabled: !!taxes && taxes.status !== "complete", onSubmitClicked: handleNextClicked, onCloseClicked: onClose })));
 };
 
 export { SavedBillingDetailsSelector };

@@ -75,6 +75,7 @@ debug: initialDebug, onEvent, onError, onMarketingOptInChange, // Not implemente
     invoiceID, setInvoiceID, taxes, setTaxes, wallet, setWalletAddress, paymentID, circlePaymentID, setPayments, } = CheckoutOverlay_hooks.useCheckoutModalState({
         invoiceID: initialInvoiceID,
         productConfirmationEnabled,
+        vertexEnabled,
         isAuthenticated,
         onError,
     });

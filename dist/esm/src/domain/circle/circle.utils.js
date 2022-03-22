@@ -24,7 +24,7 @@ function formatPhoneAsE123(phoneNumber, countryCode) {
 function transformRawSavedPaymentMethods(rawSavedPaymentMethods = []) {
     return rawSavedPaymentMethods.map((_a) => {
         var { billingDetails, metadata } = _a, rest = __rest(_a, ["billingDetails", "metadata"]);
-        if (!billingDetails || !metadata)
+        if (!billingDetails || !metadata || !billingDetails.name || !billingDetails.address1)
             return null;
         // Find country by short code:
         const { countryName = "", countryShortCode: countryCode = "", regions = [], } = countryRegionData.find(({ countryShortCode }) => countryShortCode === billingDetails.country) || {};

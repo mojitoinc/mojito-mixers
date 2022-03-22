@@ -19,7 +19,7 @@ exports.CheckoutModalStepIndex = void 0;
 })(exports.CheckoutModalStepIndex || (exports.CheckoutModalStepIndex = {}));
 const CHECKOUT_STEPS = ["authentication", "billing", "payment", "purchasing", "confirmation"];
 const WALLET_ADDRESS_FIELD_STEPS = ["billing", "payment"];
-function useCheckoutModalState({ invoiceID: initialInvoiceID = null, productConfirmationEnabled, isAuthenticated, onError, }) {
+function useCheckoutModalState({ invoiceID: initialInvoiceID = null, productConfirmationEnabled, vertexEnabled, isAuthenticated, onError, }) {
     const startAt = !isAuthenticated || productConfirmationEnabled ? "authentication" : "billing";
     const [{ checkoutStep, checkoutError, isDialogBlocked, }, setCheckoutModalState] = React.useState({
         checkoutStep: startAt,
@@ -32,7 +32,7 @@ function useCheckoutModalState({ invoiceID: initialInvoiceID = null, productConf
     });
     const [{ invoiceID, taxes, wallet, circlePaymentID, paymentID, }, setPurchaseState] = React.useState({
         invoiceID: initialInvoiceID || null,
-        taxes: { status: "incomplete" },
+        taxes: vertexEnabled ? { status: "incomplete" } : null,
         wallet: null,
         circlePaymentID: "",
         paymentID: ""
@@ -66,12 +66,12 @@ function useCheckoutModalState({ invoiceID: initialInvoiceID = null, productConf
         });
         setPurchaseState({
             invoiceID: savedFlow.invoiceID || "",
-            taxes: { status: "incomplete" },
+            taxes: vertexEnabled ? { status: "incomplete" } : null,
             wallet: null,
             circlePaymentID: savedFlow.circlePaymentID || "",
             paymentID: savedFlow.paymentID || ""
         });
-    }, [startAt]);
+    }, [startAt, vertexEnabled]);
     const goBack = React.useCallback(() => {
         setCheckoutModalState(({ checkoutStep, checkoutError }) => ({
             checkoutStep: CHECKOUT_STEPS[Math.max(CHECKOUT_STEPS.indexOf(checkoutStep) - 1, 0)],

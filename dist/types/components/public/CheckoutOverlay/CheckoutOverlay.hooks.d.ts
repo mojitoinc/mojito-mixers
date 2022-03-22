@@ -24,6 +24,7 @@ export declare enum CheckoutModalStepIndex {
 export interface CheckoutModalStateOptions {
     invoiceID?: string | null;
     productConfirmationEnabled?: boolean;
+    vertexEnabled?: boolean;
     isAuthenticated?: boolean;
     onError?: (error: CheckoutModalError) => void;
 }
@@ -39,7 +40,7 @@ export interface SelectedPaymentMethod {
 }
 export interface PurchaseState {
     invoiceID: string | null;
-    taxes: TaxesState;
+    taxes: null | TaxesState;
     wallet: null | string | Wallet;
     circlePaymentID: string;
     paymentID: string;
@@ -60,4 +61,4 @@ export interface CheckoutModalStateReturn extends CheckoutModalState, PurchaseSt
     setPayments: (circlePaymentID: string, paymentID: string) => void;
 }
 export declare const CHECKOUT_STEPS: CheckoutModalStep[];
-export declare function useCheckoutModalState({ invoiceID: initialInvoiceID, productConfirmationEnabled, isAuthenticated, onError, }: CheckoutModalStateOptions): CheckoutModalStateReturn;
+export declare function useCheckoutModalState({ invoiceID: initialInvoiceID, productConfirmationEnabled, vertexEnabled, isAuthenticated, onError, }: CheckoutModalStateOptions): CheckoutModalStateReturn;
