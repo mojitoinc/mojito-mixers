@@ -205,7 +205,7 @@ const HomePage: React.FC = () => {
       formValues.paymentWire ? "Wire" : "",
       formValues.paymentCrypto ? "Crypto" : "",
     ].filter(Boolean) as PaymentType[],
-
+    acceptedCreditCardNetworks: formValues.paymentCC ? ["visa", "mastercard"] : undefined,
 
     dictionary: {
       privacyHref: PLAYGROUND_PRIVACY_HREF,

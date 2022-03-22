@@ -9,12 +9,9 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { alpha, Box, CircularProgress, Typography } from "@mui/material";
 import { ConsentType } from "../ConsentText/ConsentText";
 import { OVERLAY_OPACITY } from "../../../config/theme/themeConstants";
-import { getCVCIsValid } from "../../../domain/payment/payment.utils";
-import { CreditCardNetwork } from "react-payment-inputs";
-
-export function validateCvv(isCvvRequired: boolean, cvv: string) {
-  return !isCvvRequired || getCVCIsValid(cvv);
-}
+import { getCreditCardNetworkFromLabel, getCvvIsValid } from "../../../domain/payment/payment.utils";
+import { withInvalidCVV } from "../../../utils/validationUtils";
+import { CreditCardNetwork, getCardTypeByType } from "../../../domain/react-payment-inputs/react-payment-inputs.utils";
 
 interface SavedPaymentDetailsSelectorState {
   isFormSubmitted: boolean;
@@ -36,6 +33,12 @@ export interface SavedPaymentDetailsSelectorProps {
   consentType?: ConsentType;
 }
 
+interface CreditCardInfo {
+  creditCardNetwork: "" | CreditCardNetwork;
+  cvvLabel: string;
+  isCvvRequired: boolean;
+}
+
 export const SavedPaymentDetailsSelector: React.FC<SavedPaymentDetailsSelectorProps> = ({
   showLoader,
   acceptedCreditCardNetworks,
@@ -50,10 +53,25 @@ export const SavedPaymentDetailsSelector: React.FC<SavedPaymentDetailsSelectorPr
   onAttemptSubmit,
   consentType,
 }) => {
-  const isCvvRequired = useMemo(() => {
+  const { creditCardNetwork, cvvLabel, isCvvRequired } = useMemo((): CreditCardInfo => {
     const selectedPaymentMethod = savedPaymentMethods.find(savedPaymentMethod => savedPaymentMethod.id === selectedPaymentMethodId);
 
-    return selectedPaymentMethod?.type === "CreditCard";
+    if (!selectedPaymentMethod || selectedPaymentMethod.type !== "CreditCard") {
+      return {
+        creditCardNetwork: "",
+        cvvLabel: "",
+        isCvvRequired: false,
+      };
+    }
+
+    const creditCardNetwork = getCreditCardNetworkFromLabel(selectedPaymentMethod.network);
+    const cvvLabel = getCardTypeByType(creditCardNetwork).code.name;
+
+    return {
+      creditCardNetwork,
+      cvvLabel,
+      isCvvRequired: true,
+    };
   }, [savedPaymentMethods, selectedPaymentMethodId]);
 
   const [{
@@ -69,14 +87,13 @@ export const SavedPaymentDetailsSelector: React.FC<SavedPaymentDetailsSelectorPr
     setSelectorState(({ isFormSubmitted }) => ({ isFormSubmitted, cvv: "" }));
   }, [selectedPaymentMethodId]);
 
-
-  const isCvvOk = validateCvv(isCvvRequired, cvv);
-  const cvvError = isFormSubmitted && !isCvvOk;
+  const { cvvExpectedLength, isCvvValid } = getCvvIsValid(cvv, creditCardNetwork, acceptedCreditCardNetworks, isCvvRequired);
+  const cvvError = isFormSubmitted && !isCvvValid;
 
   const handleNextClicked = useCallback((canSubmit: boolean) => {
     onAttemptSubmit();
 
-    if (canSubmit && selectedPaymentMethodId && isCvvOk) {
+    if (canSubmit && selectedPaymentMethodId && isCvvValid) {
       onCvvSelected(cvv);
       onNext();
 
@@ -84,7 +101,7 @@ export const SavedPaymentDetailsSelector: React.FC<SavedPaymentDetailsSelectorPr
     }
 
     setSelectorState(({ cvv }) => ({ isFormSubmitted: true, cvv }));
-  }, [onAttemptSubmit, selectedPaymentMethodId, cvv, isCvvOk, onCvvSelected, onNext]);
+  }, [onAttemptSubmit, selectedPaymentMethodId, cvv, isCvvValid, onCvvSelected, onNext]);
 
   const handleCvvChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const cvv = e.currentTarget.value || "";
@@ -121,6 +138,7 @@ export const SavedPaymentDetailsSelector: React.FC<SavedPaymentDetailsSelectorPr
           disabled: showLoader,
           onDelete,
           onPick,
+          cvvLabel,
           cvvError,
           onCvvChange: handleCvvChange,
         }) }
@@ -130,7 +148,7 @@ export const SavedPaymentDetailsSelector: React.FC<SavedPaymentDetailsSelectorPr
 
       { cvvError && (
         <Typography variant="caption" component="p" sx={{ mt: 2, color: theme => theme.palette.warning.dark }}>
-          You must enter a valid CVV number.
+          { withInvalidCVV({ cvvLabel, cvvExpectedLength }) }
         </Typography>
       ) }
 

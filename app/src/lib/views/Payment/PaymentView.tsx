@@ -17,7 +17,7 @@ import { ConsentType } from "../../components/shared/ConsentText/ConsentText";
 import { checkNeedsGenericErrorMessage } from "../../hooks/useFormCheckoutError";
 import { TaxesState } from "../Billing/BillingView";
 import { Wallet } from "../../domain/wallet/wallet.interfaces";
-import { CreditCardNetwork } from "react-payment-inputs";
+import { CreditCardNetwork } from "../../domain/react-payment-inputs/react-payment-inputs.utils";
 
 const billingInfoItemBoxProps: BoxProps = { sx: { mt: 2.5 } };
 

@@ -33,7 +33,7 @@ import { THREEDS_REDIRECT_DELAY_MS } from "../../../config/config";
 import { Network } from "../../../domain/network/network.interfaces";
 import { NEW_WALLET_OPTION } from "../../../domain/wallet/wallet.constants";
 import { StatusIcon } from "../../shared/StatusIcon/StatusIcon";
-import { CreditCardNetwork } from "react-payment-inputs";
+import { CreditCardNetwork } from "../../../domain/react-payment-inputs/react-payment-inputs.utils";
 
 export interface PUICheckoutOverlayProps {
   // Modal:
