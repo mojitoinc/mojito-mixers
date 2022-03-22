@@ -141,7 +141,7 @@ export function useCreatePaymentMethod({
     else if (status === "complete") return createPaymentMethodPromise;
 
     throw new Error("Payment method could not be validated.");
-  }, [debug, encryptCardData, createPaymentMethod, getPaymentMethodStatus]);
+  }, [debug, orgID, encryptCardData, createPaymentMethod, getPaymentMethodStatus]);
 
   return [extendedCreatePaymentMethod, createPaymentMethodResult];
 }
