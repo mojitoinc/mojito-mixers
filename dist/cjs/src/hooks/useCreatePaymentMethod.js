@@ -11,11 +11,11 @@ var formatUtils = require('../utils/formatUtils.js');
 var promiseUtils = require('../utils/promiseUtils.js');
 var config = require('../config/config.js');
 
-function useCreatePaymentMethod({ debug, }) {
-    const [encryptCardData] = useEncryptCard.useEncryptCardData();
+function useCreatePaymentMethod({ orgID, debug, }) {
+    const [encryptCardData] = useEncryptCard.useEncryptCardData({ orgID });
     const [getPaymentMethodStatus] = graphqlGenerated.useGetPaymentMethodStatusLazyQuery();
     const [createPaymentMethod, createPaymentMethodResult] = graphqlGenerated.useCreatePaymentMethodMutation();
-    const extendedCreatePaymentMethod = React.useCallback((orgID, billingInfo, paymentInfo) => tslib_es6.__awaiter(this, void 0, void 0, function* () {
+    const extendedCreatePaymentMethod = React.useCallback((billingInfo, paymentInfo) => tslib_es6.__awaiter(this, void 0, void 0, function* () {
         var _a, _b;
         if (!orgID)
             throw new Error("Missing `orgID`");
@@ -111,7 +111,7 @@ function useCreatePaymentMethod({ debug, }) {
         else if (status === "complete")
             return createPaymentMethodPromise;
         throw new Error("Payment method could not be validated.");
-    }), [debug, encryptCardData, createPaymentMethod, getPaymentMethodStatus]);
+    }), [debug, orgID, encryptCardData, createPaymentMethod, getPaymentMethodStatus]);
     return [extendedCreatePaymentMethod, createPaymentMethodResult];
 }
 

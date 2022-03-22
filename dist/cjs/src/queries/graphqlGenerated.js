@@ -364,8 +364,8 @@ function useMeQuery(baseOptions) {
     return Apollo__namespace.useQuery(MeDocument, options);
 }
 const PaymentKeyDocument = Apollo.gql `
-    query PaymentKey {
-  getPaymentPublicKey {
+    query PaymentKey($orgID: UUID1!) {
+  getPaymentPublicKey(orgID: $orgID) {
     keyID
     publicKey
   }

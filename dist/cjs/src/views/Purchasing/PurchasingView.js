@@ -12,6 +12,7 @@ var StatusIcon = require('../../components/shared/StatusIcon/StatusIcon.js');
 var graphqlGenerated = require('../../queries/graphqlGenerated.js');
 var CheckoutOverlay_utils = require('../../components/public/CheckoutOverlay/CheckoutOverlay.utils.js');
 var config = require('../../config/config.js');
+var url_utils = require('../../domain/url/url.utils.js');
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
@@ -84,7 +85,7 @@ const PurchasingView = ({ threeDSEnabled, purchasingImageSrc, purchasingMessages
         if (!hasWaited || redirectURL === "" || purchaseSuccessHandledRef.current)
             return;
         purchaseSuccessHandledRef.current = true;
-        const skipRedirect = config.DEV_SKIP_3DS_IN_LOCALHOST ;
+        const skipRedirect = url_utils.isLocalhost();
         if (redirectURL && !skipRedirect) {
             CheckoutOverlay_utils.persistCheckoutModalInfo({
                 invoiceID,
@@ -94,7 +95,7 @@ const PurchasingView = ({ threeDSEnabled, purchasingImageSrc, purchasingMessages
                 paymentInfo,
             });
         }
-        onPurchaseSuccess(circlePaymentID, paymentID, (redirectURL || ""));
+        onPurchaseSuccess(circlePaymentID, paymentID, skipRedirect ? "" : (redirectURL || ""));
     }, [
         fullPaymentState,
         hasWaited,

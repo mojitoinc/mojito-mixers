@@ -13,7 +13,11 @@ export interface UseEncryptedDataResult {
   encryptedCardData: string;
 }
 
-export function useEncryptCardData(): [
+export interface UseEncryptCardDataOptions {
+  orgID: string;
+}
+
+export function useEncryptCardData({ orgID }: UseEncryptCardDataOptions): [
   (encryptCardDataOptions: EncryptCardDataOptions) => Promise<UseEncryptedDataResult>,
   LazyQueryResult<PaymentKeyQuery, PaymentKeyQueryVariables>,
 ] {
@@ -21,7 +25,7 @@ export function useEncryptCardData(): [
   const [fetchPaymentKey, fetchPaymentKeyResult] = usePaymentKeyLazyQuery();
 
   const encryptCardData = useCallback(async (encryptCardDataOptions: EncryptCardDataOptions) => {
-    const paymentKeyResult = await fetchPaymentKey();
+    const paymentKeyResult = await fetchPaymentKey({ variables: { orgID } });
 
     const paymentKeyData = paymentKeyResult?.data;
     const publicKey = paymentKeyData?.getPaymentPublicKey?.publicKey;
@@ -38,7 +42,7 @@ export function useEncryptCardData(): [
       keyID,
       encryptedCardData,
     };
-  }, [fetchPaymentKey]);
+  }, [fetchPaymentKey, orgID]);
 
   return [encryptCardData, fetchPaymentKeyResult];
 

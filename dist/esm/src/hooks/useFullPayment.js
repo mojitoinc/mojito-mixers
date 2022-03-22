@@ -23,8 +23,8 @@ function useFullPayment({ orgID, invoiceID, savedPaymentMethods, selectedPayment
             paymentError,
         });
     }, []);
-    const [encryptCardData] = useEncryptCardData();
-    const [createPaymentMethod] = useCreatePaymentMethod({ debug });
+    const [encryptCardData] = useEncryptCardData({ orgID });
+    const [createPaymentMethod] = useCreatePaymentMethod({ orgID, debug });
     const [makePayment] = useCreatePaymentMutation();
     const fullPayment = useCallback(() => __awaiter(this, void 0, void 0, function* () {
         var _a, _b, _c, _d, _e, _f;
@@ -83,7 +83,7 @@ function useFullPayment({ orgID, invoiceID, savedPaymentMethods, selectedPayment
                     selectedPaymentInfo,
                 });
             }
-            const createPaymentMethodResult = yield createPaymentMethod(orgID, selectedBillingInfoData, selectedPaymentInfo).catch((error) => {
+            const createPaymentMethodResult = yield createPaymentMethod(selectedBillingInfoData, selectedPaymentInfo).catch((error) => {
                 mutationError = error;
                 const circleFieldErrors = parseCircleError(error);
                 if (debug)
