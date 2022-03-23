@@ -24,6 +24,14 @@ var ContractType;
     ContractType["Erc721Creator"] = "ERC721Creator";
     ContractType["Erc1155Creator"] = "ERC1155Creator";
 })(ContractType || (ContractType = {}));
+var DeliveryMethod;
+(function (DeliveryMethod) {
+    DeliveryMethod["Erc721Provenance"] = "ERC721Provenance";
+    DeliveryMethod["Erc721Transfer"] = "ERC721Transfer";
+    DeliveryMethod["Erc1155OpenEdition"] = "ERC1155OpenEdition";
+    DeliveryMethod["Erc1155Transfer"] = "ERC1155Transfer";
+    DeliveryMethod["NoOp"] = "NoOp";
+})(DeliveryMethod || (DeliveryMethod = {}));
 var ExtensionType;
 (function (ExtensionType) {
     ExtensionType["ProvenanceExtension"] = "ProvenanceExtension";
@@ -38,6 +46,9 @@ var InvoiceStatus;
 })(InvoiceStatus || (InvoiceStatus = {}));
 var KycStatus;
 (function (KycStatus) {
+    KycStatus["Clear"] = "Clear";
+    KycStatus["Failed1"] = "Failed1";
+    KycStatus["Failed2"] = "Failed2";
     KycStatus["Level1"] = "Level1";
     KycStatus["Level2"] = "Level2";
     KycStatus["None"] = "None";
@@ -107,6 +118,7 @@ const GetPaymentNotificationDocument = gql `
     message {
       ... on PaymentNotification3DSMessage {
         redirectURL
+        error
       }
     }
   }
@@ -558,5 +570,5 @@ function useGetTaxQuoteLazyQuery(baseOptions) {
     return Apollo.useLazyQuery(GetTaxQuoteDocument, options);
 }
 
-export { AuctionBidOrder, AuctionLotStatus, CollectionType, ContractType, CreateAuctionInvoiceDocument, CreatePaymentDocument, CreatePaymentMethodDocument, DeletePaymentMethodDocument, ExtensionType, GetInvoiceDetailsDocument, GetPaymentMethodListDocument, GetPaymentMethodStatusDocument, GetPaymentNotificationDocument, GetTaxQuoteDocument, InvoiceStatus, KycStatus, MarketCollectionStatus, MarketplaceCollectionItemStatus, MarketplaceSaleType, MeDocument, PaymentKeyDocument, PaymentStatus, PaymentType, PreparePaymentMethodDocument, ReleaseReservationBuyNowLotDocument, ReserveBuyNowLotDocument, Role, TransactionStatus, TransactionType, WalletParentType, WalletTxType, useCreateAuctionInvoiceMutation, useCreatePaymentMethodMutation, useCreatePaymentMutation, useDeletePaymentMethodMutation, useGetInvoiceDetailsQuery, useGetPaymentMethodListQuery, useGetPaymentMethodStatusLazyQuery, useGetPaymentNotificationQuery, useGetTaxQuoteLazyQuery, useMeQuery, usePaymentKeyLazyQuery, usePreparePaymentMethodQuery, useReleaseReservationBuyNowLotMutation, useReserveBuyNowLotMutation };
+export { AuctionBidOrder, AuctionLotStatus, CollectionType, ContractType, CreateAuctionInvoiceDocument, CreatePaymentDocument, CreatePaymentMethodDocument, DeletePaymentMethodDocument, DeliveryMethod, ExtensionType, GetInvoiceDetailsDocument, GetPaymentMethodListDocument, GetPaymentMethodStatusDocument, GetPaymentNotificationDocument, GetTaxQuoteDocument, InvoiceStatus, KycStatus, MarketCollectionStatus, MarketplaceCollectionItemStatus, MarketplaceSaleType, MeDocument, PaymentKeyDocument, PaymentStatus, PaymentType, PreparePaymentMethodDocument, ReleaseReservationBuyNowLotDocument, ReserveBuyNowLotDocument, Role, TransactionStatus, TransactionType, WalletParentType, WalletTxType, useCreateAuctionInvoiceMutation, useCreatePaymentMethodMutation, useCreatePaymentMutation, useDeletePaymentMethodMutation, useGetInvoiceDetailsQuery, useGetPaymentMethodListQuery, useGetPaymentMethodStatusLazyQuery, useGetPaymentNotificationQuery, useGetTaxQuoteLazyQuery, useMeQuery, usePaymentKeyLazyQuery, usePreparePaymentMethodQuery, useReleaseReservationBuyNowLotMutation, useReserveBuyNowLotMutation };
 //# sourceMappingURL=graphqlGenerated.js.map

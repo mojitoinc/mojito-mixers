@@ -18,7 +18,15 @@ function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'defau
 var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 
 const VARIANTS_WITH_DISCLAIMER = ["toPayment", "toPlaid", "toConfirmation"];
-const CheckoutModalFooter = ({ variant, buttonLabel, guestCheckoutEnabled, consentType, onGoToCollection, submitDisabled, onSubmitClicked, onCloseClicked, }) => {
+const CheckoutModalFooter = ({ 
+// Configuration:
+variant, guestCheckoutEnabled, consentType, 
+// Submit button:
+submitLabel, submitDisabled, onSubmitClicked, 
+// Close link:
+closeLabel, closeDisabled, onCloseClicked, 
+// onGoToCollection:
+onGoToCollection, }) => {
     // CONSENT:
     const showConsent = consentType && VARIANTS_WITH_DISCLAIMER.includes(variant);
     const consentTextElement = showConsent ? React__default["default"].createElement(ConsentText.ConsentText, null) : null;
@@ -47,9 +55,9 @@ const CheckoutModalFooter = ({ variant, buttonLabel, guestCheckoutEnabled, conse
         if (onGoToCollection)
             onGoToCollection();
     }, [onGoToCollection]);
-    // PRIMARY BUTTON:
+    // SUBMIT BUTTON:
     const primaryButtonVisible = variant !== "toGuestCheckout" || guestCheckoutEnabled;
-    const primaryButtonLabel = buttonLabel || CheckoutModalFooter_constants.LABELS_BY_VARIANT[variant];
+    const primaryButtonLabel = submitLabel || CheckoutModalFooter_constants.LABELS_BY_VARIANT[variant];
     const PrimaryButtonIcon = CheckoutModalFooter_constants.ICONS_BY_VARIANT[variant];
     const handleSubmitClicked = React.useCallback(() => tslib_es6.__awaiter(void 0, void 0, void 0, function* () {
         if (!onSubmitClicked)
@@ -71,11 +79,13 @@ const CheckoutModalFooter = ({ variant, buttonLabel, guestCheckoutEnabled, conse
         });
     }), [isConsentChecked, onSubmitClicked]);
     // CANCEL LINK:
+    const cancelLinkLabel = closeLabel || "Cancel and Return to Marketplace";
+    const cancelLinkColor = closeDisabled ? "text.disabled" : "text.primary"; // TODO: Create custom Link component with this functionality.
     const handleCancelClicked = React.useCallback((e) => {
         e.preventDefault();
-        if (onCloseClicked)
+        if (onCloseClicked && !closeDisabled)
             onCloseClicked();
-    }, [onCloseClicked]);
+    }, [onCloseClicked, closeDisabled]);
     return (React__default["default"].createElement(material.Box, { sx: {
             display: "flex",
             alignItems: "center",
@@ -88,9 +98,9 @@ const CheckoutModalFooter = ({ variant, buttonLabel, guestCheckoutEnabled, conse
                 consentTextElement), checked: isConsentChecked, onChange: handleConsentClicked, error: showConsentError, helperText: showConsentError ? ConsentText.CONSENT_ERROR_MESSAGE : undefined, sx: { alignSelf: "flex-start", mb: 5 } })),
         onGoToCollection && (React__default["default"].createElement(PrimaryButton.PrimaryButton, { onClick: handleCollectionClicked, disabled: submitDisabled || isFormLoading, sx: { mb: 2 } }, "View Collection")),
         primaryButtonVisible && (React__default["default"].createElement(PrimaryButton.PrimaryButton, { onClick: onSubmitClicked ? handleSubmitClicked : undefined, type: onSubmitClicked ? "button" : "submit", endIcon: isFormLoading ? React__default["default"].createElement(material.CircularProgress, { color: "inherit", size: "1em" }) : (PrimaryButtonIcon && React__default["default"].createElement(PrimaryButtonIcon, null)), disabled: submitDisabled || isFormLoading }, primaryButtonLabel)),
-        variant !== "toMarketplace" && onCloseClicked && (React__default["default"].createElement(material.Typography, { sx: primaryButtonVisible ? { pt: 2 } : undefined },
+        variant !== "toMarketplace" && onCloseClicked && (React__default["default"].createElement(material.Typography, { sx: { color: cancelLinkColor, pt: primaryButtonVisible ? 2 : 0 } },
             primaryButtonVisible ? "or " : null,
-            React__default["default"].createElement(material.Link, { sx: { color: "text.primary" }, href: "", onClick: handleCancelClicked }, "Cancel and Return to Marketplace"))),
+            React__default["default"].createElement(material.Link, { sx: { color: cancelLinkColor, cursor: closeDisabled ? "not-allowed" : "pointer" }, href: "", onClick: handleCancelClicked }, cancelLinkLabel))),
         showConsent && consentType === "disclaimer" && (React__default["default"].createElement(React__default["default"].Fragment, null,
             React__default["default"].createElement(material.Divider, { sx: { my: 5, width: "100%" } }),
             React__default["default"].createElement(material.Typography, { sx: { maxWidth: themeConstants.SM_MOBILE_MAX_WIDTH }, align: "center" },

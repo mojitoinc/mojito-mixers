@@ -32,7 +32,7 @@ const PUISuccessOverlay = (_a) => {
     if (!purchaseSuccess)
         return null;
     const headerElement = logoSrc ? (React__default.createElement(CheckoutModalHeader, { variant: "purchasing", logoSrc: logoSrc, logoSx: logoSx })) : null;
-    return (React__default.createElement(FullScreenOverlay, Object.assign({ centered: true, header: headerElement }, fullScreenOverlayProps),
+    return (React__default.createElement(FullScreenOverlay, Object.assign({ isDialogBlocked: true, centered: true, header: headerElement }, fullScreenOverlayProps),
         React__default.createElement(SuccessView, { successImageSrc: successImageSrc })));
 };
 const PUISuccess = withThemeProvider(PUISuccessOverlay);

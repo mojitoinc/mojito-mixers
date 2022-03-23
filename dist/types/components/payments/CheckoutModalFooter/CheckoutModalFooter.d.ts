@@ -3,12 +3,14 @@ import { ConsentType } from "../../shared/ConsentText/ConsentText";
 export declare type CheckoutModalFooterVariant = "toGuestCheckout" | "toPayment" | "toConfirmation" | "toPlaid" | "toReview" | "toMarketplace";
 export interface CheckoutModalFooterProps {
     variant: CheckoutModalFooterVariant;
-    buttonLabel?: string;
     guestCheckoutEnabled?: boolean;
     consentType?: ConsentType;
-    onGoToCollection?: () => void;
+    submitLabel?: string;
     submitDisabled?: boolean;
     onSubmitClicked?: (canSubmit: boolean) => void | Promise<void | false>;
+    closeLabel?: string;
+    closeDisabled?: boolean;
     onCloseClicked?: () => void;
+    onGoToCollection?: () => void;
 }
 export declare const CheckoutModalFooter: React.FC<CheckoutModalFooterProps>;

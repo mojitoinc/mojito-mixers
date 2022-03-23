@@ -176,7 +176,7 @@ defaultValues, checkoutError, taxes, onTaxInfoChange, onSaved, onClose, onSubmit
             JSON.stringify(watch(), null, 2),
             "\n\n",
             JSON.stringify(formState.errors, null, 2))),
-        React__default["default"].createElement(CheckoutModalFooter.CheckoutModalFooter, { variant: "toPayment", consentType: consentType, buttonLabel: (taxes === null || taxes === void 0 ? void 0 : taxes.status) === "loading" ? "Calculating taxes..." : undefined, submitDisabled: !!taxes && taxes.status !== "complete", onCloseClicked: onClose })));
+        React__default["default"].createElement(CheckoutModalFooter.CheckoutModalFooter, { variant: "toPayment", consentType: consentType, submitLabel: (taxes === null || taxes === void 0 ? void 0 : taxes.status) === "loading" ? "Calculating taxes..." : undefined, submitDisabled: !!taxes && taxes.status !== "complete", onCloseClicked: onClose })));
 };
 
 exports.BillingInfoForm = BillingInfoForm;

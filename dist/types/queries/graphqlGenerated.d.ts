@@ -195,11 +195,12 @@ export declare enum ContractType {
 export declare type CreateMarketplaceBuyNowLotInput = {
     collectionId: Scalars['UUID1'];
     collectionItemName: Scalars['String'];
+    delivery?: InputMaybe<MarketplaceItemDeliveryInput>;
     endDate: Scalars['Time'];
     marketplaceTokenId?: InputMaybe<Scalars['UUID1']>;
     sortNumber: Scalars['Int'];
     startDate: Scalars['Time'];
-    totalUnits: Scalars['Int'];
+    totalUnits?: InputMaybe<Scalars['Int']>;
     unitPrice: Scalars['Float'];
 };
 export declare type CreatePaymentCreditCardMetadataInput = {
@@ -276,6 +277,13 @@ export declare type CurrentUserUserOrgsArgs = {
 export declare type CurrentUserWonBidsArgs = {
     orgId: Scalars['UUID'];
 };
+export declare enum DeliveryMethod {
+    Erc721Provenance = "ERC721Provenance",
+    Erc721Transfer = "ERC721Transfer",
+    Erc1155OpenEdition = "ERC1155OpenEdition",
+    Erc1155Transfer = "ERC1155Transfer",
+    NoOp = "NoOp"
+}
 export declare type DeployContractInput = {
     contractType: ContractType;
     nftName: Scalars['String'];
@@ -355,6 +363,9 @@ export declare type ItemInvoiceDetail = {
     units: Scalars['Int'];
 };
 export declare enum KycStatus {
+    Clear = "Clear",
+    Failed1 = "Failed1",
+    Failed2 = "Failed2",
     Level1 = "Level1",
     Level2 = "Level2",
     None = "None",
@@ -446,6 +457,7 @@ export declare type MarketplaceAuctionLotDefaultConfigArgs = {
 export declare type MarketplaceAuctionLotInput = {
     collectionId: Scalars['UUID'];
     collectionItemName: Scalars['String'];
+    delivery?: InputMaybe<MarketplaceItemDeliveryInput>;
     endDate: Scalars['Time'];
     lotNumber?: InputMaybe<Scalars['Int']>;
     marketplaceTokenId?: InputMaybe<Scalars['UUID']>;
@@ -455,6 +467,7 @@ export declare type MarketplaceAuctionLotInput = {
     startingBid?: InputMaybe<Scalars['Float']>;
 };
 export declare type MarketplaceAuctionLotUpdateInput = {
+    delivery?: InputMaybe<MarketplaceItemDeliveryInput>;
     endDate?: InputMaybe<Scalars['Time']>;
     lotNumber?: InputMaybe<Scalars['Int']>;
     reservePrice?: InputMaybe<Scalars['Float']>;
@@ -502,6 +515,7 @@ export declare type MarketplaceCollectionCreateInput = {
 export declare type MarketplaceCollectionItem = {
     __typename?: 'MarketplaceCollectionItem';
     collectionId: Scalars['UUID'];
+    delivery?: Maybe<MarketplaceCollectionItemDelivery>;
     details: MarketplaceCollectionItemDetails;
     id: Scalars['UUID'];
     /** @deprecated Use `details` property instead */
@@ -512,6 +526,7 @@ export declare type MarketplaceCollectionItem = {
     slug: Scalars['String'];
     status: MarketplaceCollectionItemStatus;
 };
+export declare type MarketplaceCollectionItemDelivery = MarketplaceItemDeliveryErc721Provenance | MarketplaceItemDeliveryErc721Transfer | MarketplaceItemDeliveryErc1155OpenEdition | MarketplaceItemDeliveryErc1155Transfer | MarketplaceItemDeliveryNoOp;
 export declare type MarketplaceCollectionItemDetails = MarketplaceAuctionLot | MarketplaceBuyNowOutput;
 export declare enum MarketplaceCollectionItemStatus {
     Active = "Active",
@@ -526,6 +541,63 @@ export declare type MarketplaceCollectionUpdateInput = {
     slug?: InputMaybe<Scalars['String']>;
     startDate?: InputMaybe<Scalars['Time']>;
     status?: InputMaybe<MarketCollectionStatus>;
+};
+export declare type MarketplaceItemDeliveryErc721Provenance = {
+    __typename?: 'MarketplaceItemDeliveryERC721Provenance';
+    extensionAddress: Scalars['String'];
+    nftContractId: Scalars['UUID1'];
+};
+export declare type MarketplaceItemDeliveryErc721ProvenanceInput = {
+    extensionAddress: Scalars['String'];
+    nftContractId: Scalars['UUID1'];
+};
+export declare type MarketplaceItemDeliveryErc721Transfer = {
+    __typename?: 'MarketplaceItemDeliveryERC721Transfer';
+    contractAddress: Scalars['String'];
+    onChainTokenId: Scalars['Int'];
+    ownerWalletId: Scalars['UUID1'];
+};
+export declare type MarketplaceItemDeliveryErc721TransferInput = {
+    contractAddress: Scalars['String'];
+    onChainTokenId: Scalars['Int'];
+    ownerWalletId: Scalars['UUID1'];
+};
+export declare type MarketplaceItemDeliveryErc1155OpenEdition = {
+    __typename?: 'MarketplaceItemDeliveryERC1155OpenEdition';
+    contractAddress: Scalars['String'];
+    onChainTokenId: Scalars['Int'];
+    ownerWalletId: Scalars['UUID1'];
+};
+export declare type MarketplaceItemDeliveryErc1155OpenEditionInput = {
+    contractAddress: Scalars['String'];
+    onChainTokenId: Scalars['Int'];
+    ownerWalletId: Scalars['UUID1'];
+};
+export declare type MarketplaceItemDeliveryErc1155Transfer = {
+    __typename?: 'MarketplaceItemDeliveryERC1155Transfer';
+    contractAddress: Scalars['String'];
+    onChainTokenId: Scalars['Int'];
+    ownerWalletId: Scalars['UUID1'];
+};
+export declare type MarketplaceItemDeliveryErc1155TransferInput = {
+    contractAddress: Scalars['String'];
+    onChainTokenId: Scalars['Int'];
+    ownerWalletId: Scalars['UUID1'];
+};
+export declare type MarketplaceItemDeliveryInput = {
+    ERC721Provenance?: InputMaybe<MarketplaceItemDeliveryErc721ProvenanceInput>;
+    ERC721Transfer?: InputMaybe<MarketplaceItemDeliveryErc721TransferInput>;
+    ERC1155OpenEdition?: InputMaybe<MarketplaceItemDeliveryErc1155OpenEditionInput>;
+    ERC1155Transfer?: InputMaybe<MarketplaceItemDeliveryErc1155TransferInput>;
+    NoOp?: InputMaybe<MarketplaceItemDeliveryNoOpInput>;
+    deliveryMethod: DeliveryMethod;
+};
+export declare type MarketplaceItemDeliveryNoOp = {
+    __typename?: 'MarketplaceItemDeliveryNoOp';
+    notes?: Maybe<Scalars['String']>;
+};
+export declare type MarketplaceItemDeliveryNoOpInput = {
+    notes?: InputMaybe<Scalars['String']>;
 };
 export declare enum MarketplaceSaleType {
     Auction = "Auction",
@@ -608,6 +680,7 @@ export declare type Mutation = {
     nftContractAddAdmin: Scalars['String'];
     nftContractExtensionPause: Scalars['String'];
     nftContractExtensionSetBaseURI: Scalars['String'];
+    nftContractExtensionSetProvenanceHash: Scalars['String'];
     nftContractExtensionUnpause: Scalars['String'];
     nftContractRegisterExtensionProvenance: NftContract;
     nftDeployContract: NftContract;
@@ -622,6 +695,7 @@ export declare type Mutation = {
     /** Updates existing  Applicant based on input data. */
     updateApplicant: ApplicantResponse;
     updateMarketplaceAuctionLot: MarketplaceAuctionLot;
+    updateMarketplaceBuyNowLot: MarketplaceBuyNowOutput;
     updateMarketplaceCollection: MarketplaceCollection;
     /** Update name of multisig wallet */
     updateMultisigName: Scalars['Boolean'];
@@ -754,6 +828,11 @@ export declare type MutationNftContractExtensionSetBaseUriArgs = {
     extensionAddress: Scalars['String'];
     nftContractId: Scalars['UUID1'];
 };
+export declare type MutationNftContractExtensionSetProvenanceHashArgs = {
+    extensionAddress: Scalars['String'];
+    nftContractId: Scalars['UUID1'];
+    provenanceHash: Scalars['String'];
+};
 export declare type MutationNftContractExtensionUnpauseArgs = {
     extensionAddress: Scalars['String'];
     nftContractId: Scalars['UUID1'];
@@ -793,6 +872,9 @@ export declare type MutationUpdateApplicantArgs = {
 export declare type MutationUpdateMarketplaceAuctionLotArgs = {
     data: MarketplaceAuctionLotUpdateInput;
     marketplaceAuctionLotId: Scalars['UUID'];
+};
+export declare type MutationUpdateMarketplaceBuyNowLotArgs = {
+    input: CreateMarketplaceBuyNowLotInput;
 };
 export declare type MutationUpdateMarketplaceCollectionArgs = {
     data: MarketplaceCollectionUpdateInput;
@@ -936,7 +1018,8 @@ export declare type PaymentMethodUpdateInput = {
 };
 export declare type PaymentNotification3DsMessage = {
     __typename?: 'PaymentNotification3DSMessage';
-    redirectURL: Scalars['String'];
+    error?: Maybe<Scalars['String']>;
+    redirectURL?: Maybe<Scalars['String']>;
 };
 export declare type PaymentNotificationMessage = PaymentNotification3DsMessage;
 export declare type PaymentNotificationOutput = {
@@ -1347,7 +1430,8 @@ export declare type GetPaymentNotificationQuery = {
         __typename?: 'PaymentNotificationOutput';
         message: {
             __typename?: 'PaymentNotification3DSMessage';
-            redirectURL: string;
+            redirectURL?: string | null;
+            error?: string | null;
         };
     };
 };
