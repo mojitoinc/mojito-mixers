@@ -1,9 +1,10 @@
 import { SavedPaymentMethod } from "../../../domain/circle/circle.interfaces";
 import React from "react";
 import { ConsentType } from "../ConsentText/ConsentText";
-export declare function validateCvv(isCvvRequired: boolean, cvv: string): boolean;
+import { CreditCardNetwork } from "../../../domain/react-payment-inputs/react-payment-inputs.utils";
 export interface SavedPaymentDetailsSelectorProps {
     showLoader: boolean;
+    acceptedCreditCardNetworks?: CreditCardNetwork[];
     savedPaymentMethods: SavedPaymentMethod[];
     selectedPaymentMethodId?: string;
     onNew: () => void;

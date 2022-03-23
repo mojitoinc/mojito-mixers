@@ -6,6 +6,7 @@ import { CheckoutModalError, SelectedPaymentMethod } from "../../components/publ
 import { ConsentType } from "../../components/shared/ConsentText/ConsentText";
 import { TaxesState } from "../Billing/BillingView";
 import { Wallet } from "../../domain/wallet/wallet.interfaces";
+import { CreditCardNetwork } from "../../domain/react-payment-inputs/react-payment-inputs.utils";
 export interface PaymentViewProps {
     checkoutItems: CheckoutItem[];
     taxes: null | TaxesState;
@@ -22,6 +23,7 @@ export interface PaymentViewProps {
     onPrev: () => void;
     onClose: () => void;
     acceptedPaymentTypes: PaymentType[];
+    acceptedCreditCardNetworks?: CreditCardNetwork[];
     consentType?: ConsentType;
     debug?: boolean;
 }

@@ -26,6 +26,8 @@ var ConsentText = require('../components/shared/ConsentText/ConsentText.js');
 var FormErrorsBox = require('../components/shared/FormErrorsBox/FormErrorsBox.js');
 var useFormCheckoutError = require('../hooks/useFormCheckoutError.js');
 var useDictionary = require('../hooks/useDictionary.js');
+var reactPaymentInputs_utils = require('../domain/react-payment-inputs/react-payment-inputs.utils.js');
+var reactPaymentInputs = require('react-payment-inputs');
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
@@ -52,42 +54,63 @@ const PAYMENT_TYPE_FORM_DATA = {
             nameOnCard: "",
             consent: consentType === "checkbox" ? false : true,
         }),
-        schemaShape: {
+        schemaShape: (acceptedCreditCardNetworks) => ({
             cardNumber: yup.string()
                 .label(FIELD_LABELS.cardNumber)
                 .when("type", {
                 is: "CreditCard",
-                then: (schema) => schema.required().test({
+                then: (schema) => schema.required(validationUtils.withRequiredErrorMessage).test({
                     name: "is-valid-card-number",
-                    test: payment_utils.getCardNumberIsValid,
-                    message: validationUtils.withInvalidErrorMessage
+                    test: (cardNumber, context) => {
+                        const creditCardNumberError = reactPaymentInputs.getCardNumberError(cardNumber);
+                        if (creditCardNumberError) {
+                            return new yup.ValidationError(validationUtils.withInvalidCardNumber({ label: FIELD_LABELS.cardNumber }), cardNumber, context.path);
+                        }
+                        if (acceptedCreditCardNetworks && acceptedCreditCardNetworks.length > 0) {
+                            const creditCardNetwork = payment_utils.getCreditCardNetworkFromNumber(cardNumber || "");
+                            if (creditCardNetwork === "" || !acceptedCreditCardNetworks.includes(creditCardNetwork)) {
+                                return new yup.ValidationError(validationUtils.withInvalidCreditCardNetwork({ acceptedCreditCardNetworks }), cardNumber, context.path);
+                            }
+                        }
+                        return true;
+                    },
                 })
             }),
             expiryDate: yup.string()
                 .label(FIELD_LABELS.expiryDate)
                 .when("type", {
                 is: "CreditCard",
-                then: (schema) => schema.required().test({
+                then: (schema) => schema.required(validationUtils.withRequiredErrorMessage).test({
                     name: "is-valid-expiry-date",
-                    test: payment_utils.getExpiryDateIsvalid,
+                    test: payment_utils.getExpiryDateIsValid,
                     message: validationUtils.withInvalidErrorMessage
                 })
             }),
             secureCode: yup.string()
-                .label(FIELD_LABELS.secureCode)
+                // .label(FIELD_LABELS.secureCode)
                 .when("type", {
                 is: "CreditCard",
-                then: (schema) => schema.required().test({
-                    name: "is-valid-cvv-or-cid-number",
-                    test: payment_utils.getCVCIsValid,
-                    message: validationUtils.withInvalidErrorMessage
-                })
+                then: (schema) => schema.test({
+                    name: "is-valid-cvv",
+                    test: (cvv, context) => {
+                        const creditCardNetwork = payment_utils.getCreditCardNetworkFromNumber(context.parent.cardNumber || "");
+                        const cvvLabel = reactPaymentInputs_utils.getCardTypeByType(creditCardNetwork).code.name;
+                        if (!cvv) {
+                            return new yup.ValidationError(validationUtils.withRequiredErrorMessage({ label: cvvLabel }), cvv, context.path);
+                        }
+                        const { cvvExpectedLength, isCvvValid } = payment_utils.getCvvIsValid(cvv, creditCardNetwork, acceptedCreditCardNetworks, true);
+                        if (!isCvvValid) {
+                            return new yup.ValidationError(validationUtils.withInvalidCVV({ cvvLabel, cvvExpectedLength }), cvv, context.path);
+                        }
+                        return true;
+                    },
+                }),
             }),
             nameOnCard: yup.string()
                 .label(FIELD_LABELS.nameOnCard)
                 .when("type", isCreditCardThenRequireSchema),
-        },
-        fields: ({ control, consentType, privacyHref, termsOfUseHref }) => (React__default["default"].createElement(React__default["default"].Fragment, null,
+        }),
+        fields: ({ control, cvvLabel, consentType }) => (React__default["default"].createElement(React__default["default"].Fragment, null,
             React__default["default"].createElement(CardNumberField.ControlledCardNumberField, { name: "cardNumber", control: control, label: FIELD_LABELS.cardNumber }),
             React__default["default"].createElement(material.Grid, { container: true, columnSpacing: 2, direction: {
                     xs: "column",
@@ -96,11 +119,11 @@ const PAYMENT_TYPE_FORM_DATA = {
                 React__default["default"].createElement(material.Grid, { item: true, sm: 6, zeroMinWidth: true },
                     React__default["default"].createElement(CardExpiryDateField.ControlledCardExpiryDateField, { name: "expiryDate", control: control, label: FIELD_LABELS.expiryDate })),
                 React__default["default"].createElement(material.Grid, { item: true, sm: 6 },
-                    React__default["default"].createElement(CardSecureCodeField.ControlledCardSecureCodeField, { name: "secureCode", control: control, label: FIELD_LABELS.secureCode }))),
+                    React__default["default"].createElement(CardSecureCodeField.ControlledCardSecureCodeField, { name: "secureCode", control: control, label: cvvLabel }))),
             React__default["default"].createElement(TextField.ControlledTextField, { name: "nameOnCard", control: control, label: FIELD_LABELS.nameOnCard }),
             consentType === "checkbox" && (React__default["default"].createElement(Checkbox.ControlledCheckbox, { name: "consent", control: control, label: React__default["default"].createElement(React__default["default"].Fragment, null,
                     "I ",
-                    React__default["default"].createElement(ConsentText.ConsentText, { privacyHref: privacyHref, termsOfUseHref: termsOfUseHref })) })))),
+                    React__default["default"].createElement(ConsentText.ConsentText, null)) })))),
     },
     ACH: {
         defaultValues: (consentType) => ({
@@ -109,13 +132,13 @@ const PAYMENT_TYPE_FORM_DATA = {
             publicToken: "",
             consent: consentType === "checkbox" ? false : true,
         }),
-        schemaShape: {},
-        fields: ({ control, consentType, privacyHref, termsOfUseHref }) => (React__default["default"].createElement(React__default["default"].Fragment, null,
+        schemaShape: () => ({}),
+        fields: ({ control, consentType }) => (React__default["default"].createElement(React__default["default"].Fragment, null,
             React__default["default"].createElement(DisplayBox.DisplayBox, { sx: { mt: 1.5, mb: consentType === "checkbox" ? 1 : 0 } },
                 React__default["default"].createElement(material.Typography, { variant: "body1" }, "We use Plaid to connect to your account.")),
             consentType === "checkbox" && (React__default["default"].createElement(Checkbox.ControlledCheckbox, { name: "consent", control: control, label: React__default["default"].createElement(React__default["default"].Fragment, null,
                     "I ",
-                    React__default["default"].createElement(ConsentText.ConsentText, { privacyHref: privacyHref, termsOfUseHref: termsOfUseHref })) })))),
+                    React__default["default"].createElement(ConsentText.ConsentText, null)) })))),
     },
     Wire: {
         defaultValues: (consentType) => ({
@@ -124,20 +147,20 @@ const PAYMENT_TYPE_FORM_DATA = {
             routingNumber: "",
             consent: consentType === "checkbox" ? false : true,
         }),
-        schemaShape: {
+        schemaShape: () => ({
             accountNumber: yup.string()
                 .label(FIELD_LABELS.accountNumber)
                 .when("type", isWireThenRequireSchema),
             routingNumber: yup.string()
                 .label(FIELD_LABELS.routingNumber)
                 .when("type", isWireThenRequireSchema),
-        },
-        fields: ({ control, consentType, privacyHref, termsOfUseHref, dictionary }) => (React__default["default"].createElement(React__default["default"].Fragment, null,
+        }),
+        fields: ({ control, consentType, dictionary }) => (React__default["default"].createElement(React__default["default"].Fragment, null,
             React__default["default"].createElement(TextField.ControlledTextField, { name: "accountNumber", control: control, label: FIELD_LABELS.accountNumber }),
             React__default["default"].createElement(TextField.ControlledTextField, { name: "routingNumber", control: control, label: FIELD_LABELS.routingNumber }),
             consentType === "checkbox" && (React__default["default"].createElement(Checkbox.ControlledCheckbox, { name: "consent", control: control, label: React__default["default"].createElement(React__default["default"].Fragment, null,
                     "I ",
-                    React__default["default"].createElement(ConsentText.ConsentText, { privacyHref: privacyHref, termsOfUseHref: termsOfUseHref })) })),
+                    React__default["default"].createElement(ConsentText.ConsentText, null)) })),
             React__default["default"].createElement(DisplayBox.DisplayBox, { sx: { mt: 1.5 } }, dictionary.wirePaymentsDisclaimer.map((line, i) => (React__default["default"].createElement(material.Typography, { key: i, variant: "body1", sx: i === 0 ? undefined : { mt: 1.5 } }, line)))))),
     },
     Crypto: {
@@ -145,24 +168,23 @@ const PAYMENT_TYPE_FORM_DATA = {
             type: "Crypto",
             consent: consentType === "checkbox" ? false : true,
         }),
-        schemaShape: {},
-        fields: ({ control, consentType, privacyHref, termsOfUseHref }) => (React__default["default"].createElement(React__default["default"].Fragment, null,
+        schemaShape: () => ({}),
+        fields: ({ control, consentType }) => (React__default["default"].createElement(React__default["default"].Fragment, null,
             React__default["default"].createElement(DisplayBox.DisplayBox, { sx: { mt: 1.5, mb: consentType === "checkbox" ? 1 : 0 } },
                 React__default["default"].createElement(material.Typography, { variant: "body1" }, "Not supported yet.")),
             consentType === "checkbox" && (React__default["default"].createElement(Checkbox.ControlledCheckbox, { name: "consent", control: control, label: React__default["default"].createElement(React__default["default"].Fragment, null,
                     "I ",
-                    React__default["default"].createElement(ConsentText.ConsentText, { privacyHref: privacyHref, termsOfUseHref: termsOfUseHref })) })))),
+                    React__default["default"].createElement(ConsentText.ConsentText, null)) })))),
     },
 };
-const PaymentMethodForm = ({ acceptedPaymentTypes, defaultValues: parentDefaultValues, checkoutError, onPlaidLinkClicked, onSaved, onClose, onSubmit, onAttemptSubmit, consentType, debug = false }) => {
+const PaymentMethodForm = ({ acceptedPaymentTypes, acceptedCreditCardNetworks, defaultValues: parentDefaultValues, checkoutError, onPlaidLinkClicked, onSaved, onClose, onSubmit, onAttemptSubmit, consentType, debug = false }) => {
     const defaultPaymentType = acceptedPaymentTypes[0] || "CreditCard";
     const defaultPaymentTypeFormData = PAYMENT_TYPE_FORM_DATA[defaultPaymentType];
     const defaultPaymentTypeDefaultValues = defaultPaymentTypeFormData.defaultValues(consentType);
     const schema = React.useMemo(() => {
-        return yup.object().shape(Object.assign({ type: yup.string().required(), consent: yup.boolean().oneOf([true], ConsentText.CONSENT_ERROR_MESSAGE) }, Object.values(PAYMENT_TYPE_FORM_DATA).reduce((objectShape, { schemaShape }) => (Object.assign(Object.assign({}, objectShape), schemaShape)), {})));
-    }, []);
+        return yup.object().shape(Object.assign({ type: yup.string().required(validationUtils.withRequiredErrorMessage), consent: yup.boolean().oneOf([true], ConsentText.CONSENT_ERROR_MESSAGE) }, Object.values(PAYMENT_TYPE_FORM_DATA).reduce((objectShape, { schemaShape }) => (Object.assign(Object.assign({}, objectShape), schemaShape(acceptedCreditCardNetworks))), {})));
+    }, [acceptedCreditCardNetworks]);
     const dictionary = useDictionary.useDictionary();
-    const { privacyHref, termsOfUseHref } = dictionary;
     const { control, handleSubmit, watch, reset, trigger, setError, formState, } = reactHookForm.useForm({
         defaultValues: Object.assign(Object.assign({}, defaultPaymentTypeDefaultValues), parentDefaultValues),
         reValidateMode: "onChange",
@@ -175,6 +197,9 @@ const PaymentMethodForm = ({ acceptedPaymentTypes, defaultValues: parentDefaultV
     const Fields = PAYMENT_TYPE_FORM_DATA[selectedPaymentMethod].fields;
     const submitForm = handleSubmit(onSubmit);
     const checkoutErrorMessage = useFormCheckoutError.useFormCheckoutError({ formKey: "payment", checkoutError, fields: FIELD_NAMES, setError, deps: [selectedPaymentMethod] });
+    const creditCardNumber = watch("cardNumber");
+    const creditCardNetwork = payment_utils.getCreditCardNetworkFromNumber(creditCardNumber || "");
+    const cvvLabel = reactPaymentInputs_utils.getCardTypeByType(creditCardNetwork).code.name;
     const handleFormSubmit = React.useCallback((e) => tslib_es6.__awaiter(void 0, void 0, void 0, function* () {
         e.preventDefault();
         onAttemptSubmit();
@@ -196,7 +221,7 @@ const PaymentMethodForm = ({ acceptedPaymentTypes, defaultValues: parentDefaultV
         acceptedPaymentTypes.length > 1 ? (React__default["default"].createElement(React__default["default"].Fragment, null,
             React__default["default"].createElement(InputGroupLabel.InputGroupLabel, { sx: { m: 0, pt: 2, pb: 1.5 } }, "Payment Method"),
             React__default["default"].createElement(PaymentMethodSelector.PaymentMethodSelector, { selectedPaymentMethod: selectedPaymentMethod, onPaymentMethodChange: handleSelectedPaymentMethodChange, paymentMethods: acceptedPaymentTypes }))) : (null),
-        React__default["default"].createElement(Fields, { control: control, consentType: consentType, privacyHref: privacyHref, dictionary: dictionary, termsOfUseHref: termsOfUseHref }),
+        React__default["default"].createElement(Fields, { control: control, cvvLabel: cvvLabel, consentType: consentType, dictionary: dictionary }),
         checkoutErrorMessage && React__default["default"].createElement(FormErrorsBox.FormErrorsBox, { error: checkoutErrorMessage, sx: { mt: 5 } }),
         debug && (React__default["default"].createElement(DebugBox.DebugBox, { sx: { mt: 5 } },
             JSON.stringify(watch(), null, 2),

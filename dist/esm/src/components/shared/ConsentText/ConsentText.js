@@ -1,8 +1,10 @@
 import { Link } from '@mui/material';
 import React__default, { Fragment } from 'react';
+import { useDictionary } from '../../../hooks/useDictionary.js';
 
 const CONSENT_ERROR_MESSAGE = "You must accept the terms and conditions of the sale.";
-const ConsentText = ({ privacyHref, termsOfUseHref, }) => {
+const ConsentText = () => {
+    const { privacyHref, termsOfUseHref } = useDictionary();
     const linkElements = [
         privacyHref ? React__default.createElement(Link, { color: "text.primary", href: privacyHref, target: "_blank" }, "Privacy Notices") : null,
         termsOfUseHref ? React__default.createElement(Link, { color: "text.primary", href: termsOfUseHref, target: "_blank" }, "Terms of Use") : null,

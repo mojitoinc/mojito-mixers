@@ -12,18 +12,30 @@ var React = require('react');
 var material = require('@mui/material');
 var themeConstants = require('../../../config/theme/themeConstants.js');
 var payment_utils = require('../../../domain/payment/payment.utils.js');
+var validationUtils = require('../../../utils/validationUtils.js');
+var reactPaymentInputs_utils = require('../../../domain/react-payment-inputs/react-payment-inputs.utils.js');
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
 var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 
-function validateCvv(isCvvRequired, cvv) {
-    return !isCvvRequired || payment_utils.getCVCIsValid(cvv);
-}
-const SavedPaymentDetailsSelector = ({ showLoader, savedPaymentMethods, selectedPaymentMethodId, onNew, onDelete, onPick, onCvvSelected, onNext, onClose, onAttemptSubmit, consentType, }) => {
-    const isCvvRequired = React.useMemo(() => {
+const SavedPaymentDetailsSelector = ({ showLoader, acceptedCreditCardNetworks, savedPaymentMethods, selectedPaymentMethodId, onNew, onDelete, onPick, onCvvSelected, onNext, onClose, onAttemptSubmit, consentType, }) => {
+    const { creditCardNetwork, cvvLabel, isCvvRequired } = React.useMemo(() => {
         const selectedPaymentMethod = savedPaymentMethods.find(savedPaymentMethod => savedPaymentMethod.id === selectedPaymentMethodId);
-        return (selectedPaymentMethod === null || selectedPaymentMethod === void 0 ? void 0 : selectedPaymentMethod.type) === "CreditCard";
+        if (!selectedPaymentMethod || selectedPaymentMethod.type !== "CreditCard") {
+            return {
+                creditCardNetwork: "",
+                cvvLabel: "",
+                isCvvRequired: false,
+            };
+        }
+        const creditCardNetwork = payment_utils.getCreditCardNetworkFromLabel(selectedPaymentMethod.network);
+        const cvvLabel = reactPaymentInputs_utils.getCardTypeByType(creditCardNetwork).code.name;
+        return {
+            creditCardNetwork,
+            cvvLabel,
+            isCvvRequired: true,
+        };
     }, [savedPaymentMethods, selectedPaymentMethodId]);
     const [{ isFormSubmitted, cvv, }, setSelectorState] = React.useState({
         isFormSubmitted: false,
@@ -33,17 +45,17 @@ const SavedPaymentDetailsSelector = ({ showLoader, savedPaymentMethods, selected
         // Reset CVV if user selects a different payment method:
         setSelectorState(({ isFormSubmitted }) => ({ isFormSubmitted, cvv: "" }));
     }, [selectedPaymentMethodId]);
-    const isCvvOk = validateCvv(isCvvRequired, cvv);
-    const cvvError = isFormSubmitted && !isCvvOk;
+    const { cvvExpectedLength, isCvvValid } = payment_utils.getCvvIsValid(cvv, creditCardNetwork, acceptedCreditCardNetworks, isCvvRequired);
+    const cvvError = isFormSubmitted && !isCvvValid;
     const handleNextClicked = React.useCallback((canSubmit) => {
         onAttemptSubmit();
-        if (canSubmit && selectedPaymentMethodId && isCvvOk) {
+        if (canSubmit && selectedPaymentMethodId && isCvvValid) {
             onCvvSelected(cvv);
             onNext();
             return;
         }
         setSelectorState(({ cvv }) => ({ isFormSubmitted: true, cvv }));
-    }, [onAttemptSubmit, selectedPaymentMethodId, cvv, isCvvOk, onCvvSelected, onNext]);
+    }, [onAttemptSubmit, selectedPaymentMethodId, cvv, isCvvValid, onCvvSelected, onNext]);
     const handleCvvChange = React.useCallback((e) => {
         const cvv = e.currentTarget.value || "";
         setSelectorState(({ isFormSubmitted }) => ({ isFormSubmitted, cvv }));
@@ -68,15 +80,15 @@ const SavedPaymentDetailsSelector = ({ showLoader, savedPaymentMethods, selected
                     disabled: showLoader,
                     onDelete,
                     onPick,
+                    cvvLabel,
                     cvvError,
                     onCvvChange: handleCvvChange,
-                }), component: PaymentDetailsItem.PaymentDetailsItem, itemKey: getPaymentMethodId, deps: [selectedPaymentMethodId, showLoader, onDelete, onPick, cvvError, handleCvvChange] }),
-            cvvError && (React__default["default"].createElement(material.Typography, { variant: "caption", component: "p", sx: { mt: 2, color: theme => theme.palette.warning.dark } }, "You must enter a valid CVV number.")),
+                }), component: PaymentDetailsItem.PaymentDetailsItem, itemKey: getPaymentMethodId, deps: [selectedPaymentMethodId, showLoader, onDelete, onPick, cvvLabel, cvvError, handleCvvChange] }),
+            cvvError && (React__default["default"].createElement(material.Typography, { variant: "caption", component: "p", sx: { mt: 2, color: theme => theme.palette.warning.dark } }, validationUtils.withInvalidCVV({ cvvLabel, cvvExpectedLength }))),
             React__default["default"].createElement(SecondaryButton.SecondaryButton, { onClick: onNew, startIcon: React__default["default"].createElement(Add["default"], null), sx: { mt: 2.5 }, disabled: showLoader }, "Add New Payment Method"),
             isFormSubmitted && !selectedPaymentMethodId && (React__default["default"].createElement(material.Typography, { variant: "caption", component: "p", sx: { mt: 2, color: theme => theme.palette.warning.dark } }, "You must select a saved and approved payment method or create a new one."))),
         React__default["default"].createElement(CheckoutModalFooter.CheckoutModalFooter, { variant: "toConfirmation", consentType: consentType, onSubmitClicked: handleNextClicked, onCloseClicked: onClose })));
 };
 
 exports.SavedPaymentDetailsSelector = SavedPaymentDetailsSelector;
-exports.validateCvv = validateCvv;
 //# sourceMappingURL=SavedPaymentDetailsSelector.js.map

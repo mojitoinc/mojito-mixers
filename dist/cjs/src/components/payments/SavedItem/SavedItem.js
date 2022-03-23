@@ -29,7 +29,7 @@ const DISPLAY_BOX_SX = {
         sm: "row"
     },
 };
-const SavedItem = ({ children, id, variant = "stacked", labels: customLabels = {}, disabled, active, status, onEdit, onDelete, onPick, cvvError, onCvvChange, boxProps, }) => {
+const SavedItem = ({ children, id, variant = "stacked", labels: customLabels = {}, disabled, active, status, onEdit, onDelete, onPick, cvvLabel, cvvError, onCvvChange, boxProps, }) => {
     const labels = Object.assign(Object.assign({}, DEFAULT_SAVED_ITEM_LABELS), customLabels);
     const hasControls = active || onEdit || onDelete || onPick;
     const handleClick = React.useCallback((e) => {
@@ -55,7 +55,7 @@ const SavedItem = ({ children, id, variant = "stacked", labels: customLabels = {
     else if (active) {
         mainControlElement = (React__default["default"].createElement(React__default["default"].Fragment, null,
             React__default["default"].createElement(material.Chip, { size: "small", color: "success", label: "Active", variant: "outlined" }),
-            onCvvChange && React__default["default"].createElement(InlineField.InlineField, { onChange: onCvvChange, placeholder: "CVV", error: cvvError, sx: { width: "52px" } })));
+            onCvvChange && React__default["default"].createElement(InlineField.InlineField, { onChange: onCvvChange, placeholder: cvvLabel, error: cvvError, sx: { width: "52px" } })));
     }
     else if (onPick) {
         mainControlElement = (React__default["default"].createElement(SecondaryButton.SecondaryButton, { onClick: handleClick, disabled: disabledSelect, "data-action": "pick" }, labels.select));

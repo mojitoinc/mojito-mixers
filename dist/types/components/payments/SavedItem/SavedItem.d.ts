@@ -24,6 +24,7 @@ export interface SavedItemProps {
     onEdit?: SavedItemActionEventHandler;
     onDelete?: SavedItemActionEventHandler;
     onPick?: SavedItemActionEventHandler;
+    cvvLabel?: string;
     cvvError?: boolean;
     onCvvChange?: React.ChangeEventHandler<HTMLInputElement>;
     boxProps?: BoxProps;

@@ -7,15 +7,13 @@ import { Checkbox } from '../../shared/Checkbox/Checkbox.js';
 import { ConsentText, CONSENT_ERROR_MESSAGE } from '../../shared/ConsentText/ConsentText.js';
 import { PrimaryButton } from '../../shared/PrimaryButton/PrimaryButton.js';
 import { LABELS_BY_VARIANT, ICONS_BY_VARIANT } from './CheckoutModalFooter.constants.js';
-import { useDictionary } from '../../../hooks/useDictionary.js';
 import { Img } from '../../shared/Img/Img.js';
 
 const VARIANTS_WITH_DISCLAIMER = ["toPayment", "toPlaid", "toConfirmation"];
 const CheckoutModalFooter = ({ variant, buttonLabel, guestCheckoutEnabled, consentType, onGoToCollection, submitDisabled, onSubmitClicked, onCloseClicked, }) => {
     // CONSENT:
-    const { privacyHref, termsOfUseHref } = useDictionary();
     const showConsent = consentType && VARIANTS_WITH_DISCLAIMER.includes(variant);
-    const consentTextElement = showConsent ? React__default.createElement(ConsentText, { privacyHref: privacyHref, termsOfUseHref: termsOfUseHref }) : null;
+    const consentTextElement = showConsent ? React__default.createElement(ConsentText, null) : null;
     const [{ isFormSubmitted, isFormLoading, isConsentChecked, }, setConsentState] = useState({
         isFormSubmitted: false,
         isFormLoading: false,

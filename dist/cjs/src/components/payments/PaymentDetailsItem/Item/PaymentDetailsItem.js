@@ -50,7 +50,7 @@ const PaymentDetailsItem = (_a) => {
             color: "error",
         };
     }
-    return (React__default["default"].createElement(SavedItem.SavedItem, Object.assign({}, savedItemProps, { variant: "row", labels: PAYMENT_METHOD_ITEM_LABELS[savedPaymentMethod.type], disabled: disabled, status: status, id: savedPaymentMethod.id, boxProps: boxProps, cvvError: savedPaymentMethod.type === "CreditCard" ? savedItemProps === null || savedItemProps === void 0 ? void 0 : savedItemProps.cvvError : undefined, onCvvChange: savedPaymentMethod.type === "CreditCard" ? savedItemProps === null || savedItemProps === void 0 ? void 0 : savedItemProps.onCvvChange : undefined }),
+    return (React__default["default"].createElement(SavedItem.SavedItem, Object.assign({}, savedItemProps, { variant: "row", labels: PAYMENT_METHOD_ITEM_LABELS[savedPaymentMethod.type], disabled: disabled, status: status, id: savedPaymentMethod.id, boxProps: boxProps, cvvLabel: savedPaymentMethod.type === "CreditCard" ? savedItemProps === null || savedItemProps === void 0 ? void 0 : savedItemProps.cvvLabel : undefined, cvvError: savedPaymentMethod.type === "CreditCard" ? savedItemProps === null || savedItemProps === void 0 ? void 0 : savedItemProps.cvvError : undefined, onCvvChange: savedPaymentMethod.type === "CreditCard" ? savedItemProps === null || savedItemProps === void 0 ? void 0 : savedItemProps.onCvvChange : undefined }),
         React__default["default"].createElement(PaymentDetailsFragment.PaymentDetailsFragment, { savedPaymentMethod: savedPaymentMethod })));
 };
 
