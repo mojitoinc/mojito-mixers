@@ -215,11 +215,12 @@ export enum ContractType {
 export type CreateMarketplaceBuyNowLotInput = {
   collectionId: Scalars['UUID1'];
   collectionItemName: Scalars['String'];
+  delivery?: InputMaybe<MarketplaceItemDeliveryInput>;
   endDate: Scalars['Time'];
   marketplaceTokenId?: InputMaybe<Scalars['UUID1']>;
   sortNumber: Scalars['Int'];
   startDate: Scalars['Time'];
-  totalUnits: Scalars['Int'];
+  totalUnits?: InputMaybe<Scalars['Int']>;
   unitPrice: Scalars['Float'];
 };
 
@@ -312,6 +313,14 @@ export type CurrentUserWonBidsArgs = {
   orgId: Scalars['UUID'];
 };
 
+export enum DeliveryMethod {
+  Erc721Provenance = 'ERC721Provenance',
+  Erc721Transfer = 'ERC721Transfer',
+  Erc1155OpenEdition = 'ERC1155OpenEdition',
+  Erc1155Transfer = 'ERC1155Transfer',
+  NoOp = 'NoOp'
+}
+
 export type DeployContractInput = {
   contractType: ContractType;
   nftName: Scalars['String'];
@@ -400,6 +409,9 @@ export type ItemInvoiceDetail = {
 };
 
 export enum KycStatus {
+  Clear = 'Clear',
+  Failed1 = 'Failed1',
+  Failed2 = 'Failed2',
   Level1 = 'Level1',
   Level2 = 'Level2',
   None = 'None',
@@ -504,6 +516,7 @@ export type MarketplaceAuctionLotDefaultConfigArgs = {
 export type MarketplaceAuctionLotInput = {
   collectionId: Scalars['UUID'];
   collectionItemName: Scalars['String'];
+  delivery?: InputMaybe<MarketplaceItemDeliveryInput>;
   endDate: Scalars['Time'];
   lotNumber?: InputMaybe<Scalars['Int']>;
   marketplaceTokenId?: InputMaybe<Scalars['UUID']>;
@@ -514,6 +527,7 @@ export type MarketplaceAuctionLotInput = {
 };
 
 export type MarketplaceAuctionLotUpdateInput = {
+  delivery?: InputMaybe<MarketplaceItemDeliveryInput>;
   endDate?: InputMaybe<Scalars['Time']>;
   lotNumber?: InputMaybe<Scalars['Int']>;
   reservePrice?: InputMaybe<Scalars['Float']>;
@@ -567,6 +581,7 @@ export type MarketplaceCollectionCreateInput = {
 export type MarketplaceCollectionItem = {
   __typename?: 'MarketplaceCollectionItem';
   collectionId: Scalars['UUID'];
+  delivery?: Maybe<MarketplaceCollectionItemDelivery>;
   details: MarketplaceCollectionItemDetails;
   id: Scalars['UUID'];
   /** @deprecated Use `details` property instead */
@@ -577,6 +592,8 @@ export type MarketplaceCollectionItem = {
   slug: Scalars['String'];
   status: MarketplaceCollectionItemStatus;
 };
+
+export type MarketplaceCollectionItemDelivery = MarketplaceItemDeliveryErc721Provenance | MarketplaceItemDeliveryErc721Transfer | MarketplaceItemDeliveryErc1155OpenEdition | MarketplaceItemDeliveryErc1155Transfer | MarketplaceItemDeliveryNoOp;
 
 export type MarketplaceCollectionItemDetails = MarketplaceAuctionLot | MarketplaceBuyNowOutput;
 
@@ -594,6 +611,74 @@ export type MarketplaceCollectionUpdateInput = {
   slug?: InputMaybe<Scalars['String']>;
   startDate?: InputMaybe<Scalars['Time']>;
   status?: InputMaybe<MarketCollectionStatus>;
+};
+
+export type MarketplaceItemDeliveryErc721Provenance = {
+  __typename?: 'MarketplaceItemDeliveryERC721Provenance';
+  extensionAddress: Scalars['String'];
+  nftContractId: Scalars['UUID1'];
+};
+
+export type MarketplaceItemDeliveryErc721ProvenanceInput = {
+  extensionAddress: Scalars['String'];
+  nftContractId: Scalars['UUID1'];
+};
+
+export type MarketplaceItemDeliveryErc721Transfer = {
+  __typename?: 'MarketplaceItemDeliveryERC721Transfer';
+  contractAddress: Scalars['String'];
+  onChainTokenId: Scalars['Int'];
+  ownerWalletId: Scalars['UUID1'];
+};
+
+export type MarketplaceItemDeliveryErc721TransferInput = {
+  contractAddress: Scalars['String'];
+  onChainTokenId: Scalars['Int'];
+  ownerWalletId: Scalars['UUID1'];
+};
+
+export type MarketplaceItemDeliveryErc1155OpenEdition = {
+  __typename?: 'MarketplaceItemDeliveryERC1155OpenEdition';
+  contractAddress: Scalars['String'];
+  onChainTokenId: Scalars['Int'];
+  ownerWalletId: Scalars['UUID1'];
+};
+
+export type MarketplaceItemDeliveryErc1155OpenEditionInput = {
+  contractAddress: Scalars['String'];
+  onChainTokenId: Scalars['Int'];
+  ownerWalletId: Scalars['UUID1'];
+};
+
+export type MarketplaceItemDeliveryErc1155Transfer = {
+  __typename?: 'MarketplaceItemDeliveryERC1155Transfer';
+  contractAddress: Scalars['String'];
+  onChainTokenId: Scalars['Int'];
+  ownerWalletId: Scalars['UUID1'];
+};
+
+export type MarketplaceItemDeliveryErc1155TransferInput = {
+  contractAddress: Scalars['String'];
+  onChainTokenId: Scalars['Int'];
+  ownerWalletId: Scalars['UUID1'];
+};
+
+export type MarketplaceItemDeliveryInput = {
+  ERC721Provenance?: InputMaybe<MarketplaceItemDeliveryErc721ProvenanceInput>;
+  ERC721Transfer?: InputMaybe<MarketplaceItemDeliveryErc721TransferInput>;
+  ERC1155OpenEdition?: InputMaybe<MarketplaceItemDeliveryErc1155OpenEditionInput>;
+  ERC1155Transfer?: InputMaybe<MarketplaceItemDeliveryErc1155TransferInput>;
+  NoOp?: InputMaybe<MarketplaceItemDeliveryNoOpInput>;
+  deliveryMethod: DeliveryMethod;
+};
+
+export type MarketplaceItemDeliveryNoOp = {
+  __typename?: 'MarketplaceItemDeliveryNoOp';
+  notes?: Maybe<Scalars['String']>;
+};
+
+export type MarketplaceItemDeliveryNoOpInput = {
+  notes?: InputMaybe<Scalars['String']>;
 };
 
 export enum MarketplaceSaleType {
@@ -681,6 +766,7 @@ export type Mutation = {
   nftContractAddAdmin: Scalars['String'];
   nftContractExtensionPause: Scalars['String'];
   nftContractExtensionSetBaseURI: Scalars['String'];
+  nftContractExtensionSetProvenanceHash: Scalars['String'];
   nftContractExtensionUnpause: Scalars['String'];
   nftContractRegisterExtensionProvenance: NftContract;
   nftDeployContract: NftContract;
@@ -695,6 +781,7 @@ export type Mutation = {
   /** Updates existing  Applicant based on input data. */
   updateApplicant: ApplicantResponse;
   updateMarketplaceAuctionLot: MarketplaceAuctionLot;
+  updateMarketplaceBuyNowLot: MarketplaceBuyNowOutput;
   updateMarketplaceCollection: MarketplaceCollection;
   /** Update name of multisig wallet */
   updateMultisigName: Scalars['Boolean'];
@@ -893,6 +980,13 @@ export type MutationNftContractExtensionSetBaseUriArgs = {
 };
 
 
+export type MutationNftContractExtensionSetProvenanceHashArgs = {
+  extensionAddress: Scalars['String'];
+  nftContractId: Scalars['UUID1'];
+  provenanceHash: Scalars['String'];
+};
+
+
 export type MutationNftContractExtensionUnpauseArgs = {
   extensionAddress: Scalars['String'];
   nftContractId: Scalars['UUID1'];
@@ -950,6 +1044,11 @@ export type MutationUpdateApplicantArgs = {
 export type MutationUpdateMarketplaceAuctionLotArgs = {
   data: MarketplaceAuctionLotUpdateInput;
   marketplaceAuctionLotId: Scalars['UUID'];
+};
+
+
+export type MutationUpdateMarketplaceBuyNowLotArgs = {
+  input: CreateMarketplaceBuyNowLotInput;
 };
 
 
@@ -1126,7 +1225,8 @@ export type PaymentMethodUpdateInput = {
 
 export type PaymentNotification3DsMessage = {
   __typename?: 'PaymentNotification3DSMessage';
-  redirectURL: Scalars['String'];
+  error?: Maybe<Scalars['String']>;
+  redirectURL?: Maybe<Scalars['String']>;
 };
 
 export type PaymentNotificationMessage = PaymentNotification3DsMessage;
@@ -1628,7 +1728,7 @@ export type WirePaymentMethodOutput = {
 export type GetPaymentNotificationQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetPaymentNotificationQuery = { __typename?: 'Query', getPaymentNotification: { __typename?: 'PaymentNotificationOutput', message: { __typename?: 'PaymentNotification3DSMessage', redirectURL: string } } };
+export type GetPaymentNotificationQuery = { __typename?: 'Query', getPaymentNotification: { __typename?: 'PaymentNotificationOutput', message: { __typename?: 'PaymentNotification3DSMessage', redirectURL?: string | null, error?: string | null } } };
 
 /*
 export type CreatePaymentMutationVariables = Exact<{
@@ -1733,6 +1833,7 @@ export const GetPaymentNotificationDocument = gql`
     message {
       ... on PaymentNotification3DSMessage {
         redirectURL
+        error
       }
     }
   }

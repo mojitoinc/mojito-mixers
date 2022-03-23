@@ -25,7 +25,7 @@ export const PAYMENT_CREATION_MAX_WAIT_MS = 120000; // (2 min) Max. wait time fo
 export const PAYMENT_CREATION_MIN_WAIT_MS = 5000; // (5 sec) Min. time a user would be stuck in the PurchasingView.
 export const PAYMENT_CREATION_TIMEOUT_MS = PAYMENT_CREATION_MAX_WAIT_MS * 2; // (4 min) Max. time a user would be stuck in the PurchasingView before throwing an error.
 export const PAYMENT_NOTIFICATION_INTERVAL_MS = 2500; // (2.5 sec) Polling interval for GetPaymentNotificationQuery in PurchasingView.
-
+export const PAYMENT_NOTIFICATION_ERROR_MAX_WAIT_MS = 10000; // (10 sec) Max. wait time for GetPaymentNotificationQuery to get the error details in ErrorOverlay.tsx.
 
 // Plaid:
 export const PLAID_STORAGE_EXPIRATION_MS = 1000 * 60 * 15; // 15 minutes (Plaid requires filling in some data).
