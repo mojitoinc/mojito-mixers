@@ -313,7 +313,7 @@ export const BillingInfoForm: React.FC<BillingInfoFormProps> = ({
       <CheckoutModalFooter
         variant="toPayment"
         consentType={ consentType }
-        buttonLabel={ taxes?.status === "loading" ? "Calculating taxes..." : undefined }
+        submitLabel={ taxes?.status === "loading" ? "Calculating taxes..." : undefined }
         submitDisabled={ !!taxes && taxes.status !== "complete" }
         onCloseClicked={onClose} />
     </form>

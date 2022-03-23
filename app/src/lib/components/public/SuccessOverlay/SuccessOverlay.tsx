@@ -57,7 +57,7 @@ export const PUISuccessOverlay: React.FC<PUISuccessOverlayProps> = ({
   ) : null;
 
   return (
-    <FullScreenOverlay centered header={ headerElement } { ...fullScreenOverlayProps }>
+    <FullScreenOverlay isDialogBlocked centered header={ headerElement } { ...fullScreenOverlayProps }>
       <SuccessView successImageSrc={ successImageSrc } />
     </FullScreenOverlay>
   );

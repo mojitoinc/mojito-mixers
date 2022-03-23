@@ -24,6 +24,8 @@ export interface ErrorViewProps {
   debug?: boolean;
 }
 
+const LOADING_ERROR_MESSAGE = "Loading error details...";
+
 export const ErrorView: React.FC<ErrorViewProps> = ({
   checkoutError: {
     error,
@@ -47,7 +49,7 @@ export const ErrorView: React.FC<ErrorViewProps> = ({
         sx={{ my: 5 }} />
 
       <Box sx={{ maxWidth: XS_MOBILE_MAX_WIDTH, mx: "auto" }}>
-        { parseSentences(errorMessage).map((sentence) => {
+        { parseSentences(errorMessage || LOADING_ERROR_MESSAGE).map((sentence) => {
           return <Typography key={ sentence } variant="body2" sx={{ textAlign: "center", mb: 1.5 }}>{ sentence }</Typography>;
         }) }
 
@@ -59,8 +61,10 @@ export const ErrorView: React.FC<ErrorViewProps> = ({
 
     <CheckoutModalFooter
       variant="toReview"
-      buttonLabel={ ERROR_ACTION_LABELS[at] }
+      submitLabel={ ERROR_ACTION_LABELS[at] }
+      submitDisabled={ !errorMessage }
       onSubmitClicked={ onFixError }
+      closeDisabled={ !errorMessage }
       onCloseClicked={ onClose } />
 
   </>);

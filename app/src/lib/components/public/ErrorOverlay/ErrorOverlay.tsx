@@ -1,6 +1,10 @@
 import { SxProps, Theme } from "@mui/material/styles";
-import React, { useCallback, useLayoutEffect } from "react";
+import { useTimeout } from "@swyg/corre";
+import React, { useCallback, useLayoutEffect, useState, useEffect } from "react";
+import { PAYMENT_NOTIFICATION_ERROR_MAX_WAIT_MS, PAYMENT_NOTIFICATION_INTERVAL_MS } from "../../../config/config";
+import { ERROR_PURCHASE } from "../../../domain/errors/errors.constants";
 import { isUrlPathname, getUrlWithSearchParams } from "../../../domain/url/url.utils";
+import { useGetPaymentNotificationQuery } from "../../../queries/graphqlGenerated";
 import { ErrorView } from "../../../views/Error/ErrorView";
 import { CheckoutModalHeader } from "../../payments/CheckoutModalHeader/CheckoutModalHeader";
 import { FullScreenOverlay, FullScreenOverlayFunctionalProps } from "../../shared/FullScreenOverlay/FullScreenOverlay";
@@ -23,6 +27,22 @@ export const PUIErrorOverlay: React.FC<PUIErrorOverlayProps> = ({
   onRedirect,
   ...fullScreenOverlayProps
 }) => {
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const paymentNotificationResult = useGetPaymentNotificationQuery({
+    pollInterval: PAYMENT_NOTIFICATION_INTERVAL_MS,
+  });
+
+  const error = paymentNotificationResult.data?.getPaymentNotification?.message?.error || "";
+
+  useEffect(() => {
+    if (error) setErrorMessage(prevErrorMessage => prevErrorMessage || "");
+  }, [error]);
+
+  useTimeout(() => {
+    setErrorMessage(prevErrorMessage => prevErrorMessage || ERROR_PURCHASE().errorMessage);
+  }, PAYMENT_NOTIFICATION_ERROR_MAX_WAIT_MS);
+
   const { purchaseError, url = "" } = getCheckoutModalState();
 
   useLayoutEffect(() => {
@@ -51,8 +71,6 @@ export const PUIErrorOverlay: React.FC<PUIErrorOverlayProps> = ({
     onRedirect("/");
   }, [purchaseError, onRedirect]);
 
-  if (!purchaseError) return null;
-
   const headerElement = logoSrc ? (
     <CheckoutModalHeader
       variant="error"
@@ -61,9 +79,9 @@ export const PUIErrorOverlay: React.FC<PUIErrorOverlayProps> = ({
   ) : null;
 
   return (
-    <FullScreenOverlay centered header={ headerElement } { ...fullScreenOverlayProps }>
+    <FullScreenOverlay isDialogBlocked={ !errorMessage } centered header={ headerElement } { ...fullScreenOverlayProps }>
       <ErrorView
-        checkoutError={ { errorMessage: "Error creating payment method." } }
+        checkoutError={ { errorMessage } }
         errorImageSrc={ errorImageSrc }
         onFixError={ reviewData }
         onClose={ toMarketplace } />
