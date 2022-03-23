@@ -1,6 +1,6 @@
 import { __awaiter } from '../../../../node_modules/tslib/tslib.es6.js';
 import { Backdrop, CircularProgress } from '@mui/material';
-import React__default, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
+import React__default, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { transformRawSavedPaymentMethods, getSavedPaymentMethodAddressIdFromBillingInfo, savedPaymentMethodToBillingInfo } from '../../../domain/circle/circle.utils.js';
 import { useMeQuery, useGetPaymentMethodListQuery, useGetInvoiceDetailsQuery, useDeletePaymentMethodMutation, useReleaseReservationBuyNowLotMutation } from '../../../queries/graphqlGenerated.js';
 import { AuthenticationView } from '../../../views/Authentication/AuthenticationView.js';
@@ -19,10 +19,11 @@ import { transformCheckoutItemsFromInvoice } from '../../../domain/product/produ
 import { useCreateInvoiceAndReservation } from '../../../hooks/useCreateInvoiceAndReservation.js';
 import { useCheckoutItemsCostTotal } from '../../../hooks/useCheckoutItemCostTotal.js';
 import { DictionaryProvider } from '../../../providers/DictionaryProvider.js';
-import { THREEDS_REDIRECT_DELAY_MS } from '../../../config/config.js';
+import { DEV_DEBUG_ENABLED_KEY, THREEDS_REDIRECT_DELAY_MS } from '../../../config/config.js';
 import { NEW_WALLET_OPTION } from '../../../domain/wallet/wallet.constants.js';
 import { StatusIcon } from '../../shared/StatusIcon/StatusIcon.js';
 
+const DEV_DEBUG_ENABLED = process.browser && localStorage.getItem(DEV_DEBUG_ENABLED_KEY) === "true";
 const PUICheckoutOverlay = ({ 
 // Modal:
 open, onClose, onGoToCollection, 
@@ -38,10 +39,33 @@ orgID, invoiceID: initialInvoiceID, checkoutItems: parentCheckoutItems,
 // Authentication:
 onLogin, isAuthenticated, isAuthenticatedLoading, 
 // Other Events:
-debug: initialDebug, onEvent, onError, onMarketingOptInChange, // Not implemented yet. Used to let user subscribe / unsubscribe to marketing updates.
+debug: parentDebug, onEvent, onError, onMarketingOptInChange, // Not implemented yet. Used to let user subscribe / unsubscribe to marketing updates.
  }) => {
     var _a, _b, _c;
-    const [debug, setDebug] = useState(!!initialDebug);
+    const [debug, setDebug] = useState(!!parentDebug);
+    // Initialization, just to prevent issues with Next.js' SSR:
+    useEffect(() => {
+        setDebug((prevDebug) => {
+            const nextDebug = prevDebug || DEV_DEBUG_ENABLED;
+            if (nextDebug)
+                console.log(`\n🐞 DEBUG MODE ENABLED!\n\n`);
+            return nextDebug;
+        });
+    }, []);
+    // Actual changes triggered by users:
+    const toggleDebug = useCallback(() => {
+        setDebug((prevDebug) => {
+            const nextDebug = !prevDebug;
+            console.log(`\n🐞 DEBUG MODE ${nextDebug ? "ENABLED" : "DISABLED"}!\n\n`);
+            if (nextDebug) {
+                localStorage.setItem(DEV_DEBUG_ENABLED_KEY, "true");
+            }
+            else {
+                localStorage.removeItem(DEV_DEBUG_ENABLED_KEY);
+            }
+            return nextDebug;
+        });
+    }, []);
     // First, get user data and saved payment methods:
     const { data: meData, loading: meLoading, error: meError, refetch: meRefetch, } = useMeQuery({ skip: !isAuthenticated });
     const wallets = useMemo(() => {
@@ -411,7 +435,7 @@ debug: initialDebug, onEvent, onError, onMarketingOptInChange, // Not implemente
         // some other kind of indeterminate / incorrect state:
         return null;
     }
-    const headerElement = (React__default.createElement(CheckoutModalHeader, { variant: headerVariant, countdownElementRef: countdownElementRef, logoSrc: logoSrc, logoSx: logoSx, user: (_c = meData === null || meData === void 0 ? void 0 : meData.me) === null || _c === void 0 ? void 0 : _c.user, userFormat: userFormat, onLogin: onLogin, onClose: checkoutStep === startAt ? handleClose : undefined, onPrev: checkoutStep === startAt ? undefined : goBack, setDebug: setDebug }));
+    const headerElement = (React__default.createElement(CheckoutModalHeader, { variant: headerVariant, countdownElementRef: countdownElementRef, logoSrc: logoSrc, logoSx: logoSx, user: (_c = meData === null || meData === void 0 ? void 0 : meData.me) === null || _c === void 0 ? void 0 : _c.user, userFormat: userFormat, onLogin: onLogin, onClose: checkoutStep === startAt ? handleClose : undefined, onPrev: checkoutStep === startAt ? undefined : goBack, toggleDebug: toggleDebug }));
     return (React__default.createElement(DictionaryProvider, { dictionary: dictionary },
         React__default.createElement(FullScreenOverlay, { centered: checkoutStep === "purchasing" || checkoutStep === "error", open: open, onClose: handleClose, isDialogBlocked: isDialogBlocked, contentKey: checkoutStep, header: headerElement, children: checkoutStepElement })));
 };
