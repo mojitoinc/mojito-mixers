@@ -9,6 +9,7 @@ import { CheckoutModalError } from "./CheckoutOverlay.hooks";
 import { ProvidersInjectorProps } from "../../shared/ProvidersInjector/ProvidersInjector";
 import { PUIDictionary } from "../../../domain/dictionary/dictionary.interfaces";
 import { Network } from "../../../domain/network/network.interfaces";
+import { CreditCardNetwork } from "../../../domain/react-payment-inputs/react-payment-inputs.utils";
 export interface PUICheckoutOverlayProps {
     open: boolean;
     onClose: () => void;
@@ -25,6 +26,7 @@ export interface PUICheckoutOverlayProps {
     errorImageSrc: string;
     userFormat: UserFormat;
     acceptedPaymentTypes: PaymentType[];
+    acceptedCreditCardNetworks?: CreditCardNetwork[];
     paymentLimits?: Partial<Record<PaymentType, number>>;
     dictionary?: Partial<PUIDictionary>;
     network?: Network;

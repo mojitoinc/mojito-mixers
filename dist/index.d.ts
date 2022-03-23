@@ -143,6 +143,8 @@ declare type PUIDictionary = {
 };
 declare type PUIDictionaryKeys = keyof PUIDictionary;
 
+declare type CreditCardNetwork = "amex" | "dinersclub" | "discover" | "hipercard" | "jcb" | "unionpay" | "mastercard" | "maestro" | "elo" | "visa" | "placeholder";
+
 interface PUICheckoutOverlayProps {
     open: boolean;
     onClose: () => void;
@@ -159,6 +161,7 @@ interface PUICheckoutOverlayProps {
     errorImageSrc: string;
     userFormat: UserFormat;
     acceptedPaymentTypes: PaymentType[];
+    acceptedCreditCardNetworks?: CreditCardNetwork[];
     paymentLimits?: Partial<Record<PaymentType, number>>;
     dictionary?: Partial<PUIDictionary>;
     network?: Network;

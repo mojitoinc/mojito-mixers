@@ -11,7 +11,6 @@ var Checkbox = require('../../shared/Checkbox/Checkbox.js');
 var ConsentText = require('../../shared/ConsentText/ConsentText.js');
 var PrimaryButton = require('../../shared/PrimaryButton/PrimaryButton.js');
 var CheckoutModalFooter_constants = require('./CheckoutModalFooter.constants.js');
-var useDictionary = require('../../../hooks/useDictionary.js');
 var Img = require('../../shared/Img/Img.js');
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
@@ -21,9 +20,8 @@ var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 const VARIANTS_WITH_DISCLAIMER = ["toPayment", "toPlaid", "toConfirmation"];
 const CheckoutModalFooter = ({ variant, buttonLabel, guestCheckoutEnabled, consentType, onGoToCollection, submitDisabled, onSubmitClicked, onCloseClicked, }) => {
     // CONSENT:
-    const { privacyHref, termsOfUseHref } = useDictionary.useDictionary();
     const showConsent = consentType && VARIANTS_WITH_DISCLAIMER.includes(variant);
-    const consentTextElement = showConsent ? React__default["default"].createElement(ConsentText.ConsentText, { privacyHref: privacyHref, termsOfUseHref: termsOfUseHref }) : null;
+    const consentTextElement = showConsent ? React__default["default"].createElement(ConsentText.ConsentText, null) : null;
     const [{ isFormSubmitted, isFormLoading, isConsentChecked, }, setConsentState] = React.useState({
         isFormSubmitted: false,
         isFormLoading: false,
