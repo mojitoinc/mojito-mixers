@@ -70,6 +70,7 @@ export const PaymentDetailsItem: React.FC<PaymentDetailsItemProps> = ({
       status={ status }
       id={ savedPaymentMethod.id }
       boxProps={ boxProps }
+      cvvLabel={ savedPaymentMethod.type === "CreditCard" ? savedItemProps?.cvvLabel : undefined }
       cvvError={ savedPaymentMethod.type === "CreditCard" ? savedItemProps?.cvvError : undefined }
       onCvvChange={ savedPaymentMethod.type === "CreditCard" ? savedItemProps?.onCvvChange : undefined }>
       <PaymentDetailsFragment savedPaymentMethod={ savedPaymentMethod } />

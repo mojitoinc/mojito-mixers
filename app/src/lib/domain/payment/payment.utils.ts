@@ -42,9 +42,9 @@ export const getCvvIsValid = (cvv = "", network: "" | CreditCardNetwork = "", ne
 
   let cvvExpectedLength: 3 | 4 | "3 or 4" = "3 or 4"
 
-  if ((networks.length > 0 && !networks.includes("amex")) || network !== "amex") {
+  if ((!network && networks.length > 0 && !networks.includes("amex")) || network !== "amex") {
     cvvExpectedLength = 3;
-  } else if ((networks.length === 1 && networks.includes("amex")) || network === "amex") {
+  } else if ((!network && networks.length === 1 && networks.includes("amex")) || network === "amex") {
     cvvExpectedLength = 4;
   }
 

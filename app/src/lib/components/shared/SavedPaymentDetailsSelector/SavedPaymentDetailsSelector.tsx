@@ -144,7 +144,7 @@ export const SavedPaymentDetailsSelector: React.FC<SavedPaymentDetailsSelectorPr
         }) }
         component={ PaymentDetailsItem }
         itemKey={ getPaymentMethodId }
-        deps={[ selectedPaymentMethodId, showLoader, onDelete, onPick, cvvError, handleCvvChange]} />
+        deps={[ selectedPaymentMethodId, showLoader, onDelete, onPick, cvvLabel, cvvError, handleCvvChange]} />
 
       { cvvError && (
         <Typography variant="caption" component="p" sx={{ mt: 2, color: theme => theme.palette.warning.dark }}>

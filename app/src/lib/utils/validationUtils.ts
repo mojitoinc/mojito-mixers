@@ -28,5 +28,5 @@ export const withInvalidCreditCardNetwork = ({ acceptedCreditCardNetworks }: { a
     return getCardNameByType(acceptedCreditCardNetwork);
   });
 
-  return `Only ${ otherAcceptedCreditCardNames.join(", ") }${ otherAcceptedCreditCardNames.length ? " and " : "" }${ acceptedCreditCardName } ${ otherAcceptedCreditCardNames.length === 1 ? "is" : "are" } accepted.`;
+  return `Only ${ otherAcceptedCreditCardNames.join(", ") }${ otherAcceptedCreditCardNames.length ? " and " : "" }${ acceptedCreditCardName } ${ acceptedCreditCardNetworks.length === 1 ? "is" : "are" } accepted.`;
 };

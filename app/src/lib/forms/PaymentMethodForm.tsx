@@ -91,8 +91,6 @@ const PAYMENT_TYPE_FORM_DATA: Record<PaymentType, PaymentTypeFormData> = {
               test: (cardNumber, context) => {
                 const creditCardNumberError = getCardNumberError(cardNumber);
 
-                console.log({ getCardNumberError, creditCardNumberError });
-
                 if (creditCardNumberError) {
                   return new ValidationError(
                     withInvalidCardNumber({ label: FIELD_LABELS.cardNumber }),
