@@ -1,7 +1,7 @@
 export declare const DEV_DEBUG_COUNTER_EXPIRATION_MS = 1000;
 export declare const DEV_DEBUG_COUNTER_CLICKS_NEEDED = 16;
 export declare const DEV_SKIP_3DS_IN_LOCALHOST = true;
-export declare const RESERVATION_COUNTDOWN_FROM_MIN = 1.5;
+export declare const RESERVATION_COUNTDOWN_FROM_MIN = 15;
 export declare const RESERVATION_COUNTDOWN_FROM_MS: number;
 export declare const RESERVATION_COUNTDOWN_REFRESH_RATE_MS = 1000;
 export declare const PURCHASING_MIN_WAIT_MS = 3000;
