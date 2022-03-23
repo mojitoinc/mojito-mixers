@@ -17,27 +17,45 @@ interface CheckoutModalFooterConsentState {
 export type CheckoutModalFooterVariant = "toGuestCheckout" | "toPayment" | "toConfirmation" | "toPlaid" | "toReview" | "toMarketplace";
 
 export interface CheckoutModalFooterProps {
+  // Configuration:
   variant: CheckoutModalFooterVariant;
-  buttonLabel?: string;
   guestCheckoutEnabled?: boolean;
   consentType?: ConsentType;
-  onGoToCollection?: () => void;
+
+  // Submit button:
+  submitLabel?: string;
   submitDisabled?: boolean;
   onSubmitClicked?: (canSubmit: boolean) => void | Promise<void | false>;
+
+  // Close link:
+  closeLabel?: string;
+  closeDisabled?: boolean;
   onCloseClicked?: () => void;
+
+  // Collection button:
+  onGoToCollection?: () => void;
 }
 
 const VARIANTS_WITH_DISCLAIMER: CheckoutModalFooterVariant[] = ["toPayment", "toPlaid", "toConfirmation"]
 
 export const CheckoutModalFooter: React.FC<CheckoutModalFooterProps> = ({
+  // Configuration:
   variant,
-  buttonLabel,
   guestCheckoutEnabled,
   consentType,
-  onGoToCollection,
+
+  // Submit button:
+  submitLabel,
   submitDisabled,
   onSubmitClicked,
+
+  // Close link:
+  closeLabel,
+  closeDisabled,
   onCloseClicked,
+
+  // onGoToCollection:
+  onGoToCollection,
 }) => {
   // CONSENT:
   const showConsent = consentType && VARIANTS_WITH_DISCLAIMER.includes(variant);
@@ -79,9 +97,9 @@ export const CheckoutModalFooter: React.FC<CheckoutModalFooterProps> = ({
   }, [onGoToCollection]);
 
 
-  // PRIMARY BUTTON:
+  // SUBMIT BUTTON:
   const primaryButtonVisible = variant !== "toGuestCheckout" || guestCheckoutEnabled;
-  const primaryButtonLabel = buttonLabel || LABELS_BY_VARIANT[variant];
+  const primaryButtonLabel = submitLabel || LABELS_BY_VARIANT[variant];
   const PrimaryButtonIcon = ICONS_BY_VARIANT[variant];
 
   const handleSubmitClicked = useCallback(async () => {
@@ -107,11 +125,14 @@ export const CheckoutModalFooter: React.FC<CheckoutModalFooterProps> = ({
   }, [isConsentChecked, onSubmitClicked]);
 
   // CANCEL LINK:
+  const cancelLinkLabel = closeLabel || "Cancel and Return to Marketplace";
+  const cancelLinkColor = closeDisabled ? "text.disabled" : "text.primary"; // TODO: Create custom Link component with this functionality.
+
   const handleCancelClicked = useCallback((e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
 
-    if (onCloseClicked) onCloseClicked();
-  }, [onCloseClicked]);
+    if (onCloseClicked && !closeDisabled) onCloseClicked();
+  }, [onCloseClicked, closeDisabled]);
 
   return (
     <Box
@@ -153,10 +174,10 @@ export const CheckoutModalFooter: React.FC<CheckoutModalFooterProps> = ({
       )}
 
       {variant !== "toMarketplace" && onCloseClicked && (
-        <Typography sx={primaryButtonVisible ? { pt: 2 } : undefined}>
+        <Typography sx={{ color: cancelLinkColor, pt: primaryButtonVisible ? 2 : 0 }}>
           {primaryButtonVisible ? "or " : null}
-          <Link sx={{ color: "text.primary" }} href="" onClick={handleCancelClicked}>
-            Cancel and Return to Marketplace
+          <Link sx={{ color: cancelLinkColor, cursor: closeDisabled ? "not-allowed" : "pointer" }} href="" onClick={handleCancelClicked}>
+            { cancelLinkLabel }
           </Link>
         </Typography>
       )}

@@ -48,9 +48,8 @@ export const PUIErrorOverlay: React.FC<PUIErrorOverlayProps> = ({
   useLayoutEffect(() => {
     // Users should only see this page if they completed a credit card payment and 3DS' verification went wrong.
     // Otherwise, they are immediately redirected to homepage:
-    if (!purchaseError) onRedirect("/");
+    // if (!purchaseError) onRedirect("/");
   }, [purchaseError, onRedirect]);
-
 
   const reviewData = useCallback(async (): Promise<false> => {
     const isPathname = isUrlPathname(url);
@@ -72,8 +71,6 @@ export const PUIErrorOverlay: React.FC<PUIErrorOverlayProps> = ({
     onRedirect("/");
   }, [purchaseError, onRedirect]);
 
-  if (!purchaseError) return null;
-
   const headerElement = logoSrc ? (
     <CheckoutModalHeader
       variant="error"
@@ -82,9 +79,9 @@ export const PUIErrorOverlay: React.FC<PUIErrorOverlayProps> = ({
   ) : null;
 
   return (
-    <FullScreenOverlay centered header={ headerElement } { ...fullScreenOverlayProps }>
+    <FullScreenOverlay isDialogBlocked={ !errorMessage } centered header={ headerElement } { ...fullScreenOverlayProps }>
       <ErrorView
-        checkoutError={ { errorMessage: errorMessage || "Something went wrong.\nLoading error details..." } }
+        checkoutError={ { errorMessage } }
         errorImageSrc={ errorImageSrc }
         onFixError={ reviewData }
         onClose={ toMarketplace } />
