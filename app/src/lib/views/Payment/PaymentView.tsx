@@ -17,6 +17,7 @@ import { ConsentType } from "../../components/shared/ConsentText/ConsentText";
 import { checkNeedsGenericErrorMessage } from "../../hooks/useFormCheckoutError";
 import { TaxesState } from "../Billing/BillingView";
 import { Wallet } from "../../domain/wallet/wallet.interfaces";
+import { CreditCardNetwork } from "../../domain/react-payment-inputs/react-payment-inputs.utils";
 
 const billingInfoItemBoxProps: BoxProps = { sx: { mt: 2.5 } };
 
@@ -41,6 +42,7 @@ export interface PaymentViewProps {
   onPrev: () => void;
   onClose: () => void;
   acceptedPaymentTypes: PaymentType[];
+  acceptedCreditCardNetworks?: CreditCardNetwork[];
   consentType?: ConsentType;
   debug?: boolean;
 }
@@ -61,6 +63,7 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
   onPrev,
   onClose,
   acceptedPaymentTypes,
+  acceptedCreditCardNetworks,
   consentType,
   debug,
 }) => {
@@ -155,6 +158,7 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
         {showSaved ? (
           <SavedPaymentDetailsSelector
             showLoader={isDeleting}
+            acceptedCreditCardNetworks={acceptedCreditCardNetworks}
             savedPaymentMethods={savedPaymentMethods}
             selectedPaymentMethodId={typeof selectedPaymentInfo === "string" ? selectedPaymentInfo : undefined}
             onNew={handleShowForm}
@@ -168,6 +172,7 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
         ) : (
           <PaymentMethodForm
             acceptedPaymentTypes={acceptedPaymentTypes}
+            acceptedCreditCardNetworks={acceptedCreditCardNetworks}
             defaultValues={typeof selectedPaymentInfo === "string" ? undefined : selectedPaymentInfo}
             checkoutError={checkoutError}
             onPlaidLinkClicked={onPlaidLinkClicked}

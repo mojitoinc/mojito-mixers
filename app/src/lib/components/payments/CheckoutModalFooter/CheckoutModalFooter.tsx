@@ -6,7 +6,6 @@ import { Checkbox } from "../../shared/Checkbox/Checkbox";
 import { ConsentText, ConsentType, CONSENT_ERROR_MESSAGE } from "../../shared/ConsentText/ConsentText";
 import { PrimaryButton } from "../../shared/PrimaryButton/PrimaryButton";
 import { ICONS_BY_VARIANT, LABELS_BY_VARIANT } from "./CheckoutModalFooter.constants";
-import { useDictionary } from "../../../hooks/useDictionary";
 import { Img } from "../../shared/Img/Img";
 
 interface CheckoutModalFooterConsentState {
@@ -41,9 +40,8 @@ export const CheckoutModalFooter: React.FC<CheckoutModalFooterProps> = ({
   onCloseClicked,
 }) => {
   // CONSENT:
-  const { privacyHref, termsOfUseHref } = useDictionary();
   const showConsent = consentType && VARIANTS_WITH_DISCLAIMER.includes(variant);
-  const consentTextElement = showConsent ? <ConsentText privacyHref={privacyHref} termsOfUseHref={termsOfUseHref} /> : null;
+  const consentTextElement = showConsent ? <ConsentText /> : null;
 
   const [{
     isFormSubmitted,

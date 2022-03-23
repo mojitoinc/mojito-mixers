@@ -1,6 +1,6 @@
 import { Control, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { boolean, object, string } from "yup";
+import { boolean, object, string, ValidationError } from "yup";
 import { ObjectShape } from "yup/lib/object";
 import { Grid, Box } from "@mui/material";
 import BookIcon from "@mui/icons-material/Book";
@@ -19,12 +19,16 @@ import {
 } from "../domain/payment/payment.interfaces";
 import {
   requireSchemaWhenKeyIs,
-  withInvalidErrorMessage
+  withInvalidCardNumber,
+  withInvalidCreditCardNetwork,
+  withInvalidCVV,
+  withInvalidErrorMessage,
+  withRequiredErrorMessage
 } from "../utils/validationUtils";
 import {
-  getCardNumberIsValid,
-  getExpiryDateIsvalid,
-  getCVCIsValid
+  getExpiryDateIsValid,
+  getCvvIsValid,
+  getCreditCardNetworkFromNumber,
 } from "../domain/payment/payment.utils";
 import { Typography } from "@mui/material";
 import { DisplayBox } from "../components/payments/DisplayBox/DisplayBox";
@@ -36,18 +40,19 @@ import { FormErrorsBox } from "../components/shared/FormErrorsBox/FormErrorsBox"
 import { useFormCheckoutError } from "../hooks/useFormCheckoutError";
 import { PUIDictionary } from "../domain/dictionary/dictionary.interfaces";
 import { useDictionary } from "../hooks/useDictionary";
+import { CreditCardNetwork, getCardTypeByType } from "../domain/react-payment-inputs/react-payment-inputs.utils";
+import { getCardNumberError } from "react-payment-inputs";
 
 interface PaymentTypeFormProps {
   control: Control<PaymentMethod & { consent: boolean }>;
+  cvvLabel: string;
   consentType?: ConsentType;
-  privacyHref?: string;
-  termsOfUseHref?: string;
   dictionary: PUIDictionary;
 }
 
 interface PaymentTypeFormData {
   defaultValues: (consentType?: ConsentType) => PaymentMethod & { consent: boolean };
-  schemaShape: ObjectShape;
+  schemaShape: (acceptedCreditCardNetworks?: CreditCardNetwork[]) => ObjectShape;
   fields: React.FC<PaymentTypeFormProps>;
 }
 
@@ -75,16 +80,39 @@ const PAYMENT_TYPE_FORM_DATA: Record<PaymentType, PaymentTypeFormData> = {
       nameOnCard: "",
       consent: consentType === "checkbox" ? false: true,
     }),
-    schemaShape: {
+    schemaShape: (acceptedCreditCardNetworks) => ({
       cardNumber: string()
         .label(FIELD_LABELS.cardNumber)
         .when("type", {
           is: "CreditCard",
           then: (schema) =>
-            schema.required().test({
+            schema.required(withRequiredErrorMessage).test({
               name: "is-valid-card-number",
-              test: getCardNumberIsValid,
-              message: withInvalidErrorMessage
+              test: (cardNumber, context) => {
+                const creditCardNumberError = getCardNumberError(cardNumber);
+
+                if (creditCardNumberError) {
+                  return new ValidationError(
+                    withInvalidCardNumber({ label: FIELD_LABELS.cardNumber }),
+                    cardNumber,
+                    context.path,
+                  );
+                }
+
+                if (acceptedCreditCardNetworks && acceptedCreditCardNetworks.length > 0) {
+                  const creditCardNetwork = getCreditCardNetworkFromNumber(cardNumber || "");
+
+                  if (creditCardNetwork === "" || !acceptedCreditCardNetworks.includes(creditCardNetwork)) {
+                    return new ValidationError(
+                      withInvalidCreditCardNetwork({ acceptedCreditCardNetworks }),
+                      cardNumber,
+                      context.path,
+                    );
+                  }
+                }
+
+                return true;
+              },
             })
         }),
       expiryDate: string()
@@ -92,28 +120,55 @@ const PAYMENT_TYPE_FORM_DATA: Record<PaymentType, PaymentTypeFormData> = {
         .when("type", {
           is: "CreditCard",
           then: (schema) =>
-            schema.required().test({
+            schema.required(withRequiredErrorMessage).test({
               name: "is-valid-expiry-date",
-              test: getExpiryDateIsvalid,
+              test: getExpiryDateIsValid,
               message: withInvalidErrorMessage
             })
         }),
       secureCode: string()
-        .label(FIELD_LABELS.secureCode)
+        // .label(FIELD_LABELS.secureCode)
         .when("type", {
           is: "CreditCard",
           then: (schema) =>
-            schema.required().test({
-              name: "is-valid-cvv-or-cid-number",
-              test: getCVCIsValid,
-              message: withInvalidErrorMessage
-            })
+            schema.test({
+              name: "is-valid-cvv",
+              test: (cvv, context) => {
+                const creditCardNetwork = getCreditCardNetworkFromNumber(context.parent.cardNumber || "");
+                const cvvLabel = getCardTypeByType(creditCardNetwork).code.name;
+
+                if (!cvv) {
+                  return new ValidationError(
+                    withRequiredErrorMessage({ label: cvvLabel }),
+                    cvv,
+                    context.path,
+                  );
+                }
+
+                const { cvvExpectedLength, isCvvValid } = getCvvIsValid(
+                  cvv,
+                  creditCardNetwork,
+                  acceptedCreditCardNetworks,
+                  true,
+                );
+
+                if (!isCvvValid) {
+                  return new ValidationError(
+                    withInvalidCVV({ cvvLabel, cvvExpectedLength }),
+                    cvv,
+                    context.path,
+                  );
+                }
+
+                return true;
+              },
+            }),
         }),
       nameOnCard: string()
         .label(FIELD_LABELS.nameOnCard)
         .when("type", isCreditCardThenRequireSchema),
-    },
-    fields: ({ control, consentType, privacyHref, termsOfUseHref }) => (<>
+    }),
+    fields: ({ control, cvvLabel, consentType }) => (<>
       <ControlledCardNumberField
         name="cardNumber"
         control={control}
@@ -136,7 +191,7 @@ const PAYMENT_TYPE_FORM_DATA: Record<PaymentType, PaymentTypeFormData> = {
           <ControlledCardSecureCodeField
             name="secureCode"
             control={control}
-            label={FIELD_LABELS.secureCode} />
+            label={cvvLabel} />
         </Grid>
       </Grid>
 
@@ -150,7 +205,7 @@ const PAYMENT_TYPE_FORM_DATA: Record<PaymentType, PaymentTypeFormData> = {
         <ControlledCheckbox
           name="consent"
           control={control}
-          label={ <>I <ConsentText privacyHref={ privacyHref } termsOfUseHref={ termsOfUseHref } /></> } />
+          label={ <>I <ConsentText /></> } />
       ) }
     </>),
   },
@@ -161,8 +216,8 @@ const PAYMENT_TYPE_FORM_DATA: Record<PaymentType, PaymentTypeFormData> = {
       publicToken: "",
       consent: consentType === "checkbox" ? false: true,
     }),
-    schemaShape: {},
-    fields: ({ control, consentType, privacyHref, termsOfUseHref }) => (<>
+    schemaShape: () => ({}),
+    fields: ({ control, consentType }) => (<>
       <DisplayBox sx={{ mt: 1.5, mb: consentType === "checkbox" ? 1 : 0 }}>
         <Typography variant="body1">
           We use Plaid to connect to your account.
@@ -173,7 +228,7 @@ const PAYMENT_TYPE_FORM_DATA: Record<PaymentType, PaymentTypeFormData> = {
         <ControlledCheckbox
           name="consent"
           control={control}
-          label={ <>I <ConsentText privacyHref={ privacyHref } termsOfUseHref={ termsOfUseHref } /></> } />
+          label={ <>I <ConsentText /></> } />
       ) }
     </>),
   },
@@ -184,15 +239,15 @@ const PAYMENT_TYPE_FORM_DATA: Record<PaymentType, PaymentTypeFormData> = {
       routingNumber: "",
       consent: consentType === "checkbox" ? false: true,
     }),
-    schemaShape: {
+    schemaShape: () => ({
       accountNumber: string()
         .label(FIELD_LABELS.accountNumber)
         .when("type", isWireThenRequireSchema),
       routingNumber: string()
         .label(FIELD_LABELS.routingNumber)
         .when("type", isWireThenRequireSchema),
-    },
-    fields: ({ control, consentType, privacyHref, termsOfUseHref, dictionary }) => (<>
+    }),
+    fields: ({ control, consentType, dictionary }) => (<>
       <ControlledTextField
           name="accountNumber"
           control={control}
@@ -207,7 +262,7 @@ const PAYMENT_TYPE_FORM_DATA: Record<PaymentType, PaymentTypeFormData> = {
         <ControlledCheckbox
           name="consent"
           control={control}
-          label={ <>I <ConsentText privacyHref={ privacyHref } termsOfUseHref={ termsOfUseHref } /></> } />
+          label={ <>I <ConsentText /></> } />
       ) }
 
       <DisplayBox sx={{ mt: 1.5 }}>
@@ -222,8 +277,8 @@ const PAYMENT_TYPE_FORM_DATA: Record<PaymentType, PaymentTypeFormData> = {
       type: "Crypto",
       consent: consentType === "checkbox" ? false: true,
     }),
-    schemaShape: {},
-    fields: ({ control, consentType, privacyHref, termsOfUseHref }) => (<>
+    schemaShape: () => ({}),
+    fields: ({ control, consentType }) => (<>
       <DisplayBox sx={{ mt: 1.5, mb: consentType === "checkbox" ? 1 : 0 }}>
         <Typography variant="body1">
           Not supported yet.
@@ -234,7 +289,7 @@ const PAYMENT_TYPE_FORM_DATA: Record<PaymentType, PaymentTypeFormData> = {
         <ControlledCheckbox
           name="consent"
           control={control}
-          label={ <>I <ConsentText privacyHref={ privacyHref } termsOfUseHref={ termsOfUseHref } /></> } />
+          label={ <>I <ConsentText /></> } />
       ) }
     </>),
   },
@@ -242,6 +297,7 @@ const PAYMENT_TYPE_FORM_DATA: Record<PaymentType, PaymentTypeFormData> = {
 
 export interface PaymentMethodFormProps {
   acceptedPaymentTypes: PaymentType[];
+  acceptedCreditCardNetworks?: CreditCardNetwork[];
   defaultValues?: PaymentMethod;
   checkoutError?: CheckoutModalError;
   onPlaidLinkClicked: () => void;
@@ -255,6 +311,7 @@ export interface PaymentMethodFormProps {
 
 export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
   acceptedPaymentTypes,
+  acceptedCreditCardNetworks,
   defaultValues: parentDefaultValues,
   checkoutError,
   onPlaidLinkClicked,
@@ -271,14 +328,13 @@ export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
 
   const schema = useMemo(() => {
     return object().shape({
-      type: string().required(),
+      type: string().required(withRequiredErrorMessage),
       consent: boolean().oneOf([true], CONSENT_ERROR_MESSAGE),
-      ...Object.values(PAYMENT_TYPE_FORM_DATA).reduce((objectShape, { schemaShape }) => ({ ...objectShape, ...schemaShape }), {} as ObjectShape),
+      ...Object.values(PAYMENT_TYPE_FORM_DATA).reduce((objectShape, { schemaShape }) => ({ ...objectShape, ...schemaShape(acceptedCreditCardNetworks) }), {} as ObjectShape),
     });
-  }, []);
+  }, [acceptedCreditCardNetworks]);
 
   const dictionary = useDictionary();
-  const { privacyHref, termsOfUseHref } = dictionary;
 
   const {
     control,
@@ -305,6 +361,10 @@ export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
   const Fields = PAYMENT_TYPE_FORM_DATA[selectedPaymentMethod].fields;
   const submitForm = handleSubmit(onSubmit);
   const checkoutErrorMessage = useFormCheckoutError({ formKey: "payment", checkoutError, fields: FIELD_NAMES, setError, deps: [selectedPaymentMethod] });
+
+  const creditCardNumber = watch("cardNumber") as string;
+  const creditCardNetwork = getCreditCardNetworkFromNumber(creditCardNumber || "");
+  const cvvLabel = getCardTypeByType(creditCardNetwork).code.name;
 
   const handleFormSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
@@ -350,10 +410,9 @@ export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
 
       <Fields
         control={ control }
+        cvvLabel={ cvvLabel }
         consentType={ consentType }
-        privacyHref={ privacyHref }
-        dictionary={dictionary}
-        termsOfUseHref={ termsOfUseHref }/>
+        dictionary={ dictionary } />
 
       { checkoutErrorMessage && <FormErrorsBox error={ checkoutErrorMessage } sx={{ mt: 5 }} /> }
 
