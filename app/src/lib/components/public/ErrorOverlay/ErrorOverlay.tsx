@@ -84,7 +84,7 @@ export const PUIErrorOverlay: React.FC<PUIErrorOverlayProps> = ({
   return (
     <FullScreenOverlay centered header={ headerElement } { ...fullScreenOverlayProps }>
       <ErrorView
-        checkoutError={ { errorMessage } }
+        checkoutError={ { errorMessage: errorMessage || "Something went wrong.\nLoading error details..." } }
         errorImageSrc={ errorImageSrc }
         onFixError={ reviewData }
         onClose={ toMarketplace } />
