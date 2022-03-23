@@ -41,14 +41,14 @@ const COUNTDOWN_SX = {
     justifyContent: "flex-start",
     alignItems: "center",
 };
-const CheckoutModalHeader = ({ variant, countdownElementRef, title: customTitle, logoSrc, logoSx, user, userFormat, onLogin, onClose, onPrev, setDebug, }) => {
+const CheckoutModalHeader = ({ variant, countdownElementRef, title: customTitle, logoSrc, logoSx, user, userFormat, onLogin, onClose, onPrev, toggleDebug, }) => {
     const title = customTitle || CHECKOUT_MODAL_TITLE[variant] || NBSP;
     const displayUsername = getFormattedUser(variant, user, userFormat);
     const showControls = CHECKOUT_MODAL_CONTROLS[variant] || false;
     const clickCounterRef = useRef(0);
     const clickTimestampRef = useRef(0);
     const handleLogoClick = useCallback(() => {
-        if (!setDebug)
+        if (!toggleDebug)
             return;
         const counter = clickCounterRef.current;
         const timestamp = clickTimestampRef.current;
@@ -57,18 +57,13 @@ const CheckoutModalHeader = ({ variant, countdownElementRef, title: customTitle,
         const nextCounter = elapsed > DEV_DEBUG_COUNTER_EXPIRATION_MS || counter === DEV_DEBUG_COUNTER_CLICKS_NEEDED ? 1 : counter + 1;
         clickTimestampRef.current = now;
         clickCounterRef.current = nextCounter;
-        if (nextCounter === DEV_DEBUG_COUNTER_CLICKS_NEEDED) {
-            setDebug((prevValue) => {
-                const nextValue = !prevValue;
-                console.log(`\n🐞 DEBUG MODE ${nextValue ? "ENABLED" : "DISABLED"}!\n\n`);
-                return nextValue;
-            });
-        }
-    }, [setDebug]);
+        if (nextCounter === DEV_DEBUG_COUNTER_CLICKS_NEEDED)
+            toggleDebug();
+    }, [toggleDebug]);
     return (React__default.createElement(Box, null,
         React__default.createElement(Stack, { spacing: 2, direction: "row", sx: { justifyContent: "space-between", alignItems: "center", py: 2 } },
             React__default.createElement(Typography, { variant: "h5", id: "checkout-modal-header-title" }, title),
-            React__default.createElement(Img, { src: logoSrc, onClick: setDebug ? handleLogoClick : undefined, sx: Object.assign({ maxHeight: "32px", maxWidth: { xs: "180px", sm: "240px" } }, logoSx) })),
+            React__default.createElement(Img, { src: logoSrc, onClick: toggleDebug ? handleLogoClick : undefined, sx: Object.assign({ maxHeight: "32px", maxWidth: { xs: "180px", sm: "240px" } }, logoSx) })),
         React__default.createElement(Divider, null),
         showControls ? (React__default.createElement(React__default.Fragment, null,
             React__default.createElement(Stack, { spacing: 2, direction: "row", sx: { justifyContent: "space-between", alignItems: "center", py: 2 } },

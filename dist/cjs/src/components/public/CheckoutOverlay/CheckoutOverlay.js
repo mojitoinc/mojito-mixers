@@ -31,6 +31,7 @@ function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'defau
 
 var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 
+const DEV_DEBUG_ENABLED = process.browser && localStorage.getItem(config.DEV_DEBUG_ENABLED_KEY) === "true";
 const PUICheckoutOverlay = ({ 
 // Modal:
 open, onClose, onGoToCollection, 
@@ -46,10 +47,33 @@ orgID, invoiceID: initialInvoiceID, checkoutItems: parentCheckoutItems,
 // Authentication:
 onLogin, isAuthenticated, isAuthenticatedLoading, 
 // Other Events:
-debug: initialDebug, onEvent, onError, onMarketingOptInChange, // Not implemented yet. Used to let user subscribe / unsubscribe to marketing updates.
+debug: parentDebug, onEvent, onError, onMarketingOptInChange, // Not implemented yet. Used to let user subscribe / unsubscribe to marketing updates.
  }) => {
     var _a, _b, _c;
-    const [debug, setDebug] = React.useState(!!initialDebug);
+    const [debug, setDebug] = React.useState(!!parentDebug);
+    // Initialization, just to prevent issues with Next.js' SSR:
+    React.useEffect(() => {
+        setDebug((prevDebug) => {
+            const nextDebug = prevDebug || DEV_DEBUG_ENABLED;
+            if (nextDebug)
+                console.log(`\n🐞 DEBUG MODE ENABLED!\n\n`);
+            return nextDebug;
+        });
+    }, []);
+    // Actual changes triggered by users:
+    const toggleDebug = React.useCallback(() => {
+        setDebug((prevDebug) => {
+            const nextDebug = !prevDebug;
+            console.log(`\n🐞 DEBUG MODE ${nextDebug ? "ENABLED" : "DISABLED"}!\n\n`);
+            if (nextDebug) {
+                localStorage.setItem(config.DEV_DEBUG_ENABLED_KEY, "true");
+            }
+            else {
+                localStorage.removeItem(config.DEV_DEBUG_ENABLED_KEY);
+            }
+            return nextDebug;
+        });
+    }, []);
     // First, get user data and saved payment methods:
     const { data: meData, loading: meLoading, error: meError, refetch: meRefetch, } = graphqlGenerated.useMeQuery({ skip: !isAuthenticated });
     const wallets = React.useMemo(() => {
@@ -419,7 +443,7 @@ debug: initialDebug, onEvent, onError, onMarketingOptInChange, // Not implemente
         // some other kind of indeterminate / incorrect state:
         return null;
     }
-    const headerElement = (React__default["default"].createElement(CheckoutModalHeader.CheckoutModalHeader, { variant: headerVariant, countdownElementRef: countdownElementRef, logoSrc: logoSrc, logoSx: logoSx, user: (_c = meData === null || meData === void 0 ? void 0 : meData.me) === null || _c === void 0 ? void 0 : _c.user, userFormat: userFormat, onLogin: onLogin, onClose: checkoutStep === startAt ? handleClose : undefined, onPrev: checkoutStep === startAt ? undefined : goBack, setDebug: setDebug }));
+    const headerElement = (React__default["default"].createElement(CheckoutModalHeader.CheckoutModalHeader, { variant: headerVariant, countdownElementRef: countdownElementRef, logoSrc: logoSrc, logoSx: logoSx, user: (_c = meData === null || meData === void 0 ? void 0 : meData.me) === null || _c === void 0 ? void 0 : _c.user, userFormat: userFormat, onLogin: onLogin, onClose: checkoutStep === startAt ? handleClose : undefined, onPrev: checkoutStep === startAt ? undefined : goBack, toggleDebug: toggleDebug }));
     return (React__default["default"].createElement(DictionaryProvider.DictionaryProvider, { dictionary: dictionary },
         React__default["default"].createElement(FullScreenOverlay.FullScreenOverlay, { centered: checkoutStep === "purchasing" || checkoutStep === "error", open: open, onClose: handleClose, isDialogBlocked: isDialogBlocked, contentKey: checkoutStep, header: headerElement, children: checkoutStepElement })));
 };
