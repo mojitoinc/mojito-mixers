@@ -10,7 +10,15 @@ import { LABELS_BY_VARIANT, ICONS_BY_VARIANT } from './CheckoutModalFooter.const
 import { Img } from '../../shared/Img/Img.js';
 
 const VARIANTS_WITH_DISCLAIMER = ["toPayment", "toPlaid", "toConfirmation"];
-const CheckoutModalFooter = ({ variant, buttonLabel, guestCheckoutEnabled, consentType, onGoToCollection, submitDisabled, onSubmitClicked, onCloseClicked, }) => {
+const CheckoutModalFooter = ({ 
+// Configuration:
+variant, guestCheckoutEnabled, consentType, 
+// Submit button:
+submitLabel, submitDisabled, onSubmitClicked, 
+// Close link:
+closeLabel, closeDisabled, onCloseClicked, 
+// onGoToCollection:
+onGoToCollection, }) => {
     // CONSENT:
     const showConsent = consentType && VARIANTS_WITH_DISCLAIMER.includes(variant);
     const consentTextElement = showConsent ? React__default.createElement(ConsentText, null) : null;
@@ -39,9 +47,9 @@ const CheckoutModalFooter = ({ variant, buttonLabel, guestCheckoutEnabled, conse
         if (onGoToCollection)
             onGoToCollection();
     }, [onGoToCollection]);
-    // PRIMARY BUTTON:
+    // SUBMIT BUTTON:
     const primaryButtonVisible = variant !== "toGuestCheckout" || guestCheckoutEnabled;
-    const primaryButtonLabel = buttonLabel || LABELS_BY_VARIANT[variant];
+    const primaryButtonLabel = submitLabel || LABELS_BY_VARIANT[variant];
     const PrimaryButtonIcon = ICONS_BY_VARIANT[variant];
     const handleSubmitClicked = useCallback(() => __awaiter(void 0, void 0, void 0, function* () {
         if (!onSubmitClicked)
@@ -63,11 +71,13 @@ const CheckoutModalFooter = ({ variant, buttonLabel, guestCheckoutEnabled, conse
         });
     }), [isConsentChecked, onSubmitClicked]);
     // CANCEL LINK:
+    const cancelLinkLabel = closeLabel || "Cancel and Return to Marketplace";
+    const cancelLinkColor = closeDisabled ? "text.disabled" : "text.primary"; // TODO: Create custom Link component with this functionality.
     const handleCancelClicked = useCallback((e) => {
         e.preventDefault();
-        if (onCloseClicked)
+        if (onCloseClicked && !closeDisabled)
             onCloseClicked();
-    }, [onCloseClicked]);
+    }, [onCloseClicked, closeDisabled]);
     return (React__default.createElement(Box, { sx: {
             display: "flex",
             alignItems: "center",
@@ -80,9 +90,9 @@ const CheckoutModalFooter = ({ variant, buttonLabel, guestCheckoutEnabled, conse
                 consentTextElement), checked: isConsentChecked, onChange: handleConsentClicked, error: showConsentError, helperText: showConsentError ? CONSENT_ERROR_MESSAGE : undefined, sx: { alignSelf: "flex-start", mb: 5 } })),
         onGoToCollection && (React__default.createElement(PrimaryButton, { onClick: handleCollectionClicked, disabled: submitDisabled || isFormLoading, sx: { mb: 2 } }, "View Collection")),
         primaryButtonVisible && (React__default.createElement(PrimaryButton, { onClick: onSubmitClicked ? handleSubmitClicked : undefined, type: onSubmitClicked ? "button" : "submit", endIcon: isFormLoading ? React__default.createElement(CircularProgress, { color: "inherit", size: "1em" }) : (PrimaryButtonIcon && React__default.createElement(PrimaryButtonIcon, null)), disabled: submitDisabled || isFormLoading }, primaryButtonLabel)),
-        variant !== "toMarketplace" && onCloseClicked && (React__default.createElement(Typography, { sx: primaryButtonVisible ? { pt: 2 } : undefined },
+        variant !== "toMarketplace" && onCloseClicked && (React__default.createElement(Typography, { sx: { color: cancelLinkColor, pt: primaryButtonVisible ? 2 : 0 } },
             primaryButtonVisible ? "or " : null,
-            React__default.createElement(Link, { sx: { color: "text.primary" }, href: "", onClick: handleCancelClicked }, "Cancel and Return to Marketplace"))),
+            React__default.createElement(Link, { sx: { color: cancelLinkColor, cursor: closeDisabled ? "not-allowed" : "pointer" }, href: "", onClick: handleCancelClicked }, cancelLinkLabel))),
         showConsent && consentType === "disclaimer" && (React__default.createElement(React__default.Fragment, null,
             React__default.createElement(Divider, { sx: { my: 5, width: "100%" } }),
             React__default.createElement(Typography, { sx: { maxWidth: SM_MOBILE_MAX_WIDTH }, align: "center" },

@@ -47,6 +47,14 @@ exports.ContractType = void 0;
     ContractType["Erc721Creator"] = "ERC721Creator";
     ContractType["Erc1155Creator"] = "ERC1155Creator";
 })(exports.ContractType || (exports.ContractType = {}));
+exports.DeliveryMethod = void 0;
+(function (DeliveryMethod) {
+    DeliveryMethod["Erc721Provenance"] = "ERC721Provenance";
+    DeliveryMethod["Erc721Transfer"] = "ERC721Transfer";
+    DeliveryMethod["Erc1155OpenEdition"] = "ERC1155OpenEdition";
+    DeliveryMethod["Erc1155Transfer"] = "ERC1155Transfer";
+    DeliveryMethod["NoOp"] = "NoOp";
+})(exports.DeliveryMethod || (exports.DeliveryMethod = {}));
 exports.ExtensionType = void 0;
 (function (ExtensionType) {
     ExtensionType["ProvenanceExtension"] = "ProvenanceExtension";
@@ -61,6 +69,9 @@ exports.InvoiceStatus = void 0;
 })(exports.InvoiceStatus || (exports.InvoiceStatus = {}));
 exports.KycStatus = void 0;
 (function (KycStatus) {
+    KycStatus["Clear"] = "Clear";
+    KycStatus["Failed1"] = "Failed1";
+    KycStatus["Failed2"] = "Failed2";
     KycStatus["Level1"] = "Level1";
     KycStatus["Level2"] = "Level2";
     KycStatus["None"] = "None";
@@ -130,6 +141,7 @@ const GetPaymentNotificationDocument = Apollo.gql `
     message {
       ... on PaymentNotification3DSMessage {
         redirectURL
+        error
       }
     }
   }
