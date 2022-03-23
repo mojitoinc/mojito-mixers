@@ -29,7 +29,7 @@ import { PUIDictionary } from "../../../domain/dictionary/dictionary.interfaces"
 import { ApolloError } from "@apollo/client";
 import { DictionaryProvider } from "../../../providers/DictionaryProvider";
 import { Wallet } from "../../../domain/wallet/wallet.interfaces";
-import { THREEDS_REDIRECT_DELAY_MS } from "../../../config/config";
+import { DEV_DEBUG_ENABLED_KEY, THREEDS_REDIRECT_DELAY_MS } from "../../../config/config";
 import { Network } from "../../../domain/network/network.interfaces";
 import { NEW_WALLET_OPTION } from "../../../domain/wallet/wallet.constants";
 import { StatusIcon } from "../../shared/StatusIcon/StatusIcon";
@@ -79,9 +79,11 @@ export interface PUICheckoutOverlayProps {
   onEvent?: (eventType: CheckoutEventType, eventData: CheckoutEventData) => void;
   onError?: (error: CheckoutModalError) => void;
   onMarketingOptInChange?: (marketingOptIn: boolean) => void;
- }
+}
 
 export type PUICheckoutProps = PUICheckoutOverlayProps & ProvidersInjectorProps;
+
+const DEV_DEBUG_ENABLED = process.browser && localStorage.getItem(DEV_DEBUG_ENABLED_KEY) === "true";
 
 export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   // Modal:
@@ -123,12 +125,40 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   isAuthenticatedLoading,
 
   // Other Events:
-  debug: initialDebug,
+  debug: parentDebug,
   onEvent,
   onError,
   onMarketingOptInChange, // Not implemented yet. Used to let user subscribe / unsubscribe to marketing updates.
 }) => {
-  const [debug, setDebug] = useState(!!initialDebug);
+  const [debug, setDebug] = useState(!!parentDebug);
+
+  // Initialization, just to prevent issues with Next.js' SSR:
+  useEffect(() => {
+    setDebug((prevDebug) => {
+      const nextDebug = prevDebug || DEV_DEBUG_ENABLED;
+
+      if (nextDebug) console.log(`\n🐞 DEBUG MODE ENABLED!\n\n`);
+
+      return nextDebug;
+    });
+  }, []);
+
+  // Actual changes triggered by users:
+  const toggleDebug = useCallback(() => {
+    setDebug((prevDebug) => {
+      const nextDebug = !prevDebug;
+
+      console.log(`\n🐞 DEBUG MODE ${ nextDebug ? "ENABLED" : "DISABLED" }!\n\n`);
+
+      if (nextDebug) {
+        localStorage.setItem(DEV_DEBUG_ENABLED_KEY, "true");
+      } else {
+        localStorage.removeItem(DEV_DEBUG_ENABLED_KEY);
+      }
+
+      return nextDebug;
+    });
+  }, []);
 
   // First, get user data and saved payment methods:
 
@@ -746,7 +776,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
       onLogin={ onLogin }
       onClose={ checkoutStep === startAt ? handleClose : undefined }
       onPrev={ checkoutStep === startAt ? undefined : goBack }
-      setDebug={ setDebug } />
+      toggleDebug={ toggleDebug } />
   );
 
   return (
