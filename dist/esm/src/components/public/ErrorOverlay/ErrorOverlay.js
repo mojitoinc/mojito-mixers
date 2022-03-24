@@ -16,6 +16,7 @@ const PUIErrorOverlay = (_a) => {
     var { logoSrc, logoSx, errorImageSrc, onRedirect } = _a, fullScreenOverlayProps = __rest(_a, ["logoSrc", "logoSx", "errorImageSrc", "onRedirect"]);
     const [errorMessage, setErrorMessage] = useState("");
     const paymentNotificationResult = useGetPaymentNotificationQuery({
+        skip: !!errorMessage,
         pollInterval: PAYMENT_NOTIFICATION_INTERVAL_MS,
     });
     const error = ((_d = (_c = (_b = paymentNotificationResult.data) === null || _b === void 0 ? void 0 : _b.getPaymentNotification) === null || _c === void 0 ? void 0 : _c.message) === null || _d === void 0 ? void 0 : _d.error) || "";

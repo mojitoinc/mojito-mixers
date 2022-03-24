@@ -120,7 +120,7 @@ function continueFlows(noClear = false) {
         paymentInfo: "",
     };
     if (continue3DSFlow) {
-        if (savedCheckoutModalState.purchaseSuccess) {
+        if (savedCheckoutModalState.purchaseSuccess && !savedCheckoutModalState.purchaseError) {
             continueFlowsReturn.checkoutStep = "confirmation";
         }
         else {
