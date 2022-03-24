@@ -21,6 +21,7 @@ import { TaxesMessagesBox } from "../components/shared/TaxesMessagesBox/TaxesMes
 import { TaxesState } from "../views/Billing/BillingView";
 import { FormErrorsBox } from "../components/shared/FormErrorsBox/FormErrorsBox";
 import { formatPhoneAsE123, getPhonePrefix, phoneHasPrefix } from "../domain/circle/circle.utils";
+import { ConsentType } from "../components/shared/ConsentText/ConsentText";
 
 const FULL_NAME_FIELD = "fullName";
 const EMAIL_FIELD = "email";
@@ -75,8 +76,6 @@ const EMPTY_FORM_VALUES: BillingInfo = {
   [STATE_FIELD]: EMPTY_OPTION,
   [COUNTRY_FIELD]: EMPTY_OPTION,
 };
-
-// export type BillingInfoFormVariant = "guest" | "loggedIn";
 
 const schema = object()
   .shape({
@@ -133,16 +132,19 @@ const schema = object()
     }),
   }).required();
 
+// export type BillingInfoFormVariant = "guest" | "loggedIn";
+
 export interface BillingInfoFormProps {
   // variant: BillingInfoFormVariant;
   defaultValues?: BillingInfo;
   checkoutError?: CheckoutModalError;
-  taxes: TaxesState;
+  taxes: null | TaxesState;
   onTaxInfoChange: (taxInfo: Partial<TaxInfo>) => void;
   onSaved?: () => void;
   onClose: () => void;
   onSubmit: (data: BillingInfo) => void;
   onAttemptSubmit: () => void;
+  consentType?: ConsentType;
   debug?: boolean;
 }
 
@@ -156,7 +158,8 @@ export const BillingInfoForm: React.FC<BillingInfoFormProps> = ({
   onClose,
   onSubmit,
   onAttemptSubmit,
-  debug
+  consentType,
+  debug,
 }) => {
   const {
     control,
@@ -185,7 +188,6 @@ export const BillingInfoForm: React.FC<BillingInfoFormProps> = ({
     });
   }, [onTaxInfoChange, street, zip, city, state, country]);
 
-  const taxesStatus = taxes.status;
   const selectedCountryCode = country?.value;
   const submitForm = handleSubmit(onSubmit);
   const checkoutErrorMessage = useFormCheckoutError({ formKey: "billing", checkoutError, fields: FIELD_NAMES, setError });
@@ -310,8 +312,9 @@ export const BillingInfoForm: React.FC<BillingInfoFormProps> = ({
 
       <CheckoutModalFooter
         variant="toPayment"
-        buttonLabel={ taxesStatus === "loading" ? "Calculating taxes..." : undefined }
-        submitDisabled={ taxesStatus === "loading" }
+        consentType={ consentType }
+        submitLabel={ taxes?.status === "loading" ? "Calculating taxes..." : undefined }
+        submitDisabled={ !!taxes && taxes.status === "loading" }
         onCloseClicked={onClose} />
     </form>
   );

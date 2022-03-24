@@ -1,12 +1,11 @@
 import React__default, { useCallback } from 'react';
-import { useTheme, useMediaQuery, Stack, Typography, Tooltip } from '@mui/material';
+import { useMediaQuery, ToggleButtonGroup, ToggleButton, Stack, Typography, Tooltip } from '@mui/material';
 import default_1$1 from '../../../../node_modules/@mui/icons-material/AccountBalance.js';
 import default_1 from '../../../../node_modules/@mui/icons-material/CreditCard.js';
 import default_1$2 from '../../../../node_modules/@mui/icons-material/Language.js';
 import Icon from '@mdi/react';
 import { mdiEthereum } from '@mdi/js';
-import ToggleButtonGroup from '../../../../node_modules/@mui/material/ToggleButtonGroup/ToggleButtonGroup.js';
-import ToggleButton from '../../../../node_modules/@mui/material/ToggleButton/ToggleButton.js';
+import useTheme from '../../../../node_modules/@mui/material/styles/useTheme.js';
 
 const PAYMENT_METHOD_OPTION_PROPS = {
     CreditCard: {

@@ -15,7 +15,7 @@ var CheckoutModalStepIndex;
 })(CheckoutModalStepIndex || (CheckoutModalStepIndex = {}));
 const CHECKOUT_STEPS = ["authentication", "billing", "payment", "purchasing", "confirmation"];
 const WALLET_ADDRESS_FIELD_STEPS = ["billing", "payment"];
-function useCheckoutModalState({ invoiceID: initialInvoiceID = null, productConfirmationEnabled, isAuthenticated, onError, }) {
+function useCheckoutModalState({ invoiceID: initialInvoiceID = null, productConfirmationEnabled, vertexEnabled, isAuthenticated, onError, }) {
     const startAt = !isAuthenticated || productConfirmationEnabled ? "authentication" : "billing";
     const [{ checkoutStep, checkoutError, isDialogBlocked, }, setCheckoutModalState] = useState({
         checkoutStep: startAt,
@@ -26,10 +26,10 @@ function useCheckoutModalState({ invoiceID: initialInvoiceID = null, productConf
         paymentInfo: "",
         cvv: "",
     });
-    const [{ invoiceID, taxes, walletAddress, circlePaymentID, paymentID, }, setPurchaseState] = useState({
+    const [{ invoiceID, taxes, wallet, circlePaymentID, paymentID, }, setPurchaseState] = useState({
         invoiceID: initialInvoiceID || null,
-        taxes: { status: "incomplete" },
-        walletAddress: null,
+        taxes: vertexEnabled ? { status: "incomplete" } : null,
+        wallet: null,
         circlePaymentID: "",
         paymentID: ""
     });
@@ -39,9 +39,14 @@ function useCheckoutModalState({ invoiceID: initialInvoiceID = null, productConf
         // Once authentication has loaded, we know if we need to skip the product confirmation step or not. Also, when the
         // modal is re-opened, we need to reset its state, taking into account if we need to resume a Plaid OAuth flow:s
         const savedFlow = continueFlows();
-        // if (savedFlow.checkoutStep !== "") {
+        // if (savedFlow.flowType === "3DS") {
+        //   continueCheckout() already calls clearPersistedInfo().
         //   clearPersistedInfo();
+        // } else if (savedFlow.flowType === "Plaid") {
+        //   This is handled in PaymentView.tsx, in the usePlaid() hook call.
         //   clearPlaidInfo();
+        // } else if (savedFlow.checkoutStep !== "") {
+        //   TODO: Clear both as this is some kind of indeterminate / error state?
         // }
         setCheckoutModalState({
             checkoutStep: savedFlow.checkoutStep || startAt,
@@ -57,12 +62,12 @@ function useCheckoutModalState({ invoiceID: initialInvoiceID = null, productConf
         });
         setPurchaseState({
             invoiceID: savedFlow.invoiceID || "",
-            taxes: { status: "incomplete" },
-            walletAddress: null,
+            taxes: vertexEnabled ? { status: "incomplete" } : null,
+            wallet: null,
             circlePaymentID: savedFlow.circlePaymentID || "",
             paymentID: savedFlow.paymentID || ""
         });
-    }, [startAt]);
+    }, [startAt, vertexEnabled]);
     const goBack = useCallback(() => {
         setCheckoutModalState(({ checkoutStep, checkoutError }) => ({
             checkoutStep: CHECKOUT_STEPS[Math.max(CHECKOUT_STEPS.indexOf(checkoutStep) - 1, 0)],
@@ -71,14 +76,14 @@ function useCheckoutModalState({ invoiceID: initialInvoiceID = null, productConf
         }));
     }, []);
     const goNext = useCallback(() => {
-        if (!isValidWalletAddress(walletAddress) && WALLET_ADDRESS_FIELD_STEPS.includes(checkoutStep))
+        if (!isValidWalletAddress(wallet) && WALLET_ADDRESS_FIELD_STEPS.includes(checkoutStep))
             return;
         setCheckoutModalState(({ checkoutStep, checkoutError }) => ({
             checkoutStep: CHECKOUT_STEPS[Math.min(CHECKOUT_STEPS.indexOf(checkoutStep) + 1, CHECKOUT_STEPS.length - 1)],
             checkoutError,
             isDialogBlocked: false,
         }));
-    }, [checkoutStep, walletAddress]);
+    }, [checkoutStep, wallet]);
     const goTo = useCallback((checkoutStep = startAt, error) => {
         setCheckoutModalState((prevCheckoutModalState) => {
             let checkoutError;
@@ -111,19 +116,20 @@ function useCheckoutModalState({ invoiceID: initialInvoiceID = null, productConf
         }));
     }, []);
     const setInvoiceID = useCallback((invoiceID) => {
-        setPurchaseState((prevPurchasState) => (Object.assign(Object.assign({}, prevPurchasState), { invoiceID, circlePaymentID: "", paymentID: "" })));
+        setPurchaseState((prevPurchaseState) => (Object.assign(Object.assign({}, prevPurchaseState), { invoiceID, circlePaymentID: "", paymentID: "" })));
     }, []);
     const setTaxes = useCallback((taxes) => {
-        setPurchaseState((prevPurchasState) => (Object.assign(Object.assign({}, prevPurchasState), { taxes })));
+        setPurchaseState((prevPurchaseState) => (Object.assign(Object.assign({}, prevPurchaseState), { taxes })));
     }, []);
-    const setWalletAddress = useCallback((walletAddress) => {
-        setPurchaseState((prevPurchasState) => (Object.assign(Object.assign({}, prevPurchasState), { walletAddress })));
+    const setWalletAddress = useCallback((wallet) => {
+        setPurchaseState((prevPurchaseState) => (Object.assign(Object.assign({}, prevPurchaseState), { wallet })));
     }, []);
     const setPayments = useCallback((circlePaymentID, paymentID) => {
-        setPurchaseState((prevPurchasState) => (Object.assign(Object.assign({}, prevPurchasState), { circlePaymentID, paymentID })));
+        setPurchaseState((prevPurchaseState) => (Object.assign(Object.assign({}, prevPurchaseState), { circlePaymentID, paymentID })));
     }, []);
     return {
         // CheckoutModalState:
+        startAt,
         checkoutStep,
         checkoutError,
         isDialogBlocked,
@@ -141,7 +147,7 @@ function useCheckoutModalState({ invoiceID: initialInvoiceID = null, productConf
         setInvoiceID,
         taxes,
         setTaxes,
-        walletAddress,
+        wallet,
         setWalletAddress,
         circlePaymentID,
         paymentID,

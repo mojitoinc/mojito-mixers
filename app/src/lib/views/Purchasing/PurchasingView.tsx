@@ -6,21 +6,23 @@ import { Box, Typography } from "@mui/material";
 import { useTimeout, useInterval } from "@swyg/corre";
 import { CheckoutModalError, SelectedPaymentMethod } from "../../components/public/CheckoutOverlay/CheckoutOverlay.hooks";
 import { ERROR_PURCHASE_TIMEOUT } from "../../domain/errors/errors.constants";
-import { XS_MOBILE_MAX_WIDTH } from "../../config/theme/theme";
+import { XS_MOBILE_MAX_WIDTH } from "../../config/theme/themeConstants";
 import { StatusIcon } from "../../components/shared/StatusIcon/StatusIcon";
 import { useGetPaymentNotificationQuery } from "../../queries/graphqlGenerated";
 import { persistCheckoutModalInfo } from "../../components/public/CheckoutOverlay/CheckoutOverlay.utils";
-import { PAYMENT_NOTIFICATION_INTERVAL_MS, PURCHASING_MESSAGES_DEFAULT, PURCHASING_MIN_WAIT_MS, PURCHASING_MESSAGES_INTERVAL_MS } from "../../config/config";
+import { PAYMENT_NOTIFICATION_INTERVAL_MS, PURCHASING_MESSAGES_DEFAULT, PURCHASING_MIN_WAIT_MS, PURCHASING_MESSAGES_INTERVAL_MS, PAYMENT_CREATION_TIMEOUT_MS, DEV_SKIP_3DS_IN_LOCALHOST } from "../../config/config";
 import { isLocalhost } from "../../domain/url/url.utils";
+import { Wallet } from "../../domain/wallet/wallet.interfaces";
 
 export interface PurchasingViewProps {
+  threeDSEnabled?: boolean;
   purchasingImageSrc?: string;
   purchasingMessages?: false | string[];
   orgID: string;
   invoiceID: string;
   savedPaymentMethods: SavedPaymentMethod[];
   selectedPaymentMethod: SelectedPaymentMethod;
-  walletAddress: string | null;
+  wallet: null | string | Wallet;
   onPurchaseSuccess: (circlePaymentID: string, paymentID: string, redirectURL: string) => void;
   onPurchaseError: (error?: string | CheckoutModalError) => void;
   onDialogBlocked: (blocked: boolean) => void;
@@ -28,13 +30,14 @@ export interface PurchasingViewProps {
 }
 
 export const PurchasingView: React.FC<PurchasingViewProps> = ({
+  threeDSEnabled,
   purchasingImageSrc,
   purchasingMessages: customPurchasingMessages,
   orgID,
   invoiceID,
   savedPaymentMethods,
   selectedPaymentMethod,
-  walletAddress,
+  wallet,
   onPurchaseSuccess,
   onPurchaseError,
   onDialogBlocked,
@@ -60,27 +63,39 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
     invoiceID,
     savedPaymentMethods,
     selectedPaymentMethod,
-    walletAddress,
+    wallet,
     debug,
   });
 
 
   // Load 3DS redirect URL when needed:
 
-  const [redirectURL, setRedirectURL] = useState(isCreditCardPayment ? "" : null);
+  const [redirectURL, setRedirectURL] = useState(threeDSEnabled && isCreditCardPayment ? "" : null);
+
+  const skipPaymentNotificationRedirect =
+    !threeDSEnabled ||
+    !isCreditCardPayment ||
+    !!redirectURL ||
+    fullPaymentState.paymentStatus !== "processed";
 
   const paymentNotificationResult = useGetPaymentNotificationQuery({
-    skip: !isCreditCardPayment || !!redirectURL || fullPaymentState.paymentStatus !== "processed",
+    skip: skipPaymentNotificationRedirect,
     pollInterval: PAYMENT_NOTIFICATION_INTERVAL_MS,
   });
 
   const nextRedirectURL = paymentNotificationResult.data?.getPaymentNotification?.message?.redirectURL || "";
 
   useEffect(() => {
-    if (!isCreditCardPayment) return;
+    if (skipPaymentNotificationRedirect) return;
 
-    setRedirectURL(prevRedirectURL => prevRedirectURL || nextRedirectURL);
-  }, [isCreditCardPayment, nextRedirectURL]);
+    setRedirectURL((prevRedirectURL) => {
+      const redirectURL = prevRedirectURL || nextRedirectURL;
+
+      if (debug) console.log(`  👀 getPaymentNotificationQuery`, { redirectURL });
+
+      return redirectURL;
+    });
+  }, [skipPaymentNotificationRedirect, nextRedirectURL, debug]);
 
 
   // Triggers for payment mutation and onPurchaseSuccess/onPurchaseError callbacks:
@@ -94,7 +109,7 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
     purchaseSuccessHandledRef.current = true;
 
     onPurchaseError(ERROR_PURCHASE_TIMEOUT());
-  }, redirectURL === null ? null : 5000, [onPurchaseError]);
+  }, redirectURL === null ? null : PAYMENT_CREATION_TIMEOUT_MS, [onPurchaseError]);
 
   useEffect(() => {
     if (fullPaymentCalledRef.current) return;
@@ -113,17 +128,19 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
       return;
     }
 
-    if (!hasWaited || redirectURL === "" || purchaseSuccessHandledRef.current) return;
-
-    purchaseSuccessHandledRef.current = true;
-
     if (paymentStatus === "error" || paymentError) {
       onPurchaseError(paymentError);
 
       return;
     }
 
-    if (redirectURL && !isLocalhost()) {
+    if (!hasWaited || redirectURL === "" || purchaseSuccessHandledRef.current) return;
+
+    purchaseSuccessHandledRef.current = true;
+
+    const skipRedirect = DEV_SKIP_3DS_IN_LOCALHOST && isLocalhost();
+
+    if (redirectURL && !skipRedirect) {
       persistCheckoutModalInfo({
         invoiceID,
         circlePaymentID,
@@ -133,7 +150,7 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
       });
     }
 
-    onPurchaseSuccess(circlePaymentID, paymentID, isLocalhost() ? "" : (redirectURL || ""));
+    onPurchaseSuccess(circlePaymentID, paymentID, skipRedirect ? "" : (redirectURL || ""));
   }, [
     fullPaymentState,
     hasWaited,

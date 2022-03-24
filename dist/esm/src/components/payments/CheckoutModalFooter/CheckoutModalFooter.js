@@ -1,17 +1,27 @@
 import { __awaiter } from '../../../../node_modules/tslib/tslib.es6.js';
 import { Box, CircularProgress, Typography, Link, Divider } from '@mui/material';
 import React__default, { useState, useCallback } from 'react';
-import { SM_MOBILE_MAX_WIDTH, CIRCLE_LOGO_IMAGE_SRC } from '../../../config/theme/theme.js';
+import { SM_MOBILE_MAX_WIDTH, CIRCLE_LOGO_IMAGE_SRC } from '../../../config/theme/themeConstants.js';
 import { isPromise } from '../../../utils/promiseUtils.js';
 import { Checkbox } from '../../shared/Checkbox/Checkbox.js';
 import { ConsentText, CONSENT_ERROR_MESSAGE } from '../../shared/ConsentText/ConsentText.js';
 import { PrimaryButton } from '../../shared/PrimaryButton/PrimaryButton.js';
 import { LABELS_BY_VARIANT, ICONS_BY_VARIANT } from './CheckoutModalFooter.constants.js';
+import { Img } from '../../shared/Img/Img.js';
 
-const CheckoutModalFooter = ({ variant, buttonLabel, guestCheckoutEnabled, consentType, privacyHref, termsOfUseHref, onGoToCollection, submitDisabled, onSubmitClicked, onCloseClicked, }) => {
+const VARIANTS_WITH_DISCLAIMER = ["toPayment", "toPlaid", "toConfirmation"];
+const CheckoutModalFooter = ({ 
+// Configuration:
+variant, guestCheckoutEnabled, consentType, 
+// Submit button:
+submitLabel, submitDisabled, onSubmitClicked, 
+// Close link:
+closeLabel, closeDisabled, onCloseClicked, 
+// onGoToCollection:
+onGoToCollection, }) => {
     // CONSENT:
-    const showConsent = consentType && (privacyHref || termsOfUseHref) && (variant === "toConfirmation" || variant === "toPlaid");
-    const consentTextElement = showConsent ? React__default.createElement(ConsentText, { privacyHref: privacyHref, termsOfUseHref: termsOfUseHref }) : null;
+    const showConsent = consentType && VARIANTS_WITH_DISCLAIMER.includes(variant);
+    const consentTextElement = showConsent ? React__default.createElement(ConsentText, null) : null;
     const [{ isFormSubmitted, isFormLoading, isConsentChecked, }, setConsentState] = useState({
         isFormSubmitted: false,
         isFormLoading: false,
@@ -37,9 +47,9 @@ const CheckoutModalFooter = ({ variant, buttonLabel, guestCheckoutEnabled, conse
         if (onGoToCollection)
             onGoToCollection();
     }, [onGoToCollection]);
-    // PRIMARY BUTTON:
+    // SUBMIT BUTTON:
     const primaryButtonVisible = variant !== "toGuestCheckout" || guestCheckoutEnabled;
-    const primaryButtonLabel = buttonLabel || LABELS_BY_VARIANT[variant];
+    const primaryButtonLabel = submitLabel || LABELS_BY_VARIANT[variant];
     const PrimaryButtonIcon = ICONS_BY_VARIANT[variant];
     const handleSubmitClicked = useCallback(() => __awaiter(void 0, void 0, void 0, function* () {
         if (!onSubmitClicked)
@@ -61,11 +71,13 @@ const CheckoutModalFooter = ({ variant, buttonLabel, guestCheckoutEnabled, conse
         });
     }), [isConsentChecked, onSubmitClicked]);
     // CANCEL LINK:
+    const cancelLinkLabel = closeLabel || "Cancel and Return to Marketplace";
+    const cancelLinkColor = closeDisabled ? "text.disabled" : "text.primary"; // TODO: Create custom Link component with this functionality.
     const handleCancelClicked = useCallback((e) => {
         e.preventDefault();
-        if (onCloseClicked)
+        if (onCloseClicked && !closeDisabled)
             onCloseClicked();
-    }, [onCloseClicked]);
+    }, [onCloseClicked, closeDisabled]);
     return (React__default.createElement(Box, { sx: {
             display: "flex",
             alignItems: "center",
@@ -78,21 +90,20 @@ const CheckoutModalFooter = ({ variant, buttonLabel, guestCheckoutEnabled, conse
                 consentTextElement), checked: isConsentChecked, onChange: handleConsentClicked, error: showConsentError, helperText: showConsentError ? CONSENT_ERROR_MESSAGE : undefined, sx: { alignSelf: "flex-start", mb: 5 } })),
         onGoToCollection && (React__default.createElement(PrimaryButton, { onClick: handleCollectionClicked, disabled: submitDisabled || isFormLoading, sx: { mb: 2 } }, "View Collection")),
         primaryButtonVisible && (React__default.createElement(PrimaryButton, { onClick: onSubmitClicked ? handleSubmitClicked : undefined, type: onSubmitClicked ? "button" : "submit", endIcon: isFormLoading ? React__default.createElement(CircularProgress, { color: "inherit", size: "1em" }) : (PrimaryButtonIcon && React__default.createElement(PrimaryButtonIcon, null)), disabled: submitDisabled || isFormLoading }, primaryButtonLabel)),
-        variant !== "toMarketplace" && onCloseClicked && (React__default.createElement(Typography, { sx: primaryButtonVisible ? { pt: 2 } : undefined },
+        variant !== "toMarketplace" && onCloseClicked && (React__default.createElement(Typography, { sx: { color: cancelLinkColor, pt: primaryButtonVisible ? 2 : 0 } },
             primaryButtonVisible ? "or " : null,
-            React__default.createElement(Link, { sx: { color: "text.primary" }, href: "", onClick: handleCancelClicked }, "Cancel and Return to Marketplace"))),
+            React__default.createElement(Link, { sx: { color: cancelLinkColor, cursor: closeDisabled ? "not-allowed" : "pointer" }, href: "", onClick: handleCancelClicked }, cancelLinkLabel))),
         showConsent && consentType === "disclaimer" && (React__default.createElement(React__default.Fragment, null,
             React__default.createElement(Divider, { sx: { my: 5, width: "100%" } }),
             React__default.createElement(Typography, { sx: { maxWidth: SM_MOBILE_MAX_WIDTH }, align: "center" },
                 "By placing an order you affirm that you ",
-                consentTextElement,
-                "."))),
+                consentTextElement))),
         showConsent && consentType === "circle" && (React__default.createElement(React__default.Fragment, null,
             React__default.createElement(Divider, { sx: { my: 5, width: "100%" } }),
             React__default.createElement(Box, { display: "flex" },
                 React__default.createElement(Typography, { sx: { maxWidth: SM_MOBILE_MAX_WIDTH, marginRight: 1 }, align: "center" }, "Payments powered by"),
                 React__default.createElement(Link, { href: "https://www.circle.com/en/", target: "_blank", rel: "noopener noreferrer" },
-                    React__default.createElement(Box, { component: "img", src: CIRCLE_LOGO_IMAGE_SRC, height: 20 })))))));
+                    React__default.createElement(Img, { src: CIRCLE_LOGO_IMAGE_SRC, height: 20 })))))));
 };
 
 export { CheckoutModalFooter };

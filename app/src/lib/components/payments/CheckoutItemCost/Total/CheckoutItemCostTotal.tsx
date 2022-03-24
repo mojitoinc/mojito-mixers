@@ -1,8 +1,9 @@
-import { Box, SxProps, Theme, Tooltip, Typography } from "@mui/material";
+import { Box, Tooltip, Typography } from "@mui/material";
 import React from "react";
 import { formatTaxRate } from "../../../../utils/formatUtils";
 import { TaxesState } from "../../../../views/Billing/BillingView";
 import { Number } from "../../../shared/Number/Number";
+import { SxProps, Theme } from "@mui/material/styles";
 
 const TAX_RATE_PLACEHOLDER_SX: SxProps<Theme> = {
   background: theme => theme.palette.grey[100],
@@ -38,51 +39,62 @@ const ROW_SX: SxProps<Theme> = {
 export interface CheckoutItemCostTotalProps {
   total: number;
   fees: number | null;
-  taxes: TaxesState;
+  taxes: null | TaxesState;
   withDetails?: boolean;
 }
 
 export const CheckoutItemCostTotal: React.FC<CheckoutItemCostTotalProps> = ({
   total,
   fees,
-  taxes: {
-    status,
-    taxAmount = 0,
-    taxRate = 0,
-  },
+  taxes,
   withDetails = false,
 }) => {
-  let taxRateElement: React.ReactNode = null;
-  let taxAmountElement: React.ReactNode = null;
-  let totalElement: React.ReactNode = null;
-
   const feesValue = fees || 0;
 
-  if (status === "loading") {
-    taxRateElement = <Tooltip title="Calculating taxes..."><span>(<Box component="span" sx={ TAX_RATE_PLACEHOLDER_SX }>00.00</Box> %)</span></Tooltip>;
-    taxAmountElement = <Tooltip title="Calculating taxes..."><span><Box component="span" sx={ TAX_AMOUNT_PLACEHOLDER_SX }>{ `${ (total + feesValue) * 0.10 | 0 }`.replace(/./, "0") }.00</Box> USD</span></Tooltip>;
-    totalElement = <Tooltip title="Calculating total..."><span><Box component="span" sx={ TOTAL_PLACEHOLDER_SX }>{ `${ (total + feesValue) * 1.10 | 0 }`.replace(/./, "0") }.00</Box> USD</span></Tooltip>;
-  } else if (status === "complete" && taxAmount !== undefined ) {
-    taxRateElement = `(${ formatTaxRate(taxRate) })`;
-    taxAmountElement = <Number suffix=" USD">{ taxAmount }</Number>;
-    totalElement = <Number suffix=" USD">{ total + feesValue + taxAmount }</Number>;
-  } else {
-    taxRateElement = null;
-    taxAmountElement = <Tooltip title="Enter a valid address to calculate the taxes"><span><Number suffix=" USD">{ 0 }</Number></span></Tooltip>;
-    totalElement = <Tooltip title="Enter a valid address to calculate the total"><span><Number suffix=" USD">{ total + feesValue }</Number></span></Tooltip>;
+  let taxRowElement: React.ReactNode = null;
+
+  let totalElement: React.ReactNode = (
+    <Tooltip title="Enter a valid address to calculate the total"><span><Number suffix=" USD">{ total + feesValue }</Number></span></Tooltip>
+  );
+
+  if (taxes) {
+    const {
+      status,
+      taxAmount = 0,
+      taxRate = 0,
+    } = taxes;
+
+    let taxRateElement: React.ReactNode = null;
+    let taxAmountElement: React.ReactNode = null;
+
+    if (status === "loading") {
+      taxRateElement = <Tooltip title="Calculating taxes..."><span>(<Box component="span" sx={ TAX_RATE_PLACEHOLDER_SX }>00.00</Box> %)</span></Tooltip>;
+      taxAmountElement = <Tooltip title="Calculating taxes..."><span><Box component="span" sx={ TAX_AMOUNT_PLACEHOLDER_SX }>{ `${ (total + feesValue) * 0.10 | 0 }`.replace(/./, "0") }.00</Box> USD</span></Tooltip>;
+      totalElement = <Tooltip title="Calculating total..."><span><Box component="span" sx={ TOTAL_PLACEHOLDER_SX }>{ `${ (total + feesValue) * 1.10 | 0 }`.replace(/./, "0") }.00</Box> USD</span></Tooltip>;
+    } else if (status === "complete" && taxAmount !== undefined ) {
+      taxRateElement = `(${ formatTaxRate(taxRate) })`;
+      taxAmountElement = <Number suffix=" USD">{ taxAmount }</Number>;
+      totalElement = <Number suffix=" USD">{ total + feesValue + taxAmount }</Number>;
+    } else {
+      taxRateElement = null;
+      taxAmountElement = <Tooltip title="Enter a valid address to calculate the taxes"><span><Number suffix=" USD">{ 0 }</Number></span></Tooltip>;
+      totalElement = <Tooltip title="Enter a valid address to calculate the total"><span><Number suffix=" USD">{ total + feesValue }</Number></span></Tooltip>;
+    }
+
+    taxRowElement = (
+      <Box sx={ ROW_SX }>
+        <Typography sx={(theme) => ({ color: theme.palette.grey["500"] })}>Taxes { taxRateElement }</Typography>
+        <Typography>{ taxAmountElement }</Typography>
+      </Box>
+    );
   }
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", mt: { xs: 3, sm: 0.5 } }}>
       { withDetails && (<>
         <Box sx={ ROW_SX }>
-          <Typography>Your purchase</Typography>
+          <Typography>Subtotal</Typography>
           <Typography><Number suffix=" USD">{ total }</Number></Typography>
-        </Box>
-
-        <Box sx={ ROW_SX }>
-          <Typography sx={(theme) => ({ color: theme.palette.grey["500"] })}>Taxes { taxRateElement }</Typography>
-          <Typography>{ taxAmountElement }</Typography>
         </Box>
 
         { fees === null ? null : (
@@ -91,12 +103,14 @@ export const CheckoutItemCostTotal: React.FC<CheckoutItemCostTotalProps> = ({
             <Typography><Number suffix=" USD">{fees}</Number></Typography>
           </Box>
         ) }
-      </>)}
+
+        { taxRowElement }
+      </>) }
 
       <Box
         sx={{
           display: "flex",
-          mt: 3,
+          mt: 1,
           flex: 1,
           justifyContent: "space-between",
           alignItems: "center",

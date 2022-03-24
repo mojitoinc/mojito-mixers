@@ -47,6 +47,14 @@ exports.ContractType = void 0;
     ContractType["Erc721Creator"] = "ERC721Creator";
     ContractType["Erc1155Creator"] = "ERC1155Creator";
 })(exports.ContractType || (exports.ContractType = {}));
+exports.DeliveryMethod = void 0;
+(function (DeliveryMethod) {
+    DeliveryMethod["Erc721Provenance"] = "ERC721Provenance";
+    DeliveryMethod["Erc721Transfer"] = "ERC721Transfer";
+    DeliveryMethod["Erc1155OpenEdition"] = "ERC1155OpenEdition";
+    DeliveryMethod["Erc1155Transfer"] = "ERC1155Transfer";
+    DeliveryMethod["NoOp"] = "NoOp";
+})(exports.DeliveryMethod || (exports.DeliveryMethod = {}));
 exports.ExtensionType = void 0;
 (function (ExtensionType) {
     ExtensionType["ProvenanceExtension"] = "ProvenanceExtension";
@@ -61,6 +69,9 @@ exports.InvoiceStatus = void 0;
 })(exports.InvoiceStatus || (exports.InvoiceStatus = {}));
 exports.KycStatus = void 0;
 (function (KycStatus) {
+    KycStatus["Clear"] = "Clear";
+    KycStatus["Failed1"] = "Failed1";
+    KycStatus["Failed2"] = "Failed2";
     KycStatus["Level1"] = "Level1";
     KycStatus["Level2"] = "Level2";
     KycStatus["None"] = "None";
@@ -130,6 +141,7 @@ const GetPaymentNotificationDocument = Apollo.gql `
     message {
       ... on PaymentNotification3DSMessage {
         redirectURL
+        error
       }
     }
   }
@@ -288,8 +300,8 @@ function useReleaseReservationBuyNowLotMutation(baseOptions) {
     return Apollo__namespace.useMutation(ReleaseReservationBuyNowLotDocument, options);
 }
 const GetInvoiceDetailsDocument = Apollo.gql `
-    query GetInvoiceDetails($invoiceID: UUID1!, $orgID: UUID1!) {
-  getInvoiceDetails(invoiceID: $invoiceID, orgID: $orgID) {
+    query GetInvoiceDetails($invoiceID: UUID1!) {
+  getInvoiceDetails(invoiceID: $invoiceID) {
     items {
       destinationAddress
       units
@@ -313,7 +325,6 @@ const GetInvoiceDetailsDocument = Apollo.gql `
  * const { data, loading, error } = useGetInvoiceDetailsQuery({
  *   variables: {
  *      invoiceID: // value for 'invoiceID'
- *      orgID: // value for 'orgID'
  *   },
  * });
  */
@@ -365,8 +376,8 @@ function useMeQuery(baseOptions) {
     return Apollo__namespace.useQuery(MeDocument, options);
 }
 const PaymentKeyDocument = Apollo.gql `
-    query PaymentKey {
-  getPaymentPublicKey {
+    query PaymentKey($orgID: UUID1!) {
+  getPaymentPublicKey(orgID: $orgID) {
     keyID
     publicKey
   }

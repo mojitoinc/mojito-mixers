@@ -35,6 +35,7 @@ export interface SavedItemProps {
   onEdit?: SavedItemActionEventHandler;
   onDelete?: SavedItemActionEventHandler;
   onPick?: SavedItemActionEventHandler;
+  cvvLabel?: string;
   cvvError?: boolean;
   onCvvChange?: React.ChangeEventHandler<HTMLInputElement>;
   boxProps?: BoxProps;
@@ -67,6 +68,7 @@ export const SavedItem: React.FC<SavedItemProps> = ({
   onEdit,
   onDelete,
   onPick,
+  cvvLabel,
   cvvError,
   onCvvChange,
   boxProps,
@@ -104,7 +106,7 @@ export const SavedItem: React.FC<SavedItemProps> = ({
     mainControlElement = (<>
       <Chip size="small" color="success" label="Active" variant="outlined" />
 
-      { onCvvChange && <InlineField onChange={ onCvvChange } placeholder="CVV" error={ cvvError } sx={{ width: "52px" }} /> }
+      { onCvvChange && <InlineField onChange={ onCvvChange } placeholder={ cvvLabel } error={ cvvError } sx={{ width: "52px" }} /> }
     </>);
   } else if (onPick) {
     mainControlElement = (

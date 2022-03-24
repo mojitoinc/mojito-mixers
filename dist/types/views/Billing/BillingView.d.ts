@@ -3,7 +3,8 @@ import { SavedPaymentMethod } from "../../domain/circle/circle.interfaces";
 import { CheckoutItem } from "../../domain/product/product.interfaces";
 import { BillingInfo } from "../../forms/BillingInfoForm";
 import { CheckoutModalError } from "../../components/public/CheckoutOverlay/CheckoutOverlay.hooks";
-import { PUIDictionary } from "../../domain/dictionary/dictionary.interfaces";
+import { Wallet } from "../../domain/wallet/wallet.interfaces";
+import { ConsentType } from "../../components/shared/ConsentText/ConsentText";
 export declare type TaxStatus = "incomplete" | "loading" | "complete" | "error";
 export interface TaxesState {
     status: TaxStatus;
@@ -11,18 +12,20 @@ export interface TaxesState {
     taxAmount?: number;
 }
 export interface BillingViewProps {
+    vertexEnabled?: boolean;
     checkoutItems: CheckoutItem[];
     savedPaymentMethods: SavedPaymentMethod[];
     selectedBillingInfo: string | BillingInfo;
-    walletAddress: string | null;
+    wallets?: Wallet[];
+    wallet: null | string | Wallet;
     checkoutError?: CheckoutModalError;
     onBillingInfoSelected: (data: string | BillingInfo) => void;
     onTaxesChange: (taxes: TaxesState) => void;
     onSavedPaymentMethodDeleted: (savedPaymentMethodId: string) => Promise<void>;
-    onWalletAddressChange: (personalWalletAddress: string | null) => void;
+    onWalletChange: (wallet: null | string | Wallet) => void;
     onNext: () => void;
     onClose: () => void;
-    dictionary: PUIDictionary;
+    consentType?: ConsentType;
     debug?: boolean;
 }
 export declare const BillingView: React.FC<BillingViewProps>;

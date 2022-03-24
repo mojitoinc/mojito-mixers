@@ -1,21 +1,13 @@
 import "@mui/material/styles";
+import { PalettePaymentUI } from "./mui.interfaces";
 
 declare module "@mui/material/styles" {
+
   interface Palette {
-    gradients?: {
-      stepper?: string;
-      stepperReverse?: string;
-      action?: string;
-      actionReverse?: string;
-    };
+    paymentUI?: PalettePaymentUI;
   }
 
   interface PaletteOptions {
-    gradients?: {
-      stepper?: string;
-      stepperReverse?: string;
-      action?: string;
-      actionReverse?: string;
-    };
+    paymentUI?: PalettePaymentUI;
   }
 }

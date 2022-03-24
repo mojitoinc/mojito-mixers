@@ -1,22 +1,22 @@
 import { InputGroupLabel } from "../InputGroupLabel/InputGroupLabel";
 import AddIcon from '@mui/icons-material/Add';
 import { StackList } from "../StackList/StackList";
-import { useCallback } from "react";
+import React, { useCallback } from "react";
 import { BillingInfoItem } from "../../payments/BillingInfo/Item/BillingInfoItem";
 import { SecondaryButton } from "../SecondaryButton/SecondaryButton";
 import { CheckoutModalFooter } from "../../payments/CheckoutModalFooter/CheckoutModalFooter";
 import { SavedPaymentMethod } from "../../../domain/circle/circle.interfaces";
-import React from "react";
 import { alpha, Box, CircularProgress } from "@mui/material";
-import { OVERLAY_OPACITY } from "../../../config/theme/theme";
+import { OVERLAY_OPACITY } from "../../../config/theme/themeConstants";
 import { TaxesState } from "../../../views/Billing/BillingView";
 import { TaxesMessagesBox } from "../TaxesMessagesBox/TaxesMessagesBox";
+import { ConsentType } from "../ConsentText/ConsentText";
 
 export interface SavedBillingDetailsSelectorProps {
   showLoader: boolean;
   savedPaymentMethods: SavedPaymentMethod[];
   selectedPaymentMethodAddressId?: string;
-  taxes: TaxesState;
+  taxes: null | TaxesState;
   onNew: () => void;
   onEdit: (billingInfoId: string) => void;
   onDelete: (billingInfoId: string) => Promise<void>;
@@ -24,6 +24,7 @@ export interface SavedBillingDetailsSelectorProps {
   onNext: () => void;
   onClose: () => void;
   onAttemptSubmit: () => void;
+  consentType?: ConsentType;
 }
 
 export const SavedBillingDetailsSelector: React.FC<SavedBillingDetailsSelectorProps> = ({
@@ -38,6 +39,7 @@ export const SavedBillingDetailsSelector: React.FC<SavedBillingDetailsSelectorPr
   onNext,
   onClose,
   onAttemptSubmit,
+  consentType,
 }) => {
   const getPaymentMethodAddressId = useCallback((savedPaymentMethod: SavedPaymentMethod) => savedPaymentMethod.addressId, []);
 
@@ -88,8 +90,9 @@ export const SavedBillingDetailsSelector: React.FC<SavedBillingDetailsSelectorPr
 
     <CheckoutModalFooter
       variant="toPayment"
-      buttonLabel={ taxes.status === "loading" ? "Calculating taxes..." : undefined }
-      submitDisabled={ taxes.status !== "complete" }
+      consentType={ consentType }
+      submitLabel={ taxes?.status === "loading" ? "Calculating taxes..." : undefined }
+      submitDisabled={ !!taxes && taxes.status === "loading" }
       onSubmitClicked={ handleNextClicked }
       onCloseClicked={ onClose } />
   </>);

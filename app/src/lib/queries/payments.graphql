@@ -1,5 +1,5 @@
-query PaymentKey {
-  getPaymentPublicKey {
+query PaymentKey($orgID: UUID1!) {
+  getPaymentPublicKey(orgID: $orgID) {
     keyID
     publicKey
   }

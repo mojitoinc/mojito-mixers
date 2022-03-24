@@ -12,27 +12,27 @@ import { PAYMENT_CREATION_INTERVAL_MS, PAYMENT_CREATION_MAX_WAIT_MS } from "../c
 import { EXCEPTIONS } from "../domain/errors/exceptions.constants";
 
 export interface CreatePaymentMethodOptions {
+  orgID: string;
   debug?: boolean;
 }
 
 export interface ExtendedCreatePaymentMethodOptions {
-  orgID: string;
   billingInfo: BillingInfo;
   paymentInfo: PaymentMethod;
 }
 
 export function useCreatePaymentMethod({
+  orgID,
   debug,
 }: CreatePaymentMethodOptions): [
-  (orgID: string, billingInfo: BillingInfo, paymentInfo: PaymentMethod) => Promise<FetchResult<CreatePaymentMethodMutation>>,
+  (billingInfo: BillingInfo, paymentInfo: PaymentMethod) => Promise<FetchResult<CreatePaymentMethodMutation>>,
   MutationResult<CreatePaymentMethodMutation>
 ] {
-  const [encryptCardData] = useEncryptCardData();
+  const [encryptCardData] = useEncryptCardData({ orgID });
   const [getPaymentMethodStatus] = useGetPaymentMethodStatusLazyQuery();
   const [createPaymentMethod, createPaymentMethodResult] = useCreatePaymentMethodMutation();
 
   const extendedCreatePaymentMethod = useCallback(async (
-    orgID: string,
     billingInfo: BillingInfo,
     paymentInfo: PaymentMethod,
   ): Promise<FetchResult<CreatePaymentMethodMutation>> => {
@@ -117,7 +117,7 @@ export function useCreatePaymentMethod({
 
       totalWaitTimeSoFar = now - paymentMethodCreatedAt;
 
-      if (debug) console.log(`    👀 getPaymentMethodStatus (${ totalWaitTimeSoFar / 1000 | 0 } / ${ PAYMENT_CREATION_MAX_WAIT_MS / 1000 | 0 } sec.)`, { paymentMethodID  });
+      if (debug) console.log(`    👀 getPaymentMethodStatus (${ totalWaitTimeSoFar / 1000 | 0 } / ${ PAYMENT_CREATION_MAX_WAIT_MS / 1000 | 0 } sec.)`, { paymentMethodID });
 
       if (paymentMethodStatusWaitTime > 0) await wait(paymentMethodStatusWaitTime);
 
@@ -134,7 +134,7 @@ export function useCreatePaymentMethod({
     else if (status === "complete") return createPaymentMethodPromise;
 
     throw new Error(EXCEPTIONS.PAYMENT_METHOD.VALIDATION_TIMEOUT);
-  }, [debug, encryptCardData, createPaymentMethod, getPaymentMethodStatus]);
+  }, [debug, orgID, encryptCardData, createPaymentMethod, getPaymentMethodStatus]);
 
   return [extendedCreatePaymentMethod, createPaymentMethodResult];
 }

@@ -7,6 +7,7 @@ var React = require('react');
 var Apollo = require('@apollo/client');
 var index = require('../../../../node_modules/@apollo/client/link/context/index.js');
 var auth0React = require('@auth0/auth0-react');
+var url_utils = require('../../../domain/url/url.utils.js');
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
@@ -23,9 +24,12 @@ const AuthorizedApolloProvider = ({ apolloClient: parentApolloClient, uri, child
         const httpLink = Apollo.createHttpLink({ uri });
         const authLink = index.setContext((_, { headers }) => tslib_es6.__awaiter(void 0, void 0, void 0, function* () {
             const token = yield getIdTokenClaims();
-            return {
+            const context = {
                 headers: Object.assign(Object.assign({}, headers), { authorization: token ? `Bearer ${token.__raw}` : "" }),
             };
+            if (url_utils.isLocalhost())
+                context.headers["origin-overwrite"] = "https://payments-staging.mojito.xyz/";
+            return context;
         }));
         const link = authLink.concat(httpLink);
         return new Apollo.ApolloClient({ uri, link, cache });

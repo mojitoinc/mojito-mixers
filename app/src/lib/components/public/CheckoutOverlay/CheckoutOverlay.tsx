@@ -1,4 +1,4 @@
-import { Backdrop, Box, CircularProgress } from "@mui/material";
+import { Backdrop, CircularProgress } from "@mui/material";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { getSavedPaymentMethodAddressIdFromBillingInfo, savedPaymentMethodToBillingInfo, transformRawSavedPaymentMethods } from "../../../domain/circle/circle.utils";
 import { UserFormat } from "../../../domain/auth/authentication.interfaces";
@@ -26,10 +26,14 @@ import { transformCheckoutItemsFromInvoice } from "../../../domain/product/produ
 import { useCreateInvoiceAndReservation } from "../../../hooks/useCreateInvoiceAndReservation";
 import { useCheckoutItemsCostTotal } from "../../../hooks/useCheckoutItemCostTotal";
 import { PUIDictionary } from "../../../domain/dictionary/dictionary.interfaces";
-import { DEFAULT_DICTIONARY } from "../../../domain/dictionary/dictionary.constants";
 import { ApolloError } from "@apollo/client";
-import { Wallet } from "../../payments/DeliveryWallet/DeliveryWalletDetails";
-import { THREEDS_REDIRECT_DELAY_MS } from "../../../config/config";
+import { DictionaryProvider } from "../../../providers/DictionaryProvider";
+import { Wallet } from "../../../domain/wallet/wallet.interfaces";
+import { DEV_DEBUG_ENABLED_KEY, THREEDS_REDIRECT_DELAY_MS } from "../../../config/config";
+import { Network } from "../../../domain/network/network.interfaces";
+import { NEW_WALLET_OPTION } from "../../../domain/wallet/wallet.constants";
+import { StatusIcon } from "../../shared/StatusIcon/StatusIcon";
+import { CreditCardNetwork } from "../../../domain/react-payment-inputs/react-payment-inputs.utils";
 
 export interface PUICheckoutOverlayProps {
   // Modal:
@@ -40,6 +44,8 @@ export interface PUICheckoutOverlayProps {
   // Flow:
   guestCheckoutEnabled?: boolean;
   productConfirmationEnabled?: boolean;
+  vertexEnabled?: boolean;
+  threeDSEnabled?: boolean;
 
   // Personalization:
   logoSrc: string;
@@ -50,13 +56,13 @@ export interface PUICheckoutOverlayProps {
   errorImageSrc: string;
   userFormat: UserFormat;
   acceptedPaymentTypes: PaymentType[];
+  acceptedCreditCardNetworks?: CreditCardNetwork[];
   paymentLimits?: Partial<Record<PaymentType, number>>;
-  dictionary?: Partial<PUIDictionary>,
+  dictionary?: Partial<PUIDictionary>;
+  network?: Network;
 
   // Legal:
   consentType?: ConsentType;
-  privacyHref?: string;
-  termsOfUseHref?: string;
 
   // Data:
   orgID: string;
@@ -73,9 +79,11 @@ export interface PUICheckoutOverlayProps {
   onEvent?: (eventType: CheckoutEventType, eventData: CheckoutEventData) => void;
   onError?: (error: CheckoutModalError) => void;
   onMarketingOptInChange?: (marketingOptIn: boolean) => void;
- }
+}
 
 export type PUICheckoutProps = PUICheckoutOverlayProps & ProvidersInjectorProps;
+
+const DEV_DEBUG_ENABLED = process.browser && localStorage.getItem(DEV_DEBUG_ENABLED_KEY) === "true";
 
 export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   // Modal:
@@ -86,6 +94,8 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   // Flow:
   guestCheckoutEnabled,
   productConfirmationEnabled,
+  vertexEnabled = true,
+  threeDSEnabled = true,
 
   // Personalization:
   logoSrc,
@@ -96,13 +106,13 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   errorImageSrc,
   userFormat,
   acceptedPaymentTypes,
+  acceptedCreditCardNetworks,
   paymentLimits, // Not implemented yet. Used to show payment limits for some payment types.
-  dictionary: parentDictionary,
+  dictionary,
+  network,
 
   // Legal:
   consentType,
-  privacyHref,
-  termsOfUseHref,
 
   // Data:
   orgID,
@@ -115,18 +125,40 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   isAuthenticatedLoading,
 
   // Other Events:
-  debug: initialDebug,
+  debug: parentDebug,
   onEvent,
   onError,
   onMarketingOptInChange, // Not implemented yet. Used to let user subscribe / unsubscribe to marketing updates.
 }) => {
-  const [debug, setDebug] = useState(!!initialDebug);
+  const [debug, setDebug] = useState(!!parentDebug);
 
-  // TODO: This should end up being in a context + hook to avoid prop drilling and it should be memoized:
-  const dictionary = {
-    ...DEFAULT_DICTIONARY,
-    ...parentDictionary,
-  };
+  // Initialization, just to prevent issues with Next.js' SSR:
+  useEffect(() => {
+    setDebug((prevDebug) => {
+      const nextDebug = prevDebug || DEV_DEBUG_ENABLED;
+
+      if (nextDebug) console.log(`\n🐞 DEBUG MODE ENABLED!\n\n`);
+
+      return nextDebug;
+    });
+  }, []);
+
+  // Actual changes triggered by users:
+  const toggleDebug = useCallback(() => {
+    setDebug((prevDebug) => {
+      const nextDebug = !prevDebug;
+
+      console.log(`\n🐞 DEBUG MODE ${ nextDebug ? "ENABLED" : "DISABLED" }!\n\n`);
+
+      if (nextDebug) {
+        localStorage.setItem(DEV_DEBUG_ENABLED_KEY, "true");
+      } else {
+        localStorage.removeItem(DEV_DEBUG_ENABLED_KEY);
+      }
+
+      return nextDebug;
+    });
+  }, []);
 
   // First, get user data and saved payment methods:
 
@@ -136,6 +168,16 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     error: meError,
     refetch: meRefetch,
   } = useMeQuery({ skip: !isAuthenticated });
+
+  const wallets = useMemo(() => {
+    if (meLoading || !meData) return undefined;
+
+    const userWallets = meData.me?.wallets as Wallet[] || [];
+
+    return network
+      ? userWallets.filter(wallet => wallet?.network?.id === network.id)
+      : userWallets;
+  }, [meLoading, meData, network]);
 
   const {
     data: paymentMethodsData,
@@ -151,6 +193,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
 
   const {
     // CheckoutModalState:
+    startAt,
     checkoutStep,
     checkoutError,
     isDialogBlocked,
@@ -170,7 +213,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     setInvoiceID,
     taxes,
     setTaxes,
-    walletAddress,
+    wallet,
     setWalletAddress,
     paymentID,
     circlePaymentID,
@@ -178,6 +221,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   } = useCheckoutModalState({
     invoiceID: initialInvoiceID,
     productConfirmationEnabled,
+    vertexEnabled,
     isAuthenticated,
     onError,
   });
@@ -192,7 +236,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     refetch: refetchInvoiceDetails,
   } = useGetInvoiceDetailsQuery({
     skip: !invoiceID,
-    variables: { orgID, invoiceID },
+    variables: { invoiceID },
   });
 
 
@@ -212,11 +256,16 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   const invoiceItems = invoiceDetailsData?.getInvoiceDetails.items;
   const checkoutItems = useMemo(() => transformCheckoutItemsFromInvoice(parentCheckoutItems, invoiceItems), [parentCheckoutItems, invoiceItems]);
   const { total: subtotal, fees, taxAmount } = useCheckoutItemsCostTotal(checkoutItems);
-  const destinationAddress = (invoiceItems || [])?.[0]?.destinationAddress || null;
+  const destinationAddress = (invoiceItems || [])?.[0]?.destinationAddress || NEW_WALLET_OPTION.value;
 
   useEffect(() => {
-    if (destinationAddress) setWalletAddress(destinationAddress || null);
-  }, [destinationAddress, setWalletAddress]);
+    if (!destinationAddress) return;
+
+    const wallet = (wallets || []).find(({ address }) => address === destinationAddress);
+
+    setWalletAddress(wallet || destinationAddress);
+  }, [wallets, destinationAddress, setWalletAddress]);
+
 
 
   // Invoice creation & buy now lot reservation:
@@ -287,6 +336,12 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
       paymentType = paymentInfo.type;
     }
 
+    if (!eventType.startsWith("event:") && !eventType.includes(checkoutStep)) {
+      if (debug) console.log(`⚠️ eventType / checkoutStep mismatch: ${ eventType } / ${ checkoutStep }`);
+
+      return;
+    }
+
     onEvent(eventType, {
       // Location:
       step: CheckoutModalStepIndex[checkoutStep],
@@ -295,7 +350,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
       // Purchase:
       departmentCategory: "NFT",
       paymentType,
-      shippingMethod: walletAddress ? "custom wallet" : "multisig wallet",
+      shippingMethod: typeof wallet === "object" ? "multisig wallet" : "custom wallet",
       checkoutItems,
 
       // Payment:
@@ -312,8 +367,13 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   };
 
   useEffect(() => {
-    setTimeout(() => triggerAnalyticsEventRef.current(`navigate:${ checkoutStep }`));
-  }, [checkoutStep]);
+    // Original code (might this be causing the mismatch eventName / checkoutStep issue?):
+    if (!isDialogInitializing) setTimeout(() => triggerAnalyticsEventRef.current(`navigate:${ checkoutStep }`));
+
+    // Possible fix (might this cause some other issues such as missing data):
+    // if (!isDialogInitializing) triggerAnalyticsEventRef.current(`navigate:${ checkoutStep }`);
+
+  }, [isDialogInitializing, checkoutStep]);
 
 
   // Saved payment method creation-reload-sync:
@@ -591,15 +651,10 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
         open={ open }
         onClick={ handleClose }>
         { loaderImageSrc ? (
-          <Box
-            component="img"
-            src={ loaderImageSrc }
-            sx={{
-              width: 196,
-              height: 196,
-              mx: "auto",
-              mt: 5,
-            }} />
+          <StatusIcon
+            variant="loading"
+            imgSrc={ loaderImageSrc }
+            sx={{ mt: 5 }} />
         ) : (
           <CircularProgress color="primary" />
         ) }
@@ -639,18 +694,20 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   } else if (checkoutStep === "billing") {
     checkoutStepElement = (
       <BillingView
+        vertexEnabled={ vertexEnabled }
         checkoutItems={ checkoutItems }
         savedPaymentMethods={ savedPaymentMethods }
         selectedBillingInfo={ selectedPaymentMethod.billingInfo }
-        walletAddress={ walletAddress }
+        wallet={ wallet }
+        wallets={ wallets }
         checkoutError={ checkoutError }
         onBillingInfoSelected={ handleBillingInfoSelected }
         onTaxesChange={ setTaxes }
         onSavedPaymentMethodDeleted={ handleSavedPaymentMethodDeleted }
-        onWalletAddressChange={ setWalletAddress }
+        onWalletChange={ setWalletAddress }
         onNext={ goNext }
         onClose={ handleClose }
-        dictionary={ dictionary }
+        consentType={ consentType }
         debug={ debug } />
     );
   } else if (checkoutStep === "payment") {
@@ -660,20 +717,19 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
         taxes={ taxes }
         savedPaymentMethods={ savedPaymentMethods }
         selectedPaymentMethod={ selectedPaymentMethod }
-        walletAddress={ walletAddress }
+        wallet={ wallet }
+        wallets={ wallets }
         checkoutError={ checkoutError }
         onPaymentInfoSelected={ handlePaymentInfoSelected }
         onCvvSelected={ handleCvvSelected }
         onSavedPaymentMethodDeleted={ handleSavedPaymentMethodDeleted }
-        onWalletAddressChange={ setWalletAddress }
+        onWalletChange={ setWalletAddress }
         onNext={ goNext }
         onPrev={ goBack }
         onClose={ handleClose }
         acceptedPaymentTypes={ acceptedPaymentTypes }
+        acceptedCreditCardNetworks={ acceptedCreditCardNetworks }
         consentType={ consentType }
-        privacyHref={ privacyHref }
-        termsOfUseHref={ termsOfUseHref }
-        dictionary={ dictionary }
         debug={ debug } />
     );
   } else if (checkoutStep === "purchasing" && invoiceID) {
@@ -681,13 +737,14 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
 
     checkoutStepElement = (
       <PurchasingView
+        threeDSEnabled={ threeDSEnabled }
         purchasingImageSrc={ purchasingImageSrc }
         purchasingMessages={ purchasingMessages }
         orgID={ orgID }
         invoiceID={ invoiceID }
         savedPaymentMethods={ savedPaymentMethods }
         selectedPaymentMethod={ selectedPaymentMethod }
-        walletAddress={ walletAddress }
+        wallet={ wallet }
         onPurchaseSuccess={ handlePurchaseSuccess }
         onPurchaseError={ handlePurchaseError }
         onDialogBlocked={ setIsDialogBlocked }
@@ -702,11 +759,9 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
         savedPaymentMethods={ savedPaymentMethods }
         selectedPaymentMethod={ selectedPaymentMethod }
         circlePaymentID={ circlePaymentID }
-        walletAddress={ walletAddress || "" }
-        wallets={ meData?.me?.wallets as Wallet[] || undefined }
+        wallet={ wallet }
         onGoToCollection={ onGoToCollection }
-        onNext={ handleClose }
-        dictionary={ dictionary } />
+        onNext={ handleClose } />
     );
   } else {
     // !checkoutStep or
@@ -724,20 +779,23 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
       logoSx={ logoSx }
       user={ meData?.me?.user }
       userFormat={ userFormat }
-      onLoginClicked={ onLogin }
-      onPrevClicked={ checkoutStep === "authentication" ? handleClose : goBack }
-      setDebug={ setDebug } />
+      onLogin={ onLogin }
+      onClose={ checkoutStep === startAt ? handleClose : undefined }
+      onPrev={ checkoutStep === startAt ? undefined : goBack }
+      toggleDebug={ toggleDebug } />
   );
 
   return (
-    <FullScreenOverlay
-      centered={ checkoutStep === "purchasing" || checkoutStep === "error" }
-      open={ open }
-      onClose={ handleClose }
-      isDialogBlocked={ isDialogBlocked }
-      contentKey={ checkoutStep }
-      header={ headerElement }
-      children={ checkoutStepElement } />
+    <DictionaryProvider dictionary={ dictionary }>
+      <FullScreenOverlay
+        centered={ checkoutStep === "purchasing" || checkoutStep === "error" }
+        open={ open }
+        onClose={ handleClose }
+        isDialogBlocked={ isDialogBlocked }
+        contentKey={ checkoutStep }
+        header={ headerElement }
+        children={ checkoutStepElement } />
+    </DictionaryProvider>
   );
 };
 

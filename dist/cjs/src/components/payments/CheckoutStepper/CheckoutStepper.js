@@ -27,7 +27,7 @@ const CheckoutStepper = ({ progress: currentProgress, }) => {
                 position: "relative",
                 width: "100%",
                 height: 2,
-                background: theme => { var _a, _b; return (_b = (_a = theme.palette) === null || _a === void 0 ? void 0 : _a.gradients) === null || _b === void 0 ? void 0 : _b.stepper; },
+                background: theme => { var _a; return ((_a = theme.palette.paymentUI) === null || _a === void 0 ? void 0 : _a.progressBar) || theme.palette.primary.main; },
             } },
             React__default["default"].createElement(material.Divider, { sx: {
                     borderWidth: 0,

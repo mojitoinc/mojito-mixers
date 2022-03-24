@@ -3,6 +3,7 @@ query GetPaymentNotification {
     message {
       ... on PaymentNotification3DSMessage {
     		 redirectURL
+         error
       }
     }
   }

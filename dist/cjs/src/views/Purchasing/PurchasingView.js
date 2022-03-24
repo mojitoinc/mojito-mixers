@@ -7,7 +7,7 @@ var useFullPayment = require('../../hooks/useFullPayment.js');
 var material = require('@mui/material');
 var corre = require('@swyg/corre');
 var errors_constants = require('../../domain/errors/errors.constants.js');
-var theme = require('../../config/theme/theme.js');
+var themeConstants = require('../../config/theme/themeConstants.js');
 var StatusIcon = require('../../components/shared/StatusIcon/StatusIcon.js');
 var graphqlGenerated = require('../../queries/graphqlGenerated.js');
 var CheckoutOverlay_utils = require('../../components/public/CheckoutOverlay/CheckoutOverlay.utils.js');
@@ -18,7 +18,7 @@ function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'defau
 
 var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 
-const PurchasingView = ({ purchasingImageSrc, purchasingMessages: customPurchasingMessages, orgID, invoiceID, savedPaymentMethods, selectedPaymentMethod, walletAddress, onPurchaseSuccess, onPurchaseError, onDialogBlocked, debug, }) => {
+const PurchasingView = ({ threeDSEnabled, purchasingImageSrc, purchasingMessages: customPurchasingMessages, orgID, invoiceID, savedPaymentMethods, selectedPaymentMethod, wallet, onPurchaseSuccess, onPurchaseError, onDialogBlocked, debug, }) => {
     var _a, _b, _c;
     const { billingInfo, paymentInfo, cvv } = selectedPaymentMethod;
     const isCreditCardPayment = cvv || (typeof paymentInfo === "object" && paymentInfo.type === "CreditCard");
@@ -33,21 +33,30 @@ const PurchasingView = ({ purchasingImageSrc, purchasingMessages: customPurchasi
         invoiceID,
         savedPaymentMethods,
         selectedPaymentMethod,
-        walletAddress,
+        wallet,
         debug,
     });
     // Load 3DS redirect URL when needed:
-    const [redirectURL, setRedirectURL] = React.useState(isCreditCardPayment ? "" : null);
+    const [redirectURL, setRedirectURL] = React.useState(threeDSEnabled && isCreditCardPayment ? "" : null);
+    const skipPaymentNotificationRedirect = !threeDSEnabled ||
+        !isCreditCardPayment ||
+        !!redirectURL ||
+        fullPaymentState.paymentStatus !== "processed";
     const paymentNotificationResult = graphqlGenerated.useGetPaymentNotificationQuery({
-        skip: !isCreditCardPayment || !!redirectURL || fullPaymentState.paymentStatus !== "processed",
+        skip: skipPaymentNotificationRedirect,
         pollInterval: config.PAYMENT_NOTIFICATION_INTERVAL_MS,
     });
     const nextRedirectURL = ((_c = (_b = (_a = paymentNotificationResult.data) === null || _a === void 0 ? void 0 : _a.getPaymentNotification) === null || _b === void 0 ? void 0 : _b.message) === null || _c === void 0 ? void 0 : _c.redirectURL) || "";
     React.useEffect(() => {
-        if (!isCreditCardPayment)
+        if (skipPaymentNotificationRedirect)
             return;
-        setRedirectURL(prevRedirectURL => prevRedirectURL || nextRedirectURL);
-    }, [isCreditCardPayment, nextRedirectURL]);
+        setRedirectURL((prevRedirectURL) => {
+            const redirectURL = prevRedirectURL || nextRedirectURL;
+            if (debug)
+                console.log(`  👀 getPaymentNotificationQuery`, { redirectURL });
+            return redirectURL;
+        });
+    }, [skipPaymentNotificationRedirect, nextRedirectURL, debug]);
     // Triggers for payment mutation and onPurchaseSuccess/onPurchaseError callbacks:
     const fullPaymentCalledRef = React.useRef(false);
     const purchaseSuccessHandledRef = React.useRef(false);
@@ -56,7 +65,7 @@ const PurchasingView = ({ purchasingImageSrc, purchasingMessages: customPurchasi
             return;
         purchaseSuccessHandledRef.current = true;
         onPurchaseError(errors_constants.ERROR_PURCHASE_TIMEOUT());
-    }, redirectURL === null ? null : 5000, [onPurchaseError]);
+    }, redirectURL === null ? null : config.PAYMENT_CREATION_TIMEOUT_MS, [onPurchaseError]);
     React.useEffect(() => {
         if (fullPaymentCalledRef.current)
             return;
@@ -69,14 +78,15 @@ const PurchasingView = ({ purchasingImageSrc, purchasingMessages: customPurchasi
             onDialogBlocked(true);
             return;
         }
-        if (!hasWaited || redirectURL === "" || purchaseSuccessHandledRef.current)
-            return;
-        purchaseSuccessHandledRef.current = true;
         if (paymentStatus === "error" || paymentError) {
             onPurchaseError(paymentError || errors_constants.ERROR_PURCHASE());
             return;
         }
-        if (redirectURL && !url_utils.isLocalhost()) {
+        if (!hasWaited || redirectURL === "" || purchaseSuccessHandledRef.current)
+            return;
+        purchaseSuccessHandledRef.current = true;
+        const skipRedirect = url_utils.isLocalhost();
+        if (redirectURL && !skipRedirect) {
             CheckoutOverlay_utils.persistCheckoutModalInfo({
                 invoiceID,
                 circlePaymentID,
@@ -85,7 +95,7 @@ const PurchasingView = ({ purchasingImageSrc, purchasingMessages: customPurchasi
                 paymentInfo,
             });
         }
-        onPurchaseSuccess(circlePaymentID, paymentID, url_utils.isLocalhost() ? "" : (redirectURL || ""));
+        onPurchaseSuccess(circlePaymentID, paymentID, skipRedirect ? "" : (redirectURL || ""));
     }, [
         fullPaymentState,
         hasWaited,
@@ -115,7 +125,7 @@ const PurchasingView = ({ purchasingImageSrc, purchasingMessages: customPurchasi
     return (React__default["default"].createElement(material.Box, null,
         React__default["default"].createElement(StatusIcon.StatusIcon, { variant: "loading", imgSrc: purchasingImageSrc, sx: { mt: 5 } }),
         purchasingMessage ? React__default["default"].createElement(material.Typography, { variant: "body2", sx: { textAlign: "center", mt: 1.5 } }, purchasingMessage) : null,
-        React__default["default"].createElement(material.Box, { sx: { maxWidth: theme.XS_MOBILE_MAX_WIDTH, mx: "auto", my: 5 } },
+        React__default["default"].createElement(material.Box, { sx: { maxWidth: themeConstants.XS_MOBILE_MAX_WIDTH, mx: "auto", my: 5 } },
             React__default["default"].createElement(material.Typography, { variant: "body2", sx: { textAlign: "center", mb: 1.5 } }, "Hang tight! We are currently processing your payment."),
             React__default["default"].createElement(material.Typography, { variant: "body2", sx: { textAlign: "center" } }, "Please, don't close or reload the page..."))));
 };

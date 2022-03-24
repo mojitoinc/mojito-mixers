@@ -10,14 +10,14 @@ var BillingInfoItem = require('../../payments/BillingInfo/Item/BillingInfoItem.j
 var SecondaryButton = require('../SecondaryButton/SecondaryButton.js');
 var CheckoutModalFooter = require('../../payments/CheckoutModalFooter/CheckoutModalFooter.js');
 var material = require('@mui/material');
-var theme = require('../../../config/theme/theme.js');
+var themeConstants = require('../../../config/theme/themeConstants.js');
 var TaxesMessagesBox = require('../TaxesMessagesBox/TaxesMessagesBox.js');
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
 var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 
-const SavedBillingDetailsSelector = ({ showLoader, savedPaymentMethods, selectedPaymentMethodAddressId, taxes, onNew, onEdit, onDelete, onPick, onNext, onClose, onAttemptSubmit, }) => {
+const SavedBillingDetailsSelector = ({ showLoader, savedPaymentMethods, selectedPaymentMethodAddressId, taxes, onNew, onEdit, onDelete, onPick, onNext, onClose, onAttemptSubmit, consentType, }) => {
     const getPaymentMethodAddressId = React.useCallback((savedPaymentMethod) => savedPaymentMethod.addressId, []);
     const handleNextClicked = React.useCallback(() => {
         onAttemptSubmit();
@@ -32,7 +32,7 @@ const SavedBillingDetailsSelector = ({ showLoader, savedPaymentMethods, selected
                     display: "flex",
                     justifyContent: "center",
                     alignItems: "center",
-                    background: theme$1 => material.alpha(theme$1.palette.background.default, theme.OVERLAY_OPACITY),
+                    background: theme => material.alpha(theme.palette.background.default, themeConstants.OVERLAY_OPACITY),
                     zIndex: 100,
                 } },
                 React__default["default"].createElement(material.CircularProgress, { color: "secondary" }))) : null,
@@ -46,7 +46,7 @@ const SavedBillingDetailsSelector = ({ showLoader, savedPaymentMethods, selected
                 }), component: BillingInfoItem.BillingInfoItem, itemKey: getPaymentMethodAddressId, deps: [selectedPaymentMethodAddressId, showLoader, onDelete, onPick, onEdit] }),
             React__default["default"].createElement(SecondaryButton.SecondaryButton, { onClick: onNew, startIcon: React__default["default"].createElement(Add["default"], null), sx: { mt: 2.5 }, disabled: showLoader }, "Add New Billing Info"),
             React__default["default"].createElement(TaxesMessagesBox.TaxesMessagesBox, { sx: { mt: 5 }, taxes: taxes, variant: "selector" })),
-        React__default["default"].createElement(CheckoutModalFooter.CheckoutModalFooter, { variant: "toPayment", buttonLabel: taxes.status === "loading" ? "Calculating taxes..." : undefined, submitDisabled: taxes.status !== "complete", onSubmitClicked: handleNextClicked, onCloseClicked: onClose })));
+        React__default["default"].createElement(CheckoutModalFooter.CheckoutModalFooter, { variant: "toPayment", consentType: consentType, submitLabel: (taxes === null || taxes === void 0 ? void 0 : taxes.status) === "loading" ? "Calculating taxes..." : undefined, submitDisabled: !!taxes && taxes.status === "loading", onSubmitClicked: handleNextClicked, onCloseClicked: onClose })));
 };
 
 exports.SavedBillingDetailsSelector = SavedBillingDetailsSelector;

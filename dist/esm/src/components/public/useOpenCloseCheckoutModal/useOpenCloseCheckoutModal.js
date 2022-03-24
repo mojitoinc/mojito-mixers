@@ -1,11 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
-import { continueFlows } from '../CheckoutOverlay/CheckoutOverlay.utils.js';
+import { isInitiallyOpen } from '../CheckoutOverlay/CheckoutOverlay.utils.js';
 
-const initiallyOpen = continueFlows(true).checkoutStep !== "";
 function useOpenCloseCheckoutModal() {
     const [isOpen, setIsOpen] = useState(false);
     useEffect(() => {
-        setIsOpen(initiallyOpen);
+        setIsOpen(isInitiallyOpen());
     }, []);
     const onOpen = useCallback(() => {
         setIsOpen(true);

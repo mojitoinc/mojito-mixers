@@ -1,6 +1,8 @@
-// Debug Mode:
-export const COUNTER_EXPIRATION_MS = 1000;
-export const COUNTER_CLICKS_NEEDED = 16;
+// Dev / Debug Stuff:
+export const DEV_DEBUG_COUNTER_EXPIRATION_MS = 1000;
+export const DEV_DEBUG_COUNTER_CLICKS_NEEDED = 16;
+export const DEV_SKIP_3DS_IN_LOCALHOST = true;
+export const DEV_DEBUG_ENABLED_KEY = "DEV_DEBUG_ENABLED";
 
 
 // Invoice / Reservation:
@@ -21,9 +23,9 @@ export const PURCHASING_MESSAGES_DEFAULT = [
 
 export const PAYMENT_CREATION_INTERVAL_MS = 5000; // (5 sec) Polling interval for GetPaymentMethodStatus.
 export const PAYMENT_CREATION_MAX_WAIT_MS = 120000; // (2 min) Max. wait time for GetPaymentMethodStatus (to get status === "complete").
-export const PAYMENT_NOTIFICATION_INTERVAL_MS = 2500; // (2.5 sec) Polling interval for GetPaymentNotificationQuery in PurchasingView.
 export const PAYMENT_CREATION_TIMEOUT_MS = PAYMENT_CREATION_MAX_WAIT_MS * 2; // (4 min) Max. time a user would be stuck in the PurchasingView before throwing an error (for all the above).
-
+export const PAYMENT_NOTIFICATION_INTERVAL_MS = 2500; // (2.5 sec) Polling interval for GetPaymentNotificationQuery in PurchasingView.
+export const PAYMENT_NOTIFICATION_ERROR_MAX_WAIT_MS = 15000; // (15 sec) Max. wait time for GetPaymentNotificationQuery to get the error details in ErrorOverlay.tsx.
 
 // Plaid:
 export const PLAID_STORAGE_EXPIRATION_MS = 1000 * 60 * 15; // 15 minutes (Plaid requires filling in some data).

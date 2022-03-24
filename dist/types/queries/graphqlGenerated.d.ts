@@ -83,6 +83,52 @@ export declare type AchPaymentMethodPrepareStatementOutput = {
     __typename?: 'ACHPaymentMethodPrepareStatementOutput';
     linkToken: Scalars['String'];
 };
+export declare type Address = {
+    __typename?: 'Address';
+    buildingName?: Maybe<Scalars['String']>;
+    buildingNumber?: Maybe<Scalars['String']>;
+    country?: Maybe<Scalars['String']>;
+    flatNumber?: Maybe<Scalars['String']>;
+    line1?: Maybe<Scalars['String']>;
+    line2?: Maybe<Scalars['String']>;
+    line3?: Maybe<Scalars['String']>;
+    postcode: Scalars['String'];
+    street?: Maybe<Scalars['String']>;
+    subStreet?: Maybe<Scalars['String']>;
+    town?: Maybe<Scalars['String']>;
+};
+export declare type AddressInput = {
+    buildingName?: InputMaybe<Scalars['String']>;
+    buildingNumber: Scalars['String'];
+    country: Scalars['String'];
+    flatNumber?: InputMaybe<Scalars['String']>;
+    line1?: InputMaybe<Scalars['String']>;
+    line2?: InputMaybe<Scalars['String']>;
+    line3?: InputMaybe<Scalars['String']>;
+    postcode: Scalars['String'];
+    street: Scalars['String'];
+    subStreet?: InputMaybe<Scalars['String']>;
+    town: Scalars['String'];
+};
+export declare type ApplicantRequest = {
+    address?: InputMaybe<AddressInput>;
+    dob?: InputMaybe<Scalars['String']>;
+    email?: InputMaybe<Scalars['String']>;
+    firstName: Scalars['String'];
+    idNumbers?: InputMaybe<Array<InputMaybe<IdNumberInput>>>;
+    lastName: Scalars['String'];
+};
+export declare type ApplicantResponse = {
+    __typename?: 'ApplicantResponse';
+    address?: Maybe<Address>;
+    dob?: Maybe<Scalars['String']>;
+    email?: Maybe<Scalars['String']>;
+    firstName: Scalars['String'];
+    href?: Maybe<Scalars['String']>;
+    id: Scalars['String'];
+    idNumbers?: Maybe<Array<Maybe<IdNumber>>>;
+    lastName: Scalars['String'];
+};
 export declare type Asset = {
     __typename?: 'Asset';
     currentVersion?: Maybe<AssetVersion>;
@@ -130,7 +176,13 @@ export declare enum AuctionLotStatus {
 export declare type BidFilterInput = {
     marketplaceAuctionLotId?: InputMaybe<Scalars['UUID']>;
     order?: InputMaybe<AuctionBidOrder>;
+    returnDeleted?: InputMaybe<Scalars['Boolean']>;
     userId?: InputMaybe<Scalars['UUID']>;
+};
+export declare type CheckResponse = {
+    __typename?: 'CheckResponse';
+    id: Scalars['String'];
+    success: Scalars['Boolean'];
 };
 export declare enum CollectionType {
     Auction = "Auction",
@@ -143,11 +195,12 @@ export declare enum ContractType {
 export declare type CreateMarketplaceBuyNowLotInput = {
     collectionId: Scalars['UUID1'];
     collectionItemName: Scalars['String'];
+    delivery?: InputMaybe<MarketplaceItemDeliveryInput>;
     endDate: Scalars['Time'];
-    marketplaceTokenId: Scalars['UUID1'];
+    marketplaceTokenId?: InputMaybe<Scalars['UUID1']>;
     sortNumber: Scalars['Int'];
     startDate: Scalars['Time'];
-    totalUnits: Scalars['Int'];
+    totalUnits?: InputMaybe<Scalars['Int']>;
     unitPrice: Scalars['Float'];
 };
 export declare type CreatePaymentCreditCardMetadataInput = {
@@ -224,6 +277,13 @@ export declare type CurrentUserUserOrgsArgs = {
 export declare type CurrentUserWonBidsArgs = {
     orgId: Scalars['UUID'];
 };
+export declare enum DeliveryMethod {
+    Erc721Provenance = "ERC721Provenance",
+    Erc721Transfer = "ERC721Transfer",
+    Erc1155OpenEdition = "ERC1155OpenEdition",
+    Erc1155Transfer = "ERC1155Transfer",
+    NoOp = "NoOp"
+}
 export declare type DeployContractInput = {
     contractType: ContractType;
     nftName: Scalars['String'];
@@ -246,8 +306,21 @@ export declare type Erc721Metadata = {
 export declare enum ExtensionType {
     ProvenanceExtension = "ProvenanceExtension"
 }
+export declare type IdNumber = {
+    __typename?: 'IDNumber';
+    stateCode: Scalars['String'];
+    type: Scalars['String'];
+    value: Scalars['String'];
+};
+export declare type IdNumberInput = {
+    stateCode: Scalars['String'];
+    type: Scalars['String'];
+    value: Scalars['String'];
+};
 export declare type InvoiceDetails = {
     __typename?: 'InvoiceDetails';
+    OrganizationID: Scalars['UUID1'];
+    billingAddress?: Maybe<InvoiceDetailsBillingAddress>;
     externalPaymentID: Scalars['String'];
     externalUserID: Scalars['String'];
     internalUserID: Scalars['String'];
@@ -257,6 +330,15 @@ export declare type InvoiceDetails = {
     items: Array<Maybe<ItemInvoiceDetail>>;
     paymentID: Scalars['UUID1'];
     status: InvoiceStatus;
+    userName: Scalars['String'];
+};
+export declare type InvoiceDetailsBillingAddress = {
+    __typename?: 'InvoiceDetailsBillingAddress';
+    city: Scalars['String'];
+    country: Scalars['String'];
+    postalCode: Scalars['String'];
+    state: Scalars['String'];
+    street1: Scalars['String'];
 };
 export declare enum InvoiceStatus {
     Canceled = "Canceled",
@@ -281,6 +363,9 @@ export declare type ItemInvoiceDetail = {
     units: Scalars['Int'];
 };
 export declare enum KycStatus {
+    Clear = "Clear",
+    Failed1 = "Failed1",
+    Failed2 = "Failed2",
     Level1 = "Level1",
     Level2 = "Level2",
     None = "None",
@@ -306,6 +391,7 @@ export declare type MarketplaceAuctionBid = {
     buyersPremium: Scalars['Float'];
     createdAt: Scalars['Time'];
     currentBid: Scalars['Float'];
+    deletedAt?: Maybe<Scalars['Time']>;
     finalPrice: Scalars['Float'];
     id: Scalars['UUID'];
     isCurrent: Scalars['Boolean'];
@@ -371,15 +457,17 @@ export declare type MarketplaceAuctionLotDefaultConfigArgs = {
 export declare type MarketplaceAuctionLotInput = {
     collectionId: Scalars['UUID'];
     collectionItemName: Scalars['String'];
+    delivery?: InputMaybe<MarketplaceItemDeliveryInput>;
     endDate: Scalars['Time'];
     lotNumber?: InputMaybe<Scalars['Int']>;
-    marketplaceTokenId: Scalars['UUID'];
+    marketplaceTokenId?: InputMaybe<Scalars['UUID']>;
     reservePrice?: InputMaybe<Scalars['Float']>;
     saleType: MarketplaceSaleType;
     startDate: Scalars['Time'];
     startingBid?: InputMaybe<Scalars['Float']>;
 };
 export declare type MarketplaceAuctionLotUpdateInput = {
+    delivery?: InputMaybe<MarketplaceItemDeliveryInput>;
     endDate?: InputMaybe<Scalars['Time']>;
     lotNumber?: InputMaybe<Scalars['Int']>;
     reservePrice?: InputMaybe<Scalars['Float']>;
@@ -427,16 +515,18 @@ export declare type MarketplaceCollectionCreateInput = {
 export declare type MarketplaceCollectionItem = {
     __typename?: 'MarketplaceCollectionItem';
     collectionId: Scalars['UUID'];
+    delivery?: Maybe<MarketplaceCollectionItemDelivery>;
     details: MarketplaceCollectionItemDetails;
     id: Scalars['UUID'];
     /** @deprecated Use `details` property instead */
     lot: MarketplaceAuctionLot;
-    marketplaceTokenId: Scalars['UUID'];
+    marketplaceTokenId?: Maybe<Scalars['UUID']>;
     name: Scalars['String'];
     saleType: MarketplaceSaleType;
     slug: Scalars['String'];
     status: MarketplaceCollectionItemStatus;
 };
+export declare type MarketplaceCollectionItemDelivery = MarketplaceItemDeliveryErc721Provenance | MarketplaceItemDeliveryErc721Transfer | MarketplaceItemDeliveryErc1155OpenEdition | MarketplaceItemDeliveryErc1155Transfer | MarketplaceItemDeliveryNoOp;
 export declare type MarketplaceCollectionItemDetails = MarketplaceAuctionLot | MarketplaceBuyNowOutput;
 export declare enum MarketplaceCollectionItemStatus {
     Active = "Active",
@@ -451,6 +541,63 @@ export declare type MarketplaceCollectionUpdateInput = {
     slug?: InputMaybe<Scalars['String']>;
     startDate?: InputMaybe<Scalars['Time']>;
     status?: InputMaybe<MarketCollectionStatus>;
+};
+export declare type MarketplaceItemDeliveryErc721Provenance = {
+    __typename?: 'MarketplaceItemDeliveryERC721Provenance';
+    extensionAddress: Scalars['String'];
+    nftContractId: Scalars['UUID1'];
+};
+export declare type MarketplaceItemDeliveryErc721ProvenanceInput = {
+    extensionAddress: Scalars['String'];
+    nftContractId: Scalars['UUID1'];
+};
+export declare type MarketplaceItemDeliveryErc721Transfer = {
+    __typename?: 'MarketplaceItemDeliveryERC721Transfer';
+    contractAddress: Scalars['String'];
+    onChainTokenId: Scalars['Int'];
+    ownerWalletId: Scalars['UUID1'];
+};
+export declare type MarketplaceItemDeliveryErc721TransferInput = {
+    contractAddress: Scalars['String'];
+    onChainTokenId: Scalars['Int'];
+    ownerWalletId: Scalars['UUID1'];
+};
+export declare type MarketplaceItemDeliveryErc1155OpenEdition = {
+    __typename?: 'MarketplaceItemDeliveryERC1155OpenEdition';
+    contractAddress: Scalars['String'];
+    onChainTokenId: Scalars['Int'];
+    ownerWalletId: Scalars['UUID1'];
+};
+export declare type MarketplaceItemDeliveryErc1155OpenEditionInput = {
+    contractAddress: Scalars['String'];
+    onChainTokenId: Scalars['Int'];
+    ownerWalletId: Scalars['UUID1'];
+};
+export declare type MarketplaceItemDeliveryErc1155Transfer = {
+    __typename?: 'MarketplaceItemDeliveryERC1155Transfer';
+    contractAddress: Scalars['String'];
+    onChainTokenId: Scalars['Int'];
+    ownerWalletId: Scalars['UUID1'];
+};
+export declare type MarketplaceItemDeliveryErc1155TransferInput = {
+    contractAddress: Scalars['String'];
+    onChainTokenId: Scalars['Int'];
+    ownerWalletId: Scalars['UUID1'];
+};
+export declare type MarketplaceItemDeliveryInput = {
+    ERC721Provenance?: InputMaybe<MarketplaceItemDeliveryErc721ProvenanceInput>;
+    ERC721Transfer?: InputMaybe<MarketplaceItemDeliveryErc721TransferInput>;
+    ERC1155OpenEdition?: InputMaybe<MarketplaceItemDeliveryErc1155OpenEditionInput>;
+    ERC1155Transfer?: InputMaybe<MarketplaceItemDeliveryErc1155TransferInput>;
+    NoOp?: InputMaybe<MarketplaceItemDeliveryNoOpInput>;
+    deliveryMethod: DeliveryMethod;
+};
+export declare type MarketplaceItemDeliveryNoOp = {
+    __typename?: 'MarketplaceItemDeliveryNoOp';
+    notes?: Maybe<Scalars['String']>;
+};
+export declare type MarketplaceItemDeliveryNoOpInput = {
+    notes?: InputMaybe<Scalars['String']>;
 };
 export declare enum MarketplaceSaleType {
     Auction = "Auction",
@@ -492,8 +639,12 @@ export declare type Mutation = {
     cancelMarketplaceAuctionBid: Scalars['Boolean'];
     /** Cancels payment by ID, can be called by org admin */
     cancelPayment: Scalars['Boolean'];
+    /** Creates new Applicant based on input data. */
+    createApplicant: ApplicantResponse;
     /** Creates invoice for given Lot, can be called by org admin */
     createAuctionLotInvoice: InvoiceDetails;
+    /** Creates new Check based for provided applicant ID. */
+    createCheck: CheckResponse;
     createMarketplaceAuctionBid: MarketplaceAuctionBid;
     createMarketplaceAuctionLot: MarketplaceAuctionLot;
     createMarketplaceBuyNowLot: MarketplaceBuyNowOutput;
@@ -508,8 +659,6 @@ export declare type Mutation = {
     createTokenDraft: Scalars['String'];
     /** Create a new API key for given User and Organization. */
     createUserAPIKey?: Maybe<UserApiKeyResponse>;
-    /** Creates a multisig with user as parent type */
-    createUserMultisig: Scalars['String'];
     deleteAsset: Scalars['String'];
     /**
      * Delete an existing lot from User favorite lots list.
@@ -522,12 +671,16 @@ export declare type Mutation = {
     deleteToken: Scalars['String'];
     /** Delete an existing API key. */
     deleteUserAPIKey: Scalars['Boolean'];
+    /** Deploy existing multisig wallet to a new network */
+    deployWalletToNetwork: Scalars['String'];
     importExternalTokenToCollection: Scalars['String'];
     loginWithSignature: Organization;
     marketplaceUpdateTheme: Marketplace;
     mintTokens: Scalars['String'];
     nftContractAddAdmin: Scalars['String'];
     nftContractExtensionPause: Scalars['String'];
+    nftContractExtensionSetBaseURI: Scalars['String'];
+    nftContractExtensionSetProvenanceHash: Scalars['String'];
     nftContractExtensionUnpause: Scalars['String'];
     nftContractRegisterExtensionProvenance: NftContract;
     nftDeployContract: NftContract;
@@ -537,8 +690,12 @@ export declare type Mutation = {
     releaseReservation: Scalars['Boolean'];
     reserveMarketplaceBuyNowLot: MarketplaceBuyNowOutput;
     setJwtIssuerDomain: Organization;
+    /** Transfers a token in the provided wallet to the `transferTo` address */
     transferToken: Scalars['String'];
+    /** Updates existing  Applicant based on input data. */
+    updateApplicant: ApplicantResponse;
     updateMarketplaceAuctionLot: MarketplaceAuctionLot;
+    updateMarketplaceBuyNowLot: MarketplaceBuyNowOutput;
     updateMarketplaceCollection: MarketplaceCollection;
     /** Update name of multisig wallet */
     updateMultisigName: Scalars['Boolean'];
@@ -574,9 +731,16 @@ export declare type MutationCancelPaymentArgs = {
     orgID: Scalars['UUID1'];
     paymentID: Scalars['UUID1'];
 };
+export declare type MutationCreateApplicantArgs = {
+    input: ApplicantRequest;
+    orgID: Scalars['UUID1'];
+};
 export declare type MutationCreateAuctionLotInvoiceArgs = {
     lotID: Scalars['UUID1'];
     orgID: Scalars['UUID1'];
+};
+export declare type MutationCreateCheckArgs = {
+    applicantID: Scalars['String'];
 };
 export declare type MutationCreateMarketplaceAuctionBidArgs = {
     marketplaceAuctionBid: MarketplaceAuctionBidInput;
@@ -616,10 +780,6 @@ export declare type MutationCreateTokenDraftArgs = {
 export declare type MutationCreateUserApiKeyArgs = {
     orgId: Scalars['UUID1'];
 };
-export declare type MutationCreateUserMultisigArgs = {
-    chainId: Scalars['Int'];
-    name: Scalars['String'];
-};
 export declare type MutationDeleteAssetArgs = {
     assetId: Scalars['UUID1'];
 };
@@ -635,6 +795,10 @@ export declare type MutationDeleteTokenArgs = {
 };
 export declare type MutationDeleteUserApiKeyArgs = {
     keyId: Scalars['UUID1'];
+};
+export declare type MutationDeployWalletToNetworkArgs = {
+    networkId: Scalars['UUID1'];
+    walletId: Scalars['UUID1'];
 };
 export declare type MutationImportExternalTokenToCollectionArgs = {
     contractAddress: Scalars['String'];
@@ -658,6 +822,16 @@ export declare type MutationNftContractAddAdminArgs = {
 export declare type MutationNftContractExtensionPauseArgs = {
     extensionAddress: Scalars['String'];
     nftContractId: Scalars['UUID1'];
+};
+export declare type MutationNftContractExtensionSetBaseUriArgs = {
+    baseURI: Scalars['String'];
+    extensionAddress: Scalars['String'];
+    nftContractId: Scalars['UUID1'];
+};
+export declare type MutationNftContractExtensionSetProvenanceHashArgs = {
+    extensionAddress: Scalars['String'];
+    nftContractId: Scalars['UUID1'];
+    provenanceHash: Scalars['String'];
 };
 export declare type MutationNftContractExtensionUnpauseArgs = {
     extensionAddress: Scalars['String'];
@@ -691,9 +865,16 @@ export declare type MutationTransferTokenArgs = {
     transferTo: Scalars['String'];
     walletId: Scalars['UUID1'];
 };
+export declare type MutationUpdateApplicantArgs = {
+    applicantID: Scalars['String'];
+    input: ApplicantRequest;
+};
 export declare type MutationUpdateMarketplaceAuctionLotArgs = {
     data: MarketplaceAuctionLotUpdateInput;
     marketplaceAuctionLotId: Scalars['UUID'];
+};
+export declare type MutationUpdateMarketplaceBuyNowLotArgs = {
+    input: CreateMarketplaceBuyNowLotInput;
 };
 export declare type MutationUpdateMarketplaceCollectionArgs = {
     data: MarketplaceCollectionUpdateInput;
@@ -765,6 +946,7 @@ export declare type NftToken = {
     asset?: Maybe<Asset>;
     assetId?: Maybe<Scalars['UUID1']>;
     deployed: Scalars['Boolean'];
+    editions?: Maybe<Scalars['Int']>;
     ethereumTxId?: Maybe<Scalars['String']>;
     id: Scalars['UUID1'];
     metadataArweaveTxId?: Maybe<Scalars['String']>;
@@ -836,7 +1018,8 @@ export declare type PaymentMethodUpdateInput = {
 };
 export declare type PaymentNotification3DsMessage = {
     __typename?: 'PaymentNotification3DSMessage';
-    redirectURL: Scalars['String'];
+    error?: Maybe<Scalars['String']>;
+    redirectURL?: Maybe<Scalars['String']>;
 };
 export declare type PaymentNotificationMessage = PaymentNotification3DsMessage;
 export declare type PaymentNotificationOutput = {
@@ -865,6 +1048,8 @@ export declare type Query = {
     collection?: Maybe<MarketplaceCollection>;
     collectionBySlug?: Maybe<MarketplaceCollection>;
     collectionItemById?: Maybe<MarketplaceCollectionItem>;
+    /** Retrieves applicant details by organizationID */
+    getApplicant: ApplicantResponse;
     /** Retrieves invoice details by ID */
     getInvoiceDetails: InvoiceDetails;
     /** Retrieves invoice list for given user, can be called by org admin */
@@ -884,6 +1069,8 @@ export declare type Query = {
     getPaymentPublicKey: PaymentPublicKey;
     /** Retrieves payment list for given user, can be called by org admin */
     getPaymentsByUserID: Array<Maybe<Payment>>;
+    /** Retrieves sdk token to inititate onfido web SDK */
+    getSDKToken: SdkTokenResponse;
     /** Get Tax Quote */
     getTaxQuote: TaxQuoteOutput;
     marketplace: Marketplace;
@@ -913,9 +1100,11 @@ export declare type QueryCollectionBySlugArgs = {
 export declare type QueryCollectionItemByIdArgs = {
     id: Scalars['UUID1'];
 };
+export declare type QueryGetApplicantArgs = {
+    organizationID: Scalars['UUID1'];
+};
 export declare type QueryGetInvoiceDetailsArgs = {
     invoiceID: Scalars['UUID1'];
-    orgID?: InputMaybe<Scalars['UUID1']>;
 };
 export declare type QueryGetInvoicesByUserIdArgs = {
     orgID: Scalars['UUID1'];
@@ -930,9 +1119,16 @@ export declare type QueryGetPaymentMethodArgs = {
 export declare type QueryGetPaymentMethodListArgs = {
     orgID: Scalars['UUID1'];
 };
+export declare type QueryGetPaymentPublicKeyArgs = {
+    orgID: Scalars['UUID1'];
+};
 export declare type QueryGetPaymentsByUserIdArgs = {
     orgID: Scalars['UUID1'];
     userID: Scalars['UUID1'];
+};
+export declare type QueryGetSdkTokenArgs = {
+    applicantID: Scalars['String'];
+    referrer: Scalars['String'];
 };
 export declare type QueryGetTaxQuoteArgs = {
     input: TaxQuoteInput;
@@ -981,6 +1177,10 @@ export declare enum Role {
     Admin = "admin",
     User = "user"
 }
+export declare type SdkTokenResponse = {
+    __typename?: 'SDKTokenResponse';
+    token: Scalars['String'];
+};
 export declare type SettingsInput = {
     avatar?: InputMaybe<Scalars['String']>;
     settingsJson?: InputMaybe<Scalars['String']>;
@@ -1049,6 +1249,7 @@ export declare type TokenDraft = {
     assetId?: InputMaybe<Scalars['UUID1']>;
     copyright?: InputMaybe<Scalars['String']>;
     description?: InputMaybe<Scalars['String']>;
+    editions?: InputMaybe<Scalars['Int']>;
     metadataJSON?: InputMaybe<Scalars['String']>;
     name?: InputMaybe<Scalars['String']>;
     royaltyBasisPoints?: InputMaybe<Scalars['Int']>;
@@ -1229,7 +1430,8 @@ export declare type GetPaymentNotificationQuery = {
         __typename?: 'PaymentNotificationOutput';
         message: {
             __typename?: 'PaymentNotification3DSMessage';
-            redirectURL: string;
+            redirectURL?: string | null;
+            error?: string | null;
         };
     };
 };
@@ -1295,7 +1497,6 @@ export declare type ReleaseReservationBuyNowLotMutation = {
 };
 export declare type GetInvoiceDetailsQueryVariables = Exact<{
     invoiceID: Scalars['UUID1'];
-    orgID: Scalars['UUID1'];
 }>;
 export declare type GetInvoiceDetailsQuery = {
     __typename?: 'Query';
@@ -1343,7 +1544,7 @@ export declare type MeQuery = {
     } | null;
 };
 export declare type PaymentKeyQueryVariables = Exact<{
-    [key: string]: never;
+    orgID: Scalars['UUID1'];
 }>;
 export declare type PaymentKeyQuery = {
     __typename?: 'Query';
@@ -1628,17 +1829,14 @@ export declare const GetInvoiceDetailsDocument: Apollo.DocumentNode;
  * const { data, loading, error } = useGetInvoiceDetailsQuery({
  *   variables: {
  *      invoiceID: // value for 'invoiceID'
- *      orgID: // value for 'orgID'
  *   },
  * });
  */
 export declare function useGetInvoiceDetailsQuery(baseOptions: Apollo.QueryHookOptions<GetInvoiceDetailsQuery, GetInvoiceDetailsQueryVariables>): Apollo.QueryResult<GetInvoiceDetailsQuery, Exact<{
     invoiceID: any;
-    orgID: any;
 }>>;
 export declare function useGetInvoiceDetailsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetInvoiceDetailsQuery, GetInvoiceDetailsQueryVariables>): Apollo.QueryTuple<GetInvoiceDetailsQuery, Exact<{
     invoiceID: any;
-    orgID: any;
 }>>;
 export declare type GetInvoiceDetailsQueryHookResult = ReturnType<typeof useGetInvoiceDetailsQuery>;
 export declare type GetInvoiceDetailsLazyQueryHookResult = ReturnType<typeof useGetInvoiceDetailsLazyQuery>;
@@ -1681,14 +1879,15 @@ export declare const PaymentKeyDocument: Apollo.DocumentNode;
  * @example
  * const { data, loading, error } = usePaymentKeyQuery({
  *   variables: {
+ *      orgID: // value for 'orgID'
  *   },
  * });
  */
-export declare function usePaymentKeyQuery(baseOptions?: Apollo.QueryHookOptions<PaymentKeyQuery, PaymentKeyQueryVariables>): Apollo.QueryResult<PaymentKeyQuery, Exact<{
-    [key: string]: never;
+export declare function usePaymentKeyQuery(baseOptions: Apollo.QueryHookOptions<PaymentKeyQuery, PaymentKeyQueryVariables>): Apollo.QueryResult<PaymentKeyQuery, Exact<{
+    orgID: any;
 }>>;
 export declare function usePaymentKeyLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<PaymentKeyQuery, PaymentKeyQueryVariables>): Apollo.QueryTuple<PaymentKeyQuery, Exact<{
-    [key: string]: never;
+    orgID: any;
 }>>;
 export declare type PaymentKeyQueryHookResult = ReturnType<typeof usePaymentKeyQuery>;
 export declare type PaymentKeyLazyQueryHookResult = ReturnType<typeof usePaymentKeyLazyQuery>;

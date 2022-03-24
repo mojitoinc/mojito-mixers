@@ -6,10 +6,12 @@ var material = require('@mui/material');
 var PrimaryButton = require('../../shared/PrimaryButton/PrimaryButton.js');
 var OutlinedSecondaryButton = require('../../shared/OutlinedSecondaryButton/OutlinedSecondaryButton.js');
 var ChevronLeft = require('../../../../node_modules/@mui/icons-material/ChevronLeft.js');
+var Close = require('../../../../node_modules/@mui/icons-material/Close.js');
 var formatUtils = require('../../../utils/formatUtils.js');
 var CheckoutModalHeader_utils = require('./CheckoutModalHeader.utils.js');
 var React = require('react');
 var config = require('../../../config/config.js');
+var Img = require('../../shared/Img/Img.js');
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
@@ -47,42 +49,39 @@ const COUNTDOWN_SX = {
     justifyContent: "flex-start",
     alignItems: "center",
 };
-const CheckoutModalHeader = ({ variant, countdownElementRef, title: customTitle, logoSrc, logoSx, user, userFormat, onLoginClicked, onPrevClicked, setDebug, }) => {
+const CheckoutModalHeader = ({ variant, countdownElementRef, title: customTitle, logoSrc, logoSx, user, userFormat, onLogin, onClose, onPrev, toggleDebug, }) => {
     const title = customTitle || CHECKOUT_MODAL_TITLE[variant] || formatUtils.NBSP;
     const displayUsername = CheckoutModalHeader_utils.getFormattedUser(variant, user, userFormat);
     const showControls = CHECKOUT_MODAL_CONTROLS[variant] || false;
     const clickCounterRef = React.useRef(0);
     const clickTimestampRef = React.useRef(0);
     const handleLogoClick = React.useCallback(() => {
-        if (!setDebug)
+        if (!toggleDebug)
             return;
         const counter = clickCounterRef.current;
         const timestamp = clickTimestampRef.current;
         const now = Date.now();
         const elapsed = now - timestamp;
-        const nextCounter = elapsed > config.COUNTER_EXPIRATION_MS || counter === config.COUNTER_CLICKS_NEEDED ? 1 : counter + 1;
+        const nextCounter = elapsed > config.DEV_DEBUG_COUNTER_EXPIRATION_MS || counter === config.DEV_DEBUG_COUNTER_CLICKS_NEEDED ? 1 : counter + 1;
         clickTimestampRef.current = now;
         clickCounterRef.current = nextCounter;
-        if (nextCounter === config.COUNTER_CLICKS_NEEDED) {
-            setDebug((prevValue) => {
-                const nextValue = !prevValue;
-                console.log(`\n🐞 DEBUG MODE ${nextValue ? "ENABLED" : "DISABLED"}!\n\n`);
-                return nextValue;
-            });
-        }
-    }, [setDebug]);
+        if (nextCounter === config.DEV_DEBUG_COUNTER_CLICKS_NEEDED)
+            toggleDebug();
+    }, [toggleDebug]);
     return (React__default["default"].createElement(material.Box, null,
         React__default["default"].createElement(material.Stack, { spacing: 2, direction: "row", sx: { justifyContent: "space-between", alignItems: "center", py: 2 } },
             React__default["default"].createElement(material.Typography, { variant: "h5", id: "checkout-modal-header-title" }, title),
-            React__default["default"].createElement(material.Box, { component: "img", src: logoSrc, onClick: setDebug ? handleLogoClick : undefined, sx: Object.assign({ maxHeight: "32px", maxWidth: { xs: "180px", sm: "240px" } }, logoSx) })),
+            React__default["default"].createElement(Img.Img, { src: logoSrc, onClick: toggleDebug ? handleLogoClick : undefined, sx: Object.assign({ maxHeight: "32px", maxWidth: { xs: "180px", sm: "240px" } }, logoSx) })),
         React__default["default"].createElement(material.Divider, null),
         showControls ? (React__default["default"].createElement(React__default["default"].Fragment, null,
             React__default["default"].createElement(material.Stack, { spacing: 2, direction: "row", sx: { justifyContent: "space-between", alignItems: "center", py: 2 } },
-                (variant === "anonymous" && onLoginClicked) ? (React__default["default"].createElement(React__default["default"].Fragment, null,
+                (variant === "anonymous" && onLogin) ? (React__default["default"].createElement(React__default["default"].Fragment, null,
                     React__default["default"].createElement(material.Typography, { sx: { fontWeight: "500" } }, "Already have an account?"),
-                    React__default["default"].createElement(PrimaryButton.PrimaryButton, { onClick: onLoginClicked }, "Log in"))) : null,
-                (variant !== "anonymous" && onPrevClicked && displayUsername) ? (React__default["default"].createElement(React__default["default"].Fragment, null,
-                    React__default["default"].createElement(OutlinedSecondaryButton.OutlinedSecondaryButton, { onClick: onPrevClicked },
+                    React__default["default"].createElement(PrimaryButton.PrimaryButton, { onClick: onLogin }, "Log in"))) : null,
+                (variant !== "anonymous" && displayUsername) ? (React__default["default"].createElement(React__default["default"].Fragment, null,
+                    onClose && React__default["default"].createElement(OutlinedSecondaryButton.OutlinedSecondaryButton, { onClick: onClose },
+                        React__default["default"].createElement(Close["default"], null)),
+                    onPrev && React__default["default"].createElement(OutlinedSecondaryButton.OutlinedSecondaryButton, { onClick: onPrev },
                         React__default["default"].createElement(ChevronLeft["default"], null)),
                     variant === "loggedIn" && countdownElementRef ? (React__default["default"].createElement(material.Typography, { sx: { fontWeight: "500" } },
                         "Time left: ",

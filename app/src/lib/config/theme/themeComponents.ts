@@ -1,6 +1,7 @@
 import { Theme } from "@mui/material/styles";
 import { Components as ComponentsOptions } from "@mui/material/styles/components";
-import { BORDER_THICKNESS, MD_BORDER_RADIUS } from "./theme";
+import { BORDER_THICKNESS, MD_BORDER_RADIUS } from "./themeConstants";
+import { darkenBackground } from "./themeUtils";
 
 /*
 declare module "@mui/material/TextField" {
@@ -10,7 +11,7 @@ declare module "@mui/material/TextField" {
 }
 */
 
-export function createComponentsTheme({ typography, palette, spacing, breakpoints }: Theme): ComponentsOptions {
+export function createComponentsTheme({ typography, palette, spacing, breakpoints, transitions }: Theme): ComponentsOptions {
   return {
     // FORMS:
 
@@ -76,6 +77,7 @@ export function createComponentsTheme({ typography, palette, spacing, breakpoint
       styleOverrides: {
         root: {
           height: "60px",
+          borderRadius: MD_BORDER_RADIUS,
 
           "&.Mui-disabled::before": {
             border: 0,
@@ -94,6 +96,7 @@ export function createComponentsTheme({ typography, palette, spacing, breakpoint
     MuiFilledInput: {
       styleOverrides: {
         root: {
+          borderRadius: MD_BORDER_RADIUS,
           border: `${BORDER_THICKNESS}px solid ${palette.grey[200]}`,
           borderRadius: MD_BORDER_RADIUS,
           background: palette.background.default,
@@ -177,6 +180,10 @@ export function createComponentsTheme({ typography, palette, spacing, breakpoint
             border: `${BORDER_THICKNESS}px solid ${palette.grey[100]}`,
             cursor: "not-allowed",
             pointerEvents: "auto",
+
+            "&:hover": {
+              background: palette.grey["50"],
+            },
           },
         },
         sizeSmall: {
@@ -198,10 +205,14 @@ export function createComponentsTheme({ typography, palette, spacing, breakpoint
           }
         },
         containedPrimary: {
-          background: palette.gradients?.action || palette.primary.light,
-          border: `${BORDER_THICKNESS}px solid ${palette.primary.main}`,
-          color: palette.text.primary,
+          background: palette.paymentUI?.mainButtonBackground || palette.primary.main,
+          color: palette.primary.contrastText,
           minWidth: "200px !important",
+          transition: transitions.create(["background"]),
+
+          "&:hover": {
+            background: darkenBackground(palette.paymentUI?.mainButtonBackground || palette.primary.main),
+          },
         },
         containedSecondary: {
           background: palette.grey[100],
@@ -209,7 +220,7 @@ export function createComponentsTheme({ typography, palette, spacing, breakpoint
           // minWidth: 0,
 
           "&:hover": {
-            background: palette.grey[100],
+            background: palette.grey[300],
           },
         },
         outlined: {
@@ -231,6 +242,7 @@ export function createComponentsTheme({ typography, palette, spacing, breakpoint
           minWidth: spacing(5.5),
           border: 0,
           borderRadius: MD_BORDER_RADIUS,
+          transition: transitions.create(["background"]),
 
           [breakpoints.up("sm")]: {
             padding: spacing(0, 2),
@@ -242,11 +254,11 @@ export function createComponentsTheme({ typography, palette, spacing, breakpoint
           },
 
           "&.Mui-selected": {
-            background: palette.gradients?.action || palette.primary.light,
-            color: palette.grey["800"],
+            background: palette.paymentUI?.paymentMethodSelectorBackground || palette.primary.main,
+            color: palette.primary.contrastText,
 
             "&:hover": {
-              background: palette.gradients?.action || palette.primary.light,
+              background: darkenBackground(palette.paymentUI?.paymentMethodSelectorBackground || palette.primary.main),
             },
           },
 
@@ -260,7 +272,7 @@ export function createComponentsTheme({ typography, palette, spacing, breakpoint
     MuiToggleButtonGroup: {
       styleOverrides: {
         root: {
-          background: palette.gradients?.stepperReverse || palette.primary.light,
+          background: palette.paymentUI?.paymentMethodSelectorBorder || palette.primary.main,
           backgroundOrigin: "border-box",
           border: `${BORDER_THICKNESS}px solid transparent`,
           borderRadius: MD_BORDER_RADIUS + BORDER_THICKNESS,

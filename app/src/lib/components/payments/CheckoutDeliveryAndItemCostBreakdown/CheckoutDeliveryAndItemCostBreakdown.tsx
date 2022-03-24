@@ -1,38 +1,38 @@
 import React from "react";
 import { Divider, Stack } from "@mui/material";
 
-import { DeliveryWalletSelector } from "../DeliveryWallet/DeliveryWalletSelector";
+import { DeliveryWalletSelector } from "../DeliveryWallet/DeliveryWalletSelector/DeliveryWalletSelector";
 import { CheckoutItemCostBreakdown } from "../CheckoutItemCost/Breakdown/CheckoutItemCostBreakdown";
 import { CheckoutItem } from "../../../domain/product/product.interfaces";
 import { TaxesState } from "../../../views/Billing/BillingView";
-import { PUIDictionary } from "../../../domain/dictionary/dictionary.interfaces";
+import { Wallet } from "../../../domain/wallet/wallet.interfaces";
 
 interface CheckoutDeliveryAndItemCostBreakdownProps {
   checkoutItems: CheckoutItem[];
-  taxes: TaxesState;
+  taxes: null | TaxesState;
   validatePersonalDeliveryAddress: boolean;
-  walletAddress: string | null;
-  onWalletAddressChange: (walletAddress: string | null) => void;
-  dictionary: PUIDictionary;
+  wallets?: Wallet[];
+  wallet: null | string | Wallet;
+  onWalletChange: (wallet: null | string | Wallet) => void;
 }
 
 export const CheckoutDeliveryAndItemCostBreakdown: React.FC<CheckoutDeliveryAndItemCostBreakdownProps> = ({
   checkoutItems,
   taxes,
   validatePersonalDeliveryAddress,
-  walletAddress,
-  onWalletAddressChange,
-  dictionary,
+  wallets,
+  wallet,
+  onWalletChange,
 }) => (
-    <Stack sx={{ display: "flex", flex: 1 }}>
-      <DeliveryWalletSelector
-        validatePersonalAddress={ validatePersonalDeliveryAddress }
-        walletAddress={ walletAddress }
-        onWalletAddressChange={ onWalletAddressChange }
-        dictionary={ dictionary } />
+  <Stack sx={{ display: "flex", width: { xs: "100%", md: "calc(50% - 35px)" } }}>
+    <DeliveryWalletSelector
+      validatePersonalAddress={ validatePersonalDeliveryAddress }
+      wallets={ wallets }
+      wallet={ wallet }
+      onWalletChange={ onWalletChange } />
 
-      <Divider sx={{ my: 3.75 }} />
+    <Divider sx={{ my: 3.75 }} />
 
-      <CheckoutItemCostBreakdown checkoutItems={ checkoutItems } taxes={ taxes } />
-    </Stack>
-  );
+    <CheckoutItemCostBreakdown checkoutItems={ checkoutItems } taxes={ taxes } />
+  </Stack>
+);

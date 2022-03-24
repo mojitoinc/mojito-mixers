@@ -29,3 +29,9 @@ export function isLocalhost() {
 
   return window.location.hostname === "localhost";
 }
+
+export function isLocalhostOrStaging() {
+  if (!process.browser) return false;
+
+  return isLocalhost() || /\.staging\./.test(window.location.origin.replace(/[/\-.]/g, "."));
+}

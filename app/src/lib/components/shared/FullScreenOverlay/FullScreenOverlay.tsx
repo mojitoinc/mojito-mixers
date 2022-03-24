@@ -1,6 +1,7 @@
-import { Box, Dialog, DialogContent, SxProps, Theme } from "@mui/material";
+import { Box, Dialog, DialogContent } from "@mui/material";
 import React, { useEffect, useRef } from "react";
 import { useShakeAnimation } from "../../../utils/animationUtils";
+import { SxProps, Theme } from "@mui/material/styles";
 
 const centeredSx: SxProps<Theme> = {
   flex: 1,

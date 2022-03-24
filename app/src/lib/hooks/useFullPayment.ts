@@ -5,6 +5,8 @@ import { SavedPaymentMethod } from "../domain/circle/circle.interfaces";
 import { parseCircleError, savedPaymentMethodToBillingInfo } from "../domain/circle/circle.utils";
 import { ERROR_PURCHASE_CREATING_PAYMENT_METHOD, ERROR_PURCHASE_CVV, ERROR_PURCHASE_NO_ITEMS, ERROR_PURCHASE_PAYING, ERROR_PURCHASE_SELECTED_PAYMENT_METHOD } from "../domain/errors/errors.constants";
 import { PaymentStatus } from "../domain/payment/payment.interfaces";
+import { Wallet } from "../domain/wallet/wallet.interfaces";
+import { filterSpecialWalletAddressValues } from "../domain/wallet/wallet.utils";
 import { BillingInfo } from "../forms/BillingInfoForm";
 import { CreatePaymentMetadataInput, useCreatePaymentMutation } from "../queries/graphqlGenerated";
 import { useCreatePaymentMethod } from "./useCreatePaymentMethod";
@@ -15,7 +17,7 @@ export interface UseFullPaymentOptions {
   invoiceID: string;
   savedPaymentMethods: SavedPaymentMethod[];
   selectedPaymentMethod: SelectedPaymentMethod;
-  walletAddress: string | null;
+  wallet: null | string | Wallet;
   debug?: boolean;
 }
 
@@ -31,7 +33,7 @@ export function useFullPayment({
   invoiceID,
   savedPaymentMethods,
   selectedPaymentMethod,
-  walletAddress,
+  wallet,
   debug = false,
 }: UseFullPaymentOptions): [FullPaymentState, () => Promise<void>] {
   const [paymentState, setPaymentState] = useState<FullPaymentState>({
@@ -49,8 +51,8 @@ export function useFullPayment({
     });
   }, []);
 
-  const [encryptCardData] = useEncryptCardData();
-  const [createPaymentMethod] = useCreatePaymentMethod({ debug });
+  const [encryptCardData] = useEncryptCardData({ orgID });
+  const [createPaymentMethod] = useCreatePaymentMethod({ orgID, debug });
   const [makePayment] = useCreatePaymentMutation();
 
   const fullPayment = useCallback(async () => {
@@ -125,7 +127,6 @@ export function useFullPayment({
       }
 
       const createPaymentMethodResult = await createPaymentMethod(
-        orgID,
         selectedBillingInfoData,
         selectedPaymentInfo,
       ).catch((error: ApolloError | Error) => {
@@ -165,9 +166,15 @@ export function useFullPayment({
       });
     }
 
-    const metadata: Partial<CreatePaymentMetadataInput> = walletAddress ? {
-      destinationAddress: walletAddress,
-    } : { };
+    let destinationAddress = "";
+
+    if (typeof wallet === "object") {
+      destinationAddress = wallet?.address || "";
+    } else {
+      destinationAddress = filterSpecialWalletAddressValues(wallet);
+    }
+
+    const metadata: Partial<CreatePaymentMetadataInput> = destinationAddress ? { destinationAddress } : { };
 
     if (cvv) {
       const encryptCardDataResult = await encryptCardData({
@@ -231,7 +238,7 @@ export function useFullPayment({
     invoiceID,
     savedPaymentMethods,
     selectedPaymentMethod,
-    walletAddress,
+    wallet,
     debug,
     setError,
     encryptCardData,

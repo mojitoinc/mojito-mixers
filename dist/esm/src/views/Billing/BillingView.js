@@ -12,7 +12,7 @@ import { useGetTaxQuoteLazyQuery } from '../../queries/graphqlGenerated.js';
 import { useCheckoutItemsCostTotal } from '../../hooks/useCheckoutItemCostTotal.js';
 import { useThrottledCallback } from '@swyg/corre';
 
-const BillingView = ({ checkoutItems, savedPaymentMethods: rawSavedPaymentMethods, selectedBillingInfo, walletAddress, checkoutError, onBillingInfoSelected, onTaxesChange, onSavedPaymentMethodDeleted, onWalletAddressChange, onNext, onClose, dictionary, debug, }) => {
+const BillingView = ({ vertexEnabled, checkoutItems, savedPaymentMethods: rawSavedPaymentMethods, selectedBillingInfo, wallets, wallet, checkoutError, onBillingInfoSelected, onTaxesChange, onSavedPaymentMethodDeleted, onWalletChange, onNext, onClose, consentType, debug, }) => {
     const savedPaymentMethodAddressIdRef = useRef("");
     const savedPaymentMethods = useMemo(() => distinctBy(rawSavedPaymentMethods, "addressId"), [rawSavedPaymentMethods]);
     const { total: subtotal, fees } = useCheckoutItemsCostTotal(checkoutItems);
@@ -20,7 +20,7 @@ const BillingView = ({ checkoutItems, savedPaymentMethods: rawSavedPaymentMethod
     const [{ isDeleting, showSaved, taxes }, setViewState] = useState({
         isDeleting: false,
         showSaved: savedPaymentMethods.length > 0 && typeof selectedBillingInfo === "string" && !checkNeedsGenericErrorMessage("billing", checkoutError),
-        taxes: { status: "incomplete" },
+        taxes: vertexEnabled ? { status: "incomplete" } : null,
     });
     const [formSubmitAttempted, setFormSubmitAttempted] = useState(false);
     const [getTaxQuote] = useGetTaxQuoteLazyQuery();
@@ -61,18 +61,24 @@ const BillingView = ({ checkoutItems, savedPaymentMethods: rawSavedPaymentMethod
     }), [getTaxQuote, total]);
     const handleThrottledTaxInfoChange = useThrottledCallback((taxInfo) => {
         var _a, _b;
+        if (!vertexEnabled)
+            return;
         if (!taxInfo.street || !taxInfo.city || !taxInfo.zipCode || !((_a = taxInfo.country) === null || _a === void 0 ? void 0 : _a.value) || !((_b = taxInfo.state) === null || _b === void 0 ? void 0 : _b.value)) {
-            setViewState((prevViewState) => prevViewState.taxes.status === "incomplete" ? prevViewState : (Object.assign(Object.assign({}, prevViewState), { taxes: { status: "incomplete" } })));
+            setViewState((prevViewState) => { var _a; return ((_a = prevViewState.taxes) === null || _a === void 0 ? void 0 : _a.status) === "incomplete" ? prevViewState : (Object.assign(Object.assign({}, prevViewState), { taxes: { status: "incomplete" } })); });
             return;
         }
         calculateTaxes(taxInfo);
-    }, 1000, [calculateTaxes]);
+    }, 1000, [calculateTaxes, vertexEnabled]);
     const handleTaxInfoChange = useCallback((taxInfo) => {
-        setViewState((prevViewState) => prevViewState.taxes.status === "loading" ? prevViewState : (Object.assign(Object.assign({}, prevViewState), { taxes: { status: "loading" } })));
+        if (!vertexEnabled)
+            return;
+        setViewState((prevViewState) => { var _a; return ((_a = prevViewState.taxes) === null || _a === void 0 ? void 0 : _a.status) === "loading" ? prevViewState : (Object.assign(Object.assign({}, prevViewState), { taxes: { status: "loading" } })); });
         getTaxQuoteTimestampRef.current = Date.now();
         handleThrottledTaxInfoChange(taxInfo);
-    }, [handleThrottledTaxInfoChange]);
+    }, [vertexEnabled, handleThrottledTaxInfoChange]);
     useEffect(() => {
+        if (!vertexEnabled)
+            return;
         if (selectedBillingInfo && showSaved) {
             const savedPaymentMethodData = typeof selectedBillingInfo === "string"
                 ? savedPaymentMethods.find(({ addressId }) => addressId === selectedBillingInfo) : null;
@@ -88,9 +94,10 @@ const BillingView = ({ checkoutItems, savedPaymentMethods: rawSavedPaymentMethod
         else {
             setViewState((prevViewState) => (Object.assign(Object.assign({}, prevViewState), { taxes: { status: selectedBillingInfo ? "loading" : "incomplete" } })));
         }
-    }, [selectedBillingInfo, savedPaymentMethods, showSaved, calculateTaxes]);
+    }, [vertexEnabled, selectedBillingInfo, savedPaymentMethods, showSaved, calculateTaxes]);
     useEffect(() => {
-        onTaxesChange(taxes);
+        if (taxes)
+            onTaxesChange(taxes);
     }, [onTaxesChange, taxes]);
     const handleShowForm = useCallback((savedPaymentMethodAddressId) => {
         if (savedPaymentMethodAddressId && typeof savedPaymentMethodAddressId === "string") {
@@ -102,22 +109,22 @@ const BillingView = ({ checkoutItems, savedPaymentMethods: rawSavedPaymentMethod
         else {
             onBillingInfoSelected("");
         }
-        setViewState({ isDeleting: false, showSaved: false, taxes: { status: "loading" } });
-    }, [onBillingInfoSelected, savedPaymentMethods]);
+        setViewState({ isDeleting: false, showSaved: false, taxes: vertexEnabled ? { status: "loading" } : null });
+    }, [onBillingInfoSelected, savedPaymentMethods, vertexEnabled]);
     const handleShowSaved = useCallback(() => {
         const savedPaymentMethodAddressId = savedPaymentMethodAddressIdRef.current;
         if (savedPaymentMethodAddressId)
             onBillingInfoSelected(savedPaymentMethodAddressId);
-        setViewState({ isDeleting: false, showSaved: true, taxes: { status: "loading" } });
-    }, [onBillingInfoSelected]);
+        setViewState({ isDeleting: false, showSaved: true, taxes: vertexEnabled ? { status: "loading" } : null });
+    }, [onBillingInfoSelected, vertexEnabled]);
     const handleSubmit = useCallback((data) => {
-        if (taxes.status !== "complete")
+        if (taxes && taxes.status !== "complete")
             return;
         const savedPaymentMethodAddressId = getSavedPaymentMethodAddressIdFromBillingInfo(data);
         const savedPaymentMethodData = savedPaymentMethods.find(({ addressId }) => addressId === savedPaymentMethodAddressId);
         onBillingInfoSelected(savedPaymentMethodData ? savedPaymentMethodAddressId : data);
         onNext();
-    }, [savedPaymentMethods, onBillingInfoSelected, onNext, taxes.status]);
+    }, [savedPaymentMethods, onBillingInfoSelected, onNext, taxes]);
     const handleSavedPaymentMethodDeleted = useCallback((savedPaymentMethodId) => __awaiter(void 0, void 0, void 0, function* () {
         setViewState(({ taxes }) => ({ isDeleting: true, showSaved: true, taxes }));
         yield onSavedPaymentMethodDeleted(savedPaymentMethodId);
@@ -136,14 +143,14 @@ const BillingView = ({ checkoutItems, savedPaymentMethods: rawSavedPaymentMethod
             sm: "column",
             md: "row",
         }, spacing: 8.75 },
-        React__default.createElement(Stack, { sx: { display: 'flex', flex: 1, overflow: "hidden" } },
+        React__default.createElement(Stack, { sx: { display: "flex", overflow: "hidden", width: { xs: "100%", md: "calc(50% - 35px)" } } },
             React__default.createElement(CheckoutStepper, { progress: 50 }),
-            showSaved ? (React__default.createElement(SavedBillingDetailsSelector, { showLoader: isDeleting, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethodAddressId: typeof selectedBillingInfo === "string" ? selectedBillingInfo : undefined, taxes: taxes, onNew: handleShowForm, onEdit: handleShowForm, onDelete: handleSavedPaymentMethodDeleted, onPick: onBillingInfoSelected, onNext: onNext, onClose: onClose, onAttemptSubmit: handleFormAttemptSubmit })) : (React__default.createElement(BillingInfoForm
+            showSaved ? (React__default.createElement(SavedBillingDetailsSelector, { showLoader: isDeleting, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethodAddressId: typeof selectedBillingInfo === "string" ? selectedBillingInfo : undefined, taxes: taxes, onNew: handleShowForm, onEdit: handleShowForm, onDelete: handleSavedPaymentMethodDeleted, onPick: onBillingInfoSelected, onNext: onNext, onClose: onClose, onAttemptSubmit: handleFormAttemptSubmit, consentType: consentType === "checkbox" ? undefined : consentType })) : (React__default.createElement(BillingInfoForm
             // variant="loggedIn"
             , { 
                 // variant="loggedIn"
-                defaultValues: typeof selectedBillingInfo === "string" ? undefined : selectedBillingInfo, checkoutError: checkoutError, taxes: taxes, onTaxInfoChange: handleTaxInfoChange, onSaved: savedPaymentMethods.length > 0 ? handleShowSaved : undefined, onClose: onClose, onSubmit: handleSubmit, onAttemptSubmit: handleFormAttemptSubmit, debug: debug }))),
-        React__default.createElement(CheckoutDeliveryAndItemCostBreakdown, { checkoutItems: checkoutItems, taxes: taxes, validatePersonalDeliveryAddress: formSubmitAttempted, walletAddress: walletAddress, onWalletAddressChange: onWalletAddressChange, dictionary: dictionary })));
+                defaultValues: typeof selectedBillingInfo === "string" ? undefined : selectedBillingInfo, checkoutError: checkoutError, taxes: taxes, onTaxInfoChange: handleTaxInfoChange, onSaved: savedPaymentMethods.length > 0 ? handleShowSaved : undefined, onClose: onClose, onSubmit: handleSubmit, onAttemptSubmit: handleFormAttemptSubmit, consentType: consentType === "checkbox" ? undefined : consentType, debug: debug }))),
+        React__default.createElement(CheckoutDeliveryAndItemCostBreakdown, { checkoutItems: checkoutItems, taxes: vertexEnabled ? taxes : null, validatePersonalDeliveryAddress: formSubmitAttempted, wallets: wallets, wallet: wallet, onWalletChange: onWalletChange })));
 };
 
 export { BillingView };

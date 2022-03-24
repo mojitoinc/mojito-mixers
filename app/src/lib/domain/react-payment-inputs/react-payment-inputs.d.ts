@@ -6,8 +6,6 @@ declare module "react-payment-inputs" {
     ref: React.Ref<any>;
   };
 
-  export type CreditCardNetwork = "amex" | "dinersclub" | "discover" | "hipercard" | "jcb" | "unionpay" | "mastercard" | "placeholder" | "visa";
-
   export type CreditCardSvgProps = SvgIconProps & { network: CreditCardNetwork };
 
   export interface UsePaymentInputsReturn {
@@ -18,6 +16,9 @@ declare module "react-payment-inputs" {
   }
 
   export function usePaymentInputs(): UsePaymentInputsReturn;
+  export function getCVCError(cvc?: string): string;
+  export function getCardNumberError(cardNumber?: string): string;
+  export function getExpiryDateError(expiryDate?: string): string;
 }
 
 declare module "react-payment-inputs/images" {

@@ -1,8 +1,10 @@
 import { SavedPaymentMethod } from "../../../domain/circle/circle.interfaces";
 import React from "react";
 import { ConsentType } from "../ConsentText/ConsentText";
+import { CreditCardNetwork } from "../../../domain/react-payment-inputs/react-payment-inputs.utils";
 export interface SavedPaymentDetailsSelectorProps {
     showLoader: boolean;
+    acceptedCreditCardNetworks?: CreditCardNetwork[];
     savedPaymentMethods: SavedPaymentMethod[];
     selectedPaymentMethodId?: string;
     onNew: () => void;
@@ -13,7 +15,5 @@ export interface SavedPaymentDetailsSelectorProps {
     onClose: () => void;
     onAttemptSubmit: () => void;
     consentType?: ConsentType;
-    privacyHref?: string;
-    termsOfUseHref?: string;
 }
 export declare const SavedPaymentDetailsSelector: React.FC<SavedPaymentDetailsSelectorProps>;

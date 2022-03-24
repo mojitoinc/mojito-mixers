@@ -1,8 +1,8 @@
 import { PLAID_OAUTH_FLOW_INFO_KEY, PLAID_OAUTH_FLOW_RECEIVED_REDIRECT_URI_KEY, PLAID_OAUTH_FLOW_STATE_USED_KEY, PLAID_STORAGE_EXPIRATION_MS, PLAID_OAUTH_FLOW_URL_SEARCH } from "../../config/config";
 import { BillingInfo } from "../../forms/BillingInfoForm";
-import { getUrlWithoutParams, isLocalhost, urlToPathnameWhenPossible } from "../url/url.utils";
+import { getUrlWithoutParams, isLocalhost, isLocalhostOrStaging, urlToPathnameWhenPossible } from "../url/url.utils";
 
-const debug = false;
+const debug = isLocalhostOrStaging();
 
 export interface PlaidInfo {
   // TODO: Do we need to store product info?

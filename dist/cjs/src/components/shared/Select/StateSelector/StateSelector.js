@@ -14,11 +14,21 @@ var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 
 const StateSelector = (_a) => {
     var { label, value, disabled, onSelectState, countryCode } = _a, props = tslib_es6.__rest(_a, ["label", "value", "disabled", "onSelectState", "countryCode"]);
+    const initRef = React.useRef(false);
     const { options, optionsMap } = useCountryOptions.useCountryOptions(countryCode);
     const handleChange = React.useCallback((e) => {
         onSelectState(optionsMap[e.target.value]);
     }, [optionsMap, onSelectState]);
     const isDisabled = disabled || !countryCode || options.length === 0;
+    // If the selected country code changes, we reset the field. Note the useEffect below might not do that, as two
+    // different countries might have states with the same code (eg. Andorra and Anguilla):
+    React.useEffect(() => {
+        if (!initRef.current) {
+            initRef.current = true;
+            return;
+        }
+        onSelectState(Select.EMPTY_OPTION);
+    }, [countryCode, onSelectState]);
     // If the selected option can't be found among the available ones, we reset the field:
     React.useEffect(() => {
         const stateCode = value.value;
@@ -30,16 +40,17 @@ const StateSelector = (_a) => {
     // If the selected option only has one property set, we try to find a match:
     React.useEffect(() => {
         const { value: selectedValue, label: selectedLabel } = value;
-        if ((selectedValue && selectedLabel) ||
-            (!selectedValue && !selectedLabel) ||
-            options.length === 0)
+        if ((selectedValue && selectedLabel) || (!selectedValue && !selectedLabel) || options.length === 0)
             return;
         const option = selectedValue
             ? optionsMap[selectedValue]
             : options.find((option) => option.label === selectedLabel);
         setTimeout(() => onSelectState(option || Select.EMPTY_OPTION));
     }, [value, optionsMap, options, onSelectState, countryCode]);
-    return (React__default["default"].createElement(Select.Select, Object.assign({}, props, { label: label, options: options, onChange: handleChange, value: value.value, disabled: isDisabled })));
+    const selectedValue = value.value;
+    return (React__default["default"].createElement(Select.Select, Object.assign({}, props, { 
+        // See https://developers.google.com/web/updates/2015/06/checkout-faster-with-autofill:
+        autoComplete: props.autoComplete || "state", label: label, options: options, onChange: handleChange, value: optionsMap[selectedValue] ? selectedValue : "", disabled: isDisabled })));
 };
 const ControlledStateSelector = ({ name, control, label, countryCode, }) => (React__default["default"].createElement(reactHookForm.Controller, { name: name, control: control, render: (_a) => {
         var _b;

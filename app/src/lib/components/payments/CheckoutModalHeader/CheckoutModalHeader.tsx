@@ -3,12 +3,14 @@ import { Theme, SxProps } from "@mui/material/styles";
 import { PrimaryButton } from "../../shared/PrimaryButton/PrimaryButton";
 import { OutlinedSecondaryButton } from "../../shared/OutlinedSecondaryButton/OutlinedSecondaryButton";
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import CloseIcon from '@mui/icons-material/Close';
 import { NBSP } from "../../../utils/formatUtils";
 import { UserFormat } from "../../../domain/auth/authentication.interfaces";
 import { getFormattedUser } from "./CheckoutModalHeader.utils";
 import { User } from "../../../queries/graphqlGenerated";
-import React, { useRef, useCallback, Dispatch, SetStateAction } from "react";
-import { COUNTER_CLICKS_NEEDED, COUNTER_EXPIRATION_MS, RESERVATION_COUNTDOWN_FROM_MIN } from "../../../config/config";
+import React, { useRef, useCallback } from "react";
+import { DEV_DEBUG_COUNTER_CLICKS_NEEDED, DEV_DEBUG_COUNTER_EXPIRATION_MS, RESERVATION_COUNTDOWN_FROM_MIN } from "../../../config/config";
+import { Img } from "../../shared/Img/Img";
 
 export type CheckoutModalHeaderVariant = "anonymous" | "guest" | "loggedIn" | "logoOnly" | "purchasing" | "error";
 
@@ -38,9 +40,10 @@ export interface CheckoutModalHeaderProps {
   logoSx?: SxProps<Theme>;
   user?: User;
   userFormat?: UserFormat;
-  onLoginClicked?: () => void;
-  onPrevClicked?: () => void;
-  setDebug?: Dispatch<SetStateAction<boolean>>;
+  onLogin?: () => void;
+  onClose?: () => void;
+  onPrev?: () => void;
+  toggleDebug?: () => void;
 }
 
 const COUNTDOWN_CONTAINER_SX: SxProps<Theme> = {
@@ -69,9 +72,10 @@ export const CheckoutModalHeader: React.FC<CheckoutModalHeaderProps> = ({
   logoSx,
   user,
   userFormat,
-  onLoginClicked,
-  onPrevClicked,
-  setDebug,
+  onLogin,
+  onClose,
+  onPrev,
+  toggleDebug,
 }) => {
   const title = customTitle || CHECKOUT_MODAL_TITLE[variant] || NBSP;
   const displayUsername = getFormattedUser(variant, user, userFormat);
@@ -81,37 +85,28 @@ export const CheckoutModalHeader: React.FC<CheckoutModalHeaderProps> = ({
   const clickTimestampRef = useRef(0);
 
   const handleLogoClick = useCallback(() => {
-    if (!setDebug) return;
+    if (!toggleDebug) return;
 
     const counter = clickCounterRef.current;
     const timestamp = clickTimestampRef.current;
     const now = Date.now();
     const elapsed = now - timestamp;
-    const nextCounter = elapsed > COUNTER_EXPIRATION_MS || counter === COUNTER_CLICKS_NEEDED ? 1 : counter + 1;
+    const nextCounter = elapsed > DEV_DEBUG_COUNTER_EXPIRATION_MS || counter === DEV_DEBUG_COUNTER_CLICKS_NEEDED ? 1 : counter + 1;
 
     clickTimestampRef.current = now;
     clickCounterRef.current = nextCounter;
 
-    if (nextCounter === COUNTER_CLICKS_NEEDED) {
-      setDebug((prevValue) => {
-        const nextValue = !prevValue;
-
-        console.log(`\n🐞 DEBUG MODE ${ nextValue ? "ENABLED" : "DISABLED" }!\n\n`);
-
-        return nextValue;
-      });
-    }
-  }, [setDebug]);
+    if (nextCounter === DEV_DEBUG_COUNTER_CLICKS_NEEDED) toggleDebug();
+  }, [toggleDebug]);
 
   return (
     <Box>
       <Stack spacing={ 2 } direction="row" sx={{ justifyContent: "space-between", alignItems: "center", py: 2 }}>
         <Typography variant="h5" id="checkout-modal-header-title">{ title }</Typography>
 
-        <Box
-          component="img"
+        <Img
           src={ logoSrc }
-          onClick={ setDebug ? handleLogoClick : undefined }
+          onClick={ toggleDebug ? handleLogoClick : undefined }
           sx={{
             maxHeight: "32px",
             maxWidth: { xs: "180px", sm: "240px" },
@@ -123,13 +118,14 @@ export const CheckoutModalHeader: React.FC<CheckoutModalHeaderProps> = ({
 
       { showControls ? (<>
         <Stack spacing={ 2 } direction="row" sx={{ justifyContent: "space-between", alignItems: "center", py: 2 }}>
-          { (variant === "anonymous"  && onLoginClicked) ? (<>
+          { (variant === "anonymous"  && onLogin) ? (<>
               <Typography sx={{ fontWeight: "500" }}>Already have an account?</Typography>
-              <PrimaryButton onClick={ onLoginClicked }>Log in</PrimaryButton>
+              <PrimaryButton onClick={ onLogin }>Log in</PrimaryButton>
           </>) : null }
 
-          { (variant !== "anonymous" && onPrevClicked && displayUsername) ? (<>
-              <OutlinedSecondaryButton onClick={ onPrevClicked }><ChevronLeftIcon /></OutlinedSecondaryButton>
+          { (variant !== "anonymous" && displayUsername) ? (<>
+              { onClose && <OutlinedSecondaryButton onClick={ onClose }><CloseIcon /></OutlinedSecondaryButton> }
+              { onPrev && <OutlinedSecondaryButton onClick={ onPrev }><ChevronLeftIcon /></OutlinedSecondaryButton> }
               { variant === "loggedIn" && countdownElementRef ? (
                 <Typography sx={{ fontWeight: "500" }}>
                   Time left: { " " }

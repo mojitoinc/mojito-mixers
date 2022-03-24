@@ -1,7 +1,16 @@
 import { useAuth0 } from "@auth0/auth0-react";
 import { config } from "../../utils/config/config.constants";
 import { useCallback } from "react";
-import { Button } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
+import { Theme, SxProps } from "@mui/material/styles";
+
+const buttonSx: SxProps<Theme> = {
+  py: 0,
+  height: "32px",
+  display: "flex",
+  alignItems: "center",
+};
+
 
 export function AuthButton() {
   const { logout, loginWithPopup, isAuthenticated, isLoading, getIdTokenClaims } = useAuth0();
@@ -21,18 +30,22 @@ export function AuthButton() {
   }, [logout]);
 
   if (isLoading) {
-    return <p>Loading...</p>;
+    return (
+      <Box sx={ buttonSx }><Typography variant="body2">Loading...</Typography></Box>
+    );
   }
 
-  return (<>
-    { isAuthenticated ? (
-      <Button onClick={ handleLogout }>
+  if (isAuthenticated) {
+    return (
+      <Button onClick={ handleLogout } sx={ buttonSx }>
         Log Out
       </Button>
-    ) : (
-      <Button onClick={ handleLogin }>
-        Log In
-      </Button>
-    ) }
-  </>);
+    );
+  }
+
+  return (
+    <Button onClick={ handleLogin } sx={ buttonSx }>
+      Log In
+    </Button>
+  );
 }

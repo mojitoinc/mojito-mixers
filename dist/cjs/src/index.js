@@ -12,8 +12,11 @@ var usePlaid = require('./hooks/usePlaid.js');
 var CheckoutOverlay_utils = require('./components/public/CheckoutOverlay/CheckoutOverlay.utils.js');
 var theme = require('./config/theme/theme.js');
 
-if (process.env.NODE_ENV === "development")
+if (process.env.NODE_ENV === "development" && process.browser) {
     console.log("\n👨‍💻 PUI development mode.\n\n");
+    // (window as any)._React = React;
+    // (window as any)._ThemeProvider = ThemeProvider;
+}
 
 exports.PUICheckout = CheckoutOverlay.PUICheckout;
 exports.PUISuccess = SuccessOverlay.PUISuccess;

@@ -1,5 +1,6 @@
-import { useTheme, SvgIcon } from '@mui/material';
+import { SvgIcon } from '@mui/material';
 import React__default from 'react';
+import useTheme from '../../../../../node_modules/@mui/material/styles/useTheme.js';
 
 const CheckboxIconChecked = ({ error, }) => {
     const { palette } = useTheme();

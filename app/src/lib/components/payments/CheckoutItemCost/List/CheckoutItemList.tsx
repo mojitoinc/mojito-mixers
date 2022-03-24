@@ -2,7 +2,7 @@ import React from "react";
 import { Box, Typography, Grid, Avatar, Divider, Stack } from "@mui/material";
 import { Number } from "../../../shared/Number/Number";
 import { CheckoutItem } from "../../../../domain/product/product.interfaces";
-import { SxProps, Theme } from "@mui/system";
+import { SxProps, Theme } from "@mui/material/styles";
 
 interface CheckoutItemListProps {
   sx?: SxProps<Theme>;

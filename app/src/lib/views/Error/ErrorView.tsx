@@ -4,7 +4,7 @@ import { CheckoutModalFooter } from "../../components/payments/CheckoutModalFoot
 import { parseSentences } from "../../utils/formatUtils";
 import { CheckoutModalError, CheckoutModalErrorAt } from "../../components/public/CheckoutOverlay/CheckoutOverlay.hooks";
 import { DebugBox } from "../../components/payments/DebugBox/DebugBox";
-import { XS_MOBILE_MAX_WIDTH } from "../../config/theme/theme";
+import { XS_MOBILE_MAX_WIDTH } from "../../config/theme/themeConstants";
 import { StatusIcon } from "../../components/shared/StatusIcon/StatusIcon";
 import { DEFAULT_ERROR_AT, ERROR_GENERIC } from "../../domain/errors/errors.constants";
 import { DEV_EXCEPTION_PREFIX } from "../../domain/errors/exceptions.constants";
@@ -25,6 +25,8 @@ export interface ErrorViewProps {
   debug?: boolean;
 }
 
+const LOADING_ERROR_MESSAGE = "Loading error details...";
+
 export const ErrorView: React.FC<ErrorViewProps> = ({
   checkoutError: {
     error,
@@ -39,6 +41,9 @@ export const ErrorView: React.FC<ErrorViewProps> = ({
   const stringifiedError = debug && error ? JSON.stringify(error, null, "  ") : "{}";
   const debugErrorMessage = stringifiedError === "{}" && error ? error.stack : stringifiedError;
   const displayMessage = !errorMessage || errorMessage.startsWith(DEV_EXCEPTION_PREFIX) ? ERROR_GENERIC.errorMessage : errorMessage;
+
+  // TODO: If no message, show LOADING_ERROR_MESSAGE
+  // TODO: Add a timeout for this, otherwise users get stuck here.
 
   return (<>
     <Box>
@@ -61,8 +66,10 @@ export const ErrorView: React.FC<ErrorViewProps> = ({
 
     <CheckoutModalFooter
       variant="toReview"
-      buttonLabel={ ERROR_ACTION_LABELS[at] }
+      submitLabel={ ERROR_ACTION_LABELS[at] }
+      submitDisabled={ !errorMessage }
       onSubmitClicked={ onFixError }
+      closeDisabled={ !errorMessage }
       onCloseClicked={ onClose } />
 
   </>);

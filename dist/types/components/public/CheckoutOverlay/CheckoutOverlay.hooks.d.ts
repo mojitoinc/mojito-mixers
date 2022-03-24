@@ -2,6 +2,7 @@ import { ApolloError } from "@apollo/client";
 import { Dispatch, SetStateAction } from "react";
 import { CircleFieldErrors } from "../../../domain/circle/circle.utils";
 import { PaymentMethod } from "../../../domain/payment/payment.interfaces";
+import { Wallet } from "../../../domain/wallet/wallet.interfaces";
 import { BillingInfo } from "../../../forms/BillingInfoForm";
 import { TaxesState } from "../../../views/Billing/BillingView";
 export declare type CheckoutModalErrorAt = "reset" | "authentication" | "billing" | "payment" | "purchasing";
@@ -23,6 +24,7 @@ export declare enum CheckoutModalStepIndex {
 export interface CheckoutModalStateOptions {
     invoiceID?: string | null;
     productConfirmationEnabled?: boolean;
+    vertexEnabled?: boolean;
     isAuthenticated?: boolean;
     onError?: (error: CheckoutModalError) => void;
 }
@@ -38,12 +40,13 @@ export interface SelectedPaymentMethod {
 }
 export interface PurchaseState {
     invoiceID: string | null;
-    taxes: TaxesState;
-    walletAddress: string | null;
+    taxes: null | TaxesState;
+    wallet: null | string | Wallet;
     circlePaymentID: string;
     paymentID: string;
 }
 export interface CheckoutModalStateReturn extends CheckoutModalState, PurchaseState {
+    startAt: CheckoutModalStep;
     initModalState: () => void;
     goBack: () => void;
     goNext: () => void;
@@ -54,8 +57,8 @@ export interface CheckoutModalStateReturn extends CheckoutModalState, PurchaseSt
     setSelectedPaymentMethod: Dispatch<SetStateAction<SelectedPaymentMethod>>;
     setInvoiceID: (invoiceID: string | null) => void;
     setTaxes: (taxes: TaxesState) => void;
-    setWalletAddress: (walletAddress: string | null) => void;
+    setWalletAddress: (wallet: null | string | Wallet) => void;
     setPayments: (circlePaymentID: string, paymentID: string) => void;
 }
 export declare const CHECKOUT_STEPS: CheckoutModalStep[];
-export declare function useCheckoutModalState({ invoiceID: initialInvoiceID, productConfirmationEnabled, isAuthenticated, onError, }: CheckoutModalStateOptions): CheckoutModalStateReturn;
+export declare function useCheckoutModalState({ invoiceID: initialInvoiceID, productConfirmationEnabled, vertexEnabled, isAuthenticated, onError, }: CheckoutModalStateOptions): CheckoutModalStateReturn;

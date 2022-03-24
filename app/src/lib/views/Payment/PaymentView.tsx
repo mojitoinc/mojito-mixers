@@ -16,7 +16,8 @@ import { usePlaid } from "../../hooks/usePlaid";
 import { ConsentType } from "../../components/shared/ConsentText/ConsentText";
 import { checkNeedsGenericErrorMessage } from "../../hooks/useFormCheckoutError";
 import { TaxesState } from "../Billing/BillingView";
-import { PUIDictionary } from "../../domain/dictionary/dictionary.interfaces";
+import { Wallet } from "../../domain/wallet/wallet.interfaces";
+import { CreditCardNetwork } from "../../domain/react-payment-inputs/react-payment-inputs.utils";
 
 const billingInfoItemBoxProps: BoxProps = { sx: { mt: 2.5 } };
 
@@ -27,23 +28,22 @@ interface PaymentViewState {
 
 export interface PaymentViewProps {
   checkoutItems: CheckoutItem[];
-  taxes: TaxesState;
+  taxes: null | TaxesState;
   savedPaymentMethods: SavedPaymentMethod[];
   selectedPaymentMethod: SelectedPaymentMethod;
-  walletAddress: string | null;
+  wallets?: Wallet[];
+  wallet: null | string | Wallet;
   checkoutError?: CheckoutModalError;
   onPaymentInfoSelected: (data: string | PaymentMethod) => void;
   onCvvSelected: (cvv: string) => void;
   onSavedPaymentMethodDeleted: (savedPaymentMethodId: string) => void;
-  onWalletAddressChange: (walletAddress: string | null) => void;
+  onWalletChange: (wallet: null | string | Wallet) => void;
   onNext: () => void;
   onPrev: () => void;
   onClose: () => void;
   acceptedPaymentTypes: PaymentType[];
+  acceptedCreditCardNetworks?: CreditCardNetwork[];
   consentType?: ConsentType;
-  privacyHref?: string;
-  termsOfUseHref?: string;
-  dictionary: PUIDictionary;
   debug?: boolean;
 }
 
@@ -52,20 +52,19 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
   taxes,
   savedPaymentMethods: rawSavedPaymentMethods,
   selectedPaymentMethod,
-  walletAddress,
+  wallets,
+  wallet,
   checkoutError,
   onPaymentInfoSelected,
   onCvvSelected,
   onSavedPaymentMethodDeleted,
-  onWalletAddressChange,
+  onWalletChange,
   onNext,
   onPrev,
   onClose,
   acceptedPaymentTypes,
+  acceptedCreditCardNetworks,
   consentType,
-  privacyHref,
-  termsOfUseHref,
-  dictionary,
   debug,
 }) => {
   const {
@@ -147,7 +146,7 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
       }}
       spacing={8.75}
     >
-      <Stack sx={{ display: 'flex', flex: 1, overflow: "hidden" }}>
+      <Stack sx={{ display: "flex", overflow: "hidden", width: { xs: "100%", md: "calc(50% - 35px)" } }}>
         <CheckoutStepper progress={100} />
 
         <BillingInfoItem
@@ -159,6 +158,7 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
         {showSaved ? (
           <SavedPaymentDetailsSelector
             showLoader={isDeleting}
+            acceptedCreditCardNetworks={acceptedCreditCardNetworks}
             savedPaymentMethods={savedPaymentMethods}
             selectedPaymentMethodId={typeof selectedPaymentInfo === "string" ? selectedPaymentInfo : undefined}
             onNew={handleShowForm}
@@ -168,12 +168,11 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
             onNext={onNext}
             onClose={onClose}
             onAttemptSubmit={handleFormAttemptSubmit}
-            consentType={consentType}
-            privacyHref={privacyHref}
-            termsOfUseHref={termsOfUseHref} />
+            consentType={consentType} />
         ) : (
           <PaymentMethodForm
             acceptedPaymentTypes={acceptedPaymentTypes}
+            acceptedCreditCardNetworks={acceptedCreditCardNetworks}
             defaultValues={typeof selectedPaymentInfo === "string" ? undefined : selectedPaymentInfo}
             checkoutError={checkoutError}
             onPlaidLinkClicked={onPlaidLinkClicked}
@@ -182,20 +181,17 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
             onSubmit={handleSubmit}
             onAttemptSubmit={handleFormAttemptSubmit}
             consentType={consentType}
-            privacyHref={privacyHref}
-            termsOfUseHref={termsOfUseHref}
-            dictionary={dictionary}
             debug={debug} />
         )}
       </Stack>
 
       <CheckoutDeliveryAndItemCostBreakdown
-        checkoutItems={checkoutItems}
-        taxes={taxes}
-        validatePersonalDeliveryAddress={formSubmitAttempted}
-        walletAddress={walletAddress}
-        onWalletAddressChange={onWalletAddressChange}
-        dictionary={dictionary} />
+        checkoutItems={ checkoutItems }
+        taxes={ taxes }
+        validatePersonalDeliveryAddress={ formSubmitAttempted }
+        wallets={ wallets }
+        wallet={ wallet }
+        onWalletChange={onWalletChange} />
     </Stack>
   );
 };

@@ -32,7 +32,7 @@ export function StackList<T extends {} = any, A extends {} = any> ({
 }: StackListProps<T, A>) {
   const renderedList = useMemo(() => {
     return (
-      <Stack component="ol" spacing={2}>
+      <Stack component="ol" spacing={2} sx={{ m: 0, p: 0, listStyle: "none" }}>
         { data.map((itemData, index) => {
           const key = `${ getItemKey(itemData, index) }`;
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -42,6 +42,7 @@ export function StackList<T extends {} = any, A extends {} = any> ({
           return (
             <ItemComponent
               key={ key }
+              // TODO: Do we need to set the id attribute?
               id={ key }
               index={ index }
               component="li"

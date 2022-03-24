@@ -23,12 +23,9 @@ export const CountrySelector: React.FC<CountrySelectorProps> = ({
 }) => {
   const { options, optionsMap } = useCountryOptions();
 
-  const handleChange = useCallback(
-    (e: SelectChangeEvent<string | number>) => {
-      onSelectCountry(optionsMap[e.target.value]);
-    },
-    [optionsMap, onSelectCountry]
-  );
+  const handleChange = useCallback((e: SelectChangeEvent<string | number>) => {
+    onSelectCountry(optionsMap[e.target.value]);
+  }, [optionsMap, onSelectCountry]);
 
   const isDisabled = disabled || options.length === 0;
 
@@ -45,8 +42,7 @@ export const CountrySelector: React.FC<CountrySelectorProps> = ({
   useEffect(() => {
     const { value: selectedValue, label: selectedLabel } = value;
 
-    if ((selectedValue && selectedLabel) || (!selectedValue && !selectedLabel))
-      return;
+    if ((selectedValue && selectedLabel) || (!selectedValue && !selectedLabel) || options.length === 0) return;
 
     const option = selectedValue
       ? optionsMap[selectedValue]
@@ -55,15 +51,18 @@ export const CountrySelector: React.FC<CountrySelectorProps> = ({
     setTimeout(() => onSelectCountry(option || EMPTY_OPTION));
   }, [value, optionsMap, options, onSelectCountry]);
 
+  const selectedValue = value.value;
+
   return (
     <Select
-      {...props}
-      label={label}
-      options={options}
-      onChange={handleChange}
-      value={value.value}
-      disabled={isDisabled}
-    />
+      { ...props }
+      // See https://developers.google.com/web/updates/2015/06/checkout-faster-with-autofill:
+      autoComplete={ props.autoComplete || "country" }
+      label={ label }
+      options={ options }
+      onChange={ handleChange }
+      value={ optionsMap[selectedValue] ? selectedValue : ""}
+      disabled={ isDisabled } />
   );
 };
 
@@ -85,6 +84,7 @@ export const ControlledCountrySelector: React.FC<ControlledCountrySelectorProps>
         <CountrySelector
           id={name}
           name={name}
+          autoComplete="country"
           label={label}
           onSelectCountry={onChange}
           fullWidth

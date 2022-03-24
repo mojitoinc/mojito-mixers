@@ -6,5 +6,7 @@ export declare type PUIDictionary = {
     walletMultiSigTooltip: PUIDictionarySingleLine;
     wirePaymentsDisclaimer: PUIDictionaryMultiLine;
     purchaseInstructions: PUIDictionaryMultiLine;
+    privacyHref?: string;
+    termsOfUseHref?: string;
 };
 export declare type PUIDictionaryKeys = keyof PUIDictionary;

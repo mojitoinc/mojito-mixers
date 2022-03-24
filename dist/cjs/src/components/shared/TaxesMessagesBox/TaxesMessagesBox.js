@@ -11,8 +11,8 @@ function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'defau
 var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 
 const TaxesMessagesBox = (_a) => {
-    var { variant, taxes: { status }, sx } = _a, props = tslib_es6.__rest(_a, ["variant", "taxes", "sx"]);
-    if (status !== "error")
+    var { variant, taxes, sx } = _a, props = tslib_es6.__rest(_a, ["variant", "taxes", "sx"]);
+    if (taxes === null || taxes.status !== "error")
         return null;
     return (React__default["default"].createElement(material.Box, Object.assign({}, props),
         React__default["default"].createElement(material.Typography, { variant: "caption", component: "p", sx: Object.assign({ color: theme => theme.palette.warning.dark }, sx) },

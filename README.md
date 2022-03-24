@@ -16,7 +16,7 @@
 
 <p align="center">
   <a href="https://payments-staging.mojito.xyz/" target="_blank">
-    <img src="./app/public/img/og-images/mojito-payment-ui-payment.png" width="1280" />
+    <img src="./app/public/img/og-images/mojito-payment-ui.png" width="1280" />
   </a>
 </p>
 
@@ -65,13 +65,15 @@ When testing the purchase flow, you need to make sure to:
 
   You can find them using:
 
-    - **Mojito Manager** - [Dashboard (`orgID`)](https://app.mojito.xyz/dashboard), [Collections (`lotID`)](https://app.mojito.xyz/<path-to-collection>)
+    - **Mojito Mint** - [`https://mint.dev.mojito.xyz/`](https://mint.dev.mojito.xyz/).
 
-    - **Mojito API** - [GraphQL Playground](https://api.dev.mojito.xyz/query)
+    - **Mojito API GraphQL Playground** - [`https://api.dev.mojito.xyz/query`](https://api.dev.mojito.xyz/query)
 
-    - **Contentful API** - [GraphQL Playground](https://graphql.contentful.com/content/v1/spaces/fu9did2d8yaw/environments/staging/explore?access_token=19vUSnF3_8S-OsepxXBcDAI_Ua3GbwSy5c7HNTXB-R0)
+- When paying with credit card, use [Circle's](https://developers.circle.com/docs/introducing-circle-apis) [Test card numbers](https://developers.circle.com/docs/test-card-numbers). As you can see, only Visa and MasterCard are supported.
 
-- When paying with credit card, use [Circle's](https://developers.circle.com/docs/introducing-circle-apis) [Test card numbers](https://developers.circle.com/docs/test-card-numbers)
+- If you want to verify the validation of other credit card networks or the functionality of the `PaymentMethodForm` in general, you can use these [test card numbers](https://www.paypalobjects.com/en_GB/vhelp/paypalmanager_help/credit_card_numbers.htm).
+
+- If you want to check 3DS' error handling, see [3DS in Sandbox](https://developers.circle.com/docs/3d-secure-authentication#3d-secure-in-sandbox) on how to force those errors to be triggered in the sandbox environment.
 
 - When paying with ACH, refer to [Plaid's](https://plaid.com/docs/) - [Testing OAuth documentation](https://plaid.com/docs/link/oauth/#testing-oauth).
 
@@ -122,6 +124,26 @@ Once you've built the library using `yarn dist:build`, you can install it in ano
 
     "@mojitoinc/mojito-mixers": "file:../mojito-mixers"
     "@mojitoinc/mojito-mixers": "git+ssh://git@github.com/mojitoinc/mojito-mixers"
+
+Also, make sure you install the following dependencies:
+
+    react
+    react-dom
+    @mui/material
+
+And also, keep in mind:
+
+- `@emotion/react` is not needed.
+
+- `@emotion/styled` is needed as stated in [MUI's docs](https://mui.com/guides/interoperability/):
+
+    > Keep `@emotion/styled` as a dependency of your project. Even if you never use it explicitly, it's a peer dependency of `@mui/material`.
+
+- `styled-components` is needed as stated in [`react-payment-inputs`' docs](https://github.com/medipass/react-payment-inputs#using-the-built-in-styled-wrapper), but it's not used:
+
+    > Note: <PaymentInputsWrapper> requires styled-components to be installed as a dependency.
+    >
+    > By default, React Payment Inputs does not have built-in styling for it's inputs. However, React Payment Inputs comes with a styled wrapper which combines the card number, expiry & CVC fields...
 
 <br />
 
@@ -185,6 +207,8 @@ const App: React.FC = () => {
     // Flow:
     guestCheckoutEnabled: false,
     productConfirmationEnabled: false,
+    vertexEnabled: true, // Default already true (requires set up on the backend).
+    threeDSEnabled: true, // Default already true (requires set up on the backend and frontend, see 3DS section below).
 
     // Personalization:
     // These two options, `theme` (replace default theme) and `themeOptions` (merge with default theme) are optional and 
@@ -242,14 +266,35 @@ const App: React.FC = () => {
 <br />
 
 
+### Address Validation & Tax Calculation with Vertex
+
+Id you'd like address to be validated and taxes to be calculated during the checkout process, particularly in the Billing
+Information step, you need a Vertex account.
+
+Alternatively, set the following prop to disable those calls to the backend: `vertexEnabled = false`.
+
+<br />
+
+
 ### Credit Card payments with 3DS
 
-Additionally, when using 3DS for Credit Card payments you need to add a `/e/success/` and a `/e/error/` (TODO: review this) page with the
-following logic to be able to resume 3DS's flow when users are redirected back to your app:
+Additionally, when using 3DS for Credit Card payments you need to add a success and error page into your app. The URL can
+be anything you want as long as you configure that in your 3DS account. In this repo, those pages are:
+
+- `/payments/success` => [app/src/pages/payments/success.tsx](./app/src/pages/payments/success.tsx).
+- `/payments/error` => [app/src/pages/payments/error.tsx](./app/src/pages/payments/error.tsx).
+
+Alternatively, `/payments/failure` is also valid.
+
+You can just copy-paste those into your project as a starting point, only minor changes are needed there. As you can see,
+most of the logic in those pages is already provided by this library in the
+[`PUISuccess`](./app/src/lib/components/public/SuccessOverlay/SuccessOverlay.tsx) and
+[`PUIError`](app/src/lib/components/public/ErrorOverlay/ErrorOverlay.tsx) components.
+
+If you don't have a 3DS account and just want to disable that step, you can do that with the following prop: `threeDSEnabled = false`.
 
 ```TSX
-
-// /e/success/:
+// /payments/success:
 
 const CreditCardPaymentSuccessPage: React.FC = () => {
   const router = useRouter();
@@ -277,7 +322,7 @@ export default CreditCardPaymentSuccessPage;
 
 ```TSX
 
-// /e/error/:
+// /payments/error:
 
 const CreditCardPaymentErrorPage: React.FC = () => {
   const router = useRouter();
@@ -381,11 +426,52 @@ There are some texts inside the Payment UI that you can customize using `PUIChec
 <br />
 
 
+### (Secret) Debug Mode
+
+If you quickly click the logo in the top-right corner 16 times, the debug mode will be enabled (toggled, actually), even in production and regardless of
+the initial value you passed for the `debug` prop.
+
+The debug mode will, among logging/displaying some other less relevant pieces of data:
+
+<br />
+
+
+- Show form values and errors as JSON below the form:
+
+  ![Debug form phone input](./screenshots/debug-phone.png)
+
+  ![Debug form values and errors](./screenshots/debug-form-values.png)
+
+<br />
+
+
+- Show additional logging information for the most relevant queries/mutation being made:
+
+  ![Debug GraphQL queries/mutations log](./screenshots/graphql-logs.png)
+
+<br />
+
+
 ## TypeScript Support
 
-You will have to copy the following file into your project to avoid TypeScript errors when using custom props in MUI's theme:
+You will have to add the following file into your project to avoid TypeScript errors when using custom props in MUI's theme:
 
-[`app/src/lib/domain/mui/mui.d.ts`](./app/src/lib/domain/mui/mui.d.ts).
+```TSX
+import "@mui/material/styles";
+import { PalettePaymentUI } from "@mojitoinc/mojito-mixers";
+
+declare module "@mui/material/styles" {
+  interface Palette {
+    paymentUI?: PalettePaymentUI;
+  }
+
+  interface PaletteOptions {
+    paymentUI?: PalettePaymentUI;
+  }
+}
+```
+
+You can see an example here: [`app/src/lib/domain/mui/mui.d.ts`](./app/src/lib/domain/mui/mui.d.ts)
 
 <br />
 

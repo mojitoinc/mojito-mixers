@@ -8,7 +8,10 @@ export interface UseEncryptedDataResult {
     keyID: string;
     encryptedCardData: string;
 }
-export declare function useEncryptCardData(): [
+export interface UseEncryptCardDataOptions {
+    orgID: string;
+}
+export declare function useEncryptCardData({ orgID }: UseEncryptCardDataOptions): [
     (encryptCardDataOptions: EncryptCardDataOptions) => Promise<UseEncryptedDataResult>,
     LazyQueryResult<PaymentKeyQuery, PaymentKeyQueryVariables>
 ];
