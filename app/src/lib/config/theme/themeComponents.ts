@@ -98,7 +98,6 @@ export function createComponentsTheme({ typography, palette, spacing, breakpoint
         root: {
           borderRadius: MD_BORDER_RADIUS,
           border: `${BORDER_THICKNESS}px solid ${palette.grey[200]}`,
-          borderRadius: MD_BORDER_RADIUS,
           background: palette.background.default,
 
           "&:hover": {
