@@ -1,6 +1,6 @@
 {
   "name": "@mojitoinc/mojito-mixers",
-  "version": "1.0.26-alpha",
+  "version": "1.0.27-alpha",
   "description": "",
   "main": "dist/cjs/src/index.js",
   "module": "dist/esm/src/index.js",
