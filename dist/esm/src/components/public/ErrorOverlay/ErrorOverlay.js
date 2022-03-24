@@ -8,7 +8,7 @@ import { useGetPaymentNotificationQuery } from '../../../queries/graphqlGenerate
 import { ErrorView } from '../../../views/Error/ErrorView.js';
 import { CheckoutModalHeader } from '../../payments/CheckoutModalHeader/CheckoutModalHeader.js';
 import { FullScreenOverlay } from '../../shared/FullScreenOverlay/FullScreenOverlay.js';
-import { withThemeProvider } from '../../shared/ProvidersInjector/ProvidersInjector.js';
+import { withProviders } from '../../shared/ProvidersInjector/ProvidersInjector.js';
 import { getCheckoutModalState, persistReceivedRedirectUri3DS, clearPersistedInfo } from '../CheckoutOverlay/CheckoutOverlay.utils.js';
 
 const PUIErrorOverlay = (_a) => {
@@ -52,7 +52,7 @@ const PUIErrorOverlay = (_a) => {
     return (React__default.createElement(FullScreenOverlay, Object.assign({ isDialogBlocked: !errorMessage, centered: true, header: headerElement }, fullScreenOverlayProps),
         React__default.createElement(ErrorView, { checkoutError: { errorMessage }, errorImageSrc: errorImageSrc, onFixError: reviewData, onClose: toMarketplace })));
 };
-const PUIError = withThemeProvider(PUIErrorOverlay);
+const PUIError = withProviders(PUIErrorOverlay);
 
 export { PUIError, PUIErrorOverlay };
 //# sourceMappingURL=ErrorOverlay.js.map

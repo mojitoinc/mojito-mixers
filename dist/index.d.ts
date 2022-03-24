@@ -201,7 +201,7 @@ interface PUIErrorOverlayProps extends FullScreenOverlayFunctionalProps {
     errorImageSrc: string;
     onRedirect: (pathnameOrUrl: string) => void;
 }
-declare type PUIErrorProps = PUIErrorOverlayProps & ThemeProviderProps;
+declare type PUIErrorProps = PUIErrorOverlayProps & ProvidersInjectorProps;
 declare const PUIError: React$1.FC<PUIErrorProps>;
 
 interface PUIPlaidOverlayProps {

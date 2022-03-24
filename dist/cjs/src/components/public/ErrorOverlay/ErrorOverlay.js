@@ -60,7 +60,7 @@ const PUIErrorOverlay = (_a) => {
     return (React__default["default"].createElement(FullScreenOverlay.FullScreenOverlay, Object.assign({ isDialogBlocked: !errorMessage, centered: true, header: headerElement }, fullScreenOverlayProps),
         React__default["default"].createElement(ErrorView.ErrorView, { checkoutError: { errorMessage }, errorImageSrc: errorImageSrc, onFixError: reviewData, onClose: toMarketplace })));
 };
-const PUIError = ProvidersInjector.withThemeProvider(PUIErrorOverlay);
+const PUIError = ProvidersInjector.withProviders(PUIErrorOverlay);
 
 exports.PUIError = PUIError;
 exports.PUIErrorOverlay = PUIErrorOverlay;
