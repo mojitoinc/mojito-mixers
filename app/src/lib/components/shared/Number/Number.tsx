@@ -13,9 +13,12 @@ export const Number: React.FC<NumberProps> = ({
   prefix = "",
   suffix = ""
 }) => {
-  const numberFormat = new Intl.NumberFormat();
+  const numberFormat = new Intl.NumberFormat("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
 
   return (
-    <Wrapper>{`${prefix}${numberFormat.format(children)}${suffix}`}</Wrapper>
+    <Wrapper>{`${prefix}${numberFormat.format(children).replace(/[.,']00$/, "")}${suffix}`}</Wrapper>
   );
 };
