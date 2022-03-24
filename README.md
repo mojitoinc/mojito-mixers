@@ -282,6 +282,8 @@ be anything you want as long as you configure that in your 3DS account. In this 
 - `/payments/success` => [app/src/pages/payments/success.tsx](./app/src/pages/payments/success.tsx).
 - `/payments/error` => [app/src/pages/payments/error.tsx](./app/src/pages/payments/error.tsx).
 
+Alternatively, `/payments/failure` is also valid.
+
 You can just copy-paste those into your project as a starting point, only minor changes are needed there. As you can see,
 most of the logic in those pages is already provided by this library in the
 [`PUISuccess`](./app/src/lib/components/public/SuccessOverlay/SuccessOverlay.tsx) and
