@@ -30,6 +30,7 @@ export const PUIErrorOverlay: React.FC<PUIErrorOverlayProps> = ({
   const [errorMessage, setErrorMessage] = useState("");
 
   const paymentNotificationResult = useGetPaymentNotificationQuery({
+    skip: !!errorMessage,
     pollInterval: PAYMENT_NOTIFICATION_INTERVAL_MS,
   });
 

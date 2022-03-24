@@ -191,7 +191,7 @@ export function continueFlows(noClear = false) {
   };
 
   if (continue3DSFlow) {
-    if (savedCheckoutModalState.purchaseSuccess) {
+    if (savedCheckoutModalState.purchaseSuccess && !savedCheckoutModalState.purchaseError) {
       continueFlowsReturn.checkoutStep = "confirmation";
     } else {
       continueFlowsReturn.checkoutStep = "error";
