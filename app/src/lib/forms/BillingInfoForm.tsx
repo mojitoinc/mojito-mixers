@@ -77,8 +77,6 @@ const EMPTY_FORM_VALUES: BillingInfo = {
   [COUNTRY_FIELD]: EMPTY_OPTION,
 };
 
-// export type BillingInfoFormVariant = "guest" | "loggedIn";
-
 const schema = object()
   .shape({
     [FULL_NAME_FIELD]: string()
@@ -133,6 +131,8 @@ const schema = object()
         .required(withRequiredErrorMessage)
     }),
   }).required();
+
+// export type BillingInfoFormVariant = "guest" | "loggedIn";
 
 export interface BillingInfoFormProps {
   // variant: BillingInfoFormVariant;
@@ -314,7 +314,7 @@ export const BillingInfoForm: React.FC<BillingInfoFormProps> = ({
         variant="toPayment"
         consentType={ consentType }
         submitLabel={ taxes?.status === "loading" ? "Calculating taxes..." : undefined }
-        submitDisabled={ !!taxes && taxes.status !== "complete" }
+        submitDisabled={ !!taxes && taxes.status === "loading" }
         onCloseClicked={onClose} />
     </form>
   );
