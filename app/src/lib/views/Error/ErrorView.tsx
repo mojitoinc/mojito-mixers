@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Box, Typography } from "@mui/material";
 import { CheckoutModalFooter } from "../../components/payments/CheckoutModalFooter/CheckoutModalFooter";
 import { parseSentences } from "../../utils/formatUtils";
@@ -6,8 +6,10 @@ import { CheckoutModalError, CheckoutModalErrorAt } from "../../components/publi
 import { DebugBox } from "../../components/payments/DebugBox/DebugBox";
 import { XS_MOBILE_MAX_WIDTH } from "../../config/theme/themeConstants";
 import { StatusIcon } from "../../components/shared/StatusIcon/StatusIcon";
-import { DEFAULT_ERROR_AT, ERROR_GENERIC } from "../../domain/errors/errors.constants";
+import { DEFAULT_ERROR_AT, ERROR_GENERIC, ERROR_LOADING } from "../../domain/errors/errors.constants";
 import { DEV_EXCEPTION_PREFIX } from "../../domain/errors/exceptions.constants";
+import { useTimeout } from "@swyg/corre";
+import { ASYNC_ERROR_MAX_WAIT_MS } from "../../config/config";
 
 const ERROR_ACTION_LABELS: Record<CheckoutModalErrorAt, string> = {
   reset: "Try Again",
@@ -25,12 +27,11 @@ export interface ErrorViewProps {
   debug?: boolean;
 }
 
-const LOADING_ERROR_MESSAGE = "Loading error details...";
-
 export const ErrorView: React.FC<ErrorViewProps> = ({
+  // TODO: Make all object nullable if loading:
   checkoutError: {
     error,
-    errorMessage,
+    errorMessage = "",
     at = DEFAULT_ERROR_AT,
   },
   errorImageSrc,
@@ -40,10 +41,17 @@ export const ErrorView: React.FC<ErrorViewProps> = ({
 }) => {
   const stringifiedError = debug && error ? JSON.stringify(error, null, "  ") : "{}";
   const debugErrorMessage = stringifiedError === "{}" && error ? error.stack : stringifiedError;
-  const displayMessage = !errorMessage || errorMessage.startsWith(DEV_EXCEPTION_PREFIX) ? ERROR_GENERIC.errorMessage : errorMessage;
+  const rawDisplayMessage = errorMessage.startsWith(DEV_EXCEPTION_PREFIX) ? ERROR_GENERIC.errorMessage : (errorMessage || ERROR_LOADING.errorMessage);
 
-  // TODO: If no message, show LOADING_ERROR_MESSAGE
-  // TODO: Add a timeout for this, otherwise users get stuck here.
+  const [displayMessage, setDisplayMessage] = useState(rawDisplayMessage);
+
+  useEffect(() => {
+    setDisplayMessage(rawDisplayMessage);
+  }, [rawDisplayMessage]);
+
+  useTimeout(() => {
+    if (!displayMessage) setDisplayMessage(ERROR_GENERIC.errorMessage);
+  }, displayMessage ? null : ASYNC_ERROR_MAX_WAIT_MS, []);
 
   return (<>
     <Box>
@@ -67,9 +75,9 @@ export const ErrorView: React.FC<ErrorViewProps> = ({
     <CheckoutModalFooter
       variant="toReview"
       submitLabel={ ERROR_ACTION_LABELS[at] }
-      submitDisabled={ !errorMessage }
+      submitDisabled={ !displayMessage }
       onSubmitClicked={ onFixError }
-      closeDisabled={ !errorMessage }
+      closeDisabled={ !displayMessage }
       onCloseClicked={ onClose } />
 
   </>);

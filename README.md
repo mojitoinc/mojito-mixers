@@ -4,7 +4,7 @@
 <br /><br />
 
 <p align="center">
-  👨‍💻 Payment UI modal & playground UI to easily test it.
+  👨‍💻 Mojito Payment UI modal & playground UI to easily test payments with credit card, ACH, Wire and Crypto payments with Circle, 3DS, Plaid and Vertex integrations.
 </p><p align="center">
   🚀 Check it out at <a href="https://payments-staging.mojito.xyz/" target="_blank">https://payments-staging.mojito.xyz/</a>!
 </p><p align="center">

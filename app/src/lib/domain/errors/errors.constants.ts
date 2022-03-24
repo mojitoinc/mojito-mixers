@@ -27,6 +27,8 @@ function createError(errorMessage: string, at: CheckoutModalErrorAt = DEFAULT_ER
 
 export const ERROR_GENERIC = createError("An unexpected error happened.");
 
+export const ERROR_LOADING = createError("Loading error details...");
+
 
 // CheckoutModal:
 
