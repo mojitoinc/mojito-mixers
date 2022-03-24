@@ -8,7 +8,7 @@ import { useGetPaymentNotificationQuery } from "../../../queries/graphqlGenerate
 import { ErrorView } from "../../../views/Error/ErrorView";
 import { CheckoutModalHeader } from "../../payments/CheckoutModalHeader/CheckoutModalHeader";
 import { FullScreenOverlay, FullScreenOverlayFunctionalProps } from "../../shared/FullScreenOverlay/FullScreenOverlay";
-import { ThemeProviderProps, withThemeProvider } from "../../shared/ProvidersInjector/ProvidersInjector";
+import { withProviders, ProvidersInjectorProps } from "../../shared/ProvidersInjector/ProvidersInjector";
 import { clearPersistedInfo, getCheckoutModalState, persistReceivedRedirectUri3DS } from "../CheckoutOverlay/CheckoutOverlay.utils";
 
 export interface PUIErrorOverlayProps extends FullScreenOverlayFunctionalProps {
@@ -18,7 +18,7 @@ export interface PUIErrorOverlayProps extends FullScreenOverlayFunctionalProps {
   onRedirect: (pathnameOrUrl: string) => void;
 }
 
-export type PUIErrorProps = PUIErrorOverlayProps & ThemeProviderProps;
+export type PUIErrorProps = PUIErrorOverlayProps & ProvidersInjectorProps;
 
 export const PUIErrorOverlay: React.FC<PUIErrorOverlayProps> = ({
   logoSrc,
@@ -89,4 +89,4 @@ export const PUIErrorOverlay: React.FC<PUIErrorOverlayProps> = ({
   );
 }
 
-export const PUIError: React.FC<PUIErrorProps> = withThemeProvider(PUIErrorOverlay);
+export const PUIError: React.FC<PUIErrorProps> = withProviders(PUIErrorOverlay);
