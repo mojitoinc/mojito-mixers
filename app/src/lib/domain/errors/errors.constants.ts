@@ -1,9 +1,17 @@
 import { ApolloError } from "@apollo/client";
 import { CheckoutModalError, CheckoutModalErrorAt } from "../../components/public/CheckoutOverlay/CheckoutOverlay.hooks";
+import { FIELD_LABELS } from "../../forms/BillingInfoForm";
+import { withFullNameErrorMessage } from "../../utils/validationUtils";
 
 export const BUILT_IN_ERRORS = ["EvalError", "RangeError", "ReferenceError", "SyntaxError", "TypeError", "URIError", "AggregateError", "InternalError"];
 
 export const DEFAULT_ERROR_AT = "payment";
+
+export interface MappedError {
+  errorLocation?: CheckoutModalErrorAt;
+  fieldName?: string;
+  errorMessage: string;
+}
 
 export interface ErrorCreator {
   (error?: ApolloError | Error): CheckoutModalError;
@@ -67,3 +75,22 @@ export const ERROR_PURCHASE_PAYING = createError("Payment failed.");
 export const ERROR_PURCHASE_3DS = createError("Payment method could not be verified.", "payment");
 
 export const ERROR_INVOICE_TIMEOUT = createError("Your product reservation expired. Please, try to complete the purchase again in time.", "reset");
+
+
+// MAPPED ERRORS:
+
+export const MAPPED_ERRORS: Record<string, MappedError> = {
+  "lot auction not started": {
+    errorLocation: "reset",
+    errorMessage: "The auction has not started yet.",
+  },
+  "payment limit exceeded": {
+    errorLocation: "reset",
+    errorMessage: "You have already bought the maximum number of NFTs allowed for this sale.",
+  },
+  "name should contains first and last name": {
+    errorLocation: "billing",
+    fieldName: "fullName",
+    errorMessage: withFullNameErrorMessage({ label: FIELD_LABELS.fullName }),
+  },
+};

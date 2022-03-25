@@ -1,16 +1,18 @@
 
 import { ApolloError } from "@apollo/client";
 import { Dispatch, SetStateAction, useState, useCallback } from "react";
-import { CircleFieldErrors } from "../../../domain/circle/circle.utils";
-import { ERROR_GENERIC } from "../../../domain/errors/errors.constants";
+import { CircleFieldErrors, parseCircleError } from "../../../domain/circle/circle.utils";
+import { ERROR_GENERIC, MappedError, MAPPED_ERRORS } from "../../../domain/errors/errors.constants";
 import { PaymentMethod } from "../../../domain/payment/payment.interfaces";
 import { Wallet } from "../../../domain/wallet/wallet.interfaces";
 import { isValidWalletAddress } from "../../../domain/wallet/wallet.utils";
 import { BillingInfo } from "../../../forms/BillingInfoForm";
+import { fullTrim } from "../../../utils/formatUtils";
 import { TaxesState } from "../../../views/Billing/BillingView";
 import { resetStepperProgress } from "../../payments/CheckoutStepper/CheckoutStepper";
 import { continueFlows } from "./CheckoutOverlay.utils";
 
+// TODO: Add a "close" value here:
 export type CheckoutModalErrorAt = "reset" | "authentication" | "billing" | "payment" | "purchasing";
 
 export interface CheckoutModalError {
@@ -65,7 +67,7 @@ export interface CheckoutModalStateReturn extends CheckoutModalState, PurchaseSt
   initModalState: () => void;
   goBack: () => void;
   goNext: () => void;
-  goTo: (checkoutStep?: CheckoutModalStep, error?: null | string | CheckoutModalError) => void;
+  goTo: (checkoutStep?: CheckoutModalStep, checkoutError?: CheckoutModalError) => void;
   setError: (error?: string | CheckoutModalError) => void;
   setIsDialogBlocked: (isDialogBlocked: boolean) => void;
 
@@ -182,21 +184,63 @@ export function useCheckoutModalState({
     }));
   }, [checkoutStep, wallet]);
 
-  const goTo = useCallback((checkoutStep: CheckoutModalStep = startAt, error?: null | string | CheckoutModalError) => {
+  const goTo = useCallback((checkoutStep: CheckoutModalStep = startAt, checkoutError?: CheckoutModalError) => {
     setCheckoutModalState((prevCheckoutModalState) => {
-      let checkoutError: CheckoutModalError | undefined;
-
-      if (error === null) checkoutError = undefined;
-      else if (!error) checkoutError = prevCheckoutModalState.checkoutError;
-      else if (typeof error === "string") checkoutError = { errorMessage: error };
-      else checkoutError = error;
-
-      return checkoutError ? { checkoutStep, checkoutError, isDialogBlocked: false } : { checkoutStep, isDialogBlocked: false };
+      return checkoutError
+        ? { checkoutStep, checkoutError, isDialogBlocked: false }
+        : { checkoutStep, checkoutError: prevCheckoutModalState.checkoutError, isDialogBlocked: false };
     });
   }, [startAt]);
 
-  const setError = useCallback((error: undefined | string | CheckoutModalError) => {
-    const nextCheckoutError: CheckoutModalError = error ? (typeof error === "string" ? { errorMessage: error } : error) : ERROR_GENERIC();
+  const setError = useCallback((errorParam: undefined | string | CheckoutModalError) => {
+    const nextCheckoutError: CheckoutModalError = typeof errorParam === "object" ? errorParam : {
+      errorMessage: errorParam || ERROR_GENERIC.errorMessage,
+    };
+
+    const { error } = nextCheckoutError;
+
+    if (error) {
+      const circleFieldErrors = parseCircleError(error);
+
+      if (circleFieldErrors && Object.keys(circleFieldErrors).length > 2) {
+        // There's already some specific errors from Circle:
+        nextCheckoutError.circleFieldErrors = circleFieldErrors;
+      } else if (circleFieldErrors) {
+        // If only 2 keys are present, those are firstAt and summary, so we need to try to map the generic error to a
+        // more specific one:
+
+        let mappedErrorObject: MappedError | undefined;
+
+        const errorMessageParts = circleFieldErrors.summary.split(": ").reverse();
+
+        for (const errorMessagePart of errorMessageParts) {
+          mappedErrorObject = MAPPED_ERRORS[fullTrim(errorMessagePart)];
+
+          if (mappedErrorObject) break;
+        }
+
+        if (mappedErrorObject) {
+          const { errorLocation, fieldName } = mappedErrorObject;
+
+          const errorInForms = (errorLocation === "billing" || errorLocation === "payment") && fieldName;
+
+          if (errorInForms) {
+            nextCheckoutError.circleFieldErrors = {
+              firstAt: errorLocation,
+              summary: mappedErrorObject.errorMessage,
+              [errorLocation]: {
+                [fieldName]: mappedErrorObject.errorMessage,
+              },
+            };
+          } else {
+            nextCheckoutError.at = mappedErrorObject.errorLocation || nextCheckoutError.at;
+            nextCheckoutError.errorMessage = mappedErrorObject.errorMessage || nextCheckoutError.errorMessage;
+          }
+        }
+      }
+    }
+
+    console.log(nextCheckoutError);
 
     if (onError) onError(nextCheckoutError);
 
