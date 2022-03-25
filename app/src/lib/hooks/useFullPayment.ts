@@ -1,16 +1,14 @@
 import { ApolloError } from "@apollo/client";
 import { useState, useCallback } from "react";
 import { CheckoutModalError, SelectedPaymentMethod } from "../components/public/CheckoutOverlay/CheckoutOverlay.hooks";
-import { PAYMENT_CREATION_MIN_WAIT_MS } from "../config/config";
 import { SavedPaymentMethod } from "../domain/circle/circle.interfaces";
-import { parseCircleError, savedPaymentMethodToBillingInfo } from "../domain/circle/circle.utils";
+import { savedPaymentMethodToBillingInfo } from "../domain/circle/circle.utils";
 import { ERROR_PURCHASE_CREATING_PAYMENT_METHOD, ERROR_PURCHASE_CVV, ERROR_PURCHASE_NO_ITEMS, ERROR_PURCHASE_PAYING, ERROR_PURCHASE_SELECTED_PAYMENT_METHOD } from "../domain/errors/errors.constants";
 import { PaymentStatus } from "../domain/payment/payment.interfaces";
 import { Wallet } from "../domain/wallet/wallet.interfaces";
 import { filterSpecialWalletAddressValues } from "../domain/wallet/wallet.utils";
 import { BillingInfo } from "../forms/BillingInfoForm";
 import { CreatePaymentMetadataInput, useCreatePaymentMutation } from "../queries/graphqlGenerated";
-import { wait } from "../utils/promiseUtils";
 import { useCreatePaymentMethod } from "./useCreatePaymentMethod";
 import { useEncryptCardData } from "./useEncryptCard";
 
@@ -94,8 +92,6 @@ export function useFullPayment({
     let circlePaymentID = "";
     let paymentID = "";
     let mutationError: ApolloError | Error | undefined = undefined;
-    let checkoutError: CheckoutModalError | undefined = undefined;
-    let paymentMethodCreatedAt = 0;
 
     if (typeof selectedPaymentInfo === "string") {
       // If selectedPaymentInfo is a payment method ID, that's all we need, no need to create a new payment method:
@@ -135,21 +131,8 @@ export function useFullPayment({
       ).catch((error: ApolloError | Error) => {
         mutationError = error;
 
-        const circleFieldErrors = parseCircleError(error);
-
-        if (debug) console.log("      🔴 createPaymentMethod error", error, circleFieldErrors);
-
-        if (circleFieldErrors) {
-          checkoutError = {
-            at: circleFieldErrors.firstAt,
-            error: mutationError,
-            circleFieldErrors,
-            errorMessage: circleFieldErrors.summary,
-          };
-        }
+        if (debug) console.log("      🔴 createPaymentMethod error", error);
       });
-
-      paymentMethodCreatedAt = Date.now();
 
       if (createPaymentMethodResult && !createPaymentMethodResult.errors) {
         if (debug) console.log("      🟢 createPaymentMethod result", createPaymentMethodResult);
@@ -159,7 +142,7 @@ export function useFullPayment({
     }
 
     if (!paymentMethodID) {
-      setError(checkoutError || ERROR_PURCHASE_CREATING_PAYMENT_METHOD(mutationError));
+      setError(ERROR_PURCHASE_CREATING_PAYMENT_METHOD(mutationError));
 
       return;
     }
@@ -205,10 +188,6 @@ export function useFullPayment({
         encryptedData: encryptedCardData,
       };
     }
-
-    const paymentMethodStatusWaitTime = Math.max(PAYMENT_CREATION_MIN_WAIT_MS - (Date.now() - paymentMethodCreatedAt), 0);
-
-    if (paymentMethodStatusWaitTime > 0) await wait(paymentMethodStatusWaitTime);
 
     const makePaymentResult = await makePayment({
       variables: {

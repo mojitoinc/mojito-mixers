@@ -5,7 +5,7 @@ import React from "react";
 import { Box, Typography } from "@mui/material";
 import { useTimeout, useInterval } from "@swyg/corre";
 import { CheckoutModalError, SelectedPaymentMethod } from "../../components/public/CheckoutOverlay/CheckoutOverlay.hooks";
-import { ERROR_PURCHASE, ERROR_PURCHASE_TIMEOUT } from "../../domain/errors/errors.constants";
+import { ERROR_PURCHASE_TIMEOUT } from "../../domain/errors/errors.constants";
 import { XS_MOBILE_MAX_WIDTH } from "../../config/theme/themeConstants";
 import { StatusIcon } from "../../components/shared/StatusIcon/StatusIcon";
 import { useGetPaymentNotificationQuery } from "../../queries/graphqlGenerated";
@@ -24,7 +24,7 @@ export interface PurchasingViewProps {
   selectedPaymentMethod: SelectedPaymentMethod;
   wallet: null | string | Wallet;
   onPurchaseSuccess: (circlePaymentID: string, paymentID: string, redirectURL: string) => void;
-  onPurchaseError: (error: string | CheckoutModalError) => void;
+  onPurchaseError: (error?: string | CheckoutModalError) => void;
   onDialogBlocked: (blocked: boolean) => void;
   debug?: boolean;
 }
@@ -129,7 +129,7 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
     }
 
     if (paymentStatus === "error" || paymentError) {
-      onPurchaseError(paymentError || ERROR_PURCHASE());
+      onPurchaseError(paymentError);
 
       return;
     }

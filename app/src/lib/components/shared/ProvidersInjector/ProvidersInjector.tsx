@@ -3,6 +3,7 @@ import { Theme, ThemeOptions, ThemeProvider } from "@mui/material/styles";
 import { AuthorizedApolloProvider, AuthorizedApolloProviderProps } from "../AuthorizedApolloProvider/AuthorizedApolloProvider";
 import { extendDefaultTheme } from "../../../config/theme/theme";
 import { ErrorBoundary } from "../../public/ErrorBoundary/ErrorBoundary";
+import { EXCEPTIONS } from "../../../domain/errors/exceptions.constants";
 
 export interface CommonProviderProps {
   onCatch?: (error: Error, errorInfo?: ErrorInfo) => void | true;
@@ -29,7 +30,7 @@ export const ProviderInjector: React.FC<ProvidersInjectorProps> = ({
 
   useEffect(() => {
     if (parentTheme && themeOptions) {
-      throw new Error("You can't use both `themeOptions` and `theme`. Please, use only one. `themeOptions` is preferred.");
+      throw new Error(EXCEPTIONS.DEV.THEME_PROVIDER);
     }
   }, [parentTheme, themeOptions]);
 
@@ -37,11 +38,11 @@ export const ProviderInjector: React.FC<ProvidersInjectorProps> = ({
     if (apolloClient === null && uri === "") return;
 
     if (apolloClient && uri) {
-      throw new Error("You can't use both `apolloClient` and `uri`. Please, use only one. `uri` is preferred.");
+      throw new Error(EXCEPTIONS.DEV.APOLLO_PROVIDER_DUPLICATE);
     }
 
     if (!apolloClient && !uri) {
-      throw new Error("You must set `apolloClient` or  `uri`. Please, add one. `uri` is preferred.");
+      throw new Error(EXCEPTIONS.DEV.APOLLO_PROVIDER_MISSING);
     }
 
   }, [apolloClient, uri]);

@@ -3,7 +3,7 @@ import { Typography, Box, Stack, Button, FormControl, FormLabel, RadioGroup, For
 import { ErrorInfo, useCallback, useEffect, useRef, useState } from "react";
 import { PUICheckout, CheckoutModalError, PUICheckoutProps, PaymentType, useOpenCloseCheckoutModal } from "../lib";
 import { useMeQuery } from "../services/graphql/generated";
-import { PLAYGROUND_PARAGRAPHS_ARRAY, PLAYGROUND_AUTH_PRESET, PLAYGROUND_NO_AUTH_PRESET, PLAYGROUND_USER_FORMAT, PLAYGROUND_PURCHASING_IMAGE_SRC, PLAYGROUND_ERROR_IMAGE_SRC, PLAYGROUND_LOGOS_SRC, PLAYGROUND_LOGOS_SX, PLAYGROUND_LOADER_IMAGE_SRC, PLAYGROUND_MOCKED_AUCTION_LOT, PLAYGROUND_MOCKED_BUY_NOW_LOT, PLAYGROUND_PRIVACY_HREF, PLAYGROUND_TERMS_OF_USE_HREF } from "../utils/playground/playground.constants";
+import { PLAYGROUND_PARAGRAPHS_ARRAY, PLAYGROUND_AUTH_PRESET, PLAYGROUND_NO_AUTH_PRESET, PLAYGROUND_USER_FORMAT, PLAYGROUND_PURCHASING_IMAGE_SRC, PLAYGROUND_ERROR_IMAGE_SRC, PLAYGROUND_LOGOS_SRC, PLAYGROUND_LOGOS_SX, PLAYGROUND_LOADER_IMAGE_SRC, PLAYGROUND_MOCKED_AUCTION_LOT, PLAYGROUND_MOCKED_BUY_NOW_LOT, PLAYGROUND_PRIVACY_HREF, PLAYGROUND_TERMS_OF_USE_HREF, PLAYGROUND_THEMES } from "../utils/playground/playground.constants";
 import { PlaygroundFormData } from "../utils/playground/playground.interfaces";
 import { config } from "../utils/config/config.constants";
 import { CheckoutEventData, CheckoutEventType } from "../lib/domain/events/events.interfaces";
@@ -172,8 +172,9 @@ const HomePage: React.FC = () => {
     // threeDSEnabled: false,
 
     // Personalization:
-    // theme: PLAYGROUND_THEMES[formValues.theme],
+    theme: PLAYGROUND_THEMES[formValues.theme],
 
+    /*
     themeOptions: {
       // Reference App (https://github.com/mojitoinc/mojito-reference-app/) palette:
       palette: {
@@ -191,6 +192,7 @@ const HomePage: React.FC = () => {
         },
       },
     },
+    */
 
     logoSrc: PLAYGROUND_LOGOS_SRC[formValues.theme],
     logoSx: PLAYGROUND_LOGOS_SX[formValues.theme],

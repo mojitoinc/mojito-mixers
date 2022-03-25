@@ -9,6 +9,7 @@ import { fullTrim } from "../utils/formatUtils";
 import { PaymentMethodStatus } from "../domain/circle/circle.interfaces";
 import { wait } from "../utils/promiseUtils";
 import { PAYMENT_CREATION_INTERVAL_MS, PAYMENT_CREATION_MAX_WAIT_MS } from "../config/config";
+import { EXCEPTIONS } from "../domain/errors/exceptions.constants";
 
 export interface CreatePaymentMethodOptions {
   orgID: string;
@@ -35,8 +36,6 @@ export function useCreatePaymentMethod({
     billingInfo: BillingInfo,
     paymentInfo: PaymentMethod,
   ): Promise<FetchResult<CreatePaymentMethodMutation>> => {
-    if (!orgID) throw new Error("Missing `orgID`");
-
     const metadata: AchMetadata | CreditCardMetadata = {
       email: billingInfo.email,
       phoneNumber: formatPhoneAsE123(billingInfo.phone, `${ billingInfo.country.value }`),
@@ -97,26 +96,20 @@ export function useCreatePaymentMethod({
         },
       });
     } else {
-      throw new Error("Unsupported payment method.");
-    }
-
-    if (!createPaymentMethodPromise) {
-      throw new Error("Payment method could not be saved.");
+      throw new Error(EXCEPTIONS.PAYMENT_METHOD.UNSUPPORTED);
     }
 
     let lastPaymentMethodStatusCheck: number;
 
     const paymentMethodCreatedAt = lastPaymentMethodStatusCheck = Date.now();
-
-    const createPaymentMethodResult = await createPaymentMethodPromise;
-    const createPaymentMethodResultData: { id?: string; status?: string } = createPaymentMethodResult.data?.createPaymentMethod || {};
+    const createPaymentMethodResult = createPaymentMethodPromise ? await createPaymentMethodPromise : null;
+    const createPaymentMethodResultData: { id?: string; status?: string } = createPaymentMethodResult?.data?.createPaymentMethod || {};
     const paymentMethodID = createPaymentMethodResultData.id;
 
     let status: PaymentMethodStatus = createPaymentMethodResultData.status as PaymentMethodStatus;
     let totalWaitTimeSoFar = 0;
 
-    if (!paymentMethodID || status === "failed") throw new Error("Payment method could not be saved.");
-    if (status === "complete") return createPaymentMethodPromise;
+    if (!paymentMethodID) throw new Error(EXCEPTIONS.PAYMENT_METHOD.CREATION_FAILED);
 
     while (totalWaitTimeSoFar < PAYMENT_CREATION_MAX_WAIT_MS && status === "pending") {
       const now = Date.now();
@@ -137,10 +130,10 @@ export function useCreatePaymentMethod({
       status = paymentMethodStatusResult.data?.getPaymentMethod.status as PaymentMethodStatus || "failed";
     }
 
-    if (status === "failed") throw new Error("Payment method could not be saved.");
+    if (status === "failed") throw new Error(EXCEPTIONS.PAYMENT_METHOD.VALIDATION_FAILED);
     else if (status === "complete") return createPaymentMethodPromise;
 
-    throw new Error("Payment method could not be validated.");
+    throw new Error(EXCEPTIONS.PAYMENT_METHOD.VALIDATION_TIMEOUT);
   }, [debug, orgID, encryptCardData, createPaymentMethod, getPaymentMethodStatus]);
 
   return [extendedCreatePaymentMethod, createPaymentMethodResult];

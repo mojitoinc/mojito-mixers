@@ -49,7 +49,7 @@ export type BillingInfo = {
 
 export type TaxInfo = Omit<BillingInfo, "fullName" | "email" | "phone" | "apartment">
 
-const FIELD_LABELS = {
+export const FIELD_LABELS = {
   [FULL_NAME_FIELD]: "Full Name",
   [EMAIL_FIELD]: "Email",
   [PHONE_FIELD]: "Phone",

@@ -41,7 +41,7 @@ export const PUIErrorOverlay: React.FC<PUIErrorOverlayProps> = ({
   }, [error]);
 
   useTimeout(() => {
-    setErrorMessage(prevErrorMessage => prevErrorMessage || ERROR_PURCHASE().errorMessage);
+    setErrorMessage(prevErrorMessage => prevErrorMessage || ERROR_PURCHASE.errorMessage);
   }, PAYMENT_NOTIFICATION_ERROR_MAX_WAIT_MS);
 
   const { purchaseError, url = "" } = getCheckoutModalState();
