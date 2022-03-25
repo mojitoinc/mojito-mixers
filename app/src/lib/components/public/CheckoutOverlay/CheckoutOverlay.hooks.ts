@@ -240,8 +240,6 @@ export function useCheckoutModalState({
       }
     }
 
-    console.log(nextCheckoutError);
-
     if (onError) onError(nextCheckoutError);
 
     setCheckoutModalState({
