@@ -601,6 +601,8 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
         createInvoiceAndReservation(),
       ]);
 
+      // TODO: Cancel previous reservation?
+
       goTo();
     } else {
       // After an error, all data is reloaded in case the issue was caused by stale/cached data or in case a new payment

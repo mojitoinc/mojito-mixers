@@ -386,16 +386,20 @@ You can use the `themeOptions` or `theme` props to pass a custom theme or theme 
 
 - `themeOptions` (preferred) will merge Mojito's default theme with your custom one.
 
+
   ```TSX
   <PUICheckout themeOptions={ YOUR_CUSTOM_THEME_OPTIONS } { ...checkoutModalProps } />
+
   ```
 
   See [`extendDefaultTheme(...)`](app/src/lib/config/theme/theme.ts).
 
 - `theme` will completely replace Mojito's default theme with the one you provide.
 
+
   ```TSX
   <PUICheckout theme={ YOUR_CUSTOM_THEME } { ...checkoutModalProps } />
+
   ```
 
   See 
@@ -422,6 +426,164 @@ Note that using MUI's `ThemeProvider` from your project won't work as expected a
 There are some texts inside the Payment UI that you can customize using `PUICheckout`'s `dictionary` prop (more to come, ideally all texts should be customizable). You can find them all with their respective default values here:
 
 [`app/src/lib/domain/dictionary/dictionary.constants.tsx`](./app/src/lib/domain/dictionary/dictionary.constants.tsx).
+
+<br />
+
+
+### Errors, Exceptions and Validation Messages
+
+Error, exception and validation messages in the Payment UI are displayed in the [`ErrorView`](./app/src/lib/views/Error/ErrorView.tsx)
+and have a configurable button text and action (what the button does or where it takes users when clicking it). Particularly,
+those actions are:
+
+- reset: Re-creates the reservation/invoice.
+- authentication: Takes users to the authentication view (currently not used).
+- billing: Takes users to the billing view/form.
+- payment: Takes users to the payment view/form.
+- purchasing: Takes users to the purchasing view and re-tries payment.
+
+<br />
+
+
+**Error messages**
+
+Defined in [`app/src/lib/domain/errors/errors.constants.ts`](./app/src/lib/domain/errors/errors.constants.ts):
+
+- `ERROR_GENERIC = ` An unexpected error happened.
+
+  `action = payment`
+
+- `ERROR_LOADING = ` Loading error details...
+
+  `action = payment`
+
+- `ERROR_LOADING_USER = ` User could not be loaded.
+
+  `action = billing`
+
+- `ERROR_LOADING_PAYMENT_METHODS = ` Payment methods could not be loaded.
+
+  `action = billing`
+
+- `ERROR_LOADING_INVOICE = ` Invoice could not be loaded.
+
+  `action = billing`
+
+- `ERROR_PURCHASE = ` The purchase could not be completed.
+
+  `action = payment`
+
+- `ERROR_PURCHASE_TIMEOUT = ` The purchase could not be completed in time.
+
+  `action = payment`
+
+- `ERROR_PURCHASE_NO_ITEMS = ` No items to purchase.
+
+  `action = payment`
+
+- `ERROR_PURCHASE_NO_UNITS = ` No units to purchase.
+
+  `action = payment`
+
+- `ERROR_PURCHASE_LOADING_ITEMS = ` Purchase items could not be loaded.
+
+  `action = payment`
+
+- `ERROR_PURCHASE_SELECTED_PAYMENT_METHOD = ` Could not find the selected payment method.
+
+  `action = payment`
+
+- `ERROR_PURCHASE_CREATING_PAYMENT_METHOD = ` Payment method could not be saved.
+
+  `action = billing`
+
+- `ERROR_PURCHASE_CREATING_INVOICE = ` Invoice could not be created.
+
+  `action = reset`
+
+- `ERROR_PURCHASE_CVV = ` Could not verify CVV.
+
+  `action = payment`
+
+- `ERROR_PURCHASE_PAYING = ` Payment failed.
+
+  `action = payment`
+
+- `ERROR_PURCHASE_3DS = ` Payment method could not be verified.
+
+  `action = payment`
+
+- `ERROR_INVOICE_TIMEOUT = ` Your product reservation expired. Please, try to complete the purchase again in time.
+
+  `action = reset`
+
+<br />
+
+Additionally, there are some backend errors that are mapped to frontend ones:
+
+- `lot auction not started = ` The auction has not started yet.
+
+  `action = reset`
+
+- `payment limit exceeded = ` You have already bought the maximum number of NFTs allowed for this sale.
+
+  `action = reset`
+
+- `name should contains first and last name = ` Full Name must have at least first and last name.
+
+  `action = billing`
+
+<br />
+
+
+**Exceptions messages**
+
+Defined in [`app/src/lib/domain/errors/exceptions.constants.ts`](./app/src/lib/domain/errors/exceptions.constants.ts):
+
+- `DEV.THEME_PROVIDER = ` (DEV) You can't use both `themeOptions` and `theme`. Please, use only one. `themeOptions` is preferred.
+
+- `DEV.APOLLO_PROVIDER_DUPLICATE = ` (DEV) You can't use both `apolloClient` and `uri`. Please, use only one. `uri` is preferred.
+
+- `DEV.APOLLO_PROVIDER_MISSING = ` (DEV) You must set `apolloClient` or `uri`. Please, add one. `uri` is preferred.
+
+- `DEV.ENCRYPTION_KEYS_MISSING = ` (DEV) Missing `publicKey` or `keyID`.
+
+- `PAYMENT_METHOD.UNSUPPORTED = ` Unsupported payment method.
+
+- `PAYMENT_METHOD.CREATION_FAILED = ` Payment method could not be created.
+
+- `PAYMENT_METHOD.VALIDATION_FAILED = ` Payment method could not be validated.
+
+- `PAYMENT_METHOD.VALIDATION_TIMEOUT = ` Payment method validation took too long.
+
+<br />
+
+
+Note those prefixed with `(DEV)` will never be shown to regular users. Instead, they will see the `ERROR_GENERIC` from above.
+
+<br />
+
+
+**Validation Messages**
+
+Defined in [`app/src/lib/utils/validationUtils.ts`](./app/src/lib/utils/validationUtils.ts):
+
+
+- `withRequiredErrorMessage = ` `{ label }` is required.
+
+- `withTypeErrorMessageFor = ` `{ label }` must be a `{ type }`.
+
+- `withInvalidErrorMessage = ` `{ label }` is not valid.
+
+- `withFullNameErrorMessage = ` `{ label }` must have at least first and last name.
+
+- `withPhoneErrorMessage = ` `{ label }` must be a valid phone number.
+
+- `withInvalidCardNumber = ` `{ label }` is invalid.
+
+- `withInvalidCVV = ` `{ cvvLabel }` must have `{ cvvExpectedLength }` digits.
+
+- `withInvalidCreditCardNetwork = ` Only `{ acceptedCreditCardNetworks }` `{ is/a`re } accepted.
 
 <br />
 
