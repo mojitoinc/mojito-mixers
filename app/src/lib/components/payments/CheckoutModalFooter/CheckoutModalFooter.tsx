@@ -25,6 +25,7 @@ export interface CheckoutModalFooterProps {
   // Submit button:
   submitLabel?: string;
   submitDisabled?: boolean;
+  submitLoading?: boolean;
   onSubmitClicked?: (canSubmit: boolean) => void | Promise<void | false>;
 
   // Close link:
@@ -47,6 +48,7 @@ export const CheckoutModalFooter: React.FC<CheckoutModalFooterProps> = ({
   // Submit button:
   submitLabel,
   submitDisabled,
+  submitLoading,
   onSubmitClicked,
 
   // Close link:
@@ -100,6 +102,7 @@ export const CheckoutModalFooter: React.FC<CheckoutModalFooterProps> = ({
   // SUBMIT BUTTON:
   const primaryButtonVisible = variant !== "toGuestCheckout" || guestCheckoutEnabled;
   const primaryButtonLabel = submitLabel || LABELS_BY_VARIANT[variant];
+  const isPrimaryButtonDisabled = submitDisabled || isFormLoading;
   const PrimaryButtonIcon = ICONS_BY_VARIANT[variant];
 
   const handleSubmitClicked = useCallback(async () => {
@@ -127,12 +130,13 @@ export const CheckoutModalFooter: React.FC<CheckoutModalFooterProps> = ({
   // CANCEL LINK:
   const cancelLinkLabel = closeLabel || "Cancel and Return to Marketplace";
   const cancelLinkColor = closeDisabled ? "text.disabled" : "text.primary"; // TODO: Create custom Link component with this functionality.
+  const isCancelLinkDisabled = closeDisabled || isFormLoading;
 
   const handleCancelClicked = useCallback((e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
 
-    if (onCloseClicked && !closeDisabled) onCloseClicked();
-  }, [onCloseClicked, closeDisabled]);
+    if (onCloseClicked && !isCancelLinkDisabled) onCloseClicked();
+  }, [onCloseClicked, isCancelLinkDisabled]);
 
   return (
     <Box
@@ -157,7 +161,7 @@ export const CheckoutModalFooter: React.FC<CheckoutModalFooterProps> = ({
       { onGoToCollection && (
         <PrimaryButton
           onClick={ handleCollectionClicked }
-          disabled={ submitDisabled || isFormLoading }
+          disabled={ isPrimaryButtonDisabled }
           sx={{ mb: 2 }}>
           View Collection
         </PrimaryButton>
@@ -167,16 +171,16 @@ export const CheckoutModalFooter: React.FC<CheckoutModalFooterProps> = ({
         <PrimaryButton
           onClick={onSubmitClicked ? handleSubmitClicked : undefined}
           type={onSubmitClicked ? "button" : "submit"}
-          endIcon={isFormLoading ? <CircularProgress color="inherit" size="1em" /> : (PrimaryButtonIcon && <PrimaryButtonIcon />)}
-          disabled={submitDisabled || isFormLoading}>
+          endIcon={isFormLoading || submitLoading ? <CircularProgress color="inherit" size="1em" /> : (PrimaryButtonIcon && <PrimaryButtonIcon />)}
+          disabled={ isPrimaryButtonDisabled }>
           {primaryButtonLabel}
         </PrimaryButton>
       )}
 
-      {variant !== "toMarketplace" && onCloseClicked && (
+      {variant !== "toMarketplace" && (onCloseClicked || closeDisabled) && (
         <Typography sx={{ color: cancelLinkColor, pt: primaryButtonVisible ? 2 : 0 }}>
           {primaryButtonVisible ? "or " : null}
-          <Link sx={{ color: cancelLinkColor, cursor: closeDisabled ? "not-allowed" : "pointer" }} href="" onClick={handleCancelClicked}>
+          <Link sx={{ color: cancelLinkColor, cursor: isCancelLinkDisabled ? "not-allowed" : "pointer" }} href="" onClick={handleCancelClicked}>
             { cancelLinkLabel }
           </Link>
         </Typography>

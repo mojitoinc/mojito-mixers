@@ -436,13 +436,40 @@ Error, exception and validation messages in the Payment UI are displayed in the 
 and have a configurable button text and action (what the button does or where it takes users when clicking it). Particularly,
 those actions are:
 
-- reset: Re-creates the reservation/invoice.
-- authentication: Takes users to the authentication view (currently not used).
-- billing: Takes users to the billing view/form.
-- payment: Takes users to the payment view/form.
-- purchasing: Takes users to the purchasing view and re-tries payment.
+- `reset`: Re-creates the reservation/invoice.
+- `authentication`: Takes users to the authentication view (currently not used).
+- `billing`: Takes users to the billing view/form.
+- `payment`: Takes users to the payment view/form.
+- `purchasing`: Takes users to the purchasing view and re-tries payment.
 
 <br />
+
+
+Tasks:
+- ✔️ Implement URL reset on open or invalid.
+- ✔️ Re-enalbe auto opening in index page.
+- ✔️ Make sure we display the error from the param.
+- ✔️ Do not persist paymentInfo in localStorage.
+- ✔️ Fix scroll issue.
+
+- Persist timer and continue with same one.
+- Update README props/example.
+
+- Maybe also prevent initialization (if needed)
+- Add a localStorage cleanup function.
+- Adjust mobile layout.
+
+
+
+
+Tests:
+- ✔️✔️: Check success param. (with and without expired state)
+- ✔️✔️: Check error param. (with and without expired state)
+- ✔️ Check normal error.
+
+- Check success page redirect (with and without valid localStorage data)
+- Check error page redirect (with and without valid localStorage data)
+
 
 
 **Error messages**
@@ -455,7 +482,7 @@ Defined in [`app/src/lib/domain/errors/errors.constants.ts`](./app/src/lib/domai
 
 - `ERROR_LOADING = ` Loading error details...
 
-  `action = payment`
+  `action = none`
 
 - `ERROR_LOADING_USER = ` User could not be loaded.
 

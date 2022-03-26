@@ -29,11 +29,14 @@ import { PUIDictionary } from "../../../domain/dictionary/dictionary.interfaces"
 import { ApolloError } from "@apollo/client";
 import { DictionaryProvider } from "../../../providers/DictionaryProvider";
 import { Wallet } from "../../../domain/wallet/wallet.interfaces";
-import { DEV_DEBUG_ENABLED_KEY, THREEDS_REDIRECT_DELAY_MS } from "../../../config/config";
+import { DEV_DEBUG_ENABLED_KEY, THREEDS_FLOW_SEARCH_PARAM_ERROR_KEY, THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY, THREEDS_REDIRECT_DELAY_MS } from "../../../config/config";
 import { Network } from "../../../domain/network/network.interfaces";
 import { NEW_WALLET_OPTION } from "../../../domain/wallet/wallet.constants";
 import { StatusIcon } from "../../shared/StatusIcon/StatusIcon";
 import { CreditCardNetwork } from "../../../domain/react-payment-inputs/react-payment-inputs.utils";
+import { PUIStaticSuccessOverlay } from "../SuccessOverlay/StaticSuccessOverlay";
+import { LoaderMode } from "../useOpenCloseCheckoutModal/useOpenCloseCheckoutModal";
+import { PUIStaticErrorOverlay } from "../ErrorOverlay/StaticErrorOverlay";
 
 export interface PUICheckoutOverlayProps {
   // Modal:
@@ -42,6 +45,9 @@ export interface PUICheckoutOverlayProps {
   onGoToCollection?: () => void;
 
   // Flow:
+  loaderMode?: LoaderMode;
+  paymentErrorParam?: string;
+  onRemoveUrlParams: (cleanURL: string) => void;
   guestCheckoutEnabled?: boolean;
   productConfirmationEnabled?: boolean;
   vertexEnabled?: boolean;
@@ -53,6 +59,7 @@ export interface PUICheckoutOverlayProps {
   loaderImageSrc: string;
   purchasingImageSrc: string;
   purchasingMessages?: false | string[];
+  successImageSrc: string;
   errorImageSrc: string;
   userFormat: UserFormat;
   acceptedPaymentTypes: PaymentType[];
@@ -92,6 +99,9 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   onGoToCollection,
 
   // Flow:
+  loaderMode: initialLoaderMode = "default",
+  paymentErrorParam,
+  onRemoveUrlParams,
   guestCheckoutEnabled,
   productConfirmationEnabled,
   vertexEnabled = true,
@@ -103,6 +113,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   loaderImageSrc,
   purchasingImageSrc,
   purchasingMessages,
+  successImageSrc,
   errorImageSrc,
   userFormat,
   acceptedPaymentTypes,
@@ -224,6 +235,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     vertexEnabled,
     isAuthenticated,
     onError,
+    debug,
   });
 
 
@@ -245,6 +257,45 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   const isDialogLoading = isAuthenticatedLoading || meLoading || paymentMethodsLoading;
   const isDialogInitializing = isDialogLoading || invoiceDetailsLoading || !invoiceID;
   const isPlaidFlowLoading = continuePlaidOAuthFlow();
+  const [loaderMode, setLoaderMode] = useState(initialLoaderMode);
+  const isInvalidMode = loaderMode !== "default" && !open;
+  const showEspecialLoaders = open && isDialogInitializing && loaderMode !== "default" && checkoutStep !== "error";
+
+  useEffect(() => {
+    if (!isDialogInitializing || isInvalidMode) {
+      // Once we have finished loading data OR if `loaderMode` is not default but the modal is not opened (probably
+      // because the data in `localStorage` expired), we reset the loader mode:
+      setLoaderMode("default");
+    }
+  }, [isDialogInitializing, isInvalidMode]);
+
+  useEffect(() => {
+    if (showEspecialLoaders) return;
+
+    const params = new URLSearchParams(location.search);
+
+    params.delete(THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY);
+    params.delete(THREEDS_FLOW_SEARCH_PARAM_ERROR_KEY);
+
+    const cleanParams = params.toString();
+    const cleanURL = location.href.replace(location.search, cleanParams ? `?${ cleanParams }` : "");
+
+    if (cleanURL && cleanURL !== location.href) onRemoveUrlParams(cleanURL);
+  }, [showEspecialLoaders, onRemoveUrlParams]);
+
+  useEffect(() => {
+    let emoji = "🔄";
+
+    if (isInvalidMode) {
+      emoji = "⚠️";
+    } else if (loaderMode === "default") {
+      emoji = open ? "📬" : "📭";
+    } else {
+      emoji = loaderMode === "success" ? "✔️" : "❌";
+    }
+
+    if (debug) console.log(`${ emoji } loaderMode = ${ loaderMode } / isOpen = ${ open }`);
+  }, [debug, isInvalidMode, loaderMode, open, onRemoveUrlParams]);
 
 
   // Payment methods and checkout items / invoice items transforms:
@@ -265,7 +316,6 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
 
     setWalletAddress(wallet || destinationAddress);
   }, [wallets, destinationAddress, setWalletAddress]);
-
 
 
   // Invoice creation & buy now lot reservation:
@@ -332,7 +382,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
       const payment = savedPaymentMethods.find(({ id }) => id === paymentInfo);
 
       paymentType = payment?.type;
-    } else {
+    } else if (paymentInfo) {
       paymentType = paymentInfo.type;
     }
 
@@ -645,6 +695,27 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
 
   // Loading UI:
 
+  if (open && isDialogInitializing && loaderMode === "success" && checkoutStep !== "error") {
+    return (
+      <PUIStaticSuccessOverlay
+        // TODO: Add to dictionary:
+        successImageSrc={ successImageSrc }
+        logoSrc={ logoSrc }
+        logoSx={ logoSx } />
+    );
+  }
+
+  if (open && isDialogInitializing && loaderMode === "error" && checkoutStep !== "error") {
+    return (
+      <PUIStaticErrorOverlay
+        checkoutError={{ errorMessage: paymentErrorParam || "" }}
+        // TODO: Add to dictionary:
+        errorImageSrc={ errorImageSrc }
+        logoSrc={ logoSrc }
+        logoSx={ logoSx } />
+    );
+  }
+
   if ((isDialogInitializing || isPlaidFlowLoading) && (checkoutStep !== "error")) {
     return (<>
       { isPlaidFlowLoading && <PlaidFlow onSubmit={ handlePlaidFlowCompleted } /> }
@@ -766,6 +837,8 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
         onNext={ handleClose } />
     );
   } else {
+    console.warn("Unknown checkoutStepElement!");
+
     // !checkoutStep or
     // checkoutStep === "error" && !checkoutError or
     // checkoutStep === "purchasing" && !invoiceID or

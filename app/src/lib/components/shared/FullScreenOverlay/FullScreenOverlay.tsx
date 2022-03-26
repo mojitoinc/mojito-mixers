@@ -2,6 +2,7 @@ import { Box, Dialog, DialogContent } from "@mui/material";
 import React, { useEffect, useRef } from "react";
 import { useShakeAnimation } from "../../../utils/animationUtils";
 import { SxProps, Theme } from "@mui/material/styles";
+import { NoTransition } from "../NoTransition/NoTransition";
 
 const centeredSx: SxProps<Theme> = {
   flex: 1,
@@ -66,6 +67,7 @@ export const FullScreenOverlay: React.FC<FullScreenOverlayProps> = ({
       scroll="body"
       ref={ dialogRootRef }
       PaperProps={ { sx: shakeSx, ref: paperRef }}
+      TransitionComponent={ NoTransition }
       // Dialog only:
       // fullWidth
       // maxWidth="sm"

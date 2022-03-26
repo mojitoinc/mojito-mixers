@@ -351,6 +351,7 @@ export function createComponentsTheme({ typography, palette, spacing, breakpoint
           minHeight: "100vh",
           display: "flex",
           flexDirection: "column",
+          boxSizing: "border-box",
         },
       },
     },
