@@ -445,33 +445,6 @@ those actions are:
 <br />
 
 
-Tasks:
-- ✔️ Implement URL reset on open or invalid.
-- ✔️ Re-enalbe auto opening in index page.
-- ✔️ Make sure we display the error from the param.
-- ✔️ Do not persist paymentInfo in localStorage.
-- ✔️ Fix scroll issue.
-
-- Persist timer and continue with same one.
-- Update README props/example.
-
-- Maybe also prevent initialization (if needed)
-- Add a localStorage cleanup function.
-- Adjust mobile layout.
-
-
-
-
-Tests:
-- ✔️✔️: Check success param. (with and without expired state)
-- ✔️✔️: Check error param. (with and without expired state)
-- ✔️ Check normal error.
-
-- Check success page redirect (with and without valid localStorage data)
-- Check error page redirect (with and without valid localStorage data)
-
-
-
 **Error messages**
 
 Defined in [`app/src/lib/domain/errors/errors.constants.ts`](./app/src/lib/domain/errors/errors.constants.ts):
