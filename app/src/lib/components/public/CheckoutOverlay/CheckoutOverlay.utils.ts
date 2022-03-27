@@ -111,8 +111,8 @@ export function getCheckoutModalState(): CheckoutModalState3DS {
   } = savedPlaidInfo || {};
 
   // Swap to test error flow:
-  const receivedRedirectUri = "localhost:3000/payments/error";
-  // const receivedRedirectUri = savedReceivedRedirectUri || (window.location.search.startsWith(THREEDS_FLOW_SEARCH_PARAM_SUCCESS) ? window.location.href : undefined);
+  // const receivedRedirectUri = "localhost:3000/payments/error";
+  const receivedRedirectUri = savedReceivedRedirectUri || (window.location.search.startsWith(THREEDS_FLOW_SEARCH_PARAM_SUCCESS) ? window.location.href : undefined);
 
   // In dev, this works fine even if there's nothing in localStorage, which helps with testing across some other domain and localhost:
   const hasLocalhostOrigin = process.env.NODE_ENV === "development" && !isLocalhost();
@@ -168,7 +168,6 @@ export type FlowType = "" | "3DS" | "Plaid";
 export interface ContinueFlowsReturn {
   flowType: FlowType;
   checkoutStep: CheckoutModalStep | "";
-  // checkoutError?: CheckoutModalError;
   invoiceID: string;
   circlePaymentID: string;
   paymentID: string;
@@ -190,16 +189,16 @@ export function continueFlows(noClear = false) {
   };
 
   // Uncomment to test error flow:
-  savedCheckoutModalState.purchaseSuccess = false;
-  savedCheckoutModalState.purchaseError = true;
+  // savedCheckoutModalState.purchaseSuccess = false;
+  // savedCheckoutModalState.purchaseError = true;
 
   if (continue3DSFlow) {
     if (savedCheckoutModalState.purchaseSuccess && !savedCheckoutModalState.purchaseError) {
       continueFlowsReturn.checkoutStep = "confirmation";
     } else {
+      // By the time we come back from 3DS' error page to the Payment UI, we have already seen the error, so we go
+      // straight to the PaymentView to review the payment information:
       continueFlowsReturn.checkoutStep = "payment";
-      // continueFlowsReturn.checkoutStep = "error";
-      // continueFlowsReturn.checkoutError = ERROR_PURCHASE_3DS();
     }
 
     continueFlowsReturn.flowType = "3DS";
