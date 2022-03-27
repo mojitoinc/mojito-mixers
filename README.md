@@ -164,7 +164,15 @@ const App: React.FC = () => {
   const router = useRouter();
   const { profile } = useProfile();
   const { loginWithPopup, isAuthenticated, isLoading, getIdTokenClaims } = useAuth0();
-  const { isOpen, onOpen, onClose } = useOpenCloseCheckoutModal();
+
+  const paymentIdParam = router.query[THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY]?.toString();
+  const paymentErrorParam = router.query[THREEDS_FLOW_SEARCH_PARAM_ERROR_KEY]?.toString();
+
+  const { loaderMode, isOpen, onOpen, onClose } = useOpenCloseCheckoutModal({ paymentIdParam, paymentErrorParam });
+
+  const onRemoveUrlParams = useCallback((cleanURL: string) => {
+    router.replace(cleanURL, undefined, { shallow: true });
+  }, [router]);
 
   const handleGoToCollection = useCallback(() => {
     router.push("/profile/collection");
@@ -205,6 +213,9 @@ const App: React.FC = () => {
     onClose,
 
     // Flow:
+    loaderMode,
+    paymentErrorParam,
+    onRemoveUrlParams
     guestCheckoutEnabled: false,
     productConfirmationEnabled: false,
     vertexEnabled: true, // Default already true (requires set up on the backend).
@@ -220,9 +231,12 @@ const App: React.FC = () => {
     loaderImageSrc: "https://...",
     purchasingImageSrc: "https://...",
     purchasingMessages: ["...", "...", "..."],
+    successImageSrc: "https://...",
     errorImageSrc: "https://...",
     userFormat: "email",
     acceptedPaymentTypes: ["CreditCard", "ACH"],
+    acceptedCreditCardNetworks: ["visa", "mastercard"],
+    network: "",
     dictionary: {
       walletInfo: <p>Lorem ipsum...</p>,
     },
@@ -436,11 +450,11 @@ Error, exception and validation messages in the Payment UI are displayed in the 
 and have a configurable button text and action (what the button does or where it takes users when clicking it). Particularly,
 those actions are:
 
-- reset: Re-creates the reservation/invoice.
-- authentication: Takes users to the authentication view (currently not used).
-- billing: Takes users to the billing view/form.
-- payment: Takes users to the payment view/form.
-- purchasing: Takes users to the purchasing view and re-tries payment.
+- `reset`: Re-creates the reservation/invoice.
+- `authentication`: Takes users to the authentication view (currently not used).
+- `billing`: Takes users to the billing view/form.
+- `payment`: Takes users to the payment view/form.
+- `purchasing`: Takes users to the purchasing view and re-tries payment.
 
 <br />
 
@@ -455,7 +469,7 @@ Defined in [`app/src/lib/domain/errors/errors.constants.ts`](./app/src/lib/domai
 
 - `ERROR_LOADING = ` Loading error details...
 
-  `action = payment`
+  `action = none`
 
 - `ERROR_LOADING_USER = ` User could not be loaded.
 

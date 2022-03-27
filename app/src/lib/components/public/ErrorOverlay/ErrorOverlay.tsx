@@ -1,31 +1,22 @@
-import { SxProps, Theme } from "@mui/material/styles";
 import { useTimeout } from "@swyg/corre";
 import React, { useCallback, useLayoutEffect, useState, useEffect } from "react";
-import { PAYMENT_NOTIFICATION_ERROR_MAX_WAIT_MS, PAYMENT_NOTIFICATION_INTERVAL_MS } from "../../../config/config";
+import { PAYMENT_NOTIFICATION_ERROR_MAX_WAIT_MS, PAYMENT_NOTIFICATION_INTERVAL_MS, THREEDS_FLOW_SEARCH_PARAM_ERROR } from "../../../config/config";
 import { ERROR_PURCHASE } from "../../../domain/errors/errors.constants";
-import { isUrlPathname, getUrlWithSearchParams } from "../../../domain/url/url.utils";
+import { isUrlPathname } from "../../../domain/url/url.utils";
 import { useGetPaymentNotificationQuery } from "../../../queries/graphqlGenerated";
-import { ErrorView } from "../../../views/Error/ErrorView";
-import { CheckoutModalHeader } from "../../payments/CheckoutModalHeader/CheckoutModalHeader";
-import { FullScreenOverlay, FullScreenOverlayFunctionalProps } from "../../shared/FullScreenOverlay/FullScreenOverlay";
 import { withProviders, ProvidersInjectorProps } from "../../shared/ProvidersInjector/ProvidersInjector";
 import { clearPersistedInfo, getCheckoutModalState, persistReceivedRedirectUri3DS } from "../CheckoutOverlay/CheckoutOverlay.utils";
+import { PUIStaticErrorOverlay, PUIStaticErrorOverlayProps } from "./StaticErrorOverlay";
 
-export interface PUIErrorOverlayProps extends FullScreenOverlayFunctionalProps {
-  logoSrc?: string;
-  logoSx?: SxProps<Theme>;
-  errorImageSrc: string;
+export interface PUIErrorOverlayProps extends PUIStaticErrorOverlayProps {
   onRedirect: (pathnameOrUrl: string) => void;
 }
 
 export type PUIErrorProps = PUIErrorOverlayProps & ProvidersInjectorProps;
 
 export const PUIErrorOverlay: React.FC<PUIErrorOverlayProps> = ({
-  logoSrc,
-  logoSx,
-  errorImageSrc,
   onRedirect,
-  ...fullScreenOverlayProps
+  ...staticErrorOverlayProps
 }) => {
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -52,13 +43,14 @@ export const PUIErrorOverlay: React.FC<PUIErrorOverlayProps> = ({
     if (!purchaseError) onRedirect("/");
   }, [purchaseError, onRedirect]);
 
-  const reviewData = useCallback(async (): Promise<false> => {
+  const reviewData = useCallback(async (errorMessage: string): Promise<false> => {
     const isPathname = isUrlPathname(url);
 
     if (isPathname) persistReceivedRedirectUri3DS(window.location.href);
 
     // If there was an error, users can click the review button and go back to the Payment UI to review the data...:
-    onRedirect(isPathname ? url : getUrlWithSearchParams(url));
+
+    onRedirect(`${ url }${ THREEDS_FLOW_SEARCH_PARAM_ERROR }${ encodeURIComponent(errorMessage) }`);
 
     return false;
   }, [onRedirect, url]);
@@ -72,22 +64,13 @@ export const PUIErrorOverlay: React.FC<PUIErrorOverlayProps> = ({
     onRedirect("/");
   }, [purchaseError, onRedirect]);
 
-  const headerElement = logoSrc ? (
-    <CheckoutModalHeader
-      variant="error"
-      logoSrc={ logoSrc }
-      logoSx={ logoSx } />
+  return purchaseError ? (
+    <PUIStaticErrorOverlay
+      { ...staticErrorOverlayProps }
+      checkoutError={ { errorMessage } }
+      onFixError={ reviewData }
+      onClose={ toMarketplace } />
   ) : null;
-
-  return (
-    <FullScreenOverlay isDialogBlocked={ !errorMessage } centered header={ headerElement } { ...fullScreenOverlayProps }>
-      <ErrorView
-        checkoutError={ { errorMessage } }
-        errorImageSrc={ errorImageSrc }
-        onFixError={ reviewData }
-        onClose={ toMarketplace } />
-    </FullScreenOverlay>
-  );
 }
 
 export const PUIError: React.FC<PUIErrorProps> = withProviders(PUIErrorOverlay);

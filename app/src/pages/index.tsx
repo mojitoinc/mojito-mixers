@@ -8,6 +8,8 @@ import { PlaygroundFormData } from "../utils/playground/playground.interfaces";
 import { config } from "../utils/config/config.constants";
 import { CheckoutEventData, CheckoutEventType } from "../lib/domain/events/events.interfaces";
 import { isLocalhost } from "../lib/domain/url/url.utils";
+import { useRouter } from "next/router";
+import { THREEDS_FLOW_SEARCH_PARAM_ERROR_KEY, THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY } from "../lib/config/config";
 
 const DEFAULT_FORM_VALUES: PlaygroundFormData = {
   // Organization:
@@ -48,13 +50,22 @@ if (process.browser) {
 }
 
 const HomePage: React.FC = () => {
+  const router = useRouter();
   const firstTimeRef = useRef(true);
-  const { isOpen, onOpen, onClose } = useOpenCloseCheckoutModal();
   const { loginWithPopup, isAuthenticated, isLoading: isAuthenticatedLoading, getIdTokenClaims } = useAuth0();
   const { data: meData, loading: meLoading, error: meError } = useMeQuery({ skip: !isAuthenticated });
   const isLoading = isAuthenticatedLoading || meLoading;
   const organizations = isLoading ? [] : (meData?.me?.userOrgs || []).map(userOrg => userOrg.organization);
   const hasOrganizations = organizations.length > 0;
+
+  const paymentIdParam = router.query[THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY]?.toString();
+  const paymentErrorParam = router.query[THREEDS_FLOW_SEARCH_PARAM_ERROR_KEY]?.toString();
+
+  const { loaderMode, isOpen, onOpen, onClose } = useOpenCloseCheckoutModal({ paymentIdParam, paymentErrorParam });
+
+  const onRemoveUrlParams = useCallback((cleanURL: string) => {
+    router.replace(cleanURL, undefined, { shallow: true });
+  }, [router]);
 
   useEffect(() => {
     if (
@@ -166,6 +177,9 @@ const HomePage: React.FC = () => {
     onGoToCollection: handleGoToCollection,
 
     // Flow:
+    loaderMode,
+    paymentErrorParam,
+    onRemoveUrlParams,
     guestCheckoutEnabled: testPreset.guestCheckoutEnabled,
     productConfirmationEnabled: testPreset.productConfirmationEnabled,
     // vertexEnabled: false,
@@ -199,6 +213,7 @@ const HomePage: React.FC = () => {
     loaderImageSrc: formValues.customImages ? PLAYGROUND_LOADER_IMAGE_SRC : "",
     purchasingImageSrc: formValues.customImages ? PLAYGROUND_PURCHASING_IMAGE_SRC : "",
     purchasingMessages: undefined,
+    successImageSrc: "",
     errorImageSrc: formValues.customImages ? PLAYGROUND_ERROR_IMAGE_SRC : "",
     userFormat: PLAYGROUND_USER_FORMAT,
     acceptedPaymentTypes: [

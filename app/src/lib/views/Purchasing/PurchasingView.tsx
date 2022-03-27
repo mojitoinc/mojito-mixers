@@ -44,7 +44,7 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
   debug,
 }) => {
   const { billingInfo, paymentInfo, cvv } = selectedPaymentMethod;
-  const isCreditCardPayment = cvv || (typeof paymentInfo === "object" && paymentInfo.type === "CreditCard");
+  const isCreditCardPayment = cvv || (paymentInfo !== null && typeof paymentInfo === "object" && paymentInfo.type === "CreditCard");
 
 
   // Minimum wait time:
@@ -146,7 +146,7 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
         circlePaymentID,
         paymentID,
         billingInfo,
-        paymentInfo,
+        paymentInfo: typeof paymentInfo === "string" ? paymentInfo : null,
       });
     }
 

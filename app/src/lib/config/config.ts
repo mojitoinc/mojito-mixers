@@ -1,7 +1,7 @@
 // Dev / Debug Stuff:
 export const DEV_DEBUG_COUNTER_EXPIRATION_MS = 1000;
 export const DEV_DEBUG_COUNTER_CLICKS_NEEDED = 16;
-export const DEV_SKIP_3DS_IN_LOCALHOST = true;
+export const DEV_SKIP_3DS_IN_LOCALHOST = false;
 export const DEV_DEBUG_ENABLED_KEY = "DEV_DEBUG_ENABLED";
 
 
@@ -46,7 +46,10 @@ export const THREEDS_STORAGE_EXPIRATION_MS = 1000 * 60 * 7; // 7 minutes (3DS wi
 export const THREEDS_FLOW_INFO_KEY = "THREEDS_FLOW_INFO";
 export const THREEDS_FLOW_RECEIVED_REDIRECT_URI_KEY = "THREEDS_FLOW_RECEIVED_REDIRECT_URI";
 export const THREEDS_FLOW_STATE_USED_KEY = "THREEDS_FLOW_STATE_USED";
-export const THREEDS_FLOW_URL_SEARCH = "?paymentId=";
+export const THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY = "paymentId";
+export const THREEDS_FLOW_SEARCH_PARAM_ERROR_KEY = "paymentError";
+export const THREEDS_FLOW_SEARCH_PARAM_SUCCESS = `?${ THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY }=`;
+export const THREEDS_FLOW_SEARCH_PARAM_ERROR = `?${ THREEDS_FLOW_SEARCH_PARAM_ERROR_KEY }=`;
 
 export const THREEDS_REDIRECT_DELAY_MS = 1000; // (1 sec) Small delay before redirecting users to 3DS' page (PurchasingView => 3DS)
 
