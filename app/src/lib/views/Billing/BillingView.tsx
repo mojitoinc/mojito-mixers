@@ -23,6 +23,7 @@ export interface TaxesState {
   status: TaxStatus;
   taxRate?: number;
   taxAmount?: number;
+  zipCodeRange?: string;
 }
 
 interface BillingViewState {
@@ -112,13 +113,15 @@ export const BillingView: React.FC<BillingViewProps> = ({
 
     const taxResult = result.data?.getTaxQuote || {} as TaxQuoteOutput;
     const isValid = !!taxResult.verifiedAddress;
+    const zipCodeRange = taxResult.verifiedAddress?.postalCode || "";
 
     setViewState((prevViewState) => ({ ...prevViewState, taxes: isValid ? {
-      status: "complete",
+      status: showSaved || taxInfo.zipCode === zipCodeRange ? "complete" : "error",
       taxRate: 100 * taxResult.totalTaxAmount / taxResult.taxablePrice,
       taxAmount: taxResult.totalTaxAmount,
+      zipCodeRange,
     } : { status: "error"} }));
-  }, [getTaxQuote, total]);
+  }, [getTaxQuote, total, showSaved]);
 
   const handleThrottledTaxInfoChange = useThrottledCallback((taxInfo: Partial<TaxInfo>) => {
     if (!vertexEnabled) return;

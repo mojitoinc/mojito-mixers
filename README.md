@@ -593,6 +593,8 @@ Defined in [`app/src/lib/utils/validationUtils.ts`](./app/src/lib/utils/validati
 
 - `withFullNameErrorMessage = ` `{ label }` must have at least first and last name.
 
+- `withFullNameCharsetErrorMessage = ` `{ label }` contains invalid characters.
+
 - `withPhoneErrorMessage = ` `{ label }` must be a valid phone number.
 
 - `withInvalidCardNumber = ` `{ label }` is invalid.
