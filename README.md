@@ -164,7 +164,15 @@ const App: React.FC = () => {
   const router = useRouter();
   const { profile } = useProfile();
   const { loginWithPopup, isAuthenticated, isLoading, getIdTokenClaims } = useAuth0();
-  const { isOpen, onOpen, onClose } = useOpenCloseCheckoutModal();
+
+  const paymentIdParam = router.query[THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY]?.toString();
+  const paymentErrorParam = router.query[THREEDS_FLOW_SEARCH_PARAM_ERROR_KEY]?.toString();
+
+  const { loaderMode, isOpen, onOpen, onClose } = useOpenCloseCheckoutModal({ paymentIdParam, paymentErrorParam });
+
+  const onRemoveUrlParams = useCallback((cleanURL: string) => {
+    router.replace(cleanURL, undefined, { shallow: true });
+  }, [router]);
 
   const handleGoToCollection = useCallback(() => {
     router.push("/profile/collection");
@@ -205,6 +213,9 @@ const App: React.FC = () => {
     onClose,
 
     // Flow:
+    loaderMode,
+    paymentErrorParam,
+    onRemoveUrlParams
     guestCheckoutEnabled: false,
     productConfirmationEnabled: false,
     vertexEnabled: true, // Default already true (requires set up on the backend).
@@ -220,9 +231,12 @@ const App: React.FC = () => {
     loaderImageSrc: "https://...",
     purchasingImageSrc: "https://...",
     purchasingMessages: ["...", "...", "..."],
+    successImageSrc: "https://...",
     errorImageSrc: "https://...",
     userFormat: "email",
     acceptedPaymentTypes: ["CreditCard", "ACH"],
+    acceptedCreditCardNetworks: ["visa", "mastercard"],
+    network: "",
     dictionary: {
       walletInfo: <p>Lorem ipsum...</p>,
     },
