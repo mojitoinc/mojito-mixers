@@ -35,7 +35,7 @@ export const PUISuccessOverlay: React.FC<PUISuccessOverlayProps> = ({
     // If everything's ok, users see this confirmation screen for 5 seconds and then are redirected to the purchase
     // confirmation page:
     if (purchaseSuccess) onRedirect(getUrlWithSearchParams(url));
-  }, THREEDS_SUCCESS_REDIRECT_DELAY_MS, [purchaseSuccess, isPathname, onRedirect]);
+  }, THREEDS_SUCCESS_REDIRECT_DELAY_MS);
 
   return purchaseSuccess ? (<PUIStaticSuccessOverlay { ...staticSuccessOverlayProps } />) : null;
 }
