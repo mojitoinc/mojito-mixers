@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Box, Typography } from "@mui/material";
 import { CheckoutModalFooter } from "../../components/payments/CheckoutModalFooter/CheckoutModalFooter";
 import { parseSentences } from "../../utils/formatUtils";
@@ -20,10 +20,10 @@ const ERROR_ACTION_LABELS: Record<CheckoutModalErrorAt, string> = {
 };
 
 export interface ErrorViewProps {
-  checkoutError: CheckoutModalError;
+  checkoutError?: CheckoutModalError;
   errorImageSrc?: string;
-  onFixError: () => Promise<false>;
-  onClose: () => void;
+  onFixError?: (errorMessage: string) => Promise<false>;
+  onClose?: () => void;
   debug?: boolean;
 }
 
@@ -33,7 +33,7 @@ export const ErrorView: React.FC<ErrorViewProps> = ({
     error,
     circleFieldErrors,
     errorMessage = "",
-  },
+  } = { },
   errorImageSrc,
   onFixError,
   onClose,
@@ -47,7 +47,7 @@ export const ErrorView: React.FC<ErrorViewProps> = ({
   if (circleFieldErrors) {
     rawDisplayMessage = circleFieldErrors.summary;
   } else {
-    rawDisplayMessage = errorMessage.startsWith(DEV_EXCEPTION_PREFIX) ? ERROR_GENERIC.errorMessage : (errorMessage || ERROR_LOADING.errorMessage);
+    rawDisplayMessage = errorMessage.startsWith(DEV_EXCEPTION_PREFIX) ? ERROR_GENERIC.errorMessage : errorMessage;
   }
 
   const [displayMessage, setDisplayMessage] = useState(rawDisplayMessage);
@@ -60,6 +60,12 @@ export const ErrorView: React.FC<ErrorViewProps> = ({
     if (!displayMessage) setDisplayMessage(ERROR_GENERIC.errorMessage);
   }, displayMessage ? null : ASYNC_ERROR_MAX_WAIT_MS, []);
 
+  const handleSubmitClicked: () => Promise<false> = useCallback(async () => {
+    if (onFixError) onFixError(displayMessage);
+
+    return false;
+  }, [onFixError, displayMessage]);
+
   return (<>
     <Box>
 
@@ -71,7 +77,7 @@ export const ErrorView: React.FC<ErrorViewProps> = ({
       <Box sx={{ maxWidth: XS_MOBILE_MAX_WIDTH, mx: "auto", textAlign: "center" }}>
         <Typography variant="body2" sx={{ mb: 1.5 }}>Sorry, we are experiencing some issues:</Typography>
 
-        { parseSentences(displayMessage).map((sentence) => {
+        { parseSentences(displayMessage || ERROR_LOADING.errorMessage).map((sentence) => {
           return <Typography key={ sentence } variant="body2" sx={{ mb: 1.5 }}>{ sentence }</Typography>;
         }) }
 
@@ -84,9 +90,10 @@ export const ErrorView: React.FC<ErrorViewProps> = ({
     <CheckoutModalFooter
       variant="toReview"
       submitLabel={ ERROR_ACTION_LABELS[at] }
-      submitDisabled={ !displayMessage }
-      onSubmitClicked={ onFixError }
-      closeDisabled={ !displayMessage }
+      submitDisabled={ !displayMessage || !onFixError }
+      submitLoading={ !displayMessage || !onFixError }
+      onSubmitClicked={ handleSubmitClicked }
+      closeDisabled={ !displayMessage || !onClose }
       onCloseClicked={ onClose } />
 
   </>);

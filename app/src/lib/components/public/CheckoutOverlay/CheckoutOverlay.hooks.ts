@@ -39,6 +39,7 @@ export interface CheckoutModalStateOptions {
   vertexEnabled?: boolean;
   isAuthenticated?: boolean;
   onError?: (error: CheckoutModalError) => void;
+  debug?: boolean;
 }
 
 export interface CheckoutModalState {
@@ -49,7 +50,7 @@ export interface CheckoutModalState {
 
 export interface SelectedPaymentMethod {
   billingInfo: string | BillingInfo;
-  paymentInfo: string | PaymentMethod;
+  paymentInfo: string | PaymentMethod | null;
   cvv: string;
 }
 
@@ -92,6 +93,7 @@ export function useCheckoutModalState({
   vertexEnabled,
   isAuthenticated,
   onError,
+  debug,
 }: CheckoutModalStateOptions): CheckoutModalStateReturn {
   const startAt: CheckoutModalStep = !isAuthenticated || productConfirmationEnabled ? "authentication" : "billing";
 
@@ -125,6 +127,8 @@ export function useCheckoutModalState({
   });
 
   const initModalState = useCallback(() => {
+    if (debug) console.log("\n⚙️ Init Modal State!\n\n");
+
     // Make sure the progress tracker in BillingView and PaymentView is properly animated:
     resetStepperProgress();
 
@@ -144,7 +148,7 @@ export function useCheckoutModalState({
 
     setCheckoutModalState({
       checkoutStep: savedFlow.checkoutStep || startAt,
-      checkoutError: savedFlow.checkoutError,
+      // checkoutError: savedFlow.checkoutError,
       isDialogBlocked: false,
     });
 
@@ -164,7 +168,7 @@ export function useCheckoutModalState({
       circlePaymentID: savedFlow.circlePaymentID || "",
       paymentID: savedFlow.paymentID || ""
     });
-  }, [startAt, vertexEnabled]);
+  }, [debug, startAt, vertexEnabled]);
 
   const goBack = useCallback(() => {
     setCheckoutModalState(({ checkoutStep, checkoutError }) => ({

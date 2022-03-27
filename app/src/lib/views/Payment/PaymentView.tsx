@@ -124,12 +124,14 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
 
   useEffect(() => {
     const selectedPaymentInfoMatch = typeof selectedPaymentInfo === "string" && savedPaymentMethods.some(({ id }) => id === selectedPaymentInfo);
-    const firstActiveSavedPaymentMethod = savedPaymentMethods.find(({ status }) => status === "complete");
+    const lastActiveSavedPaymentMethod = savedPaymentMethods.slice().reverse().find(({ status }) => status === "complete");
 
-    if (showSaved && !selectedPaymentInfoMatch && firstActiveSavedPaymentMethod /* && savedPaymentMethods.length > 0 && !checkoutError */) {
-      onPaymentInfoSelected(firstActiveSavedPaymentMethod.id);
+    if (showSaved && !selectedPaymentInfoMatch && lastActiveSavedPaymentMethod /* && savedPaymentMethods.length > 0 && !checkoutError */) {
+      onPaymentInfoSelected(lastActiveSavedPaymentMethod.id);
     }
   }, [showSaved, onPaymentInfoSelected, savedPaymentMethods, selectedPaymentInfo/*, checkoutError*/]);
+
+  console.log("selectedPaymentInfo =", selectedPaymentInfo);
 
   // PLAIN LINKS:
   const onPlaidLinkClicked = usePlaid({
@@ -175,7 +177,7 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
           <PaymentMethodForm
             acceptedPaymentTypes={acceptedPaymentTypes}
             acceptedCreditCardNetworks={acceptedCreditCardNetworks}
-            defaultValues={typeof selectedPaymentInfo === "string" ? undefined : selectedPaymentInfo}
+            defaultValues={typeof selectedPaymentInfo === "string" || selectedPaymentInfo === null ? undefined : selectedPaymentInfo}
             checkoutError={checkoutError}
             onPlaidLinkClicked={onPlaidLinkClicked}
             onSaved={savedPaymentMethods.length > 0 ? handleShowSaved : undefined}

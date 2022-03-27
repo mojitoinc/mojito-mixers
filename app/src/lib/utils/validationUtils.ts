@@ -15,6 +15,8 @@ export const withInvalidErrorMessage = ({ label }: { label: string }) => `${ lab
 
 export const withFullNameErrorMessage = ({ label }: { label: string }) => `${ label } must have at least first and last name.`;
 
+export const withFullNameCharsetErrorMessage = ({ label }: { label: string }) => `${ label } contains invalid characters.`;
+
 export const withPhoneErrorMessage = ({ label }: { label: string }) => `${ label } must be a valid phone number.`;
 
 export const withInvalidCardNumber = ({ label }: { label: string }) => `${ label } is invalid.`;

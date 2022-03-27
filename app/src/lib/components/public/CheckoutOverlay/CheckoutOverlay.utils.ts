@@ -1,10 +1,8 @@
-import { THREEDS_FLOW_INFO_KEY, THREEDS_FLOW_RECEIVED_REDIRECT_URI_KEY, THREEDS_FLOW_STATE_USED_KEY, THREEDS_STORAGE_EXPIRATION_MS, THREEDS_FLOW_URL_SEARCH } from "../../../config/config";
-import { ERROR_PURCHASE_3DS } from "../../../domain/errors/errors.constants";
-import { PaymentMethod } from "../../../domain/payment/payment.interfaces";
+import { THREEDS_FLOW_INFO_KEY, THREEDS_FLOW_RECEIVED_REDIRECT_URI_KEY, THREEDS_FLOW_STATE_USED_KEY, THREEDS_STORAGE_EXPIRATION_MS, THREEDS_FLOW_SEARCH_PARAM_SUCCESS } from "../../../config/config";
 import { getUrlWithoutParams, isLocalhost, isLocalhostOrStaging, urlToPathnameWhenPossible } from "../../../domain/url/url.utils";
 import { BillingInfo } from "../../../forms/BillingInfoForm";
 import { continuePlaidOAuthFlow, INITIAL_PLAID_OAUTH_FLOW_STATE } from "../../../hooks/usePlaid";
-import { CheckoutModalError, CheckoutModalStep } from "./CheckoutOverlay.hooks";
+import { CheckoutModalStep } from "./CheckoutOverlay.hooks";
 
 const debug = isLocalhostOrStaging();
 
@@ -14,7 +12,7 @@ export interface CheckoutModalInfo {
   circlePaymentID: string;
   paymentID: string;
   billingInfo: string | BillingInfo;
-  paymentInfo: string | PaymentMethod;
+  paymentInfo: string | null;
   timestamp?: number;
 }
 
@@ -112,12 +110,13 @@ export function getCheckoutModalState(): CheckoutModalState3DS {
     timestamp,
   } = savedPlaidInfo || {};
 
-  const receivedRedirectUri = savedReceivedRedirectUri || (window.location.search.startsWith(THREEDS_FLOW_URL_SEARCH) ? window.location.href : undefined);
-  // const receivedRedirectUri = savedReceivedRedirectUri || window.location.href || "";
+  // Swap to test error flow:
+  // const receivedRedirectUri = "localhost:3000/payments/error";
+  const receivedRedirectUri = savedReceivedRedirectUri || (window.location.search.startsWith(THREEDS_FLOW_SEARCH_PARAM_SUCCESS) ? window.location.href : undefined);
 
   // In dev, this works fine even if there's nothing in localStorage, which helps with testing across some other domain and localhost:
   const hasLocalhostOrigin = process.env.NODE_ENV === "development" && !isLocalhost();
-  const continue3DSFlow = hasLocalhostOrigin || !!(url && invoiceID && circlePaymentID && paymentID && billingInfo && paymentInfo && receivedRedirectUri);
+  const continue3DSFlow = hasLocalhostOrigin || !!(url && invoiceID && circlePaymentID && paymentID && billingInfo && (paymentInfo || paymentInfo === null) && receivedRedirectUri);
 
   if ((continue3DSFlow && savedStateUsed) || (!continue3DSFlow && localStorage.getItem(THREEDS_FLOW_INFO_KEY)) || isExpired(timestamp)) {
     return clearPersistedInfo(isExpired(timestamp));
@@ -143,7 +142,7 @@ export function getCheckoutModalState(): CheckoutModalState3DS {
 
     // Whether we need to resume the 3DS flow and show the confirmation or error screens:
     continue3DSFlow,
-    purchaseSuccess: continue3DSFlow && !!receivedRedirectUri && (receivedRedirectUri.includes("success") || receivedRedirectUri.includes(THREEDS_FLOW_URL_SEARCH)),
+    purchaseSuccess: continue3DSFlow && !!receivedRedirectUri && (receivedRedirectUri.includes("success") || receivedRedirectUri.includes(THREEDS_FLOW_SEARCH_PARAM_SUCCESS)),
     purchaseError: continue3DSFlow && !!receivedRedirectUri && (receivedRedirectUri.includes("error") || receivedRedirectUri.includes("failure")),
 
     // Wether we already tried to resume the previous OAuth flow:
@@ -169,12 +168,11 @@ export type FlowType = "" | "3DS" | "Plaid";
 export interface ContinueFlowsReturn {
   flowType: FlowType;
   checkoutStep: CheckoutModalStep | "";
-  checkoutError?: CheckoutModalError;
   invoiceID: string;
   circlePaymentID: string;
   paymentID: string;
   billingInfo: string | BillingInfo;
-  paymentInfo: string | PaymentMethod;
+  paymentInfo: string | null;
 }
 
 export function continueFlows(noClear = false) {
@@ -190,12 +188,17 @@ export function continueFlows(noClear = false) {
     paymentInfo: "",
   };
 
+  // Uncomment to test error flow:
+  // savedCheckoutModalState.purchaseSuccess = false;
+  // savedCheckoutModalState.purchaseError = true;
+
   if (continue3DSFlow) {
     if (savedCheckoutModalState.purchaseSuccess && !savedCheckoutModalState.purchaseError) {
       continueFlowsReturn.checkoutStep = "confirmation";
     } else {
-      continueFlowsReturn.checkoutStep = "error";
-      continueFlowsReturn.checkoutError = ERROR_PURCHASE_3DS();
+      // By the time we come back from 3DS' error page to the Payment UI, we have already seen the error, so we go
+      // straight to the PaymentView to review the payment information:
+      continueFlowsReturn.checkoutStep = "payment";
     }
 
     continueFlowsReturn.flowType = "3DS";

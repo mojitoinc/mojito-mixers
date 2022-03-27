@@ -8,7 +8,6 @@ import { SavedPaymentMethod } from "../../domain/circle/circle.interfaces";
 import { billingInfoToSavedPaymentMethodBillingInfo } from "../../domain/circle/circle.utils";
 import { CheckoutItem } from "../../domain/product/product.interfaces";
 import { SelectedPaymentMethod } from "../../components/public/CheckoutOverlay/CheckoutOverlay.hooks";
-import { PUIDictionary } from "../../domain/dictionary/dictionary.interfaces";
 import { Wallet } from "../../domain/wallet/wallet.interfaces";
 
 export interface ConfirmationViewProps {
@@ -17,8 +16,9 @@ export interface ConfirmationViewProps {
   selectedPaymentMethod: SelectedPaymentMethod;
   circlePaymentID: string;
   wallet: null | string | Wallet;
-  onGoToCollection?: () => void;
   onNext: () => void;
+  goToLabel?: string;
+  onGoTo?: () => void;
 }
 
 export const ConfirmationView: React.FC<ConfirmationViewProps> = ({
@@ -27,8 +27,9 @@ export const ConfirmationView: React.FC<ConfirmationViewProps> = ({
   selectedPaymentMethod,
   circlePaymentID,
   wallet,
-  onGoToCollection,
   onNext,
+  goToLabel,
+  onGoTo,
 }) => {
   const {
     billingInfo: selectedBillingInfo,
@@ -82,7 +83,8 @@ export const ConfirmationView: React.FC<ConfirmationViewProps> = ({
         <CheckoutModalFooter
           variant="toMarketplace"
           onSubmitClicked={onNext}
-          onGoToCollection={onGoToCollection} />
+          goToLabel={goToLabel}
+          onGoTo={onGoTo} />
       </Stack>
 
     </Stack>

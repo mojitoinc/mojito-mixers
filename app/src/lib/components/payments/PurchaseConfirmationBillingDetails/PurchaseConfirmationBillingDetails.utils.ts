@@ -9,11 +9,11 @@ export interface GetFormattedPaymentMethodReturn {
   network: string;
 }
 
-function isSavedPaymentMethod(paymentMethodInfo: PaymentMethod | SavedPaymentMethod): paymentMethodInfo is SavedPaymentMethod {
-  return paymentMethodInfo.hasOwnProperty("id");
+function isSavedPaymentMethod(paymentMethodInfo: PaymentMethod | SavedPaymentMethod | null): paymentMethodInfo is SavedPaymentMethod {
+  return !!paymentMethodInfo && paymentMethodInfo.hasOwnProperty("id");
 }
 
-export function getFormattedPaymentMethod(paymentMethodInfo: PaymentMethod | SavedPaymentMethod): GetFormattedPaymentMethodReturn {
+export function getFormattedPaymentMethod(paymentMethodInfo: PaymentMethod | SavedPaymentMethod | null): GetFormattedPaymentMethodReturn {
   let isMasked = false;
   let paymentType: PaymentType = "CreditCard";
   let displayValue = "";
@@ -30,6 +30,9 @@ export function getFormattedPaymentMethod(paymentMethodInfo: PaymentMethod | Sav
       displayValue = `${ CREDIT_CARD_MASK_PREFIX } ${ paymentMethodInfo.last4Digit }`;
       network = paymentMethodInfo.network;
     }
+  } else if (paymentMethodInfo === null) {
+    isMasked = true;
+    displayValue = `${ CREDIT_CARD_MASK_PREFIX } XXXX`;
   } else {
     displayValue = (paymentMethodInfo as CreditCard).cardNumber;
   }

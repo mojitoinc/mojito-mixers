@@ -25,6 +25,7 @@ export interface CheckoutModalFooterProps {
   // Submit button:
   submitLabel?: string;
   submitDisabled?: boolean;
+  submitLoading?: boolean;
   onSubmitClicked?: (canSubmit: boolean) => void | Promise<void | false>;
 
   // Close link:
@@ -33,7 +34,8 @@ export interface CheckoutModalFooterProps {
   onCloseClicked?: () => void;
 
   // Collection button:
-  onGoToCollection?: () => void;
+  goToLabel?: string;
+  onGoTo?: () => void;
 }
 
 const VARIANTS_WITH_DISCLAIMER: CheckoutModalFooterVariant[] = ["toPayment", "toPlaid", "toConfirmation"]
@@ -47,6 +49,7 @@ export const CheckoutModalFooter: React.FC<CheckoutModalFooterProps> = ({
   // Submit button:
   submitLabel,
   submitDisabled,
+  submitLoading,
   onSubmitClicked,
 
   // Close link:
@@ -54,10 +57,12 @@ export const CheckoutModalFooter: React.FC<CheckoutModalFooterProps> = ({
   closeDisabled,
   onCloseClicked,
 
-  // onGoToCollection:
-  onGoToCollection,
+  // Secondary button:
+  goToLabel = "View Invoices",
+  onGoTo,
 }) => {
   // CONSENT:
+
   const showConsent = consentType && VARIANTS_WITH_DISCLAIMER.includes(variant);
   const consentTextElement = showConsent ? <ConsentText /> : null;
 
@@ -81,25 +86,28 @@ export const CheckoutModalFooter: React.FC<CheckoutModalFooterProps> = ({
     }));
   }, []);
 
-  // COLLECTION BUTTON (ConfirmationView-specific):
-  const handleCollectionClicked = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
 
-    // TODO: In order to implement be functionality below, we need to pass a Link component to PUI to use, and then we
-    // can just pass a collectionPathname instead of onGoToCollection:
+  // SECONDARY BUTTON (ConfirmationView-specific):
 
-    // We want to display the link (href) if the user hovers the button or if they click with the wheel or Ctrl + Click,
-    // but we don't know what type of routing the parent app is using (Next.js, React Router, etc.) so we just prevent
-    // default here and let the parent app handle the routing:
-    // console.log(e.ctrlKey, e.button);
+  const handleGoToClicked = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
+    // We want to display the link (href) if the user hovers the button or if they click with the wheel or
+    // Ctrl/Command + Click, but we don't know what type of routing the parent app is using (Next.js, React Router, etc.)
+    // so we just prevent default here and let the parent app handle the routing:
 
-    if (onGoToCollection) onGoToCollection();
-  }, [onGoToCollection]);
+    if (!e.ctrlKey && !e.metaKey) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+
+    if (onGoTo) onGoTo();
+  }, [onGoTo]);
 
 
   // SUBMIT BUTTON:
+
   const primaryButtonVisible = variant !== "toGuestCheckout" || guestCheckoutEnabled;
   const primaryButtonLabel = submitLabel || LABELS_BY_VARIANT[variant];
+  const isPrimaryButtonDisabled = submitDisabled || isFormLoading;
   const PrimaryButtonIcon = ICONS_BY_VARIANT[variant];
 
   const handleSubmitClicked = useCallback(async () => {
@@ -124,15 +132,18 @@ export const CheckoutModalFooter: React.FC<CheckoutModalFooterProps> = ({
     });
   }, [isConsentChecked, onSubmitClicked]);
 
+
   // CANCEL LINK:
+
   const cancelLinkLabel = closeLabel || "Cancel and Return to Marketplace";
   const cancelLinkColor = closeDisabled ? "text.disabled" : "text.primary"; // TODO: Create custom Link component with this functionality.
+  const isCancelLinkDisabled = closeDisabled || isFormLoading;
 
   const handleCancelClicked = useCallback((e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
 
-    if (onCloseClicked && !closeDisabled) onCloseClicked();
-  }, [onCloseClicked, closeDisabled]);
+    if (onCloseClicked && !isCancelLinkDisabled) onCloseClicked();
+  }, [onCloseClicked, isCancelLinkDisabled]);
 
   return (
     <Box
@@ -154,12 +165,13 @@ export const CheckoutModalFooter: React.FC<CheckoutModalFooterProps> = ({
           sx={{ alignSelf: "flex-start", mb: 5 }} />
       )}
 
-      { onGoToCollection && (
+      { goToLabel && onGoTo && (
         <PrimaryButton
-          onClick={ handleCollectionClicked }
-          disabled={ submitDisabled || isFormLoading }
+          onClickCapture={ handleGoToClicked }
+          disabled={ isPrimaryButtonDisabled }
+          href="/profile/invoices"
           sx={{ mb: 2 }}>
-          View Collection
+          { goToLabel }
         </PrimaryButton>
       ) }
 
@@ -167,16 +179,16 @@ export const CheckoutModalFooter: React.FC<CheckoutModalFooterProps> = ({
         <PrimaryButton
           onClick={onSubmitClicked ? handleSubmitClicked : undefined}
           type={onSubmitClicked ? "button" : "submit"}
-          endIcon={isFormLoading ? <CircularProgress color="inherit" size="1em" /> : (PrimaryButtonIcon && <PrimaryButtonIcon />)}
-          disabled={submitDisabled || isFormLoading}>
+          endIcon={isFormLoading || submitLoading ? <CircularProgress color="inherit" size="1em" /> : (PrimaryButtonIcon && <PrimaryButtonIcon />)}
+          disabled={ isPrimaryButtonDisabled }>
           {primaryButtonLabel}
         </PrimaryButton>
       )}
 
-      {variant !== "toMarketplace" && onCloseClicked && (
+      {variant !== "toMarketplace" && (onCloseClicked || closeDisabled) && (
         <Typography sx={{ color: cancelLinkColor, pt: primaryButtonVisible ? 2 : 0 }}>
           {primaryButtonVisible ? "or " : null}
-          <Link sx={{ color: cancelLinkColor, cursor: closeDisabled ? "not-allowed" : "pointer" }} href="" onClick={handleCancelClicked}>
+          <Link sx={{ color: cancelLinkColor, cursor: isCancelLinkDisabled ? "not-allowed" : "pointer" }} href="" onClick={handleCancelClicked}>
             { cancelLinkLabel }
           </Link>
         </Typography>

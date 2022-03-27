@@ -18,7 +18,7 @@ export interface PurchaseConfirmationBillingDetailsProps {
   circlePaymentID: string;
   wallet: null | string | Wallet;
   selectedPaymentMethodBillingInfo: SavedPaymentMethodBillingInfo;
-  selectedPaymentMethodPaymentInfo: PaymentMethod | SavedPaymentMethod;
+  selectedPaymentMethodPaymentInfo: PaymentMethod | SavedPaymentMethod | null;
 }
 
 export const PurchaseConfirmationBillingDetails: React.FC<PurchaseConfirmationBillingDetailsProps> = ({
