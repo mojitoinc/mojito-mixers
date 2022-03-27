@@ -82,7 +82,7 @@ const schema = object()
     [FULL_NAME_FIELD]: string()
       .label(FIELD_LABELS[FULL_NAME_FIELD])
       .required(withRequiredErrorMessage)
-      .matches(/^[a-zA-ZÀ-ÿ.·' -]+$/, withFullNameCharsetErrorMessage)
+      .matches(/^[A-Za-zÀ-ÖØ-öø-ÿ.·' -]+$/, withFullNameCharsetErrorMessage)
       .test({
         name: "is-valid-full-name",
         test: (value) => {
