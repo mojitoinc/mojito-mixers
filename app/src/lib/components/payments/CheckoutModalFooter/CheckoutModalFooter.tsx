@@ -34,7 +34,8 @@ export interface CheckoutModalFooterProps {
   onCloseClicked?: () => void;
 
   // Collection button:
-  onGoToCollection?: () => void;
+  goToLabel?: string;
+  onGoTo?: () => void;
 }
 
 const VARIANTS_WITH_DISCLAIMER: CheckoutModalFooterVariant[] = ["toPayment", "toPlaid", "toConfirmation"]
@@ -56,10 +57,12 @@ export const CheckoutModalFooter: React.FC<CheckoutModalFooterProps> = ({
   closeDisabled,
   onCloseClicked,
 
-  // onGoToCollection:
-  onGoToCollection,
+  // Secondary button:
+  goToLabel = "View Invoices",
+  onGoTo,
 }) => {
   // CONSENT:
+
   const showConsent = consentType && VARIANTS_WITH_DISCLAIMER.includes(variant);
   const consentTextElement = showConsent ? <ConsentText /> : null;
 
@@ -83,23 +86,25 @@ export const CheckoutModalFooter: React.FC<CheckoutModalFooterProps> = ({
     }));
   }, []);
 
-  // COLLECTION BUTTON (ConfirmationView-specific):
-  const handleCollectionClicked = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
 
-    // TODO: In order to implement be functionality below, we need to pass a Link component to PUI to use, and then we
-    // can just pass a collectionPathname instead of onGoToCollection:
+  // SECONDARY BUTTON (ConfirmationView-specific):
 
-    // We want to display the link (href) if the user hovers the button or if they click with the wheel or Ctrl + Click,
-    // but we don't know what type of routing the parent app is using (Next.js, React Router, etc.) so we just prevent
-    // default here and let the parent app handle the routing:
-    // console.log(e.ctrlKey, e.button);
+  const handleGoToClicked = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
+    // We want to display the link (href) if the user hovers the button or if they click with the wheel or
+    // Ctrl/Command + Click, but we don't know what type of routing the parent app is using (Next.js, React Router, etc.)
+    // so we just prevent default here and let the parent app handle the routing:
 
-    if (onGoToCollection) onGoToCollection();
-  }, [onGoToCollection]);
+    if (!e.ctrlKey && !e.metaKey) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+
+    if (onGoTo) onGoTo();
+  }, [onGoTo]);
 
 
   // SUBMIT BUTTON:
+
   const primaryButtonVisible = variant !== "toGuestCheckout" || guestCheckoutEnabled;
   const primaryButtonLabel = submitLabel || LABELS_BY_VARIANT[variant];
   const isPrimaryButtonDisabled = submitDisabled || isFormLoading;
@@ -127,7 +132,9 @@ export const CheckoutModalFooter: React.FC<CheckoutModalFooterProps> = ({
     });
   }, [isConsentChecked, onSubmitClicked]);
 
+
   // CANCEL LINK:
+
   const cancelLinkLabel = closeLabel || "Cancel and Return to Marketplace";
   const cancelLinkColor = closeDisabled ? "text.disabled" : "text.primary"; // TODO: Create custom Link component with this functionality.
   const isCancelLinkDisabled = closeDisabled || isFormLoading;
@@ -158,12 +165,13 @@ export const CheckoutModalFooter: React.FC<CheckoutModalFooterProps> = ({
           sx={{ alignSelf: "flex-start", mb: 5 }} />
       )}
 
-      { onGoToCollection && (
+      { goToLabel && onGoTo && (
         <PrimaryButton
-          onClick={ handleCollectionClicked }
+          onClickCapture={ handleGoToClicked }
           disabled={ isPrimaryButtonDisabled }
+          href="/profile/invoices"
           sx={{ mb: 2 }}>
-          View Collection
+          { goToLabel }
         </PrimaryButton>
       ) }
 
