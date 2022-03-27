@@ -174,8 +174,8 @@ const App: React.FC = () => {
     router.replace(cleanURL, undefined, { shallow: true });
   }, [router]);
 
-  const handleGoToCollection = useCallback(() => {
-    router.push("/profile/collection");
+  const handleGoToClicked = useCallback(() => {
+    router.push("/profile/invoices");
   }, []);
 
   const handleLogin = useCallback(async () => {
@@ -211,6 +211,8 @@ const App: React.FC = () => {
     // Modal:
     open: isOpen,
     onClose,
+    onGoTo: handleGoToClicked,
+    onGoToLabel: "View Invoices",
 
     // Flow:
     loaderMode,

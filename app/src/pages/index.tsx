@@ -83,10 +83,9 @@ const HomePage: React.FC = () => {
     onOpen();
   }, [isLoading, isAuthenticated, meData, hasOrganizations, onOpen]);
 
-  const handleGoToCollection = useCallback(() => {
-    console.log("Go to Collection Page.");
-    // router.push("/collection");
-  }, []);
+  const handleGoToClicked = useCallback(() => {
+    router.push("/profile/invoices");
+  }, [router]);
 
   const handleEvent = useCallback((eventType: CheckoutEventType, eventData: CheckoutEventData) => {
     if (!isLocalhost()) console.log(`🎯 ${ eventType }`, eventData);
@@ -174,7 +173,7 @@ const HomePage: React.FC = () => {
     // Modal:
     open: isOpen,
     onClose,
-    onGoToCollection: handleGoToCollection,
+    onGoTo: handleGoToClicked,
 
     // Flow:
     loaderMode,

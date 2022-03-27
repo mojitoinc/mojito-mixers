@@ -42,7 +42,8 @@ export interface PUICheckoutOverlayProps {
   // Modal:
   open: boolean;
   onClose: () => void;
-  onGoToCollection?: () => void;
+  onGoTo?: () => void;
+  goToLabel?: string;
 
   // Flow:
   loaderMode?: LoaderMode;
@@ -96,7 +97,8 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   // Modal:
   open,
   onClose,
-  onGoToCollection,
+  onGoTo,
+  goToLabel,
 
   // Flow:
   loaderMode: initialLoaderMode = "default",
@@ -833,8 +835,9 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
         selectedPaymentMethod={ selectedPaymentMethod }
         circlePaymentID={ circlePaymentID }
         wallet={ wallet }
-        onGoToCollection={ onGoToCollection }
-        onNext={ handleClose } />
+        onNext={ handleClose }
+        goToLabel={ goToLabel }
+        onGoTo={ onGoTo } />
     );
   } else {
     console.warn("Unknown checkoutStepElement!");
