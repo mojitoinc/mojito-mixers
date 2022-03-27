@@ -13,7 +13,7 @@ import { SecondaryButton } from "../components/shared/SecondaryButton/SecondaryB
 import { Box, InputAdornment, Typography } from "@mui/material";
 import BookIcon from "@mui/icons-material/Book";
 import { EMPTY_OPTION, SelectOption } from "../components/shared/Select/Select";
-import { withFullNameErrorMessage, withPhoneErrorMessage, withRequiredErrorMessage } from "../utils/validationUtils";
+import { withFullNameCharsetErrorMessage, withFullNameErrorMessage, withPhoneErrorMessage, withRequiredErrorMessage } from "../utils/validationUtils";
 import { DebugBox } from "../components/payments/DebugBox/DebugBox";
 import { CheckoutModalError } from "../components/public/CheckoutOverlay/CheckoutOverlay.hooks";
 import { useFormCheckoutError } from "../hooks/useFormCheckoutError";
@@ -82,6 +82,7 @@ const schema = object()
     [FULL_NAME_FIELD]: string()
       .label(FIELD_LABELS[FULL_NAME_FIELD])
       .required(withRequiredErrorMessage)
+      .matches(/^[a-zA-ZÀ-ÿ.·' -]+$/, withFullNameCharsetErrorMessage)
       .test({
         name: "is-valid-full-name",
         test: (value) => {
