@@ -8,6 +8,7 @@ export { getPlaidOAuthFlowState, persistPlaidReceivedRedirectUri } from "./domai
 export { continuePlaidOAuthFlow } from "./hooks/usePlaid";
 export { continueCheckout, continueFlows, getCheckoutModalState, persistReceivedRedirectUri3DS } from "./components/public/CheckoutOverlay/CheckoutOverlay.utils";
 export { extendDefaultTheme, MOJITO_LIGHT_THEME, MOJITO_DARK_THEME } from "./config/theme/theme";
+export { THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY, THREEDS_FLOW_SEARCH_PARAM_ERROR_KEY } from "./config/config";
 
 export type { Theme as CheckoutModalTheme, ThemeOptions as CheckoutModalThemeOptions } from "@mui/material/styles";
 export type { PUICheckoutProps } from "./components/public/CheckoutOverlay/CheckoutOverlay";
