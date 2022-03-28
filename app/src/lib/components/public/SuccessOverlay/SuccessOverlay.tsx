@@ -37,7 +37,7 @@ export const PUISuccessOverlay: React.FC<PUISuccessOverlayProps> = ({
     if (purchaseSuccess) onRedirect(getUrlWithSearchParams(url));
   }, THREEDS_SUCCESS_REDIRECT_DELAY_MS);
 
-  return purchaseSuccess ? (<PUIStaticSuccessOverlay { ...staticSuccessOverlayProps } />) : null;
+  return <PUIStaticSuccessOverlay { ...staticSuccessOverlayProps } />;
 }
 
 export const PUISuccess: React.FC<PUISuccessProps> = withThemeProvider(PUISuccessOverlay);
