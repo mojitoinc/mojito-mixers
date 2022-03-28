@@ -47,7 +47,7 @@ const PUIErrorOverlay = (_a) => {
         // ...or they can just go back to the marketplace homepage:
         onRedirect("/");
     }, [purchaseError, onRedirect]);
-    return purchaseError ? (React__default.createElement(PUIStaticErrorOverlay, Object.assign({}, staticErrorOverlayProps, { checkoutError: { errorMessage }, onFixError: reviewData, onClose: toMarketplace }))) : null;
+    return (React__default.createElement(PUIStaticErrorOverlay, Object.assign({}, staticErrorOverlayProps, { checkoutError: { errorMessage }, onFixError: reviewData, onClose: toMarketplace })));
 };
 const PUIError = withProviders(PUIErrorOverlay);
 

@@ -27,7 +27,7 @@ const PUISuccessOverlay = (_a) => {
         if (purchaseSuccess)
             onRedirect(getUrlWithSearchParams(url));
     }, THREEDS_SUCCESS_REDIRECT_DELAY_MS);
-    return purchaseSuccess ? (React__default.createElement(PUIStaticSuccessOverlay, Object.assign({}, staticSuccessOverlayProps))) : null;
+    return React__default.createElement(PUIStaticSuccessOverlay, Object.assign({}, staticSuccessOverlayProps));
 };
 const PUISuccess = withThemeProvider(PUISuccessOverlay);
 
