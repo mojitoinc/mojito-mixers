@@ -21,9 +21,9 @@ export type TaxStatus = "incomplete" | "loading" | "complete" | "error";
 
 export interface TaxesState {
   status: TaxStatus;
+  invalidZipCode?: boolean;
   taxRate?: number;
   taxAmount?: number;
-  zipCodeRange?: string;
 }
 
 interface BillingViewState {
@@ -93,6 +93,8 @@ export const BillingView: React.FC<BillingViewProps> = ({
   const calculateTaxes = useCallback(async (taxInfo: TaxInfo | BillingInfo) => {
     const calledAt = getTaxQuoteTimestampRef.current;
 
+    let invalidZipCode = false;
+
     const result = await getTaxQuote({
       variables: {
         input: {
@@ -106,22 +108,31 @@ export const BillingView: React.FC<BillingViewProps> = ({
           },
         },
       },
-    }).catch(() => ({ data: null }));
+    }).catch((err) => {
+      invalidZipCode = /invalid zipcode/i.test(err.message);
+
+      return { data: null };
+    });
 
     // Discard stale result:
     if (calledAt !== getTaxQuoteTimestampRef.current) return;
 
     const taxResult = result.data?.getTaxQuote || {} as TaxQuoteOutput;
-    const isValid = !!taxResult.verifiedAddress;
-    const zipCodeRange = taxResult.verifiedAddress?.postalCode || "";
+    const hasVerifiedAddress = !!taxResult.verifiedAddress;
+    const zipPlusFour = taxResult.verifiedAddress?.postalCode || "";
 
-    setViewState((prevViewState) => ({ ...prevViewState, taxes: isValid ? {
-      status: showSaved || taxInfo.zipCode === zipCodeRange ? "complete" : "error",
+    if (zipPlusFour) invalidZipCode ||= !zipPlusFour.startsWith(taxInfo.zipCode);
+
+    setViewState((prevViewState) => ({ ...prevViewState, taxes: hasVerifiedAddress ? {
+      status: invalidZipCode ? "error" : "complete",
+      invalidZipCode,
       taxRate: 100 * taxResult.totalTaxAmount / taxResult.taxablePrice,
       taxAmount: taxResult.totalTaxAmount,
-      zipCodeRange,
-    } : { status: "error"} }));
-  }, [getTaxQuote, total, showSaved]);
+    } : {
+      status: "error",
+      invalidZipCode,
+    }}));
+  }, [getTaxQuote, total]);
 
   const handleThrottledTaxInfoChange = useThrottledCallback((taxInfo: Partial<TaxInfo>) => {
     if (!vertexEnabled) return;

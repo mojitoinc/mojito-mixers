@@ -299,7 +299,7 @@ export const BillingInfoForm: React.FC<BillingInfoFormProps> = ({
 
       { checkoutErrorMessage && <FormErrorsBox error={ checkoutErrorMessage } sx={{ mt: 5 }} /> }
 
-      { formState.isSubmitted && <TaxesMessagesBox sx={{ mt: 5 }} variant="form" taxes={ taxes } zipCode={ zip } /> }
+      { formState.isSubmitted && <TaxesMessagesBox sx={{ mt: 5 }} variant="form" taxes={ taxes } /> }
 
       { debug && (
         <DebugBox sx={{ mt: 5 }}>
