@@ -6,7 +6,7 @@ import { FullScreenOverlay } from '../../shared/FullScreenOverlay/FullScreenOver
 
 const PUIStaticErrorOverlay = (_a) => {
     var { logoSrc, logoSx } = _a, errorViewProps = __rest(_a, ["logoSrc", "logoSx"]);
-    const headerElement = logoSrc ? (React__default.createElement(CheckoutModalHeader, { variant: "error", logoSrc: logoSrc, logoSx: logoSx })) : null;
+    const headerElement = (React__default.createElement(CheckoutModalHeader, { variant: "error", logoSrc: logoSrc, logoSx: logoSx }));
     return (React__default.createElement(FullScreenOverlay, { isDialogBlocked: true, centered: true, header: headerElement },
         React__default.createElement(ErrorView, Object.assign({}, errorViewProps))));
 };

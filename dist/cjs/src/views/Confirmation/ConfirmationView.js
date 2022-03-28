@@ -13,7 +13,7 @@ function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'defau
 
 var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 
-const ConfirmationView = ({ checkoutItems, savedPaymentMethods, selectedPaymentMethod, circlePaymentID, wallet, onNext, goToLabel, onGoTo, }) => {
+const ConfirmationView = ({ checkoutItems, savedPaymentMethods, selectedPaymentMethod, circlePaymentID, wallet, onNext, goToHref, goToLabel, onGoTo, }) => {
     const { billingInfo: selectedBillingInfo, paymentInfo: selectedPaymentInfo, } = selectedPaymentMethod;
     const { selectedPaymentMethodBillingInfo, selectedPaymentMethodPaymentInfo, } = React.useMemo(() => {
         if (typeof selectedPaymentInfo === "string") {
@@ -40,7 +40,7 @@ const ConfirmationView = ({ checkoutItems, savedPaymentMethods, selectedPaymentM
         React__default["default"].createElement(PurchaseConfirmationBillingDetails.PurchaseConfirmationBillingDetails, { checkoutItems: checkoutItems, circlePaymentID: circlePaymentID, wallet: wallet, selectedPaymentMethodBillingInfo: selectedPaymentMethodBillingInfo, selectedPaymentMethodPaymentInfo: selectedPaymentMethodPaymentInfo }),
         React__default["default"].createElement(material.Stack, { sx: { display: "flex", flex: 1 } },
             React__default["default"].createElement(PurchaseConfirmationItemDetails.PurchaseConfirmationItemDetails, { checkoutItems: checkoutItems }),
-            React__default["default"].createElement(CheckoutModalFooter.CheckoutModalFooter, { variant: "toMarketplace", onSubmitClicked: onNext, goToLabel: goToLabel, onGoTo: onGoTo }))));
+            React__default["default"].createElement(CheckoutModalFooter.CheckoutModalFooter, { variant: "toMarketplace", onSubmitClicked: onNext, goToHref: goToHref, goToLabel: goToLabel, onGoTo: onGoTo }))));
 };
 
 exports.ConfirmationView = ConfirmationView;

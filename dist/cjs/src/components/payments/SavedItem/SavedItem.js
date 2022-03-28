@@ -42,8 +42,8 @@ const SavedItem = ({ children, id, variant = "stacked", labels: customLabels = {
             delete: onDelete,
             pick: onPick,
         }[action];
-        if (callback && id !== undefined)
-            callback(id, e);
+        if (callback)
+            callback(id || "", e);
     }, [id, onEdit, onDelete, onPick]);
     const disabledSelect = !!disabled;
     const disabledOther = disabled === true;

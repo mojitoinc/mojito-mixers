@@ -15,6 +15,7 @@ export interface PUICheckoutOverlayProps {
     open: boolean;
     onClose: () => void;
     onGoTo?: () => void;
+    goToHref?: string;
     goToLabel?: string;
     loaderMode?: LoaderMode;
     paymentErrorParam?: string;
@@ -23,15 +24,15 @@ export interface PUICheckoutOverlayProps {
     productConfirmationEnabled?: boolean;
     vertexEnabled?: boolean;
     threeDSEnabled?: boolean;
-    logoSrc: string;
+    logoSrc?: string;
     logoSx?: SxProps<Theme>;
-    loaderImageSrc: string;
-    purchasingImageSrc: string;
+    loaderImageSrc?: string;
+    purchasingImageSrc?: string;
     purchasingMessages?: false | string[];
-    successImageSrc: string;
-    errorImageSrc: string;
-    userFormat: UserFormat;
-    acceptedPaymentTypes: PaymentType[];
+    successImageSrc?: string;
+    errorImageSrc?: string;
+    userFormat?: UserFormat;
+    acceptedPaymentTypes?: PaymentType[];
     acceptedCreditCardNetworks?: CreditCardNetwork[];
     network?: Network;
     paymentLimits?: Partial<Record<PaymentType, number>>;
@@ -46,7 +47,6 @@ export interface PUICheckoutOverlayProps {
     debug?: boolean;
     onEvent?: (eventType: CheckoutEventType, eventData: CheckoutEventData) => void;
     onError?: (error: CheckoutModalError) => void;
-    onMarketingOptInChange?: (marketingOptIn: boolean) => void;
 }
 export declare type PUICheckoutProps = PUICheckoutOverlayProps & ProvidersInjectorProps;
 export declare const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps>;

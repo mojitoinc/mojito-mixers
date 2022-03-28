@@ -2,7 +2,6 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-var BillingInfoForm = require('../../forms/BillingInfoForm.js');
 var validationUtils = require('../../utils/validationUtils.js');
 
 const BUILT_IN_ERRORS = ["EvalError", "RangeError", "ReferenceError", "SyntaxError", "TypeError", "URIError", "AggregateError", "InternalError"];
@@ -50,7 +49,7 @@ const MAPPED_ERRORS = {
     "name should contains first and last name": {
         errorLocation: "billing",
         fieldName: "fullName",
-        errorMessage: validationUtils.withFullNameErrorMessage({ label: BillingInfoForm.FIELD_LABELS.fullName }),
+        errorMessage: validationUtils.withFullNameErrorMessage({ label: "Full Name" }),
     },
 };
 

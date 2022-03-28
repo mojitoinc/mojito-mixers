@@ -36,7 +36,9 @@ var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 const DEV_DEBUG_ENABLED = process.browser && localStorage.getItem(config.DEV_DEBUG_ENABLED_KEY) === "true";
 const PUICheckoutOverlay = ({ 
 // Modal:
-open, onClose, onGoTo, goToLabel, 
+open, onClose, onGoTo, 
+// TODO: Move to dictionary:
+goToHref, goToLabel, 
 // Flow:
 loaderMode: initialLoaderMode = "default", paymentErrorParam, onRemoveUrlParams, guestCheckoutEnabled, productConfirmationEnabled, vertexEnabled = true, threeDSEnabled = true, 
 // Personalization:
@@ -49,8 +51,7 @@ orgID, invoiceID: initialInvoiceID, checkoutItems: parentCheckoutItems,
 // Authentication:
 onLogin, isAuthenticated, isAuthenticatedLoading, 
 // Other Events:
-debug: parentDebug, onEvent, onError, onMarketingOptInChange, // Not implemented yet. Used to let user subscribe / unsubscribe to marketing updates.
- }) => {
+debug: parentDebug, onEvent, onError, }) => {
     var _a, _b, _c;
     const [debug, setDebug] = React.useState(!!parentDebug);
     // Initialization, just to prevent issues with Next.js' SSR:
@@ -88,7 +89,7 @@ debug: parentDebug, onEvent, onError, onMarketingOptInChange, // Not implemented
             : userWallets;
     }, [meLoading, meData, network]);
     const { data: paymentMethodsData, loading: paymentMethodsLoading, error: paymentMethodsError, refetch: refetchPaymentMethods, } = graphqlGenerated.useGetPaymentMethodListQuery({
-        skip: !isAuthenticated,
+        skip: !isAuthenticated || !orgID,
         variables: { orgID },
     });
     // Get everything related to Payment UI routing, error and state handling, including resuming Plaid / 3DS flows:
@@ -112,7 +113,7 @@ debug: parentDebug, onEvent, onError, onMarketingOptInChange, // Not implemented
         variables: { invoiceID },
     });
     // Modal loading state:
-    const isDialogLoading = isAuthenticatedLoading || meLoading || paymentMethodsLoading;
+    const isDialogLoading = !orgID || parentCheckoutItems.length === 0 || isAuthenticatedLoading || meLoading || paymentMethodsLoading;
     const isDialogInitializing = isDialogLoading || invoiceDetailsLoading || !invoiceID;
     const isPlaidFlowLoading = usePlaid.continuePlaidOAuthFlow();
     const [loaderMode, setLoaderMode] = React.useState(initialLoaderMode);
@@ -292,9 +293,9 @@ debug: parentDebug, onEvent, onError, onMarketingOptInChange, // Not implemented
     // Delete payment methods:
     const [deletePaymentMethod] = graphqlGenerated.useDeletePaymentMethodMutation();
     const handleSavedPaymentMethodDeleted = React.useCallback((addressIdOrPaymentMethodId) => tslib_es6.__awaiter(void 0, void 0, void 0, function* () {
-        const idsToDelete = checkoutStep === "billing"
+        const idsToDelete = (checkoutStep === "billing"
             ? savedPaymentMethods.filter(({ addressId }) => addressId === addressIdOrPaymentMethodId).map(({ id }) => id)
-            : [addressIdOrPaymentMethodId];
+            : [addressIdOrPaymentMethodId]).filter(Boolean);
         if (idsToDelete.length === 0)
             return;
         // DELETE LOGIC:
@@ -486,7 +487,7 @@ debug: parentDebug, onEvent, onError, onMarketingOptInChange, // Not implemented
     }
     else if (checkoutStep === "confirmation") {
         headerVariant = "logoOnly";
-        checkoutStepElement = (React__default["default"].createElement(ConfirmationView.ConfirmationView, { checkoutItems: checkoutItems, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethod: selectedPaymentMethod, circlePaymentID: circlePaymentID, wallet: wallet, onNext: handleClose, goToLabel: goToLabel, onGoTo: onGoTo }));
+        checkoutStepElement = (React__default["default"].createElement(ConfirmationView.ConfirmationView, { checkoutItems: checkoutItems, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethod: selectedPaymentMethod, circlePaymentID: circlePaymentID, wallet: wallet, onNext: handleClose, goToHref: goToHref, goToLabel: goToLabel, onGoTo: onGoTo }));
     }
     else {
         console.warn("Unknown checkoutStepElement!");

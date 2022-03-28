@@ -127,24 +127,16 @@ declare type PUIDictionaryKeys = keyof PUIDictionary;
 declare type CreditCardNetwork = "amex" | "dinersclub" | "discover" | "hipercard" | "jcb" | "unionpay" | "mastercard" | "maestro" | "elo" | "visa" | "placeholder";
 
 declare type LoaderMode = "default" | "success" | "error";
-interface UseOpenCloseCheckoutModalState {
-    loaderMode: LoaderMode;
-    isOpen: boolean;
-}
-interface UseOpenCloseCheckoutModalReturn extends UseOpenCloseCheckoutModalState {
-    onOpen: () => void;
-    onClose: () => void;
-}
 interface UseOpenCloseCheckoutModalOptions {
     paymentIdParam?: string;
     paymentErrorParam?: string;
 }
-declare function useOpenCloseCheckoutModal({ paymentIdParam, paymentErrorParam, }: UseOpenCloseCheckoutModalOptions): UseOpenCloseCheckoutModalReturn;
 
 interface PUICheckoutOverlayProps {
     open: boolean;
     onClose: () => void;
     onGoTo?: () => void;
+    goToHref?: string;
     goToLabel?: string;
     loaderMode?: LoaderMode;
     paymentErrorParam?: string;
@@ -153,15 +145,15 @@ interface PUICheckoutOverlayProps {
     productConfirmationEnabled?: boolean;
     vertexEnabled?: boolean;
     threeDSEnabled?: boolean;
-    logoSrc: string;
+    logoSrc?: string;
     logoSx?: SxProps<Theme>;
-    loaderImageSrc: string;
-    purchasingImageSrc: string;
+    loaderImageSrc?: string;
+    purchasingImageSrc?: string;
     purchasingMessages?: false | string[];
-    successImageSrc: string;
-    errorImageSrc: string;
-    userFormat: UserFormat;
-    acceptedPaymentTypes: PaymentType[];
+    successImageSrc?: string;
+    errorImageSrc?: string;
+    userFormat?: UserFormat;
+    acceptedPaymentTypes?: PaymentType[];
     acceptedCreditCardNetworks?: CreditCardNetwork[];
     network?: Network;
     paymentLimits?: Partial<Record<PaymentType, number>>;
@@ -176,7 +168,6 @@ interface PUICheckoutOverlayProps {
     debug?: boolean;
     onEvent?: (eventType: CheckoutEventType, eventData: CheckoutEventData) => void;
     onError?: (error: CheckoutModalError) => void;
-    onMarketingOptInChange?: (marketingOptIn: boolean) => void;
 }
 declare type PUICheckoutProps = PUICheckoutOverlayProps & ProvidersInjectorProps;
 declare const PUICheckout: React$1.FC<PUICheckoutProps>;
@@ -275,6 +266,19 @@ declare const MOJITO_DARK_THEME: Theme;
 declare const THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY = "paymentId";
 declare const THREEDS_FLOW_SEARCH_PARAM_ERROR_KEY = "paymentError";
 
+declare type CheckoutComponentProps = Partial<Omit<PUICheckoutProps, "open" | "onClose" | "loaderMode" | "paymentErrorParam">>;
+declare type CheckoutComponentWithRequiredProps = Partial<PUICheckoutProps> & Pick<PUICheckoutProps, "open" | "onClose" | "loaderMode" | "paymentErrorParam">;
+interface CheckoutOverlayContextProps {
+    open: (checkoutComponentProps?: CheckoutComponentProps) => void;
+    close: () => void;
+    setCheckoutComponentProps: React$1.Dispatch<React$1.SetStateAction<CheckoutComponentProps>>;
+}
+interface CheckoutOverlayProviderProps extends UseOpenCloseCheckoutModalOptions {
+    checkoutComponent: React$1.ComponentType<CheckoutComponentWithRequiredProps>;
+}
+declare const CheckoutOverlayProvider: React$1.FC<CheckoutOverlayProviderProps>;
+declare function useCheckoutOverlay(): CheckoutOverlayContextProps;
+
 interface PalettePaymentUI {
     progressBar?: string;
     paymentMethodSelectorBorder?: string;
@@ -283,4 +287,4 @@ interface PalettePaymentUI {
     mainButtonBorderWidth?: number;
 }
 
-export { CheckoutEventData, CheckoutEventType, CheckoutItem, CheckoutModalError, CheckoutModalErrorAt, CircleFieldErrorAt, CircleFieldErrors, MOJITO_DARK_THEME, MOJITO_LIGHT_THEME, PUICheckout, PUICheckoutProps, PUIDictionary, PUIDictionaryKeys, PUIDictionaryMultiLine, PUIDictionarySingleLine, PUIError, PUIErrorProps, PUIPlaid, PUISuccess, PUISuccessProps$1 as PUISuccessProps, PalettePaymentUI, PaymentType, THREEDS_FLOW_SEARCH_PARAM_ERROR_KEY, THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY, UserFormat, continueCheckout, continueFlows, continuePlaidOAuthFlow, extendDefaultTheme, getCheckoutModalState, getPlaidOAuthFlowState, persistPlaidReceivedRedirectUri, persistReceivedRedirectUri3DS, useOpenCloseCheckoutModal };
+export { CheckoutComponentProps, CheckoutEventData, CheckoutEventType, CheckoutItem, CheckoutModalError, CheckoutModalErrorAt, CheckoutOverlayContextProps, CheckoutOverlayProvider, CheckoutOverlayProviderProps, CircleFieldErrorAt, CircleFieldErrors, MOJITO_DARK_THEME, MOJITO_LIGHT_THEME, PUICheckout, PUICheckoutProps, PUIDictionary, PUIDictionaryKeys, PUIDictionaryMultiLine, PUIDictionarySingleLine, PUIError, PUIErrorProps, PUIPlaid, PUISuccess, PUISuccessProps$1 as PUISuccessProps, PalettePaymentUI, PaymentType, THREEDS_FLOW_SEARCH_PARAM_ERROR_KEY, THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY, UserFormat, continueCheckout, continueFlows, continuePlaidOAuthFlow, extendDefaultTheme, getCheckoutModalState, getPlaidOAuthFlowState, persistPlaidReceivedRedirectUri, persistReceivedRedirectUri3DS, useCheckoutOverlay };

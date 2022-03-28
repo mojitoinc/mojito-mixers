@@ -11,7 +11,7 @@ import { usePlaid } from '../../hooks/usePlaid.js';
 import { checkNeedsGenericErrorMessage } from '../../hooks/useFormCheckoutError.js';
 
 const billingInfoItemBoxProps = { sx: { mt: 2.5 } };
-const PaymentView = ({ checkoutItems, taxes, savedPaymentMethods: rawSavedPaymentMethods, selectedPaymentMethod, wallets, wallet, checkoutError, onPaymentInfoSelected, onCvvSelected, onSavedPaymentMethodDeleted, onWalletChange, onNext, onPrev, onClose, acceptedPaymentTypes, acceptedCreditCardNetworks, consentType, debug, }) => {
+const PaymentView = ({ checkoutItems, taxes, savedPaymentMethods: rawSavedPaymentMethods, selectedPaymentMethod, wallets, wallet, checkoutError, onPaymentInfoSelected, onCvvSelected, onSavedPaymentMethodDeleted, onWalletChange, onNext, onPrev, onClose, acceptedPaymentTypes = ["CreditCard"], acceptedCreditCardNetworks, consentType, debug, }) => {
     const { billingInfo: selectedBillingInfo, paymentInfo: selectedPaymentInfo, } = selectedPaymentMethod;
     const savedPaymentMethods = useMemo(() => {
         if (typeof selectedBillingInfo !== "string")
@@ -56,7 +56,6 @@ const PaymentView = ({ checkoutItems, taxes, savedPaymentMethods: rawSavedPaymen
             onPaymentInfoSelected(lastActiveSavedPaymentMethod.id);
         }
     }, [showSaved, onPaymentInfoSelected, savedPaymentMethods, selectedPaymentInfo /*, checkoutError*/]);
-    console.log("selectedPaymentInfo =", selectedPaymentInfo);
     // PLAIN LINKS:
     const onPlaidLinkClicked = usePlaid({
         selectedBillingInfo,

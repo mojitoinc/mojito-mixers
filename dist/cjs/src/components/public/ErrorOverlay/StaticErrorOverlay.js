@@ -14,7 +14,7 @@ var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 
 const PUIStaticErrorOverlay = (_a) => {
     var { logoSrc, logoSx } = _a, errorViewProps = tslib_es6.__rest(_a, ["logoSrc", "logoSx"]);
-    const headerElement = logoSrc ? (React__default["default"].createElement(CheckoutModalHeader.CheckoutModalHeader, { variant: "error", logoSrc: logoSrc, logoSx: logoSx })) : null;
+    const headerElement = (React__default["default"].createElement(CheckoutModalHeader.CheckoutModalHeader, { variant: "error", logoSrc: logoSrc, logoSx: logoSx }));
     return (React__default["default"].createElement(FullScreenOverlay.FullScreenOverlay, { isDialogBlocked: true, centered: true, header: headerElement },
         React__default["default"].createElement(ErrorView.ErrorView, Object.assign({}, errorViewProps))));
 };
