@@ -22,7 +22,7 @@ export interface PaymentViewProps {
     onNext: () => void;
     onPrev: () => void;
     onClose: () => void;
-    acceptedPaymentTypes: PaymentType[];
+    acceptedPaymentTypes?: PaymentType[];
     acceptedCreditCardNetworks?: CreditCardNetwork[];
     consentType?: ConsentType;
     debug?: boolean;

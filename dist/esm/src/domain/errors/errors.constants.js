@@ -1,4 +1,3 @@
-import { FIELD_LABELS } from '../../forms/BillingInfoForm.js';
 import { withFullNameErrorMessage } from '../../utils/validationUtils.js';
 
 const BUILT_IN_ERRORS = ["EvalError", "RangeError", "ReferenceError", "SyntaxError", "TypeError", "URIError", "AggregateError", "InternalError"];
@@ -46,7 +45,7 @@ const MAPPED_ERRORS = {
     "name should contains first and last name": {
         errorLocation: "billing",
         fieldName: "fullName",
-        errorMessage: withFullNameErrorMessage({ label: FIELD_LABELS.fullName }),
+        errorMessage: withFullNameErrorMessage({ label: "Full Name" }),
     },
 };
 

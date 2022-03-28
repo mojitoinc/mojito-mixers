@@ -12,6 +12,7 @@ export interface CheckoutModalFooterProps {
     closeLabel?: string;
     closeDisabled?: boolean;
     onCloseClicked?: () => void;
+    goToHref?: string;
     goToLabel?: string;
     onGoTo?: () => void;
 }

@@ -26,7 +26,7 @@ submitLabel, submitDisabled, submitLoading, onSubmitClicked,
 // Close link:
 closeLabel, closeDisabled, onCloseClicked, 
 // Secondary button:
-goToLabel = "View Invoices", onGoTo, }) => {
+goToHref = "/profile/invoices", goToLabel = "View Invoices", onGoTo, }) => {
     // CONSENT:
     const showConsent = consentType && VARIANTS_WITH_DISCLAIMER.includes(variant);
     const consentTextElement = showConsent ? React__default["default"].createElement(ConsentText.ConsentText, null) : null;
@@ -98,7 +98,7 @@ goToLabel = "View Invoices", onGoTo, }) => {
         showConsent && consentType === "checkbox" && (React__default["default"].createElement(Checkbox.Checkbox, { label: React__default["default"].createElement(React__default["default"].Fragment, null,
                 "I ",
                 consentTextElement), checked: isConsentChecked, onChange: handleConsentClicked, error: showConsentError, helperText: showConsentError ? ConsentText.CONSENT_ERROR_MESSAGE : undefined, sx: { alignSelf: "flex-start", mb: 5 } })),
-        goToLabel && onGoTo && (React__default["default"].createElement(PrimaryButton.PrimaryButton, { onClickCapture: handleGoToClicked, disabled: isPrimaryButtonDisabled, href: "/profile/invoices", sx: { mb: 2 } }, goToLabel)),
+        goToLabel && onGoTo && (React__default["default"].createElement(PrimaryButton.PrimaryButton, { onClickCapture: handleGoToClicked, disabled: isPrimaryButtonDisabled, href: goToHref, sx: { mb: 2 } }, goToLabel)),
         primaryButtonVisible && (React__default["default"].createElement(PrimaryButton.PrimaryButton, { onClick: onSubmitClicked ? handleSubmitClicked : undefined, type: onSubmitClicked ? "button" : "submit", endIcon: isFormLoading || submitLoading ? React__default["default"].createElement(material.CircularProgress, { color: "inherit", size: "1em" }) : (PrimaryButtonIcon && React__default["default"].createElement(PrimaryButtonIcon, null)), disabled: isPrimaryButtonDisabled }, primaryButtonLabel)),
         variant !== "toMarketplace" && (onCloseClicked || closeDisabled) && (React__default["default"].createElement(material.Typography, { sx: { color: cancelLinkColor, pt: primaryButtonVisible ? 2 : 0 } },
             primaryButtonVisible ? "or " : null,

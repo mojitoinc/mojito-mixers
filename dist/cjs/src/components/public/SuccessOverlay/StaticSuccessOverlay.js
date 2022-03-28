@@ -14,7 +14,7 @@ var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 
 const PUIStaticSuccessOverlay = (_a) => {
     var { logoSrc, logoSx } = _a, successViewProps = tslib_es6.__rest(_a, ["logoSrc", "logoSx"]);
-    const headerElement = logoSrc ? (React__default["default"].createElement(CheckoutModalHeader.CheckoutModalHeader, { variant: "purchasing", logoSrc: logoSrc, logoSx: logoSx })) : null;
+    const headerElement = (React__default["default"].createElement(CheckoutModalHeader.CheckoutModalHeader, { variant: "purchasing", logoSrc: logoSrc, logoSx: logoSx }));
     return (React__default["default"].createElement(FullScreenOverlay.FullScreenOverlay, { isDialogBlocked: true, centered: true, header: headerElement },
         React__default["default"].createElement(SuccessView.SuccessView, Object.assign({}, successViewProps))));
 };

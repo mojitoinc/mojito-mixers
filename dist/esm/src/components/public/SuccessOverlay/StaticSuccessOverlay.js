@@ -6,7 +6,7 @@ import { FullScreenOverlay } from '../../shared/FullScreenOverlay/FullScreenOver
 
 const PUIStaticSuccessOverlay = (_a) => {
     var { logoSrc, logoSx } = _a, successViewProps = __rest(_a, ["logoSrc", "logoSx"]);
-    const headerElement = logoSrc ? (React__default.createElement(CheckoutModalHeader, { variant: "purchasing", logoSrc: logoSrc, logoSx: logoSx })) : null;
+    const headerElement = (React__default.createElement(CheckoutModalHeader, { variant: "purchasing", logoSrc: logoSrc, logoSx: logoSx }));
     return (React__default.createElement(FullScreenOverlay, { isDialogBlocked: true, centered: true, header: headerElement },
         React__default.createElement(SuccessView, Object.assign({}, successViewProps))));
 };

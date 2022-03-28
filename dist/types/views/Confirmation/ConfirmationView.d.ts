@@ -10,6 +10,7 @@ export interface ConfirmationViewProps {
     circlePaymentID: string;
     wallet: null | string | Wallet;
     onNext: () => void;
+    goToHref?: string;
     goToLabel?: string;
     onGoTo?: () => void;
 }
