@@ -64,13 +64,13 @@ export const PUIErrorOverlay: React.FC<PUIErrorOverlayProps> = ({
     onRedirect("/");
   }, [purchaseError, onRedirect]);
 
-  return purchaseError ? (
+  return (
     <PUIStaticErrorOverlay
       { ...staticErrorOverlayProps }
       checkoutError={ { errorMessage } }
       onFixError={ reviewData }
       onClose={ toMarketplace } />
-  ) : null;
+  );
 }
 
 export const PUIError: React.FC<PUIErrorProps> = withProviders(PUIErrorOverlay);
