@@ -17,6 +17,7 @@ export interface ConfirmationViewProps {
   circlePaymentID: string;
   wallet: null | string | Wallet;
   onNext: () => void;
+  goToHref?: string;
   goToLabel?: string;
   onGoTo?: () => void;
 }
@@ -28,6 +29,7 @@ export const ConfirmationView: React.FC<ConfirmationViewProps> = ({
   circlePaymentID,
   wallet,
   onNext,
+  goToHref,
   goToLabel,
   onGoTo,
 }) => {
@@ -83,6 +85,7 @@ export const ConfirmationView: React.FC<ConfirmationViewProps> = ({
         <CheckoutModalFooter
           variant="toMarketplace"
           onSubmitClicked={onNext}
+          goToHref={goToHref}
           goToLabel={goToLabel}
           onGoTo={onGoTo} />
       </Stack>

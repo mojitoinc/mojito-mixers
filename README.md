@@ -212,7 +212,8 @@ const App: React.FC = () => {
     open: isOpen,
     onClose,
     onGoTo: handleGoToClicked,
-    onGoToLabel: "View Invoices",
+    goToHref: "/profile/invoices",
+    goToLabel: "View Invoices",
 
     // Flow:
     loaderMode,

@@ -43,6 +43,7 @@ export interface PUICheckoutOverlayProps {
   open: boolean;
   onClose: () => void;
   onGoTo?: () => void;
+  goToHref?: string;
   goToLabel?: string;
 
   // Flow:
@@ -98,6 +99,8 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   open,
   onClose,
   onGoTo,
+  // TODO: Move to dictionary:
+  goToHref,
   goToLabel,
 
   // Flow:
@@ -836,6 +839,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
         circlePaymentID={ circlePaymentID }
         wallet={ wallet }
         onNext={ handleClose }
+        goToHref={ goToHref }
         goToLabel={ goToLabel }
         onGoTo={ onGoTo } />
     );
