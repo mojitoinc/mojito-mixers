@@ -9,7 +9,8 @@ export interface ConfirmationViewProps {
     selectedPaymentMethod: SelectedPaymentMethod;
     circlePaymentID: string;
     wallet: null | string | Wallet;
-    onGoToCollection?: () => void;
     onNext: () => void;
+    goToLabel?: string;
+    onGoTo?: () => void;
 }
 export declare const ConfirmationView: React.FC<ConfirmationViewProps>;

@@ -3,14 +3,12 @@ import { useTimeout } from '@swyg/corre';
 import React__default, { useLayoutEffect } from 'react';
 import { THREEDS_SUCCESS_REDIRECT_DELAY_MS } from '../../../config/config.js';
 import { isUrlPathname, getUrlWithSearchParams } from '../../../domain/url/url.utils.js';
-import { SuccessView } from '../../../views/Success/SuccessView.js';
-import { CheckoutModalHeader } from '../../payments/CheckoutModalHeader/CheckoutModalHeader.js';
-import { FullScreenOverlay } from '../../shared/FullScreenOverlay/FullScreenOverlay.js';
 import { withThemeProvider } from '../../shared/ProvidersInjector/ProvidersInjector.js';
 import { getCheckoutModalState, persistReceivedRedirectUri3DS } from '../CheckoutOverlay/CheckoutOverlay.utils.js';
+import { PUIStaticSuccessOverlay } from './StaticSuccessOverlay.js';
 
 const PUISuccessOverlay = (_a) => {
-    var { logoSrc, logoSx, successImageSrc, onRedirect } = _a, fullScreenOverlayProps = __rest(_a, ["logoSrc", "logoSx", "successImageSrc", "onRedirect"]);
+    var { onRedirect } = _a, staticSuccessOverlayProps = __rest(_a, ["onRedirect"]);
     const { purchaseSuccess, url = "" } = getCheckoutModalState();
     const isPathname = isUrlPathname(url);
     useLayoutEffect(() => {
@@ -27,13 +25,9 @@ const PUISuccessOverlay = (_a) => {
         // If everything's ok, users see this confirmation screen for 5 seconds and then are redirected to the purchase
         // confirmation page:
         if (purchaseSuccess)
-            onRedirect(isPathname ? url : getUrlWithSearchParams(url));
-    }, THREEDS_SUCCESS_REDIRECT_DELAY_MS, [purchaseSuccess, isPathname, onRedirect]);
-    if (!purchaseSuccess)
-        return null;
-    const headerElement = logoSrc ? (React__default.createElement(CheckoutModalHeader, { variant: "purchasing", logoSrc: logoSrc, logoSx: logoSx })) : null;
-    return (React__default.createElement(FullScreenOverlay, Object.assign({ isDialogBlocked: true, centered: true, header: headerElement }, fullScreenOverlayProps),
-        React__default.createElement(SuccessView, { successImageSrc: successImageSrc })));
+            onRedirect(getUrlWithSearchParams(url));
+    }, THREEDS_SUCCESS_REDIRECT_DELAY_MS);
+    return purchaseSuccess ? (React__default.createElement(PUIStaticSuccessOverlay, Object.assign({}, staticSuccessOverlayProps))) : null;
 };
 const PUISuccess = withThemeProvider(PUISuccessOverlay);
 

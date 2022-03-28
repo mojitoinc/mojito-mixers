@@ -1,13 +1,12 @@
-import { PaymentMethod } from "../../../domain/payment/payment.interfaces";
 import { BillingInfo } from "../../../forms/BillingInfoForm";
-import { CheckoutModalError, CheckoutModalStep } from "./CheckoutOverlay.hooks";
+import { CheckoutModalStep } from "./CheckoutOverlay.hooks";
 export interface CheckoutModalInfo {
     url?: string;
     invoiceID: string;
     circlePaymentID: string;
     paymentID: string;
     billingInfo: string | BillingInfo;
-    paymentInfo: string | PaymentMethod;
+    paymentInfo: string | null;
     timestamp?: number;
 }
 export interface CheckoutModalState3DS extends CheckoutModalInfo {
@@ -28,11 +27,10 @@ export declare type FlowType = "" | "3DS" | "Plaid";
 export interface ContinueFlowsReturn {
     flowType: FlowType;
     checkoutStep: CheckoutModalStep | "";
-    checkoutError?: CheckoutModalError;
     invoiceID: string;
     circlePaymentID: string;
     paymentID: string;
     billingInfo: string | BillingInfo;
-    paymentInfo: string | PaymentMethod;
+    paymentInfo: string | null;
 }
 export declare function continueFlows(noClear?: boolean): ContinueFlowsReturn;

@@ -1,19 +1,17 @@
 import { __rest, __awaiter } from '../../../../node_modules/tslib/tslib.es6.js';
 import { useTimeout } from '@swyg/corre';
 import React__default, { useState, useEffect, useLayoutEffect, useCallback } from 'react';
-import { PAYMENT_NOTIFICATION_ERROR_MAX_WAIT_MS, PAYMENT_NOTIFICATION_INTERVAL_MS } from '../../../config/config.js';
+import { PAYMENT_NOTIFICATION_ERROR_MAX_WAIT_MS, THREEDS_FLOW_SEARCH_PARAM_ERROR, PAYMENT_NOTIFICATION_INTERVAL_MS } from '../../../config/config.js';
 import { ERROR_PURCHASE } from '../../../domain/errors/errors.constants.js';
-import { isUrlPathname, getUrlWithSearchParams } from '../../../domain/url/url.utils.js';
+import { isUrlPathname } from '../../../domain/url/url.utils.js';
 import { useGetPaymentNotificationQuery } from '../../../queries/graphqlGenerated.js';
-import { ErrorView } from '../../../views/Error/ErrorView.js';
-import { CheckoutModalHeader } from '../../payments/CheckoutModalHeader/CheckoutModalHeader.js';
-import { FullScreenOverlay } from '../../shared/FullScreenOverlay/FullScreenOverlay.js';
 import { withProviders } from '../../shared/ProvidersInjector/ProvidersInjector.js';
 import { getCheckoutModalState, persistReceivedRedirectUri3DS, clearPersistedInfo } from '../CheckoutOverlay/CheckoutOverlay.utils.js';
+import { PUIStaticErrorOverlay } from './StaticErrorOverlay.js';
 
 const PUIErrorOverlay = (_a) => {
     var _b, _c, _d;
-    var { logoSrc, logoSx, errorImageSrc, onRedirect } = _a, fullScreenOverlayProps = __rest(_a, ["logoSrc", "logoSx", "errorImageSrc", "onRedirect"]);
+    var { onRedirect } = _a, staticErrorOverlayProps = __rest(_a, ["onRedirect"]);
     const [errorMessage, setErrorMessage] = useState("");
     const paymentNotificationResult = useGetPaymentNotificationQuery({
         skip: !!errorMessage,
@@ -25,7 +23,7 @@ const PUIErrorOverlay = (_a) => {
             setErrorMessage(prevErrorMessage => prevErrorMessage || "");
     }, [error]);
     useTimeout(() => {
-        setErrorMessage(prevErrorMessage => prevErrorMessage || ERROR_PURCHASE().errorMessage);
+        setErrorMessage(prevErrorMessage => prevErrorMessage || ERROR_PURCHASE.errorMessage);
     }, PAYMENT_NOTIFICATION_ERROR_MAX_WAIT_MS);
     const { purchaseError, url = "" } = getCheckoutModalState();
     useLayoutEffect(() => {
@@ -34,12 +32,12 @@ const PUIErrorOverlay = (_a) => {
         if (!purchaseError)
             onRedirect("/");
     }, [purchaseError, onRedirect]);
-    const reviewData = useCallback(() => __awaiter(void 0, void 0, void 0, function* () {
+    const reviewData = useCallback((errorMessage) => __awaiter(void 0, void 0, void 0, function* () {
         const isPathname = isUrlPathname(url);
         if (isPathname)
             persistReceivedRedirectUri3DS(window.location.href);
         // If there was an error, users can click the review button and go back to the Payment UI to review the data...:
-        onRedirect(isPathname ? url : getUrlWithSearchParams(url));
+        onRedirect(`${url}${THREEDS_FLOW_SEARCH_PARAM_ERROR}${encodeURIComponent(errorMessage)}`);
         return false;
     }), [onRedirect, url]);
     const toMarketplace = useCallback(() => {
@@ -49,9 +47,7 @@ const PUIErrorOverlay = (_a) => {
         // ...or they can just go back to the marketplace homepage:
         onRedirect("/");
     }, [purchaseError, onRedirect]);
-    const headerElement = logoSrc ? (React__default.createElement(CheckoutModalHeader, { variant: "error", logoSrc: logoSrc, logoSx: logoSx })) : null;
-    return (React__default.createElement(FullScreenOverlay, Object.assign({ isDialogBlocked: !errorMessage, centered: true, header: headerElement }, fullScreenOverlayProps),
-        React__default.createElement(ErrorView, { checkoutError: { errorMessage }, errorImageSrc: errorImageSrc, onFixError: reviewData, onClose: toMarketplace })));
+    return purchaseError ? (React__default.createElement(PUIStaticErrorOverlay, Object.assign({}, staticErrorOverlayProps, { checkoutError: { errorMessage }, onFixError: reviewData, onClose: toMarketplace }))) : null;
 };
 const PUIError = withProviders(PUIErrorOverlay);
 

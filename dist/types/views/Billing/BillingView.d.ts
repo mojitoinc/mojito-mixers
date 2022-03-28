@@ -8,6 +8,7 @@ import { ConsentType } from "../../components/shared/ConsentText/ConsentText";
 export declare type TaxStatus = "incomplete" | "loading" | "complete" | "error";
 export interface TaxesState {
     status: TaxStatus;
+    invalidZipCode?: boolean;
     taxRate?: number;
     taxAmount?: number;
 }

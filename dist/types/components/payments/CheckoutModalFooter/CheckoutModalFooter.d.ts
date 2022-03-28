@@ -7,10 +7,12 @@ export interface CheckoutModalFooterProps {
     consentType?: ConsentType;
     submitLabel?: string;
     submitDisabled?: boolean;
+    submitLoading?: boolean;
     onSubmitClicked?: (canSubmit: boolean) => void | Promise<void | false>;
     closeLabel?: string;
     closeDisabled?: boolean;
     onCloseClicked?: () => void;
-    onGoToCollection?: () => void;
+    goToLabel?: string;
+    onGoTo?: () => void;
 }
 export declare const CheckoutModalFooter: React.FC<CheckoutModalFooterProps>;

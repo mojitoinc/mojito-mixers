@@ -14,11 +14,11 @@ const CheckoutModalFooter = ({
 // Configuration:
 variant, guestCheckoutEnabled, consentType, 
 // Submit button:
-submitLabel, submitDisabled, onSubmitClicked, 
+submitLabel, submitDisabled, submitLoading, onSubmitClicked, 
 // Close link:
 closeLabel, closeDisabled, onCloseClicked, 
-// onGoToCollection:
-onGoToCollection, }) => {
+// Secondary button:
+goToLabel = "View Invoices", onGoTo, }) => {
     // CONSENT:
     const showConsent = consentType && VARIANTS_WITH_DISCLAIMER.includes(variant);
     const consentTextElement = showConsent ? React__default.createElement(ConsentText, null) : null;
@@ -35,21 +35,22 @@ onGoToCollection, }) => {
             isConsentChecked: checked,
         }));
     }, []);
-    // COLLECTION BUTTON (ConfirmationView-specific):
-    const handleCollectionClicked = useCallback((e) => {
-        e.preventDefault();
-        // TODO: In order to implement be functionality below, we need to pass a Link component to PUI to use, and then we
-        // can just pass a collectionPathname instead of onGoToCollection:
-        // We want to display the link (href) if the user hovers the button or if they click with the wheel or Ctrl + Click,
-        // but we don't know what type of routing the parent app is using (Next.js, React Router, etc.) so we just prevent
-        // default here and let the parent app handle the routing:
-        // console.log(e.ctrlKey, e.button);
-        if (onGoToCollection)
-            onGoToCollection();
-    }, [onGoToCollection]);
+    // SECONDARY BUTTON (ConfirmationView-specific):
+    const handleGoToClicked = useCallback((e) => {
+        // We want to display the link (href) if the user hovers the button or if they click with the wheel or
+        // Ctrl/Command + Click, but we don't know what type of routing the parent app is using (Next.js, React Router, etc.)
+        // so we just prevent default here and let the parent app handle the routing:
+        if (!e.ctrlKey && !e.metaKey) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        if (onGoTo)
+            onGoTo();
+    }, [onGoTo]);
     // SUBMIT BUTTON:
     const primaryButtonVisible = variant !== "toGuestCheckout" || guestCheckoutEnabled;
     const primaryButtonLabel = submitLabel || LABELS_BY_VARIANT[variant];
+    const isPrimaryButtonDisabled = submitDisabled || isFormLoading;
     const PrimaryButtonIcon = ICONS_BY_VARIANT[variant];
     const handleSubmitClicked = useCallback(() => __awaiter(void 0, void 0, void 0, function* () {
         if (!onSubmitClicked)
@@ -73,11 +74,12 @@ onGoToCollection, }) => {
     // CANCEL LINK:
     const cancelLinkLabel = closeLabel || "Cancel and Return to Marketplace";
     const cancelLinkColor = closeDisabled ? "text.disabled" : "text.primary"; // TODO: Create custom Link component with this functionality.
+    const isCancelLinkDisabled = closeDisabled || isFormLoading;
     const handleCancelClicked = useCallback((e) => {
         e.preventDefault();
-        if (onCloseClicked && !closeDisabled)
+        if (onCloseClicked && !isCancelLinkDisabled)
             onCloseClicked();
-    }, [onCloseClicked, closeDisabled]);
+    }, [onCloseClicked, isCancelLinkDisabled]);
     return (React__default.createElement(Box, { sx: {
             display: "flex",
             alignItems: "center",
@@ -88,11 +90,11 @@ onGoToCollection, }) => {
         showConsent && consentType === "checkbox" && (React__default.createElement(Checkbox, { label: React__default.createElement(React__default.Fragment, null,
                 "I ",
                 consentTextElement), checked: isConsentChecked, onChange: handleConsentClicked, error: showConsentError, helperText: showConsentError ? CONSENT_ERROR_MESSAGE : undefined, sx: { alignSelf: "flex-start", mb: 5 } })),
-        onGoToCollection && (React__default.createElement(PrimaryButton, { onClick: handleCollectionClicked, disabled: submitDisabled || isFormLoading, sx: { mb: 2 } }, "View Collection")),
-        primaryButtonVisible && (React__default.createElement(PrimaryButton, { onClick: onSubmitClicked ? handleSubmitClicked : undefined, type: onSubmitClicked ? "button" : "submit", endIcon: isFormLoading ? React__default.createElement(CircularProgress, { color: "inherit", size: "1em" }) : (PrimaryButtonIcon && React__default.createElement(PrimaryButtonIcon, null)), disabled: submitDisabled || isFormLoading }, primaryButtonLabel)),
-        variant !== "toMarketplace" && onCloseClicked && (React__default.createElement(Typography, { sx: { color: cancelLinkColor, pt: primaryButtonVisible ? 2 : 0 } },
+        goToLabel && onGoTo && (React__default.createElement(PrimaryButton, { onClickCapture: handleGoToClicked, disabled: isPrimaryButtonDisabled, href: "/profile/invoices", sx: { mb: 2 } }, goToLabel)),
+        primaryButtonVisible && (React__default.createElement(PrimaryButton, { onClick: onSubmitClicked ? handleSubmitClicked : undefined, type: onSubmitClicked ? "button" : "submit", endIcon: isFormLoading || submitLoading ? React__default.createElement(CircularProgress, { color: "inherit", size: "1em" }) : (PrimaryButtonIcon && React__default.createElement(PrimaryButtonIcon, null)), disabled: isPrimaryButtonDisabled }, primaryButtonLabel)),
+        variant !== "toMarketplace" && (onCloseClicked || closeDisabled) && (React__default.createElement(Typography, { sx: { color: cancelLinkColor, pt: primaryButtonVisible ? 2 : 0 } },
             primaryButtonVisible ? "or " : null,
-            React__default.createElement(Link, { sx: { color: cancelLinkColor, cursor: closeDisabled ? "not-allowed" : "pointer" }, href: "", onClick: handleCancelClicked }, cancelLinkLabel))),
+            React__default.createElement(Link, { sx: { color: cancelLinkColor, cursor: isCancelLinkDisabled ? "not-allowed" : "pointer" }, href: "", onClick: handleCancelClicked }, cancelLinkLabel))),
         showConsent && consentType === "disclaimer" && (React__default.createElement(React__default.Fragment, null,
             React__default.createElement(Divider, { sx: { my: 5, width: "100%" } }),
             React__default.createElement(Typography, { sx: { maxWidth: SM_MOBILE_MAX_WIDTH }, align: "center" },

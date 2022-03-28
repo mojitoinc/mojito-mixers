@@ -10,6 +10,7 @@ var circle_utils = require('../domain/circle/circle.utils.js');
 var formatUtils = require('../utils/formatUtils.js');
 var promiseUtils = require('../utils/promiseUtils.js');
 var config = require('../config/config.js');
+var exceptions_constants = require('../domain/errors/exceptions.constants.js');
 
 function useCreatePaymentMethod({ orgID, debug, }) {
     const [encryptCardData] = useEncryptCard.useEncryptCardData({ orgID });
@@ -17,8 +18,6 @@ function useCreatePaymentMethod({ orgID, debug, }) {
     const [createPaymentMethod, createPaymentMethodResult] = graphqlGenerated.useCreatePaymentMethodMutation();
     const extendedCreatePaymentMethod = React.useCallback((billingInfo, paymentInfo) => tslib_es6.__awaiter(this, void 0, void 0, function* () {
         var _a, _b;
-        if (!orgID)
-            throw new Error("Missing `orgID`");
         const metadata = {
             email: billingInfo.email,
             phoneNumber: circle_utils.formatPhoneAsE123(billingInfo.phone, `${billingInfo.country.value}`),
@@ -76,22 +75,17 @@ function useCreatePaymentMethod({ orgID, debug, }) {
             });
         }
         else {
-            throw new Error("Unsupported payment method.");
-        }
-        if (!createPaymentMethodPromise) {
-            throw new Error("Payment method could not be saved.");
+            throw new Error(exceptions_constants.EXCEPTIONS.PAYMENT_METHOD.UNSUPPORTED);
         }
         let lastPaymentMethodStatusCheck;
         const paymentMethodCreatedAt = lastPaymentMethodStatusCheck = Date.now();
-        const createPaymentMethodResult = yield createPaymentMethodPromise;
-        const createPaymentMethodResultData = ((_a = createPaymentMethodResult.data) === null || _a === void 0 ? void 0 : _a.createPaymentMethod) || {};
+        const createPaymentMethodResult = createPaymentMethodPromise ? yield createPaymentMethodPromise : null;
+        const createPaymentMethodResultData = ((_a = createPaymentMethodResult === null || createPaymentMethodResult === void 0 ? void 0 : createPaymentMethodResult.data) === null || _a === void 0 ? void 0 : _a.createPaymentMethod) || {};
         const paymentMethodID = createPaymentMethodResultData.id;
         let status = createPaymentMethodResultData.status;
         let totalWaitTimeSoFar = 0;
-        if (!paymentMethodID || status === "failed")
-            throw new Error("Payment method could not be saved.");
-        if (status === "complete")
-            return createPaymentMethodPromise;
+        if (!paymentMethodID)
+            throw new Error(exceptions_constants.EXCEPTIONS.PAYMENT_METHOD.CREATION_FAILED);
         while (totalWaitTimeSoFar < config.PAYMENT_CREATION_MAX_WAIT_MS && status === "pending") {
             const now = Date.now();
             const paymentMethodStatusWaitTime = Math.max(config.PAYMENT_CREATION_INTERVAL_MS - (now - lastPaymentMethodStatusCheck), 0);
@@ -107,10 +101,10 @@ function useCreatePaymentMethod({ orgID, debug, }) {
             status = ((_b = paymentMethodStatusResult.data) === null || _b === void 0 ? void 0 : _b.getPaymentMethod.status) || "failed";
         }
         if (status === "failed")
-            throw new Error("Payment method could not be saved.");
+            throw new Error(exceptions_constants.EXCEPTIONS.PAYMENT_METHOD.VALIDATION_FAILED);
         else if (status === "complete")
             return createPaymentMethodPromise;
-        throw new Error("Payment method could not be validated.");
+        throw new Error(exceptions_constants.EXCEPTIONS.PAYMENT_METHOD.VALIDATION_TIMEOUT);
     }), [debug, orgID, encryptCardData, createPaymentMethod, getPaymentMethodStatus]);
     return [extendedCreatePaymentMethod, createPaymentMethodResult];
 }

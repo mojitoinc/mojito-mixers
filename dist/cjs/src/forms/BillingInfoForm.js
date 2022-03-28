@@ -65,6 +65,7 @@ const schema = yup.object()
     [FULL_NAME_FIELD]: yup.string()
         .label(FIELD_LABELS[FULL_NAME_FIELD])
         .required(validationUtils.withRequiredErrorMessage)
+        .matches(/^[A-Za-zÀ-ÖØ-öø-ÿ.·' -]+$/, validationUtils.withFullNameCharsetErrorMessage)
         .test({
         name: "is-valid-full-name",
         test: (value) => {
@@ -170,7 +171,7 @@ defaultValues, checkoutError, taxes, onTaxInfoChange, onSaved, onClose, onSubmit
             React__default["default"].createElement(Grid["default"], { item: true, sm: 6 },
                 React__default["default"].createElement(TextField.ControlledTextField, { name: ZIP_CODE_FIELD, control: control, label: FIELD_LABELS[ZIP_CODE_FIELD] }))),
         checkoutErrorMessage && React__default["default"].createElement(FormErrorsBox.FormErrorsBox, { error: checkoutErrorMessage, sx: { mt: 5 } }),
-        formState.isSubmitted && React__default["default"].createElement(TaxesMessagesBox.TaxesMessagesBox, { sx: { mt: 5 }, taxes: taxes, variant: "form" }),
+        formState.isSubmitted && React__default["default"].createElement(TaxesMessagesBox.TaxesMessagesBox, { sx: { mt: 5 }, variant: "form", taxes: taxes }),
         debug && (React__default["default"].createElement(DebugBox.DebugBox, { sx: { mt: 5 } },
             JSON.stringify(watch(), null, 2),
             "\n\n",
@@ -179,4 +180,5 @@ defaultValues, checkoutError, taxes, onTaxInfoChange, onSaved, onClose, onSubmit
 };
 
 exports.BillingInfoForm = BillingInfoForm;
+exports.FIELD_LABELS = FIELD_LABELS;
 //# sourceMappingURL=BillingInfoForm.js.map

@@ -40,8 +40,9 @@ const BillingView = ({ vertexEnabled, checkoutItems, savedPaymentMethods: rawSav
         };
     }, []);
     const calculateTaxes = React.useCallback((taxInfo) => tslib_es6.__awaiter(void 0, void 0, void 0, function* () {
-        var _a;
+        var _a, _b;
         const calledAt = getTaxQuoteTimestampRef.current;
+        let invalidZipCode = false;
         const result = yield getTaxQuote({
             variables: {
                 input: {
@@ -55,17 +56,27 @@ const BillingView = ({ vertexEnabled, checkoutItems, savedPaymentMethods: rawSav
                     },
                 },
             },
-        }).catch(() => ({ data: null }));
+        }).catch((err) => {
+            invalidZipCode = /invalid zipcode/i.test(err.message);
+            return { data: null };
+        });
         // Discard stale result:
         if (calledAt !== getTaxQuoteTimestampRef.current)
             return;
         const taxResult = ((_a = result.data) === null || _a === void 0 ? void 0 : _a.getTaxQuote) || {};
-        const isValid = !!taxResult.verifiedAddress;
-        setViewState((prevViewState) => (Object.assign(Object.assign({}, prevViewState), { taxes: isValid ? {
-                status: "complete",
+        const hasVerifiedAddress = !!taxResult.verifiedAddress;
+        const zipPlusFour = ((_b = taxResult.verifiedAddress) === null || _b === void 0 ? void 0 : _b.postalCode) || "";
+        if (zipPlusFour)
+            invalidZipCode || (invalidZipCode = !zipPlusFour.startsWith(taxInfo.zipCode));
+        setViewState((prevViewState) => (Object.assign(Object.assign({}, prevViewState), { taxes: hasVerifiedAddress ? {
+                status: invalidZipCode ? "error" : "complete",
+                invalidZipCode,
                 taxRate: 100 * taxResult.totalTaxAmount / taxResult.taxablePrice,
                 taxAmount: taxResult.totalTaxAmount,
-            } : { status: "error" } })));
+            } : {
+                status: "error",
+                invalidZipCode,
+            } })));
     }), [getTaxQuote, total]);
     const handleThrottledTaxInfoChange = corre.useThrottledCallback((taxInfo) => {
         var _a, _b;
