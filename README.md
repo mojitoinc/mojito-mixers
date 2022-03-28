@@ -178,8 +178,6 @@ open the Payment UI:
 ```TSX
   const { open, setCheckoutComponentProps } = useCheckoutOverlay();
 
-  const handleOpenClicked = useCallback(() => open(), [open]);
-
   const getComponentPropsRef = useRef<() => CheckoutComponentProps>(() => ({}));
 
   getComponentPropsRef.current = () => {
@@ -205,6 +203,8 @@ open the Payment UI:
       }],
     };
   };
+
+  const handleOpenClicked = useCallback(() => open(getComponentPropsRef.current()), [open]);
 
   useEffect(() => {
     setCheckoutComponentProps(getComponentPropsRef.current());
