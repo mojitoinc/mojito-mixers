@@ -3,7 +3,7 @@ import { Typography, Box, Stack, Button, FormControl, FormLabel, RadioGroup, For
 import { useCallback, useEffect, useRef, useState } from "react";
 import { PaymentType, CheckoutComponentProps, useCheckoutOverlay } from "../lib";
 import { useMeQuery } from "../services/graphql/generated";
-import { PLAYGROUND_PARAGRAPHS_ARRAY, PLAYGROUND_USER_FORMAT, PLAYGROUND_MOCKED_AUCTION_LOT, PLAYGROUND_MOCKED_BUY_NOW_LOT } from "../utils/playground/playground.constants";
+import { PLAYGROUND_PARAGRAPHS_ARRAY, PLAYGROUND_MOCKED_AUCTION_LOT, PLAYGROUND_MOCKED_BUY_NOW_LOT } from "../utils/playground/playground.constants";
 import { PlaygroundFormData } from "../utils/playground/playground.interfaces";
 
 const DEFAULT_FORM_VALUES: PlaygroundFormData = {
@@ -64,7 +64,6 @@ const HomePage: React.FC = () => {
 
     return {
       // Personalization:
-      userFormat: PLAYGROUND_USER_FORMAT,
       acceptedPaymentTypes: [
         formValues.paymentCC ? "CreditCard" : "",
         formValues.paymentACH ? "ACH" : "",

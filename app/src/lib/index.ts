@@ -3,7 +3,6 @@ export { PUICheckout } from "./components/public/CheckoutOverlay/CheckoutOverlay
 export { PUISuccess } from "./components/public/SuccessOverlay/SuccessOverlay";
 export { PUIError } from "./components/public/ErrorOverlay/ErrorOverlay";
 export { PUIPlaid } from "./components/public/PlaidOverlay/PlaidOverlay";
-export { useOpenCloseCheckoutModal } from "./components/public/useOpenCloseCheckoutModal/useOpenCloseCheckoutModal";
 export { getPlaidOAuthFlowState, persistPlaidReceivedRedirectUri } from "./domain/plaid/plaid.utils";
 export { continuePlaidOAuthFlow } from "./hooks/usePlaid";
 export { continueCheckout, continueFlows, getCheckoutModalState, persistReceivedRedirectUri3DS } from "./components/public/CheckoutOverlay/CheckoutOverlay.utils";

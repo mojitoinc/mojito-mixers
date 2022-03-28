@@ -150,134 +150,73 @@ And also, keep in mind:
 
 ## Usage:
 
+In your App's entry point (`_app.tsx` in Next.js), you need to add the `CheckoutOverlayProvider`:
+
 ```TSX
-
-import React, { ErrorInfo } from "react";
-
-import {
-  PUICheckout,
-  PUICheckoutProps,
-  useOpenCloseCheckoutModal,
-} from "@mojitoinc/mojito-mixers";
-
-const App: React.FC = () => {
   const router = useRouter();
-  const { profile } = useProfile();
-  const { loginWithPopup, isAuthenticated, isLoading, getIdTokenClaims } = useAuth0();
-
   const paymentIdParam = router.query[THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY]?.toString();
   const paymentErrorParam = router.query[THREEDS_FLOW_SEARCH_PARAM_ERROR_KEY]?.toString();
 
-  const { loaderMode, isOpen, onOpen, onClose } = useOpenCloseCheckoutModal({ paymentIdParam, paymentErrorParam });
+  return (
+    <CheckoutOverlayProvider
+      paymentIdParam={ paymentIdParam }
+      paymentErrorParam={ paymentErrorParam }
+      checkoutComponent={ CheckoutComponent }>
+      { ... }
+    </CheckoutOverlayProvider>
+  );
+```
 
-  const onRemoveUrlParams = useCallback((cleanURL: string) => {
-    router.replace(cleanURL, undefined, { shallow: true });
-  }, [router]);
+Where `CheckoutComponent: React.FC<CheckoutComponentWithRequiredProps>` is a component you need to create that renders
+`PUICheckout` with your custom configuration and its props. Simply copy the following file and adapt it to your needs:
 
-  const handleGoToClicked = useCallback(() => {
-    router.push("/profile/invoices");
-  }, []);
+[app/src/components/checkout-component/CheckoutComponent.tsx](./app/src/components/checkout-component/CheckoutComponent.tsx)
 
-  const handleLogin = useCallback(async () => {
-    await loginWithPopup({ prompt: "login" });
-    await getIdTokenClaims();
-  }, [loginWithPopup, getIdTokenClaims]);
+Lastly, in the pages where you'd like to use the Payment UI, you need to use the `useCheckoutOverlay` to customize and
+open the Payment UI:
 
-  const handleError = useCallback((error: CheckoutModalError) => {
-    Sentry.captureException(error);
-  }, []);
+```TSX
+  const { open, setCheckoutComponentProps } = useCheckoutOverlay();
 
-  const handleEvent = useCallback((eventType: CheckoutEventType, eventData: CheckoutEventData) => {
-    // Handle the data for each step or action as needed.
-  }, []);
+  const handleOpenClicked = useCallback(() => open(), [open]);
 
-  const handleCatch = useCallback((error: Error, errorInfo?: ErrorInfo) => {
-    Sentry.captureException({ error, errorInfo });
-  }, []);
+  const getComponentPropsRef = useRef<() => CheckoutComponentProps>(() => ({}));
 
-  const handleMarketingOptInChange = useCallback((marketingOptIn: boolean) => {
-    // Subscribe / unsubscribe.
-  }, []);
+  getComponentPropsRef.current = () => {
+    return {
+      orgID: "<orgID>",
+      invoiceID: "<invoiceID>",
+      checkoutItems: [{
+        // Common:
+        lotID: "<lotID>", // Mojito API ID
+        lotType: "<lotType>",
+        name: "<name>",
+        description: "<description>",
+        imageSrc: "<imageSrc>",
+        imageBackground: "<imageBackground>",
 
-  useEffect(() => {
-    // Open the modal automatically:
-    onOpen();
-  }, [onOpen])
-  
-  const checkoutModalProps: PUICheckoutProps = {
-    // ProviderInjector:
-    uri: config.MOJITO_API_URL,
+        // Buy Now:
+        totalSupply: "<totalSupply>",
+        remainingSupply: "<remainingSupply>",
+        units: "<units>",
 
-    // Modal:
-    open: isOpen,
-    onClose,
-    onGoTo: handleGoToClicked,
-    goToHref: "/profile/invoices",
-    goToLabel: "View Invoices",
-
-    // Flow:
-    loaderMode,
-    paymentErrorParam,
-    onRemoveUrlParams,
-    guestCheckoutEnabled: false,
-    productConfirmationEnabled: false,
-    vertexEnabled: true, // Default already true (requires set up on the backend).
-    threeDSEnabled: true, // Default already true (requires set up on the backend and frontend, see 3DS section below).
-
-    // Personalization:
-    // These two options, `theme` (replace default theme) and `themeOptions` (merge with default theme) are optional and 
-    // can't be defined at the same time:
-    // theme: YOUR_CUSTOM_THEME,
-    themeOptions: YOUR_CUSTOM_THEME_OPTIONS,
-    logoSrc: "https://...",
-    logoSx: { ... },
-    loaderImageSrc: "https://...",
-    purchasingImageSrc: "https://...",
-    purchasingMessages: ["...", "...", "..."],
-    successImageSrc: "https://...",
-    errorImageSrc: "https://...",
-    userFormat: "email",
-    acceptedPaymentTypes: ["CreditCard", "ACH"],
-    acceptedCreditCardNetworks: ["visa", "mastercard"],
-    network: { ... },
-    dictionary: {
-      walletInfo: <p>Lorem ipsum...</p>,
-    },
-
-    // Legal:
-    consentType: "circle",
-    privacyHref: "https://...",
-    termsOfUseHref: "https://...",
-
-    // Data:
-    orgID: "<ORG_ID>", // Usually profile.userOrgs[0].organizationId
-    invoiceID: "<INVOICE_ID>" // Only required for auction lots"
-    checkoutItem: {
-      lotID: "<LOT_IT>",
-      buyNow: "buyNow",
-      name: "Lorem ipsum...",
-      description: "Lorem ipsum...",
-      price: 0,
-      fee: 0,
-      imageSrc: "https://...",
-      imageBackground: "rgba(...)",
-    },
-    
-    // Authentication:
-    onLogin: handleLogin,
-    isAuthenticated,
-    isAuthenticatedLoading: isLoading,
-
-    // Other Events:
-    debug: true,
-    onEvent: handleEvent,
-    onError: handleError,
-    onCatch: handleCatch,
+        // Auction:
+        fee: "<fee>",
+      }],
+    };
   };
 
-  return <PUICheckout { ...checkoutModalProps } />;
-};
+  useEffect(() => {
+    setCheckoutComponentProps(getComponentPropsRef.current());
+  }, [setCheckoutComponentProps]);
+
 ```
+
+You can see an example here:
+
+[app/src/pages/index.tsx](./app/src/pages/index.tsx).
+
+**Make sure you check the setup steps below for Vertex, 3DS and Plaid.**
 
 <br />
 

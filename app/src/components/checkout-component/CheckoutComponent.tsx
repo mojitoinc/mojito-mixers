@@ -6,7 +6,7 @@ import { PUICheckout, PUICheckoutProps } from "../../lib/components/public/Check
 import { CheckoutComponentWithRequiredProps } from "../../lib/components/public/CheckoutOverlayProvider/CheckoutOverlayProvider";
 import { isLocalhost } from "../../lib/domain/url/url.utils";
 import { config } from "../../utils/config/config.constants";
-import { PLAYGROUND_MOJITO_LOGO } from "../../utils/playground/playground.constants";
+import { PLAYGROUND_MOJITO_LOGO, PLAYGROUND_USER_FORMAT } from "../../utils/playground/playground.constants";
 
 export const CheckoutComponent: React.FC<CheckoutComponentWithRequiredProps> = (checkoutComponentProps) => {
   const router = useRouter();
@@ -96,7 +96,7 @@ export const CheckoutComponent: React.FC<CheckoutComponentWithRequiredProps> = (
     // purchasingMessages,
     // successImageSrc,
     // errorImageSrc,
-    // userFormat,
+    userFormat: PLAYGROUND_USER_FORMAT,
     // acceptedPaymentTypes,
     // acceptedCreditCardNetworks,
     // network,
