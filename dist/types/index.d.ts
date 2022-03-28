@@ -20,4 +20,4 @@ export type { CircleFieldErrorAt, CircleFieldErrors } from "./domain/circle/circ
 export type { PUIDictionary, PUIDictionaryKeys, PUIDictionarySingleLine, PUIDictionaryMultiLine } from "./domain/dictionary/dictionary.interfaces";
 export type { CheckoutEventType, CheckoutEventData } from "./domain/events/events.interfaces";
 export type { PalettePaymentUI } from "./domain/mui/mui.interfaces";
-export type { CheckoutComponentProps, CheckoutOverlayContextProps, CheckoutOverlayProviderProps } from "./components/public/CheckoutOverlayProvider/CheckoutOverlayProvider";
+export type { CheckoutComponentProps, CheckoutComponentWithRequiredProps, CheckoutOverlayContextProps, CheckoutOverlayProviderProps } from "./components/public/CheckoutOverlayProvider/CheckoutOverlayProvider";
