@@ -1,11 +1,7 @@
-import { SxProps, Theme } from "@mui/material/styles";
 import React from "react";
-import { FullScreenOverlayFunctionalProps } from "../../shared/FullScreenOverlay/FullScreenOverlay";
 import { ThemeProviderProps } from "../../shared/ProvidersInjector/ProvidersInjector";
-export interface PUISuccessOverlayProps extends FullScreenOverlayFunctionalProps {
-    logoSrc?: string;
-    logoSx?: SxProps<Theme>;
-    successImageSrc: string;
+import { PUIStaticSuccessOverlayProps } from "./StaticSuccessOverlay";
+export interface PUISuccessOverlayProps extends PUIStaticSuccessOverlayProps {
     onRedirect: (pathnameOrUrl: string) => void;
 }
 export declare type PUISuccessProps = PUISuccessOverlayProps & ThemeProviderProps;

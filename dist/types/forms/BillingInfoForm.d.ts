@@ -24,6 +24,17 @@ export declare type BillingInfo = {
     [COUNTRY_FIELD]: SelectOption;
 };
 export declare type TaxInfo = Omit<BillingInfo, "fullName" | "email" | "phone" | "apartment">;
+export declare const FIELD_LABELS: {
+    fullName: string;
+    email: string;
+    phone: string;
+    street: string;
+    apartment: string;
+    zipCode: string;
+    city: string;
+    state: string;
+    country: string;
+};
 export interface BillingInfoFormProps {
     defaultValues?: BillingInfo;
     checkoutError?: CheckoutModalError;

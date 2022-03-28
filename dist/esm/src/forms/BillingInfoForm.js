@@ -12,7 +12,7 @@ import { SecondaryButton } from '../components/shared/SecondaryButton/SecondaryB
 import { Box, InputAdornment, Typography } from '@mui/material';
 import default_1 from '../../node_modules/@mui/icons-material/Book.js';
 import { EMPTY_OPTION } from '../components/shared/Select/Select.js';
-import { withRequiredErrorMessage, withFullNameErrorMessage, withPhoneErrorMessage } from '../utils/validationUtils.js';
+import { withRequiredErrorMessage, withFullNameCharsetErrorMessage, withFullNameErrorMessage, withPhoneErrorMessage } from '../utils/validationUtils.js';
 import { DebugBox } from '../components/payments/DebugBox/DebugBox.js';
 import { useFormCheckoutError } from '../hooks/useFormCheckoutError.js';
 import { TaxesMessagesBox } from '../components/shared/TaxesMessagesBox/TaxesMessagesBox.js';
@@ -57,6 +57,7 @@ const schema = object()
     [FULL_NAME_FIELD]: string()
         .label(FIELD_LABELS[FULL_NAME_FIELD])
         .required(withRequiredErrorMessage)
+        .matches(/^[A-Za-zÀ-ÖØ-öø-ÿ.·' -]+$/, withFullNameCharsetErrorMessage)
         .test({
         name: "is-valid-full-name",
         test: (value) => {
@@ -162,7 +163,7 @@ defaultValues, checkoutError, taxes, onTaxInfoChange, onSaved, onClose, onSubmit
             React__default.createElement(Grid, { item: true, sm: 6 },
                 React__default.createElement(ControlledTextField, { name: ZIP_CODE_FIELD, control: control, label: FIELD_LABELS[ZIP_CODE_FIELD] }))),
         checkoutErrorMessage && React__default.createElement(FormErrorsBox, { error: checkoutErrorMessage, sx: { mt: 5 } }),
-        formState.isSubmitted && React__default.createElement(TaxesMessagesBox, { sx: { mt: 5 }, taxes: taxes, variant: "form" }),
+        formState.isSubmitted && React__default.createElement(TaxesMessagesBox, { sx: { mt: 5 }, variant: "form", taxes: taxes }),
         debug && (React__default.createElement(DebugBox, { sx: { mt: 5 } },
             JSON.stringify(watch(), null, 2),
             "\n\n",
@@ -170,5 +171,5 @@ defaultValues, checkoutError, taxes, onTaxInfoChange, onSaved, onClose, onSubmit
         React__default.createElement(CheckoutModalFooter, { variant: "toPayment", consentType: consentType, submitLabel: (taxes === null || taxes === void 0 ? void 0 : taxes.status) === "loading" ? "Calculating taxes..." : undefined, submitDisabled: !!taxes && taxes.status === "loading", onCloseClicked: onClose })));
 };
 
-export { BillingInfoForm };
+export { BillingInfoForm, FIELD_LABELS };
 //# sourceMappingURL=BillingInfoForm.js.map

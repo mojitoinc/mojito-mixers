@@ -10,10 +10,15 @@ import { ProvidersInjectorProps } from "../../shared/ProvidersInjector/Providers
 import { PUIDictionary } from "../../../domain/dictionary/dictionary.interfaces";
 import { Network } from "../../../domain/network/network.interfaces";
 import { CreditCardNetwork } from "../../../domain/react-payment-inputs/react-payment-inputs.utils";
+import { LoaderMode } from "../useOpenCloseCheckoutModal/useOpenCloseCheckoutModal";
 export interface PUICheckoutOverlayProps {
     open: boolean;
     onClose: () => void;
-    onGoToCollection?: () => void;
+    onGoTo?: () => void;
+    goToLabel?: string;
+    loaderMode?: LoaderMode;
+    paymentErrorParam?: string;
+    onRemoveUrlParams: (cleanURL: string) => void;
     guestCheckoutEnabled?: boolean;
     productConfirmationEnabled?: boolean;
     vertexEnabled?: boolean;
@@ -23,13 +28,14 @@ export interface PUICheckoutOverlayProps {
     loaderImageSrc: string;
     purchasingImageSrc: string;
     purchasingMessages?: false | string[];
+    successImageSrc: string;
     errorImageSrc: string;
     userFormat: UserFormat;
     acceptedPaymentTypes: PaymentType[];
     acceptedCreditCardNetworks?: CreditCardNetwork[];
+    network?: Network;
     paymentLimits?: Partial<Record<PaymentType, number>>;
     dictionary?: Partial<PUIDictionary>;
-    network?: Network;
     consentType?: ConsentType;
     orgID: string;
     invoiceID?: string;

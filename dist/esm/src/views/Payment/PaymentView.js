@@ -51,11 +51,12 @@ const PaymentView = ({ checkoutItems, taxes, savedPaymentMethods: rawSavedPaymen
     }, [selectedPaymentMethodBillingInfo, onPrev]);
     useEffect(() => {
         const selectedPaymentInfoMatch = typeof selectedPaymentInfo === "string" && savedPaymentMethods.some(({ id }) => id === selectedPaymentInfo);
-        const firstActiveSavedPaymentMethod = savedPaymentMethods.find(({ status }) => status === "complete");
-        if (showSaved && !selectedPaymentInfoMatch && firstActiveSavedPaymentMethod /* && savedPaymentMethods.length > 0 && !checkoutError */) {
-            onPaymentInfoSelected(firstActiveSavedPaymentMethod.id);
+        const lastActiveSavedPaymentMethod = savedPaymentMethods.slice().reverse().find(({ status }) => status === "complete");
+        if (showSaved && !selectedPaymentInfoMatch && lastActiveSavedPaymentMethod /* && savedPaymentMethods.length > 0 && !checkoutError */) {
+            onPaymentInfoSelected(lastActiveSavedPaymentMethod.id);
         }
     }, [showSaved, onPaymentInfoSelected, savedPaymentMethods, selectedPaymentInfo /*, checkoutError*/]);
+    console.log("selectedPaymentInfo =", selectedPaymentInfo);
     // PLAIN LINKS:
     const onPlaidLinkClicked = usePlaid({
         selectedBillingInfo,
@@ -72,7 +73,7 @@ const PaymentView = ({ checkoutItems, taxes, savedPaymentMethods: rawSavedPaymen
             React__default.createElement(CheckoutStepper, { progress: 100 }),
             React__default.createElement(BillingInfoItem, { data: selectedPaymentMethodBillingInfo, additionalProps: { onEdit: onPrev, disabled: isDeleting, boxProps: billingInfoItemBoxProps } }),
             React__default.createElement(Divider, { sx: { mt: 2.5 } }),
-            showSaved ? (React__default.createElement(SavedPaymentDetailsSelector, { showLoader: isDeleting, acceptedCreditCardNetworks: acceptedCreditCardNetworks, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethodId: typeof selectedPaymentInfo === "string" ? selectedPaymentInfo : undefined, onNew: handleShowForm, onDelete: handleSavedPaymentMethodDeleted, onPick: onPaymentInfoSelected, onCvvSelected: onCvvSelected, onNext: onNext, onClose: onClose, onAttemptSubmit: handleFormAttemptSubmit, consentType: consentType })) : (React__default.createElement(PaymentMethodForm, { acceptedPaymentTypes: acceptedPaymentTypes, acceptedCreditCardNetworks: acceptedCreditCardNetworks, defaultValues: typeof selectedPaymentInfo === "string" ? undefined : selectedPaymentInfo, checkoutError: checkoutError, onPlaidLinkClicked: onPlaidLinkClicked, onSaved: savedPaymentMethods.length > 0 ? handleShowSaved : undefined, onClose: onClose, onSubmit: handleSubmit, onAttemptSubmit: handleFormAttemptSubmit, consentType: consentType, debug: debug }))),
+            showSaved ? (React__default.createElement(SavedPaymentDetailsSelector, { showLoader: isDeleting, acceptedCreditCardNetworks: acceptedCreditCardNetworks, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethodId: typeof selectedPaymentInfo === "string" ? selectedPaymentInfo : undefined, onNew: handleShowForm, onDelete: handleSavedPaymentMethodDeleted, onPick: onPaymentInfoSelected, onCvvSelected: onCvvSelected, onNext: onNext, onClose: onClose, onAttemptSubmit: handleFormAttemptSubmit, consentType: consentType })) : (React__default.createElement(PaymentMethodForm, { acceptedPaymentTypes: acceptedPaymentTypes, acceptedCreditCardNetworks: acceptedCreditCardNetworks, defaultValues: typeof selectedPaymentInfo === "string" || selectedPaymentInfo === null ? undefined : selectedPaymentInfo, checkoutError: checkoutError, onPlaidLinkClicked: onPlaidLinkClicked, onSaved: savedPaymentMethods.length > 0 ? handleShowSaved : undefined, onClose: onClose, onSubmit: handleSubmit, onAttemptSubmit: handleFormAttemptSubmit, consentType: consentType, debug: debug }))),
         React__default.createElement(CheckoutDeliveryAndItemCostBreakdown, { checkoutItems: checkoutItems, taxes: taxes, validatePersonalDeliveryAddress: formSubmitAttempted, wallets: wallets, wallet: wallet, onWalletChange: onWalletChange })));
 };
 

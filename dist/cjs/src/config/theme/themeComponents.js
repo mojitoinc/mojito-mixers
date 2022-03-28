@@ -303,6 +303,7 @@ function createComponentsTheme({ typography, palette, spacing, breakpoints, tran
                     minHeight: "100vh",
                     display: "flex",
                     flexDirection: "column",
+                    boxSizing: "border-box",
                 },
             },
         },

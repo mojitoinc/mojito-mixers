@@ -5,7 +5,7 @@ import { PurchaseConfirmationBillingDetails } from '../../components/payments/Pu
 import { PurchaseConfirmationItemDetails } from '../../components/payments/PurchaseConfirmationItemDetails/PurchaseConfirmationItemDetails.js';
 import { billingInfoToSavedPaymentMethodBillingInfo } from '../../domain/circle/circle.utils.js';
 
-const ConfirmationView = ({ checkoutItems, savedPaymentMethods, selectedPaymentMethod, circlePaymentID, wallet, onGoToCollection, onNext, }) => {
+const ConfirmationView = ({ checkoutItems, savedPaymentMethods, selectedPaymentMethod, circlePaymentID, wallet, onNext, goToLabel, onGoTo, }) => {
     const { billingInfo: selectedBillingInfo, paymentInfo: selectedPaymentInfo, } = selectedPaymentMethod;
     const { selectedPaymentMethodBillingInfo, selectedPaymentMethodPaymentInfo, } = useMemo(() => {
         if (typeof selectedPaymentInfo === "string") {
@@ -32,7 +32,7 @@ const ConfirmationView = ({ checkoutItems, savedPaymentMethods, selectedPaymentM
         React__default.createElement(PurchaseConfirmationBillingDetails, { checkoutItems: checkoutItems, circlePaymentID: circlePaymentID, wallet: wallet, selectedPaymentMethodBillingInfo: selectedPaymentMethodBillingInfo, selectedPaymentMethodPaymentInfo: selectedPaymentMethodPaymentInfo }),
         React__default.createElement(Stack, { sx: { display: "flex", flex: 1 } },
             React__default.createElement(PurchaseConfirmationItemDetails, { checkoutItems: checkoutItems }),
-            React__default.createElement(CheckoutModalFooter, { variant: "toMarketplace", onSubmitClicked: onNext, onGoToCollection: onGoToCollection }))));
+            React__default.createElement(CheckoutModalFooter, { variant: "toMarketplace", onSubmitClicked: onNext, goToLabel: goToLabel, onGoTo: onGoTo }))));
 };
 
 export { ConfirmationView };

@@ -6,4 +6,4 @@ export interface GetFormattedPaymentMethodReturn {
     displayValue: string;
     network: string;
 }
-export declare function getFormattedPaymentMethod(paymentMethodInfo: PaymentMethod | SavedPaymentMethod): GetFormattedPaymentMethodReturn;
+export declare function getFormattedPaymentMethod(paymentMethodInfo: PaymentMethod | SavedPaymentMethod | null): GetFormattedPaymentMethodReturn;

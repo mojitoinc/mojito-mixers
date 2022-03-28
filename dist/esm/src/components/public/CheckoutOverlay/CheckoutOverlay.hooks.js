@@ -1,6 +1,8 @@
 import { useState, useCallback } from 'react';
-import { ERROR_PURCHASE } from '../../../domain/errors/errors.constants.js';
+import { parseCircleError } from '../../../domain/circle/circle.utils.js';
+import { MAPPED_ERRORS, ERROR_GENERIC } from '../../../domain/errors/errors.constants.js';
 import { isValidWalletAddress } from '../../../domain/wallet/wallet.utils.js';
+import { fullTrim } from '../../../utils/formatUtils.js';
 import { resetStepperProgress } from '../../payments/CheckoutStepper/CheckoutStepper.js';
 import { continueFlows } from './CheckoutOverlay.utils.js';
 
@@ -15,7 +17,7 @@ var CheckoutModalStepIndex;
 })(CheckoutModalStepIndex || (CheckoutModalStepIndex = {}));
 const CHECKOUT_STEPS = ["authentication", "billing", "payment", "purchasing", "confirmation"];
 const WALLET_ADDRESS_FIELD_STEPS = ["billing", "payment"];
-function useCheckoutModalState({ invoiceID: initialInvoiceID = null, productConfirmationEnabled, vertexEnabled, isAuthenticated, onError, }) {
+function useCheckoutModalState({ invoiceID: initialInvoiceID = null, productConfirmationEnabled, vertexEnabled, isAuthenticated, onError, debug, }) {
     const startAt = !isAuthenticated || productConfirmationEnabled ? "authentication" : "billing";
     const [{ checkoutStep, checkoutError, isDialogBlocked, }, setCheckoutModalState] = useState({
         checkoutStep: startAt,
@@ -34,6 +36,8 @@ function useCheckoutModalState({ invoiceID: initialInvoiceID = null, productConf
         paymentID: ""
     });
     const initModalState = useCallback(() => {
+        if (debug)
+            console.log("\n⚙️ Init Modal State!\n\n");
         // Make sure the progress tracker in BillingView and PaymentView is properly animated:
         resetStepperProgress();
         // Once authentication has loaded, we know if we need to skip the product confirmation step or not. Also, when the
@@ -50,7 +54,7 @@ function useCheckoutModalState({ invoiceID: initialInvoiceID = null, productConf
         // }
         setCheckoutModalState({
             checkoutStep: savedFlow.checkoutStep || startAt,
-            checkoutError: savedFlow.checkoutError,
+            // checkoutError: savedFlow.checkoutError,
             isDialogBlocked: false,
         });
         // setCheckoutModalState({ checkoutStep: "error", checkoutError: { errorMessage: "test" } });
@@ -67,7 +71,7 @@ function useCheckoutModalState({ invoiceID: initialInvoiceID = null, productConf
             circlePaymentID: savedFlow.circlePaymentID || "",
             paymentID: savedFlow.paymentID || ""
         });
-    }, [startAt, vertexEnabled]);
+    }, [debug, startAt, vertexEnabled]);
     const goBack = useCallback(() => {
         setCheckoutModalState(({ checkoutStep, checkoutError }) => ({
             checkoutStep: CHECKOUT_STEPS[Math.max(CHECKOUT_STEPS.indexOf(checkoutStep) - 1, 0)],
@@ -84,22 +88,53 @@ function useCheckoutModalState({ invoiceID: initialInvoiceID = null, productConf
             isDialogBlocked: false,
         }));
     }, [checkoutStep, wallet]);
-    const goTo = useCallback((checkoutStep = startAt, error) => {
+    const goTo = useCallback((checkoutStep = startAt, checkoutError) => {
         setCheckoutModalState((prevCheckoutModalState) => {
-            let checkoutError;
-            if (error === null)
-                checkoutError = undefined;
-            else if (!error)
-                checkoutError = prevCheckoutModalState.checkoutError;
-            else if (typeof error === "string")
-                checkoutError = { errorMessage: error };
-            else
-                checkoutError = error;
-            return checkoutError ? { checkoutStep, checkoutError, isDialogBlocked: false } : { checkoutStep, isDialogBlocked: false };
+            return checkoutError
+                ? { checkoutStep, checkoutError, isDialogBlocked: false }
+                : { checkoutStep, checkoutError: prevCheckoutModalState.checkoutError, isDialogBlocked: false };
         });
     }, [startAt]);
-    const setError = useCallback((error) => {
-        const nextCheckoutError = typeof error === "string" ? { errorMessage: error || ERROR_PURCHASE().errorMessage } : error;
+    const setError = useCallback((errorParam) => {
+        const nextCheckoutError = typeof errorParam === "object" ? errorParam : {
+            errorMessage: errorParam || ERROR_GENERIC.errorMessage,
+        };
+        const { error } = nextCheckoutError;
+        if (error) {
+            const circleFieldErrors = parseCircleError(error);
+            if (circleFieldErrors && Object.keys(circleFieldErrors).length > 2) {
+                // There's already some specific errors from Circle:
+                nextCheckoutError.circleFieldErrors = circleFieldErrors;
+            }
+            else if (circleFieldErrors) {
+                // If only 2 keys are present, those are firstAt and summary, so we need to try to map the generic error to a
+                // more specific one:
+                let mappedErrorObject;
+                const errorMessageParts = circleFieldErrors.summary.split(": ").reverse();
+                for (const errorMessagePart of errorMessageParts) {
+                    mappedErrorObject = MAPPED_ERRORS[fullTrim(errorMessagePart)];
+                    if (mappedErrorObject)
+                        break;
+                }
+                if (mappedErrorObject) {
+                    const { errorLocation, fieldName } = mappedErrorObject;
+                    const errorInForms = (errorLocation === "billing" || errorLocation === "payment") && fieldName;
+                    if (errorInForms) {
+                        nextCheckoutError.circleFieldErrors = {
+                            firstAt: errorLocation,
+                            summary: mappedErrorObject.errorMessage,
+                            [errorLocation]: {
+                                [fieldName]: mappedErrorObject.errorMessage,
+                            },
+                        };
+                    }
+                    else {
+                        nextCheckoutError.at = mappedErrorObject.errorLocation || nextCheckoutError.at;
+                        nextCheckoutError.errorMessage = mappedErrorObject.errorMessage || nextCheckoutError.errorMessage;
+                    }
+                }
+            }
+        }
         if (onError)
             onError(nextCheckoutError);
         setCheckoutModalState({

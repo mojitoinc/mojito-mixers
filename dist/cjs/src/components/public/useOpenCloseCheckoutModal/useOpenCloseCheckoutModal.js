@@ -5,22 +5,26 @@ Object.defineProperty(exports, '__esModule', { value: true });
 var React = require('react');
 var CheckoutOverlay_utils = require('../CheckoutOverlay/CheckoutOverlay.utils.js');
 
-function useOpenCloseCheckoutModal() {
-    const [isOpen, setIsOpen] = React.useState(false);
+function useOpenCloseCheckoutModal({ paymentIdParam, paymentErrorParam, }) {
+    let initialLoaderMode = "default";
+    if (paymentIdParam)
+        initialLoaderMode = "success";
+    else if (paymentErrorParam)
+        initialLoaderMode = "error";
+    const [state, setState] = React.useState({
+        loaderMode: initialLoaderMode,
+        isOpen: initialLoaderMode !== "default",
+    });
     React.useEffect(() => {
-        setIsOpen(CheckoutOverlay_utils.isInitiallyOpen());
+        setState(({ loaderMode }) => ({ loaderMode, isOpen: CheckoutOverlay_utils.isInitiallyOpen() }));
     }, []);
     const onOpen = React.useCallback(() => {
-        setIsOpen(true);
+        setState(({ loaderMode }) => ({ loaderMode, isOpen: true }));
     }, []);
     const onClose = React.useCallback(() => {
-        setIsOpen(false);
+        setState({ loaderMode: "default", isOpen: false });
     }, []);
-    return {
-        isOpen,
-        onOpen,
-        onClose,
-    };
+    return Object.assign(Object.assign({}, state), { onOpen, onClose });
 }
 
 exports.useOpenCloseCheckoutModal = useOpenCloseCheckoutModal;

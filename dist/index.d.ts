@@ -7,25 +7,6 @@ import { ApolloError, ApolloClient, NormalizedCacheObject } from '@apollo/client
 declare type UserFormat = "username" | "email" | "name";
 
 declare type PaymentType = "CreditCard" | "ACH" | "Wire" | "Crypto";
-declare type CreditCard = {
-    type: "CreditCard";
-    cardNumber: string;
-    expiryDate: string;
-    secureCode: string;
-    nameOnCard: string;
-};
-declare type AchAccount = {
-    type: "ACH";
-    accountId: string;
-    publicToken: string;
-};
-declare type WireAccount = {
-    type: "Wire";
-};
-declare type CryptoAddress = {
-    type: "Crypto";
-};
-declare type PaymentMethod = CreditCard | AchAccount | WireAccount | CryptoAddress;
 
 declare type LotType = "auction" | "buyNow";
 interface CheckoutItemInfo {
@@ -145,10 +126,29 @@ declare type PUIDictionaryKeys = keyof PUIDictionary;
 
 declare type CreditCardNetwork = "amex" | "dinersclub" | "discover" | "hipercard" | "jcb" | "unionpay" | "mastercard" | "maestro" | "elo" | "visa" | "placeholder";
 
+declare type LoaderMode = "default" | "success" | "error";
+interface UseOpenCloseCheckoutModalState {
+    loaderMode: LoaderMode;
+    isOpen: boolean;
+}
+interface UseOpenCloseCheckoutModalReturn extends UseOpenCloseCheckoutModalState {
+    onOpen: () => void;
+    onClose: () => void;
+}
+interface UseOpenCloseCheckoutModalOptions {
+    paymentIdParam?: string;
+    paymentErrorParam?: string;
+}
+declare function useOpenCloseCheckoutModal({ paymentIdParam, paymentErrorParam, }: UseOpenCloseCheckoutModalOptions): UseOpenCloseCheckoutModalReturn;
+
 interface PUICheckoutOverlayProps {
     open: boolean;
     onClose: () => void;
-    onGoToCollection?: () => void;
+    onGoTo?: () => void;
+    goToLabel?: string;
+    loaderMode?: LoaderMode;
+    paymentErrorParam?: string;
+    onRemoveUrlParams: (cleanURL: string) => void;
     guestCheckoutEnabled?: boolean;
     productConfirmationEnabled?: boolean;
     vertexEnabled?: boolean;
@@ -158,13 +158,14 @@ interface PUICheckoutOverlayProps {
     loaderImageSrc: string;
     purchasingImageSrc: string;
     purchasingMessages?: false | string[];
+    successImageSrc: string;
     errorImageSrc: string;
     userFormat: UserFormat;
     acceptedPaymentTypes: PaymentType[];
     acceptedCreditCardNetworks?: CreditCardNetwork[];
+    network?: Network;
     paymentLimits?: Partial<Record<PaymentType, number>>;
     dictionary?: Partial<PUIDictionary>;
-    network?: Network;
     consentType?: ConsentType;
     orgID: string;
     invoiceID?: string;
@@ -180,25 +181,35 @@ interface PUICheckoutOverlayProps {
 declare type PUICheckoutProps = PUICheckoutOverlayProps & ProvidersInjectorProps;
 declare const PUICheckout: React$1.FC<PUICheckoutProps>;
 
-interface FullScreenOverlayFunctionalProps {
-    open?: boolean;
-    onClose?: () => void;
-    isDialogBlocked?: boolean;
+interface SuccessViewProps {
+    successImageSrc?: string;
 }
 
-interface PUISuccessOverlayProps extends FullScreenOverlayFunctionalProps {
+interface PUIStaticSuccessOverlayProps extends SuccessViewProps {
     logoSrc?: string;
     logoSx?: SxProps<Theme>;
-    successImageSrc: string;
+}
+
+interface PUISuccessOverlayProps extends PUIStaticSuccessOverlayProps {
     onRedirect: (pathnameOrUrl: string) => void;
 }
 declare type PUISuccessProps$1 = PUISuccessOverlayProps & ThemeProviderProps;
 declare const PUISuccess: React$1.FC<PUISuccessProps$1>;
 
-interface PUIErrorOverlayProps extends FullScreenOverlayFunctionalProps {
+interface ErrorViewProps {
+    checkoutError?: CheckoutModalError;
+    errorImageSrc?: string;
+    onFixError?: (errorMessage: string) => Promise<false>;
+    onClose?: () => void;
+    debug?: boolean;
+}
+
+interface PUIStaticErrorOverlayProps extends ErrorViewProps {
     logoSrc?: string;
     logoSx?: SxProps<Theme>;
-    errorImageSrc: string;
+}
+
+interface PUIErrorOverlayProps extends PUIStaticErrorOverlayProps {
     onRedirect: (pathnameOrUrl: string) => void;
 }
 declare type PUIErrorProps = PUIErrorOverlayProps & ProvidersInjectorProps;
@@ -209,12 +220,6 @@ interface PUIPlaidOverlayProps {
 }
 declare type PUISuccessProps = PUIPlaidOverlayProps & ThemeProviderProps;
 declare const PUIPlaid: React$1.FC<PUISuccessProps>;
-
-declare function useOpenCloseCheckoutModal(): {
-    isOpen: boolean;
-    onOpen: () => void;
-    onClose: () => void;
-};
 
 interface PlaidInfo {
     url?: string;
@@ -238,7 +243,7 @@ interface CheckoutModalInfo {
     circlePaymentID: string;
     paymentID: string;
     billingInfo: string | BillingInfo;
-    paymentInfo: string | PaymentMethod;
+    paymentInfo: string | null;
     timestamp?: number;
 }
 interface CheckoutModalState3DS extends CheckoutModalInfo {
@@ -255,12 +260,11 @@ declare type FlowType = "" | "3DS" | "Plaid";
 interface ContinueFlowsReturn {
     flowType: FlowType;
     checkoutStep: CheckoutModalStep | "";
-    checkoutError?: CheckoutModalError;
     invoiceID: string;
     circlePaymentID: string;
     paymentID: string;
     billingInfo: string | BillingInfo;
-    paymentInfo: string | PaymentMethod;
+    paymentInfo: string | null;
 }
 declare function continueFlows(noClear?: boolean): ContinueFlowsReturn;
 
