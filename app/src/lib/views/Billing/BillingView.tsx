@@ -21,6 +21,7 @@ export type TaxStatus = "incomplete" | "loading" | "complete" | "error";
 
 export interface TaxesState {
   status: TaxStatus;
+  invalidZipCode?: boolean;
   taxRate?: number;
   taxAmount?: number;
 }
@@ -92,6 +93,8 @@ export const BillingView: React.FC<BillingViewProps> = ({
   const calculateTaxes = useCallback(async (taxInfo: TaxInfo | BillingInfo) => {
     const calledAt = getTaxQuoteTimestampRef.current;
 
+    let invalidZipCode = false;
+
     const result = await getTaxQuote({
       variables: {
         input: {
@@ -105,19 +108,30 @@ export const BillingView: React.FC<BillingViewProps> = ({
           },
         },
       },
-    }).catch(() => ({ data: null }));
+    }).catch((err) => {
+      invalidZipCode = /invalid zipcode/i.test(err.message);
+
+      return { data: null };
+    });
 
     // Discard stale result:
     if (calledAt !== getTaxQuoteTimestampRef.current) return;
 
     const taxResult = result.data?.getTaxQuote || {} as TaxQuoteOutput;
-    const isValid = !!taxResult.verifiedAddress;
+    const hasVerifiedAddress = !!taxResult.verifiedAddress;
+    const zipPlusFour = taxResult.verifiedAddress?.postalCode || "";
 
-    setViewState((prevViewState) => ({ ...prevViewState, taxes: isValid ? {
-      status: "complete",
+    if (zipPlusFour) invalidZipCode ||= !zipPlusFour.startsWith(taxInfo.zipCode);
+
+    setViewState((prevViewState) => ({ ...prevViewState, taxes: hasVerifiedAddress ? {
+      status: invalidZipCode ? "error" : "complete",
+      invalidZipCode,
       taxRate: 100 * taxResult.totalTaxAmount / taxResult.taxablePrice,
       taxAmount: taxResult.totalTaxAmount,
-    } : { status: "error"} }));
+    } : {
+      status: "error",
+      invalidZipCode,
+    }}));
   }, [getTaxQuote, total]);
 
   const handleThrottledTaxInfoChange = useThrottledCallback((taxInfo: Partial<TaxInfo>) => {
