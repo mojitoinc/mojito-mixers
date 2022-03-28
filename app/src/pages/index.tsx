@@ -46,14 +46,9 @@ const HomePage: React.FC = () => {
   const hasOrganizations = organizations.length > 0;
 
 
-  // CHECKOUT OPENING WITH FORM VALUES:
+  // CHECKOUT OPENING & FORM VALUES:
 
   const { open, setCheckoutComponentProps } = useCheckoutOverlay();
-
-  const handleOpenClicked = useCallback(() => open(), [open]);
-
-
-  // FORM VALUES:
 
   const [formValues, setFormValues] = useState<PlaygroundFormData>(DEFAULT_FORM_VALUES);
 
@@ -83,6 +78,8 @@ const HomePage: React.FC = () => {
       }],
     };
   };
+
+  const handleOpenClicked = useCallback(() => open(getComponentPropsRef.current()), [open]);
 
   useEffect(() => {
     setCheckoutComponentProps(getComponentPropsRef.current());

@@ -13,7 +13,7 @@ export const CheckoutComponent: React.FC<CheckoutComponentWithRequiredProps> = (
 
   const { loginWithPopup, isAuthenticated, isLoading: isAuthenticatedLoading, getIdTokenClaims } = useAuth0();
 
-  const handleGoToClicked = useCallback(() => {
+  const onGoTo = useCallback(() => {
     router.push("/profile/invoices");
   }, [router]);
 
@@ -55,7 +55,9 @@ export const CheckoutComponent: React.FC<CheckoutComponentWithRequiredProps> = (
     // Modal:
     // open,
     // onClose,
-    onGoTo: handleGoToClicked,
+    onGoTo,
+    // goToHref,
+    // goToLabel,
 
     // Flow:
     // loaderMode,
@@ -63,10 +65,10 @@ export const CheckoutComponent: React.FC<CheckoutComponentWithRequiredProps> = (
     onRemoveUrlParams,
     guestCheckoutEnabled: false,
     productConfirmationEnabled: false,
-    // vertexEnabled,
-    // threeDSEnabled,
+    vertexEnabled: true,
+    threeDSEnabled: true,
 
-    // Personalization:
+    // Theming:
     theme: MOJITO_LIGHT_THEME,
 
     /*
@@ -89,6 +91,7 @@ export const CheckoutComponent: React.FC<CheckoutComponentWithRequiredProps> = (
     },
     */
 
+    // Personalization:
     logoSrc: PLAYGROUND_MOJITO_LOGO,
     // logoSx,
     // loaderImageSrc,
@@ -100,7 +103,7 @@ export const CheckoutComponent: React.FC<CheckoutComponentWithRequiredProps> = (
     // acceptedPaymentTypes,
     // acceptedCreditCardNetworks,
     // network,
-
+    // paymentLimits,
     dictionary: {
       privacyHref: "https://mojito.xyz",
       termsOfUseHref: "https://mojito.xyz",
