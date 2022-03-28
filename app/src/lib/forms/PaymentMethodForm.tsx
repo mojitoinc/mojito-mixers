@@ -396,7 +396,7 @@ export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
         </Box>
       )}
 
-      { acceptedPaymentTypes.length > 1 ? (<>
+      { acceptedPaymentTypes.length > 1 && (<>
         <InputGroupLabel sx={{ m: 0, pt: 2, pb: 1.5 }}>Payment Method</InputGroupLabel>
 
         <PaymentMethodSelector
@@ -404,8 +404,10 @@ export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
           onPaymentMethodChange={handleSelectedPaymentMethodChange}
           paymentMethods={acceptedPaymentTypes}
         />
-      </>) : (
-        null
+      </>) }
+
+      { !onSaved && acceptedPaymentTypes.length <= 1 && (
+        <Box sx={{ mt: 1 }} />
       ) }
 
       <Fields

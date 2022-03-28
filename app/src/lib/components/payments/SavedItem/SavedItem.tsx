@@ -88,7 +88,7 @@ export const SavedItem: React.FC<SavedItemProps> = ({
       pick: onPick,
     }[action];
 
-    if (callback && id !== undefined) callback(id, e);
+    if (callback) callback(id || "", e);
   }, [id, onEdit, onDelete, onPick]);
 
   const disabledSelect = !!disabled;

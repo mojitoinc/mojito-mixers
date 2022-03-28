@@ -493,9 +493,9 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   const [deletePaymentMethod] = useDeletePaymentMethodMutation();
 
   const handleSavedPaymentMethodDeleted = useCallback(async (addressIdOrPaymentMethodId: string) => {
-    const idsToDelete: string[] = checkoutStep === "billing"
+    const idsToDelete: string[] = (checkoutStep === "billing"
       ? savedPaymentMethods.filter(({ addressId }) => addressId === addressIdOrPaymentMethodId).map(({ id }) => id)
-      : [addressIdOrPaymentMethodId];
+      : [addressIdOrPaymentMethodId]).filter(Boolean);
 
     if (idsToDelete.length === 0) return;
 
