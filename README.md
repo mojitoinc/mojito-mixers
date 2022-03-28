@@ -160,6 +160,9 @@ In your App's entry point (`_app.tsx` in Next.js), you need to add the `Checkout
   // Add any other pages where you don't want the Payment UI to be rendered:
   const doNotRenderPaymentUI = ["/payments/success", "/payments/error", "/payments/failure"].includes(router.pathname);
 
+  // Debug information in case you need it:
+  // console.log({ pathname: router.asPath, paymentIdParam, paymentErrorParam, doNotRenderPaymentUI });
+
   return (
     <CheckoutOverlayProvider
       paymentIdParam={ paymentIdParam }

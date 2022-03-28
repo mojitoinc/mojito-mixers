@@ -18,6 +18,14 @@ function useOpenCloseCheckoutModal({ paymentIdParam, paymentErrorParam, }) {
     React.useEffect(() => {
         setState(({ loaderMode }) => ({ loaderMode, isOpen: CheckoutOverlay_utils.isInitiallyOpen() }));
     }, []);
+    React.useEffect(() => {
+        if (initialLoaderMode === "default")
+            return;
+        setState({
+            loaderMode: initialLoaderMode,
+            isOpen: true,
+        });
+    }, [initialLoaderMode]);
     const onOpen = React.useCallback(() => {
         setState(({ loaderMode }) => ({ loaderMode, isOpen: true }));
     }, []);
