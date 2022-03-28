@@ -212,6 +212,8 @@ open the Payment UI:
 
   useEffect(() => {
     setCheckoutComponentProps(getComponentPropsRef.current());
+
+  // If some of the fields in the object above can change, add them to the dependencies here:
   }, [setCheckoutComponentProps]);
 
 ```
