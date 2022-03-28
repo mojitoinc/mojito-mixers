@@ -157,11 +157,15 @@ In your App's entry point (`_app.tsx` in Next.js), you need to add the `Checkout
   const paymentIdParam = router.query[THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY]?.toString();
   const paymentErrorParam = router.query[THREEDS_FLOW_SEARCH_PARAM_ERROR_KEY]?.toString();
 
+  // Add any other pages where you don't want the Payment UI to be rendered:
+  const doNotRenderPaymentUI = ["/payments/success", "/payments/error", "/payments/failure"].includes(router.pathname);
+
   return (
     <CheckoutOverlayProvider
       paymentIdParam={ paymentIdParam }
       paymentErrorParam={ paymentErrorParam }
-      checkoutComponent={ CheckoutComponent }>
+      checkoutComponent={ CheckoutComponent }
+      doNotRenderPaymentUI={ doNotRenderPaymentUI }>
       { ... }
     </CheckoutOverlayProvider>
   );

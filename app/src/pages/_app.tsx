@@ -20,6 +20,7 @@ function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter();
   const paymentIdParam = router.query[THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY]?.toString();
   const paymentErrorParam = router.query[THREEDS_FLOW_SEARCH_PARAM_ERROR_KEY]?.toString();
+  const doNotRenderPaymentUI = ["/payments/success", "/payments/error", "/payments/failure"].includes(router.pathname);
 
   return (
     <Auth0Provider
@@ -40,7 +41,8 @@ function MyApp({ Component, pageProps }: AppProps) {
           <CheckoutOverlayProvider
             paymentIdParam={ paymentIdParam }
             paymentErrorParam={ paymentErrorParam }
-            checkoutComponent={ CheckoutComponent }>
+            checkoutComponent={ CheckoutComponent }
+            doNotRenderPaymentUI={ doNotRenderPaymentUI }>
 
             <Container>
               <Header />

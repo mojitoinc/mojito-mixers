@@ -26,12 +26,14 @@ export const CheckoutOverlayContext = createContext<CheckoutOverlayContextProps>
 
 export interface CheckoutOverlayProviderProps extends UseOpenCloseCheckoutModalOptions {
   checkoutComponent: React.ComponentType<CheckoutComponentWithRequiredProps>;
+  doNotRenderPaymentUI?: boolean;
 }
 
 export const CheckoutOverlayProvider: React.FC<CheckoutOverlayProviderProps> = ({
   paymentIdParam,
   paymentErrorParam,
   checkoutComponent: CheckoutComponent,
+  doNotRenderPaymentUI,
   children,
 }) => {
   const { loaderMode, isOpen, onOpen, onClose } = useOpenCloseCheckoutModal({ paymentIdParam, paymentErrorParam });
@@ -53,6 +55,8 @@ export const CheckoutOverlayProvider: React.FC<CheckoutOverlayProviderProps> = (
   const close = useCallback(() => {
     handleOnClose();
   }, [handleOnClose]);
+
+  if (doNotRenderPaymentUI) return <>{ children }</>;
 
   return (
     <CheckoutOverlayContext.Provider value={ { open, close, setCheckoutComponentProps } }>
