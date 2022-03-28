@@ -217,7 +217,7 @@ const App: React.FC = () => {
     // Flow:
     loaderMode,
     paymentErrorParam,
-    onRemoveUrlParams
+    onRemoveUrlParams,
     guestCheckoutEnabled: false,
     productConfirmationEnabled: false,
     vertexEnabled: true, // Default already true (requires set up on the backend).
