@@ -7,6 +7,7 @@ export { getPlaidOAuthFlowState, persistPlaidReceivedRedirectUri } from './domai
 export { continuePlaidOAuthFlow } from './hooks/usePlaid.js';
 export { continueCheckout, continueFlows, getCheckoutModalState, persistReceivedRedirectUri3DS } from './components/public/CheckoutOverlay/CheckoutOverlay.utils.js';
 export { MOJITO_DARK_THEME, MOJITO_LIGHT_THEME, extendDefaultTheme } from './config/theme/theme.js';
+export { THREEDS_FLOW_SEARCH_PARAM_ERROR_KEY, THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY } from './config/config.js';
 
 if (process.env.NODE_ENV === "development" && process.browser) {
     console.log("\n👨‍💻 PUI development mode.\n\n");

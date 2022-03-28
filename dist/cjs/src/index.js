@@ -11,6 +11,7 @@ var plaid_utils = require('./domain/plaid/plaid.utils.js');
 var usePlaid = require('./hooks/usePlaid.js');
 var CheckoutOverlay_utils = require('./components/public/CheckoutOverlay/CheckoutOverlay.utils.js');
 var theme = require('./config/theme/theme.js');
+var config = require('./config/config.js');
 
 if (process.env.NODE_ENV === "development" && process.browser) {
     console.log("\n👨‍💻 PUI development mode.\n\n");
@@ -33,4 +34,6 @@ exports.persistReceivedRedirectUri3DS = CheckoutOverlay_utils.persistReceivedRed
 exports.MOJITO_DARK_THEME = theme.MOJITO_DARK_THEME;
 exports.MOJITO_LIGHT_THEME = theme.MOJITO_LIGHT_THEME;
 exports.extendDefaultTheme = theme.extendDefaultTheme;
+exports.THREEDS_FLOW_SEARCH_PARAM_ERROR_KEY = config.THREEDS_FLOW_SEARCH_PARAM_ERROR_KEY;
+exports.THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY = config.THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY;
 //# sourceMappingURL=index.js.map
