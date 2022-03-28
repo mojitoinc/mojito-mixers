@@ -1,9 +1,9 @@
 import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useCallback } from "react";
-import { PUIError } from "../../lib";
+import { MOJITO_LIGHT_THEME, PUIError } from "../../lib";
 import { config } from "../../utils/config/config.constants";
-import { PLAYGROUND_THEMES, PLAYGROUND_LOGOS_SRC, PLAYGROUND_LOGOS_SX } from "../../utils/playground/playground.constants";
+import { PLAYGROUND_MOJITO_LOGO } from "../../utils/playground/playground.constants";
 
 const ErrorPage: NextPage = () => {
   const router = useRouter();
@@ -21,9 +21,8 @@ const ErrorPage: NextPage = () => {
   return (
     <PUIError
       uri={ `${ config.API_HOSTNAME }/query` }
-      theme={ PLAYGROUND_THEMES.light }
-      logoSrc={ PLAYGROUND_LOGOS_SRC.light }
-      logoSx={ PLAYGROUND_LOGOS_SX.light }
+      theme={MOJITO_LIGHT_THEME}
+      logoSrc={PLAYGROUND_MOJITO_LOGO}
       errorImageSrc=""
       onRedirect={ handleRedirect } />
   );

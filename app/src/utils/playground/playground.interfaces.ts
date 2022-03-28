@@ -1,11 +1,5 @@
 import { LotType } from "../../lib/domain/product/product.interfaces";
 
-export type PlaygroundNoAuthPresetFieldValues = "noAuthGuestDisabled" | "noAuthGuestEnabled";
-
-export type PlaygroundAuthPresetFieldValues = "authConfirmationDisabled" | "authConfirmationEnabledNoGuest" | "authConfirmationEnabledGuest";
-
-export type PlaygroundThemeFieldValues = "light" | "dark";
-
 export interface PlaygroundFormData {
   // Organization:
   orgID: string;
@@ -18,12 +12,6 @@ export interface PlaygroundFormData {
   lotID: string;
   lotType: LotType;
   lotUnits: number;
-
-  // Personalization:
-  theme: PlaygroundThemeFieldValues;
-  customImages: boolean;
-  notAuthPreset: PlaygroundNoAuthPresetFieldValues;
-  authPresets: PlaygroundAuthPresetFieldValues;
 
   // Payment:
   paymentCC: boolean;

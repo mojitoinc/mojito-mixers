@@ -23,6 +23,6 @@ export const useCheckoutItemsCostTotal = (checkoutItems: CheckoutItem[]): UseChe
       return result;
     }, to<UseCheckoutItemsCostTotalReduceResult>({ total: 0, fees: 0, taxAmount: 0 }));
 
-    return { ...reduceResult, taxRate: 100 * reduceResult.taxAmount / reduceResult.total };
+    return { ...reduceResult, taxRate: 100 * reduceResult.taxAmount / (reduceResult.total || 1) };
   }, [checkoutItems]);
 };

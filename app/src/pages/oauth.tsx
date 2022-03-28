@@ -1,8 +1,7 @@
 import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useCallback } from "react";
-import { PUIPlaid } from "../lib";
-import { PLAYGROUND_THEMES } from "../utils/playground/playground.constants";
+import { MOJITO_LIGHT_THEME, PUIPlaid } from "../lib";
 
 const PlaidOAuthPage: NextPage = () => {
   const router = useRouter();
@@ -19,7 +18,7 @@ const PlaidOAuthPage: NextPage = () => {
 
   return (
     <PUIPlaid
-      theme={PLAYGROUND_THEMES.light}
+      theme={MOJITO_LIGHT_THEME}
       onRedirect={handleRedirect} />
   );
 }

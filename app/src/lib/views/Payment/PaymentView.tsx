@@ -41,7 +41,7 @@ export interface PaymentViewProps {
   onNext: () => void;
   onPrev: () => void;
   onClose: () => void;
-  acceptedPaymentTypes: PaymentType[];
+  acceptedPaymentTypes?: PaymentType[];
   acceptedCreditCardNetworks?: CreditCardNetwork[];
   consentType?: ConsentType;
   debug?: boolean;
@@ -62,7 +62,7 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
   onNext,
   onPrev,
   onClose,
-  acceptedPaymentTypes,
+  acceptedPaymentTypes = ["CreditCard"],
   acceptedCreditCardNetworks,
   consentType,
   debug,
@@ -128,8 +128,6 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
       onPaymentInfoSelected(lastActiveSavedPaymentMethod.id);
     }
   }, [showSaved, onPaymentInfoSelected, savedPaymentMethods, selectedPaymentInfo/*, checkoutError*/]);
-
-  console.log("selectedPaymentInfo =", selectedPaymentInfo);
 
   // PLAIN LINKS:
   const onPlaidLinkClicked = usePlaid({

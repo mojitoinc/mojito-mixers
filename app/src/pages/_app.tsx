@@ -9,10 +9,18 @@ import { AuthorizedApolloProvider } from "../lib/components/shared/AuthorizedApo
 import { GlobalStyles } from "@mui/material";
 import { GLOBAL_STYLES } from "../components/core/global-styles.constants";
 import { Container } from "../components/core/Container";
+import { CheckoutOverlayProvider } from "../lib/components/public/CheckoutOverlayProvider/CheckoutOverlayProvider";
+import { CheckoutComponent } from "../components/checkout-component/CheckoutComponent";
+import { THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY, THREEDS_FLOW_SEARCH_PARAM_ERROR_KEY } from "../lib";
+import { useRouter } from "next/router";
 
 const defaultTheme = createTheme();
 
 function MyApp({ Component, pageProps }: AppProps) {
+  const router = useRouter();
+  const paymentIdParam = router.query[THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY]?.toString();
+  const paymentErrorParam = router.query[THREEDS_FLOW_SEARCH_PARAM_ERROR_KEY]?.toString();
+
   return (
     <Auth0Provider
       domain={ config.AUTH0_DOMAIN }
@@ -29,10 +37,17 @@ function MyApp({ Component, pageProps }: AppProps) {
         <ThemeProvider theme={ defaultTheme }>
           <GlobalStyles styles={ GLOBAL_STYLES } />
 
-          <Container>
-            <Header />
-            <Component { ...pageProps } />
-          </Container>
+          <CheckoutOverlayProvider
+            paymentIdParam={ paymentIdParam }
+            paymentErrorParam={ paymentErrorParam }
+            checkoutComponent={ CheckoutComponent }>
+
+            <Container>
+              <Header />
+              <Component { ...pageProps } />
+            </Container>
+
+          </CheckoutOverlayProvider>
 
         </ThemeProvider>
       </AuthorizedApolloProvider>

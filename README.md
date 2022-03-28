@@ -273,7 +273,6 @@ const App: React.FC = () => {
     onEvent: handleEvent,
     onError: handleError,
     onCatch: handleCatch,
-    onMarketingOptInChange: handleMarketingOptInChange,
   };
 
   return <PUICheckout { ...checkoutModalProps } />;
