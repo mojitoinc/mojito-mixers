@@ -14,12 +14,12 @@ export const PUIStaticSuccessOverlay: React.FC<PUIStaticSuccessOverlayProps> = (
   logoSx,
   ...successViewProps
 }) => {
-  const headerElement = logoSrc ? (
+  const headerElement = (
     <CheckoutModalHeader
       variant="purchasing"
       logoSrc={ logoSrc }
       logoSx={ logoSx } />
-  ) : null;
+  );
 
   return (
     <FullScreenOverlay isDialogBlocked centered header={ headerElement }>

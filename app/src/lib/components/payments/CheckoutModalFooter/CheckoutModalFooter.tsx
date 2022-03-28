@@ -34,6 +34,7 @@ export interface CheckoutModalFooterProps {
   onCloseClicked?: () => void;
 
   // Collection button:
+  goToHref?: string;
   goToLabel?: string;
   onGoTo?: () => void;
 }
@@ -58,6 +59,7 @@ export const CheckoutModalFooter: React.FC<CheckoutModalFooterProps> = ({
   onCloseClicked,
 
   // Secondary button:
+  goToHref = "/profile/invoices",
   goToLabel = "View Invoices",
   onGoTo,
 }) => {
@@ -169,7 +171,7 @@ export const CheckoutModalFooter: React.FC<CheckoutModalFooterProps> = ({
         <PrimaryButton
           onClickCapture={ handleGoToClicked }
           disabled={ isPrimaryButtonDisabled }
-          href="/profile/invoices"
+          href={ goToHref }
           sx={{ mb: 2 }}>
           { goToLabel }
         </PrimaryButton>

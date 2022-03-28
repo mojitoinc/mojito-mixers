@@ -43,6 +43,7 @@ export interface PUICheckoutOverlayProps {
   open: boolean;
   onClose: () => void;
   onGoTo?: () => void;
+  goToHref?: string;
   goToLabel?: string;
 
   // Flow:
@@ -55,15 +56,15 @@ export interface PUICheckoutOverlayProps {
   threeDSEnabled?: boolean;
 
   // Personalization:
-  logoSrc: string;
+  logoSrc?: string;
   logoSx?: SxProps<Theme>;
-  loaderImageSrc: string;
-  purchasingImageSrc: string;
+  loaderImageSrc?: string;
+  purchasingImageSrc?: string;
   purchasingMessages?: false | string[];
-  successImageSrc: string;
-  errorImageSrc: string;
-  userFormat: UserFormat;
-  acceptedPaymentTypes: PaymentType[];
+  successImageSrc?: string;
+  errorImageSrc?: string;
+  userFormat?: UserFormat;
+  acceptedPaymentTypes?: PaymentType[];
   acceptedCreditCardNetworks?: CreditCardNetwork[];
   network?: Network;
   paymentLimits?: Partial<Record<PaymentType, number>>;
@@ -86,7 +87,6 @@ export interface PUICheckoutOverlayProps {
   debug?: boolean;
   onEvent?: (eventType: CheckoutEventType, eventData: CheckoutEventData) => void;
   onError?: (error: CheckoutModalError) => void;
-  onMarketingOptInChange?: (marketingOptIn: boolean) => void;
 }
 
 export type PUICheckoutProps = PUICheckoutOverlayProps & ProvidersInjectorProps;
@@ -98,6 +98,8 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   open,
   onClose,
   onGoTo,
+  // TODO: Move to dictionary:
+  goToHref,
   goToLabel,
 
   // Flow:
@@ -141,7 +143,6 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   debug: parentDebug,
   onEvent,
   onError,
-  onMarketingOptInChange, // Not implemented yet. Used to let user subscribe / unsubscribe to marketing updates.
 }) => {
   const [debug, setDebug] = useState(!!parentDebug);
 
@@ -198,7 +199,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     error: paymentMethodsError,
     refetch: refetchPaymentMethods,
   } = useGetPaymentMethodListQuery({
-    skip: !isAuthenticated,
+    skip: !isAuthenticated || !orgID,
     variables: { orgID },
   });
 
@@ -256,7 +257,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
 
   // Modal loading state:
 
-  const isDialogLoading = isAuthenticatedLoading || meLoading || paymentMethodsLoading;
+  const isDialogLoading = !orgID || parentCheckoutItems.length === 0 || isAuthenticatedLoading || meLoading || paymentMethodsLoading;
   const isDialogInitializing = isDialogLoading || invoiceDetailsLoading || !invoiceID;
   const isPlaidFlowLoading = continuePlaidOAuthFlow();
   const [loaderMode, setLoaderMode] = useState(initialLoaderMode);
@@ -492,9 +493,9 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   const [deletePaymentMethod] = useDeletePaymentMethodMutation();
 
   const handleSavedPaymentMethodDeleted = useCallback(async (addressIdOrPaymentMethodId: string) => {
-    const idsToDelete: string[] = checkoutStep === "billing"
+    const idsToDelete: string[] = (checkoutStep === "billing"
       ? savedPaymentMethods.filter(({ addressId }) => addressId === addressIdOrPaymentMethodId).map(({ id }) => id)
-      : [addressIdOrPaymentMethodId];
+      : [addressIdOrPaymentMethodId]).filter(Boolean);
 
     if (idsToDelete.length === 0) return;
 
@@ -836,6 +837,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
         circlePaymentID={ circlePaymentID }
         wallet={ wallet }
         onNext={ handleClose }
+        goToHref={ goToHref }
         goToLabel={ goToLabel }
         onGoTo={ onGoTo } />
     );

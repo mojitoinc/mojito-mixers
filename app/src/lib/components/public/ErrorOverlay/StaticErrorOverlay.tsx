@@ -14,12 +14,12 @@ export const PUIStaticErrorOverlay: React.FC<PUIStaticErrorOverlayProps> = ({
   logoSx,
   ...errorViewProps
 }) => {
-  const headerElement = logoSrc ? (
+  const headerElement = (
     <CheckoutModalHeader
       variant="error"
       logoSrc={ logoSrc }
       logoSx={ logoSx } />
-  ) : null;
+  );
 
   return (
     <FullScreenOverlay isDialogBlocked centered header={ headerElement }>
