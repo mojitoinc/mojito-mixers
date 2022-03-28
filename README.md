@@ -238,7 +238,7 @@ const App: React.FC = () => {
     userFormat: "email",
     acceptedPaymentTypes: ["CreditCard", "ACH"],
     acceptedCreditCardNetworks: ["visa", "mastercard"],
-    network: "",
+    network: { ... },
     dictionary: {
       walletInfo: <p>Lorem ipsum...</p>,
     },
