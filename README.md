@@ -597,11 +597,15 @@ Defined in [`app/src/lib/utils/validationUtils.ts`](./app/src/lib/utils/validati
 
 - `withPhoneErrorMessage = ` `{ label }` must be a valid phone number.
 
+- `withInvalidAddress = ` Please, `{ enter/select }` a valid address to calculate taxes.
+
+- `withInvalidZipCode = ` The `{ label }` you entered does not match the address.
+
 - `withInvalidCardNumber = ` `{ label }` is invalid.
 
 - `withInvalidCVV = ` `{ cvvLabel }` must have `{ cvvExpectedLength }` digits.
 
-- `withInvalidCreditCardNetwork = ` Only `{ acceptedCreditCardNetworks }` `{ is/a`re } accepted.
+- `withInvalidCreditCardNetwork = ` Only `{ acceptedCreditCardNetworks }` `{ is/are }` accepted.
 
 <br />
 

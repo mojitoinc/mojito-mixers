@@ -19,6 +19,10 @@ export const withFullNameCharsetErrorMessage = ({ label }: { label: string }) =>
 
 export const withPhoneErrorMessage = ({ label }: { label: string }) => `${ label } must be a valid phone number.`;
 
+export const withInvalidAddress = ({ variant }: { variant: "form" | "selector" }) => `Please, ${ variant === "form" ? "enter" : "select" } a valid address to calculate taxes.`;
+
+export const withInvalidZipCode = ({ label }: { label: string }) => `The ${ label } you entered does not match the address.`;
+
 export const withInvalidCardNumber = ({ label }: { label: string }) => `${ label } is invalid.`;
 
 export const withInvalidCVV = ({ cvvLabel, cvvExpectedLength }: { cvvLabel: string, cvvExpectedLength: 3 | 4 | "3 or 4" }) => {

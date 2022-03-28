@@ -1,5 +1,6 @@
 import { Box, BoxProps, Typography } from "@mui/material";
 import React from "react";
+import { withInvalidZipCode, withInvalidAddress } from "../../../utils/validationUtils";
 import { TaxesState } from "../../../views/Billing/BillingView";
 
 export type TaxesMessagesBoxVariant = "form" | "selector";
@@ -18,8 +19,8 @@ export const TaxesMessagesBox: React.FC<TaxesMessagesBoxProps> = ({
   if (taxes === null || taxes.status !== "error") return null;
 
   const message = taxes.invalidZipCode && variant === "form"
-    ? "The zip code you entered does not match the address."
-    : `Please, ${ variant === "form" ? "enter" : "select" } a valid address to calculate taxes.`;
+    ? withInvalidZipCode({ label: "zip code" })
+    : withInvalidAddress({ variant });
 
   return (
     <Box { ...props }>
