@@ -6,7 +6,7 @@ const CheckoutOverlayContext = createContext({
     close: () => { },
     setCheckoutComponentProps: () => { },
 });
-const CheckoutOverlayProvider = ({ paymentIdParam, paymentErrorParam, checkoutComponent: CheckoutComponent, children, }) => {
+const CheckoutOverlayProvider = ({ paymentIdParam, paymentErrorParam, checkoutComponent: CheckoutComponent, doNotRenderPaymentUI, children, }) => {
     const { loaderMode, isOpen, onOpen, onClose } = useOpenCloseCheckoutModal({ paymentIdParam, paymentErrorParam });
     const [checkoutComponentProps, setCheckoutComponentProps] = useState({});
     const handleOnClose = useCallback(() => {
@@ -21,6 +21,8 @@ const CheckoutOverlayProvider = ({ paymentIdParam, paymentErrorParam, checkoutCo
     const close = useCallback(() => {
         handleOnClose();
     }, [handleOnClose]);
+    if (doNotRenderPaymentUI)
+        return React__default.createElement(React__default.Fragment, null, children);
     return (React__default.createElement(CheckoutOverlayContext.Provider, { value: { open, close, setCheckoutComponentProps } },
         children,
         React__default.createElement(CheckoutComponent, Object.assign({}, checkoutComponentProps, { open: isOpen, onClose: handleOnClose, loaderMode: loaderMode, paymentErrorParam: paymentErrorParam }))));
