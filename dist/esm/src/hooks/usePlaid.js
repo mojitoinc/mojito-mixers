@@ -1,7 +1,8 @@
-import { useRef, useCallback, useEffect } from 'react';
+import { useRef, useEffect, useCallback } from 'react';
 import { usePreparePaymentMethodQuery } from '../queries/graphqlGenerated.js';
 import { usePlaidLink } from 'react-plaid-link';
 import { getPlaidOAuthFlowState, clearPlaidInfo, persistPlaidOAuthStateUsed, persistPlaidInfo } from '../domain/plaid/plaid.utils.js';
+import { isLocalhostOrStaging } from '../domain/url/url.utils.js';
 
 function isUsePlaidOptionsStartFlow(options) {
     return options.hasOwnProperty("selectedBillingInfo");
@@ -17,13 +18,25 @@ function continuePlaidOAuthFlow() {
 }
 function usePlaid(options) {
     var _a;
+    const orgID = isUsePlaidOptionsStartFlow(options) ? options.orgID : null;
     const selectedBillingInfo = isUsePlaidOptionsStartFlow(options) ? options.selectedBillingInfo : null;
     const onSubmit = isUsePlaidOptionsContinueFlow(options) ? options.onSubmit : null;
     const plaidOAuthFlowStateRef = useRef(INITIAL_PLAID_OAUTH_FLOW_STATE);
     const { linkToken: savedLinkToken, receivedRedirectUri, continueOAuthFlow, } = plaidOAuthFlowStateRef.current || {};
     const { loading: isPreparePaymentMethodLoading, error: preparePaymentMethodError, data: preparePaymentMethodData, } = usePreparePaymentMethodQuery({
-        skip: continueOAuthFlow || onSubmit !== null,
+        variables: { orgID },
+        skip: continueOAuthFlow || !!onSubmit || !orgID,
     });
+    useEffect(() => {
+        if (!isLocalhostOrStaging())
+            return;
+        if (isPreparePaymentMethodLoading) {
+            console.log("🏦 Loading Plaid Link...");
+        }
+        else if (preparePaymentMethodError) {
+            console.log("🏚️ Plaid Link Error: ", preparePaymentMethodError);
+        }
+    }, [isPreparePaymentMethodLoading, preparePaymentMethodError]);
     const linkToken = (continueOAuthFlow ? savedLinkToken : (_a = preparePaymentMethodData === null || preparePaymentMethodData === void 0 ? void 0 : preparePaymentMethodData.preparePaymentMethod) === null || _a === void 0 ? void 0 : _a.linkToken) || "";
     const onSuccess = useCallback((public_token, metadata) => {
         // Reset in case purchase fails and we need to try again:
