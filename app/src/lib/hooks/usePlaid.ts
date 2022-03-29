@@ -5,8 +5,10 @@ import { PlaidLinkOnEvent, PlaidLinkOnExit, PlaidLinkOnSuccess, PlaidLinkOptions
 import { clearPlaidInfo, getPlaidOAuthFlowState, persistPlaidInfo, persistPlaidOAuthStateUsed, PlaidOAuthFlowState } from "../domain/plaid/plaid.utils";
 import { BillingInfo } from "../forms/BillingInfoForm";
 import { PaymentMethod } from "../domain/payment/payment.interfaces";
+import { isLocalhostOrStaging } from "../domain/url/url.utils";
 
 export interface UsePlaidOptionsStartFlow {
+  orgID: string;
   selectedBillingInfo: string | BillingInfo;
 }
 
@@ -33,6 +35,7 @@ export function continuePlaidOAuthFlow() {
 }
 
 export function usePlaid(options: UsePlaidOptions) {
+  const orgID = isUsePlaidOptionsStartFlow(options) ? options.orgID : null;
   const selectedBillingInfo = isUsePlaidOptionsStartFlow(options) ? options.selectedBillingInfo : null;
   const onSubmit = isUsePlaidOptionsContinueFlow(options) ? options.onSubmit : null;
   const plaidOAuthFlowStateRef = useRef<PlaidOAuthFlowState>(INITIAL_PLAID_OAUTH_FLOW_STATE);
@@ -48,8 +51,19 @@ export function usePlaid(options: UsePlaidOptions) {
     error: preparePaymentMethodError,
     data: preparePaymentMethodData,
   } = usePreparePaymentMethodQuery({
-    skip: continueOAuthFlow || onSubmit !== null,
+    variables: { orgID },
+    skip: continueOAuthFlow || !!onSubmit || !orgID,
   });
+
+  useEffect(() => {
+    if (!isLocalhostOrStaging()) return;
+
+    if (isPreparePaymentMethodLoading) {
+      console.log("🏦 Loading Plaid Link...");
+    } else if (preparePaymentMethodError) {
+      console.log("🏚️ Plaid Link Error: ", preparePaymentMethodError);
+    }
+  }, [isPreparePaymentMethodLoading, preparePaymentMethodError])
 
   const linkToken = (continueOAuthFlow ? savedLinkToken : preparePaymentMethodData?.preparePaymentMethod?.linkToken) || "";
 
@@ -103,6 +117,8 @@ export function usePlaid(options: UsePlaidOptions) {
     ready: plaidLinkReady,
     error: plaidLinkError,
   } = usePlaidLink(config);
+
+
 
   useEffect(() => {
     if ((preparePaymentMethodError || plaidLinkError) && onSubmit) onSubmit();
