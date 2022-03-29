@@ -285,11 +285,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     const cleanParams = params.toString();
     const cleanURL = location.href.replace(location.search, cleanParams ? `?${ cleanParams }` : "");
 
-    if (cleanURL && cleanURL !== location.href) {
-      console.log("onRemoveUrlParams()");
-
-      onRemoveUrlParams(cleanURL);
-    }
+    if (cleanURL && cleanURL !== location.href) onRemoveUrlParams(cleanURL);
   }, [showEspecialLoaders, onRemoveUrlParams]);
 
   useEffect(() => {
