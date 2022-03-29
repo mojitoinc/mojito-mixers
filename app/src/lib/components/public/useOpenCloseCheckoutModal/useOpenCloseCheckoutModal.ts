@@ -39,8 +39,6 @@ export function useOpenCloseCheckoutModal({
   useEffect(() => {
     if (initialLoaderMode === "default") return;
 
-    console.log("RESET MODE", initialLoaderMode);
-
     setState({
       loaderMode: initialLoaderMode,
       isOpen: true,
