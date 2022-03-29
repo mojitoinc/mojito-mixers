@@ -17,6 +17,7 @@ export interface UseCreateInvoiceAndReservationOptions {
 
 export interface InvoiceAndReservationState {
   invoiceID?: string;
+  invoiceCountdownStart?: number;
   error?: string | CheckoutModalError;
 }
 
@@ -163,9 +164,9 @@ export function useCreateInvoiceAndReservation({
       return;
     }
 
-    countdownStartRef.current = Date.now();
+    const invoiceCountdownStart = countdownStartRef.current = Date.now();
 
-    setInvoiceAndReservationState({ invoiceID });
+    setInvoiceAndReservationState({ invoiceID, invoiceCountdownStart });
 
     // TODO: Error handling and automatic retry:
   }, [

@@ -9,6 +9,7 @@ const debug = isLocalhostOrStaging();
 export interface CheckoutModalInfo {
   url?: string;
   invoiceID: string;
+  invoiceCountdownStart: number;
   circlePaymentID: string;
   paymentID: string;
   billingInfo: string | BillingInfo;
@@ -27,6 +28,7 @@ export interface CheckoutModalState3DS extends CheckoutModalInfo {
 const FALLBACK_MODAL_STATE: CheckoutModalState3DS = {
   url: "",
   invoiceID: "",
+  invoiceCountdownStart: 0,
   circlePaymentID: "",
   paymentID: "",
   billingInfo: "",
@@ -103,6 +105,7 @@ export function getCheckoutModalState(): CheckoutModalState3DS {
   const {
     url = "",
     invoiceID = "",
+    invoiceCountdownStart = -1,
     circlePaymentID = "",
     paymentID = "",
     billingInfo = "",
@@ -128,6 +131,7 @@ export function getCheckoutModalState(): CheckoutModalState3DS {
 
     // The invoiceID we need to re-load the products and units:
     invoiceID,
+    invoiceCountdownStart: invoiceCountdownStart === -1 ? Date.now() : invoiceCountdownStart,
 
     // The reference number of the payment:
     circlePaymentID,
@@ -169,6 +173,7 @@ export interface ContinueFlowsReturn {
   flowType: FlowType;
   checkoutStep: CheckoutModalStep | "";
   invoiceID: string;
+  invoiceCountdownStart: number;
   circlePaymentID: string;
   paymentID: string;
   billingInfo: string | BillingInfo;
@@ -182,6 +187,7 @@ export function continueFlows(noClear = false) {
     flowType: "",
     checkoutStep: "",
     invoiceID: "",
+    invoiceCountdownStart: -1,
     circlePaymentID: "",
     paymentID: "",
     billingInfo: "",
@@ -203,6 +209,7 @@ export function continueFlows(noClear = false) {
 
     continueFlowsReturn.flowType = "3DS";
     continueFlowsReturn.invoiceID = savedCheckoutModalState.invoiceID;
+    continueFlowsReturn.invoiceCountdownStart = savedCheckoutModalState.invoiceCountdownStart === -1 ? Date.now() : savedCheckoutModalState.invoiceCountdownStart;
     continueFlowsReturn.circlePaymentID = savedCheckoutModalState.circlePaymentID;
     continueFlowsReturn.paymentID = savedCheckoutModalState.paymentID;
     continueFlowsReturn.billingInfo = savedCheckoutModalState.billingInfo;

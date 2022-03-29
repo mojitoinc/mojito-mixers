@@ -224,6 +224,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
 
     // PurchaseState:
     invoiceID,
+    invoiceCountdownStart,
     setInvoiceID,
     taxes,
     setTaxes,
@@ -258,7 +259,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   // Modal loading state:
 
   const isDialogLoading = !orgID || parentCheckoutItems.length === 0 || isAuthenticatedLoading || meLoading || paymentMethodsLoading;
-  const isDialogInitializing = isDialogLoading || invoiceDetailsLoading || !invoiceID;
+  const isDialogInitializing = isDialogLoading || invoiceDetailsLoading || !invoiceID || !invoiceCountdownStart;
   const isPlaidFlowLoading = continuePlaidOAuthFlow();
   const [loaderMode, setLoaderMode] = useState(initialLoaderMode);
   const isInvalidMode = loaderMode !== "default" && !open;
@@ -340,16 +341,18 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   }, [isDialogLoading, invoiceID, createInvoiceAndReservation]);
 
   useEffect(() => {
-    if (invoiceAndReservationState.error) {
+    const { invoiceID, invoiceCountdownStart, error } = invoiceAndReservationState;
+
+    if (error) {
       // TODO: It would be great if we can keep track of the reservation expiration without changing the displayed error
       // if there's already once, so when clicking the action button for that one, on top of calling its respective error
       // handling code, we re-create the reservation:
-      setError(invoiceAndReservationState.error);
+      setError(error);
 
       return;
     }
 
-    if (invoiceAndReservationState.invoiceID) setInvoiceID(invoiceAndReservationState.invoiceID);
+    if (invoiceID && invoiceCountdownStart) setInvoiceID(invoiceID, invoiceCountdownStart);
   }, [invoiceAndReservationState, setError, setInvoiceID]);
 
 
@@ -636,7 +639,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
 
     createInvoiceAndReservationCalledRef.current = false;
 
-    setInvoiceID(null);
+    setInvoiceID(null, null);
 
     onClose();
   }, [handleBeforeUnload, setInvoiceID, onClose]);
@@ -808,7 +811,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
         consentType={ consentType }
         debug={ debug } />
     );
-  } else if (checkoutStep === "purchasing" && invoiceID) {
+  } else if (checkoutStep === "purchasing" && invoiceID && invoiceCountdownStart) {
     headerVariant = "purchasing";
 
     checkoutStepElement = (
@@ -818,6 +821,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
         purchasingMessages={ purchasingMessages }
         orgID={ orgID }
         invoiceID={ invoiceID }
+        invoiceCountdownStart={ invoiceCountdownStart }
         savedPaymentMethods={ savedPaymentMethods }
         selectedPaymentMethod={ selectedPaymentMethod }
         wallet={ wallet }
