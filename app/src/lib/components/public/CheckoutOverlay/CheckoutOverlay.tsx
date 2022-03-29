@@ -37,6 +37,7 @@ import { CreditCardNetwork } from "../../../domain/react-payment-inputs/react-pa
 import { PUIStaticSuccessOverlay } from "../SuccessOverlay/StaticSuccessOverlay";
 import { LoaderMode } from "../useOpenCloseCheckoutModal/useOpenCloseCheckoutModal";
 import { PUIStaticErrorOverlay } from "../ErrorOverlay/StaticErrorOverlay";
+import { useCountdown } from "../../../hooks/useContdown";
 
 export interface PUICheckoutOverlayProps {
   // Modal:
@@ -284,7 +285,11 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     const cleanParams = params.toString();
     const cleanURL = location.href.replace(location.search, cleanParams ? `?${ cleanParams }` : "");
 
-    if (cleanURL && cleanURL !== location.href) onRemoveUrlParams(cleanURL);
+    if (cleanURL && cleanURL !== location.href) {
+      console.log("onRemoveUrlParams()");
+
+      onRemoveUrlParams(cleanURL);
+    }
   }, [showEspecialLoaders, onRemoveUrlParams]);
 
   useEffect(() => {
@@ -327,10 +332,10 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   const createInvoiceAndReservationCalledRef = useRef(false);
 
   const {
+    // TODO: Instead of returning state, just pass setError and setInvoiceID or return it from createInvoiceAndReservation.
     invoiceAndReservationState,
     createInvoiceAndReservation,
-    countdownElementRef,
-  } = useCreateInvoiceAndReservation({ orgID, checkoutItems, stop: checkoutStep === "confirmation", debug });
+  } = useCreateInvoiceAndReservation({ orgID, checkoutItems, debug });
 
   useEffect(() => {
     if (isDialogLoading || invoiceID === null || invoiceID || createInvoiceAndReservationCalledRef.current) return;
@@ -354,6 +359,14 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
 
     if (invoiceID && invoiceCountdownStart) setInvoiceID(invoiceID, invoiceCountdownStart);
   }, [invoiceAndReservationState, setError, setInvoiceID]);
+
+
+  // Reservation countdown:
+
+  const { countdownElementRef } = useCountdown({
+    invoiceCountdownStart: checkoutStep === "confirmation" ? null : invoiceCountdownStart,
+    setError,
+  });
 
 
   // Init modal state once everything has been loaded:
@@ -539,7 +552,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
 
     await Promise.allSettled(promises);
 
-    await refetchPaymentMethods({ orgID });
+    await refetchPaymentMethods().catch(() => { /* TODO: Handle this error properly. */ });
   }, [checkoutStep, deletePaymentMethod, orgID, refetchPaymentMethods, savedPaymentMethods, setSelectedPaymentMethod]);
 
 
@@ -561,7 +574,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     }
 
     // After a successful purchase, a new payment method might have been created, so we reload them:
-    await refetchPaymentMethods();
+    await refetchPaymentMethods().catch(() => { /* TODO: Handle this error properly. */ });
 
     goNext();
   }, [setPayments, debug, refetchPaymentMethods, goNext]);
@@ -571,7 +584,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
 
     // After a failed purchase, a new payment method might have been created anyway, so we reload them (createPaymentMethod
     // works but createPayment fails):
-    await refetchPaymentMethods();
+    await refetchPaymentMethods().catch(() => { /* TODO: Handle this error properly. */ });
 
     setError(error);
   }, [refetchPaymentMethods, setError]);
@@ -653,7 +666,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     if (at === "reset") {
       await Promise.allSettled([
         meRefetch(),
-        refetchPaymentMethods(),
+        refetchPaymentMethods().catch(() => { /* TODO: Handle this error properly. */ }),
         createInvoiceAndReservation(),
       ]);
 
@@ -665,7 +678,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
       // method has been created despite the error:
       await Promise.allSettled([
         meRefetch(),
-        refetchPaymentMethods(),
+        refetchPaymentMethods().catch(() => { /* TODO: Handle this error properly. */ }),
         refetchInvoiceDetails(),
       ]);
 

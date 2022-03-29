@@ -1,17 +1,13 @@
 import { ApolloError } from "@apollo/client";
-import { useThrottledRequestAnimationFrame } from "@swyg/corre";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useState } from "react";
 import { CheckoutModalError } from "../components/public/CheckoutOverlay/CheckoutOverlay.hooks";
-import { RESERVATION_COUNTDOWN_FROM_MS, RESERVATION_COUNTDOWN_REFRESH_RATE_MS } from "../config/config";
-import { ERROR_INVOICE_TIMEOUT, ERROR_PURCHASE_CREATING_INVOICE, ERROR_PURCHASE_LOADING_ITEMS, ERROR_PURCHASE_NO_ITEMS, ERROR_PURCHASE_NO_UNITS } from "../domain/errors/errors.constants";
+import { ERROR_PURCHASE_CREATING_INVOICE, ERROR_PURCHASE_LOADING_ITEMS, ERROR_PURCHASE_NO_ITEMS, ERROR_PURCHASE_NO_UNITS } from "../domain/errors/errors.constants";
 import { CheckoutItem } from "../domain/product/product.interfaces";
 import { useCreateAuctionInvoiceMutation, useReserveBuyNowLotMutation } from "../queries/graphqlGenerated";
-import { formatTimeLeft } from "../utils/formatUtils";
 
 export interface UseCreateInvoiceAndReservationOptions {
   orgID: string;
   checkoutItems: CheckoutItem[];
-  stop: boolean;
   debug?: boolean;
 }
 
@@ -24,13 +20,11 @@ export interface InvoiceAndReservationState {
 export interface UseCreateInvoiceAndReservationReturn {
   invoiceAndReservationState: InvoiceAndReservationState;
   createInvoiceAndReservation: () => Promise<void>;
-  countdownElementRef: React.RefObject<HTMLSpanElement>;
 }
 
 export function useCreateInvoiceAndReservation({
   orgID,
   checkoutItems,
-  stop,
   debug = false,
 }: UseCreateInvoiceAndReservationOptions): UseCreateInvoiceAndReservationReturn {
   const [invoiceAndReservationState, setInvoiceAndReservationState] = useState<InvoiceAndReservationState>({ });
@@ -40,29 +34,6 @@ export function useCreateInvoiceAndReservation({
       error,
     });
   }, []);
-
-  const countdownStartRef = useRef<number | null>(null);
-  const countdownElementRef = useRef<HTMLSpanElement | null>(null);
-
-  useThrottledRequestAnimationFrame(() => {
-    const countdownStart = countdownStartRef.current;
-    const countdownElement = countdownElementRef.current;
-
-    if (countdownStart === null) return;
-
-    const formattedTimeLeft = formatTimeLeft(countdownStart, RESERVATION_COUNTDOWN_FROM_MS);
-
-    if (formattedTimeLeft === "00:00") {
-      countdownStartRef.current = null;
-
-      setError(ERROR_INVOICE_TIMEOUT());
-
-      return;
-    }
-
-    if (countdownElement) countdownElement.textContent = formattedTimeLeft;
-
-  }, countdownStartRef.current === null || stop ? null : RESERVATION_COUNTDOWN_REFRESH_RATE_MS);
 
   const [createAuctionInvoice] = useCreateAuctionInvoiceMutation();
   const [reserveBuyNowLot] = useReserveBuyNowLotMutation();
@@ -164,9 +135,7 @@ export function useCreateInvoiceAndReservation({
       return;
     }
 
-    const invoiceCountdownStart = countdownStartRef.current = Date.now();
-
-    setInvoiceAndReservationState({ invoiceID, invoiceCountdownStart });
+    setInvoiceAndReservationState({ invoiceID, invoiceCountdownStart: Date.now() });
 
     // TODO: Error handling and automatic retry:
   }, [
@@ -181,6 +150,5 @@ export function useCreateInvoiceAndReservation({
   return {
     invoiceAndReservationState,
     createInvoiceAndReservation,
-    countdownElementRef,
   };
 }

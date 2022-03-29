@@ -135,6 +135,7 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
   const onPlaidLinkClicked = usePlaid({
     orgID,
     selectedBillingInfo,
+    skip: !acceptedPaymentTypes.includes("ACH"),
   });
 
   // TODO: Handle errors properly:
