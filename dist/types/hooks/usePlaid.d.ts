@@ -3,6 +3,7 @@ import { PlaidOAuthFlowState } from "../domain/plaid/plaid.utils";
 import { BillingInfo } from "../forms/BillingInfoForm";
 import { PaymentMethod } from "../domain/payment/payment.interfaces";
 export interface UsePlaidOptionsStartFlow {
+    orgID: string;
     selectedBillingInfo: string | BillingInfo;
 }
 export interface UsePlaidOptionsContinueFlow {

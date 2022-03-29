@@ -8,6 +8,7 @@ import { TaxesState } from "../Billing/BillingView";
 import { Wallet } from "../../domain/wallet/wallet.interfaces";
 import { CreditCardNetwork } from "../../domain/react-payment-inputs/react-payment-inputs.utils";
 export interface PaymentViewProps {
+    orgID: string;
     checkoutItems: CheckoutItem[];
     taxes: null | TaxesState;
     savedPaymentMethods: SavedPaymentMethod[];

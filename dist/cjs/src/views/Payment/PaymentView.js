@@ -19,7 +19,7 @@ function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'defau
 var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 
 const billingInfoItemBoxProps = { sx: { mt: 2.5 } };
-const PaymentView = ({ checkoutItems, taxes, savedPaymentMethods: rawSavedPaymentMethods, selectedPaymentMethod, wallets, wallet, checkoutError, onPaymentInfoSelected, onCvvSelected, onSavedPaymentMethodDeleted, onWalletChange, onNext, onPrev, onClose, acceptedPaymentTypes = ["CreditCard"], acceptedCreditCardNetworks, consentType, debug, }) => {
+const PaymentView = ({ orgID, checkoutItems, taxes, savedPaymentMethods: rawSavedPaymentMethods, selectedPaymentMethod, wallets, wallet, checkoutError, onPaymentInfoSelected, onCvvSelected, onSavedPaymentMethodDeleted, onWalletChange, onNext, onPrev, onClose, acceptedPaymentTypes = ["CreditCard"], acceptedCreditCardNetworks, consentType, debug, }) => {
     const { billingInfo: selectedBillingInfo, paymentInfo: selectedPaymentInfo, } = selectedPaymentMethod;
     const savedPaymentMethods = React.useMemo(() => {
         if (typeof selectedBillingInfo !== "string")
@@ -66,6 +66,7 @@ const PaymentView = ({ checkoutItems, taxes, savedPaymentMethods: rawSavedPaymen
     }, [showSaved, onPaymentInfoSelected, savedPaymentMethods, selectedPaymentInfo /*, checkoutError*/]);
     // PLAIN LINKS:
     const onPlaidLinkClicked = usePlaid.usePlaid({
+        orgID,
         selectedBillingInfo,
     });
     // TODO: Handle errors properly:

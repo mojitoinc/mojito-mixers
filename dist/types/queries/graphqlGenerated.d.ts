@@ -275,7 +275,7 @@ export declare type CurrentUserUserOrgsArgs = {
     filter?: InputMaybe<UserOrgFilter>;
 };
 export declare type CurrentUserWonBidsArgs = {
-    orgId: Scalars['UUID'];
+    orgId?: InputMaybe<Scalars['UUID']>;
 };
 export declare enum DeliveryMethod {
     Erc721Provenance = "ERC721Provenance",
@@ -733,7 +733,7 @@ export declare type MutationCancelPaymentArgs = {
 };
 export declare type MutationCreateApplicantArgs = {
     input: ApplicantRequest;
-    orgID: Scalars['UUID1'];
+    orgID?: InputMaybe<Scalars['UUID1']>;
 };
 export declare type MutationCreateAuctionLotInvoiceArgs = {
     lotID: Scalars['UUID1'];
@@ -1153,9 +1153,10 @@ export declare type QueryOrganizationArgs = {
     handle: Scalars['String'];
 };
 export declare type QueryOrganizationByIdArgs = {
-    id: Scalars['UUID1'];
+    id?: InputMaybe<Scalars['UUID1']>;
 };
 export declare type QueryPreparePaymentMethodArgs = {
+    orgID?: InputMaybe<Scalars['UUID1']>;
     paymentMethodType: PaymentType;
 };
 export declare type QueryValidateIpArgs = {
@@ -1279,7 +1280,7 @@ export declare type UserApiKeyResponse = {
     updatedAt?: Maybe<Scalars['Time']>;
 };
 export declare type UserOrgFilter = {
-    orgId: Scalars['UUID'];
+    orgId?: InputMaybe<Scalars['UUID']>;
 };
 export declare type UserOrganization = {
     __typename?: 'UserOrganization';
@@ -1639,7 +1640,7 @@ export declare type DeletePaymentMethodMutation = {
     deletePaymentMethod: boolean;
 };
 export declare type PreparePaymentMethodQueryVariables = Exact<{
-    [key: string]: never;
+    orgID: Scalars['UUID1'];
 }>;
 export declare type PreparePaymentMethodQuery = {
     __typename?: 'Query';
@@ -1985,14 +1986,15 @@ export declare const PreparePaymentMethodDocument: Apollo.DocumentNode;
  * @example
  * const { data, loading, error } = usePreparePaymentMethodQuery({
  *   variables: {
+ *      orgID: // value for 'orgID'
  *   },
  * });
  */
-export declare function usePreparePaymentMethodQuery(baseOptions?: Apollo.QueryHookOptions<PreparePaymentMethodQuery, PreparePaymentMethodQueryVariables>): Apollo.QueryResult<PreparePaymentMethodQuery, Exact<{
-    [key: string]: never;
+export declare function usePreparePaymentMethodQuery(baseOptions: Apollo.QueryHookOptions<PreparePaymentMethodQuery, PreparePaymentMethodQueryVariables>): Apollo.QueryResult<PreparePaymentMethodQuery, Exact<{
+    orgID: any;
 }>>;
 export declare function usePreparePaymentMethodLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<PreparePaymentMethodQuery, PreparePaymentMethodQueryVariables>): Apollo.QueryTuple<PreparePaymentMethodQuery, Exact<{
-    [key: string]: never;
+    orgID: any;
 }>>;
 export declare type PreparePaymentMethodQueryHookResult = ReturnType<typeof usePreparePaymentMethodQuery>;
 export declare type PreparePaymentMethodLazyQueryHookResult = ReturnType<typeof usePreparePaymentMethodLazyQuery>;
