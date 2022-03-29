@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { Stack } from "@mui/material";
+import { Divider, Stack } from "@mui/material";
 
 import { CheckoutModalFooter } from "../../components/payments/CheckoutModalFooter/CheckoutModalFooter";
 import { PurchaseConfirmationBillingDetails } from "../../components/payments/PurchaseConfirmationBillingDetails/PurchaseConfirmationBillingDetails";
@@ -63,13 +63,8 @@ export const ConfirmationView: React.FC<ConfirmationViewProps> = ({
 
   return (
     <Stack
-      direction={{
-        xs: "column",
-        sm: "column",
-        md: "row",
-      }}
-      spacing={8.75}
-      sx={{ display: "flex" }}>
+      direction={{ xs: "column",  md: "row" }}
+      spacing={{ xs: 3,  md: 3.75 }}>
 
       <PurchaseConfirmationBillingDetails
         checkoutItems={ checkoutItems }
@@ -79,6 +74,8 @@ export const ConfirmationView: React.FC<ConfirmationViewProps> = ({
         selectedPaymentMethodPaymentInfo={ selectedPaymentMethodPaymentInfo } />
 
       <Stack sx={{ display: "flex", flex: 1 }}>
+        <Divider sx={{ display: { xs: "block", md: "none" } }} />
+
         <PurchaseConfirmationItemDetails
           checkoutItems={checkoutItems}/>
 

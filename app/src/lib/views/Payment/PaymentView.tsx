@@ -143,14 +143,10 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
 
   return (
     <Stack
-      direction={{
-        xs: "column",
-        sm: "column",
-        md: "row",
-      }}
-      spacing={8.75}
-    >
-      <Stack sx={{ display: "flex", overflow: "hidden", width: { xs: "100%", md: "calc(50% - 35px)" } }}>
+      direction={{ xs: "column",  md: "row" }}
+      spacing={{ xs: 0,  md: 3.75 }}>
+
+      <Stack sx={{ display: "flex", overflow: "hidden", width: (theme) => ({ xs: "100%", md: `calc(50% - ${ theme.spacing(3.75 / 2) })` }) }}>
         <CheckoutStepper progress={100} />
 
         <BillingInfoItem
@@ -188,6 +184,8 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
             debug={debug} />
         )}
       </Stack>
+
+      <Divider sx={{ display: { xs: "block", md: "none" } }} />
 
       <CheckoutDeliveryAndItemCostBreakdown
         checkoutItems={ checkoutItems }
