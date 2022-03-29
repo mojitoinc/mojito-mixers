@@ -17,7 +17,7 @@ function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'defau
 
 var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 
-const PurchasingView = ({ threeDSEnabled, purchasingImageSrc, purchasingMessages: customPurchasingMessages, orgID, invoiceID, savedPaymentMethods, selectedPaymentMethod, wallet, onPurchaseSuccess, onPurchaseError, onDialogBlocked, debug, }) => {
+const PurchasingView = ({ threeDSEnabled, purchasingImageSrc, purchasingMessages: customPurchasingMessages, orgID, invoiceID, invoiceCountdownStart, savedPaymentMethods, selectedPaymentMethod, wallet, onPurchaseSuccess, onPurchaseError, onDialogBlocked, debug, }) => {
     var _a, _b, _c;
     const { billingInfo, paymentInfo, cvv } = selectedPaymentMethod;
     const isCreditCardPayment = cvv || (paymentInfo !== null && typeof paymentInfo === "object" && paymentInfo.type === "CreditCard");
@@ -88,6 +88,7 @@ const PurchasingView = ({ threeDSEnabled, purchasingImageSrc, purchasingMessages
         if (redirectURL && !skipRedirect) {
             CheckoutOverlay_utils.persistCheckoutModalInfo({
                 invoiceID,
+                invoiceCountdownStart,
                 circlePaymentID,
                 paymentID,
                 billingInfo,
@@ -106,6 +107,7 @@ const PurchasingView = ({ threeDSEnabled, purchasingImageSrc, purchasingMessages
         onDialogBlocked,
         onPurchaseSuccess,
         invoiceID,
+        invoiceCountdownStart,
         debug,
     ]);
     // Purchasing Messages:

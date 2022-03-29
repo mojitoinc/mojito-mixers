@@ -28,8 +28,9 @@ function useCheckoutModalState({ invoiceID: initialInvoiceID = null, productConf
         paymentInfo: "",
         cvv: "",
     });
-    const [{ invoiceID, taxes, wallet, circlePaymentID, paymentID, }, setPurchaseState] = useState({
+    const [{ invoiceID, invoiceCountdownStart, taxes, wallet, circlePaymentID, paymentID, }, setPurchaseState] = useState({
         invoiceID: initialInvoiceID || null,
+        invoiceCountdownStart: null,
         taxes: vertexEnabled ? { status: "incomplete" } : null,
         wallet: null,
         circlePaymentID: "",
@@ -66,6 +67,7 @@ function useCheckoutModalState({ invoiceID: initialInvoiceID = null, productConf
         });
         setPurchaseState({
             invoiceID: savedFlow.invoiceID || "",
+            invoiceCountdownStart: savedFlow.invoiceCountdownStart || null,
             taxes: vertexEnabled ? { status: "incomplete" } : null,
             wallet: null,
             circlePaymentID: savedFlow.circlePaymentID || "",
@@ -150,8 +152,8 @@ function useCheckoutModalState({ invoiceID: initialInvoiceID = null, productConf
             isDialogBlocked,
         }));
     }, []);
-    const setInvoiceID = useCallback((invoiceID) => {
-        setPurchaseState((prevPurchaseState) => (Object.assign(Object.assign({}, prevPurchaseState), { invoiceID, circlePaymentID: "", paymentID: "" })));
+    const setInvoiceID = useCallback((invoiceID, invoiceCountdownStart) => {
+        setPurchaseState((prevPurchaseState) => (Object.assign(Object.assign({}, prevPurchaseState), { invoiceID, invoiceCountdownStart, circlePaymentID: "", paymentID: "" })));
     }, []);
     const setTaxes = useCallback((taxes) => {
         setPurchaseState((prevPurchaseState) => (Object.assign(Object.assign({}, prevPurchaseState), { taxes })));
@@ -179,6 +181,7 @@ function useCheckoutModalState({ invoiceID: initialInvoiceID = null, productConf
         setSelectedPaymentMethod,
         // PurchaseState:
         invoiceID,
+        invoiceCountdownStart,
         setInvoiceID,
         taxes,
         setTaxes,

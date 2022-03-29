@@ -68,6 +68,7 @@ const PaymentView = ({ orgID, checkoutItems, taxes, savedPaymentMethods: rawSave
     const onPlaidLinkClicked = usePlaid.usePlaid({
         orgID,
         selectedBillingInfo,
+        skip: !acceptedPaymentTypes.includes("ACH"),
     });
     // TODO: Handle errors properly:
     if (!selectedPaymentMethodBillingInfo)

@@ -8,6 +8,7 @@ export interface PurchasingViewProps {
     purchasingMessages?: false | string[];
     orgID: string;
     invoiceID: string;
+    invoiceCountdownStart: number;
     savedPaymentMethods: SavedPaymentMethod[];
     selectedPaymentMethod: SelectedPaymentMethod;
     wallet: null | string | Wallet;
