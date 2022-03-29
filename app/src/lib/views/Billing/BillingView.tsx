@@ -19,11 +19,18 @@ import { ConsentType } from "../../components/shared/ConsentText/ConsentText";
 
 export type TaxStatus = "incomplete" | "loading" | "complete" | "error";
 
+export interface VertexSuggestions {
+  street?: string;
+  city?: string;
+  zipCode?: string;
+}
+
 export interface TaxesState {
   status: TaxStatus;
   invalidZipCode?: boolean;
   taxRate?: number;
   taxAmount?: number;
+  vertexSuggestions?: VertexSuggestions;
 }
 
 interface BillingViewState {
@@ -118,21 +125,28 @@ export const BillingView: React.FC<BillingViewProps> = ({
     if (calledAt !== getTaxQuoteTimestampRef.current) return;
 
     const taxResult = result.data?.getTaxQuote || {} as TaxQuoteOutput;
-    const hasVerifiedAddress = !!taxResult.verifiedAddress;
-    const zipPlusFour = taxResult.verifiedAddress?.postalCode || "";
+    const { verifiedAddress } = taxResult;
+    const vertexSuggestions: VertexSuggestions = {};
 
-    if (zipPlusFour) invalidZipCode ||= !zipPlusFour.startsWith(taxInfo.zipCode);
+    if (!showSaved && verifiedAddress) {
+      // Vertex returns 5+4 zip codes, so we remove the last 4 digits to get the "normal" one:
+      const zipCode = (verifiedAddress?.postalCode || "").replace(/-\d{4}$/, "");
 
-    setViewState((prevViewState) => ({ ...prevViewState, taxes: hasVerifiedAddress ? {
-      status: invalidZipCode ? "error" : "complete",
-      invalidZipCode,
+      if (taxInfo.street !== verifiedAddress.street1) vertexSuggestions.street = verifiedAddress.street1;
+      if (taxInfo.city !== verifiedAddress.city) vertexSuggestions.city = verifiedAddress.city;
+      if (taxInfo.zipCode !== zipCode) vertexSuggestions.zipCode = zipCode;
+    }
+
+    setViewState((prevViewState) => ({ ...prevViewState, taxes: verifiedAddress ? {
+      status: "complete",
       taxRate: 100 * taxResult.totalTaxAmount / taxResult.taxablePrice,
       taxAmount: taxResult.totalTaxAmount,
+      vertexSuggestions,
     } : {
       status: "error",
       invalidZipCode,
     }}));
-  }, [getTaxQuote, total]);
+  }, [getTaxQuote, total, showSaved]);
 
   const handleThrottledTaxInfoChange = useThrottledCallback((taxInfo: Partial<TaxInfo>) => {
     if (!vertexEnabled) return;
