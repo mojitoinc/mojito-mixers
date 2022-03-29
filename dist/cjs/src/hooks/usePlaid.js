@@ -6,6 +6,7 @@ var React = require('react');
 var graphqlGenerated = require('../queries/graphqlGenerated.js');
 var reactPlaidLink = require('react-plaid-link');
 var plaid_utils = require('../domain/plaid/plaid.utils.js');
+var url_utils = require('../domain/url/url.utils.js');
 
 function isUsePlaidOptionsStartFlow(options) {
     return options.hasOwnProperty("selectedBillingInfo");
@@ -21,13 +22,25 @@ function continuePlaidOAuthFlow() {
 }
 function usePlaid(options) {
     var _a;
+    const orgID = isUsePlaidOptionsStartFlow(options) ? options.orgID : null;
     const selectedBillingInfo = isUsePlaidOptionsStartFlow(options) ? options.selectedBillingInfo : null;
     const onSubmit = isUsePlaidOptionsContinueFlow(options) ? options.onSubmit : null;
     const plaidOAuthFlowStateRef = React.useRef(exports.INITIAL_PLAID_OAUTH_FLOW_STATE);
     const { linkToken: savedLinkToken, receivedRedirectUri, continueOAuthFlow, } = plaidOAuthFlowStateRef.current || {};
     const { loading: isPreparePaymentMethodLoading, error: preparePaymentMethodError, data: preparePaymentMethodData, } = graphqlGenerated.usePreparePaymentMethodQuery({
-        skip: continueOAuthFlow || onSubmit !== null,
+        variables: { orgID },
+        skip: continueOAuthFlow || !!onSubmit || !orgID,
     });
+    React.useEffect(() => {
+        if (!url_utils.isLocalhostOrStaging())
+            return;
+        if (isPreparePaymentMethodLoading) {
+            console.log("🏦 Loading Plaid Link...");
+        }
+        else if (preparePaymentMethodError) {
+            console.log("🏚️ Plaid Link Error: ", preparePaymentMethodError);
+        }
+    }, [isPreparePaymentMethodLoading, preparePaymentMethodError]);
     const linkToken = (continueOAuthFlow ? savedLinkToken : (_a = preparePaymentMethodData === null || preparePaymentMethodData === void 0 ? void 0 : preparePaymentMethodData.preparePaymentMethod) === null || _a === void 0 ? void 0 : _a.linkToken) || "";
     const onSuccess = React.useCallback((public_token, metadata) => {
         // Reset in case purchase fails and we need to try again:

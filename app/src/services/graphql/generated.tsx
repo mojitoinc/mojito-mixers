@@ -310,7 +310,7 @@ export type CurrentUserUserOrgsArgs = {
 
 
 export type CurrentUserWonBidsArgs = {
-  orgId: Scalars['UUID'];
+  orgId?: InputMaybe<Scalars['UUID']>;
 };
 
 export enum DeliveryMethod {
@@ -833,7 +833,7 @@ export type MutationCancelPaymentArgs = {
 
 export type MutationCreateApplicantArgs = {
   input: ApplicantRequest;
-  orgID: Scalars['UUID1'];
+  orgID?: InputMaybe<Scalars['UUID1']>;
 };
 
 
@@ -1406,11 +1406,12 @@ export type QueryOrganizationArgs = {
 
 
 export type QueryOrganizationByIdArgs = {
-  id: Scalars['UUID1'];
+  id?: InputMaybe<Scalars['UUID1']>;
 };
 
 
 export type QueryPreparePaymentMethodArgs = {
+  orgID?: InputMaybe<Scalars['UUID1']>;
   paymentMethodType: PaymentType;
 };
 
@@ -1565,7 +1566,7 @@ export type UserApiKeyResponse = {
 };
 
 export type UserOrgFilter = {
-  orgId: Scalars['UUID'];
+  orgId?: InputMaybe<Scalars['UUID']>;
 };
 
 export type UserOrganization = {
@@ -1803,7 +1804,9 @@ export type DeletePaymentMethodMutationVariables = Exact<{
 
 export type DeletePaymentMethodMutation = { __typename?: 'Mutation', deletePaymentMethod: boolean };
 
-export type PreparePaymentMethodQueryVariables = Exact<{ [key: string]: never; }>;
+export type PreparePaymentMethodQueryVariables = Exact<{
+  orgID: Scalars['UUID1'];
+}>;
 
 
 export type PreparePaymentMethodQuery = { __typename?: 'Query', preparePaymentMethod?: { __typename?: 'ACHPaymentMethodPrepareStatementOutput', linkToken: string } | null };
@@ -2302,8 +2305,8 @@ export type DeletePaymentMethodMutationHookResult = ReturnType<typeof useDeleteP
 export type DeletePaymentMethodMutationResult = Apollo.MutationResult<DeletePaymentMethodMutation>;
 export type DeletePaymentMethodMutationOptions = Apollo.BaseMutationOptions<DeletePaymentMethodMutation, DeletePaymentMethodMutationVariables>;
 export const PreparePaymentMethodDocument = gql`
-    query PreparePaymentMethod {
-  preparePaymentMethod(paymentMethodType: ACH) {
+    query PreparePaymentMethod($orgID: UUID1!) {
+  preparePaymentMethod(paymentMethodType: ACH, orgID: $orgID) {
     ... on ACHPaymentMethodPrepareStatementOutput {
       linkToken
     }
@@ -2323,10 +2326,11 @@ export const PreparePaymentMethodDocument = gql`
  * @example
  * const { data, loading, error } = usePreparePaymentMethodQuery({
  *   variables: {
+ *      orgID: // value for 'orgID'
  *   },
  * });
  */
-export function usePreparePaymentMethodQuery(baseOptions?: Apollo.QueryHookOptions<PreparePaymentMethodQuery, PreparePaymentMethodQueryVariables>) {
+export function usePreparePaymentMethodQuery(baseOptions: Apollo.QueryHookOptions<PreparePaymentMethodQuery, PreparePaymentMethodQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
         return Apollo.useQuery<PreparePaymentMethodQuery, PreparePaymentMethodQueryVariables>(PreparePaymentMethodDocument, options);
       }

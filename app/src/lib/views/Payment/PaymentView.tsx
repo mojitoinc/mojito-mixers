@@ -27,6 +27,7 @@ interface PaymentViewState {
 }
 
 export interface PaymentViewProps {
+  orgID: string;
   checkoutItems: CheckoutItem[];
   taxes: null | TaxesState;
   savedPaymentMethods: SavedPaymentMethod[];
@@ -48,6 +49,7 @@ export interface PaymentViewProps {
 }
 
 export const PaymentView: React.FC<PaymentViewProps> = ({
+  orgID,
   checkoutItems,
   taxes,
   savedPaymentMethods: rawSavedPaymentMethods,
@@ -131,6 +133,7 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
 
   // PLAIN LINKS:
   const onPlaidLinkClicked = usePlaid({
+    orgID,
     selectedBillingInfo,
   });
 

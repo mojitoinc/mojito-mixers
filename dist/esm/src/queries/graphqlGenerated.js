@@ -500,8 +500,8 @@ function useDeletePaymentMethodMutation(baseOptions) {
     return Apollo.useMutation(DeletePaymentMethodDocument, options);
 }
 const PreparePaymentMethodDocument = gql `
-    query PreparePaymentMethod {
-  preparePaymentMethod(paymentMethodType: ACH) {
+    query PreparePaymentMethod($orgID: UUID1!) {
+  preparePaymentMethod(paymentMethodType: ACH, orgID: $orgID) {
     ... on ACHPaymentMethodPrepareStatementOutput {
       linkToken
     }
@@ -520,6 +520,7 @@ const PreparePaymentMethodDocument = gql `
  * @example
  * const { data, loading, error } = usePreparePaymentMethodQuery({
  *   variables: {
+ *      orgID: // value for 'orgID'
  *   },
  * });
  */
