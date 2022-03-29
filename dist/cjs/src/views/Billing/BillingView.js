@@ -40,7 +40,7 @@ const BillingView = ({ vertexEnabled, checkoutItems, savedPaymentMethods: rawSav
         };
     }, []);
     const calculateTaxes = React.useCallback((taxInfo) => tslib_es6.__awaiter(void 0, void 0, void 0, function* () {
-        var _a, _b;
+        var _a;
         const calledAt = getTaxQuoteTimestampRef.current;
         let invalidZipCode = false;
         const result = yield getTaxQuote({
@@ -64,20 +64,28 @@ const BillingView = ({ vertexEnabled, checkoutItems, savedPaymentMethods: rawSav
         if (calledAt !== getTaxQuoteTimestampRef.current)
             return;
         const taxResult = ((_a = result.data) === null || _a === void 0 ? void 0 : _a.getTaxQuote) || {};
-        const hasVerifiedAddress = !!taxResult.verifiedAddress;
-        const zipPlusFour = ((_b = taxResult.verifiedAddress) === null || _b === void 0 ? void 0 : _b.postalCode) || "";
-        if (zipPlusFour)
-            invalidZipCode || (invalidZipCode = !zipPlusFour.startsWith(taxInfo.zipCode));
-        setViewState((prevViewState) => (Object.assign(Object.assign({}, prevViewState), { taxes: hasVerifiedAddress ? {
-                status: invalidZipCode ? "error" : "complete",
-                invalidZipCode,
+        const { verifiedAddress } = taxResult;
+        const vertexSuggestions = {};
+        if (!showSaved && verifiedAddress) {
+            // Vertex returns 5+4 zip codes, so we remove the last 4 digits to get the "normal" one:
+            const zipCode = ((verifiedAddress === null || verifiedAddress === void 0 ? void 0 : verifiedAddress.postalCode) || "").replace(/-\d{4}$/, "");
+            if (taxInfo.street !== verifiedAddress.street1)
+                vertexSuggestions.street = verifiedAddress.street1;
+            if (taxInfo.city !== verifiedAddress.city)
+                vertexSuggestions.city = verifiedAddress.city;
+            if (taxInfo.zipCode !== zipCode)
+                vertexSuggestions.zipCode = zipCode;
+        }
+        setViewState((prevViewState) => (Object.assign(Object.assign({}, prevViewState), { taxes: verifiedAddress ? {
+                status: "complete",
                 taxRate: 100 * taxResult.totalTaxAmount / taxResult.taxablePrice,
                 taxAmount: taxResult.totalTaxAmount,
+                vertexSuggestions,
             } : {
                 status: "error",
                 invalidZipCode,
             } })));
-    }), [getTaxQuote, total]);
+    }), [getTaxQuote, total, showSaved]);
     const handleThrottledTaxInfoChange = corre.useThrottledCallback((taxInfo) => {
         var _a, _b;
         if (!vertexEnabled)

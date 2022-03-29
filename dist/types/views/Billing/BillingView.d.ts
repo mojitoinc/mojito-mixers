@@ -6,11 +6,17 @@ import { CheckoutModalError } from "../../components/public/CheckoutOverlay/Chec
 import { Wallet } from "../../domain/wallet/wallet.interfaces";
 import { ConsentType } from "../../components/shared/ConsentText/ConsentText";
 export declare type TaxStatus = "incomplete" | "loading" | "complete" | "error";
+export interface VertexSuggestions {
+    street?: string;
+    city?: string;
+    zipCode?: string;
+}
 export interface TaxesState {
     status: TaxStatus;
     invalidZipCode?: boolean;
     taxRate?: number;
     taxAmount?: number;
+    vertexSuggestions?: VertexSuggestions;
 }
 export interface BillingViewProps {
     vertexEnabled?: boolean;
