@@ -40,7 +40,7 @@ const FIELD_LABELS = {
     [STATE_FIELD]: "State",
     [COUNTRY_FIELD]: "Country",
 };
-const FIELD_NAMES = Object.keys(FIELD_LABELS);
+const FIELD_KEYS = Object.keys(FIELD_LABELS);
 const EMPTY_FORM_VALUES = {
     [FULL_NAME_FIELD]: "",
     [EMAIL_FIELD]: "",
@@ -110,7 +110,7 @@ const schema = object()
 const BillingInfoForm = ({ 
 // variant,
 defaultValues, checkoutError, taxes, onTaxInfoChange, onSaved, onClose, onSubmit, onAttemptSubmit, consentType, debug, }) => {
-    const { control, handleSubmit, watch, setError, formState, } = useForm({
+    const { control, handleSubmit, watch, setValue, setError, formState, } = useForm({
         defaultValues: Object.assign(Object.assign({}, EMPTY_FORM_VALUES), defaultValues),
         reValidateMode: "onChange",
         resolver: o(schema),
@@ -127,11 +127,16 @@ defaultValues, checkoutError, taxes, onTaxInfoChange, onSaved, onClose, onSubmit
     }, [onTaxInfoChange, street, zip, city, state, country]);
     const selectedCountryCode = country === null || country === void 0 ? void 0 : country.value;
     const submitForm = handleSubmit(onSubmit);
-    const checkoutErrorMessage = useFormCheckoutError({ formKey: "billing", checkoutError, fields: FIELD_NAMES, setError });
+    const checkoutErrorMessage = useFormCheckoutError({ formKey: "billing", checkoutError, fields: FIELD_KEYS, setError });
     const handleFormSubmit = useCallback((e) => __awaiter(void 0, void 0, void 0, function* () {
         onAttemptSubmit();
         submitForm(e);
     }), [onAttemptSubmit, submitForm]);
+    const handleSuggestionAccepted = useCallback((fieldKey, newValue) => {
+        if (!FIELD_KEYS.includes(fieldKey))
+            return;
+        setValue(fieldKey, newValue);
+    }, [setValue]);
     return (React__default.createElement("form", { onSubmit: handleFormSubmit },
         onSaved && (React__default.createElement(Box, { sx: { my: 2.5 } },
             React__default.createElement(SecondaryButton, { onClick: onSaved, startIcon: React__default.createElement(default_1, null) }, "Use Saved Billing Info"))),
@@ -163,7 +168,7 @@ defaultValues, checkoutError, taxes, onTaxInfoChange, onSaved, onClose, onSubmit
             React__default.createElement(Grid, { item: true, sm: 6 },
                 React__default.createElement(ControlledTextField, { name: ZIP_CODE_FIELD, control: control, label: FIELD_LABELS[ZIP_CODE_FIELD] }))),
         checkoutErrorMessage && React__default.createElement(FormErrorsBox, { error: checkoutErrorMessage, sx: { mt: 5 } }),
-        formState.isSubmitted && React__default.createElement(TaxesMessagesBox, { sx: { mt: 5 }, variant: "form", taxes: taxes }),
+        React__default.createElement(TaxesMessagesBox, { sx: { mt: 5 }, isSubmitted: formState.isSubmitted, variant: "form", taxes: taxes, onSuggestionAccepted: handleSuggestionAccepted }),
         debug && (React__default.createElement(DebugBox, { sx: { mt: 5 } },
             JSON.stringify(watch(), null, 2),
             "\n\n",
