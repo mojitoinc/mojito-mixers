@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Stack } from "@mui/material";
+import { Divider, Stack } from "@mui/material";
 
 import { CheckoutDeliveryAndItemCostBreakdown } from "../../components/payments/CheckoutDeliveryAndItemCostBreakdown/CheckoutDeliveryAndItemCostBreakdown";
 import { CheckoutStepper } from "../../components/payments/CheckoutStepper/CheckoutStepper";
@@ -237,14 +237,10 @@ export const BillingView: React.FC<BillingViewProps> = ({
 
   return (
     <Stack
-      direction={{
-        xs: "column",
-        sm: "column",
-        md: "row",
-      }}
-      spacing={8.75}
-    >
-      <Stack sx={{ display: "flex", overflow: "hidden", width: { xs: "100%", md: "calc(50% - 35px)" } }}>
+      direction={{ xs: "column",  md: "row" }}
+      spacing={{ xs: 0,  md: 3.75 }}>
+
+      <Stack sx={{ display: "flex", overflow: "hidden", width: (theme) => ({ xs: "100%", md: `calc(50% - ${ theme.spacing(3.75 / 2) })` }) }}>
         <CheckoutStepper progress={ 50 } />
 
           { showSaved ? (
@@ -276,6 +272,8 @@ export const BillingView: React.FC<BillingViewProps> = ({
               debug={ debug } />
           ) }
       </Stack>
+
+      <Divider sx={{ display: { xs: "block", md: "none" } }} />
 
       <CheckoutDeliveryAndItemCostBreakdown
         checkoutItems={ checkoutItems }
