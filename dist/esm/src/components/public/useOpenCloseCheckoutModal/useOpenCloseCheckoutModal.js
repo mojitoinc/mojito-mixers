@@ -17,6 +17,7 @@ function useOpenCloseCheckoutModal({ paymentIdParam, paymentErrorParam, }) {
     useEffect(() => {
         if (initialLoaderMode === "default")
             return;
+        console.log("RESET MODE", initialLoaderMode);
         setState({
             loaderMode: initialLoaderMode,
             isOpen: true,
@@ -28,7 +29,12 @@ function useOpenCloseCheckoutModal({ paymentIdParam, paymentErrorParam, }) {
     const onClose = useCallback(() => {
         setState({ loaderMode: "default", isOpen: false });
     }, []);
-    return Object.assign(Object.assign({}, state), { onOpen, onClose });
+    return {
+        loaderMode: initialLoaderMode === "default" ? state.loaderMode : initialLoaderMode,
+        isOpen: initialLoaderMode === "default" ? state.isOpen : true,
+        onOpen,
+        onClose,
+    };
 }
 
 export { useOpenCloseCheckoutModal };

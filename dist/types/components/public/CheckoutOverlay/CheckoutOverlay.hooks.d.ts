@@ -41,6 +41,7 @@ export interface SelectedPaymentMethod {
 }
 export interface PurchaseState {
     invoiceID: string | null;
+    invoiceCountdownStart: number | null;
     taxes: null | TaxesState;
     wallet: null | string | Wallet;
     circlePaymentID: string;
@@ -56,7 +57,7 @@ export interface CheckoutModalStateReturn extends CheckoutModalState, PurchaseSt
     setIsDialogBlocked: (isDialogBlocked: boolean) => void;
     selectedPaymentMethod: SelectedPaymentMethod;
     setSelectedPaymentMethod: Dispatch<SetStateAction<SelectedPaymentMethod>>;
-    setInvoiceID: (invoiceID: string | null) => void;
+    setInvoiceID: (invoiceID: string | null, invoiceCountdownStart: number | null) => void;
     setTaxes: (taxes: TaxesState) => void;
     setWalletAddress: (wallet: null | string | Wallet) => void;
     setPayments: (circlePaymentID: string, paymentID: string) => void;

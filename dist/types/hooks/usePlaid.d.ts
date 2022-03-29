@@ -5,6 +5,7 @@ import { PaymentMethod } from "../domain/payment/payment.interfaces";
 export interface UsePlaidOptionsStartFlow {
     orgID: string;
     selectedBillingInfo: string | BillingInfo;
+    skip: boolean;
 }
 export interface UsePlaidOptionsContinueFlow {
     onSubmit: (data?: PaymentMethod) => void;

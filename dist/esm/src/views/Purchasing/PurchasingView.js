@@ -9,7 +9,7 @@ import { useGetPaymentNotificationQuery } from '../../queries/graphqlGenerated.j
 import { persistCheckoutModalInfo } from '../../components/public/CheckoutOverlay/CheckoutOverlay.utils.js';
 import { PURCHASING_MIN_WAIT_MS, PAYMENT_NOTIFICATION_INTERVAL_MS, PAYMENT_CREATION_TIMEOUT_MS, PURCHASING_MESSAGES_DEFAULT, PURCHASING_MESSAGES_INTERVAL_MS, DEV_SKIP_3DS_IN_LOCALHOST } from '../../config/config.js';
 
-const PurchasingView = ({ threeDSEnabled, purchasingImageSrc, purchasingMessages: customPurchasingMessages, orgID, invoiceID, savedPaymentMethods, selectedPaymentMethod, wallet, onPurchaseSuccess, onPurchaseError, onDialogBlocked, debug, }) => {
+const PurchasingView = ({ threeDSEnabled, purchasingImageSrc, purchasingMessages: customPurchasingMessages, orgID, invoiceID, invoiceCountdownStart, savedPaymentMethods, selectedPaymentMethod, wallet, onPurchaseSuccess, onPurchaseError, onDialogBlocked, debug, }) => {
     var _a, _b, _c;
     const { billingInfo, paymentInfo, cvv } = selectedPaymentMethod;
     const isCreditCardPayment = cvv || (paymentInfo !== null && typeof paymentInfo === "object" && paymentInfo.type === "CreditCard");
@@ -80,6 +80,7 @@ const PurchasingView = ({ threeDSEnabled, purchasingImageSrc, purchasingMessages
         if (redirectURL && !skipRedirect) {
             persistCheckoutModalInfo({
                 invoiceID,
+                invoiceCountdownStart,
                 circlePaymentID,
                 paymentID,
                 billingInfo,
@@ -98,6 +99,7 @@ const PurchasingView = ({ threeDSEnabled, purchasingImageSrc, purchasingMessages
         onDialogBlocked,
         onPurchaseSuccess,
         invoiceID,
+        invoiceCountdownStart,
         debug,
     ]);
     // Purchasing Messages:

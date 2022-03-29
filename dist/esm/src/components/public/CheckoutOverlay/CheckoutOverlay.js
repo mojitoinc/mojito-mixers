@@ -24,6 +24,7 @@ import { NEW_WALLET_OPTION } from '../../../domain/wallet/wallet.constants.js';
 import { StatusIcon } from '../../shared/StatusIcon/StatusIcon.js';
 import { PUIStaticSuccessOverlay } from '../SuccessOverlay/StaticSuccessOverlay.js';
 import { PUIStaticErrorOverlay } from '../ErrorOverlay/StaticErrorOverlay.js';
+import { useCountdown } from '../../../hooks/useContdown.js';
 
 const DEV_DEBUG_ENABLED = process.browser && localStorage.getItem(DEV_DEBUG_ENABLED_KEY) === "true";
 const PUICheckoutOverlay = ({ 
@@ -91,7 +92,7 @@ debug: parentDebug, onEvent, onError, }) => {
     // SelectedPaymentMethod:
     selectedPaymentMethod, setSelectedPaymentMethod, 
     // PurchaseState:
-    invoiceID, setInvoiceID, taxes, setTaxes, wallet, setWalletAddress, paymentID, circlePaymentID, setPayments, } = useCheckoutModalState({
+    invoiceID, invoiceCountdownStart, setInvoiceID, taxes, setTaxes, wallet, setWalletAddress, paymentID, circlePaymentID, setPayments, } = useCheckoutModalState({
         invoiceID: initialInvoiceID,
         productConfirmationEnabled,
         vertexEnabled,
@@ -106,7 +107,7 @@ debug: parentDebug, onEvent, onError, }) => {
     });
     // Modal loading state:
     const isDialogLoading = !orgID || parentCheckoutItems.length === 0 || isAuthenticatedLoading || meLoading || paymentMethodsLoading;
-    const isDialogInitializing = isDialogLoading || invoiceDetailsLoading || !invoiceID;
+    const isDialogInitializing = isDialogLoading || invoiceDetailsLoading || !invoiceID || !invoiceCountdownStart;
     const isPlaidFlowLoading = continuePlaidOAuthFlow();
     const [loaderMode, setLoaderMode] = useState(initialLoaderMode);
     const isInvalidMode = loaderMode !== "default" && !open;
@@ -159,7 +160,9 @@ debug: parentDebug, onEvent, onError, }) => {
     }, [wallets, destinationAddress, setWalletAddress]);
     // Invoice creation & buy now lot reservation:
     const createInvoiceAndReservationCalledRef = useRef(false);
-    const { invoiceAndReservationState, createInvoiceAndReservation, countdownElementRef, } = useCreateInvoiceAndReservation({ orgID, checkoutItems, stop: checkoutStep === "confirmation", debug });
+    const { 
+    // TODO: Instead of returning state, just pass setError and setInvoiceID or return it from createInvoiceAndReservation.
+    invoiceAndReservationState, createInvoiceAndReservation, } = useCreateInvoiceAndReservation({ orgID, checkoutItems, debug });
     useEffect(() => {
         if (isDialogLoading || invoiceID === null || invoiceID || createInvoiceAndReservationCalledRef.current)
             return;
@@ -167,16 +170,22 @@ debug: parentDebug, onEvent, onError, }) => {
         createInvoiceAndReservation();
     }, [isDialogLoading, invoiceID, createInvoiceAndReservation]);
     useEffect(() => {
-        if (invoiceAndReservationState.error) {
+        const { invoiceID, invoiceCountdownStart, error } = invoiceAndReservationState;
+        if (error) {
             // TODO: It would be great if we can keep track of the reservation expiration without changing the displayed error
             // if there's already once, so when clicking the action button for that one, on top of calling its respective error
             // handling code, we re-create the reservation:
-            setError(invoiceAndReservationState.error);
+            setError(error);
             return;
         }
-        if (invoiceAndReservationState.invoiceID)
-            setInvoiceID(invoiceAndReservationState.invoiceID);
+        if (invoiceID && invoiceCountdownStart)
+            setInvoiceID(invoiceID, invoiceCountdownStart);
     }, [invoiceAndReservationState, setError, setInvoiceID]);
+    // Reservation countdown:
+    const { countdownElementRef } = useCountdown({
+        invoiceCountdownStart: checkoutStep === "confirmation" ? null : invoiceCountdownStart,
+        setError,
+    });
     // Init modal state once everything has been loaded:
     useEffect(() => {
         if (!isDialogLoading && open)
@@ -320,7 +329,7 @@ debug: parentDebug, onEvent, onError, }) => {
             });
         });
         yield Promise.allSettled(promises);
-        yield refetchPaymentMethods({ orgID });
+        yield refetchPaymentMethods().catch(() => { });
     }), [checkoutStep, deletePaymentMethod, orgID, refetchPaymentMethods, savedPaymentMethods, setSelectedPaymentMethod]);
     // Purchase:
     const handlePurchaseSuccess = useCallback((nextCirclePaymentID, nextPaymentID, redirectURL) => __awaiter(void 0, void 0, void 0, function* () {
@@ -335,14 +344,14 @@ debug: parentDebug, onEvent, onError, }) => {
             return;
         }
         // After a successful purchase, a new payment method might have been created, so we reload them:
-        yield refetchPaymentMethods();
+        yield refetchPaymentMethods().catch(() => { });
         goNext();
     }), [setPayments, debug, refetchPaymentMethods, goNext]);
     const handlePurchaseError = useCallback((error) => __awaiter(void 0, void 0, void 0, function* () {
         setTimeout(() => triggerAnalyticsEventRef.current("event:paymentError"));
         // After a failed purchase, a new payment method might have been created anyway, so we reload them (createPaymentMethod
         // works but createPayment fails):
-        yield refetchPaymentMethods();
+        yield refetchPaymentMethods().catch(() => { });
         setError(error);
     }), [refetchPaymentMethods, setError]);
     // Release reservation:
@@ -394,7 +403,7 @@ debug: parentDebug, onEvent, onError, }) => {
         window.removeEventListener('beforeunload', handleBeforeUnload);
         handleBeforeUnload();
         createInvoiceAndReservationCalledRef.current = false;
-        setInvoiceID(null);
+        setInvoiceID(null, null);
         onClose();
     }, [handleBeforeUnload, setInvoiceID, onClose]);
     // Error handling:
@@ -403,7 +412,7 @@ debug: parentDebug, onEvent, onError, }) => {
         if (at === "reset") {
             yield Promise.allSettled([
                 meRefetch(),
-                refetchPaymentMethods(),
+                refetchPaymentMethods().catch(() => { }),
                 createInvoiceAndReservation(),
             ]);
             // TODO: Cancel previous reservation?
@@ -414,7 +423,7 @@ debug: parentDebug, onEvent, onError, }) => {
             // method has been created despite the error:
             yield Promise.allSettled([
                 meRefetch(),
-                refetchPaymentMethods(),
+                refetchPaymentMethods().catch(() => { }),
                 refetchInvoiceDetails(),
             ]);
             if (at !== "purchasing") {
@@ -473,9 +482,9 @@ debug: parentDebug, onEvent, onError, }) => {
     else if (checkoutStep === "payment") {
         checkoutStepElement = (React__default.createElement(PaymentView, { orgID: orgID, checkoutItems: checkoutItems, taxes: taxes, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethod: selectedPaymentMethod, wallet: wallet, wallets: wallets, checkoutError: checkoutError, onPaymentInfoSelected: handlePaymentInfoSelected, onCvvSelected: handleCvvSelected, onSavedPaymentMethodDeleted: handleSavedPaymentMethodDeleted, onWalletChange: setWalletAddress, onNext: goNext, onPrev: goBack, onClose: handleClose, acceptedPaymentTypes: acceptedPaymentTypes, acceptedCreditCardNetworks: acceptedCreditCardNetworks, consentType: consentType, debug: debug }));
     }
-    else if (checkoutStep === "purchasing" && invoiceID) {
+    else if (checkoutStep === "purchasing" && invoiceID && invoiceCountdownStart) {
         headerVariant = "purchasing";
-        checkoutStepElement = (React__default.createElement(PurchasingView, { threeDSEnabled: threeDSEnabled, purchasingImageSrc: purchasingImageSrc, purchasingMessages: purchasingMessages, orgID: orgID, invoiceID: invoiceID, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethod: selectedPaymentMethod, wallet: wallet, onPurchaseSuccess: handlePurchaseSuccess, onPurchaseError: handlePurchaseError, onDialogBlocked: setIsDialogBlocked, debug: debug }));
+        checkoutStepElement = (React__default.createElement(PurchasingView, { threeDSEnabled: threeDSEnabled, purchasingImageSrc: purchasingImageSrc, purchasingMessages: purchasingMessages, orgID: orgID, invoiceID: invoiceID, invoiceCountdownStart: invoiceCountdownStart, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethod: selectedPaymentMethod, wallet: wallet, onPurchaseSuccess: handlePurchaseSuccess, onPurchaseError: handlePurchaseError, onDialogBlocked: setIsDialogBlocked, debug: debug }));
     }
     else if (checkoutStep === "confirmation") {
         headerVariant = "logoOnly";

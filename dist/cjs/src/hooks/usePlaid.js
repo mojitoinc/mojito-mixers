@@ -22,14 +22,24 @@ function continuePlaidOAuthFlow() {
 }
 function usePlaid(options) {
     var _a;
-    const orgID = isUsePlaidOptionsStartFlow(options) ? options.orgID : null;
-    const selectedBillingInfo = isUsePlaidOptionsStartFlow(options) ? options.selectedBillingInfo : null;
-    const onSubmit = isUsePlaidOptionsContinueFlow(options) ? options.onSubmit : null;
+    let orgID = null;
+    let selectedBillingInfo = null;
+    let skip = false;
+    let onSubmit = null;
+    if (isUsePlaidOptionsStartFlow(options)) {
+        orgID = options.orgID;
+        selectedBillingInfo = options.selectedBillingInfo;
+        skip = options.skip || !orgID;
+    }
+    else if (isUsePlaidOptionsContinueFlow(options)) {
+        onSubmit = options.onSubmit;
+        skip = true;
+    }
     const plaidOAuthFlowStateRef = React.useRef(exports.INITIAL_PLAID_OAUTH_FLOW_STATE);
     const { linkToken: savedLinkToken, receivedRedirectUri, continueOAuthFlow, } = plaidOAuthFlowStateRef.current || {};
     const { loading: isPreparePaymentMethodLoading, error: preparePaymentMethodError, data: preparePaymentMethodData, } = graphqlGenerated.usePreparePaymentMethodQuery({
         variables: { orgID },
-        skip: continueOAuthFlow || !!onSubmit || !orgID,
+        skip,
     });
     React.useEffect(() => {
         if (!url_utils.isLocalhostOrStaging())

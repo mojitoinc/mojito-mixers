@@ -1,34 +1,15 @@
 import { __awaiter } from '../../node_modules/tslib/tslib.es6.js';
-import { useThrottledRequestAnimationFrame } from '@swyg/corre';
-import { useState, useCallback, useRef } from 'react';
-import { RESERVATION_COUNTDOWN_REFRESH_RATE_MS, RESERVATION_COUNTDOWN_FROM_MS } from '../config/config.js';
-import { ERROR_INVOICE_TIMEOUT, ERROR_PURCHASE_NO_ITEMS, ERROR_PURCHASE_NO_UNITS, ERROR_PURCHASE_LOADING_ITEMS, ERROR_PURCHASE_CREATING_INVOICE } from '../domain/errors/errors.constants.js';
+import { useState, useCallback } from 'react';
+import { ERROR_PURCHASE_NO_ITEMS, ERROR_PURCHASE_NO_UNITS, ERROR_PURCHASE_LOADING_ITEMS, ERROR_PURCHASE_CREATING_INVOICE } from '../domain/errors/errors.constants.js';
 import { useCreateAuctionInvoiceMutation, useReserveBuyNowLotMutation } from '../queries/graphqlGenerated.js';
-import { formatTimeLeft } from '../utils/formatUtils.js';
 
-function useCreateInvoiceAndReservation({ orgID, checkoutItems, stop, debug = false, }) {
+function useCreateInvoiceAndReservation({ orgID, checkoutItems, debug = false, }) {
     const [invoiceAndReservationState, setInvoiceAndReservationState] = useState({});
     const setError = useCallback((error) => {
         setInvoiceAndReservationState({
             error,
         });
     }, []);
-    const countdownStartRef = useRef(null);
-    const countdownElementRef = useRef(null);
-    useThrottledRequestAnimationFrame(() => {
-        const countdownStart = countdownStartRef.current;
-        const countdownElement = countdownElementRef.current;
-        if (countdownStart === null)
-            return;
-        const formattedTimeLeft = formatTimeLeft(countdownStart, RESERVATION_COUNTDOWN_FROM_MS);
-        if (formattedTimeLeft === "00:00") {
-            countdownStartRef.current = null;
-            setError(ERROR_INVOICE_TIMEOUT());
-            return;
-        }
-        if (countdownElement)
-            countdownElement.textContent = formattedTimeLeft;
-    }, countdownStartRef.current === null || stop ? null : RESERVATION_COUNTDOWN_REFRESH_RATE_MS);
     const [createAuctionInvoice] = useCreateAuctionInvoiceMutation();
     const [reserveBuyNowLot] = useReserveBuyNowLotMutation();
     const createInvoiceAndReservation = useCallback(() => __awaiter(this, void 0, void 0, function* () {
@@ -108,8 +89,7 @@ function useCreateInvoiceAndReservation({ orgID, checkoutItems, stop, debug = fa
             setError(ERROR_PURCHASE_CREATING_INVOICE(mutationError));
             return;
         }
-        countdownStartRef.current = Date.now();
-        setInvoiceAndReservationState({ invoiceID });
+        setInvoiceAndReservationState({ invoiceID, invoiceCountdownStart: Date.now() });
         // TODO: Error handling and automatic retry:
     }), [
         orgID,
@@ -122,7 +102,6 @@ function useCreateInvoiceAndReservation({ orgID, checkoutItems, stop, debug = fa
     return {
         invoiceAndReservationState,
         createInvoiceAndReservation,
-        countdownElementRef,
     };
 }
 

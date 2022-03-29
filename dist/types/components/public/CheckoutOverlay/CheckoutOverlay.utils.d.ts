@@ -3,6 +3,7 @@ import { CheckoutModalStep } from "./CheckoutOverlay.hooks";
 export interface CheckoutModalInfo {
     url?: string;
     invoiceID: string;
+    invoiceCountdownStart: number;
     circlePaymentID: string;
     paymentID: string;
     billingInfo: string | BillingInfo;
@@ -28,6 +29,7 @@ export interface ContinueFlowsReturn {
     flowType: FlowType;
     checkoutStep: CheckoutModalStep | "";
     invoiceID: string;
+    invoiceCountdownStart: number;
     circlePaymentID: string;
     paymentID: string;
     billingInfo: string | BillingInfo;

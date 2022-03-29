@@ -231,6 +231,7 @@ declare function continuePlaidOAuthFlow(): boolean;
 interface CheckoutModalInfo {
     url?: string;
     invoiceID: string;
+    invoiceCountdownStart: number;
     circlePaymentID: string;
     paymentID: string;
     billingInfo: string | BillingInfo;
@@ -252,6 +253,7 @@ interface ContinueFlowsReturn {
     flowType: FlowType;
     checkoutStep: CheckoutModalStep | "";
     invoiceID: string;
+    invoiceCountdownStart: number;
     circlePaymentID: string;
     paymentID: string;
     billingInfo: string | BillingInfo;
