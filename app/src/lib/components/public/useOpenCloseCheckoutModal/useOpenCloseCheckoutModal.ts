@@ -39,6 +39,8 @@ export function useOpenCloseCheckoutModal({
   useEffect(() => {
     if (initialLoaderMode === "default") return;
 
+    console.log("RESET MODE", initialLoaderMode);
+
     setState({
       loaderMode: initialLoaderMode,
       isOpen: true,
@@ -53,5 +55,10 @@ export function useOpenCloseCheckoutModal({
     setState({ loaderMode: "default", isOpen: false });
   }, []);
 
-  return { ...state, onOpen, onClose };
+  return {
+    loaderMode: initialLoaderMode === "default" ? state.loaderMode : initialLoaderMode,
+    isOpen: initialLoaderMode === "default" ? state.isOpen : true,
+    onOpen,
+    onClose,
+  };
 }

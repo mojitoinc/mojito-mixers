@@ -37,6 +37,7 @@ import { CreditCardNetwork } from "../../../domain/react-payment-inputs/react-pa
 import { PUIStaticSuccessOverlay } from "../SuccessOverlay/StaticSuccessOverlay";
 import { LoaderMode } from "../useOpenCloseCheckoutModal/useOpenCloseCheckoutModal";
 import { PUIStaticErrorOverlay } from "../ErrorOverlay/StaticErrorOverlay";
+import { useCountdown } from "../../../hooks/useContdown";
 
 export interface PUICheckoutOverlayProps {
   // Modal:
@@ -224,6 +225,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
 
     // PurchaseState:
     invoiceID,
+    invoiceCountdownStart,
     setInvoiceID,
     taxes,
     setTaxes,
@@ -258,7 +260,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   // Modal loading state:
 
   const isDialogLoading = !orgID || parentCheckoutItems.length === 0 || isAuthenticatedLoading || meLoading || paymentMethodsLoading;
-  const isDialogInitializing = isDialogLoading || invoiceDetailsLoading || !invoiceID;
+  const isDialogInitializing = isDialogLoading || invoiceDetailsLoading || !invoiceID || !invoiceCountdownStart;
   const isPlaidFlowLoading = continuePlaidOAuthFlow();
   const [loaderMode, setLoaderMode] = useState(initialLoaderMode);
   const isInvalidMode = loaderMode !== "default" && !open;
@@ -326,10 +328,10 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   const createInvoiceAndReservationCalledRef = useRef(false);
 
   const {
+    // TODO: Instead of returning state, just pass setError and setInvoiceID or return it from createInvoiceAndReservation.
     invoiceAndReservationState,
     createInvoiceAndReservation,
-    countdownElementRef,
-  } = useCreateInvoiceAndReservation({ orgID, checkoutItems, stop: checkoutStep === "confirmation", debug });
+  } = useCreateInvoiceAndReservation({ orgID, checkoutItems, debug });
 
   useEffect(() => {
     if (isDialogLoading || invoiceID === null || invoiceID || createInvoiceAndReservationCalledRef.current) return;
@@ -340,17 +342,27 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   }, [isDialogLoading, invoiceID, createInvoiceAndReservation]);
 
   useEffect(() => {
-    if (invoiceAndReservationState.error) {
+    const { invoiceID, invoiceCountdownStart, error } = invoiceAndReservationState;
+
+    if (error) {
       // TODO: It would be great if we can keep track of the reservation expiration without changing the displayed error
       // if there's already once, so when clicking the action button for that one, on top of calling its respective error
       // handling code, we re-create the reservation:
-      setError(invoiceAndReservationState.error);
+      setError(error);
 
       return;
     }
 
-    if (invoiceAndReservationState.invoiceID) setInvoiceID(invoiceAndReservationState.invoiceID);
+    if (invoiceID && invoiceCountdownStart) setInvoiceID(invoiceID, invoiceCountdownStart);
   }, [invoiceAndReservationState, setError, setInvoiceID]);
+
+
+  // Reservation countdown:
+
+  const { countdownElementRef } = useCountdown({
+    invoiceCountdownStart: checkoutStep === "confirmation" ? null : invoiceCountdownStart,
+    setError,
+  });
 
 
   // Init modal state once everything has been loaded:
@@ -536,7 +548,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
 
     await Promise.allSettled(promises);
 
-    await refetchPaymentMethods({ orgID });
+    await refetchPaymentMethods().catch(() => { /* TODO: Handle this error properly. */ });
   }, [checkoutStep, deletePaymentMethod, orgID, refetchPaymentMethods, savedPaymentMethods, setSelectedPaymentMethod]);
 
 
@@ -558,7 +570,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     }
 
     // After a successful purchase, a new payment method might have been created, so we reload them:
-    await refetchPaymentMethods();
+    await refetchPaymentMethods().catch(() => { /* TODO: Handle this error properly. */ });
 
     goNext();
   }, [setPayments, debug, refetchPaymentMethods, goNext]);
@@ -568,7 +580,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
 
     // After a failed purchase, a new payment method might have been created anyway, so we reload them (createPaymentMethod
     // works but createPayment fails):
-    await refetchPaymentMethods();
+    await refetchPaymentMethods().catch(() => { /* TODO: Handle this error properly. */ });
 
     setError(error);
   }, [refetchPaymentMethods, setError]);
@@ -636,7 +648,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
 
     createInvoiceAndReservationCalledRef.current = false;
 
-    setInvoiceID(null);
+    setInvoiceID(null, null);
 
     onClose();
   }, [handleBeforeUnload, setInvoiceID, onClose]);
@@ -650,7 +662,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     if (at === "reset") {
       await Promise.allSettled([
         meRefetch(),
-        refetchPaymentMethods(),
+        refetchPaymentMethods().catch(() => { /* TODO: Handle this error properly. */ }),
         createInvoiceAndReservation(),
       ]);
 
@@ -662,7 +674,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
       // method has been created despite the error:
       await Promise.allSettled([
         meRefetch(),
-        refetchPaymentMethods(),
+        refetchPaymentMethods().catch(() => { /* TODO: Handle this error properly. */ }),
         refetchInvoiceDetails(),
       ]);
 
@@ -809,7 +821,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
         consentType={ consentType }
         debug={ debug } />
     );
-  } else if (checkoutStep === "purchasing" && invoiceID) {
+  } else if (checkoutStep === "purchasing" && invoiceID && invoiceCountdownStart) {
     headerVariant = "purchasing";
 
     checkoutStepElement = (
@@ -819,6 +831,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
         purchasingMessages={ purchasingMessages }
         orgID={ orgID }
         invoiceID={ invoiceID }
+        invoiceCountdownStart={ invoiceCountdownStart }
         savedPaymentMethods={ savedPaymentMethods }
         selectedPaymentMethod={ selectedPaymentMethod }
         wallet={ wallet }

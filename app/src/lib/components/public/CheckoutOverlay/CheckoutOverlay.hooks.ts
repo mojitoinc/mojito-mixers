@@ -56,6 +56,7 @@ export interface SelectedPaymentMethod {
 
 export interface PurchaseState {
   invoiceID: string | null;
+  invoiceCountdownStart: number | null;
   taxes: null | TaxesState;
   wallet: null | string | Wallet;
   circlePaymentID: string;
@@ -77,7 +78,7 @@ export interface CheckoutModalStateReturn extends CheckoutModalState, PurchaseSt
   setSelectedPaymentMethod: Dispatch<SetStateAction<SelectedPaymentMethod>>;
 
   // PurchaseState (+ inherited stuff):
-  setInvoiceID: (invoiceID: string | null) => void;
+  setInvoiceID: (invoiceID: string | null, invoiceCountdownStart: number | null) => void;
   setTaxes: (taxes: TaxesState) => void;
   setWalletAddress: (wallet: null | string | Wallet) => void;
   setPayments: (circlePaymentID: string, paymentID: string) => void;
@@ -114,12 +115,14 @@ export function useCheckoutModalState({
 
   const [{
     invoiceID,
+    invoiceCountdownStart,
     taxes,
     wallet,
     circlePaymentID,
     paymentID,
   }, setPurchaseState] = useState<PurchaseState>({
     invoiceID: initialInvoiceID || null,
+    invoiceCountdownStart: null,
     taxes: vertexEnabled ? { status: "incomplete" } : null,
     wallet: null,
     circlePaymentID: "",
@@ -163,6 +166,7 @@ export function useCheckoutModalState({
 
     setPurchaseState({
       invoiceID: savedFlow.invoiceID || "",
+      invoiceCountdownStart: savedFlow.invoiceCountdownStart || null,
       taxes: vertexEnabled ? { status: "incomplete" } : null,
       wallet: null,
       circlePaymentID: savedFlow.circlePaymentID || "",
@@ -261,8 +265,8 @@ export function useCheckoutModalState({
     }));
   }, []);
 
-  const setInvoiceID = useCallback((invoiceID: string | null) => {
-    setPurchaseState((prevPurchaseState) => ({ ...prevPurchaseState, invoiceID, circlePaymentID: "", paymentID: "" }));
+  const setInvoiceID = useCallback((invoiceID: string | null, invoiceCountdownStart: number | null) => {
+    setPurchaseState((prevPurchaseState) => ({ ...prevPurchaseState, invoiceID, invoiceCountdownStart, circlePaymentID: "", paymentID: "" }));
   }, []);
 
   const setTaxes = useCallback((taxes: TaxesState) => {
@@ -296,6 +300,7 @@ export function useCheckoutModalState({
 
     // PurchaseState:
     invoiceID,
+    invoiceCountdownStart,
     setInvoiceID,
     taxes,
     setTaxes,

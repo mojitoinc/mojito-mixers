@@ -10,6 +10,7 @@ import { isLocalhostOrStaging } from "../domain/url/url.utils";
 export interface UsePlaidOptionsStartFlow {
   orgID: string;
   selectedBillingInfo: string | BillingInfo;
+  skip: boolean;
 }
 
 export interface UsePlaidOptionsContinueFlow {
@@ -35,9 +36,20 @@ export function continuePlaidOAuthFlow() {
 }
 
 export function usePlaid(options: UsePlaidOptions) {
-  const orgID = isUsePlaidOptionsStartFlow(options) ? options.orgID : null;
-  const selectedBillingInfo = isUsePlaidOptionsStartFlow(options) ? options.selectedBillingInfo : null;
-  const onSubmit = isUsePlaidOptionsContinueFlow(options) ? options.onSubmit : null;
+  let orgID: string | null = null;
+  let selectedBillingInfo: string | BillingInfo | null = null;
+  let skip = false;
+  let onSubmit: ((data?: PaymentMethod) => void) | null = null;
+
+  if (isUsePlaidOptionsStartFlow(options)) {
+    orgID = options.orgID;
+    selectedBillingInfo = options.selectedBillingInfo;
+    skip = options.skip || !orgID;
+  } else if (isUsePlaidOptionsContinueFlow(options) ) {
+    onSubmit = options.onSubmit;
+    skip = true;
+  }
+
   const plaidOAuthFlowStateRef = useRef<PlaidOAuthFlowState>(INITIAL_PLAID_OAUTH_FLOW_STATE);
 
   const {
@@ -52,7 +64,7 @@ export function usePlaid(options: UsePlaidOptions) {
     data: preparePaymentMethodData,
   } = usePreparePaymentMethodQuery({
     variables: { orgID },
-    skip: continueOAuthFlow || !!onSubmit || !orgID,
+    skip,
   });
 
   useEffect(() => {

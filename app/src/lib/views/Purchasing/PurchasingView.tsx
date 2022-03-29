@@ -20,6 +20,7 @@ export interface PurchasingViewProps {
   purchasingMessages?: false | string[];
   orgID: string;
   invoiceID: string;
+  invoiceCountdownStart: number;
   savedPaymentMethods: SavedPaymentMethod[];
   selectedPaymentMethod: SelectedPaymentMethod;
   wallet: null | string | Wallet;
@@ -35,6 +36,7 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
   purchasingMessages: customPurchasingMessages,
   orgID,
   invoiceID,
+  invoiceCountdownStart,
   savedPaymentMethods,
   selectedPaymentMethod,
   wallet,
@@ -143,6 +145,7 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
     if (redirectURL && !skipRedirect) {
       persistCheckoutModalInfo({
         invoiceID,
+        invoiceCountdownStart,
         circlePaymentID,
         paymentID,
         billingInfo,
@@ -162,6 +165,7 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
     onDialogBlocked,
     onPurchaseSuccess,
     invoiceID,
+    invoiceCountdownStart,
     debug,
   ]);
 
