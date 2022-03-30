@@ -7,11 +7,11 @@ var reactUseCountryRegion = require('react-use-country-region');
 
 const mapCountryToSelectOption = (country) => ({
     label: country.countryName,
-    value: country.countryShortCode,
+    value: country.countryShortCode || country.countryShortCode || "",
 });
 const mapRegionToSelectOption = (region) => ({
     label: region.name,
-    value: region.shortCode,
+    value: region.shortCode || region.name || "",
 });
 const reduceSelectOptionsToMap = (optionsMap, selectOption) => {
     optionsMap[selectOption.value] = selectOption;

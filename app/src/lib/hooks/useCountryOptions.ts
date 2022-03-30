@@ -15,12 +15,12 @@ interface RawRegion {
 
 const mapCountryToSelectOption = (country: RawCountry): SelectOption => ({
   label: country.countryName,
-  value: country.countryShortCode,
+  value: country.countryShortCode || country.countryShortCode || "",
 });
 
 const mapRegionToSelectOption = (region: RawRegion): SelectOption => ({
   label: region.name,
-  value: region.shortCode,
+  value: region.shortCode || region.name || "",
 });
 
 const reduceSelectOptionsToMap = (
