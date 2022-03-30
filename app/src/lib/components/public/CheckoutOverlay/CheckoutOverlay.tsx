@@ -585,6 +585,12 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     setError(error);
   }, [refetchPaymentMethods, setError]);
 
+  const handleGoTo = useCallback(() => {
+    if (onGoTo) onGoTo();
+
+    onClose();
+  }, [onGoTo, onClose]);
+
 
   // Release reservation:
 
@@ -853,7 +859,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
         onNext={ handleClose }
         goToHref={ goToHref }
         goToLabel={ goToLabel }
-        onGoTo={ onGoTo } />
+        onGoTo={ handleGoTo } />
     );
   } else {
     console.warn("Unknown checkoutStepElement!");
