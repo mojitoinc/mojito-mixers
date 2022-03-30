@@ -362,6 +362,11 @@ debug: parentDebug, onEvent, onError, }) => {
         yield refetchPaymentMethods().catch(() => { });
         setError(error);
     }), [refetchPaymentMethods, setError]);
+    const handleGoTo = React.useCallback(() => {
+        if (onGoTo)
+            onGoTo();
+        onClose();
+    }, [onGoTo, onClose]);
     // Release reservation:
     const lastReleasedReservationID = React.useRef("");
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -496,7 +501,7 @@ debug: parentDebug, onEvent, onError, }) => {
     }
     else if (checkoutStep === "confirmation") {
         headerVariant = "logoOnly";
-        checkoutStepElement = (React__default["default"].createElement(ConfirmationView.ConfirmationView, { checkoutItems: checkoutItems, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethod: selectedPaymentMethod, circlePaymentID: circlePaymentID, wallet: wallet, onNext: handleClose, goToHref: goToHref, goToLabel: goToLabel, onGoTo: onGoTo }));
+        checkoutStepElement = (React__default["default"].createElement(ConfirmationView.ConfirmationView, { checkoutItems: checkoutItems, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethod: selectedPaymentMethod, circlePaymentID: circlePaymentID, wallet: wallet, onNext: handleClose, goToHref: goToHref, goToLabel: goToLabel, onGoTo: handleGoTo }));
     }
     else {
         console.warn("Unknown checkoutStepElement!");
