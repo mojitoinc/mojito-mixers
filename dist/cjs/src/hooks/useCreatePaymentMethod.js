@@ -17,7 +17,7 @@ function useCreatePaymentMethod({ orgID, debug, }) {
     const [getPaymentMethodStatus] = graphqlGenerated.useGetPaymentMethodStatusLazyQuery();
     const [createPaymentMethod, createPaymentMethodResult] = graphqlGenerated.useCreatePaymentMethodMutation();
     const extendedCreatePaymentMethod = React.useCallback((billingInfo, paymentInfo) => tslib_es6.__awaiter(this, void 0, void 0, function* () {
-        var _a, _b;
+        var _a, _b, _c;
         const metadata = {
             email: billingInfo.email,
             phoneNumber: circle_utils.formatPhoneAsE123(billingInfo.phone, `${billingInfo.country.value}`),
@@ -98,7 +98,7 @@ function useCreatePaymentMethod({ orgID, debug, }) {
             const paymentMethodStatusResult = yield getPaymentMethodStatus({
                 variables: { paymentMethodID },
             });
-            status = ((_b = paymentMethodStatusResult.data) === null || _b === void 0 ? void 0 : _b.getPaymentMethod.status) || "failed";
+            status = ((_c = (_b = paymentMethodStatusResult.data) === null || _b === void 0 ? void 0 : _b.getPaymentMethod) === null || _c === void 0 ? void 0 : _c.status) || "failed";
         }
         if (status === "failed")
             throw new Error(exceptions_constants.EXCEPTIONS.PAYMENT_METHOD.VALIDATION_FAILED);
