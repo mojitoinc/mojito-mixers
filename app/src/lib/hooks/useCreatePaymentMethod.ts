@@ -127,7 +127,7 @@ export function useCreatePaymentMethod({
         variables: { paymentMethodID },
       });
 
-      status = paymentMethodStatusResult.data?.getPaymentMethod.status as PaymentMethodStatus || "failed";
+      status = paymentMethodStatusResult.data?.getPaymentMethod?.status as PaymentMethodStatus || "failed";
     }
 
     if (status === "failed") throw new Error(EXCEPTIONS.PAYMENT_METHOD.VALIDATION_FAILED);

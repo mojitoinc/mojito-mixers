@@ -31,7 +31,7 @@ const reduceSelectOptionsToMap = (
   return optionsMap;
 };
 
-const UNAVAILABLE_COUNTRIES = ["RU"];
+const UNAVAILABLE_COUNTRIES = ["AF", "AL", "BB", "BS", "BW", "BY", "CF", "CU", "GH", "GW", "IQ", "IR", "JM", "KH", "KP", "KS", "LY", "ML", "MM", "MN", "MU", "NI", "PA", "PK", "RU", "SD", "SO", "SS", "SY", "TT", "UA", "UG", "VE", "VI", "VU", "YE", "ZW"];
 
 const countryIsAvailable = (country: RawCountry) =>
   !UNAVAILABLE_COUNTRIES.includes(country.countryShortCode);
@@ -40,6 +40,9 @@ export function useCountryOptions(countryCode?: string | number) {
   const { result: country, getCountryList } = useCountryRegion(countryCode);
 
   return useMemo(() => {
+    // Read about this line in useCountryOptionsBlacklistScript.js:
+    (window as any).countries = getCountryList();
+
     // useCountryRegion seems to return null as the result (country) when countryCode changes. It takes an additional
     // render to get the right value, thus this check:
     if (countryCode === "" || (countryCode && !country)) return { options: [], optionsMap: {} };
