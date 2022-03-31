@@ -230,6 +230,19 @@ You can see an example here:
 <br />
 
 
+### Supported Countries
+
+We use Circle for payments, so the supported countries depend on which payment method is going to be used, as described here:
+
+https://developers.circle.com/docs/supported-countries
+
+We use the following script to compile the list of excluded countries:
+
+[app/src/lib/hooks/useCountryOptionsBlacklistScript.js](./app/src/lib/hooks/useCountryOptionsBlacklistScript.js)
+
+<br />
+
+
 ### Address Validation & Tax Calculation with Vertex
 
 Id you'd like address to be validated and taxes to be calculated during the checkout process, particularly in the Billing
