@@ -9,6 +9,14 @@ import { useCallback } from "react";
 import { WalletAddressSelector } from "../../../shared/Select/WalletAddressSelector/WalletAddressSelector";
 import { Wallet } from "../../../../domain/wallet/wallet.interfaces";
 import { useDictionary } from "../../../../hooks/useDictionary";
+import { InjectedConnector } from '@web3-react/injected-connector';
+import { useWeb3React } from "@web3-react/core";
+import { SecondaryButton } from "../../../shared/SecondaryButton/SecondaryButton";
+
+export const injected = new InjectedConnector({
+  // See https://piyopiyo.medium.com/list-of-ethereums-major-network-and-chain-ids-2bc58e928508
+  supportedChainIds: [1, 3, 4, 5, 42],
+});
 
 export interface DeliveryWalletSelectorProps {
   validatePersonalAddress: boolean;
@@ -29,6 +37,32 @@ export const DeliveryWalletSelector: React.FC<DeliveryWalletSelectorProps> = ({
   wallet,
   onWalletChange,
 }) => {
+  const { active, account, library, connector, activate, deactivate } = useWeb3React();
+
+  // console.log(library, connector);
+
+  const connect = useCallback(async () => {
+    try {
+      await activate(injected)
+    } catch (ex) {
+      console.log(ex)
+    }
+  }, [activate]);
+
+  const disconnect = useCallback(async () => {
+    try {
+      deactivate()
+    } catch (ex) {
+      console.log(ex)
+    }
+  }, [deactivate]);
+
+  /*
+  useEffect(() => {
+    connect();
+  }, [connect]);
+  */
+
   const dictionary = useDictionary();
 
   const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -44,6 +78,17 @@ export const DeliveryWalletSelector: React.FC<DeliveryWalletSelectorProps> = ({
 
   return (
     <>
+      <DisplayBox sx={{ mt: 2.5, mb: 1.5 }}>
+        { active ? (<>
+          <Typography sx={{ mb: 0.5 }}>Connected with:</Typography>
+          <Typography sx={{ fontWeight: "bold", mb: 1 }}>{account}</Typography>
+          <SecondaryButton onClick={ disconnect }>Disconnect</SecondaryButton>
+        </>) : (<>
+          <Typography sx={{ mb: 1 }}>Not connected</Typography>
+          <SecondaryButton onClick={ connect }>Connect</SecondaryButton>
+        </>) }
+      </DisplayBox>
+
       <InputGroupLabel sx={{ mt: 2.5, mb: 1.5 }}>
         Wallet Delivery Address
       </InputGroupLabel>

@@ -4,6 +4,7 @@ import { AuthorizedApolloProvider, AuthorizedApolloProviderProps } from "../Auth
 import { extendDefaultTheme } from "../../../config/theme/theme";
 import { ErrorBoundary } from "../../public/ErrorBoundary/ErrorBoundary";
 import { EXCEPTIONS } from "../../../domain/errors/exceptions.constants";
+import Web3Provider from "./Web3ProviderInjector";
 
 export interface CommonProviderProps {
   onCatch?: (error: Error, errorInfo?: ErrorInfo) => void | true;
@@ -47,11 +48,13 @@ export const ProviderInjector: React.FC<ProvidersInjectorProps> = ({
 
   }, [apolloClient, uri]);
 
-  return (
+  return (<>
+    <Web3Provider />
+
     <AuthorizedApolloProvider apolloClient={apolloClient} uri={uri}>
       {theme ? <ThemeProvider theme={theme}>{children}</ThemeProvider> : children}
     </AuthorizedApolloProvider>
-  );
+  </>);
 }
 
 export function withThemeProvider<P extends object>(Component: React.ComponentType<P>) {
