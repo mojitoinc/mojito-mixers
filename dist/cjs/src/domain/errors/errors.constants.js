@@ -20,7 +20,7 @@ const ERROR_GENERIC = createError("An unexpected error happened.");
 const ERROR_LOADING = createError("Loading error details...");
 // CheckoutModal:
 const ERROR_LOADING_USER = createError("User could not be loaded.", "billing");
-const ERROR_LOADING_PAYMENT_METHODS = createError("Payment methods could not be loaded.", "billing");
+createError("Payment methods could not be loaded.", "billing");
 const ERROR_LOADING_INVOICE = createError("Invoice could not be loaded.", "billing");
 // PurchasingView:
 const ERROR_PURCHASE = createError("The purchase could not be completed.");
@@ -59,7 +59,6 @@ exports.ERROR_GENERIC = ERROR_GENERIC;
 exports.ERROR_INVOICE_TIMEOUT = ERROR_INVOICE_TIMEOUT;
 exports.ERROR_LOADING = ERROR_LOADING;
 exports.ERROR_LOADING_INVOICE = ERROR_LOADING_INVOICE;
-exports.ERROR_LOADING_PAYMENT_METHODS = ERROR_LOADING_PAYMENT_METHODS;
 exports.ERROR_LOADING_USER = ERROR_LOADING_USER;
 exports.ERROR_PURCHASE = ERROR_PURCHASE;
 exports.ERROR_PURCHASE_CREATING_INVOICE = ERROR_PURCHASE_CREATING_INVOICE;

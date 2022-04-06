@@ -11,7 +11,7 @@ const FALLBACK_MODAL_STATE = {
     url: "",
     invoiceID: "",
     invoiceCountdownStart: 0,
-    circlePaymentID: "",
+    processorPaymentID: "",
     paymentID: "",
     billingInfo: "",
     paymentInfo: "",
@@ -70,13 +70,13 @@ function getCheckoutModalState() {
         if (debug)
             console.log(err);
     }
-    const { url = "", invoiceID = "", invoiceCountdownStart = -1, circlePaymentID = "", paymentID = "", billingInfo = "", paymentInfo = "", timestamp, } = savedPlaidInfo || {};
+    const { url = "", invoiceID = "", invoiceCountdownStart = -1, processorPaymentID = "", paymentID = "", billingInfo = "", paymentInfo = "", timestamp, } = savedPlaidInfo || {};
     // Swap to test error flow:
     // const receivedRedirectUri = "localhost:3000/payments/error";
     const receivedRedirectUri = savedReceivedRedirectUri || (window.location.search.startsWith(config.THREEDS_FLOW_SEARCH_PARAM_SUCCESS) ? window.location.href : undefined);
     // In dev, this works fine even if there's nothing in localStorage, which helps with testing across some other domain and localhost:
     const hasLocalhostOrigin = process.env.NODE_ENV === "development" && !url_utils.isLocalhost();
-    const continue3DSFlow = hasLocalhostOrigin || !!(url && invoiceID && circlePaymentID && paymentID && billingInfo && (paymentInfo || paymentInfo === null) && receivedRedirectUri);
+    const continue3DSFlow = hasLocalhostOrigin || !!(url && invoiceID && processorPaymentID && paymentID && billingInfo && (paymentInfo || paymentInfo === null) && receivedRedirectUri);
     if ((continue3DSFlow && savedStateUsed) || (!continue3DSFlow && localStorage.getItem(config.THREEDS_FLOW_INFO_KEY)) || isExpired(timestamp)) {
         return clearPersistedInfo(isExpired(timestamp));
     }
@@ -87,7 +87,7 @@ function getCheckoutModalState() {
         invoiceID,
         invoiceCountdownStart: invoiceCountdownStart === -1 ? Date.now() : invoiceCountdownStart,
         // The reference number of the payment:
-        circlePaymentID,
+        processorPaymentID,
         paymentID,
         // The billing & payment info selected / entered before starting the 3DS flow:
         billingInfo,
@@ -121,7 +121,7 @@ function continueFlows(noClear = false) {
         checkoutStep: "",
         invoiceID: "",
         invoiceCountdownStart: -1,
-        circlePaymentID: "",
+        processorPaymentID: "",
         paymentID: "",
         billingInfo: "",
         paymentInfo: "",
@@ -141,7 +141,7 @@ function continueFlows(noClear = false) {
         continueFlowsReturn.flowType = "3DS";
         continueFlowsReturn.invoiceID = savedCheckoutModalState.invoiceID;
         continueFlowsReturn.invoiceCountdownStart = savedCheckoutModalState.invoiceCountdownStart === -1 ? Date.now() : savedCheckoutModalState.invoiceCountdownStart;
-        continueFlowsReturn.circlePaymentID = savedCheckoutModalState.circlePaymentID;
+        continueFlowsReturn.processorPaymentID = savedCheckoutModalState.processorPaymentID;
         continueFlowsReturn.paymentID = savedCheckoutModalState.paymentID;
         continueFlowsReturn.billingInfo = savedCheckoutModalState.billingInfo;
         continueFlowsReturn.paymentInfo = savedCheckoutModalState.paymentInfo;

@@ -12,7 +12,7 @@ import { PurchasingView } from '../../../views/Purchasing/PurchasingView.js';
 import { ErrorView } from '../../../views/Error/ErrorView.js';
 import { continuePlaidOAuthFlow, PlaidFlow } from '../../../hooks/usePlaid.js';
 import { useCheckoutModalState, CheckoutModalStepIndex } from './CheckoutOverlay.hooks.js';
-import { ERROR_LOADING_USER, ERROR_LOADING_PAYMENT_METHODS, ERROR_LOADING_INVOICE, DEFAULT_ERROR_AT } from '../../../domain/errors/errors.constants.js';
+import { ERROR_LOADING_USER, ERROR_LOADING_INVOICE, DEFAULT_ERROR_AT } from '../../../domain/errors/errors.constants.js';
 import { FullScreenOverlay } from '../../shared/FullScreenOverlay/FullScreenOverlay.js';
 import { withProviders } from '../../shared/ProvidersInjector/ProvidersInjector.js';
 import { transformCheckoutItemsFromInvoice } from '../../../domain/product/product.utils.js';
@@ -82,7 +82,7 @@ debug: parentDebug, onEvent, onError, }) => {
             : userWallets;
     }, [meLoading, meData, network]);
     const { data: paymentMethodsData, loading: paymentMethodsLoading, error: paymentMethodsError, refetch: refetchPaymentMethods, } = useGetPaymentMethodListQuery({
-        skip: !isAuthenticated || !orgID,
+        skip: !isAuthenticated || !orgID || !open,
         variables: { orgID },
     });
     // Get everything related to Payment UI routing, error and state handling, including resuming Plaid / 3DS flows:
@@ -92,7 +92,7 @@ debug: parentDebug, onEvent, onError, }) => {
     // SelectedPaymentMethod:
     selectedPaymentMethod, setSelectedPaymentMethod, 
     // PurchaseState:
-    invoiceID, invoiceCountdownStart, setInvoiceID, taxes, setTaxes, wallet, setWalletAddress, paymentID, circlePaymentID, setPayments, } = useCheckoutModalState({
+    invoiceID, invoiceCountdownStart, setInvoiceID, taxes, setTaxes, wallet, setWalletAddress, paymentID, processorPaymentID, setPayments, } = useCheckoutModalState({
         invoiceID: initialInvoiceID,
         productConfirmationEnabled,
         vertexEnabled,
@@ -195,10 +195,13 @@ debug: parentDebug, onEvent, onError, }) => {
     useEffect(() => {
         if (meError)
             setError(ERROR_LOADING_USER(meError));
-        if (paymentMethodsError)
-            setError(ERROR_LOADING_PAYMENT_METHODS(paymentMethodsError));
         if (invoiceDetailsError)
             setError(ERROR_LOADING_INVOICE(invoiceDetailsError));
+        if (paymentMethodsError) {
+            {
+                console.log("\n❌ (IGNORED) Error loading saved payment methods:\n\n", paymentMethodsError);
+            }
+        }
     }, [meError, paymentMethodsError, invoiceDetailsError, setError]);
     // Analytics:
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -236,7 +239,7 @@ debug: parentDebug, onEvent, onError, }) => {
             tax: taxAmount,
             total: subtotal + fees + taxAmount,
             // Order:
-            circlePaymentID,
+            processorPaymentID,
             paymentID,
         });
     };
@@ -370,7 +373,7 @@ debug: parentDebug, onEvent, onError, }) => {
         },
     });
     const handleBeforeUnload = handleBeforeUnloadRef.current = useCallback((e) => {
-        if (paymentID || circlePaymentID)
+        if (paymentID || processorPaymentID)
             return;
         if (orgID && invoiceID && invoiceID !== lastReleasedReservationID.current) {
             if (debug)
@@ -393,7 +396,7 @@ debug: parentDebug, onEvent, onError, }) => {
             // The absence of a returnValue property on the event will guarantee the browser unload happens:
             delete e['returnValue'];
         }
-    }, [paymentID, circlePaymentID, orgID, invoiceID, debug, releaseReservationBuyNowLot]);
+    }, [paymentID, processorPaymentID, orgID, invoiceID, debug, releaseReservationBuyNowLot]);
     useEffect(() => {
         if ((checkoutError === null || checkoutError === void 0 ? void 0 : checkoutError.at) === "reset")
             handleBeforeUnloadRef.current();
@@ -493,7 +496,7 @@ debug: parentDebug, onEvent, onError, }) => {
     }
     else if (checkoutStep === "confirmation") {
         headerVariant = "logoOnly";
-        checkoutStepElement = (React__default.createElement(ConfirmationView, { checkoutItems: checkoutItems, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethod: selectedPaymentMethod, circlePaymentID: circlePaymentID, wallet: wallet, onNext: handleClose, goToHref: goToHref, goToLabel: goToLabel, onGoTo: handleGoTo }));
+        checkoutStepElement = (React__default.createElement(ConfirmationView, { checkoutItems: checkoutItems, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethod: selectedPaymentMethod, processorPaymentID: processorPaymentID, wallet: wallet, onNext: handleClose, goToHref: goToHref, goToLabel: goToLabel, onGoTo: handleGoTo }));
     }
     else {
         console.warn("Unknown checkoutStepElement!");

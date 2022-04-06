@@ -7,7 +7,7 @@ export interface ConfirmationViewProps {
     checkoutItems: CheckoutItem[];
     savedPaymentMethods: SavedPaymentMethod[];
     selectedPaymentMethod: SelectedPaymentMethod;
-    circlePaymentID: string;
+    processorPaymentID: string;
     wallet: null | string | Wallet;
     onNext: () => void;
     goToHref?: string;

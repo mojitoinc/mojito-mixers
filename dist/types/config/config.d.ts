@@ -1,6 +1,6 @@
 export declare const DEV_DEBUG_COUNTER_EXPIRATION_MS = 1000;
 export declare const DEV_DEBUG_COUNTER_CLICKS_NEEDED = 16;
-export declare const DEV_SKIP_3DS_IN_LOCALHOST = false;
+export declare const DEV_SKIP_3DS_IN_LOCALHOST = true;
 export declare const DEV_DEBUG_ENABLED_KEY = "DEV_DEBUG_ENABLED";
 export declare const ASYNC_ERROR_MAX_WAIT_MS = 16000;
 export declare const RESERVATION_COUNTDOWN_FROM_MIN = 15;

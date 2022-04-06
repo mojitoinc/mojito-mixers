@@ -40,7 +40,7 @@ interface CheckoutEventData {
     fees: number;
     tax?: number;
     total: number;
-    circlePaymentID?: string;
+    processorPaymentID?: string;
     paymentID?: string;
 }
 declare type CheckoutModalNavigateType = "navigate:authentication" | "navigate:billing" | "navigate:payment" | "navigate:purchasing" | "navigate:confirmation" | "navigate:error";
@@ -232,7 +232,7 @@ interface CheckoutModalInfo {
     url?: string;
     invoiceID: string;
     invoiceCountdownStart: number;
-    circlePaymentID: string;
+    processorPaymentID: string;
     paymentID: string;
     billingInfo: string | BillingInfo;
     paymentInfo: string | null;
@@ -254,7 +254,7 @@ interface ContinueFlowsReturn {
     checkoutStep: CheckoutModalStep | "";
     invoiceID: string;
     invoiceCountdownStart: number;
-    circlePaymentID: string;
+    processorPaymentID: string;
     paymentID: string;
     billingInfo: string | BillingInfo;
     paymentInfo: string | null;
