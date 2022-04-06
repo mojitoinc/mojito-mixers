@@ -10,7 +10,7 @@ export interface CheckoutModalInfo {
   url?: string;
   invoiceID: string;
   invoiceCountdownStart: number;
-  circlePaymentID: string;
+  processorPaymentID: string;
   paymentID: string;
   billingInfo: string | BillingInfo;
   paymentInfo: string | null;
@@ -29,7 +29,7 @@ const FALLBACK_MODAL_STATE: CheckoutModalState3DS = {
   url: "",
   invoiceID: "",
   invoiceCountdownStart: 0,
-  circlePaymentID: "",
+  processorPaymentID: "",
   paymentID: "",
   billingInfo: "",
   paymentInfo: "",
@@ -106,7 +106,7 @@ export function getCheckoutModalState(): CheckoutModalState3DS {
     url = "",
     invoiceID = "",
     invoiceCountdownStart = -1,
-    circlePaymentID = "",
+    processorPaymentID = "",
     paymentID = "",
     billingInfo = "",
     paymentInfo = "",
@@ -119,7 +119,7 @@ export function getCheckoutModalState(): CheckoutModalState3DS {
 
   // In dev, this works fine even if there's nothing in localStorage, which helps with testing across some other domain and localhost:
   const hasLocalhostOrigin = process.env.NODE_ENV === "development" && !isLocalhost();
-  const continue3DSFlow = hasLocalhostOrigin || !!(url && invoiceID && circlePaymentID && paymentID && billingInfo && (paymentInfo || paymentInfo === null) && receivedRedirectUri);
+  const continue3DSFlow = hasLocalhostOrigin || !!(url && invoiceID && processorPaymentID && paymentID && billingInfo && (paymentInfo || paymentInfo === null) && receivedRedirectUri);
 
   if ((continue3DSFlow && savedStateUsed) || (!continue3DSFlow && localStorage.getItem(THREEDS_FLOW_INFO_KEY)) || isExpired(timestamp)) {
     return clearPersistedInfo(isExpired(timestamp));
@@ -134,7 +134,7 @@ export function getCheckoutModalState(): CheckoutModalState3DS {
     invoiceCountdownStart: invoiceCountdownStart === -1 ? Date.now() : invoiceCountdownStart,
 
     // The reference number of the payment:
-    circlePaymentID,
+    processorPaymentID,
     paymentID,
 
     // The billing & payment info selected / entered before starting the 3DS flow:
@@ -174,7 +174,7 @@ export interface ContinueFlowsReturn {
   checkoutStep: CheckoutModalStep | "";
   invoiceID: string;
   invoiceCountdownStart: number;
-  circlePaymentID: string;
+  processorPaymentID: string;
   paymentID: string;
   billingInfo: string | BillingInfo;
   paymentInfo: string | null;
@@ -188,7 +188,7 @@ export function continueFlows(noClear = false) {
     checkoutStep: "",
     invoiceID: "",
     invoiceCountdownStart: -1,
-    circlePaymentID: "",
+    processorPaymentID: "",
     paymentID: "",
     billingInfo: "",
     paymentInfo: "",
@@ -210,7 +210,7 @@ export function continueFlows(noClear = false) {
     continueFlowsReturn.flowType = "3DS";
     continueFlowsReturn.invoiceID = savedCheckoutModalState.invoiceID;
     continueFlowsReturn.invoiceCountdownStart = savedCheckoutModalState.invoiceCountdownStart === -1 ? Date.now() : savedCheckoutModalState.invoiceCountdownStart;
-    continueFlowsReturn.circlePaymentID = savedCheckoutModalState.circlePaymentID;
+    continueFlowsReturn.processorPaymentID = savedCheckoutModalState.processorPaymentID;
     continueFlowsReturn.paymentID = savedCheckoutModalState.paymentID;
     continueFlowsReturn.billingInfo = savedCheckoutModalState.billingInfo;
     continueFlowsReturn.paymentInfo = savedCheckoutModalState.paymentInfo;

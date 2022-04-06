@@ -200,7 +200,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     error: paymentMethodsError,
     refetch: refetchPaymentMethods,
   } = useGetPaymentMethodListQuery({
-    skip: !isAuthenticated || !orgID,
+    skip: !isAuthenticated || !orgID || !open,
     variables: { orgID },
   });
 
@@ -232,7 +232,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     wallet,
     setWalletAddress,
     paymentID,
-    circlePaymentID,
+    processorPaymentID,
     setPayments,
   } = useCheckoutModalState({
     invoiceID: initialInvoiceID,
@@ -376,8 +376,18 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
 
   useEffect(() => {
     if (meError) setError(ERROR_LOADING_USER(meError));
-    if (paymentMethodsError) setError(ERROR_LOADING_PAYMENT_METHODS(paymentMethodsError));
     if (invoiceDetailsError) setError(ERROR_LOADING_INVOICE(invoiceDetailsError));
+
+    // TODO: We could add an option to configure if we want to ignore this error:
+    const ignorePaymentMethodsError = true;
+
+    if (paymentMethodsError) {
+      if (ignorePaymentMethodsError) {
+        console.log("\n❌ (IGNORED) Error loading saved payment methods:\n\n", paymentMethodsError);
+      } else {
+        setError(ERROR_LOADING_PAYMENT_METHODS(paymentMethodsError));
+      }
+    }
   }, [meError, paymentMethodsError, invoiceDetailsError, setError]);
 
 
@@ -426,7 +436,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
       total: subtotal + fees + taxAmount,
 
       // Order:
-      circlePaymentID,
+      processorPaymentID,
       paymentID,
     });
   };
@@ -607,7 +617,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   });
 
   const handleBeforeUnload = handleBeforeUnloadRef.current = useCallback((e?: BeforeUnloadEvent) => {
-    if (paymentID || circlePaymentID) return;
+    if (paymentID || processorPaymentID) return;
 
     if (orgID && invoiceID && invoiceID !== lastReleasedReservationID.current) {
       if (debug) console.log(`\n♻️ Releasing reservation invoice ${ invoiceID } (orgID = ${ orgID })...\n`);
@@ -633,7 +643,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
       // The absence of a returnValue property on the event will guarantee the browser unload happens:
       delete e['returnValue'];
     }
-  }, [paymentID, circlePaymentID, orgID, invoiceID, debug, releaseReservationBuyNowLot]);
+  }, [paymentID, processorPaymentID, orgID, invoiceID, debug, releaseReservationBuyNowLot]);
 
   useEffect(() => {
     if (checkoutError?.at === "reset") handleBeforeUnloadRef.current();
@@ -854,7 +864,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
         checkoutItems={ checkoutItems }
         savedPaymentMethods={ savedPaymentMethods }
         selectedPaymentMethod={ selectedPaymentMethod }
-        circlePaymentID={ circlePaymentID }
+        processorPaymentID={ processorPaymentID }
         wallet={ wallet }
         onNext={ handleClose }
         goToHref={ goToHref }

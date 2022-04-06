@@ -702,7 +702,7 @@ interface CheckoutEventData {
   total: number; // Total value of the order with discounts, taxes and fees.
 
   // Order:
-  circlePaymentID?: string; // Can be used as orderID.
+  processorPaymentID?: string; // Can be used as orderID.
   paymentID?: string; // Can be used as orderID.
 }
 ```

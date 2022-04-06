@@ -96,6 +96,7 @@ export type Address = {
   line2?: Maybe<Scalars['String']>;
   line3?: Maybe<Scalars['String']>;
   postcode: Scalars['String'];
+  state?: Maybe<Scalars['String']>;
   street?: Maybe<Scalars['String']>;
   subStreet?: Maybe<Scalars['String']>;
   town?: Maybe<Scalars['String']>;
@@ -110,6 +111,7 @@ export type AddressInput = {
   line2?: InputMaybe<Scalars['String']>;
   line3?: InputMaybe<Scalars['String']>;
   postcode: Scalars['String'];
+  state?: InputMaybe<Scalars['String']>;
   street: Scalars['String'];
   subStreet?: InputMaybe<Scalars['String']>;
   town: Scalars['String'];
@@ -229,8 +231,16 @@ export type CreatePaymentCreditCardMetadataInput = {
   keyID: Scalars['String'];
 };
 
+export type CreatePaymentCryptoMetadataInput = {
+  billingDetails?: InputMaybe<CryptoBillingDetails>;
+  description?: InputMaybe<Scalars['String']>;
+  localPrice: LocalPrice;
+  name?: InputMaybe<Scalars['String']>;
+};
+
 export type CreatePaymentMetadataInput = {
-  creditCardData: CreatePaymentCreditCardMetadataInput;
+  creditCardData?: InputMaybe<CreatePaymentCreditCardMetadataInput>;
+  cryptoData?: InputMaybe<CreatePaymentCryptoMetadataInput>;
   destinationAddress?: InputMaybe<Scalars['EthAddress']>;
 };
 
@@ -286,6 +296,28 @@ export type CreditCardPaymentMethodOutput = {
   type: PaymentType;
 };
 
+export type CryptoBillingDetails = {
+  address1?: InputMaybe<Scalars['String']>;
+  address2?: InputMaybe<Scalars['String']>;
+  city?: InputMaybe<Scalars['String']>;
+  country?: InputMaybe<Scalars['String']>;
+  district?: InputMaybe<Scalars['String']>;
+  name?: InputMaybe<Scalars['String']>;
+  postalCode?: InputMaybe<Scalars['String']>;
+};
+
+export type CryptoPaymentDetails = {
+  __typename?: 'CryptoPaymentDetails';
+  hostedURL: Scalars['String'];
+};
+
+export type CryptoPaymentMethodOutput = {
+  __typename?: 'CryptoPaymentMethodOutput';
+  id: Scalars['UUID1'];
+  status: Scalars['String'];
+  type: PaymentType;
+};
+
 export type CurrentUser = {
   __typename?: 'CurrentUser';
   activeBids: Array<MarketplaceAuctionBid>;
@@ -310,7 +342,7 @@ export type CurrentUserUserOrgsArgs = {
 
 
 export type CurrentUserWonBidsArgs = {
-  orgId?: InputMaybe<Scalars['UUID']>;
+  orgId: Scalars['UUID'];
 };
 
 export enum DeliveryMethod {
@@ -388,6 +420,8 @@ export enum InvoiceStatus {
   Canceled = 'Canceled',
   Delivered = 'Delivered',
   Draft = 'Draft',
+  Expired = 'Expired',
+  Failed = 'Failed',
   Paid = 'Paid',
   Pending = 'Pending'
 }
@@ -417,6 +451,11 @@ export enum KycStatus {
   None = 'None',
   Pending = 'Pending'
 }
+
+export type LocalPrice = {
+  amount: Scalars['Float'];
+  currency: Scalars['String'];
+};
 
 export enum MarketCollectionStatus {
   Active = 'Active',
@@ -542,11 +581,21 @@ export type MarketplaceBuyNowOutput = {
   id: Scalars['UUID'];
   invoice?: Maybe<InvoiceDetails>;
   marketplaceCollectionItem?: Maybe<MarketplaceCollectionItem>;
+  purchaseTimeoutInMinutes?: Maybe<Scalars['Int']>;
+  remainingCount: Scalars['Int'];
   sortNumber: Scalars['Int'];
   startDate: Scalars['Time'];
   totalAvailableUnits: Scalars['Int'];
   totalUnits: Scalars['Int'];
   unitPrice: Scalars['Float'];
+};
+
+export type MarketplaceBuyNowUpdateInput = {
+  endDate?: InputMaybe<Scalars['Time']>;
+  sortNumber?: InputMaybe<Scalars['Int']>;
+  startDate?: InputMaybe<Scalars['Time']>;
+  totalUnits?: InputMaybe<Scalars['Int']>;
+  unitPrice?: InputMaybe<Scalars['Float']>;
 };
 
 export type MarketplaceCollection = {
@@ -739,7 +788,7 @@ export type Mutation = {
   /** Creates a multisig with organization as parent type */
   createOrgMultisig: Scalars['String'];
   /** Creates payment for given Invoice */
-  createPayment: Payment;
+  createPayment: PaymentOutput;
   /** Creates new Payment method based on input data. */
   createPaymentMethod: PaymentMethodOutput;
   createTokenDraft: Scalars['String'];
@@ -759,23 +808,30 @@ export type Mutation = {
   deleteUserAPIKey: Scalars['Boolean'];
   /** Deploy existing multisig wallet to a new network */
   deployWalletToNetwork: Scalars['String'];
+  /** Generates promo codes for a marketplace item */
+  generateCodes: Array<Maybe<Scalars['String']>>;
   importExternalTokenToCollection: Scalars['String'];
   loginWithSignature: Organization;
   marketplaceUpdateTheme: Marketplace;
   mintTokens: Scalars['String'];
   nftContractAddAdmin: Scalars['String'];
   nftContractExtensionPause: Scalars['String'];
+  nftContractExtensionProvenanceMint: Scalars['String'];
   nftContractExtensionSetBaseURI: Scalars['String'];
   nftContractExtensionSetProvenanceHash: Scalars['String'];
   nftContractExtensionUnpause: Scalars['String'];
   nftContractRegisterExtensionProvenance: NftContract;
+  nftContractSetTokenURI: Scalars['String'];
   nftDeployContract: NftContract;
   orgCreateMarketplace: Marketplace;
   ping: Scalars['String'];
+  /** Redeem a promo code */
+  redeemPromoCode: Scalars['Boolean'];
   /** Release reservations held by invoice ID */
   releaseReservation: Scalars['Boolean'];
   reserveMarketplaceBuyNowLot: MarketplaceBuyNowOutput;
   setJwtIssuerDomain: Organization;
+  startInvoiceDelivery: Scalars['Boolean'];
   /** Transfers a token in the provided wallet to the `transferTo` address */
   transferToken: Scalars['String'];
   /** Updates existing  Applicant based on input data. */
@@ -833,7 +889,7 @@ export type MutationCancelPaymentArgs = {
 
 export type MutationCreateApplicantArgs = {
   input: ApplicantRequest;
-  orgID?: InputMaybe<Scalars['UUID1']>;
+  orgID: Scalars['UUID1'];
 };
 
 
@@ -938,6 +994,12 @@ export type MutationDeployWalletToNetworkArgs = {
 };
 
 
+export type MutationGenerateCodesArgs = {
+  marketplaceCollectionItemId: Scalars['UUID1'];
+  num: Scalars['Int'];
+};
+
+
 export type MutationImportExternalTokenToCollectionArgs = {
   contractAddress: Scalars['String'];
   marketplaceId: Scalars['UUID1'];
@@ -973,6 +1035,15 @@ export type MutationNftContractExtensionPauseArgs = {
 };
 
 
+export type MutationNftContractExtensionProvenanceMintArgs = {
+  contractId: Scalars['UUID1'];
+  extensionAddress: Scalars['String'];
+  mintToAddress: Scalars['String'];
+  numberOfTokens: Scalars['Int'];
+  voucherId: Scalars['UUID1'];
+};
+
+
 export type MutationNftContractExtensionSetBaseUriArgs = {
   baseURI: Scalars['String'];
   extensionAddress: Scalars['String'];
@@ -999,6 +1070,13 @@ export type MutationNftContractRegisterExtensionProvenanceArgs = {
 };
 
 
+export type MutationNftContractSetTokenUriArgs = {
+  nftContractId: Scalars['UUID1'];
+  tokenId: Scalars['Int'];
+  uri: Scalars['String'];
+};
+
+
 export type MutationNftDeployContractArgs = {
   input: DeployContractInput;
 };
@@ -1007,6 +1085,12 @@ export type MutationNftDeployContractArgs = {
 export type MutationOrgCreateMarketplaceArgs = {
   name: Scalars['String'];
   orgId?: InputMaybe<Scalars['UUID1']>;
+};
+
+
+export type MutationRedeemPromoCodeArgs = {
+  code: Scalars['String'];
+  destAddr?: InputMaybe<Scalars['String']>;
 };
 
 
@@ -1024,6 +1108,11 @@ export type MutationReserveMarketplaceBuyNowLotArgs = {
 export type MutationSetJwtIssuerDomainArgs = {
   domain: Scalars['String'];
   orgId: Scalars['UUID'];
+};
+
+
+export type MutationStartInvoiceDeliveryArgs = {
+  invoiceID: Scalars['UUID1'];
 };
 
 
@@ -1048,7 +1137,8 @@ export type MutationUpdateMarketplaceAuctionLotArgs = {
 
 
 export type MutationUpdateMarketplaceBuyNowLotArgs = {
-  input: CreateMarketplaceBuyNowLotInput;
+  input: MarketplaceBuyNowUpdateInput;
+  marketplaceBuyNowLotID: Scalars['UUID'];
 };
 
 
@@ -1186,6 +1276,13 @@ export type OrganizationAssetsArgs = {
   filter?: InputMaybe<AssetFilter>;
 };
 
+
+export type OrganizationMembersArgs = {
+  filter?: InputMaybe<OrganizationMemberFilter>;
+  limit?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+};
+
 export type OrganizationMember = {
   __typename?: 'OrganizationMember';
   email?: Maybe<Scalars['String']>;
@@ -1193,7 +1290,11 @@ export type OrganizationMember = {
   id: Scalars['UUID'];
   name?: Maybe<Scalars['String']>;
   role?: Maybe<Scalars['String']>;
-  username: Scalars['String'];
+  username?: Maybe<Scalars['String']>;
+};
+
+export type OrganizationMemberFilter = {
+  externalUserId?: InputMaybe<Scalars['String']>;
 };
 
 export type Payment = {
@@ -1206,6 +1307,8 @@ export type Payment = {
   userID: Scalars['UUID1'];
 };
 
+export type PaymentDetails = CryptoPaymentDetails;
+
 export type PaymentMethodCreateInput = {
   achData?: InputMaybe<AchData>;
   creditCardData?: InputMaybe<CreditCardData>;
@@ -1213,7 +1316,7 @@ export type PaymentMethodCreateInput = {
   wireData?: InputMaybe<WireData>;
 };
 
-export type PaymentMethodOutput = AchPaymentMethodOutput | CreditCardPaymentMethodOutput | WirePaymentMethodOutput;
+export type PaymentMethodOutput = AchPaymentMethodOutput | CreditCardPaymentMethodOutput | CryptoPaymentMethodOutput | WirePaymentMethodOutput;
 
 export type PaymentMethodPrepareStatementOutput = AchPaymentMethodPrepareStatementOutput;
 
@@ -1236,6 +1339,17 @@ export type PaymentNotificationOutput = {
   message: PaymentNotificationMessage;
 };
 
+export type PaymentOutput = {
+  __typename?: 'PaymentOutput';
+  details?: Maybe<PaymentDetails>;
+  id: Scalars['UUID1'];
+  invoiceID: Scalars['UUID1'];
+  paymentMethodID: Scalars['UUID1'];
+  processorPaymentID: Scalars['String'];
+  status: PaymentStatus;
+  userID: Scalars['UUID1'];
+};
+
 export type PaymentPublicKey = {
   __typename?: 'PaymentPublicKey';
   keyID: Scalars['String'];
@@ -1253,6 +1367,7 @@ export enum PaymentStatus {
 export enum PaymentType {
   Ach = 'ACH',
   CreditCard = 'CreditCard',
+  Crypto = 'Crypto',
   Wire = 'Wire'
 }
 
@@ -1286,6 +1401,10 @@ export type Query = {
   getSDKToken: SdkTokenResponse;
   /** Get Tax Quote */
   getTaxQuote: TaxQuoteOutput;
+  /** create invoice/lot report by collectionID and mails  to provided email */
+  mailInvoiceLotDetailReportMailByCollectionID: Scalars['Boolean'];
+  /** create salesreport by collectionID and mails to provided email */
+  mailSalesReportByCollectionID: Scalars['Boolean'];
   marketplace: Marketplace;
   me?: Maybe<CurrentUser>;
   network: Network;
@@ -1348,7 +1467,7 @@ export type QueryGetPaymentMethodArgs = {
 
 
 export type QueryGetPaymentMethodListArgs = {
-  orgID: Scalars['UUID1'];
+  orgID?: InputMaybe<Scalars['UUID1']>;
 };
 
 
@@ -1371,6 +1490,19 @@ export type QueryGetSdkTokenArgs = {
 
 export type QueryGetTaxQuoteArgs = {
   input: TaxQuoteInput;
+};
+
+
+export type QueryMailInvoiceLotDetailReportMailByCollectionIdArgs = {
+  collectionID: Scalars['UUID1'];
+  toEmail: Scalars['String'];
+};
+
+
+export type QueryMailSalesReportByCollectionIdArgs = {
+  collectionID: Scalars['UUID1'];
+  orgID: Scalars['UUID1'];
+  toEmail: Scalars['String'];
 };
 
 
@@ -1406,7 +1538,7 @@ export type QueryOrganizationArgs = {
 
 
 export type QueryOrganizationByIdArgs = {
-  id?: InputMaybe<Scalars['UUID1']>;
+  id: Scalars['UUID1'];
 };
 
 
@@ -1566,7 +1698,7 @@ export type UserApiKeyResponse = {
 };
 
 export type UserOrgFilter = {
-  orgId?: InputMaybe<Scalars['UUID']>;
+  orgId: Scalars['UUID'];
 };
 
 export type UserOrganization = {
@@ -1740,8 +1872,7 @@ export type CreatePaymentMutationVariables = Exact<{
 
 export type CreatePaymentMutationVariables = MutationCreatePaymentArgs;
 
-
-export type CreatePaymentMutation = { __typename?: 'Mutation', createPayment: { __typename?: 'Payment', id: any, invoiceID: any, circlePaymentID: string, status: PaymentStatus, userID: any } };
+export type CreatePaymentMutation = { __typename?: 'Mutation', createPayment: { __typename?: 'PaymentOutput', id: any, invoiceID: any, processorPaymentID: string, status: PaymentStatus, userID: any } };
 
 export type CreateAuctionInvoiceMutationVariables = Exact<{
   orgID: Scalars['UUID1'];
@@ -1790,7 +1921,7 @@ export type GetPaymentMethodListQueryVariables = Exact<{
 }>;
 
 
-export type GetPaymentMethodListQuery = { __typename?: 'Query', getPaymentMethodList: Array<{ __typename?: 'ACHPaymentMethodOutput', id: any, type: PaymentType, status: string, accountNumber: string, metadata?: { __typename?: 'ACHMetadataOutput', email: string, phoneNumber: string } | null, billingDetails?: { __typename?: 'ACHBillingDetailsOutput', name: string, city: string, country: string, address1: string, address2: string, district: string, postalCode: string } | null, bankAddress?: { __typename?: 'ACHBankAddressOutput', bankName: string } | null } | { __typename?: 'CreditCardPaymentMethodOutput', id: any, type: PaymentType, status: string, network: string, last4Digit: string, metadata?: { __typename?: 'CreditCardMetadataOutput', email: string, phoneNumber: string } | null, billingDetails?: { __typename?: 'CreditCardBillingDetailsOutput', name: string, city: string, country: string, address1: string, address2: string, district: string, postalCode: string } | null } | { __typename?: 'WirePaymentMethodOutput' }> };
+export type GetPaymentMethodListQuery = { __typename?: 'Query', getPaymentMethodList: Array<{ __typename?: 'ACHPaymentMethodOutput', id: any, type: PaymentType, status: string, accountNumber: string, metadata?: { __typename?: 'ACHMetadataOutput', email: string, phoneNumber: string } | null, billingDetails?: { __typename?: 'ACHBillingDetailsOutput', name: string, city: string, country: string, address1: string, address2: string, district: string, postalCode: string } | null, bankAddress?: { __typename?: 'ACHBankAddressOutput', bankName: string } | null } | { __typename?: 'CreditCardPaymentMethodOutput', id: any, type: PaymentType, status: string, network: string, last4Digit: string, metadata?: { __typename?: 'CreditCardMetadataOutput', email: string, phoneNumber: string } | null, billingDetails?: { __typename?: 'CreditCardBillingDetailsOutput', name: string, city: string, country: string, address1: string, address2: string, district: string, postalCode: string } | null } | { __typename?: 'CryptoPaymentMethodOutput' } | { __typename?: 'WirePaymentMethodOutput' }> };
 
 export type CreatePaymentMethodMutationVariables = Exact<{
   orgID: Scalars['UUID1'];
@@ -1798,7 +1929,7 @@ export type CreatePaymentMethodMutationVariables = Exact<{
 }>;
 
 
-export type CreatePaymentMethodMutation = { __typename?: 'Mutation', createPaymentMethod: { __typename?: 'ACHPaymentMethodOutput', id: any, status: string } | { __typename?: 'CreditCardPaymentMethodOutput', id: any, status: string } | { __typename?: 'WirePaymentMethodOutput', id: any, status: string } };
+export type CreatePaymentMethodMutation = { __typename?: 'Mutation', createPaymentMethod: { __typename?: 'ACHPaymentMethodOutput', id: any, status: string } | { __typename?: 'CreditCardPaymentMethodOutput', id: any, status: string } | { __typename?: 'CryptoPaymentMethodOutput', id: any, status: string } | { __typename?: 'WirePaymentMethodOutput', id: any, status: string } };
 
 export type DeletePaymentMethodMutationVariables = Exact<{
   paymentMethodID: Scalars['UUID1'];
@@ -1820,7 +1951,7 @@ export type GetPaymentMethodStatusQueryVariables = Exact<{
 }>;
 
 
-export type GetPaymentMethodStatusQuery = { __typename?: 'Query', getPaymentMethod: { __typename?: 'ACHPaymentMethodOutput', id: any, status: string } | { __typename?: 'CreditCardPaymentMethodOutput', id: any, status: string } | { __typename?: 'WirePaymentMethodOutput', id: any, status: string } };
+export type GetPaymentMethodStatusQuery = { __typename?: 'Query', getPaymentMethod: { __typename?: 'ACHPaymentMethodOutput', id: any, status: string } | { __typename?: 'CreditCardPaymentMethodOutput', id: any, status: string } | { __typename?: 'CryptoPaymentMethodOutput', id: any, status: string } | { __typename?: 'WirePaymentMethodOutput', id: any, status: string } };
 
 export type GetTaxQuoteQueryVariables = Exact<{
   input: TaxQuoteInput;
@@ -1874,7 +2005,7 @@ export const CreatePaymentDocument = gql`
   createPayment(paymentMethodID: $paymentMethodID, invoiceID: $invoiceID, metadata: $metadata) {
     id
     invoiceID
-    circlePaymentID
+    processorPaymentID
     status
     userID
   }
@@ -2241,6 +2372,10 @@ export const CreatePaymentMethodDocument = gql`
       id
       status
     }
+    ... on CryptoPaymentMethodOutput {
+      id
+      status
+    }
   }
 }
     `;
@@ -2352,6 +2487,10 @@ export const GetPaymentMethodStatusDocument = gql`
       status
     }
     ... on WirePaymentMethodOutput {
+      id
+      status
+    }
+    ... on CryptoPaymentMethodOutput {
       id
       status
     }

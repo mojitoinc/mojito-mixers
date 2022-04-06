@@ -23,7 +23,7 @@ export interface UseFullPaymentOptions {
 
 export interface FullPaymentState {
   paymentStatus: PaymentStatus;
-  circlePaymentID: string;
+  processorPaymentID: string;
   paymentID: string;
   paymentError?: string | CheckoutModalError;
 }
@@ -38,14 +38,14 @@ export function useFullPayment({
 }: UseFullPaymentOptions): [FullPaymentState, () => Promise<void>] {
   const [paymentState, setPaymentState] = useState<FullPaymentState>({
     paymentStatus: "processing",
-    circlePaymentID: "",
+    processorPaymentID: "",
     paymentID: ""
   });
 
   const setError = useCallback((paymentError: string | CheckoutModalError) => {
     setPaymentState({
       paymentStatus: "error",
-      circlePaymentID: "",
+      processorPaymentID: "",
       paymentID: "",
       paymentError,
     });
@@ -91,12 +91,12 @@ export function useFullPayment({
 
     setPaymentState({
       paymentStatus: "processing",
-      circlePaymentID: "",
+      processorPaymentID: "",
       paymentID: "",
     });
 
     let paymentMethodID = "";
-    let circlePaymentID = "";
+    let processorPaymentID = "";
     let paymentID = "";
     let mutationError: ApolloError | Error | undefined = undefined;
 
@@ -211,11 +211,11 @@ export function useFullPayment({
     if (makePaymentResult && !makePaymentResult.errors) {
       if (debug) console.log("    🟢 makePayment result", makePaymentResult);
 
-      circlePaymentID = makePaymentResult.data?.createPayment?.circlePaymentID || "";
+      processorPaymentID = makePaymentResult.data?.createPayment?.processorPaymentID || "";
       paymentID = makePaymentResult.data?.createPayment?.id || "";
     }
 
-    if (!circlePaymentID) {
+    if (!processorPaymentID) {
       setError(ERROR_PURCHASE_PAYING(mutationError));
 
       return;
@@ -225,7 +225,7 @@ export function useFullPayment({
 
     setPaymentState({
       paymentStatus: "processed",
-      circlePaymentID,
+      processorPaymentID,
       paymentID
     });
   }, [

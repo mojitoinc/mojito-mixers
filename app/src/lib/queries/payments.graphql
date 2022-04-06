@@ -86,6 +86,10 @@ mutation CreatePaymentMethod(
       id
       status
     }
+    ... on CryptoPaymentMethodOutput {
+      id
+      status
+    }
   }
 }
 
@@ -153,6 +157,10 @@ query GetPaymentMethodStatus(
       status
     }
     ... on WirePaymentMethodOutput {
+      id
+      status
+    }
+    ... on CryptoPaymentMethodOutput {
       id
       status
     }
