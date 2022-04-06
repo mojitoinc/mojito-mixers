@@ -24,7 +24,7 @@ export interface PurchasingViewProps {
   savedPaymentMethods: SavedPaymentMethod[];
   selectedPaymentMethod: SelectedPaymentMethod;
   wallet: null | string | Wallet;
-  onPurchaseSuccess: (circlePaymentID: string, paymentID: string, redirectURL: string) => void;
+  onPurchaseSuccess: (processorPaymentID: string, paymentID: string, redirectURL: string) => void;
   onPurchaseError: (error?: string | CheckoutModalError) => void;
   onDialogBlocked: (blocked: boolean) => void;
   debug?: boolean;
@@ -122,7 +122,7 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
   }, [fullPayment]);
 
   useEffect(() => {
-    const { paymentStatus, circlePaymentID, paymentID, paymentError } = fullPaymentState;
+    const { paymentStatus, processorPaymentID, paymentID, paymentError } = fullPaymentState;
 
     if (paymentStatus === "processing") {
       onDialogBlocked(true);
@@ -146,14 +146,14 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
       persistCheckoutModalInfo({
         invoiceID,
         invoiceCountdownStart,
-        circlePaymentID,
+        processorPaymentID,
         paymentID,
         billingInfo,
         paymentInfo: typeof paymentInfo === "string" ? paymentInfo : null,
       });
     }
 
-    onPurchaseSuccess(circlePaymentID, paymentID, skipRedirect ? "" : (redirectURL || ""));
+    onPurchaseSuccess(processorPaymentID, paymentID, skipRedirect ? "" : (redirectURL || ""));
   }, [
     fullPaymentState,
     hasWaited,

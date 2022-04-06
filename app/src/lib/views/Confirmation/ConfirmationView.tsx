@@ -14,7 +14,7 @@ export interface ConfirmationViewProps {
   checkoutItems: CheckoutItem[];
   savedPaymentMethods: SavedPaymentMethod[];
   selectedPaymentMethod: SelectedPaymentMethod;
-  circlePaymentID: string;
+  processorPaymentID: string;
   wallet: null | string | Wallet;
   onNext: () => void;
   goToHref?: string;
@@ -26,7 +26,7 @@ export const ConfirmationView: React.FC<ConfirmationViewProps> = ({
   checkoutItems,
   savedPaymentMethods,
   selectedPaymentMethod,
-  circlePaymentID,
+  processorPaymentID,
   wallet,
   onNext,
   goToHref,
@@ -68,7 +68,7 @@ export const ConfirmationView: React.FC<ConfirmationViewProps> = ({
 
       <PurchaseConfirmationBillingDetails
         checkoutItems={ checkoutItems }
-        circlePaymentID={ circlePaymentID }
+        processorPaymentID={ processorPaymentID }
         wallet={ wallet }
         selectedPaymentMethodBillingInfo={ selectedPaymentMethodBillingInfo }
         selectedPaymentMethodPaymentInfo={ selectedPaymentMethodPaymentInfo } />

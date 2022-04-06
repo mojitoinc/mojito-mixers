@@ -15,7 +15,7 @@ import { Wallet } from "../../../domain/wallet/wallet.interfaces";
 
 export interface PurchaseConfirmationBillingDetailsProps {
   checkoutItems: CheckoutItem[];
-  circlePaymentID: string;
+  processorPaymentID: string;
   wallet: null | string | Wallet;
   selectedPaymentMethodBillingInfo: SavedPaymentMethodBillingInfo;
   selectedPaymentMethodPaymentInfo: PaymentMethod | SavedPaymentMethod | null;
@@ -23,7 +23,7 @@ export interface PurchaseConfirmationBillingDetailsProps {
 
 export const PurchaseConfirmationBillingDetails: React.FC<PurchaseConfirmationBillingDetailsProps> = ({
   checkoutItems,
-  circlePaymentID,
+  processorPaymentID,
   wallet,
   selectedPaymentMethodBillingInfo,
   selectedPaymentMethodPaymentInfo,
@@ -90,12 +90,12 @@ export const PurchaseConfirmationBillingDetails: React.FC<PurchaseConfirmationBi
 
         <ReadOnlyField
           label="Reference No."
-          value={ circlePaymentID || "-" }
-          InputProps={ circlePaymentID ? {
+          value={ processorPaymentID || "-" }
+          InputProps={ processorPaymentID ? {
             endAdornment: (
               <CopyButton
                 label="Reference No."
-                value={ circlePaymentID }
+                value={ processorPaymentID }
                 size="small" />
             ),
           } : undefined } />
