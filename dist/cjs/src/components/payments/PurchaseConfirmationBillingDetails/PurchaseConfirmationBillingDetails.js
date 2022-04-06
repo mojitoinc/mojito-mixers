@@ -17,7 +17,7 @@ function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'defau
 
 var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 
-const PurchaseConfirmationBillingDetails = ({ checkoutItems, circlePaymentID, wallet, selectedPaymentMethodBillingInfo, selectedPaymentMethodPaymentInfo, }) => {
+const PurchaseConfirmationBillingDetails = ({ checkoutItems, processorPaymentID, wallet, selectedPaymentMethodBillingInfo, selectedPaymentMethodPaymentInfo, }) => {
     const { isMasked, paymentType, displayValue, network, } = PurchaseConfirmationBillingDetails_utils.getFormattedPaymentMethod(selectedPaymentMethodPaymentInfo);
     const icon = network ? React__default["default"].createElement(Icons.CreditCardIcon, { network: network }) : null;
     return (React__default["default"].createElement(material.Box, { sx: { display: 'flex', flexDirection: 'column', flex: 1, position: "relative" } },
@@ -39,8 +39,8 @@ const PurchaseConfirmationBillingDetails = ({ checkoutItems, circlePaymentID, wa
             isMasked ? (React__default["default"].createElement(ReadOnlyField.ReadOnlyField, { label: PurchaseConfirmationBillingDetails_constants.PAYMENT_TYPE_LABEL[paymentType], value: displayValue, InputProps: icon ? {
                     endAdornment: (React__default["default"].createElement(material.InputAdornment, { position: "end" }, icon)),
                 } : undefined })) : (React__default["default"].createElement(ReadOnlyField.ReadOnlyCardField, { label: PurchaseConfirmationBillingDetails_constants.PAYMENT_TYPE_LABEL[paymentType], value: displayValue })),
-            React__default["default"].createElement(ReadOnlyField.ReadOnlyField, { label: "Reference No.", value: circlePaymentID || "-", InputProps: circlePaymentID ? {
-                    endAdornment: (React__default["default"].createElement(CopyButton.CopyButton, { label: "Reference No.", value: circlePaymentID, size: "small" })),
+            React__default["default"].createElement(ReadOnlyField.ReadOnlyField, { label: "Reference No.", value: processorPaymentID || "-", InputProps: processorPaymentID ? {
+                    endAdornment: (React__default["default"].createElement(CopyButton.CopyButton, { label: "Reference No.", value: processorPaymentID, size: "small" })),
                 } : undefined })),
         React__default["default"].createElement(CheckoutItemCostPurchase.CheckoutItemCostPurchase, { checkoutItems: checkoutItems, selectedPaymentMethodBillingInfo: selectedPaymentMethodBillingInfo }),
         React__default["default"].createElement(DeliveryWalletDetails.DeliveryWalletDetails, { wallet: wallet })));

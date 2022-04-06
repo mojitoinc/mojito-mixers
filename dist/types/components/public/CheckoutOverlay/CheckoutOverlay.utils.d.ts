@@ -4,7 +4,7 @@ export interface CheckoutModalInfo {
     url?: string;
     invoiceID: string;
     invoiceCountdownStart: number;
-    circlePaymentID: string;
+    processorPaymentID: string;
     paymentID: string;
     billingInfo: string | BillingInfo;
     paymentInfo: string | null;
@@ -30,7 +30,7 @@ export interface ContinueFlowsReturn {
     checkoutStep: CheckoutModalStep | "";
     invoiceID: string;
     invoiceCountdownStart: number;
-    circlePaymentID: string;
+    processorPaymentID: string;
     paymentID: string;
     billingInfo: string | BillingInfo;
     paymentInfo: string | null;

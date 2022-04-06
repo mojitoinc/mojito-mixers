@@ -44,7 +44,7 @@ export interface PurchaseState {
     invoiceCountdownStart: number | null;
     taxes: null | TaxesState;
     wallet: null | string | Wallet;
-    circlePaymentID: string;
+    processorPaymentID: string;
     paymentID: string;
 }
 export interface CheckoutModalStateReturn extends CheckoutModalState, PurchaseState {
@@ -60,7 +60,7 @@ export interface CheckoutModalStateReturn extends CheckoutModalState, PurchaseSt
     setInvoiceID: (invoiceID: string | null, invoiceCountdownStart: number | null) => void;
     setTaxes: (taxes: TaxesState) => void;
     setWalletAddress: (wallet: null | string | Wallet) => void;
-    setPayments: (circlePaymentID: string, paymentID: string) => void;
+    setPayments: (processorPaymentID: string, paymentID: string) => void;
 }
 export declare const CHECKOUT_STEPS: CheckoutModalStep[];
 export declare function useCheckoutModalState({ invoiceID: initialInvoiceID, productConfirmationEnabled, vertexEnabled, isAuthenticated, onError, debug, }: CheckoutModalStateOptions): CheckoutModalStateReturn;

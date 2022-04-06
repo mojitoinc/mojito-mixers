@@ -32,12 +32,12 @@ function useCheckoutModalState({ invoiceID: initialInvoiceID = null, productConf
         paymentInfo: "",
         cvv: "",
     });
-    const [{ invoiceID, invoiceCountdownStart, taxes, wallet, circlePaymentID, paymentID, }, setPurchaseState] = React.useState({
+    const [{ invoiceID, invoiceCountdownStart, taxes, wallet, processorPaymentID, paymentID, }, setPurchaseState] = React.useState({
         invoiceID: initialInvoiceID || null,
         invoiceCountdownStart: null,
         taxes: vertexEnabled ? { status: "incomplete" } : null,
         wallet: null,
-        circlePaymentID: "",
+        processorPaymentID: "",
         paymentID: ""
     });
     const initModalState = React.useCallback(() => {
@@ -74,7 +74,7 @@ function useCheckoutModalState({ invoiceID: initialInvoiceID = null, productConf
             invoiceCountdownStart: savedFlow.invoiceCountdownStart || null,
             taxes: vertexEnabled ? { status: "incomplete" } : null,
             wallet: null,
-            circlePaymentID: savedFlow.circlePaymentID || "",
+            processorPaymentID: savedFlow.processorPaymentID || "",
             paymentID: savedFlow.paymentID || ""
         });
     }, [debug, startAt, vertexEnabled]);
@@ -157,7 +157,7 @@ function useCheckoutModalState({ invoiceID: initialInvoiceID = null, productConf
         }));
     }, []);
     const setInvoiceID = React.useCallback((invoiceID, invoiceCountdownStart) => {
-        setPurchaseState((prevPurchaseState) => (Object.assign(Object.assign({}, prevPurchaseState), { invoiceID, invoiceCountdownStart, circlePaymentID: "", paymentID: "" })));
+        setPurchaseState((prevPurchaseState) => (Object.assign(Object.assign({}, prevPurchaseState), { invoiceID, invoiceCountdownStart, processorPaymentID: "", paymentID: "" })));
     }, []);
     const setTaxes = React.useCallback((taxes) => {
         setPurchaseState((prevPurchaseState) => (Object.assign(Object.assign({}, prevPurchaseState), { taxes })));
@@ -165,8 +165,8 @@ function useCheckoutModalState({ invoiceID: initialInvoiceID = null, productConf
     const setWalletAddress = React.useCallback((wallet) => {
         setPurchaseState((prevPurchaseState) => (Object.assign(Object.assign({}, prevPurchaseState), { wallet })));
     }, []);
-    const setPayments = React.useCallback((circlePaymentID, paymentID) => {
-        setPurchaseState((prevPurchaseState) => (Object.assign(Object.assign({}, prevPurchaseState), { circlePaymentID, paymentID })));
+    const setPayments = React.useCallback((processorPaymentID, paymentID) => {
+        setPurchaseState((prevPurchaseState) => (Object.assign(Object.assign({}, prevPurchaseState), { processorPaymentID, paymentID })));
     }, []);
     return {
         // CheckoutModalState:
@@ -191,7 +191,7 @@ function useCheckoutModalState({ invoiceID: initialInvoiceID = null, productConf
         setTaxes,
         wallet,
         setWalletAddress,
-        circlePaymentID,
+        processorPaymentID,
         paymentID,
         setPayments,
     };

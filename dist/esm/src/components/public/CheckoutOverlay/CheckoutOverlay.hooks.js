@@ -28,12 +28,12 @@ function useCheckoutModalState({ invoiceID: initialInvoiceID = null, productConf
         paymentInfo: "",
         cvv: "",
     });
-    const [{ invoiceID, invoiceCountdownStart, taxes, wallet, circlePaymentID, paymentID, }, setPurchaseState] = useState({
+    const [{ invoiceID, invoiceCountdownStart, taxes, wallet, processorPaymentID, paymentID, }, setPurchaseState] = useState({
         invoiceID: initialInvoiceID || null,
         invoiceCountdownStart: null,
         taxes: vertexEnabled ? { status: "incomplete" } : null,
         wallet: null,
-        circlePaymentID: "",
+        processorPaymentID: "",
         paymentID: ""
     });
     const initModalState = useCallback(() => {
@@ -70,7 +70,7 @@ function useCheckoutModalState({ invoiceID: initialInvoiceID = null, productConf
             invoiceCountdownStart: savedFlow.invoiceCountdownStart || null,
             taxes: vertexEnabled ? { status: "incomplete" } : null,
             wallet: null,
-            circlePaymentID: savedFlow.circlePaymentID || "",
+            processorPaymentID: savedFlow.processorPaymentID || "",
             paymentID: savedFlow.paymentID || ""
         });
     }, [debug, startAt, vertexEnabled]);
@@ -153,7 +153,7 @@ function useCheckoutModalState({ invoiceID: initialInvoiceID = null, productConf
         }));
     }, []);
     const setInvoiceID = useCallback((invoiceID, invoiceCountdownStart) => {
-        setPurchaseState((prevPurchaseState) => (Object.assign(Object.assign({}, prevPurchaseState), { invoiceID, invoiceCountdownStart, circlePaymentID: "", paymentID: "" })));
+        setPurchaseState((prevPurchaseState) => (Object.assign(Object.assign({}, prevPurchaseState), { invoiceID, invoiceCountdownStart, processorPaymentID: "", paymentID: "" })));
     }, []);
     const setTaxes = useCallback((taxes) => {
         setPurchaseState((prevPurchaseState) => (Object.assign(Object.assign({}, prevPurchaseState), { taxes })));
@@ -161,8 +161,8 @@ function useCheckoutModalState({ invoiceID: initialInvoiceID = null, productConf
     const setWalletAddress = useCallback((wallet) => {
         setPurchaseState((prevPurchaseState) => (Object.assign(Object.assign({}, prevPurchaseState), { wallet })));
     }, []);
-    const setPayments = useCallback((circlePaymentID, paymentID) => {
-        setPurchaseState((prevPurchaseState) => (Object.assign(Object.assign({}, prevPurchaseState), { circlePaymentID, paymentID })));
+    const setPayments = useCallback((processorPaymentID, paymentID) => {
+        setPurchaseState((prevPurchaseState) => (Object.assign(Object.assign({}, prevPurchaseState), { processorPaymentID, paymentID })));
     }, []);
     return {
         // CheckoutModalState:
@@ -187,7 +187,7 @@ function useCheckoutModalState({ invoiceID: initialInvoiceID = null, productConf
         setTaxes,
         wallet,
         setWalletAddress,
-        circlePaymentID,
+        processorPaymentID,
         paymentID,
         setPayments,
     };

@@ -9,7 +9,7 @@ import default_1 from '../../../../node_modules/@mui/icons-material/Check.js';
 import { DeliveryWalletDetails } from '../DeliveryWallet/DeliveryWalletDetails/DeliveryWalletDetails.js';
 import { CopyButton } from '../../shared/CopyButton/CopyButton.js';
 
-const PurchaseConfirmationBillingDetails = ({ checkoutItems, circlePaymentID, wallet, selectedPaymentMethodBillingInfo, selectedPaymentMethodPaymentInfo, }) => {
+const PurchaseConfirmationBillingDetails = ({ checkoutItems, processorPaymentID, wallet, selectedPaymentMethodBillingInfo, selectedPaymentMethodPaymentInfo, }) => {
     const { isMasked, paymentType, displayValue, network, } = getFormattedPaymentMethod(selectedPaymentMethodPaymentInfo);
     const icon = network ? React__default.createElement(CreditCardIcon, { network: network }) : null;
     return (React__default.createElement(Box, { sx: { display: 'flex', flexDirection: 'column', flex: 1, position: "relative" } },
@@ -31,8 +31,8 @@ const PurchaseConfirmationBillingDetails = ({ checkoutItems, circlePaymentID, wa
             isMasked ? (React__default.createElement(ReadOnlyField, { label: PAYMENT_TYPE_LABEL[paymentType], value: displayValue, InputProps: icon ? {
                     endAdornment: (React__default.createElement(InputAdornment, { position: "end" }, icon)),
                 } : undefined })) : (React__default.createElement(ReadOnlyCardField, { label: PAYMENT_TYPE_LABEL[paymentType], value: displayValue })),
-            React__default.createElement(ReadOnlyField, { label: "Reference No.", value: circlePaymentID || "-", InputProps: circlePaymentID ? {
-                    endAdornment: (React__default.createElement(CopyButton, { label: "Reference No.", value: circlePaymentID, size: "small" })),
+            React__default.createElement(ReadOnlyField, { label: "Reference No.", value: processorPaymentID || "-", InputProps: processorPaymentID ? {
+                    endAdornment: (React__default.createElement(CopyButton, { label: "Reference No.", value: processorPaymentID, size: "small" })),
                 } : undefined })),
         React__default.createElement(CheckoutItemCostPurchase, { checkoutItems: checkoutItems, selectedPaymentMethodBillingInfo: selectedPaymentMethodBillingInfo }),
         React__default.createElement(DeliveryWalletDetails, { wallet: wallet })));

@@ -10,13 +10,13 @@ import { useEncryptCardData } from './useEncryptCard.js';
 function useFullPayment({ orgID, invoiceID, savedPaymentMethods, selectedPaymentMethod, wallet, debug = false, }) {
     const [paymentState, setPaymentState] = useState({
         paymentStatus: "processing",
-        circlePaymentID: "",
+        processorPaymentID: "",
         paymentID: ""
     });
     const setError = useCallback((paymentError) => {
         setPaymentState({
             paymentStatus: "error",
-            circlePaymentID: "",
+            processorPaymentID: "",
             paymentID: "",
             paymentError,
         });
@@ -49,11 +49,11 @@ function useFullPayment({ orgID, invoiceID, savedPaymentMethods, selectedPayment
         }
         setPaymentState({
             paymentStatus: "processing",
-            circlePaymentID: "",
+            processorPaymentID: "",
             paymentID: "",
         });
         let paymentMethodID = "";
-        let circlePaymentID = "";
+        let processorPaymentID = "";
         let paymentID = "";
         let mutationError = undefined;
         if (typeof selectedPaymentInfo === "string") {
@@ -145,17 +145,17 @@ function useFullPayment({ orgID, invoiceID, savedPaymentMethods, selectedPayment
         if (makePaymentResult && !makePaymentResult.errors) {
             if (debug)
                 console.log("    🟢 makePayment result", makePaymentResult);
-            circlePaymentID = ((_d = (_c = makePaymentResult.data) === null || _c === void 0 ? void 0 : _c.createPayment) === null || _d === void 0 ? void 0 : _d.circlePaymentID) || "";
+            processorPaymentID = ((_d = (_c = makePaymentResult.data) === null || _c === void 0 ? void 0 : _c.createPayment) === null || _d === void 0 ? void 0 : _d.processorPaymentID) || "";
             paymentID = ((_f = (_e = makePaymentResult.data) === null || _e === void 0 ? void 0 : _e.createPayment) === null || _f === void 0 ? void 0 : _f.id) || "";
         }
-        if (!circlePaymentID) {
+        if (!processorPaymentID) {
             setError(ERROR_PURCHASE_PAYING(mutationError));
             return;
         }
         // TODO: Error handling and automatic retry:
         setPaymentState({
             paymentStatus: "processed",
-            circlePaymentID,
+            processorPaymentID,
             paymentID
         });
     }), [

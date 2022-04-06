@@ -13,7 +13,7 @@ function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'defau
 
 var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 
-const ConfirmationView = ({ checkoutItems, savedPaymentMethods, selectedPaymentMethod, circlePaymentID, wallet, onNext, goToHref, goToLabel, onGoTo, }) => {
+const ConfirmationView = ({ checkoutItems, savedPaymentMethods, selectedPaymentMethod, processorPaymentID, wallet, onNext, goToHref, goToLabel, onGoTo, }) => {
     const { billingInfo: selectedBillingInfo, paymentInfo: selectedPaymentInfo, } = selectedPaymentMethod;
     const { selectedPaymentMethodBillingInfo, selectedPaymentMethodPaymentInfo, } = React.useMemo(() => {
         if (typeof selectedPaymentInfo === "string") {
@@ -33,7 +33,7 @@ const ConfirmationView = ({ checkoutItems, savedPaymentMethods, selectedPaymentM
     if (!selectedPaymentMethodBillingInfo || !selectedPaymentMethodPaymentInfo)
         return null;
     return (React__default["default"].createElement(material.Stack, { direction: { xs: "column", md: "row" }, spacing: { xs: 3, md: 3.75 } },
-        React__default["default"].createElement(PurchaseConfirmationBillingDetails.PurchaseConfirmationBillingDetails, { checkoutItems: checkoutItems, circlePaymentID: circlePaymentID, wallet: wallet, selectedPaymentMethodBillingInfo: selectedPaymentMethodBillingInfo, selectedPaymentMethodPaymentInfo: selectedPaymentMethodPaymentInfo }),
+        React__default["default"].createElement(PurchaseConfirmationBillingDetails.PurchaseConfirmationBillingDetails, { checkoutItems: checkoutItems, processorPaymentID: processorPaymentID, wallet: wallet, selectedPaymentMethodBillingInfo: selectedPaymentMethodBillingInfo, selectedPaymentMethodPaymentInfo: selectedPaymentMethodPaymentInfo }),
         React__default["default"].createElement(material.Stack, { sx: { display: "flex", flex: 1 } },
             React__default["default"].createElement(material.Divider, { sx: { display: { xs: "block", md: "none" } } }),
             React__default["default"].createElement(PurchaseConfirmationItemDetails.PurchaseConfirmationItemDetails, { checkoutItems: checkoutItems }),

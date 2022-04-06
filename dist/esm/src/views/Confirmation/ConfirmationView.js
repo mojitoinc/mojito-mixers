@@ -5,7 +5,7 @@ import { PurchaseConfirmationBillingDetails } from '../../components/payments/Pu
 import { PurchaseConfirmationItemDetails } from '../../components/payments/PurchaseConfirmationItemDetails/PurchaseConfirmationItemDetails.js';
 import { billingInfoToSavedPaymentMethodBillingInfo } from '../../domain/circle/circle.utils.js';
 
-const ConfirmationView = ({ checkoutItems, savedPaymentMethods, selectedPaymentMethod, circlePaymentID, wallet, onNext, goToHref, goToLabel, onGoTo, }) => {
+const ConfirmationView = ({ checkoutItems, savedPaymentMethods, selectedPaymentMethod, processorPaymentID, wallet, onNext, goToHref, goToLabel, onGoTo, }) => {
     const { billingInfo: selectedBillingInfo, paymentInfo: selectedPaymentInfo, } = selectedPaymentMethod;
     const { selectedPaymentMethodBillingInfo, selectedPaymentMethodPaymentInfo, } = useMemo(() => {
         if (typeof selectedPaymentInfo === "string") {
@@ -25,7 +25,7 @@ const ConfirmationView = ({ checkoutItems, savedPaymentMethods, selectedPaymentM
     if (!selectedPaymentMethodBillingInfo || !selectedPaymentMethodPaymentInfo)
         return null;
     return (React__default.createElement(Stack, { direction: { xs: "column", md: "row" }, spacing: { xs: 3, md: 3.75 } },
-        React__default.createElement(PurchaseConfirmationBillingDetails, { checkoutItems: checkoutItems, circlePaymentID: circlePaymentID, wallet: wallet, selectedPaymentMethodBillingInfo: selectedPaymentMethodBillingInfo, selectedPaymentMethodPaymentInfo: selectedPaymentMethodPaymentInfo }),
+        React__default.createElement(PurchaseConfirmationBillingDetails, { checkoutItems: checkoutItems, processorPaymentID: processorPaymentID, wallet: wallet, selectedPaymentMethodBillingInfo: selectedPaymentMethodBillingInfo, selectedPaymentMethodPaymentInfo: selectedPaymentMethodPaymentInfo }),
         React__default.createElement(Stack, { sx: { display: "flex", flex: 1 } },
             React__default.createElement(Divider, { sx: { display: { xs: "block", md: "none" } } }),
             React__default.createElement(PurchaseConfirmationItemDetails, { checkoutItems: checkoutItems }),
