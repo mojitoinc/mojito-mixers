@@ -360,7 +360,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   // Reservation countdown:
 
   const { countdownElementRef } = useCountdown({
-    invoiceCountdownStart: checkoutStep === "confirmation" ? null : invoiceCountdownStart,
+    invoiceCountdownStart: checkoutStep === "confirmation" || checkoutStep === "error" ? null : invoiceCountdownStart,
     setError,
   });
 
