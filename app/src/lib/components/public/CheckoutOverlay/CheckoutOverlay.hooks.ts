@@ -165,14 +165,14 @@ export function useCheckoutModalState({
     });
 
     setPurchaseState({
-      invoiceID: savedFlow.invoiceID || "",
-      invoiceCountdownStart: savedFlow.invoiceCountdownStart || null,
+      invoiceID: initialInvoiceID ? initialInvoiceID : (savedFlow.invoiceID || ""),
+      invoiceCountdownStart: initialInvoiceID ? Date.now() : (savedFlow.invoiceCountdownStart || null),
       taxes: vertexEnabled ? { status: "incomplete" } : null,
       wallet: null,
       processorPaymentID: savedFlow.processorPaymentID || "",
       paymentID: savedFlow.paymentID || ""
     });
-  }, [debug, startAt, vertexEnabled]);
+  }, [debug, startAt, initialInvoiceID, vertexEnabled]);
 
   const goBack = useCallback(() => {
     setCheckoutModalState(({ checkoutStep, checkoutError }) => ({
