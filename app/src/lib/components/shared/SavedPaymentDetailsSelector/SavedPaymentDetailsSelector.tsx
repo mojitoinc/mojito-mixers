@@ -31,6 +31,7 @@ export interface SavedPaymentDetailsSelectorProps {
   onClose: () => void;
   onAttemptSubmit: () => void;
   onUpdateItemLimits: () => void;
+  loadingLimits: boolean;
   consentType?: ConsentType;
 }
 
@@ -53,6 +54,7 @@ export const SavedPaymentDetailsSelector: React.FC<SavedPaymentDetailsSelectorPr
   onClose,
   onAttemptSubmit,
   onUpdateItemLimits,
+  loadingLimits,
   consentType,
 }) => {
   const handlePick = useCallback((paymentMethodId: string) => {
@@ -178,6 +180,8 @@ export const SavedPaymentDetailsSelector: React.FC<SavedPaymentDetailsSelectorPr
     <CheckoutModalFooter
       variant="toConfirmation"
       consentType={ consentType }
+      submitLabel={ loadingLimits ? "Verifying purchase..." : undefined }
+      submitDisabled={ loadingLimits }
       onSubmitClicked={ handleNextClicked }
       onCloseClicked={ onClose } />
   </>);

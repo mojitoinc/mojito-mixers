@@ -308,6 +308,7 @@ export interface PaymentMethodFormProps {
   onUpdateItemLimits: () => void;
   consentType?: ConsentType;
   remainingItemsLimits?: Record<PaymentType, number>;
+  loadingLimits: boolean;
   debug?: boolean;
 }
 
@@ -324,6 +325,7 @@ export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
   onUpdateItemLimits,
   consentType,
   remainingItemsLimits,
+  loadingLimits,
   debug = false
 }) => {
   const defaultPaymentType = acceptedPaymentTypes[0] || "CreditCard";
@@ -465,7 +467,8 @@ export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
       <CheckoutModalFooter
         variant={ selectedPaymentMethod === "ACH" ? "toPlaid" : "toConfirmation" }
         consentType={ consentType === "checkbox" ? undefined : consentType }
-        submitDisabled={ selectedPaymentMethod === "Crypto" }
+        submitLabel={ loadingLimits ? "Verifying purchase..." : undefined }
+        submitDisabled={ loadingLimits || selectedPaymentMethod === "Crypto" }
         onCloseClicked={ onClose } />
     </form>
   );

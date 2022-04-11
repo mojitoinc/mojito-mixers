@@ -142,7 +142,7 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
   const firstCheckoutItem = checkoutItems[0];
 
   // Item limits
-  const { remainingItemsLimits, refetch: refetchItemLimits } = useLimits(firstCheckoutItem);
+  const { remainingItemsLimits, refetch: refetchItemLimits, loading: loadingItemLimits } = useLimits(firstCheckoutItem);
 
   // TODO: Handle errors properly:
   if (!selectedPaymentMethodBillingInfo) return null;
@@ -175,6 +175,7 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
             onClose={onClose}
             onAttemptSubmit={handleFormAttemptSubmit}
             onUpdateItemLimits={refetchItemLimits}
+            loadingLimits={loadingItemLimits}
             consentType={consentType} />
         ) : (
           <PaymentMethodForm
@@ -188,6 +189,7 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
             onSubmit={handleSubmit}
             onAttemptSubmit={handleFormAttemptSubmit}
             onUpdateItemLimits={refetchItemLimits}
+            loadingLimits={loadingItemLimits}
             consentType={consentType}
             remainingItemsLimits={remainingItemsLimits}
             debug={debug} />
