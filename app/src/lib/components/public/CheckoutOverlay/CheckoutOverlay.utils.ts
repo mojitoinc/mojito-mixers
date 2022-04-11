@@ -1,7 +1,8 @@
-import { THREEDS_FLOW_INFO_KEY, THREEDS_FLOW_RECEIVED_REDIRECT_URI_KEY, THREEDS_FLOW_STATE_USED_KEY, THREEDS_STORAGE_EXPIRATION_MS, THREEDS_FLOW_SEARCH_PARAM_SUCCESS } from "../../../config/config";
+import { THREEDS_FLOW_INFO_KEY, THREEDS_FLOW_RECEIVED_REDIRECT_URI_KEY, THREEDS_FLOW_STATE_USED_KEY, THREEDS_FLOW_SEARCH_PARAM_SUCCESS, THREEDS_STORAGE_EXPIRATION_MIN } from "../../../config/config";
 import { getUrlWithoutParams, isLocalhost, isLocalhostOrStaging, urlToPathnameWhenPossible } from "../../../domain/url/url.utils";
 import { BillingInfo } from "../../../forms/BillingInfoForm";
 import { continuePlaidOAuthFlow, INITIAL_PLAID_OAUTH_FLOW_STATE } from "../../../hooks/usePlaid";
+import { cookieStorage } from "../../../utils/storageUtils";
 import { CheckoutModalStep } from "./CheckoutOverlay.hooks";
 
 const debug = isLocalhostOrStaging();
@@ -14,7 +15,7 @@ export interface CheckoutModalInfo {
   paymentID: string;
   billingInfo: string | BillingInfo;
   paymentInfo: string | null;
-  timestamp?: number;
+  // timestamp?: number;
 }
 
 export interface CheckoutModalState3DS extends CheckoutModalInfo {
@@ -43,31 +44,36 @@ export function persistCheckoutModalInfo(info: CheckoutModalInfo) {
   if (!process.browser) return;
 
   try {
-    localStorage.setItem(THREEDS_FLOW_INFO_KEY, JSON.stringify({
+    cookieStorage.setItem(THREEDS_FLOW_INFO_KEY, {
       ...info,
       url: info.url || getUrlWithoutParams(),
-      timestamp: info.timestamp || Date.now(),
-    }));
+      // timestamp: info.timestamp || Date.now(),
+    }, {
+      // domain: "",
+      // path: "",
+      secure: !isLocalhost(),
+      expires: { minutes: THREEDS_STORAGE_EXPIRATION_MIN },
+    });
   } catch (err) {
     if (debug) console.log(err);
   }
 }
 
 export function persistReceivedRedirectUri3DS(receivedRedirectUri: string) {
-  localStorage.setItem(THREEDS_FLOW_RECEIVED_REDIRECT_URI_KEY, receivedRedirectUri);
+  cookieStorage.setItem(THREEDS_FLOW_RECEIVED_REDIRECT_URI_KEY, receivedRedirectUri);
 }
 
 export function persistCheckoutModalInfoUsed(used = true) {
-  localStorage.setItem(THREEDS_FLOW_STATE_USED_KEY, `${used}`);
+  cookieStorage.setItem(THREEDS_FLOW_STATE_USED_KEY, used);
 }
 
-export function clearPersistedInfo(isExpired?: boolean) {
-  if (debug) console.log(`💾 Clearing ${isExpired ? "expired " : ""}state (3DS)...`);
+export function clearPersistedInfo() {
+  if (debug) console.log(`💾 Clearing state (3DS)...`);
 
   if (process.browser) {
-    localStorage.removeItem(THREEDS_FLOW_INFO_KEY);
-    localStorage.removeItem(THREEDS_FLOW_RECEIVED_REDIRECT_URI_KEY);
-    localStorage.removeItem(THREEDS_FLOW_STATE_USED_KEY);
+    cookieStorage.removeItem(THREEDS_FLOW_INFO_KEY);
+    cookieStorage.removeItem(THREEDS_FLOW_RECEIVED_REDIRECT_URI_KEY);
+    cookieStorage.removeItem(THREEDS_FLOW_STATE_USED_KEY);
   }
 
   return FALLBACK_MODAL_STATE;
@@ -79,9 +85,11 @@ export function persistedInfoCleanUp() {
 }
 */
 
+/*
 function isExpired(timestamp?: number) {
   return timestamp !== undefined && Date.now() - timestamp > THREEDS_STORAGE_EXPIRATION_MS;
 }
+*/
 
 export function isInitiallyOpen() {
   return continueFlows(true).checkoutStep !== "";
@@ -95,9 +103,9 @@ export function getCheckoutModalState(): CheckoutModalState3DS {
   let savedStateUsed = false;
 
   try {
-    savedPlaidInfo = JSON.parse(localStorage.getItem(THREEDS_FLOW_INFO_KEY) || "{}") || {};
-    savedReceivedRedirectUri = localStorage.getItem(THREEDS_FLOW_RECEIVED_REDIRECT_URI_KEY) || "";
-    savedStateUsed = localStorage.getItem(THREEDS_FLOW_STATE_USED_KEY) === "true" || false;
+    savedPlaidInfo = cookieStorage.getItem(THREEDS_FLOW_INFO_KEY) || {};
+    savedReceivedRedirectUri = cookieStorage.getItem(THREEDS_FLOW_RECEIVED_REDIRECT_URI_KEY) || "";
+    savedStateUsed = cookieStorage.getItem(THREEDS_FLOW_STATE_USED_KEY) || false;
   } catch (err) {
     if (debug) console.log(err);
   }
@@ -110,19 +118,19 @@ export function getCheckoutModalState(): CheckoutModalState3DS {
     paymentID = "",
     billingInfo = "",
     paymentInfo = "",
-    timestamp,
+    // timestamp,
   } = savedPlaidInfo || {};
 
   // Swap to test error flow:
   // const receivedRedirectUri = "localhost:3000/payments/error";
   const receivedRedirectUri = savedReceivedRedirectUri || (window.location.search.startsWith(THREEDS_FLOW_SEARCH_PARAM_SUCCESS) ? window.location.href : undefined);
 
-  // In dev, this works fine even if there's nothing in localStorage, which helps with testing across some other domain and localhost:
+  // In dev, this works fine even if there's nothing in cookieStorage, which helps with testing across some other domain and localhost:
   const hasLocalhostOrigin = process.env.NODE_ENV === "development" && !isLocalhost();
   const continue3DSFlow = hasLocalhostOrigin || !!(url && invoiceID && processorPaymentID && paymentID && billingInfo && (paymentInfo || paymentInfo === null) && receivedRedirectUri);
 
-  if ((continue3DSFlow && savedStateUsed) || (!continue3DSFlow && localStorage.getItem(THREEDS_FLOW_INFO_KEY)) || isExpired(timestamp)) {
-    return clearPersistedInfo(isExpired(timestamp));
+  if ((continue3DSFlow && savedStateUsed) || (!continue3DSFlow && cookieStorage.getItem(THREEDS_FLOW_INFO_KEY)) /* || isExpired(timestamp) */) {
+    return clearPersistedInfo(/* isExpired(timestamp) */);
   }
 
   return {

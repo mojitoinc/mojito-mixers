@@ -61,7 +61,6 @@ export function useFullPayment({
       paymentInfo: selectedPaymentInfo,
     } = selectedPaymentMethod;
 
-
     if (selectedPaymentInfo === null) {
       setError(ERROR_PURCHASE_CREATING_PAYMENT_METHOD());
 
