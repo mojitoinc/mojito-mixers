@@ -8,6 +8,7 @@ export interface CheckoutItemInfo {
   description: string;
   imageSrc: string;
   imageBackground: string;
+  collectionItemId: string;
 
   // Buy Now:
   totalSupply: number;

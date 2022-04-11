@@ -309,6 +309,7 @@ export interface PaymentMethodFormProps {
   onClose: () => void;
   onSubmit: (data: PaymentMethod) => void;
   onAttemptSubmit: () => void;
+  onUpdateItemLimits: () => void;
   consentType?: ConsentType;
   remainingItemsLimits?: Record<PaymentType, number>;
   debug?: boolean;
@@ -327,6 +328,7 @@ export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
   onClose,
   onSubmit,
   onAttemptSubmit,
+  onUpdateItemLimits,
   consentType,
   remainingItemsLimits,
   debug = false
@@ -366,7 +368,9 @@ export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
     reset({ ...PAYMENT_TYPE_FORM_DATA[paymentType].defaultValues(consentType) });
 
     if (paymentType === "ACH" && !!plaidError) refetchPlaidLink();
-  }, [reset, consentType, plaidError, refetchPlaidLink]);
+
+    onUpdateItemLimits();
+  }, [reset, consentType, plaidError, refetchPlaidLink, onUpdateItemLimits]);
 
   const selectedPaymentMethod = watch("type") as PaymentType;
   const Fields = PAYMENT_TYPE_FORM_DATA[selectedPaymentMethod].fields;
