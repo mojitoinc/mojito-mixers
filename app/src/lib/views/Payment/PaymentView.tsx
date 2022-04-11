@@ -18,6 +18,7 @@ import { checkNeedsGenericErrorMessage } from "../../hooks/useFormCheckoutError"
 import { TaxesState } from "../Billing/BillingView";
 import { Wallet } from "../../domain/wallet/wallet.interfaces";
 import { CreditCardNetwork } from "../../domain/react-payment-inputs/react-payment-inputs.utils";
+import { useLimits } from "@lib/hooks/useLimits";
 
 const billingInfoItemBoxProps: BoxProps = { sx: { mt: 2.5 } };
 
@@ -45,7 +46,6 @@ export interface PaymentViewProps {
   acceptedPaymentTypes?: PaymentType[];
   acceptedCreditCardNetworks?: CreditCardNetwork[];
   consentType?: ConsentType;
-  remainingItemsLimits?: Record<PaymentType, number>;
   debug?: boolean;
 }
 
@@ -68,7 +68,6 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
   acceptedPaymentTypes = ["CreditCard"],
   acceptedCreditCardNetworks,
   consentType,
-  remainingItemsLimits,
   debug,
 }) => {
   const {
@@ -140,6 +139,11 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
     skip: !acceptedPaymentTypes.includes("ACH"),
   });
 
+  const firstCheckoutItem = checkoutItems[0];
+
+  // Item limits
+  const { remainingItemsLimits, refetch: refetchItemLimits } = useLimits(firstCheckoutItem);
+
   // TODO: Handle errors properly:
   if (!selectedPaymentMethodBillingInfo) return null;
 
@@ -170,6 +174,7 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
             onNext={onNext}
             onClose={onClose}
             onAttemptSubmit={handleFormAttemptSubmit}
+            onUpdateItemLimits={refetchItemLimits}
             consentType={consentType} />
         ) : (
           <PaymentMethodForm
@@ -182,6 +187,7 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
             onClose={onClose}
             onSubmit={handleSubmit}
             onAttemptSubmit={handleFormAttemptSubmit}
+            onUpdateItemLimits={refetchItemLimits}
             consentType={consentType}
             remainingItemsLimits={remainingItemsLimits}
             debug={debug} />

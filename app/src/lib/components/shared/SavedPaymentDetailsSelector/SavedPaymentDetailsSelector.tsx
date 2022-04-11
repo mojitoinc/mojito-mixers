@@ -30,6 +30,7 @@ export interface SavedPaymentDetailsSelectorProps {
   onNext: () => void;
   onClose: () => void;
   onAttemptSubmit: () => void;
+  onUpdateItemLimits: () => void;
   consentType?: ConsentType;
 }
 
@@ -51,8 +52,14 @@ export const SavedPaymentDetailsSelector: React.FC<SavedPaymentDetailsSelectorPr
   onNext,
   onClose,
   onAttemptSubmit,
+  onUpdateItemLimits,
   consentType,
 }) => {
+  const handlePick = useCallback((paymentMethodId: string) => {
+    onPick(paymentMethodId);
+    onUpdateItemLimits();
+  }, [onPick, onUpdateItemLimits]);
+
   const { creditCardNetwork, cvvLabel, isCvvRequired } = useMemo((): CreditCardInfo => {
     const selectedPaymentMethod = savedPaymentMethods.find(savedPaymentMethod => savedPaymentMethod.id === selectedPaymentMethodId);
 
@@ -137,14 +144,14 @@ export const SavedPaymentDetailsSelector: React.FC<SavedPaymentDetailsSelectorPr
           active: savedPaymentMethod.id === selectedPaymentMethodId,
           disabled: showLoader,
           onDelete,
-          onPick,
+          onPick: handlePick,
           cvvLabel,
           cvvError,
           onCvvChange: handleCvvChange,
         }) }
         component={ PaymentDetailsItem }
         itemKey={ getPaymentMethodId }
-        deps={[ selectedPaymentMethodId, showLoader, onDelete, onPick, cvvLabel, cvvError, handleCvvChange]} />
+        deps={[ selectedPaymentMethodId, showLoader, onDelete, handlePick, cvvLabel, cvvError, handleCvvChange]} />
 
       { cvvError && (
         <Typography variant="caption" component="p" sx={{ mt: 2, color: theme => theme.palette.warning.dark }}>
