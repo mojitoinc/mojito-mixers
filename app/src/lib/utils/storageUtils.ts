@@ -21,6 +21,7 @@ interface CookieParams extends CookieOptions {
   expirationDate?: Date | false;
 }
 
+// TODO: Change to getCookieParams:
 function getCookieSecurityParams(params: CookieParams = {}) {
   const {
     domain = "",
@@ -86,6 +87,10 @@ function getCookies(): Record<string, string> {
   );
 }
 
+function hasCookie(key: string): boolean {
+  return getCookies()[key] !== undefined;
+}
+
 function getCookie<T = any>(name: string, options: CookieOptions = {}): T | string | undefined {
   const rawCookie = getCookies()[name] || undefined;
 
@@ -93,6 +98,17 @@ function getCookie<T = any>(name: string, options: CookieOptions = {}): T | stri
   if (options.noParse) return rawCookie;
 
   return parseCookie(rawCookie);
+}
+
+function deleteCookie(key: string, params: CookieParams = {}) {
+  if (DEBUG) console.info(`Deleting cookie ${ key }=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=${ params.path || "/" };${ getCookieSecurityParams(params) }`);
+
+  const hasCookieResult = hasCookie(key);
+
+  document.cookie = `${ key }=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=${ params.path || "/" };${ getCookieSecurityParams(params) }`;
+
+  // Note this might return a false negative if the cookie was set in a different domain or path or if it was httpOnly:
+  return hasCookieResult;
 }
 
 export type ProxyStorageType = "localStorage" | "cookieStorage" | "sessionStorage" | "memoryStorage";
@@ -124,15 +140,15 @@ export class ProxyStorage {
    * Deletes an item from the storage.
    * The options parameter is used only with instances of cookieStorage.
    */
-  removeItem(key: string, options?: any) {
-    // TODO: Implement.
+  removeItem(key: string, options?: CookieParams) {
+    return deleteCookie(key, options);
   }
 
   /**
    * Removes all items from the storage instance.
    */
-  clear() {
-    // TODO: Implement.
+  clear(options?: CookieParams) {
+    Object.keys(getCookies()).forEach(key => deleteCookie(key, options));
   }
 
   /**
