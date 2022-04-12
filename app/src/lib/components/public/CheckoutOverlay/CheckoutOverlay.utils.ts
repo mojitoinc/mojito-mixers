@@ -15,7 +15,6 @@ export interface CheckoutModalInfo {
   paymentID: string;
   billingInfo: string | BillingInfo;
   paymentInfo: string | null;
-  // timestamp?: number;
 }
 
 export interface CheckoutModalState3DS extends CheckoutModalInfo {
@@ -47,7 +46,6 @@ export function persistCheckoutModalInfo(info: CheckoutModalInfo) {
     cookieStorage.setItem(THREEDS_FLOW_INFO_KEY, {
       ...info,
       url: info.url || getUrlWithoutParams(),
-      // timestamp: info.timestamp || Date.now(),
     }, {
       // domain: "",
       // path: "",
@@ -119,7 +117,6 @@ export function getCheckoutModalState(): CheckoutModalState3DS {
     paymentID = "",
     billingInfo = "",
     paymentInfo = "",
-    // timestamp,
   } = savedPlaidInfo || {};
 
   // Swap to test error flow:
@@ -130,8 +127,8 @@ export function getCheckoutModalState(): CheckoutModalState3DS {
   const hasLocalhostOrigin = process.env.NODE_ENV === "development" && !isLocalhost();
   const continue3DSFlow = hasLocalhostOrigin || !!(url && invoiceID && processorPaymentID && paymentID && billingInfo && (paymentInfo || paymentInfo === null) && receivedRedirectUri);
 
-  if ((continue3DSFlow && savedStateUsed) || (!continue3DSFlow && cookieStorage.getItem(THREEDS_FLOW_INFO_KEY)) /* || isExpired(timestamp) */) {
-    return clearPersistedInfo(/* isExpired(timestamp) */);
+  if ((continue3DSFlow && savedStateUsed) || (!continue3DSFlow && cookieStorage.getItem(THREEDS_FLOW_INFO_KEY))) {
+    return clearPersistedInfo();
   }
 
   return {
