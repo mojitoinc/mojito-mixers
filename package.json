@@ -39,7 +39,6 @@
     "country-region-data": "^2.2.0",
     "merge-options": "^3.0.4",
     "openpgp": "5.2.0",
-    "proxy-storage": "^2.3.2",
     "react-hook-form": "^7.29.0",
     "react-payment-inputs": "^1.1.9",
     "react-plaid-link": "^3.3.1",

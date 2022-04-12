@@ -51,8 +51,9 @@ export function persistCheckoutModalInfo(info: CheckoutModalInfo) {
     }, {
       // domain: "",
       // path: "",
-      secure: !isLocalhost(),
-      expires: { minutes: THREEDS_STORAGE_EXPIRATION_MIN },
+      // secure: !isLocalhost(),
+      // expires: { minutes: THREEDS_STORAGE_EXPIRATION_MIN },
+      expirationDate: new Date(Date.now() + THREEDS_STORAGE_EXPIRATION_MIN * 60000)
     });
   } catch (err) {
     if (debug) console.log(err);
