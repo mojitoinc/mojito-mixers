@@ -18,12 +18,14 @@ export const useLimits = (checkoutItem: CheckoutItem) => {
   const {
     data: paymentLimitData,
     refetch,
+    loading,
   } = useValidatePaymentLimitQuery({
     skip: !collectionId,
     variables: {
       collectionId,
       itemsCount: checkoutItem?.units || 0,
     },
+    notifyOnNetworkStatusChange: true
   });
 
   const rawRemainingItemLimit = paymentLimitData?.validatePaymentLimit;
@@ -33,5 +35,5 @@ export const useLimits = (checkoutItem: CheckoutItem) => {
     [rawRemainingItemLimit]
   );
 
-  return { remainingItemsLimits, refetch };
+  return { remainingItemsLimits, refetch, loading };
 }
