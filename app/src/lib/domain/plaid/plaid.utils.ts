@@ -1,5 +1,4 @@
-import { PLAID_OAUTH_FLOW_INFO_KEY, PLAID_OAUTH_FLOW_RECEIVED_REDIRECT_URI_KEY, PLAID_OAUTH_FLOW_STATE_USED_KEY, PLAID_OAUTH_FLOW_URL_SEARCH } from "../../config/config";
-import { isLocalhost, isLocalhostOrStaging, urlToPathnameWhenPossible } from "../url/url.utils";
+import { isLocalhostOrStaging } from "../url/url.utils";
 
 const debug = isLocalhostOrStaging();
 
@@ -63,7 +62,6 @@ export function clearPlaidInfo(isExpired?: boolean) {
 function isExpired(timestamp?: number) {
   return timestamp !== undefined && Date.now() - timestamp > PLAID_STORAGE_EXPIRATION_MS;
 }
-*/
 
 export function getPlaidOAuthFlowState(): PlaidOAuthFlowState {
   if (!process.browser) {
@@ -120,3 +118,5 @@ export function getPlaidOAuthFlowState(): PlaidOAuthFlowState {
     savedStateUsed,
   };
 }
+
+*/

@@ -1,11 +1,9 @@
-import { THREEDS_FLOW_INFO_KEY, THREEDS_FLOW_SEARCH_PARAM_SUCCESS, THREEDS_STORAGE_EXPIRATION_MIN, CHECKOUT_MODAL_INFO_REDIRECT_URI_KEY, CHECKOUT_MODAL_INFO_USED_KEY, CHECKOUT_MODAL_INFO_KEY } from "../../../config/config";
+import { THREEDS_FLOW_SEARCH_PARAM_SUCCESS, THREEDS_STORAGE_EXPIRATION_MIN, CHECKOUT_MODAL_INFO_REDIRECT_URI_KEY, CHECKOUT_MODAL_INFO_USED_KEY, CHECKOUT_MODAL_INFO_KEY, PLAID_OAUTH_FLOW_URL_SEARCH } from "../../../config/config";
 import { getUrlWithoutParams, isLocalhost, isLocalhostOrStaging, urlToPathnameWhenPossible } from "../../../domain/url/url.utils";
-import { BillingInfo } from "../../../forms/BillingInfoForm";
-import { continuePlaidOAuthFlow, INITIAL_PLAID_OAUTH_FLOW_STATE } from "../../../hooks/usePlaid";
 import { cookieStorage } from "../../../utils/storageUtils";
-import { FALLBACK_MODAL_STATE_3DS, FALLBACK_MODAL_STATE_PLAID } from "./CheckoutOverlay.constants";
-import { CheckoutModalStep } from "./CheckoutOverlay.hooks";
-import { CheckoutModalInfo, CheckoutModalState3DS, CheckoutModalStatePlaid, FlowType } from "./CheckoutOverlay.types";
+import { to } from "../../../utils/typescriptUtils";
+import { FALLBACK_MODAL_STATE_COMMON } from "./CheckoutOverlay.constants";
+import { CheckoutModalInfo, CheckoutModalInfo3DS, CheckoutModalInfoPlaid, CheckoutModalState3DS, CheckoutModalStateCommon, CheckoutModalStatePlaid } from "./CheckoutOverlay.types";
 
 /*
   TODO:
@@ -27,6 +25,7 @@ export function persistCheckoutModalInfo(info: CheckoutModalInfo) {
     cookieStorage.setItem(CHECKOUT_MODAL_INFO_KEY, {
       ...info,
       url: info.url || getUrlWithoutParams(),
+      fromLocalhost: info.fromLocalhost ?? isLocalhost(),
     }, {
       // domain: "",
       // path: "",
@@ -59,17 +58,26 @@ export function clearPersistedInfo() {
 }
 
 export function isInitiallyOpen() {
-  return continueFlows(true).checkoutStep !== "";
+  return getCheckoutModalState(true).checkoutStep !== "";
 }
 
-export function getCheckoutModalState(flowType: "3DS"): CheckoutModalState3DS
-export function getCheckoutModalState(flowType: "Plaid"): CheckoutModalStatePlaid
-export function getCheckoutModalState(flowType: FlowType): CheckoutModalState3DS | CheckoutModalStatePlaid {
-  const defaultModalState = flowType === "3DS" ? FALLBACK_MODAL_STATE_3DS : FALLBACK_MODAL_STATE_PLAID;
+function isCheckoutModalInfo3DS(checkoutModalInfo: Partial<CheckoutModalInfo3DS | CheckoutModalInfoPlaid>): checkoutModalInfo is CheckoutModalInfo3DS {
+  return checkoutModalInfo.hasOwnProperty("paymentInfo") || checkoutModalInfo.hasOwnProperty("checkoutItems");
+}
+
+function isCheckoutModalInfoPlaid(checkoutModalInfo: Partial<CheckoutModalInfo3DS | CheckoutModalInfoPlaid>): checkoutModalInfo is CheckoutModalInfoPlaid {
+  return checkoutModalInfo.hasOwnProperty("linkToken");
+}
+
+// export function getCheckoutModalState(flowType: ""): CheckoutModalStateCommon
+// export function getCheckoutModalState(flowType: "3DS"): CheckoutModalState3DS
+// export function getCheckoutModalState(flowType: "Plaid"): CheckoutModalStatePlaid
+export function getCheckoutModalState(noClear?: boolean): CheckoutModalStateCommon | CheckoutModalState3DS | CheckoutModalStatePlaid {
+  const defaultModalState = FALLBACK_MODAL_STATE_COMMON;
 
   if (!process.browser) return defaultModalState;
 
-  let savedModalInfo: Partial<CheckoutModalState3DS> = {};
+  let savedModalInfo: Partial<CheckoutModalInfo> = {};
   let savedReceivedRedirectUri = "";
   let savedInfoUsed = false;
 
@@ -83,59 +91,127 @@ export function getCheckoutModalState(flowType: FlowType): CheckoutModalState3DS
 
   const {
     url = "",
+    fromLocalhost = false,
     invoiceID = "",
     invoiceCountdownStart = -1,
     // processorPaymentID = "",
     // paymentID = "",
     billingInfo = "",
-    paymentInfo = "",
-  } = savedModalInfo || {};
+    // paymentInfo = "",
+  } = savedModalInfo;
 
   // Swap to test error flow:
   // const receivedRedirectUri = "localhost:3000/payments/error";
-  const receivedRedirectUri = savedReceivedRedirectUri || (window.location.search.startsWith(THREEDS_FLOW_SEARCH_PARAM_SUCCESS) ? window.location.href : undefined);
+  const receivedRedirectUri = savedReceivedRedirectUri || window.location.href;
 
   // In dev, this works fine even if there's nothing in cookieStorage, which helps with testing across some other domain and localhost:
-  const hasLocalhostOrigin = process.env.NODE_ENV === "development" && !isLocalhost();
-  const continue3DSFlow = hasLocalhostOrigin || !!(url && invoiceID && processorPaymentID && paymentID && billingInfo && (paymentInfo || paymentInfo === null) && receivedRedirectUri);
+  let isValid = fromLocalhost || !!(url && invoiceID && billingInfo && receivedRedirectUri);
 
-  if ((continue3DSFlow && savedInfoUsed) || (!continue3DSFlow && cookieStorage.getItem(THREEDS_FLOW_INFO_KEY))) {
-    clearPersistedInfo();
+  if (isValid) {
+    const savedCheckoutModalState = {};
+    if (debug) console.log("💾 Continue 3DS Flow...", savedCheckoutModalState);
 
+    if (!noClear) clearPersistedInfo();
 
-    // TODO: Or FALLBACK_PLAID_OAUTH_FLOW_STATE
-    return FALLBACK_MODAL_STATE;
+    const commonModalState: CheckoutModalStateCommon = {
+      // The URL of the page where we initially opened the modal:
+      url: urlToPathnameWhenPossible(url || (fromLocalhost ? "http://localhost:3000" : "")),
+      fromLocalhost,
+
+      // The invoiceID we need to re-load the products and units:
+      invoiceID,
+      invoiceCountdownStart: invoiceCountdownStart === -1 ? Date.now() : invoiceCountdownStart,
+
+      // The billing info selected / entered before starting the flow:
+      billingInfo,
+
+      // Where we left off:
+      flowType: "",
+      checkoutStep: "",
+
+      // The redirect URI with params:
+      receivedRedirectUri,
+
+      // Wether we already tried to resume the previous OAuth flow:
+      savedInfoUsed,
+
+      // Whether we need to resume the 3DS flow and show the confirmation or error screens:
+      continueFlow: true,
+    };
+
+    if (isCheckoutModalInfo3DS(savedModalInfo)) {
+      const {
+        paymentInfo,
+        checkoutItems = [],
+      } = savedModalInfo;
+
+      isValid &&=
+        window.location.search.startsWith(THREEDS_FLOW_SEARCH_PARAM_SUCCESS) &&
+        // processorPaymentID &&
+        // paymentID &&
+        paymentInfo !== undefined &&
+        checkoutItems.length > 0;
+
+      if (isValid) {
+
+        const purchaseError = receivedRedirectUri.includes("error") || receivedRedirectUri.includes("failure");
+        const purchaseSuccess = !purchaseError && (receivedRedirectUri.includes("success") || receivedRedirectUri.includes(THREEDS_FLOW_SEARCH_PARAM_SUCCESS));
+
+        return to<CheckoutModalState3DS>({
+          ...commonModalState,
+
+          flowType: "3DS",
+          checkoutStep: purchaseSuccess ? "confirmation" : "payment",
+
+          // The reference number of the payment:
+          // processorPaymentID,
+          // paymentID,
+
+          // The payment info id selected before starting the 3DS flow:
+          paymentInfo,
+
+          // Item info to display in the confirmation view:
+          checkoutItems,
+
+          // 3DS status:
+          purchaseSuccess,
+          purchaseError,
+        });
+      }
+    }
+
+    if (isCheckoutModalInfoPlaid(savedModalInfo)) {
+      const {
+        linkToken
+      } = savedModalInfo;
+
+      isValid &&=
+        window.location.search.startsWith(PLAID_OAUTH_FLOW_URL_SEARCH) &&
+        !!linkToken;
+
+      if (isValid) {
+        return to<CheckoutModalStatePlaid>({
+          ...commonModalState,
+
+          flowType: "Plaid",
+          checkoutStep: "purchasing",
+
+          // The Link token from the first Link initialization:
+          linkToken,
+        });
+      }
+    }
   }
 
-  return {
-    // The URL of the page where we initially opened the modal:
-    url: urlToPathnameWhenPossible(url || (hasLocalhostOrigin ? "http://localhost:3000" : "")),
+  // TODO: isValid && savedInfoUsed never reached:
+  if ((isValid && savedInfoUsed) || (!isValid && cookieStorage.getItem(CHECKOUT_MODAL_INFO_KEY))) {
+    clearPersistedInfo();
+  }
 
-    // The invoiceID we need to re-load the products and units:
-    invoiceID,
-    invoiceCountdownStart: invoiceCountdownStart === -1 ? Date.now() : invoiceCountdownStart,
-
-    // The reference number of the payment:
-    // processorPaymentID,
-    // paymentID,
-
-    // The billing & payment info selected / entered before starting the 3DS flow:
-    billingInfo,
-    paymentInfo,
-
-    // The redirect URI with params:
-    receivedRedirectUri,
-
-    // Whether we need to resume the 3DS flow and show the confirmation or error screens:
-    continue3DSFlow,
-    purchaseSuccess: continue3DSFlow && !!receivedRedirectUri && (receivedRedirectUri.includes("success") || receivedRedirectUri.includes(THREEDS_FLOW_SEARCH_PARAM_SUCCESS)),
-    purchaseError: continue3DSFlow && !!receivedRedirectUri && (receivedRedirectUri.includes("error") || receivedRedirectUri.includes("failure")),
-
-    // Wether we already tried to resume the previous OAuth flow:
-    savedInfoUsed,
-  };
+  return defaultModalState;
 }
 
+/*
 export function continueCheckout(noClear = false): [boolean, CheckoutModalState3DS] {
   const savedCheckoutModalState = getCheckoutModalState();
   const { continue3DSFlow } = savedCheckoutModalState;
@@ -148,7 +224,9 @@ export function continueCheckout(noClear = false): [boolean, CheckoutModalState3
 
   return [continue3DSFlow, savedCheckoutModalState];
 }
+*/
 
+/*
 export interface ContinueFlowsReturn {
   flowType: FlowType;
   checkoutStep: CheckoutModalStep | "";
@@ -205,3 +283,4 @@ export function continueFlows(noClear = false) {
 
   return continueFlowsReturn;
 }
+*/

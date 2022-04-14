@@ -1,4 +1,4 @@
-import { CheckoutModalState3DS, CheckoutModalStatePlaid } from "./CheckoutOverlay.types";
+import { CheckoutModalState3DS, CheckoutModalStateCommon, CheckoutModalStatePlaid } from "./CheckoutOverlay.types";
 
 export const FALLBACK_MODAL_STATE_3DS: CheckoutModalState3DS = {
   // CheckoutModalInfoCommon:
@@ -38,3 +38,20 @@ export const FALLBACK_MODAL_STATE_PLAID: CheckoutModalStatePlaid = {
   savedStateUsed: false,
   continuePlaid: false,
 };
+
+export const FALLBACK_MODAL_STATE_COMMON: CheckoutModalStateCommon = {
+  // CheckoutModalInfoCommon:
+  // url: "",
+  invoiceID: "",
+  invoiceCountdownStart: 0,
+  billingInfo: "",
+
+  // CheckoutModalInfoPlaid:
+  // linkToken: "",
+
+  // CheckoutModalStateCommon:
+  // receivedRedirectUri: "",
+  savedStateUsed: false,
+  continuePlaid: false,
+};
+

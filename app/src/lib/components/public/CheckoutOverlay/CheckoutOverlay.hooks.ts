@@ -10,7 +10,7 @@ import { BillingInfo } from "../../../forms/BillingInfoForm";
 import { fullTrim } from "../../../utils/formatUtils";
 import { TaxesState } from "../../../views/Billing/BillingView";
 import { resetStepperProgress } from "../../payments/CheckoutStepper/CheckoutStepper";
-import { continueFlows } from "./CheckoutOverlay.utils";
+import { getCheckoutModalState } from "./CheckoutOverlay.utils";
 
 // TODO: Add a "close" value here:
 export type CheckoutModalErrorAt = "reset" | "authentication" | "billing" | "payment" | "purchasing";
@@ -137,21 +137,21 @@ export function useCheckoutModalState({
 
     // Once authentication has loaded, we know if we need to skip the product confirmation step or not. Also, when the
     // modal is re-opened, we need to reset its state, taking into account if we need to resume a Plaid OAuth flow:s
-    const savedFlow = continueFlows();
+    const checkoutModalState = getCheckoutModalState();
 
-    // if (savedFlow.flowType === "3DS") {
+    // if (checkoutModalState.flowType === "3DS") {
     //   continueCheckout() already calls clearPersistedInfo().
     //   clearPersistedInfo();
-    // } else if (savedFlow.flowType === "Plaid") {
+    // } else if (checkoutModalState.flowType === "Plaid") {
     //   This is handled in PaymentView.tsx, in the usePlaid() hook call.
     //   clearPlaidInfo();
-    // } else if (savedFlow.checkoutStep !== "") {
+    // } else if (checkoutModalState.checkoutStep !== "") {
     //   TODO: Clear both as this is some kind of indeterminate / error state?
     // }
 
     setCheckoutModalState({
-      checkoutStep: savedFlow.checkoutStep || startAt,
-      // checkoutError: savedFlow.checkoutError,
+      checkoutStep: checkoutModalState.checkoutStep || startAt,
+      // checkoutError: checkoutModalState.checkoutError,
       isDialogBlocked: false,
     });
 
@@ -159,18 +159,18 @@ export function useCheckoutModalState({
     // setCheckoutModalState({ checkoutStep: "purchasing" });
 
     setSelectedPaymentMethod({
-      billingInfo: savedFlow.billingInfo || "",
-      paymentInfo: savedFlow.paymentInfo || "",
+      billingInfo: checkoutModalState.billingInfo || "",
+      paymentInfo: checkoutModalState.paymentInfo || "",
       cvv: "",
     });
 
     setPurchaseState({
-      invoiceID: initialInvoiceID ? initialInvoiceID : (savedFlow.invoiceID || ""),
-      invoiceCountdownStart: initialInvoiceID ? Date.now() : (savedFlow.invoiceCountdownStart || null),
+      invoiceID: initialInvoiceID ? initialInvoiceID : (checkoutModalState.invoiceID || ""),
+      invoiceCountdownStart: initialInvoiceID ? Date.now() : (checkoutModalState.invoiceCountdownStart || null),
       taxes: vertexEnabled ? { status: "incomplete" } : null,
       wallet: null,
-      processorPaymentID: savedFlow.processorPaymentID || "",
-      paymentID: savedFlow.paymentID || ""
+      processorPaymentID: checkoutModalState.processorPaymentID || "",
+      paymentID: checkoutModalState.paymentID || ""
     });
   }, [debug, startAt, initialInvoiceID, vertexEnabled]);
 

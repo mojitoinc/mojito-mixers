@@ -1,13 +1,15 @@
 import { CheckoutItemInfo } from "../../../domain/product/product.interfaces";
 import { BillingInfo } from "../../../forms/BillingInfoForm";
+import { CheckoutModalStep } from "./CheckoutOverlay.hooks";
 
-export type FlowType = "3DS" | "Plaid";
+export type FlowType = "" | "3DS" | "Plaid";
 
 
 // INFO:
 
 export interface CheckoutModalInfoCommon {
   url?: string;
+  fromLocalhost: boolean;
   invoiceID: string;
   invoiceCountdownStart: number;
   billingInfo: string | BillingInfo;
@@ -29,9 +31,11 @@ export type CheckoutModalInfo = CheckoutModalInfo3DS | CheckoutModalInfoPlaid;
 
 // STATE:
 
-export interface CheckoutModalStateCommon {
+export interface CheckoutModalStateCommon extends CheckoutModalInfoCommon {
+  flowType: FlowType;
+  checkoutStep: CheckoutModalStep | "";
   receivedRedirectUri?: string;
-  savedStateUsed: boolean;
+  savedInfoUsed: boolean;
   continueFlow: boolean;
 }
 
@@ -42,3 +46,15 @@ export interface CheckoutModalState3DS extends CheckoutModalStateCommon, Checkou
 
 export type CheckoutModalStatePlaid = CheckoutModalStateCommon & CheckoutModalInfoPlaid;
 
+
+
+/*
+export interface ContinueFlowsReturn {
+  invoiceID: string;
+  invoiceCountdownStart: number;
+  processorPaymentID: string;
+  paymentID: string;
+  billingInfo: string | BillingInfo;
+  paymentInfo: string | null;
+}
+*/
