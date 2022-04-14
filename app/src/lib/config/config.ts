@@ -33,6 +33,11 @@ export const PAYMENT_NOTIFICATION_INTERVAL_MS = 2500; // (2.5 sec) Polling inter
 export const PAYMENT_NOTIFICATION_ERROR_MAX_WAIT_MS = ASYNC_ERROR_MAX_WAIT_MS - 1000; // (15 sec) Max. wait time for GetPaymentNotificationQuery to get the error details in ErrorOverlay.tsx.
 
 
+// Storage:
+export const CHECKOUT_MODAL_INFO_KEY = "CHECKOUT_MODAL_INFO";
+export const CHECKOUT_MODAL_INFO_REDIRECT_URI_KEY = "CHECKOUT_MODAL_INFO_REDIRECT_URI";
+export const CHECKOUT_MODAL_INFO_USED_KEY = "CHECKOUT_MODAL_INFO_USED";
+
 // Plaid:
 export const PLAID_STORAGE_EXPIRATION_MS = 1000 * 60 * 15; // 15 minutes (Plaid requires filling in some data).
 export const PLAID_OAUTH_FLOW_INFO_KEY = "PLAID_OAUTH_FLOW_INFO";

@@ -1,9 +1,9 @@
-import { PLAID_OAUTH_FLOW_INFO_KEY, PLAID_OAUTH_FLOW_RECEIVED_REDIRECT_URI_KEY, PLAID_OAUTH_FLOW_STATE_USED_KEY, PLAID_STORAGE_EXPIRATION_MS, PLAID_OAUTH_FLOW_URL_SEARCH } from "../../config/config";
-import { BillingInfo } from "../../forms/BillingInfoForm";
-import { getUrlWithoutParams, isLocalhost, isLocalhostOrStaging, urlToPathnameWhenPossible } from "../url/url.utils";
+import { PLAID_OAUTH_FLOW_INFO_KEY, PLAID_OAUTH_FLOW_RECEIVED_REDIRECT_URI_KEY, PLAID_OAUTH_FLOW_STATE_USED_KEY, PLAID_OAUTH_FLOW_URL_SEARCH } from "../../config/config";
+import { isLocalhost, isLocalhostOrStaging, urlToPathnameWhenPossible } from "../url/url.utils";
 
 const debug = isLocalhostOrStaging();
 
+/*
 export interface PlaidInfo {
   // TODO: Do we need to store product info?
   url?: string;
@@ -60,15 +60,10 @@ export function clearPlaidInfo(isExpired?: boolean) {
   return FALLBACK_PLAID_OAUTH_FLOW_STATE;
 }
 
-/*
-export function persistedInfoCleanUp() {
-
-}
-*/
-
 function isExpired(timestamp?: number) {
   return timestamp !== undefined && Date.now() - timestamp > PLAID_STORAGE_EXPIRATION_MS;
 }
+*/
 
 export function getPlaidOAuthFlowState(): PlaidOAuthFlowState {
   if (!process.browser) {
