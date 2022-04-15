@@ -1,57 +1,32 @@
-import { CheckoutModalState3DS, CheckoutModalStateCommon, CheckoutModalStatePlaid } from "./CheckoutOverlay.types";
+import { CheckoutModalStateCombined } from "./CheckoutOverlay.types";
 
-export const FALLBACK_MODAL_STATE_3DS: CheckoutModalState3DS = {
+export const FALLBACK_MODAL_STATE_COMMON: CheckoutModalStateCombined = {
+
   // CheckoutModalInfoCommon:
-  // url: "",
+  url: "",
+  fromLocalhost: false,
   invoiceID: "",
   invoiceCountdownStart: 0,
   billingInfo: "",
 
+  // CheckoutModalStateCommon:
+  flowType: "",
+  checkoutStep: "",
+  receivedRedirectUri: "",
+  savedInfoUsed: false,
+  continueFlow: false,
+
   // CheckoutModalInfo3DS:
-  // processorPaymentID: "",
-  // paymentID: "",
+  processorPaymentID: "",
+  paymentID: "",
   paymentInfo: "",
   checkoutItems: [],
-
-  // CheckoutModalStateCommon:
-  // receivedRedirectUri: "",
-  savedStateUsed: false,
-  continuePlaid: false,
 
   // CheckoutModalState3DS:
   purchaseSuccess: false,
   purchaseError: false,
-};
-
-export const FALLBACK_MODAL_STATE_PLAID: CheckoutModalStatePlaid = {
-  // CheckoutModalInfoCommon:
-  // url: "",
-  invoiceID: "",
-  invoiceCountdownStart: 0,
-  billingInfo: "",
 
   // CheckoutModalInfoPlaid:
   linkToken: "",
-
-  // CheckoutModalStateCommon:
-  // receivedRedirectUri: "",
-  savedStateUsed: false,
-  continuePlaid: false,
-};
-
-export const FALLBACK_MODAL_STATE_COMMON: CheckoutModalStateCommon = {
-  // CheckoutModalInfoCommon:
-  // url: "",
-  invoiceID: "",
-  invoiceCountdownStart: 0,
-  billingInfo: "",
-
-  // CheckoutModalInfoPlaid:
-  // linkToken: "",
-
-  // CheckoutModalStateCommon:
-  // receivedRedirectUri: "",
-  savedStateUsed: false,
-  continuePlaid: false,
 };
 

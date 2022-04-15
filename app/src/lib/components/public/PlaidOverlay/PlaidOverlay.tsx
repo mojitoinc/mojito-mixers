@@ -1,6 +1,6 @@
 import React, { useLayoutEffect } from "react";
-import { getPlaidOAuthFlowState, persistPlaidReceivedRedirectUri } from "../../../domain/plaid/plaid.utils";
 import { ThemeProviderProps, withThemeProvider } from "../../shared/ProvidersInjector/ProvidersInjector";
+import { getCheckoutModalState, persistCheckoutModalInfoRedirectURI } from "../CheckoutOverlay/CheckoutOverlay.utils";
 
 export interface PUIPlaidOverlayProps {
   onRedirect: (pathnameOrUrl: string) => void;
@@ -11,15 +11,15 @@ export type PUISuccessProps = PUIPlaidOverlayProps & ThemeProviderProps;
 export const PUIPlaidOverlay: React.FC<PUIPlaidOverlayProps> = ({
   onRedirect,
 }) => {
-  const { continueOAuthFlow, url } = getPlaidOAuthFlowState();
+  const { continueFlow, url } = getCheckoutModalState();
 
   useLayoutEffect(() => {
-    if (continueOAuthFlow) {
-      persistPlaidReceivedRedirectUri(window.location.href);
+    if (continueFlow) {
+      persistCheckoutModalInfoRedirectURI(window.location.href);
     }
 
     onRedirect(url || "/");
-  }, [continueOAuthFlow, onRedirect, url]);
+  }, [continueFlow, onRedirect, url]);
 
   return null;
 }

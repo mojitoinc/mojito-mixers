@@ -814,10 +814,12 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
         consentType={ consentType }
         debug={ debug } />
     );
-  } else if (checkoutStep === "payment") {
+  } else if (checkoutStep === "payment" && invoiceID && invoiceCountdownStart) {
     checkoutStepElement = (
       <PaymentView
         orgID={ orgID }
+        invoiceID={ invoiceID }
+        invoiceCountdownStart={ invoiceCountdownStart }
         checkoutItems={ checkoutItems }
         taxes={ taxes }
         savedPaymentMethods={ savedPaymentMethods }
@@ -848,6 +850,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
         orgID={ orgID }
         invoiceID={ invoiceID }
         invoiceCountdownStart={ invoiceCountdownStart }
+        checkoutItems={ checkoutItems }
         savedPaymentMethods={ savedPaymentMethods }
         selectedPaymentMethod={ selectedPaymentMethod }
         wallet={ wallet }

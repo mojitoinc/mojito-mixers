@@ -9,15 +9,15 @@ export type FlowType = "" | "3DS" | "Plaid";
 
 export interface CheckoutModalInfoCommon {
   url?: string;
-  fromLocalhost: boolean;
+  fromLocalhost?: boolean;
   invoiceID: string;
   invoiceCountdownStart: number;
   billingInfo: string | BillingInfo;
 }
 
 export interface CheckoutModalInfo3DS extends CheckoutModalInfoCommon {
-  // processorPaymentID: string; // TODO: This might be needed to match confirmation screens (use it in the localStorage key).
-  // paymentID: string;
+  processorPaymentID: string; // TODO: This might be needed to match confirmation screens (use it in the localStorage key).
+  paymentID: string;
   paymentInfo: string | null;
   checkoutItems: CheckoutItemInfo[];
 }
@@ -46,7 +46,7 @@ export interface CheckoutModalState3DS extends CheckoutModalStateCommon, Checkou
 
 export type CheckoutModalStatePlaid = CheckoutModalStateCommon & CheckoutModalInfoPlaid;
 
-
+export type CheckoutModalStateCombined = CheckoutModalState3DS & CheckoutModalStatePlaid;
 
 /*
 export interface ContinueFlowsReturn {

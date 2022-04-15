@@ -5,7 +5,7 @@ import { ERROR_PURCHASE } from "../../../domain/errors/errors.constants";
 import { isUrlPathname } from "../../../domain/url/url.utils";
 import { useGetPaymentNotificationQuery } from "../../../queries/graphqlGenerated";
 import { withProviders, ProvidersInjectorProps } from "../../shared/ProvidersInjector/ProvidersInjector";
-import { clearPersistedInfo, getCheckoutModalState, persistReceivedRedirectUri3DS } from "../CheckoutOverlay/CheckoutOverlay.utils";
+import { clearPersistedInfo, getCheckoutModalState, persistCheckoutModalInfoRedirectURI } from "../CheckoutOverlay/CheckoutOverlay.utils";
 import { PUIStaticErrorOverlay, PUIStaticErrorOverlayProps } from "./StaticErrorOverlay";
 
 export interface PUIErrorOverlayProps extends PUIStaticErrorOverlayProps {
@@ -46,7 +46,7 @@ export const PUIErrorOverlay: React.FC<PUIErrorOverlayProps> = ({
   const reviewData = useCallback(async (errorMessage: string): Promise<false> => {
     const isPathname = isUrlPathname(url);
 
-    if (isPathname) persistReceivedRedirectUri3DS(window.location.href);
+    if (isPathname) persistCheckoutModalInfoRedirectURI(window.location.href);
 
     // If there was an error, users can click the review button and go back to the Payment UI to review the data...:
 

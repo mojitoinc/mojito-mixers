@@ -28,6 +28,8 @@ interface PaymentViewState {
 
 export interface PaymentViewProps {
   orgID: string;
+  invoiceID: string;
+  invoiceCountdownStart: number;
   checkoutItems: CheckoutItem[];
   taxes: null | TaxesState;
   savedPaymentMethods: SavedPaymentMethod[];
@@ -50,6 +52,8 @@ export interface PaymentViewProps {
 
 export const PaymentView: React.FC<PaymentViewProps> = ({
   orgID,
+  invoiceID,
+  invoiceCountdownStart,
   checkoutItems,
   taxes,
   savedPaymentMethods: rawSavedPaymentMethods,
@@ -134,6 +138,8 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
   // PLAIN LINKS:
   const onPlaidLinkClicked = usePlaid({
     orgID,
+    invoiceID,
+    invoiceCountdownStart,
     selectedBillingInfo,
     skip: !acceptedPaymentTypes.includes("ACH"),
   });

@@ -1,16 +1,19 @@
 import { THREEDS_FLOW_SEARCH_PARAM_SUCCESS, THREEDS_STORAGE_EXPIRATION_MIN, CHECKOUT_MODAL_INFO_REDIRECT_URI_KEY, CHECKOUT_MODAL_INFO_USED_KEY, CHECKOUT_MODAL_INFO_KEY, PLAID_OAUTH_FLOW_URL_SEARCH } from "../../../config/config";
 import { getUrlWithoutParams, isLocalhost, isLocalhostOrStaging, urlToPathnameWhenPossible } from "../../../domain/url/url.utils";
 import { cookieStorage } from "../../../utils/storageUtils";
-import { to } from "../../../utils/typescriptUtils";
 import { FALLBACK_MODAL_STATE_COMMON } from "./CheckoutOverlay.constants";
-import { CheckoutModalInfo, CheckoutModalInfo3DS, CheckoutModalInfoPlaid, CheckoutModalState3DS, CheckoutModalStateCommon, CheckoutModalStatePlaid } from "./CheckoutOverlay.types";
+import { CheckoutModalInfo, CheckoutModalInfo3DS, CheckoutModalInfoPlaid, CheckoutModalStateCombined, CheckoutModalStateCommon } from "./CheckoutOverlay.types";
 
 /*
-  TODO:
-  - Combine 3DS and Plaid logic here.
-  - Persist product data.
-  - For 3DS, load confirmation in /success and redirect once users clicks something.
-  - For Plaid, maybe add a URL param or read cookies?
+DONE:
+- Combine 3DS and Plaid logic here.
+
+DOING:
+- Persist product data.
+
+TODO:
+- For 3DS, load confirmation in /success and redirect once users clicks something.
+- For Plaid, maybe add a URL param or read cookies?
 
 */
 
@@ -69,10 +72,7 @@ function isCheckoutModalInfoPlaid(checkoutModalInfo: Partial<CheckoutModalInfo3D
   return checkoutModalInfo.hasOwnProperty("linkToken");
 }
 
-// export function getCheckoutModalState(flowType: ""): CheckoutModalStateCommon
-// export function getCheckoutModalState(flowType: "3DS"): CheckoutModalState3DS
-// export function getCheckoutModalState(flowType: "Plaid"): CheckoutModalStatePlaid
-export function getCheckoutModalState(noClear?: boolean): CheckoutModalStateCommon | CheckoutModalState3DS | CheckoutModalStatePlaid {
+export function getCheckoutModalState(noClear?: boolean): CheckoutModalStateCombined {
   const defaultModalState = FALLBACK_MODAL_STATE_COMMON;
 
   if (!process.browser) return defaultModalState;
@@ -157,7 +157,8 @@ export function getCheckoutModalState(noClear?: boolean): CheckoutModalStateComm
         const purchaseError = receivedRedirectUri.includes("error") || receivedRedirectUri.includes("failure");
         const purchaseSuccess = !purchaseError && (receivedRedirectUri.includes("success") || receivedRedirectUri.includes(THREEDS_FLOW_SEARCH_PARAM_SUCCESS));
 
-        return to<CheckoutModalState3DS>({
+        return {
+          ...FALLBACK_MODAL_STATE_COMMON,
           ...commonModalState,
 
           flowType: "3DS",
@@ -176,7 +177,7 @@ export function getCheckoutModalState(noClear?: boolean): CheckoutModalStateComm
           // 3DS status:
           purchaseSuccess,
           purchaseError,
-        });
+        };
       }
     }
 
@@ -190,7 +191,8 @@ export function getCheckoutModalState(noClear?: boolean): CheckoutModalStateComm
         !!linkToken;
 
       if (isValid) {
-        return to<CheckoutModalStatePlaid>({
+        return {
+          ...FALLBACK_MODAL_STATE_COMMON,
           ...commonModalState,
 
           flowType: "Plaid",
@@ -198,7 +200,7 @@ export function getCheckoutModalState(noClear?: boolean): CheckoutModalStateComm
 
           // The Link token from the first Link initialization:
           linkToken,
-        });
+        };
       }
     }
   }

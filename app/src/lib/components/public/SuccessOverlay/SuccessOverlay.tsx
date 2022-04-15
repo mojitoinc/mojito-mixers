@@ -3,7 +3,7 @@ import React, { useLayoutEffect } from "react";
 import { THREEDS_SUCCESS_REDIRECT_DELAY_MS } from "../../../config/config";
 import { getUrlWithSearchParams, isUrlPathname } from "../../../domain/url/url.utils";
 import { ThemeProviderProps, withThemeProvider } from "../../shared/ProvidersInjector/ProvidersInjector";
-import { getCheckoutModalState, persistReceivedRedirectUri3DS } from "../CheckoutOverlay/CheckoutOverlay.utils";
+import { getCheckoutModalState, persistCheckoutModalInfoRedirectURI } from "../CheckoutOverlay/CheckoutOverlay.utils";
 import { PUIStaticSuccessOverlay, PUIStaticSuccessOverlayProps } from "./StaticSuccessOverlay";
 
 export interface PUISuccessOverlayProps extends PUIStaticSuccessOverlayProps {
@@ -21,7 +21,7 @@ export const PUISuccessOverlay: React.FC<PUISuccessOverlayProps> = ({
 
   useLayoutEffect(() => {
     if (purchaseSuccess) {
-      if (isPathname) persistReceivedRedirectUri3DS(window.location.href);
+      if (isPathname) persistCheckoutModalInfoRedirectURI(window.location.href);
 
       return;
     }
