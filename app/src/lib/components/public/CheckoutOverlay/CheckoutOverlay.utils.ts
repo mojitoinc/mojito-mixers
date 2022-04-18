@@ -4,23 +4,6 @@ import { cookieStorage } from "../../../utils/storageUtils";
 import { FALLBACK_MODAL_STATE_COMMON } from "./CheckoutOverlay.constants";
 import { CheckoutModalInfo, CheckoutModalInfo3DS, CheckoutModalInfoPlaid, CheckoutModalStateCombined, CheckoutModalStateCommon } from "./CheckoutOverlay.types";
 
-/*
-DONE:
-- Combine 3DS and Plaid logic here.
-
-DOING:
-- Persist product data.
-
-TODO:
-- CheckoutOverlayProps is an union with and without the page data.
-- Without will load data from localStorage or redirect if missing.
-- Once the confirmation has been show (3DS), we store the last page in case we need to redirect users there.
-
-- For 3DS, load confirmation in /success and redirect once users clicks something.
-- For Plaid, maybe add a URL param or read cookies? Also continue flow on same page.
-
-*/
-
 const debug = isLocalhostOrStaging();
 
 export function persistCheckoutModalInfo(info: CheckoutModalInfo) {

@@ -139,21 +139,8 @@ export function useCheckoutModalState({
     // modal is re-opened, we need to reset its state, taking into account if we need to resume a Plaid OAuth flow:s
     const checkoutModalState = getCheckoutModalState();
 
-    // debugger;
-
-    // if (checkoutModalState.flowType === "3DS") {
-    //   continueCheckout() already calls clearPersistedInfo().
-    //   clearPersistedInfo();
-    // } else if (checkoutModalState.flowType === "Plaid") {
-    //   This is handled in PaymentView.tsx, in the usePlaid() hook call.
-    //   clearPlaidInfo();
-    // } else if (checkoutModalState.checkoutStep !== "") {
-    //   TODO: Clear both as this is some kind of indeterminate / error state?
-    // }
-
     setCheckoutModalState({
       checkoutStep: checkoutModalState.checkoutStep || startAt,
-      // checkoutError: checkoutModalState.checkoutError,
       isDialogBlocked: false,
     });
 
@@ -170,7 +157,7 @@ export function useCheckoutModalState({
       invoiceID: initialInvoiceID ? initialInvoiceID : (checkoutModalState.invoiceID || ""),
       invoiceCountdownStart: initialInvoiceID ? Date.now() : (checkoutModalState.invoiceCountdownStart || null),
       taxes: vertexEnabled ? { status: "incomplete" } : null,
-      wallet: null, // TODO: Wallet is added from invoice. Make sure this works: setWalletAddress(wallet || destinationAddress)
+      wallet: null, // Wallet is added from invoice: `setWalletAddress(wallet || destinationAddress)`
       processorPaymentID: checkoutModalState.processorPaymentID || "",
       paymentID: checkoutModalState.paymentID || ""
     });
