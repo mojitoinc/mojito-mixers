@@ -136,7 +136,12 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
   }, [showSaved, onPaymentInfoSelected, savedPaymentMethods, selectedPaymentInfo/*, checkoutError*/]);
 
   // PLAIN LINKS:
-  const onPlaidLinkClicked = usePlaid({
+  const {
+    loading: plaidLoading,
+    error: plaidError,
+    openLink: onPlaidLinkClicked,
+    refetchLink: refetchPlaidLink,
+  } = usePlaid({
     orgID,
     invoiceID,
     invoiceCountdownStart,
@@ -181,7 +186,10 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
             acceptedCreditCardNetworks={acceptedCreditCardNetworks}
             defaultValues={typeof selectedPaymentInfo === "string" || selectedPaymentInfo === null ? undefined : selectedPaymentInfo}
             checkoutError={checkoutError}
+            plaidLoading={plaidLoading}
+            plaidError={plaidError}
             onPlaidLinkClicked={onPlaidLinkClicked}
+            refetchPlaidLink={refetchPlaidLink}
             onSaved={savedPaymentMethods.length > 0 ? handleShowSaved : undefined}
             onClose={onClose}
             onSubmit={handleSubmit}

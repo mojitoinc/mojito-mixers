@@ -266,9 +266,6 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   const isInvalidMode = loaderMode !== "default" && !open;
   const showEspecialLoaders = open && isDialogInitializing && loaderMode !== "default" && checkoutStep !== "error";
 
-  console.log({ isDialogLoading, isDialogInitializing, isPlaidFlowLoading });
-  console.log({ isAuthenticatedLoading, meLoading, paymentMethodsLoading, invoiceDetailsLoading, invoiceID, invoiceCountdownStart });
-
   useEffect(() => {
     if (!isDialogInitializing || isInvalidMode) {
       // Once we have finished loading data OR if `loaderMode` is not default but the modal is not opened (probably

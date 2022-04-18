@@ -42,6 +42,7 @@ import { PUIDictionary } from "../domain/dictionary/dictionary.interfaces";
 import { useDictionary } from "../hooks/useDictionary";
 import { CreditCardNetwork, getCardTypeByType } from "../domain/react-payment-inputs/react-payment-inputs.utils";
 import { getCardNumberError } from "react-payment-inputs";
+import { ApolloError } from "@apollo/client";
 
 interface PaymentTypeFormProps {
   control: Control<PaymentMethod & { consent: boolean }>;
@@ -300,7 +301,10 @@ export interface PaymentMethodFormProps {
   acceptedCreditCardNetworks?: CreditCardNetwork[];
   defaultValues?: PaymentMethod;
   checkoutError?: CheckoutModalError;
+  plaidLoading: boolean;
+  plaidError?: ApolloError;
   onPlaidLinkClicked: () => void;
+  refetchPlaidLink: () => void;
   onSaved?: () => void;
   onClose: () => void;
   onSubmit: (data: PaymentMethod) => void;
@@ -314,7 +318,10 @@ export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
   acceptedCreditCardNetworks,
   defaultValues: parentDefaultValues,
   checkoutError,
+  plaidLoading,
+  plaidError,
   onPlaidLinkClicked,
+  refetchPlaidLink,
   onSaved,
   onClose,
   onSubmit,
@@ -355,7 +362,9 @@ export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
 
   const handleSelectedPaymentMethodChange = useCallback((paymentType: PaymentType) => {
     reset({ ...PAYMENT_TYPE_FORM_DATA[paymentType].defaultValues(consentType) });
-  }, [reset, consentType]);
+
+    if (paymentType === "ACH" && !!plaidError) refetchPlaidLink();
+  }, [reset, consentType, plaidError, refetchPlaidLink]);
 
   const selectedPaymentMethod = watch("type") as PaymentType;
   const Fields = PAYMENT_TYPE_FORM_DATA[selectedPaymentMethod].fields;
@@ -385,6 +394,10 @@ export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
       submitForm(e);
     }
   }, [onAttemptSubmit, selectedPaymentMethod, onPlaidLinkClicked, submitForm, trigger]);
+
+  const showPlaidError = selectedPaymentMethod === "ACH" && !!plaidError;
+
+  console.log("plaidLoading =", plaidLoading, plaidError);
 
   return (
     <form onSubmit={ handleFormSubmit }>
@@ -418,6 +431,12 @@ export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
 
       { checkoutErrorMessage && <FormErrorsBox error={ checkoutErrorMessage } sx={{ mt: 5 }} /> }
 
+      { showPlaidError && (
+        <Typography variant="caption" component="p" sx={{ mt: 2, color: theme => theme.palette.warning.dark }}>
+          Error connecting to Plaid.
+        </Typography>
+      ) }
+
       { debug && (
         <DebugBox sx={{ mt: 5 }}>
           { JSON.stringify(watch(), null, 2) }
@@ -429,7 +448,8 @@ export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
       <CheckoutModalFooter
         variant={ selectedPaymentMethod === "ACH" ? "toPlaid" : "toConfirmation" }
         consentType={ consentType === "checkbox" ? undefined : consentType }
-        submitDisabled={ selectedPaymentMethod === "Crypto" }
+        submitDisabled={ selectedPaymentMethod === "Crypto" || showPlaidError }
+        submitLoading={ plaidLoading }
         onCloseClicked={ onClose } />
     </form>
   );

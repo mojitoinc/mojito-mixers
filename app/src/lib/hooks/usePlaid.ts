@@ -8,6 +8,7 @@ import { isLocalhostOrStaging } from "../domain/url/url.utils";
 import { clearPersistedInfo, getCheckoutModalState, isCheckoutModalInfoPlaid, persistCheckoutModalInfo, persistCheckoutModalInfoUsed } from "../components/public/CheckoutOverlay/CheckoutOverlay.utils";
 import { CheckoutModalStatePlaid } from "../components/public/CheckoutOverlay/CheckoutOverlay.types";
 import { FALLBACK_MODAL_STATE_COMMON } from "../components/public/CheckoutOverlay/CheckoutOverlay.constants";
+import { ApolloError } from "@apollo/client";
 
 export interface UsePlaidOptionsStartFlow {
   orgID: string;
@@ -39,7 +40,14 @@ export function continuePlaidOAuthFlow() {
   return INITIAL_PLAID_OAUTH_FLOW_STATE.continueFlow && !INITIAL_PLAID_OAUTH_FLOW_STATE.savedInfoUsed && isCheckoutModalInfoPlaid(INITIAL_PLAID_OAUTH_FLOW_STATE);
 }
 
-export function usePlaid(options: UsePlaidOptions) {
+export interface UsePlaidReturn {
+  loading: boolean;
+  error?: ApolloError;
+  openLink: () => void;
+  refetchLink: () => void;
+}
+
+export function usePlaid(options: UsePlaidOptions): UsePlaidReturn {
   let orgID: string | null = null;
   let invoiceID: string | null = null;
   let invoiceCountdownStart: number | null = null;
@@ -70,6 +78,7 @@ export function usePlaid(options: UsePlaidOptions) {
     loading: isPreparePaymentMethodLoading,
     error: preparePaymentMethodError,
     data: preparePaymentMethodData,
+    refetch: refetchLink,
   } = usePreparePaymentMethodQuery({
     variables: { orgID },
     skip,
@@ -148,7 +157,7 @@ export function usePlaid(options: UsePlaidOptions) {
 
   useEffect(() => {
     if (continueFlow && plaidLinkReady) {
-      console.log("Open plaid link automatically...");
+      if (isLocalhostOrStaging()) console.log("Open plaid link automatically...");
 
       plaidLinkOpen();
 
@@ -158,12 +167,10 @@ export function usePlaid(options: UsePlaidOptions) {
     }
   }, [continueFlow, plaidLinkReady, plaidLinkOpen]);
 
-  const handlePlaidLinkClicked = useCallback(() => {
-    // TODO: Handle errors properly:
-    // TODO: This could be clicked before the link is ready:
+  const openLink = useCallback(() => {
     if (!plaidLinkReady || isPreparePaymentMethodLoading || !invoiceID || !invoiceCountdownStart || !selectedBillingInfo || !linkToken) return;
 
-    console.log("Open plain link manually", linkToken);
+    if (isLocalhostOrStaging()) console.log("Open plain link manually", linkToken);
 
     persistCheckoutModalInfo({
       invoiceID,
@@ -183,7 +190,12 @@ export function usePlaid(options: UsePlaidOptions) {
     plaidLinkOpen,
   ]);
 
-  return handlePlaidLinkClicked;
+  return {
+    loading: isPreparePaymentMethodLoading,
+    error: preparePaymentMethodError,
+    openLink,
+    refetchLink,
+  };
 }
 
 export const PlaidFlow: React.FC<UsePlaidOptionsContinueFlow> = ({
