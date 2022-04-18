@@ -57,7 +57,7 @@ export const useLimits = (checkoutItem: CheckoutItem) => {
     [itemsCount, getItemLimitFor]
   );
 
-  const getItemLimitExeededMessageFor = useCallback(
+  const getItemLimitExceededMessageFor = useCallback(
     (selectedPaymentType: PaymentType, acceptedPaymentTypes: PaymentType[]) => {
       const otherPaymentMethodsWithLimit = acceptedPaymentTypes.filter(
         (paymentType: PaymentType) => paymentType !== selectedPaymentType && !limitExceededFor(paymentType)
@@ -81,5 +81,5 @@ export const useLimits = (checkoutItem: CheckoutItem) => {
     [getItemLimitFor, limitExceededFor]
   );
 
-  return { itemLimits, refetch, loading, limitExceededFor, getItemLimitExeededMessageFor };
+  return { itemLimits, refetch, loading, limitExceededFor, getItemLimitExceededMessageFor };
 };

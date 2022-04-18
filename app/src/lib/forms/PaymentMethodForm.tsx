@@ -369,8 +369,9 @@ export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
 
   const firstCheckoutItem = checkoutItems[0];
 
-  // Item limits
-  const { refetch: refetchItemLimits, loading: loadingItemLimits, limitExceededFor, getItemLimitExeededMessageFor } = useLimits(firstCheckoutItem);
+  // Item Limits:
+
+  const { refetch: refetchItemLimits, loading: loadingItemLimits, limitExceededFor, getItemLimitExceededMessageFor } = useLimits(firstCheckoutItem);
 
   const handleSelectedPaymentMethodChange = useCallback((paymentType: PaymentType) => {
     reset({ ...PAYMENT_TYPE_FORM_DATA[paymentType].defaultValues(consentType) });
@@ -389,9 +390,9 @@ export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
 
   const itemLimitExceeded = limitExceededFor(selectedPaymentMethod);
 
-  const itemLimitExeededMessage = useMemo(
-    () => getItemLimitExeededMessageFor(selectedPaymentMethod, acceptedPaymentTypes),
-    [getItemLimitExeededMessageFor, selectedPaymentMethod, acceptedPaymentTypes]
+  const itemLimitExceededMessage = useMemo(
+    () => getItemLimitExceededMessageFor(selectedPaymentMethod, acceptedPaymentTypes),
+    [getItemLimitExceededMessageFor, selectedPaymentMethod, acceptedPaymentTypes]
   );
 
   const creditCardNumber = watch("cardNumber") as string;
@@ -447,7 +448,7 @@ export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
       { !loadingItemLimits && itemLimitExceeded ? (
         <DisplayBox>
           <Typography sx={{ fontWeight: "500" }}>
-            {itemLimitExeededMessage}
+            {itemLimitExceededMessage}
           </Typography>
         </DisplayBox>
       ) : null }

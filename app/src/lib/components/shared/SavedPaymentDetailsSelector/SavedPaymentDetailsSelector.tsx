@@ -63,8 +63,9 @@ export const SavedPaymentDetailsSelector: React.FC<SavedPaymentDetailsSelectorPr
 }) => {
   const firstCheckoutItem = checkoutItems[0];
 
-  // Item limits
-  const { refetch: refetchItemLimits, loading: loadingItemLimits, limitExceededFor, getItemLimitExeededMessageFor } = useLimits(firstCheckoutItem);
+  // Item Limits:
+
+  const { refetch: refetchItemLimits, loading: loadingItemLimits, limitExceededFor, getItemLimitExceededMessageFor } = useLimits(firstCheckoutItem);
 
   const handlePick = useCallback((paymentMethodId: string) => {
     onPick(paymentMethodId);
@@ -78,9 +79,9 @@ export const SavedPaymentDetailsSelector: React.FC<SavedPaymentDetailsSelectorPr
 
   const itemLimitExceeded = selectedPaymentMethod ? limitExceededFor(selectedPaymentMethod.type) : false;
 
-  const itemLimitExeededMessage = useMemo(
-    () => selectedPaymentMethod ? getItemLimitExeededMessageFor(selectedPaymentMethod.type, acceptedPaymentTypes) : undefined,
-    [getItemLimitExeededMessageFor, selectedPaymentMethod, acceptedPaymentTypes]
+  const itemLimitExceededMessage = useMemo(
+    () => selectedPaymentMethod ? getItemLimitExceededMessageFor(selectedPaymentMethod.type, acceptedPaymentTypes) : undefined,
+    [getItemLimitExceededMessageFor, selectedPaymentMethod, acceptedPaymentTypes]
   );
 
   const { creditCardNetwork, cvvLabel, isCvvRequired } = useMemo((): CreditCardInfo => {
@@ -162,7 +163,7 @@ export const SavedPaymentDetailsSelector: React.FC<SavedPaymentDetailsSelectorPr
       { !loadingItemLimits && itemLimitExceeded ? (
         <DisplayBox sx={{ mb: 2 }}>
           <Typography sx={{ fontWeight: "500" }}>
-            {itemLimitExeededMessage}
+            {itemLimitExceededMessage}
           </Typography>
         </DisplayBox>
       ) : null }
