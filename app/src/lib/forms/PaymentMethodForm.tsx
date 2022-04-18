@@ -18,8 +18,10 @@ import {
   PaymentType
 } from "../domain/payment/payment.interfaces";
 import {
+  CONSENT_ERROR_MESSAGE,
   requireSchemaWhenKeyIs,
   withInvalidCardNumber,
+  withInvalidConnection,
   withInvalidCreditCardNetwork,
   withInvalidCVV,
   withInvalidErrorMessage,
@@ -34,7 +36,7 @@ import { Typography } from "@mui/material";
 import { DisplayBox } from "../components/payments/DisplayBox/DisplayBox";
 import { DebugBox } from "../components/payments/DebugBox/DebugBox";
 import { ControlledCheckbox } from "../components/shared/Checkbox/Checkbox";
-import { ConsentText, ConsentType, CONSENT_ERROR_MESSAGE } from "../components/shared/ConsentText/ConsentText";
+import { ConsentText, ConsentType } from "../components/shared/ConsentText/ConsentText";
 import { CheckoutModalError } from "../components/public/CheckoutOverlay/CheckoutOverlay.hooks";
 import { FormErrorsBox } from "../components/shared/FormErrorsBox/FormErrorsBox";
 import { useFormCheckoutError } from "../hooks/useFormCheckoutError";
@@ -43,6 +45,7 @@ import { useDictionary } from "../hooks/useDictionary";
 import { CreditCardNetwork, getCardTypeByType } from "../domain/react-payment-inputs/react-payment-inputs.utils";
 import { getCardNumberError } from "react-payment-inputs";
 import { ApolloError } from "@apollo/client";
+import { FormErrorsCaption } from "../components/shared/FormErrorCaption/FormErrorCaption";
 
 interface PaymentTypeFormProps {
   control: Control<PaymentMethod & { consent: boolean }>;
@@ -397,8 +400,6 @@ export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
 
   const showPlaidError = selectedPaymentMethod === "ACH" && !!plaidError;
 
-  console.log("plaidLoading =", plaidLoading, plaidError);
-
   return (
     <form onSubmit={ handleFormSubmit }>
       {onSaved && (
@@ -432,9 +433,9 @@ export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
       { checkoutErrorMessage && <FormErrorsBox error={ checkoutErrorMessage } sx={{ mt: 5 }} /> }
 
       { showPlaidError && (
-        <Typography variant="caption" component="p" sx={{ mt: 2, color: theme => theme.palette.warning.dark }}>
-          Error connecting to Plaid.
-        </Typography>
+        <FormErrorsCaption sx={{ mt: 2 }}>
+          { withInvalidConnection({ label: "Plaid" }) }
+        </FormErrorsCaption>
       ) }
 
       { debug && (

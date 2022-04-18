@@ -545,18 +545,19 @@ Note those prefixed with `(DEV)` will never be shown to regular users. Instead, 
 
 Defined in [`app/src/lib/utils/validationUtils.ts`](./app/src/lib/utils/validationUtils.ts):
 
-
 - `withRequiredErrorMessage = ` `{ label }` is required.
 
-- `withTypeErrorMessageFor = ` `{ label }` must be a `{ type }`.
-
 - `withInvalidErrorMessage = ` `{ label }` is not valid.
+
+- `CONSENT_ERROR_MESSAGE = ` You must accept the terms and conditions of the sale.
 
 - `withFullNameErrorMessage = ` `{ label }` must have at least first and last name.
 
 - `withFullNameCharsetErrorMessage = ` `{ label }` contains invalid characters.
 
 - `withPhoneErrorMessage = ` `{ label }` must be a valid phone number.
+
+- `SELECTION_ERROR_MESSAGE = ` You must select a saved and approved payment method or create a new one.
 
 - `withInvalidAddress = ` Please, `{ enter/select }` a valid address to calculate taxes.
 
@@ -567,6 +568,8 @@ Defined in [`app/src/lib/utils/validationUtils.ts`](./app/src/lib/utils/validati
 - `withInvalidCVV = ` `{ cvvLabel }` must have `{ cvvExpectedLength }` digits.
 
 - `withInvalidCreditCardNetwork = ` Only `{ acceptedCreditCardNetworks }` `{ is/are }` accepted.
+
+- `withInvalidConnection = ` Could not connect `{ label }`.
 
 <br />
 
