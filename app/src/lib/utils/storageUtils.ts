@@ -25,7 +25,7 @@ interface CookieParams extends CookieOptions {
 function getCookieSecurityParams(params: CookieParams = {}) {
   const {
     domain = "",
-    secure,
+    secure = true,
     crossDomain = false,
     httpOnly,
   } = params;

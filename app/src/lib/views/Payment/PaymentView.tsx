@@ -28,6 +28,8 @@ interface PaymentViewState {
 
 export interface PaymentViewProps {
   orgID: string;
+  invoiceID: string;
+  invoiceCountdownStart: number;
   checkoutItems: CheckoutItem[];
   taxes: null | TaxesState;
   savedPaymentMethods: SavedPaymentMethod[];
@@ -50,6 +52,8 @@ export interface PaymentViewProps {
 
 export const PaymentView: React.FC<PaymentViewProps> = ({
   orgID,
+  invoiceID,
+  invoiceCountdownStart,
   checkoutItems,
   taxes,
   savedPaymentMethods: rawSavedPaymentMethods,
@@ -132,8 +136,15 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
   }, [showSaved, onPaymentInfoSelected, savedPaymentMethods, selectedPaymentInfo/*, checkoutError*/]);
 
   // PLAIN LINKS:
-  const onPlaidLinkClicked = usePlaid({
+  const {
+    loading: plaidLoading,
+    error: plaidError,
+    openLink: onPlaidLinkClicked,
+    refetchLink: refetchPlaidLink,
+  } = usePlaid({
     orgID,
+    invoiceID,
+    invoiceCountdownStart,
     selectedBillingInfo,
     skip: !acceptedPaymentTypes.includes("ACH"),
   });
@@ -175,7 +186,10 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
             acceptedCreditCardNetworks={acceptedCreditCardNetworks}
             defaultValues={typeof selectedPaymentInfo === "string" || selectedPaymentInfo === null ? undefined : selectedPaymentInfo}
             checkoutError={checkoutError}
+            plaidLoading={plaidLoading}
+            plaidError={plaidError}
             onPlaidLinkClicked={onPlaidLinkClicked}
+            refetchPlaidLink={refetchPlaidLink}
             onSaved={savedPaymentMethods.length > 0 ? handleShowSaved : undefined}
             onClose={onClose}
             onSubmit={handleSubmit}

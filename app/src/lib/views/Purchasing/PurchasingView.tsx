@@ -13,6 +13,7 @@ import { persistCheckoutModalInfo } from "../../components/public/CheckoutOverla
 import { PAYMENT_NOTIFICATION_INTERVAL_MS, PURCHASING_MESSAGES_DEFAULT, PURCHASING_MIN_WAIT_MS, PURCHASING_MESSAGES_INTERVAL_MS, PAYMENT_CREATION_TIMEOUT_MS, DEV_SKIP_3DS_IN_LOCALHOST } from "../../config/config";
 import { isLocalhost } from "../../domain/url/url.utils";
 import { Wallet } from "../../domain/wallet/wallet.interfaces";
+import { CheckoutItemInfo } from "../../domain/product/product.interfaces";
 
 export interface PurchasingViewProps {
   threeDSEnabled?: boolean;
@@ -21,6 +22,7 @@ export interface PurchasingViewProps {
   orgID: string;
   invoiceID: string;
   invoiceCountdownStart: number;
+  checkoutItems: CheckoutItemInfo[];
   savedPaymentMethods: SavedPaymentMethod[];
   selectedPaymentMethod: SelectedPaymentMethod;
   wallet: null | string | Wallet;
@@ -37,6 +39,7 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
   orgID,
   invoiceID,
   invoiceCountdownStart,
+  checkoutItems,
   savedPaymentMethods,
   selectedPaymentMethod,
   wallet,
@@ -150,6 +153,7 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
         paymentID,
         billingInfo,
         paymentInfo: typeof paymentInfo === "string" ? paymentInfo : null,
+        checkoutItems,
       });
     }
 
@@ -166,6 +170,7 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
     onPurchaseSuccess,
     invoiceID,
     invoiceCountdownStart,
+    checkoutItems,
     debug,
   ]);
 

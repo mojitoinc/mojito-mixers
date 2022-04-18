@@ -33,20 +33,18 @@ export const PAYMENT_NOTIFICATION_INTERVAL_MS = 2500; // (2.5 sec) Polling inter
 export const PAYMENT_NOTIFICATION_ERROR_MAX_WAIT_MS = ASYNC_ERROR_MAX_WAIT_MS - 1000; // (15 sec) Max. wait time for GetPaymentNotificationQuery to get the error details in ErrorOverlay.tsx.
 
 
+// Storage:
+export const CHECKOUT_MODAL_INFO_KEY = "CHECKOUT_MODAL_INFO";
+export const CHECKOUT_MODAL_INFO_REDIRECT_URI_KEY = "CHECKOUT_MODAL_INFO_REDIRECT_URI";
+export const CHECKOUT_MODAL_INFO_USED_KEY = "CHECKOUT_MODAL_INFO_USED";
+
 // Plaid:
 export const PLAID_STORAGE_EXPIRATION_MS = 1000 * 60 * 15; // 15 minutes (Plaid requires filling in some data).
-export const PLAID_OAUTH_FLOW_INFO_KEY = "PLAID_OAUTH_FLOW_INFO";
-export const PLAID_OAUTH_FLOW_RECEIVED_REDIRECT_URI_KEY = "PLAID_OAUTH_FLOW_RECEIVED_REDIRECT_URI";
-export const PLAID_OAUTH_FLOW_STATE_USED_KEY = "PLAID_OAUTH_FLOW_STATE_USED";
 export const PLAID_OAUTH_FLOW_URL_SEARCH = "?oauth_state_id=";
 
 
 // 3DS:
 export const THREEDS_STORAGE_EXPIRATION_MIN = 7; // 7 minutes (3DS will also ask for some information (in PROD only)).
-export const THREEDS_STORAGE_EXPIRATION_MS = 1000 * 60 * 7; // 7 minutes (3DS will also ask for some information (in PROD only)).
-export const THREEDS_FLOW_INFO_KEY = "THREEDS_FLOW_INFO";
-export const THREEDS_FLOW_RECEIVED_REDIRECT_URI_KEY = "THREEDS_FLOW_RECEIVED_REDIRECT_URI";
-export const THREEDS_FLOW_STATE_USED_KEY = "THREEDS_FLOW_STATE_USED";
 export const THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY = "paymentId";
 export const THREEDS_FLOW_SEARCH_PARAM_ERROR_KEY = "paymentError";
 export const THREEDS_FLOW_SEARCH_PARAM_SUCCESS = `?${ THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY }=`;
