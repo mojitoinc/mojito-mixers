@@ -18,7 +18,6 @@ import { checkNeedsGenericErrorMessage } from "../../hooks/useFormCheckoutError"
 import { TaxesState } from "../Billing/BillingView";
 import { Wallet } from "../../domain/wallet/wallet.interfaces";
 import { CreditCardNetwork } from "../../domain/react-payment-inputs/react-payment-inputs.utils";
-import { useLimits } from "@lib/hooks/useLimits";
 
 const billingInfoItemBoxProps: BoxProps = { sx: { mt: 2.5 } };
 
@@ -150,11 +149,6 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
     skip: !acceptedPaymentTypes.includes("ACH"),
   });
 
-  const firstCheckoutItem = checkoutItems[0];
-
-  // Item limits
-  const { remainingItemsLimits, refetch: refetchItemLimits, loading: loadingItemLimits } = useLimits(firstCheckoutItem);
-
   // TODO: Handle errors properly:
   if (!selectedPaymentMethodBillingInfo) return null;
 
@@ -174,6 +168,7 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
 
         {showSaved ? (
           <SavedPaymentDetailsSelector
+            acceptedPaymentTypes={acceptedPaymentTypes}
             showLoader={isDeleting}
             acceptedCreditCardNetworks={acceptedCreditCardNetworks}
             savedPaymentMethods={savedPaymentMethods}
@@ -185,9 +180,8 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
             onNext={onNext}
             onClose={onClose}
             onAttemptSubmit={handleFormAttemptSubmit}
-            onUpdateItemLimits={refetchItemLimits}
-            loadingLimits={loadingItemLimits}
-            consentType={consentType} />
+            consentType={consentType}
+            checkoutItems={checkoutItems} />
         ) : (
           <PaymentMethodForm
             acceptedPaymentTypes={acceptedPaymentTypes}
@@ -202,10 +196,8 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
             onClose={onClose}
             onSubmit={handleSubmit}
             onAttemptSubmit={handleFormAttemptSubmit}
-            onUpdateItemLimits={refetchItemLimits}
-            loadingLimits={loadingItemLimits}
             consentType={consentType}
-            remainingItemsLimits={remainingItemsLimits}
+            checkoutItems={checkoutItems}
             debug={debug} />
         )}
       </Stack>

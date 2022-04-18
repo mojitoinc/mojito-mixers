@@ -60,9 +60,9 @@ export const getCvvIsValid = (cvv = "", network: "" | CreditCardNetwork = "", ne
   };
 };
 
-export const transformRawRemainingItemLimit = (rawRemainingItemLimit : ValidatePaymentLimitOutput) => ({
-  CreditCard: rawRemainingItemLimit?.creditCard?.remainingTransaction ?? Infinity,
-  ACH: rawRemainingItemLimit?.ach?.remainingTransaction ?? Infinity,
-  Wire: rawRemainingItemLimit?.wire?.remainingTransaction ?? Infinity,
-  Crypto: Infinity // TODO: Add crypto when added to ValidatePaymentLimitOutput
+export const transformRawRemainingItemLimit = (rawRemainingItemLimit: ValidatePaymentLimitOutput, itemsCount: number) => ({
+  CreditCard: (rawRemainingItemLimit?.creditCard?.remainingTransaction ?? Infinity) + itemsCount,
+  ACH: (rawRemainingItemLimit?.ach?.remainingTransaction ?? Infinity) + itemsCount,
+  Wire: (rawRemainingItemLimit?.wire?.remainingTransaction ?? Infinity) + itemsCount,
+  Crypto: (Infinity) + itemsCount // TODO: Add crypto when added to ValidatePaymentLimitOutput
 });
