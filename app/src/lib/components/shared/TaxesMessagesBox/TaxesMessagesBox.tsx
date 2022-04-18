@@ -2,6 +2,7 @@ import { Box, BoxProps, Link, Tooltip, Typography } from "@mui/material";
 import React, { useCallback } from "react";
 import { withInvalidZipCode, withInvalidAddress } from "../../../utils/validationUtils";
 import { TaxesState, VertexSuggestions } from "../../../views/Billing/BillingView";
+import { FormErrorsCaption } from "../FormErrorCaption/FormErrorCaption";
 
 export type TaxesMessagesBoxVariant = "form" | "selector";
 
@@ -44,9 +45,9 @@ export const TaxesMessagesBox: React.FC<TaxesMessagesBoxProps> = ({
 
     return (
       <Box { ...props }>
-        <Typography variant="caption" component="p" sx={{ color: theme => theme.palette.warning.dark }}>
+        <FormErrorsCaption>
           { message }
-        </Typography>
+        </FormErrorsCaption>
       </Box>
     );
   }

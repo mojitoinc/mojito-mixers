@@ -2,7 +2,6 @@ import { Link } from "@mui/material";
 import React, { Fragment } from "react";
 import { useDictionary } from "../../../hooks/useDictionary";
 
-export const CONSENT_ERROR_MESSAGE = "You must accept the terms and conditions of the sale.";
 
 export type ConsentType = "disclaimer" | "checkbox" | "circle";
 

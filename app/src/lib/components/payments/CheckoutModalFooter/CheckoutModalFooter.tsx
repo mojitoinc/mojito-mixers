@@ -3,10 +3,11 @@ import React, { useCallback, useState } from "react";
 import { CIRCLE_LOGO_IMAGE_SRC, SM_MOBILE_MAX_WIDTH } from "../../../config/theme/themeConstants";
 import { isPromise } from "../../../utils/promiseUtils";
 import { Checkbox } from "../../shared/Checkbox/Checkbox";
-import { ConsentText, ConsentType, CONSENT_ERROR_MESSAGE } from "../../shared/ConsentText/ConsentText";
+import { ConsentText, ConsentType } from "../../shared/ConsentText/ConsentText";
 import { PrimaryButton } from "../../shared/PrimaryButton/PrimaryButton";
 import { ICONS_BY_VARIANT, LABELS_BY_VARIANT } from "./CheckoutModalFooter.constants";
 import { Img } from "../../shared/Img/Img";
+import { CONSENT_ERROR_MESSAGE } from "../../../utils/validationUtils";
 
 interface CheckoutModalFooterConsentState {
   isFormSubmitted: boolean;
