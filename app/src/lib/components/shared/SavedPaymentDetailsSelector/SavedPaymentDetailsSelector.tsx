@@ -4,22 +4,26 @@ import { StackList } from "../StackList/StackList";
 import { SecondaryButton } from "../SecondaryButton/SecondaryButton";
 import { PaymentDetailsItem } from "../../payments/PaymentDetailsItem/Item/PaymentDetailsItem";
 import { CheckoutModalFooter } from "../../payments/CheckoutModalFooter/CheckoutModalFooter";
+import { DisplayBox } from "../../payments/DisplayBox/DisplayBox";
 import { SavedPaymentMethod } from "../../../domain/circle/circle.interfaces";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { alpha, Box, CircularProgress } from "@mui/material";
+import { alpha, Box, CircularProgress, Typography } from "@mui/material";
 import { ConsentType } from "../ConsentText/ConsentText";
 import { OVERLAY_OPACITY } from "../../../config/theme/themeConstants";
 import { getCreditCardNetworkFromLabel, getCvvIsValid } from "../../../domain/payment/payment.utils";
+import { PaymentType } from "../../../domain/payment/payment.interfaces";
 import { SELECTION_ERROR_MESSAGE, withInvalidCVV } from "../../../utils/validationUtils";
 import { CreditCardNetwork, getCardTypeByType } from "../../../domain/react-payment-inputs/react-payment-inputs.utils";
+import { CheckoutItem } from "../../../domain/product/product.interfaces";
+import { useLimits } from "../../../hooks/useLimits";
 import { FormErrorsCaption } from "../FormErrorCaption/FormErrorCaption";
-
 interface SavedPaymentDetailsSelectorState {
   isFormSubmitted: boolean;
   cvv: string;
 }
 
 export interface SavedPaymentDetailsSelectorProps {
+  acceptedPaymentTypes: PaymentType[];
   showLoader: boolean;
   acceptedCreditCardNetworks?: CreditCardNetwork[];
   savedPaymentMethods: SavedPaymentMethod[];
@@ -32,6 +36,7 @@ export interface SavedPaymentDetailsSelectorProps {
   onClose: () => void;
   onAttemptSubmit: () => void;
   consentType?: ConsentType;
+  checkoutItems: CheckoutItem[];
 }
 
 interface CreditCardInfo {
@@ -41,6 +46,7 @@ interface CreditCardInfo {
 }
 
 export const SavedPaymentDetailsSelector: React.FC<SavedPaymentDetailsSelectorProps> = ({
+  acceptedPaymentTypes,
   showLoader,
   acceptedCreditCardNetworks,
   savedPaymentMethods,
@@ -53,10 +59,31 @@ export const SavedPaymentDetailsSelector: React.FC<SavedPaymentDetailsSelectorPr
   onClose,
   onAttemptSubmit,
   consentType,
+  checkoutItems,
 }) => {
-  const { creditCardNetwork, cvvLabel, isCvvRequired } = useMemo((): CreditCardInfo => {
-    const selectedPaymentMethod = savedPaymentMethods.find(savedPaymentMethod => savedPaymentMethod.id === selectedPaymentMethodId);
+  const firstCheckoutItem = checkoutItems[0];
 
+  // Item limits
+  const { refetch: refetchItemLimits, loading: loadingItemLimits, limitExceededFor, getItemLimitExeededMessageFor } = useLimits(firstCheckoutItem);
+
+  const handlePick = useCallback((paymentMethodId: string) => {
+    onPick(paymentMethodId);
+    refetchItemLimits();
+  }, [onPick, refetchItemLimits]);
+
+  const selectedPaymentMethod = useMemo(
+    () => savedPaymentMethods.find(savedPaymentMethod => savedPaymentMethod.id === selectedPaymentMethodId),
+    [savedPaymentMethods, selectedPaymentMethodId]
+  );
+
+  const itemLimitExceeded = selectedPaymentMethod ? limitExceededFor(selectedPaymentMethod.type) : false;
+
+  const itemLimitExeededMessage = useMemo(
+    () => selectedPaymentMethod ? getItemLimitExeededMessageFor(selectedPaymentMethod.type, acceptedPaymentTypes) : undefined,
+    [getItemLimitExeededMessageFor, selectedPaymentMethod, acceptedPaymentTypes]
+  );
+
+  const { creditCardNetwork, cvvLabel, isCvvRequired } = useMemo((): CreditCardInfo => {
     if (!selectedPaymentMethod || selectedPaymentMethod.type !== "CreditCard") {
       return {
         creditCardNetwork: "",
@@ -73,7 +100,7 @@ export const SavedPaymentDetailsSelector: React.FC<SavedPaymentDetailsSelectorPr
       cvvLabel,
       isCvvRequired: true,
     };
-  }, [savedPaymentMethods, selectedPaymentMethodId]);
+  }, [selectedPaymentMethod]);
 
   const [{
     isFormSubmitted,
@@ -132,20 +159,28 @@ export const SavedPaymentDetailsSelector: React.FC<SavedPaymentDetailsSelectorPr
 
       <InputGroupLabel sx={{ mt: 2.5, mb: 1.5 }}>Saved Payment Methods</InputGroupLabel>
 
+      { !loadingItemLimits && itemLimitExceeded ? (
+        <DisplayBox sx={{ mb: 2 }}>
+          <Typography sx={{ fontWeight: "500" }}>
+            {itemLimitExeededMessage}
+          </Typography>
+        </DisplayBox>
+      ) : null }
+
       <StackList
         data={ savedPaymentMethods }
         additionalProps={ (savedPaymentMethod) => ({
           active: savedPaymentMethod.id === selectedPaymentMethodId,
           disabled: showLoader,
           onDelete,
-          onPick,
+          onPick: handlePick,
           cvvLabel,
           cvvError,
           onCvvChange: handleCvvChange,
         }) }
         component={ PaymentDetailsItem }
         itemKey={ getPaymentMethodId }
-        deps={[ selectedPaymentMethodId, showLoader, onDelete, onPick, cvvLabel, cvvError, handleCvvChange]} />
+        deps={[ selectedPaymentMethodId, showLoader, onDelete, handlePick, cvvLabel, cvvError, handleCvvChange]} />
 
       { cvvError && (
         <FormErrorsCaption sx={{ mt: 2 }}>
@@ -172,6 +207,8 @@ export const SavedPaymentDetailsSelector: React.FC<SavedPaymentDetailsSelectorPr
     <CheckoutModalFooter
       variant="toConfirmation"
       consentType={ consentType }
+      submitLabel={ loadingItemLimits ? "Verifying purchase..." : undefined }
+      submitDisabled={ loadingItemLimits || itemLimitExceeded }
       onSubmitClicked={ handleNextClicked }
       onCloseClicked={ onClose } />
   </>);

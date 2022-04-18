@@ -12,7 +12,7 @@ import { ControlledCardExpiryDateField } from "../components/shared/CardExpiryDa
 import { ControlledCardSecureCodeField } from "../components/shared/CardSecureCodeField/CardSecureCodeField";
 import { InputGroupLabel } from "../components/shared/InputGroupLabel/InputGroupLabel";
 import { SecondaryButton } from "../components/shared/SecondaryButton/SecondaryButton";
-import { PaymentMethodSelector, PAYMENT_METHOD_OPTION_PROPS } from "../components/shared/PaymentMethodSelector/PaymentMethodSelector";
+import { PaymentMethodSelector } from "../components/shared/PaymentMethodSelector/PaymentMethodSelector";
 import {
   PaymentMethod,
   PaymentType
@@ -46,6 +46,8 @@ import { CreditCardNetwork, getCardTypeByType } from "../domain/react-payment-in
 import { getCardNumberError } from "react-payment-inputs";
 import { ApolloError } from "@apollo/client";
 import { FormErrorsCaption } from "../components/shared/FormErrorCaption/FormErrorCaption";
+import { CheckoutItem } from "../domain/product/product.interfaces";
+import { useLimits } from "../hooks/useLimits";
 
 interface PaymentTypeFormProps {
   control: Control<PaymentMethod & { consent: boolean }>;
@@ -314,6 +316,7 @@ export interface PaymentMethodFormProps {
   onAttemptSubmit: () => void;
   consentType?: ConsentType;
   remainingItemsLimits?: Record<PaymentType, number>;
+  checkoutItems: CheckoutItem[];
   debug?: boolean;
 }
 
@@ -332,6 +335,7 @@ export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
   onAttemptSubmit,
   consentType,
   remainingItemsLimits,
+  checkoutItems,
   debug = false
 }) => {
   const defaultPaymentType = acceptedPaymentTypes[0] || "CreditCard";
@@ -365,11 +369,18 @@ export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
     resolver: yupResolver(schema),
   });
 
+  const firstCheckoutItem = checkoutItems[0];
+
+  // Item limits
+  const { refetch: refetchItemLimits, loading: loadingItemLimits, limitExceededFor, getItemLimitExeededMessageFor } = useLimits(firstCheckoutItem);
+
   const handleSelectedPaymentMethodChange = useCallback((paymentType: PaymentType) => {
     reset({ ...PAYMENT_TYPE_FORM_DATA[paymentType].defaultValues(consentType) });
 
     if (paymentType === "ACH" && !!plaidError) refetchPlaidLink();
-  }, [reset, consentType, plaidError, refetchPlaidLink]);
+
+    refetchItemLimits();
+  }, [reset, consentType, plaidError, refetchPlaidLink, refetchItemLimits]);
 
   const selectedPaymentMethod = watch("type") as PaymentType;
   const Fields = PAYMENT_TYPE_FORM_DATA[selectedPaymentMethod].fields;
@@ -378,25 +389,11 @@ export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
 
   const acceptsManyPaymentMethods = acceptedPaymentTypes.length > 1;
 
-  const remainingItemsWithSelectedPaymentMethod = !!remainingItemsLimits && remainingItemsLimits[selectedPaymentMethod];
-  const itemLimitExceeded = remainingItemsWithSelectedPaymentMethod && remainingItemsWithSelectedPaymentMethod < 0;
+  const itemLimitExceeded = limitExceededFor(selectedPaymentMethod);
 
   const itemLimitExeededMessage = useMemo(
-    () => {
-      const otherPaymentMethodsWithLimit = remainingItemsLimits
-        ? acceptedPaymentTypes
-          .filter(
-            (paymentType: PaymentType) => {
-              const remainingLimit = remainingItemsLimits[paymentType];
-
-              return paymentType !== selectedPaymentMethod && remainingLimit && remainingLimit > 0;
-            }
-          )
-          .map((paymentType: PaymentType) => PAYMENT_METHOD_OPTION_PROPS[paymentType].label)
-        : [];
-
-      return `You can't buy that amount of items${otherPaymentMethodsWithLimit.length > 0 ? ` with this payment method. Try with ${otherPaymentMethodsWithLimit.join(", ")}.` : `.`}`
-    }, [remainingItemsLimits, acceptedPaymentTypes, selectedPaymentMethod]
+    () => getItemLimitExeededMessageFor(selectedPaymentMethod, acceptedPaymentTypes),
+    [getItemLimitExeededMessageFor, selectedPaymentMethod, acceptedPaymentTypes]
   );
 
   const creditCardNumber = watch("cardNumber") as string;
@@ -435,7 +432,7 @@ export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
         </Box>
       )}
 
-      { acceptedPaymentTypes.length > 1 && (<>
+      { acceptsManyPaymentMethods && (<>
         <InputGroupLabel sx={{ m: 0, pt: 2, pb: 1.5 }}>Payment Method</InputGroupLabel>
 
         <PaymentMethodSelector
@@ -449,7 +446,7 @@ export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
         <Box sx={{ mt: 1 }} />
       ) }
 
-      { itemLimitExceeded ? (
+      { !loadingItemLimits && itemLimitExceeded ? (
         <DisplayBox>
           <Typography sx={{ fontWeight: "500" }}>
             {itemLimitExeededMessage}
@@ -482,7 +479,8 @@ export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
       <CheckoutModalFooter
         variant={ selectedPaymentMethod === "ACH" ? "toPlaid" : "toConfirmation" }
         consentType={ consentType === "checkbox" ? undefined : consentType }
-        submitDisabled={ selectedPaymentMethod === "Crypto" || showPlaidError }
+        submitLabel={ loadingItemLimits ? "Verifying purchase..." : undefined }
+        submitDisabled={ selectedPaymentMethod === "Crypto" || showPlaidError || loadingItemLimits || itemLimitExceeded }
         submitLoading={ plaidLoading }
         onCloseClicked={ onClose } />
     </form>
