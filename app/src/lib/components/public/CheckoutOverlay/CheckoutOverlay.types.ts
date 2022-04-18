@@ -47,14 +47,3 @@ export interface CheckoutModalState3DS extends CheckoutModalStateCommon, Checkou
 export type CheckoutModalStatePlaid = CheckoutModalStateCommon & CheckoutModalInfoPlaid;
 
 export type CheckoutModalStateCombined = CheckoutModalState3DS & CheckoutModalStatePlaid;
-
-/*
-export interface ContinueFlowsReturn {
-  invoiceID: string;
-  invoiceCountdownStart: number;
-  processorPaymentID: string;
-  paymentID: string;
-  billingInfo: string | BillingInfo;
-  paymentInfo: string | null;
-}
-*/

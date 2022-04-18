@@ -60,9 +60,9 @@ export function isCheckoutModalInfoPlaid(checkoutModalInfo: Partial<CheckoutModa
 }
 
 export function getCheckoutModalState(noClear?: boolean): CheckoutModalStateCombined {
-  const defaultModalState = FALLBACK_MODAL_STATE_COMMON;
+  let modalState = FALLBACK_MODAL_STATE_COMMON;
 
-  if (!process.browser) return defaultModalState;
+  if (!process.browser) return modalState;
 
   let savedModalInfo: Partial<CheckoutModalInfo> = {};
   let savedReceivedRedirectUri = "";
@@ -91,7 +91,7 @@ export function getCheckoutModalState(noClear?: boolean): CheckoutModalStateComb
   // In dev, this works fine even if there's nothing in cookieStorage, which helps with testing across some other domain and localhost:
   let isValid = fromLocalhost || !!(url && invoiceID && billingInfo && receivedRedirectUri);
 
-  if (isValid) {
+  if (isValid && !savedInfoUsed) {
     if (!noClear) clearPersistedInfo();
 
     const commonModalState: CheckoutModalStateCommon = {
@@ -120,8 +120,6 @@ export function getCheckoutModalState(noClear?: boolean): CheckoutModalStateComb
       continueFlow: true,
     };
 
-    if (debug) console.log("💾 Continue Saved Flow...", commonModalState);
-
     if (isCheckoutModalInfo3DS(savedModalInfo)) {
       const {
         processorPaymentID,
@@ -131,7 +129,7 @@ export function getCheckoutModalState(noClear?: boolean): CheckoutModalStateComb
       } = savedModalInfo;
 
       isValid &&=
-        // TODO: URL param should match stored one.
+        // TODO: URL param (paymentID) should match stored one.
         window.location.search.startsWith(THREEDS_FLOW_SEARCH_PARAM_SUCCESS) &&
         processorPaymentID !== undefined &&
         paymentID !== undefined &&
@@ -142,7 +140,7 @@ export function getCheckoutModalState(noClear?: boolean): CheckoutModalStateComb
         const purchaseError = receivedRedirectUri.includes("error") || receivedRedirectUri.includes("failure");
         const purchaseSuccess = !purchaseError && (receivedRedirectUri.includes("success") || receivedRedirectUri.includes(THREEDS_FLOW_SEARCH_PARAM_SUCCESS));
 
-        return {
+        modalState = {
           ...FALLBACK_MODAL_STATE_COMMON,
           ...commonModalState,
 
@@ -176,7 +174,7 @@ export function getCheckoutModalState(noClear?: boolean): CheckoutModalStateComb
         !!linkToken;
 
       if (isValid) {
-        return {
+        modalState = {
           ...FALLBACK_MODAL_STATE_COMMON,
           ...commonModalState,
 
@@ -190,86 +188,13 @@ export function getCheckoutModalState(noClear?: boolean): CheckoutModalStateComb
     }
   }
 
-  // TODO: Move log here.
-
-  // TODO: isValid && savedInfoUsed never reached:
   if ((isValid && savedInfoUsed) || (!isValid && cookieStorage.getItem(CHECKOUT_MODAL_INFO_KEY))) {
+    if (debug) console.log("💾 Discard saved flow...", modalState);
+
     clearPersistedInfo();
+  } else if (debug) {
+    console.log("💾 Continue saved flow...", modalState);
   }
 
-  return defaultModalState;
+  return modalState;
 }
-
-/*
-export function continueCheckout(noClear = false): [boolean, CheckoutModalState3DS] {
-  const savedCheckoutModalState = getCheckoutModalState();
-  const { continue3DSFlow } = savedCheckoutModalState;
-
-  if (continue3DSFlow) {
-    if (debug) console.log("💾 Continue 3DS Flow...", savedCheckoutModalState);
-
-    if (!noClear) clearPersistedInfo();
-  }
-
-  return [continue3DSFlow, savedCheckoutModalState];
-}
-*/
-
-/*
-export interface ContinueFlowsReturn {
-  flowType: FlowType;
-  checkoutStep: CheckoutModalStep | "";
-  invoiceID: string;
-  invoiceCountdownStart: number;
-  processorPaymentID: string;
-  paymentID: string;
-  billingInfo: string | BillingInfo;
-  paymentInfo: string | null;
-}
-
-export function continueFlows(noClear = false) {
-  const [continue3DSFlow, savedCheckoutModalState] = continueCheckout(noClear);
-  const continueOAuthFlow = continuePlaidOAuthFlow();
-  const continueFlowsReturn: ContinueFlowsReturn = {
-    flowType: "",
-    checkoutStep: "",
-    invoiceID: "",
-    invoiceCountdownStart: -1,
-    processorPaymentID: "",
-    paymentID: "",
-    billingInfo: "",
-    paymentInfo: "",
-  };
-
-  // Uncomment to test error flow:
-  // savedCheckoutModalState.purchaseSuccess = false;
-  // savedCheckoutModalState.purchaseError = true;
-
-  if (continue3DSFlow) {
-    if (savedCheckoutModalState.purchaseSuccess && !savedCheckoutModalState.purchaseError) {
-      continueFlowsReturn.checkoutStep = "confirmation";
-    } else {
-      // By the time we come back from 3DS' error page to the Payment UI, we have already seen the error, so we go
-      // straight to the PaymentView to review the payment information:
-      continueFlowsReturn.checkoutStep = "payment";
-    }
-
-    continueFlowsReturn.flowType = "3DS";
-    continueFlowsReturn.invoiceID = savedCheckoutModalState.invoiceID;
-    continueFlowsReturn.invoiceCountdownStart = savedCheckoutModalState.invoiceCountdownStart === -1 ? Date.now() : savedCheckoutModalState.invoiceCountdownStart;
-    // continueFlowsReturn.processorPaymentID = savedCheckoutModalState.processorPaymentID;
-    // continueFlowsReturn.paymentID = savedCheckoutModalState.paymentID;
-    continueFlowsReturn.billingInfo = savedCheckoutModalState.billingInfo;
-    continueFlowsReturn.paymentInfo = savedCheckoutModalState.paymentInfo;
-  } else if (continueOAuthFlow) {
-    if (debug) console.log("💾 Continue Plaid OAuth Flow...", INITIAL_PLAID_OAUTH_FLOW_STATE);
-
-    continueFlowsReturn.flowType = "Plaid";
-    continueFlowsReturn.checkoutStep = "purchasing";
-    continueFlowsReturn.billingInfo = INITIAL_PLAID_OAUTH_FLOW_STATE.selectedBillingInfo;
-    // continueFlowsReturn.paymentInfo = INITIAL_PLAID_OAUTH_FLOW_STATE.paymentInfo;
-  }
-
-  return continueFlowsReturn;
-}
-*/
