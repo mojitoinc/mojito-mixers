@@ -17,7 +17,6 @@ import { CreditCardNetwork, getCardTypeByType } from "../../../domain/react-paym
 import { CheckoutItem } from "../../../domain/product/product.interfaces";
 import { useLimits } from "../../../hooks/useLimits";
 import { FormErrorsCaption } from "../FormErrorCaption/FormErrorCaption";
-import { isLocalhostOrStaging } from "../../../domain/url/url.utils";
 import { DebugBox } from "../../payments/DebugBox/DebugBox";
 interface SavedPaymentDetailsSelectorState {
   isFormSubmitted: boolean;
@@ -39,6 +38,7 @@ export interface SavedPaymentDetailsSelectorProps {
   onAttemptSubmit: () => void;
   consentType?: ConsentType;
   checkoutItems: CheckoutItem[];
+  debug?: boolean;
 }
 
 interface CreditCardInfo {
@@ -62,6 +62,7 @@ export const SavedPaymentDetailsSelector: React.FC<SavedPaymentDetailsSelectorPr
   onAttemptSubmit,
   consentType,
   checkoutItems,
+  debug = false
 }) => {
   const firstCheckoutItem = checkoutItems[0];
 
@@ -170,12 +171,6 @@ export const SavedPaymentDetailsSelector: React.FC<SavedPaymentDetailsSelectorPr
         </DisplayBox>
       ) : null }
 
-      { isLocalhostOrStaging() && !itemLimitExceeded ? (
-        <DebugBox sx={{ mb: 2 }}>
-          { JSON.stringify(itemLimits, null, 2)}
-        </DebugBox>
-      ) : null }
-
       <StackList
         data={ savedPaymentMethods }
         additionalProps={ (savedPaymentMethod) => ({
@@ -210,6 +205,12 @@ export const SavedPaymentDetailsSelector: React.FC<SavedPaymentDetailsSelectorPr
          { SELECTION_ERROR_MESSAGE }
         </FormErrorsCaption>
       ) }
+
+      { debug ? (
+        <DebugBox sx={{ mt: 2.5 }}>
+          { JSON.stringify(itemLimits, null, 2)}
+        </DebugBox>
+      ) : null }
 
     </Box>
 

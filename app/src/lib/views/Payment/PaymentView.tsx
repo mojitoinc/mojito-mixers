@@ -181,7 +181,8 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
             onClose={onClose}
             onAttemptSubmit={handleFormAttemptSubmit}
             consentType={consentType}
-            checkoutItems={checkoutItems} />
+            checkoutItems={checkoutItems}
+            debug={debug} />
         ) : (
           <PaymentMethodForm
             acceptedPaymentTypes={acceptedPaymentTypes}
