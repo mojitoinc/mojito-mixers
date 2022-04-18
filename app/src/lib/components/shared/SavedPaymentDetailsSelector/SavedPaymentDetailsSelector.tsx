@@ -17,6 +17,8 @@ import { CreditCardNetwork, getCardTypeByType } from "../../../domain/react-paym
 import { CheckoutItem } from "../../../domain/product/product.interfaces";
 import { useLimits } from "../../../hooks/useLimits";
 import { FormErrorsCaption } from "../FormErrorCaption/FormErrorCaption";
+import { isLocalhostOrStaging } from "../../../domain/url/url.utils";
+import { DebugBox } from "../../payments/DebugBox/DebugBox";
 interface SavedPaymentDetailsSelectorState {
   isFormSubmitted: boolean;
   cvv: string;
@@ -65,7 +67,7 @@ export const SavedPaymentDetailsSelector: React.FC<SavedPaymentDetailsSelectorPr
 
   // Item Limits:
 
-  const { refetch: refetchItemLimits, loading: loadingItemLimits, limitExceededFor, getItemLimitExceededMessageFor } = useLimits(firstCheckoutItem);
+  const { itemLimits, refetch: refetchItemLimits, loading: loadingItemLimits, limitExceededFor, getItemLimitExceededMessageFor } = useLimits(firstCheckoutItem);
 
   const handlePick = useCallback((paymentMethodId: string) => {
     onPick(paymentMethodId);
@@ -166,6 +168,12 @@ export const SavedPaymentDetailsSelector: React.FC<SavedPaymentDetailsSelectorPr
             {itemLimitExceededMessage}
           </Typography>
         </DisplayBox>
+      ) : null }
+
+      { isLocalhostOrStaging() && !itemLimitExceeded ? (
+        <DebugBox sx={{ mb: 2 }}>
+          { JSON.stringify(itemLimits, null, 2)}
+        </DebugBox>
       ) : null }
 
       <StackList

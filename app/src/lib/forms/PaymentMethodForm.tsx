@@ -371,7 +371,7 @@ export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
 
   // Item Limits:
 
-  const { refetch: refetchItemLimits, loading: loadingItemLimits, limitExceededFor, getItemLimitExceededMessageFor } = useLimits(firstCheckoutItem);
+  const { itemLimits, refetch: refetchItemLimits, loading: loadingItemLimits, limitExceededFor, getItemLimitExceededMessageFor } = useLimits(firstCheckoutItem);
 
   const handleSelectedPaymentMethodChange = useCallback((paymentType: PaymentType) => {
     reset({ ...PAYMENT_TYPE_FORM_DATA[paymentType].defaultValues(consentType) });
@@ -419,6 +419,8 @@ export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
     }
   }, [onAttemptSubmit, selectedPaymentMethod, onPlaidLinkClicked, submitForm, trigger]);
 
+  const addSpacing = !onSaved && acceptedPaymentTypes.length <= 1;
+  const showLimitError = !loadingItemLimits && itemLimitExceeded;
   const showPlaidError = selectedPaymentMethod === "ACH" && !!plaidError;
 
   return (
@@ -441,12 +443,12 @@ export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
         />
       </>) }
 
-      { !onSaved && acceptedPaymentTypes.length <= 1 && (
+      { addSpacing && !showLimitError ? (
         <Box sx={{ mt: 1 }} />
-      ) }
+      ) : null }
 
-      { !loadingItemLimits && itemLimitExceeded ? (
-        <DisplayBox>
+      { showLimitError ? (
+        <DisplayBox sx={{ mt: addSpacing ? 1 : 0, mb: 2.5 }}>
           <Typography sx={{ fontWeight: "500" }}>
             {itemLimitExceededMessage}
           </Typography>
@@ -472,6 +474,8 @@ export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
           { JSON.stringify(watch(), null, 2) }
           { "\n\n" }
           { JSON.stringify(formState.errors, null, 2) }
+          { "\n\n" }
+          { JSON.stringify(itemLimits, null, 2) }
         </DebugBox>
       ) }
 
