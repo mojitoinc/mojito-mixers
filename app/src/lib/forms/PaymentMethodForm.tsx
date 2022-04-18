@@ -315,7 +315,6 @@ export interface PaymentMethodFormProps {
   onSubmit: (data: PaymentMethod) => void;
   onAttemptSubmit: () => void;
   consentType?: ConsentType;
-  remainingItemsLimits?: Record<PaymentType, number>;
   checkoutItems: CheckoutItem[];
   debug?: boolean;
 }
@@ -334,7 +333,6 @@ export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
   onSubmit,
   onAttemptSubmit,
   consentType,
-  remainingItemsLimits,
   checkoutItems,
   debug = false
 }) => {

@@ -47,7 +47,6 @@ export interface PaymentViewProps {
   acceptedPaymentTypes?: PaymentType[];
   acceptedCreditCardNetworks?: CreditCardNetwork[];
   consentType?: ConsentType;
-  remainingItemsLimits?: Record<PaymentType, number>;
   debug?: boolean;
 }
 
@@ -72,7 +71,6 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
   acceptedPaymentTypes = ["CreditCard"],
   acceptedCreditCardNetworks,
   consentType,
-  remainingItemsLimits,
   debug,
 }) => {
   const {
@@ -199,7 +197,6 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
             onSubmit={handleSubmit}
             onAttemptSubmit={handleFormAttemptSubmit}
             consentType={consentType}
-            remainingItemsLimits={remainingItemsLimits}
             checkoutItems={checkoutItems}
             debug={debug} />
         )}

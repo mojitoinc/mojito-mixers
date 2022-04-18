@@ -6,7 +6,7 @@ import { PaymentMethod, PaymentType } from "../../../domain/payment/payment.inte
 import { CheckoutEventData, CheckoutEventType } from "../../../domain/events/events.interfaces";
 import { CheckoutItemInfo } from "../../../domain/product/product.interfaces";
 import { BillingInfo } from "../../../forms/BillingInfoForm";
-import { useDeletePaymentMethodMutation, useGetInvoiceDetailsQuery, useCollectionItemByIdQuery, useValidatePaymentLimitQuery, useGetPaymentMethodListQuery, useMeQuery, useReleaseReservationBuyNowLotMutation, ValidatePaymentLimitOutput } from "../../../queries/graphqlGenerated";
+import { useDeletePaymentMethodMutation, useGetInvoiceDetailsQuery, useGetPaymentMethodListQuery, useMeQuery, useReleaseReservationBuyNowLotMutation } from "../../../queries/graphqlGenerated";
 import { AuthenticationView } from "../../../views/Authentication/AuthenticationView";
 import { BillingView } from "../../../views/Billing/BillingView";
 import { ConfirmationView } from "../../../views/Confirmation/ConfirmationView";
@@ -34,7 +34,6 @@ import { Network } from "../../../domain/network/network.interfaces";
 import { NEW_WALLET_OPTION } from "../../../domain/wallet/wallet.constants";
 import { StatusIcon } from "../../shared/StatusIcon/StatusIcon";
 import { CreditCardNetwork } from "../../../domain/react-payment-inputs/react-payment-inputs.utils";
-import { transformRawRemainingItemLimit } from "@lib/domain/payment/payment.utils";
 import { PUIStaticSuccessOverlay } from "../SuccessOverlay/StaticSuccessOverlay";
 import { LoaderMode } from "../useOpenCloseCheckoutModal/useOpenCloseCheckoutModal";
 import { PUIStaticErrorOverlay } from "../ErrorOverlay/StaticErrorOverlay";
@@ -255,33 +254,6 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     variables: { invoiceID },
   });
 
-  // TODO: Extend this to support multiple items
-  const firstInvoiceItem = invoiceDetailsData?.getInvoiceDetails?.items[0];
-  const collectionItemId = firstInvoiceItem?.collectionItemID;
-
-  const { data: collectionItemData } = useCollectionItemByIdQuery({
-    skip: !collectionItemId,
-    variables: {
-      id: collectionItemId,
-    },
-  });
-
-  const collectionId = collectionItemData?.collectionItemById?.collectionId;
-
-  const { data: paymentLimitData } = useValidatePaymentLimitQuery({
-    skip: !collectionId,
-    variables: {
-      collectionId,
-      itemsCount: firstInvoiceItem?.units || 0,
-    },
-  });
-
-  const rawRemainingItemLimit = paymentLimitData?.validatePaymentLimit;
-
-  const remainingItemsLimits : Record<PaymentType, number> = useMemo(
-    () => transformRawRemainingItemLimit(rawRemainingItemLimit as ValidatePaymentLimitOutput),
-    [rawRemainingItemLimit]
-  );
 
   // Modal loading state:
 
@@ -863,7 +835,6 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
         acceptedPaymentTypes={ acceptedPaymentTypes }
         acceptedCreditCardNetworks={ acceptedCreditCardNetworks }
         consentType={ consentType }
-        remainingItemsLimits={remainingItemsLimits}
         debug={ debug } />
     );
   } else if (checkoutStep === "purchasing" && invoiceID && invoiceCountdownStart) {
