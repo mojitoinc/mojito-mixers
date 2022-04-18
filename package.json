@@ -46,6 +46,7 @@
     "ts-deepmerge": "^2.0.1",
     "use-callback-ref": "^1.2.5",
     "uuidv4": "^6.2.13",
+    "web3-utils": "^1.6.1",
     "yup": "^0.32.11"
   },
   "peerDependencies": {
