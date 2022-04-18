@@ -42,6 +42,7 @@ const BillingView = ({ vertexEnabled, checkoutItems, savedPaymentMethods: rawSav
     const calculateTaxes = React.useCallback((taxInfo) => tslib_es6.__awaiter(void 0, void 0, void 0, function* () {
         var _a;
         const calledAt = getTaxQuoteTimestampRef.current;
+        let invalidZipCode = false;
         const result = yield getTaxQuote({
             variables: {
                 input: {
@@ -55,18 +56,36 @@ const BillingView = ({ vertexEnabled, checkoutItems, savedPaymentMethods: rawSav
                     },
                 },
             },
-        }).catch(() => ({ data: null }));
+        }).catch((err) => {
+            invalidZipCode = /invalid zipcode/i.test(err.message);
+            return { data: null };
+        });
         // Discard stale result:
         if (calledAt !== getTaxQuoteTimestampRef.current)
             return;
         const taxResult = ((_a = result.data) === null || _a === void 0 ? void 0 : _a.getTaxQuote) || {};
-        const isValid = !!taxResult.verifiedAddress;
-        setViewState((prevViewState) => (Object.assign(Object.assign({}, prevViewState), { taxes: isValid ? {
+        const { verifiedAddress } = taxResult;
+        const vertexSuggestions = {};
+        if (!showSaved && verifiedAddress) {
+            // Vertex returns 5+4 zip codes, so we remove the last 4 digits to get the "normal" one:
+            const zipCode = ((verifiedAddress === null || verifiedAddress === void 0 ? void 0 : verifiedAddress.postalCode) || "").replace(/-\d{4}$/, "");
+            if (taxInfo.street !== verifiedAddress.street1)
+                vertexSuggestions.street = verifiedAddress.street1;
+            if (taxInfo.city !== verifiedAddress.city)
+                vertexSuggestions.city = verifiedAddress.city;
+            if (taxInfo.zipCode !== zipCode)
+                vertexSuggestions.zipCode = zipCode;
+        }
+        setViewState((prevViewState) => (Object.assign(Object.assign({}, prevViewState), { taxes: verifiedAddress ? {
                 status: "complete",
                 taxRate: 100 * taxResult.totalTaxAmount / taxResult.taxablePrice,
                 taxAmount: taxResult.totalTaxAmount,
-            } : { status: "error" } })));
-    }), [getTaxQuote, total]);
+                vertexSuggestions,
+            } : {
+                status: "error",
+                invalidZipCode,
+            } })));
+    }), [getTaxQuote, total, showSaved]);
     const handleThrottledTaxInfoChange = corre.useThrottledCallback((taxInfo) => {
         var _a, _b;
         if (!vertexEnabled)
@@ -146,18 +165,15 @@ const BillingView = ({ vertexEnabled, checkoutItems, savedPaymentMethods: rawSav
             onBillingInfoSelected(savedPaymentMethods[0].addressId);
         }
     }, [showSaved, savedPaymentMethods, selectedBillingInfo, onBillingInfoSelected /*, checkoutError*/]);
-    return (React__default["default"].createElement(material.Stack, { direction: {
-            xs: "column",
-            sm: "column",
-            md: "row",
-        }, spacing: 8.75 },
-        React__default["default"].createElement(material.Stack, { sx: { display: "flex", overflow: "hidden", width: { xs: "100%", md: "calc(50% - 35px)" } } },
+    return (React__default["default"].createElement(material.Stack, { direction: { xs: "column", md: "row" }, spacing: { xs: 0, md: 3.75 } },
+        React__default["default"].createElement(material.Stack, { sx: { display: "flex", overflow: "hidden", width: (theme) => ({ xs: "100%", md: `calc(50% - ${theme.spacing(3.75 / 2)})` }) } },
             React__default["default"].createElement(CheckoutStepper.CheckoutStepper, { progress: 50 }),
             showSaved ? (React__default["default"].createElement(SavedBillingDetailsSelector.SavedBillingDetailsSelector, { showLoader: isDeleting, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethodAddressId: typeof selectedBillingInfo === "string" ? selectedBillingInfo : undefined, taxes: taxes, onNew: handleShowForm, onEdit: handleShowForm, onDelete: handleSavedPaymentMethodDeleted, onPick: onBillingInfoSelected, onNext: onNext, onClose: onClose, onAttemptSubmit: handleFormAttemptSubmit, consentType: consentType === "checkbox" ? undefined : consentType })) : (React__default["default"].createElement(BillingInfoForm.BillingInfoForm
             // variant="loggedIn"
             , { 
                 // variant="loggedIn"
                 defaultValues: typeof selectedBillingInfo === "string" ? undefined : selectedBillingInfo, checkoutError: checkoutError, taxes: taxes, onTaxInfoChange: handleTaxInfoChange, onSaved: savedPaymentMethods.length > 0 ? handleShowSaved : undefined, onClose: onClose, onSubmit: handleSubmit, onAttemptSubmit: handleFormAttemptSubmit, consentType: consentType === "checkbox" ? undefined : consentType, debug: debug }))),
+        React__default["default"].createElement(material.Divider, { sx: { display: { xs: "block", md: "none" } } }),
         React__default["default"].createElement(CheckoutDeliveryAndItemCostBreakdown.CheckoutDeliveryAndItemCostBreakdown, { checkoutItems: checkoutItems, taxes: vertexEnabled ? taxes : null, validatePersonalDeliveryAddress: formSubmitAttempted, wallets: wallets, wallet: wallet, onWalletChange: onWalletChange })));
 };
 

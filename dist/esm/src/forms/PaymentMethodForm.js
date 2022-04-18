@@ -2,7 +2,7 @@ import { __awaiter } from '../../node_modules/tslib/tslib.es6.js';
 import { useForm } from 'react-hook-form';
 import { yupResolver as o } from '../../node_modules/@hookform/resolvers/yup/dist/yup.mjs.js';
 import { object, string, boolean, ValidationError } from 'yup';
-import { Box, Grid, Typography } from '@mui/material';
+import { Box, Typography, Grid } from '@mui/material';
 import default_1 from '../../node_modules/@mui/icons-material/Book.js';
 import React__default, { useMemo, useCallback } from 'react';
 import { CheckoutModalFooter } from '../components/payments/CheckoutModalFooter/CheckoutModalFooter.js';
@@ -169,7 +169,7 @@ const PAYMENT_TYPE_FORM_DATA = {
                     React__default.createElement(ConsentText, null)) })))),
     },
 };
-const PaymentMethodForm = ({ acceptedPaymentTypes, acceptedCreditCardNetworks, defaultValues: parentDefaultValues, checkoutError, onPlaidLinkClicked, onSaved, onClose, onSubmit, onAttemptSubmit, consentType, debug = false }) => {
+const PaymentMethodForm = ({ acceptedPaymentTypes, acceptedCreditCardNetworks, defaultValues: parentDefaultValues, checkoutError, plaidLoading, plaidError, onPlaidLinkClicked, refetchPlaidLink, onSaved, onClose, onSubmit, onAttemptSubmit, consentType, debug = false }) => {
     const defaultPaymentType = acceptedPaymentTypes[0] || "CreditCard";
     const defaultPaymentTypeFormData = PAYMENT_TYPE_FORM_DATA[defaultPaymentType];
     const defaultPaymentTypeDefaultValues = defaultPaymentTypeFormData.defaultValues(consentType);
@@ -184,7 +184,9 @@ const PaymentMethodForm = ({ acceptedPaymentTypes, acceptedCreditCardNetworks, d
     });
     const handleSelectedPaymentMethodChange = useCallback((paymentType) => {
         reset(Object.assign({}, PAYMENT_TYPE_FORM_DATA[paymentType].defaultValues(consentType)));
-    }, [reset, consentType]);
+        if (paymentType === "ACH" && !!plaidError)
+            refetchPlaidLink();
+    }, [reset, consentType, plaidError, refetchPlaidLink]);
     const selectedPaymentMethod = watch("type");
     const Fields = PAYMENT_TYPE_FORM_DATA[selectedPaymentMethod].fields;
     const submitForm = handleSubmit(onSubmit);
@@ -207,19 +209,23 @@ const PaymentMethodForm = ({ acceptedPaymentTypes, acceptedCreditCardNetworks, d
             submitForm(e);
         }
     }), [onAttemptSubmit, selectedPaymentMethod, onPlaidLinkClicked, submitForm, trigger]);
+    const showPlaidError = selectedPaymentMethod === "ACH" && !!plaidError;
+    console.log("plaidLoading =", plaidLoading, plaidError);
     return (React__default.createElement("form", { onSubmit: handleFormSubmit },
         onSaved && (React__default.createElement(Box, { sx: { my: 2.5 } },
             React__default.createElement(SecondaryButton, { onClick: onSaved, startIcon: React__default.createElement(default_1, null) }, "Use Saved Payment Method"))),
-        acceptedPaymentTypes.length > 1 ? (React__default.createElement(React__default.Fragment, null,
+        acceptedPaymentTypes.length > 1 && (React__default.createElement(React__default.Fragment, null,
             React__default.createElement(InputGroupLabel, { sx: { m: 0, pt: 2, pb: 1.5 } }, "Payment Method"),
-            React__default.createElement(PaymentMethodSelector, { selectedPaymentMethod: selectedPaymentMethod, onPaymentMethodChange: handleSelectedPaymentMethodChange, paymentMethods: acceptedPaymentTypes }))) : (null),
+            React__default.createElement(PaymentMethodSelector, { selectedPaymentMethod: selectedPaymentMethod, onPaymentMethodChange: handleSelectedPaymentMethodChange, paymentMethods: acceptedPaymentTypes }))),
+        !onSaved && acceptedPaymentTypes.length <= 1 && (React__default.createElement(Box, { sx: { mt: 1 } })),
         React__default.createElement(Fields, { control: control, cvvLabel: cvvLabel, consentType: consentType, dictionary: dictionary }),
         checkoutErrorMessage && React__default.createElement(FormErrorsBox, { error: checkoutErrorMessage, sx: { mt: 5 } }),
+        showPlaidError && (React__default.createElement(Typography, { variant: "caption", component: "p", sx: { mt: 2, color: theme => theme.palette.warning.dark } }, "Error connecting to Plaid.")),
         debug && (React__default.createElement(DebugBox, { sx: { mt: 5 } },
             JSON.stringify(watch(), null, 2),
             "\n\n",
             JSON.stringify(formState.errors, null, 2))),
-        React__default.createElement(CheckoutModalFooter, { variant: selectedPaymentMethod === "ACH" ? "toPlaid" : "toConfirmation", consentType: consentType === "checkbox" ? undefined : consentType, submitDisabled: selectedPaymentMethod === "Crypto", onCloseClicked: onClose })));
+        React__default.createElement(CheckoutModalFooter, { variant: selectedPaymentMethod === "ACH" ? "toPlaid" : "toConfirmation", consentType: consentType === "checkbox" ? undefined : consentType, submitDisabled: selectedPaymentMethod === "Crypto" || showPlaidError, submitLoading: plaidLoading, onCloseClicked: onClose })));
 };
 
 export { PaymentMethodForm };

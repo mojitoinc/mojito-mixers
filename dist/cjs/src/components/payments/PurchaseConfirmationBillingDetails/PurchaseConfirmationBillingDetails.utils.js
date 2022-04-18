@@ -5,7 +5,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 var payment_constants = require('../../../domain/payment/payment.constants.js');
 
 function isSavedPaymentMethod(paymentMethodInfo) {
-    return paymentMethodInfo.hasOwnProperty("id");
+    return !!paymentMethodInfo && paymentMethodInfo.hasOwnProperty("id");
 }
 function getFormattedPaymentMethod(paymentMethodInfo) {
     let isMasked = false;
@@ -23,6 +23,10 @@ function getFormattedPaymentMethod(paymentMethodInfo) {
             displayValue = `${payment_constants.CREDIT_CARD_MASK_PREFIX} ${paymentMethodInfo.last4Digit}`;
             network = paymentMethodInfo.network;
         }
+    }
+    else if (paymentMethodInfo === null) {
+        isMasked = true;
+        displayValue = `${payment_constants.CREDIT_CARD_MASK_PREFIX} XXXX`;
     }
     else {
         displayValue = paymentMethodInfo.cardNumber;

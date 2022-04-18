@@ -57,7 +57,7 @@ const DISPLAY_BOX_SX: SxProps<Theme> = {
   },
 };
 
-export const SavedItem: React.FC<SavedItemProps> = ({
+export const SavedItem: React.FC<SavedItemProps & { children: React.ReactNode }> = ({
   children,
   id,
   variant = "stacked",
@@ -88,7 +88,7 @@ export const SavedItem: React.FC<SavedItemProps> = ({
       pick: onPick,
     }[action];
 
-    if (callback && id !== undefined) callback(id, e);
+    if (callback) callback(id || "", e);
   }, [id, onEdit, onDelete, onPick]);
 
   const disabledSelect = !!disabled;

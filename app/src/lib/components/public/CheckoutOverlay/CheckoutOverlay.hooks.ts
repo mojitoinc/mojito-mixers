@@ -10,7 +10,7 @@ import { BillingInfo } from "../../../forms/BillingInfoForm";
 import { fullTrim } from "../../../utils/formatUtils";
 import { TaxesState } from "../../../views/Billing/BillingView";
 import { resetStepperProgress } from "../../payments/CheckoutStepper/CheckoutStepper";
-import { continueFlows } from "./CheckoutOverlay.utils";
+import { getCheckoutModalState } from "./CheckoutOverlay.utils";
 
 // TODO: Add a "close" value here:
 export type CheckoutModalErrorAt = "reset" | "authentication" | "billing" | "payment" | "purchasing";
@@ -56,9 +56,10 @@ export interface SelectedPaymentMethod {
 
 export interface PurchaseState {
   invoiceID: string | null;
+  invoiceCountdownStart: number | null;
   taxes: null | TaxesState;
   wallet: null | string | Wallet;
-  circlePaymentID: string;
+  processorPaymentID: string;
   paymentID: string;
 }
 
@@ -77,10 +78,10 @@ export interface CheckoutModalStateReturn extends CheckoutModalState, PurchaseSt
   setSelectedPaymentMethod: Dispatch<SetStateAction<SelectedPaymentMethod>>;
 
   // PurchaseState (+ inherited stuff):
-  setInvoiceID: (invoiceID: string | null) => void;
+  setInvoiceID: (invoiceID: string | null, invoiceCountdownStart: number | null) => void;
   setTaxes: (taxes: TaxesState) => void;
   setWalletAddress: (wallet: null | string | Wallet) => void;
-  setPayments: (circlePaymentID: string, paymentID: string) => void;
+  setPayments: (processorPaymentID: string, paymentID: string) => void;
 }
 
 export const CHECKOUT_STEPS: CheckoutModalStep[] = ["authentication", "billing", "payment", "purchasing", "confirmation"];
@@ -114,15 +115,17 @@ export function useCheckoutModalState({
 
   const [{
     invoiceID,
+    invoiceCountdownStart,
     taxes,
     wallet,
-    circlePaymentID,
+    processorPaymentID,
     paymentID,
   }, setPurchaseState] = useState<PurchaseState>({
     invoiceID: initialInvoiceID || null,
+    invoiceCountdownStart: null,
     taxes: vertexEnabled ? { status: "incomplete" } : null,
     wallet: null,
-    circlePaymentID: "",
+    processorPaymentID: "",
     paymentID: ""
   });
 
@@ -134,21 +137,10 @@ export function useCheckoutModalState({
 
     // Once authentication has loaded, we know if we need to skip the product confirmation step or not. Also, when the
     // modal is re-opened, we need to reset its state, taking into account if we need to resume a Plaid OAuth flow:s
-    const savedFlow = continueFlows();
-
-    // if (savedFlow.flowType === "3DS") {
-    //   continueCheckout() already calls clearPersistedInfo().
-    //   clearPersistedInfo();
-    // } else if (savedFlow.flowType === "Plaid") {
-    //   This is handled in PaymentView.tsx, in the usePlaid() hook call.
-    //   clearPlaidInfo();
-    // } else if (savedFlow.checkoutStep !== "") {
-    //   TODO: Clear both as this is some kind of indeterminate / error state?
-    // }
+    const checkoutModalState = getCheckoutModalState();
 
     setCheckoutModalState({
-      checkoutStep: savedFlow.checkoutStep || startAt,
-      // checkoutError: savedFlow.checkoutError,
+      checkoutStep: checkoutModalState.checkoutStep || startAt,
       isDialogBlocked: false,
     });
 
@@ -156,19 +148,20 @@ export function useCheckoutModalState({
     // setCheckoutModalState({ checkoutStep: "purchasing" });
 
     setSelectedPaymentMethod({
-      billingInfo: savedFlow.billingInfo || "",
-      paymentInfo: savedFlow.paymentInfo || "",
+      billingInfo: checkoutModalState.billingInfo || "",
+      paymentInfo: checkoutModalState.paymentInfo || "",
       cvv: "",
     });
 
     setPurchaseState({
-      invoiceID: savedFlow.invoiceID || "",
+      invoiceID: initialInvoiceID ? initialInvoiceID : (checkoutModalState.invoiceID || ""),
+      invoiceCountdownStart: initialInvoiceID ? Date.now() : (checkoutModalState.invoiceCountdownStart || null),
       taxes: vertexEnabled ? { status: "incomplete" } : null,
-      wallet: null,
-      circlePaymentID: savedFlow.circlePaymentID || "",
-      paymentID: savedFlow.paymentID || ""
+      wallet: null, // Wallet is added from invoice: `setWalletAddress(wallet || destinationAddress)`
+      processorPaymentID: checkoutModalState.processorPaymentID || "",
+      paymentID: checkoutModalState.paymentID || ""
     });
-  }, [debug, startAt, vertexEnabled]);
+  }, [debug, startAt, initialInvoiceID, vertexEnabled]);
 
   const goBack = useCallback(() => {
     setCheckoutModalState(({ checkoutStep, checkoutError }) => ({
@@ -261,8 +254,8 @@ export function useCheckoutModalState({
     }));
   }, []);
 
-  const setInvoiceID = useCallback((invoiceID: string | null) => {
-    setPurchaseState((prevPurchaseState) => ({ ...prevPurchaseState, invoiceID, circlePaymentID: "", paymentID: "" }));
+  const setInvoiceID = useCallback((invoiceID: string | null, invoiceCountdownStart: number | null) => {
+    setPurchaseState((prevPurchaseState) => ({ ...prevPurchaseState, invoiceID, invoiceCountdownStart, processorPaymentID: "", paymentID: "" }));
   }, []);
 
   const setTaxes = useCallback((taxes: TaxesState) => {
@@ -273,8 +266,8 @@ export function useCheckoutModalState({
     setPurchaseState((prevPurchaseState) => ({ ...prevPurchaseState, wallet }));
   }, []);
 
-  const setPayments = useCallback((circlePaymentID: string, paymentID: string) => {
-    setPurchaseState((prevPurchaseState) => ({ ...prevPurchaseState, circlePaymentID, paymentID }));
+  const setPayments = useCallback((processorPaymentID: string, paymentID: string) => {
+    setPurchaseState((prevPurchaseState) => ({ ...prevPurchaseState, processorPaymentID, paymentID }));
   }, []);
 
   return {
@@ -296,12 +289,13 @@ export function useCheckoutModalState({
 
     // PurchaseState:
     invoiceID,
+    invoiceCountdownStart,
     setInvoiceID,
     taxes,
     setTaxes,
     wallet,
     setWalletAddress,
-    circlePaymentID,
+    processorPaymentID,
     paymentID,
     setPayments,
   };

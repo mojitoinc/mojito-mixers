@@ -13,6 +13,7 @@ import { persistCheckoutModalInfo } from "../../components/public/CheckoutOverla
 import { PAYMENT_NOTIFICATION_INTERVAL_MS, PURCHASING_MESSAGES_DEFAULT, PURCHASING_MIN_WAIT_MS, PURCHASING_MESSAGES_INTERVAL_MS, PAYMENT_CREATION_TIMEOUT_MS, DEV_SKIP_3DS_IN_LOCALHOST } from "../../config/config";
 import { isLocalhost } from "../../domain/url/url.utils";
 import { Wallet } from "../../domain/wallet/wallet.interfaces";
+import { CheckoutItemInfo } from "../../domain/product/product.interfaces";
 
 export interface PurchasingViewProps {
   threeDSEnabled?: boolean;
@@ -20,10 +21,12 @@ export interface PurchasingViewProps {
   purchasingMessages?: false | string[];
   orgID: string;
   invoiceID: string;
+  invoiceCountdownStart: number;
+  checkoutItems: CheckoutItemInfo[];
   savedPaymentMethods: SavedPaymentMethod[];
   selectedPaymentMethod: SelectedPaymentMethod;
   wallet: null | string | Wallet;
-  onPurchaseSuccess: (circlePaymentID: string, paymentID: string, redirectURL: string) => void;
+  onPurchaseSuccess: (processorPaymentID: string, paymentID: string, redirectURL: string) => void;
   onPurchaseError: (error?: string | CheckoutModalError) => void;
   onDialogBlocked: (blocked: boolean) => void;
   debug?: boolean;
@@ -35,6 +38,8 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
   purchasingMessages: customPurchasingMessages,
   orgID,
   invoiceID,
+  invoiceCountdownStart,
+  checkoutItems,
   savedPaymentMethods,
   selectedPaymentMethod,
   wallet,
@@ -120,7 +125,7 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
   }, [fullPayment]);
 
   useEffect(() => {
-    const { paymentStatus, circlePaymentID, paymentID, paymentError } = fullPaymentState;
+    const { paymentStatus, processorPaymentID, paymentID, paymentError } = fullPaymentState;
 
     if (paymentStatus === "processing") {
       onDialogBlocked(true);
@@ -143,14 +148,16 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
     if (redirectURL && !skipRedirect) {
       persistCheckoutModalInfo({
         invoiceID,
-        circlePaymentID,
+        invoiceCountdownStart,
+        processorPaymentID,
         paymentID,
         billingInfo,
         paymentInfo: typeof paymentInfo === "string" ? paymentInfo : null,
+        checkoutItems,
       });
     }
 
-    onPurchaseSuccess(circlePaymentID, paymentID, skipRedirect ? "" : (redirectURL || ""));
+    onPurchaseSuccess(processorPaymentID, paymentID, skipRedirect ? "" : (redirectURL || ""));
   }, [
     fullPaymentState,
     hasWaited,
@@ -162,6 +169,8 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
     onDialogBlocked,
     onPurchaseSuccess,
     invoiceID,
+    invoiceCountdownStart,
+    checkoutItems,
     debug,
   ]);
 

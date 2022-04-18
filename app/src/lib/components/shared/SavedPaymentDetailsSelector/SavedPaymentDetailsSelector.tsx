@@ -6,12 +6,13 @@ import { PaymentDetailsItem } from "../../payments/PaymentDetailsItem/Item/Payme
 import { CheckoutModalFooter } from "../../payments/CheckoutModalFooter/CheckoutModalFooter";
 import { SavedPaymentMethod } from "../../../domain/circle/circle.interfaces";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { alpha, Box, CircularProgress, Typography } from "@mui/material";
+import { alpha, Box, CircularProgress } from "@mui/material";
 import { ConsentType } from "../ConsentText/ConsentText";
 import { OVERLAY_OPACITY } from "../../../config/theme/themeConstants";
 import { getCreditCardNetworkFromLabel, getCvvIsValid } from "../../../domain/payment/payment.utils";
-import { withInvalidCVV } from "../../../utils/validationUtils";
+import { SELECTION_ERROR_MESSAGE, withInvalidCVV } from "../../../utils/validationUtils";
 import { CreditCardNetwork, getCardTypeByType } from "../../../domain/react-payment-inputs/react-payment-inputs.utils";
+import { FormErrorsCaption } from "../FormErrorCaption/FormErrorCaption";
 
 interface SavedPaymentDetailsSelectorState {
   isFormSubmitted: boolean;
@@ -147,9 +148,9 @@ export const SavedPaymentDetailsSelector: React.FC<SavedPaymentDetailsSelectorPr
         deps={[ selectedPaymentMethodId, showLoader, onDelete, onPick, cvvLabel, cvvError, handleCvvChange]} />
 
       { cvvError && (
-        <Typography variant="caption" component="p" sx={{ mt: 2, color: theme => theme.palette.warning.dark }}>
+        <FormErrorsCaption sx={{ mt: 2 }}>
           { withInvalidCVV({ cvvLabel, cvvExpectedLength }) }
-        </Typography>
+        </FormErrorsCaption>
       ) }
 
       <SecondaryButton
@@ -161,9 +162,9 @@ export const SavedPaymentDetailsSelector: React.FC<SavedPaymentDetailsSelectorPr
       </SecondaryButton>
 
       { isFormSubmitted && !selectedPaymentMethodId && (
-        <Typography variant="caption" component="p" sx={{ mt: 2, color: theme => theme.palette.warning.dark }}>
-          You must select a saved and approved payment method or create a new one.
-        </Typography>
+        <FormErrorsCaption sx={{ mt: 2 }}>
+         { SELECTION_ERROR_MESSAGE }
+        </FormErrorsCaption>
       ) }
 
     </Box>

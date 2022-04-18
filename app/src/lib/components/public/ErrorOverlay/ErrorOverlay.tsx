@@ -5,7 +5,7 @@ import { ERROR_PURCHASE } from "../../../domain/errors/errors.constants";
 import { isUrlPathname } from "../../../domain/url/url.utils";
 import { useGetPaymentNotificationQuery } from "../../../queries/graphqlGenerated";
 import { withProviders, ProvidersInjectorProps } from "../../shared/ProvidersInjector/ProvidersInjector";
-import { clearPersistedInfo, getCheckoutModalState, persistReceivedRedirectUri3DS } from "../CheckoutOverlay/CheckoutOverlay.utils";
+import { clearPersistedInfo, getCheckoutModalState, persistCheckoutModalInfoRedirectURI } from "../CheckoutOverlay/CheckoutOverlay.utils";
 import { PUIStaticErrorOverlay, PUIStaticErrorOverlayProps } from "./StaticErrorOverlay";
 
 export interface PUIErrorOverlayProps extends PUIStaticErrorOverlayProps {
@@ -35,7 +35,7 @@ export const PUIErrorOverlay: React.FC<PUIErrorOverlayProps> = ({
     setErrorMessage(prevErrorMessage => prevErrorMessage || ERROR_PURCHASE.errorMessage);
   }, PAYMENT_NOTIFICATION_ERROR_MAX_WAIT_MS);
 
-  const { purchaseError, url = "" } = getCheckoutModalState();
+  const { purchaseError, url = "" } = getCheckoutModalState(true);
 
   useLayoutEffect(() => {
     // Users should only see this page if they completed a credit card payment and 3DS' verification went wrong.
@@ -46,7 +46,7 @@ export const PUIErrorOverlay: React.FC<PUIErrorOverlayProps> = ({
   const reviewData = useCallback(async (errorMessage: string): Promise<false> => {
     const isPathname = isUrlPathname(url);
 
-    if (isPathname) persistReceivedRedirectUri3DS(window.location.href);
+    if (isPathname) persistCheckoutModalInfoRedirectURI(window.location.href);
 
     // If there was an error, users can click the review button and go back to the Payment UI to review the data...:
 
@@ -64,13 +64,13 @@ export const PUIErrorOverlay: React.FC<PUIErrorOverlayProps> = ({
     onRedirect("/");
   }, [purchaseError, onRedirect]);
 
-  return purchaseError ? (
+  return (
     <PUIStaticErrorOverlay
       { ...staticErrorOverlayProps }
       checkoutError={ { errorMessage } }
       onFixError={ reviewData }
       onClose={ toMarketplace } />
-  ) : null;
+  );
 }
 
 export const PUIError: React.FC<PUIErrorProps> = withProviders(PUIErrorOverlay);

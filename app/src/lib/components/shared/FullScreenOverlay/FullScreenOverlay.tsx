@@ -25,6 +25,7 @@ interface FullScreenOverlayCommonProps extends FullScreenOverlayFunctionalProps 
 
 export interface FullScreenOverlayNoColumnsProps extends FullScreenOverlayCommonProps {
   centered?: boolean;
+  children: React.ReactNode;
 }
 
 export interface FullScreenOverlayWithColumnsProps extends FullScreenOverlayCommonProps {
@@ -83,7 +84,7 @@ export const FullScreenOverlay: React.FC<FullScreenOverlayProps> = ({
         py: 2.5,
         maxWidth: theme => theme.breakpoints.values.lg,
         mx: "auto",
-      }}>
+      }}><>
 
       { header }
 
@@ -97,7 +98,7 @@ export const FullScreenOverlay: React.FC<FullScreenOverlayProps> = ({
         }
       ) }
 
-    </DialogContent>
+    </></DialogContent>
   </Dialog>
   );
 }

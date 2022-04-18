@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { Stack } from "@mui/material";
+import { Divider, Stack } from "@mui/material";
 
 import { CheckoutModalFooter } from "../../components/payments/CheckoutModalFooter/CheckoutModalFooter";
 import { PurchaseConfirmationBillingDetails } from "../../components/payments/PurchaseConfirmationBillingDetails/PurchaseConfirmationBillingDetails";
@@ -14,9 +14,10 @@ export interface ConfirmationViewProps {
   checkoutItems: CheckoutItem[];
   savedPaymentMethods: SavedPaymentMethod[];
   selectedPaymentMethod: SelectedPaymentMethod;
-  circlePaymentID: string;
+  processorPaymentID: string;
   wallet: null | string | Wallet;
   onNext: () => void;
+  goToHref?: string;
   goToLabel?: string;
   onGoTo?: () => void;
 }
@@ -25,9 +26,10 @@ export const ConfirmationView: React.FC<ConfirmationViewProps> = ({
   checkoutItems,
   savedPaymentMethods,
   selectedPaymentMethod,
-  circlePaymentID,
+  processorPaymentID,
   wallet,
   onNext,
+  goToHref,
   goToLabel,
   onGoTo,
 }) => {
@@ -61,28 +63,26 @@ export const ConfirmationView: React.FC<ConfirmationViewProps> = ({
 
   return (
     <Stack
-      direction={{
-        xs: "column",
-        sm: "column",
-        md: "row",
-      }}
-      spacing={8.75}
-      sx={{ display: "flex" }}>
+      direction={{ xs: "column",  md: "row" }}
+      spacing={{ xs: 3,  md: 3.75 }}>
 
       <PurchaseConfirmationBillingDetails
         checkoutItems={ checkoutItems }
-        circlePaymentID={ circlePaymentID }
+        processorPaymentID={ processorPaymentID }
         wallet={ wallet }
         selectedPaymentMethodBillingInfo={ selectedPaymentMethodBillingInfo }
         selectedPaymentMethodPaymentInfo={ selectedPaymentMethodPaymentInfo } />
 
       <Stack sx={{ display: "flex", flex: 1 }}>
+        <Divider sx={{ display: { xs: "block", md: "none" } }} />
+
         <PurchaseConfirmationItemDetails
           checkoutItems={checkoutItems}/>
 
         <CheckoutModalFooter
           variant="toMarketplace"
           onSubmitClicked={onNext}
+          goToHref={goToHref}
           goToLabel={goToLabel}
           onGoTo={onGoTo} />
       </Stack>

@@ -150,129 +150,95 @@ And also, keep in mind:
 
 ## Usage:
 
+In your App's entry point (`_app.tsx` in Next.js), you need to add the `CheckoutOverlayProvider`:
+
 ```TSX
-
-import React, { ErrorInfo } from "react";
-
-import {
-  PUICheckout,
-  PUICheckoutProps,
-  useOpenCloseCheckoutModal,
-} from "@mojitoinc/mojito-mixers";
-
-const App: React.FC = () => {
   const router = useRouter();
-  const { profile } = useProfile();
-  const { loginWithPopup, isAuthenticated, isLoading, getIdTokenClaims } = useAuth0();
-
   const paymentIdParam = router.query[THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY]?.toString();
   const paymentErrorParam = router.query[THREEDS_FLOW_SEARCH_PARAM_ERROR_KEY]?.toString();
 
-  const { loaderMode, isOpen, onOpen, onClose } = useOpenCloseCheckoutModal({ paymentIdParam, paymentErrorParam });
+  // Add any other pages where you don't want the Payment UI to be rendered:
+  const doNotRenderPaymentUI = ["/payments/success", "/payments/error", "/payments/failure"].includes(router.pathname);
 
-  const onRemoveUrlParams = useCallback((cleanURL: string) => {
-    router.replace(cleanURL, undefined, { shallow: true });
-  }, [router]);
+  // Debug information in case you need it:
+  // console.log({ pathname: router.asPath, paymentIdParam, paymentErrorParam, doNotRenderPaymentUI });
 
-  const handleGoToClicked = useCallback(() => {
-    router.push("/profile/invoices");
-  }, []);
+  return (
+    <CheckoutOverlayProvider
+      paymentIdParam={ paymentIdParam }
+      paymentErrorParam={ paymentErrorParam }
+      checkoutComponent={ CheckoutComponent }
+      doNotRenderPaymentUI={ doNotRenderPaymentUI }>
+      { ... }
+    </CheckoutOverlayProvider>
+  );
+```
 
-  const handleLogin = useCallback(async () => {
-    await loginWithPopup({ prompt: "login" });
-    await getIdTokenClaims();
-  }, [loginWithPopup, getIdTokenClaims]);
+Where `CheckoutComponent: React.FC<CheckoutComponentWithRequiredProps>` is a component you need to create that renders
+`PUICheckout` with your custom configuration and its props. Simply copy the following file and adapt it to your needs:
 
-  const handleError = useCallback((error: CheckoutModalError) => {
-    Sentry.captureException(error);
-  }, []);
+[app/src/components/checkout-component/CheckoutComponent.tsx](./app/src/components/checkout-component/CheckoutComponent.tsx)
 
-  const handleEvent = useCallback((eventType: CheckoutEventType, eventData: CheckoutEventData) => {
-    // Handle the data for each step or action as needed.
-  }, []);
+Lastly, in the pages where you'd like to use the Payment UI, you need to use the `useCheckoutOverlay` to customize and
+open the Payment UI:
 
-  const handleCatch = useCallback((error: Error, errorInfo?: ErrorInfo) => {
-    Sentry.captureException({ error, errorInfo });
-  }, []);
+```TSX
+  const { open, setCheckoutComponentProps } = useCheckoutOverlay();
 
-  useEffect(() => {
-    // Open the modal automatically:
-    onOpen();
-  }, [onOpen])
-  
-  const checkoutModalProps: PUICheckoutProps = {
-    // ProviderInjector:
-    uri: config.MOJITO_API_URL,
+  const getComponentPropsRef = useRef<() => CheckoutComponentProps>(() => ({}));
 
-    // Modal:
-    open: isOpen,
-    onClose,
-    onGoTo: handleGoToClicked,
-    onGoToLabel: "View Invoices",
+  getComponentPropsRef.current = () => {
+    return {
+      orgID: "<orgID>",
+      invoiceID: "<invoiceID>",
+      checkoutItems: [{
+        // Common:
+        lotID: "<lotID>", // Mojito API ID
+        lotType: "<lotType>",
+        name: "<name>",
+        description: "<description>",
+        imageSrc: "<imageSrc>",
+        imageBackground: "<imageBackground>",
 
-    // Flow:
-    loaderMode,
-    paymentErrorParam,
-    onRemoveUrlParams
-    guestCheckoutEnabled: false,
-    productConfirmationEnabled: false,
-    vertexEnabled: true, // Default already true (requires set up on the backend).
-    threeDSEnabled: true, // Default already true (requires set up on the backend and frontend, see 3DS section below).
+        // Buy Now:
+        totalSupply: "<totalSupply>",
+        remainingSupply: "<remainingSupply>",
+        units: "<units>",
 
-    // Personalization:
-    // These two options, `theme` (replace default theme) and `themeOptions` (merge with default theme) are optional and 
-    // can't be defined at the same time:
-    // theme: YOUR_CUSTOM_THEME,
-    themeOptions: YOUR_CUSTOM_THEME_OPTIONS,
-    logoSrc: "https://...",
-    logoSx: { ... },
-    loaderImageSrc: "https://...",
-    purchasingImageSrc: "https://...",
-    purchasingMessages: ["...", "...", "..."],
-    successImageSrc: "https://...",
-    errorImageSrc: "https://...",
-    userFormat: "email",
-    acceptedPaymentTypes: ["CreditCard", "ACH"],
-    acceptedCreditCardNetworks: ["visa", "mastercard"],
-    network: "",
-    dictionary: {
-      walletInfo: <p>Lorem ipsum...</p>,
-    },
-
-    // Legal:
-    consentType: "circle",
-    privacyHref: "https://...",
-    termsOfUseHref: "https://...",
-
-    // Data:
-    orgID: "<ORG_ID>", // Usually profile.userOrgs[0].organizationId
-    invoiceID: "<INVOICE_ID>" // Only required for auction lots"
-    checkoutItem: {
-      lotID: "<LOT_IT>",
-      buyNow: "buyNow",
-      name: "Lorem ipsum...",
-      description: "Lorem ipsum...",
-      price: 0,
-      fee: 0,
-      imageSrc: "https://...",
-      imageBackground: "rgba(...)",
-    },
-    
-    // Authentication:
-    onLogin: handleLogin,
-    isAuthenticated,
-    isAuthenticatedLoading: isLoading,
-
-    // Other Events:
-    debug: true,
-    onEvent: handleEvent,
-    onError: handleError,
-    onCatch: handleCatch,
+        // Auction:
+        fee: "<fee>",
+      }],
+    };
   };
 
-  return <PUICheckout { ...checkoutModalProps } />;
-};
+  const handleOpenClicked = useCallback(() => open(getComponentPropsRef.current()), [open]);
+
+  useEffect(() => {
+    setCheckoutComponentProps(getComponentPropsRef.current());
+
+  // If some of the fields in the object above can change, add them to the dependencies here:
+  }, [setCheckoutComponentProps]);
+
 ```
+
+You can see an example here:
+
+[app/src/pages/index.tsx](./app/src/pages/index.tsx).
+
+**Make sure you check the setup steps below for Vertex, 3DS and Plaid.**
+
+<br />
+
+
+### Supported Countries
+
+We use Circle for payments, so the supported countries depend on which payment method is going to be used, as described here:
+
+https://developers.circle.com/docs/supported-countries
+
+We use the following script to compile the list of excluded countries:
+
+[app/src/lib/hooks/useCountryOptionsBlacklistScript.js](./app/src/lib/hooks/useCountryOptionsBlacklistScript.js)
 
 <br />
 
@@ -579,22 +545,31 @@ Note those prefixed with `(DEV)` will never be shown to regular users. Instead, 
 
 Defined in [`app/src/lib/utils/validationUtils.ts`](./app/src/lib/utils/validationUtils.ts):
 
-
 - `withRequiredErrorMessage = ` `{ label }` is required.
-
-- `withTypeErrorMessageFor = ` `{ label }` must be a `{ type }`.
 
 - `withInvalidErrorMessage = ` `{ label }` is not valid.
 
+- `CONSENT_ERROR_MESSAGE = ` You must accept the terms and conditions of the sale.
+
 - `withFullNameErrorMessage = ` `{ label }` must have at least first and last name.
 
+- `withFullNameCharsetErrorMessage = ` `{ label }` contains invalid characters.
+
 - `withPhoneErrorMessage = ` `{ label }` must be a valid phone number.
+
+- `SELECTION_ERROR_MESSAGE = ` You must select a saved and approved payment method or create a new one.
+
+- `withInvalidAddress = ` Please, `{ enter/select }` a valid address to calculate taxes.
+
+- `withInvalidZipCode = ` The `{ label }` you entered does not match the address.
 
 - `withInvalidCardNumber = ` `{ label }` is invalid.
 
 - `withInvalidCVV = ` `{ cvvLabel }` must have `{ cvvExpectedLength }` digits.
 
-- `withInvalidCreditCardNetwork = ` Only `{ acceptedCreditCardNetworks }` `{ is/a`re } accepted.
+- `withInvalidCreditCardNetwork = ` Only `{ acceptedCreditCardNetworks }` `{ is/are }` accepted.
+
+- `withInvalidConnection = ` Could not connect `{ label }`.
 
 <br />
 
@@ -730,7 +705,7 @@ interface CheckoutEventData {
   total: number; // Total value of the order with discounts, taxes and fees.
 
   // Order:
-  circlePaymentID?: string; // Can be used as orderID.
+  processorPaymentID?: string; // Can be used as orderID.
   paymentID?: string; // Can be used as orderID.
 }
 ```

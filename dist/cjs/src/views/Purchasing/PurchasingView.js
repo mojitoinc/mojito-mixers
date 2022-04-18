@@ -12,16 +12,15 @@ var StatusIcon = require('../../components/shared/StatusIcon/StatusIcon.js');
 var graphqlGenerated = require('../../queries/graphqlGenerated.js');
 var CheckoutOverlay_utils = require('../../components/public/CheckoutOverlay/CheckoutOverlay.utils.js');
 var config = require('../../config/config.js');
-var url_utils = require('../../domain/url/url.utils.js');
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
 var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 
-const PurchasingView = ({ threeDSEnabled, purchasingImageSrc, purchasingMessages: customPurchasingMessages, orgID, invoiceID, savedPaymentMethods, selectedPaymentMethod, wallet, onPurchaseSuccess, onPurchaseError, onDialogBlocked, debug, }) => {
+const PurchasingView = ({ threeDSEnabled, purchasingImageSrc, purchasingMessages: customPurchasingMessages, orgID, invoiceID, invoiceCountdownStart, checkoutItems, savedPaymentMethods, selectedPaymentMethod, wallet, onPurchaseSuccess, onPurchaseError, onDialogBlocked, debug, }) => {
     var _a, _b, _c;
     const { billingInfo, paymentInfo, cvv } = selectedPaymentMethod;
-    const isCreditCardPayment = cvv || (typeof paymentInfo === "object" && paymentInfo.type === "CreditCard");
+    const isCreditCardPayment = cvv || (paymentInfo !== null && typeof paymentInfo === "object" && paymentInfo.type === "CreditCard");
     // Minimum wait time:
     const [hasWaited, setHasWaited] = React.useState(false);
     corre.useTimeout(() => {
@@ -73,29 +72,31 @@ const PurchasingView = ({ threeDSEnabled, purchasingImageSrc, purchasingMessages
         fullPayment();
     }, [fullPayment]);
     React.useEffect(() => {
-        const { paymentStatus, circlePaymentID, paymentID, paymentError } = fullPaymentState;
+        const { paymentStatus, processorPaymentID, paymentID, paymentError } = fullPaymentState;
         if (paymentStatus === "processing") {
             onDialogBlocked(true);
             return;
         }
         if (paymentStatus === "error" || paymentError) {
-            onPurchaseError(paymentError || errors_constants.ERROR_PURCHASE());
+            onPurchaseError(paymentError);
             return;
         }
         if (!hasWaited || redirectURL === "" || purchaseSuccessHandledRef.current)
             return;
         purchaseSuccessHandledRef.current = true;
-        const skipRedirect = url_utils.isLocalhost();
+        const skipRedirect = config.DEV_SKIP_3DS_IN_LOCALHOST ;
         if (redirectURL && !skipRedirect) {
             CheckoutOverlay_utils.persistCheckoutModalInfo({
                 invoiceID,
-                circlePaymentID,
+                invoiceCountdownStart,
+                processorPaymentID,
                 paymentID,
                 billingInfo,
-                paymentInfo,
+                paymentInfo: typeof paymentInfo === "string" ? paymentInfo : null,
+                checkoutItems,
             });
         }
-        onPurchaseSuccess(circlePaymentID, paymentID, skipRedirect ? "" : (redirectURL || ""));
+        onPurchaseSuccess(processorPaymentID, paymentID, (redirectURL || ""));
     }, [
         fullPaymentState,
         hasWaited,
@@ -107,6 +108,8 @@ const PurchasingView = ({ threeDSEnabled, purchasingImageSrc, purchasingMessages
         onDialogBlocked,
         onPurchaseSuccess,
         invoiceID,
+        invoiceCountdownStart,
+        checkoutItems,
         debug,
     ]);
     // Purchasing Messages:

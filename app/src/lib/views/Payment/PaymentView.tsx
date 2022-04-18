@@ -27,6 +27,9 @@ interface PaymentViewState {
 }
 
 export interface PaymentViewProps {
+  orgID: string;
+  invoiceID: string;
+  invoiceCountdownStart: number;
   checkoutItems: CheckoutItem[];
   taxes: null | TaxesState;
   savedPaymentMethods: SavedPaymentMethod[];
@@ -41,7 +44,7 @@ export interface PaymentViewProps {
   onNext: () => void;
   onPrev: () => void;
   onClose: () => void;
-  acceptedPaymentTypes: PaymentType[];
+  acceptedPaymentTypes?: PaymentType[];
   acceptedCreditCardNetworks?: CreditCardNetwork[];
   consentType?: ConsentType;
   remainingItemsLimits?: Record<PaymentType, number>;
@@ -49,6 +52,9 @@ export interface PaymentViewProps {
 }
 
 export const PaymentView: React.FC<PaymentViewProps> = ({
+  orgID,
+  invoiceID,
+  invoiceCountdownStart,
   checkoutItems,
   taxes,
   savedPaymentMethods: rawSavedPaymentMethods,
@@ -63,7 +69,7 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
   onNext,
   onPrev,
   onClose,
-  acceptedPaymentTypes,
+  acceptedPaymentTypes = ["CreditCard"],
   acceptedCreditCardNetworks,
   consentType,
   remainingItemsLimits,
@@ -131,11 +137,18 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
     }
   }, [showSaved, onPaymentInfoSelected, savedPaymentMethods, selectedPaymentInfo/*, checkoutError*/]);
 
-  console.log("selectedPaymentInfo =", selectedPaymentInfo);
-
   // PLAIN LINKS:
-  const onPlaidLinkClicked = usePlaid({
+  const {
+    loading: plaidLoading,
+    error: plaidError,
+    openLink: onPlaidLinkClicked,
+    refetchLink: refetchPlaidLink,
+  } = usePlaid({
+    orgID,
+    invoiceID,
+    invoiceCountdownStart,
     selectedBillingInfo,
+    skip: !acceptedPaymentTypes.includes("ACH"),
   });
 
   // TODO: Handle errors properly:
@@ -143,14 +156,10 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
 
   return (
     <Stack
-      direction={{
-        xs: "column",
-        sm: "column",
-        md: "row",
-      }}
-      spacing={8.75}
-    >
-      <Stack sx={{ display: "flex", overflow: "hidden", width: { xs: "100%", md: "calc(50% - 35px)" } }}>
+      direction={{ xs: "column",  md: "row" }}
+      spacing={{ xs: 0,  md: 3.75 }}>
+
+      <Stack sx={{ display: "flex", overflow: "hidden", width: (theme) => ({ xs: "100%", md: `calc(50% - ${ theme.spacing(3.75 / 2) })` }) }}>
         <CheckoutStepper progress={100} />
 
         <BillingInfoItem
@@ -179,7 +188,10 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
             acceptedCreditCardNetworks={acceptedCreditCardNetworks}
             defaultValues={typeof selectedPaymentInfo === "string" || selectedPaymentInfo === null ? undefined : selectedPaymentInfo}
             checkoutError={checkoutError}
+            plaidLoading={plaidLoading}
+            plaidError={plaidError}
             onPlaidLinkClicked={onPlaidLinkClicked}
+            refetchPlaidLink={refetchPlaidLink}
             onSaved={savedPaymentMethods.length > 0 ? handleShowSaved : undefined}
             onClose={onClose}
             onSubmit={handleSubmit}
@@ -189,6 +201,8 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
             debug={debug} />
         )}
       </Stack>
+
+      <Divider sx={{ display: { xs: "block", md: "none" } }} />
 
       <CheckoutDeliveryAndItemCostBreakdown
         checkoutItems={ checkoutItems }

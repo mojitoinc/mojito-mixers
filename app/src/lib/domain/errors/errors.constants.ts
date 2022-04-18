@@ -1,6 +1,5 @@
 import { ApolloError } from "@apollo/client";
 import { CheckoutModalError, CheckoutModalErrorAt } from "../../components/public/CheckoutOverlay/CheckoutOverlay.hooks";
-import { FIELD_LABELS } from "../../forms/BillingInfoForm";
 import { withFullNameErrorMessage } from "../../utils/validationUtils";
 
 export const BUILT_IN_ERRORS = ["EvalError", "RangeError", "ReferenceError", "SyntaxError", "TypeError", "URIError", "AggregateError", "InternalError"];
@@ -91,6 +90,6 @@ export const MAPPED_ERRORS: Record<string, MappedError> = {
   "name should contains first and last name": {
     errorLocation: "billing",
     fieldName: "fullName",
-    errorMessage: withFullNameErrorMessage({ label: FIELD_LABELS.fullName }),
+    errorMessage: withFullNameErrorMessage({ label: "Full Name" }),
   },
 };

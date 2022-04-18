@@ -2,7 +2,7 @@ mutation CreatePayment($paymentMethodID: UUID1!, $invoiceID: UUID1!) {
   createPayment(paymentMethodID: $paymentMethodID, invoiceID: $invoiceID) {
     id
     invoiceID
-    circlePaymentID
+    processorPaymentID
     status
     userID
   }

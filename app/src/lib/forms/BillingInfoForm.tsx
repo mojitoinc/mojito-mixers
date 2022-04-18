@@ -62,7 +62,7 @@ export const FIELD_LABELS = {
   [COUNTRY_FIELD]: "Country",
 };
 
-const FIELD_NAMES = Object.keys(FIELD_LABELS);
+const FIELD_KEYS = Object.keys(FIELD_LABELS);
 
 const EMPTY_FORM_VALUES: BillingInfo = {
   [FULL_NAME_FIELD]: "",
@@ -166,6 +166,7 @@ export const BillingInfoForm: React.FC<BillingInfoFormProps> = ({
     control,
     handleSubmit,
     watch,
+    setValue,
     setError,
     formState,
   } = useForm<BillingInfo>({
@@ -191,12 +192,18 @@ export const BillingInfoForm: React.FC<BillingInfoFormProps> = ({
 
   const selectedCountryCode = country?.value;
   const submitForm = handleSubmit(onSubmit);
-  const checkoutErrorMessage = useFormCheckoutError({ formKey: "billing", checkoutError, fields: FIELD_NAMES, setError });
+  const checkoutErrorMessage = useFormCheckoutError({ formKey: "billing", checkoutError, fields: FIELD_KEYS, setError });
 
   const handleFormSubmit = useCallback(async (e: React.FormEvent) => {
     onAttemptSubmit();
     submitForm(e);
   }, [onAttemptSubmit, submitForm]);
+
+  const handleSuggestionAccepted = useCallback((fieldKey: string, newValue: string) => {
+    if (!FIELD_KEYS.includes(fieldKey)) return;
+
+    setValue(fieldKey as keyof BillingInfo, newValue);
+  }, [setValue]);
 
   return (
     <form onSubmit={handleFormSubmit}>
@@ -299,7 +306,12 @@ export const BillingInfoForm: React.FC<BillingInfoFormProps> = ({
 
       { checkoutErrorMessage && <FormErrorsBox error={ checkoutErrorMessage } sx={{ mt: 5 }} /> }
 
-      { formState.isSubmitted && <TaxesMessagesBox sx={{ mt: 5 }} taxes={ taxes } variant="form" /> }
+      <TaxesMessagesBox
+        sx={{ mt: 5 }}
+        isSubmitted={ formState.isSubmitted }
+        variant="form"
+        taxes={ taxes }
+        onSuggestionAccepted={ handleSuggestionAccepted } />
 
       { debug && (
         <DebugBox sx={{ mt: 5 }}>

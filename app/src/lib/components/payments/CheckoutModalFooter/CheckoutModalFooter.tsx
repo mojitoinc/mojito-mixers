@@ -3,10 +3,11 @@ import React, { useCallback, useState } from "react";
 import { CIRCLE_LOGO_IMAGE_SRC, SM_MOBILE_MAX_WIDTH } from "../../../config/theme/themeConstants";
 import { isPromise } from "../../../utils/promiseUtils";
 import { Checkbox } from "../../shared/Checkbox/Checkbox";
-import { ConsentText, ConsentType, CONSENT_ERROR_MESSAGE } from "../../shared/ConsentText/ConsentText";
+import { ConsentText, ConsentType } from "../../shared/ConsentText/ConsentText";
 import { PrimaryButton } from "../../shared/PrimaryButton/PrimaryButton";
 import { ICONS_BY_VARIANT, LABELS_BY_VARIANT } from "./CheckoutModalFooter.constants";
 import { Img } from "../../shared/Img/Img";
+import { CONSENT_ERROR_MESSAGE } from "../../../utils/validationUtils";
 
 interface CheckoutModalFooterConsentState {
   isFormSubmitted: boolean;
@@ -34,6 +35,7 @@ export interface CheckoutModalFooterProps {
   onCloseClicked?: () => void;
 
   // Collection button:
+  goToHref?: string;
   goToLabel?: string;
   onGoTo?: () => void;
 }
@@ -58,6 +60,7 @@ export const CheckoutModalFooter: React.FC<CheckoutModalFooterProps> = ({
   onCloseClicked,
 
   // Secondary button:
+  goToHref = "/profile/invoices",
   goToLabel = "View Invoices",
   onGoTo,
 }) => {
@@ -78,7 +81,7 @@ export const CheckoutModalFooter: React.FC<CheckoutModalFooterProps> = ({
 
   const showConsentError = isFormSubmitted && !isConsentChecked;
 
-  const handleConsentClicked = useCallback((_, checked: boolean) => {
+  const handleConsentClicked = useCallback((_: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
     setConsentState((prevConsentState) => ({
       isFormSubmitted: prevConsentState.isFormSubmitted,
       isFormLoading: prevConsentState.isFormLoading,
@@ -169,7 +172,7 @@ export const CheckoutModalFooter: React.FC<CheckoutModalFooterProps> = ({
         <PrimaryButton
           onClickCapture={ handleGoToClicked }
           disabled={ isPrimaryButtonDisabled }
-          href="/profile/invoices"
+          href={ goToHref }
           sx={{ mb: 2 }}>
           { goToLabel }
         </PrimaryButton>

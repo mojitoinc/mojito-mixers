@@ -16,6 +16,7 @@ const cache = new InMemoryCache();
 export interface AuthorizedApolloProviderProps {
   apolloClient?: ApolloClient<NormalizedCacheObject> | null;
   uri: string;
+  children?: React.ReactNode;
 }
 
 export const AuthorizedApolloProvider: React.FC<AuthorizedApolloProviderProps> = ({

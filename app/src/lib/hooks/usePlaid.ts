@@ -2,12 +2,20 @@
 import { useCallback, useEffect, useRef } from "react";
 import { usePreparePaymentMethodQuery } from "../queries/graphqlGenerated";
 import { PlaidLinkOnEvent, PlaidLinkOnExit, PlaidLinkOnSuccess, PlaidLinkOptions, usePlaidLink } from "react-plaid-link";
-import { clearPlaidInfo, getPlaidOAuthFlowState, persistPlaidInfo, persistPlaidOAuthStateUsed, PlaidOAuthFlowState } from "../domain/plaid/plaid.utils";
 import { BillingInfo } from "../forms/BillingInfoForm";
 import { PaymentMethod } from "../domain/payment/payment.interfaces";
+import { isLocalhostOrStaging } from "../domain/url/url.utils";
+import { clearPersistedInfo, getCheckoutModalState, isCheckoutModalInfoPlaid, persistCheckoutModalInfo, persistCheckoutModalInfoUsed } from "../components/public/CheckoutOverlay/CheckoutOverlay.utils";
+import { CheckoutModalStatePlaid } from "../components/public/CheckoutOverlay/CheckoutOverlay.types";
+import { FALLBACK_MODAL_STATE_COMMON } from "../components/public/CheckoutOverlay/CheckoutOverlay.constants";
+import { ApolloError } from "@apollo/client";
 
 export interface UsePlaidOptionsStartFlow {
+  orgID: string;
+  invoiceID: string;
+  invoiceCountdownStart: number;
   selectedBillingInfo: string | BillingInfo;
+  skip: boolean;
 }
 
 export interface UsePlaidOptionsContinueFlow {
@@ -25,37 +33,74 @@ export function isUsePlaidOptionsContinueFlow(options: UsePlaidOptions): options
 }
 
 // Load the initial OAuth flow state from localStorage to initialize the ref. Note `getPlaidOAuthFlowState` will
-// automatically discard the saved data if it's invalid (`continueOAuthFlow && savedStateUsed`):
-export let INITIAL_PLAID_OAUTH_FLOW_STATE = getPlaidOAuthFlowState();
+// automatically discard the saved data if it's invalid (`continueFlow && savedStateUsed`):
+export let INITIAL_PLAID_OAUTH_FLOW_STATE = getCheckoutModalState(true);
 
 export function continuePlaidOAuthFlow() {
-  return INITIAL_PLAID_OAUTH_FLOW_STATE.continueOAuthFlow && !INITIAL_PLAID_OAUTH_FLOW_STATE.savedStateUsed;;
+  return INITIAL_PLAID_OAUTH_FLOW_STATE.continueFlow && !INITIAL_PLAID_OAUTH_FLOW_STATE.savedInfoUsed && isCheckoutModalInfoPlaid(INITIAL_PLAID_OAUTH_FLOW_STATE);
 }
 
-export function usePlaid(options: UsePlaidOptions) {
-  const selectedBillingInfo = isUsePlaidOptionsStartFlow(options) ? options.selectedBillingInfo : null;
-  const onSubmit = isUsePlaidOptionsContinueFlow(options) ? options.onSubmit : null;
-  const plaidOAuthFlowStateRef = useRef<PlaidOAuthFlowState>(INITIAL_PLAID_OAUTH_FLOW_STATE);
+export interface UsePlaidReturn {
+  loading: boolean;
+  error?: ApolloError;
+  openLink: () => void;
+  refetchLink: () => void;
+}
+
+export function usePlaid(options: UsePlaidOptions): UsePlaidReturn {
+  let orgID: string | null = null;
+  let invoiceID: string | null = null;
+  let invoiceCountdownStart: number | null = null;
+  let selectedBillingInfo: string | BillingInfo | null = null;
+  let skip = false;
+  let onSubmit: ((data?: PaymentMethod) => void) | null = null;
+
+  if (isUsePlaidOptionsStartFlow(options)) {
+    orgID = options.orgID;
+    invoiceID = options.invoiceID;
+    invoiceCountdownStart = options.invoiceCountdownStart;
+    selectedBillingInfo = options.selectedBillingInfo;
+    skip = options.skip || !orgID;
+  } else if (isUsePlaidOptionsContinueFlow(options) ) {
+    onSubmit = options.onSubmit;
+    skip = true;
+  }
+
+  const plaidOAuthFlowStateRef = useRef<CheckoutModalStatePlaid>(INITIAL_PLAID_OAUTH_FLOW_STATE);
 
   const {
     linkToken: savedLinkToken,
     receivedRedirectUri,
-    continueOAuthFlow,
+    continueFlow,
   } = plaidOAuthFlowStateRef.current || {};
 
   const {
     loading: isPreparePaymentMethodLoading,
     error: preparePaymentMethodError,
     data: preparePaymentMethodData,
+    refetch: refetchLink,
   } = usePreparePaymentMethodQuery({
-    skip: continueOAuthFlow || onSubmit !== null,
+    variables: { orgID },
+    skip,
   });
 
-  const linkToken = (continueOAuthFlow ? savedLinkToken : preparePaymentMethodData?.preparePaymentMethod?.linkToken) || "";
+  useEffect(() => {
+    if (!isLocalhostOrStaging()) return;
+
+    if (isPreparePaymentMethodLoading) {
+      console.log("🏦 Loading Plaid Link...");
+    } else if (preparePaymentMethodError) {
+      console.log("🏚️ Plaid Link Error: ", preparePaymentMethodError);
+    }
+  }, [isPreparePaymentMethodLoading, preparePaymentMethodError])
+
+  const linkToken = (continueFlow ? savedLinkToken : preparePaymentMethodData?.preparePaymentMethod?.linkToken) || "";
 
   const onSuccess = useCallback<PlaidLinkOnSuccess>((public_token, metadata) => {
     // Reset in case purchase fails and we need to try again:
-    plaidOAuthFlowStateRef.current = INITIAL_PLAID_OAUTH_FLOW_STATE = clearPlaidInfo();
+    clearPersistedInfo();
+
+    plaidOAuthFlowStateRef.current = INITIAL_PLAID_OAUTH_FLOW_STATE = FALLBACK_MODAL_STATE_COMMON;
 
     if (!onSubmit) return;
 
@@ -72,7 +117,9 @@ export function usePlaid(options: UsePlaidOptions) {
     if (plaidOAuthFlowStateRef.current === INITIAL_PLAID_OAUTH_FLOW_STATE && !error) return;
 
     // Reset in case purchase fails and we need to try again.
-    plaidOAuthFlowStateRef.current = INITIAL_PLAID_OAUTH_FLOW_STATE = clearPlaidInfo();
+    clearPersistedInfo();
+
+    plaidOAuthFlowStateRef.current = INITIAL_PLAID_OAUTH_FLOW_STATE = FALLBACK_MODAL_STATE_COMMON;
 
     if (!onSubmit) return;
 
@@ -86,7 +133,7 @@ export function usePlaid(options: UsePlaidOptions) {
     // When an error happens in Plaid (can be simulated in the first screen of the test banks), users are given an option
     // to retry. When clicking it, an "ERROR" event will be triggered, and we need to use this to mark the persisted Plaid
     // OAuth state as not used so that it is not deleted when we come back from this new attempt:
-    persistPlaidOAuthStateUsed(false);
+    persistCheckoutModalInfoUsed(false);
   }, []);
 
   const config: PlaidLinkOptions = {
@@ -109,33 +156,46 @@ export function usePlaid(options: UsePlaidOptions) {
   }, [preparePaymentMethodError, plaidLinkError, onSubmit]);
 
   useEffect(() => {
-    if (continueOAuthFlow && plaidLinkReady) {
-      console.log("Open plaid link automatically...");
+    if (continueFlow && plaidLinkReady) {
+      if (isLocalhostOrStaging()) console.log("Open plaid link automatically...");
 
       plaidLinkOpen();
 
       // If the user aborts the Plaid OAuth flow after it's been resumed (e.g. by not selecting an account), the
       // persisted data will remain in localStorage. However, we are marking it as used so that this flow is not resumed again:
-      persistPlaidOAuthStateUsed();
+      persistCheckoutModalInfoUsed();
     }
-  }, [continueOAuthFlow, plaidLinkReady, plaidLinkOpen]);
+  }, [continueFlow, plaidLinkReady, plaidLinkOpen]);
 
-  const handlePlaidLinkClicked = useCallback(() => {
-    // TODO: Handle errors properly:
-    // TODO: This could be clicked before the link is ready:
-    if (!plaidLinkReady || isPreparePaymentMethodLoading || !linkToken || !selectedBillingInfo) return;
+  const openLink = useCallback(() => {
+    if (!plaidLinkReady || isPreparePaymentMethodLoading || !invoiceID || !invoiceCountdownStart || !selectedBillingInfo || !linkToken) return;
 
-    console.log("Open plain link manually", linkToken);
+    if (isLocalhostOrStaging()) console.log("Open plain link manually", linkToken);
 
-    persistPlaidInfo({
+    persistCheckoutModalInfo({
+      invoiceID,
+      invoiceCountdownStart,
+      billingInfo: selectedBillingInfo,
       linkToken,
-      selectedBillingInfo,
     });
 
     plaidLinkOpen();
-  }, [plaidLinkReady, isPreparePaymentMethodLoading, linkToken, selectedBillingInfo, plaidLinkOpen]);
+  }, [
+    plaidLinkReady,
+    isPreparePaymentMethodLoading,
+    linkToken,
+    selectedBillingInfo,
+    invoiceID,
+    invoiceCountdownStart,
+    plaidLinkOpen,
+  ]);
 
-  return handlePlaidLinkClicked;
+  return {
+    loading: isPreparePaymentMethodLoading,
+    error: preparePaymentMethodError,
+    openLink,
+    refetchLink,
+  };
 }
 
 export const PlaidFlow: React.FC<UsePlaidOptionsContinueFlow> = ({

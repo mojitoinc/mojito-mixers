@@ -5,9 +5,9 @@ import { CheckoutItem } from "../../../domain/product/product.interfaces";
 import { Wallet } from "../../../domain/wallet/wallet.interfaces";
 export interface PurchaseConfirmationBillingDetailsProps {
     checkoutItems: CheckoutItem[];
-    circlePaymentID: string;
+    processorPaymentID: string;
     wallet: null | string | Wallet;
     selectedPaymentMethodBillingInfo: SavedPaymentMethodBillingInfo;
-    selectedPaymentMethodPaymentInfo: PaymentMethod | SavedPaymentMethod;
+    selectedPaymentMethodPaymentInfo: PaymentMethod | SavedPaymentMethod | null;
 }
 export declare const PurchaseConfirmationBillingDetails: React.FC<PurchaseConfirmationBillingDetailsProps>;

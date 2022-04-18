@@ -64,6 +64,8 @@ exports.InvoiceStatus = void 0;
     InvoiceStatus["Canceled"] = "Canceled";
     InvoiceStatus["Delivered"] = "Delivered";
     InvoiceStatus["Draft"] = "Draft";
+    InvoiceStatus["Expired"] = "Expired";
+    InvoiceStatus["Failed"] = "Failed";
     InvoiceStatus["Paid"] = "Paid";
     InvoiceStatus["Pending"] = "Pending";
 })(exports.InvoiceStatus || (exports.InvoiceStatus = {}));
@@ -107,6 +109,7 @@ exports.PaymentType = void 0;
 (function (PaymentType) {
     PaymentType["Ach"] = "ACH";
     PaymentType["CreditCard"] = "CreditCard";
+    PaymentType["Crypto"] = "Crypto";
     PaymentType["Wire"] = "Wire";
 })(exports.PaymentType || (exports.PaymentType = {}));
 exports.Role = void 0;
@@ -171,7 +174,7 @@ const CreatePaymentDocument = Apollo.gql `
   createPayment(paymentMethodID: $paymentMethodID, invoiceID: $invoiceID, metadata: $metadata) {
     id
     invoiceID
-    circlePaymentID
+    processorPaymentID
     status
     userID
   }
@@ -470,6 +473,10 @@ const CreatePaymentMethodDocument = Apollo.gql `
       id
       status
     }
+    ... on CryptoPaymentMethodOutput {
+      id
+      status
+    }
   }
 }
     `;
@@ -523,8 +530,8 @@ function useDeletePaymentMethodMutation(baseOptions) {
     return Apollo__namespace.useMutation(DeletePaymentMethodDocument, options);
 }
 const PreparePaymentMethodDocument = Apollo.gql `
-    query PreparePaymentMethod {
-  preparePaymentMethod(paymentMethodType: ACH) {
+    query PreparePaymentMethod($orgID: UUID1!) {
+  preparePaymentMethod(paymentMethodType: ACH, orgID: $orgID) {
     ... on ACHPaymentMethodPrepareStatementOutput {
       linkToken
     }
@@ -543,6 +550,7 @@ const PreparePaymentMethodDocument = Apollo.gql `
  * @example
  * const { data, loading, error } = usePreparePaymentMethodQuery({
  *   variables: {
+ *      orgID: // value for 'orgID'
  *   },
  * });
  */
@@ -562,6 +570,10 @@ const GetPaymentMethodStatusDocument = Apollo.gql `
       status
     }
     ... on WirePaymentMethodOutput {
+      id
+      status
+    }
+    ... on CryptoPaymentMethodOutput {
       id
       status
     }

@@ -1,11 +1,7 @@
-import { SxProps, Theme } from "@mui/material/styles";
 import React from "react";
-import { FullScreenOverlayFunctionalProps } from "../../shared/FullScreenOverlay/FullScreenOverlay";
 import { ProvidersInjectorProps } from "../../shared/ProvidersInjector/ProvidersInjector";
-export interface PUIErrorOverlayProps extends FullScreenOverlayFunctionalProps {
-    logoSrc?: string;
-    logoSx?: SxProps<Theme>;
-    errorImageSrc: string;
+import { PUIStaticErrorOverlayProps } from "./StaticErrorOverlay";
+export interface PUIErrorOverlayProps extends PUIStaticErrorOverlayProps {
     onRedirect: (pathnameOrUrl: string) => void;
 }
 export declare type PUIErrorProps = PUIErrorOverlayProps & ProvidersInjectorProps;

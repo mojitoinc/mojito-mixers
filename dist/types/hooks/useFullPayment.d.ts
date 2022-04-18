@@ -12,7 +12,7 @@ export interface UseFullPaymentOptions {
 }
 export interface FullPaymentState {
     paymentStatus: PaymentStatus;
-    circlePaymentID: string;
+    processorPaymentID: string;
     paymentID: string;
     paymentError?: string | CheckoutModalError;
 }

@@ -85,7 +85,7 @@ export const SavedBillingDetailsSelector: React.FC<SavedBillingDetailsSelectorPr
         Add New Billing Info
       </SecondaryButton>
 
-      <TaxesMessagesBox sx={{ mt: 5 }} taxes={ taxes } variant="selector" />
+      <TaxesMessagesBox sx={{ mt: 5 }} isSubmitted variant="selector" taxes={ taxes } />
     </Box>
 
     <CheckoutModalFooter

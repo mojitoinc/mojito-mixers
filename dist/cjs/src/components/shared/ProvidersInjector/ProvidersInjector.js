@@ -7,6 +7,7 @@ var React = require('react');
 var AuthorizedApolloProvider = require('../AuthorizedApolloProvider/AuthorizedApolloProvider.js');
 var theme = require('../../../config/theme/theme.js');
 var ErrorBoundary = require('../../public/ErrorBoundary/ErrorBoundary.js');
+var exceptions_constants = require('../../../domain/errors/exceptions.constants.js');
 var system = require('@mui/system');
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
@@ -21,17 +22,17 @@ theme: parentTheme, themeOptions, children, }) => {
     const theme$1 = React.useMemo(() => parentTheme !== null && parentTheme !== void 0 ? parentTheme : theme.extendDefaultTheme(themeOptions), [parentTheme, themeOptions]);
     React.useEffect(() => {
         if (parentTheme && themeOptions) {
-            throw new Error("You can't use both `themeOptions` and `theme`. Please, use only one. `themeOptions` is preferred.");
+            throw new Error(exceptions_constants.EXCEPTIONS.DEV.THEME_PROVIDER);
         }
     }, [parentTheme, themeOptions]);
     React.useEffect(() => {
         if (apolloClient === null && uri === "")
             return;
         if (apolloClient && uri) {
-            throw new Error("You can't use both `apolloClient` and `uri`. Please, use only one. `uri` is preferred.");
+            throw new Error(exceptions_constants.EXCEPTIONS.DEV.APOLLO_PROVIDER_DUPLICATE);
         }
         if (!apolloClient && !uri) {
-            throw new Error("You must set `apolloClient` or  `uri`. Please, add one. `uri` is preferred.");
+            throw new Error(exceptions_constants.EXCEPTIONS.DEV.APOLLO_PROVIDER_MISSING);
         }
     }, [apolloClient, uri]);
     return (React__default["default"].createElement(AuthorizedApolloProvider.AuthorizedApolloProvider, { apolloClient: apolloClient, uri: uri }, theme$1 ? React__default["default"].createElement(system.ThemeProvider, { theme: theme$1 }, children) : children));

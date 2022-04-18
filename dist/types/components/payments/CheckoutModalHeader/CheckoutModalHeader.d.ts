@@ -7,7 +7,7 @@ export interface CheckoutModalHeaderProps {
     variant: CheckoutModalHeaderVariant;
     countdownElementRef?: React.RefObject<HTMLSpanElement>;
     title?: string;
-    logoSrc: string;
+    logoSrc?: string;
     logoSx?: SxProps<Theme>;
     user?: User;
     userFormat?: UserFormat;

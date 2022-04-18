@@ -1,15 +1,15 @@
 import { useLayoutEffect } from 'react';
-import { getPlaidOAuthFlowState, persistPlaidReceivedRedirectUri } from '../../../domain/plaid/plaid.utils.js';
 import { withThemeProvider } from '../../shared/ProvidersInjector/ProvidersInjector.js';
+import { getCheckoutModalState, persistCheckoutModalInfoRedirectURI } from '../CheckoutOverlay/CheckoutOverlay.utils.js';
 
 const PUIPlaidOverlay = ({ onRedirect, }) => {
-    const { continueOAuthFlow, url } = getPlaidOAuthFlowState();
+    const { continueFlow, url } = getCheckoutModalState(true);
     useLayoutEffect(() => {
-        if (continueOAuthFlow) {
-            persistPlaidReceivedRedirectUri(window.location.href);
+        if (continueFlow) {
+            persistCheckoutModalInfoRedirectURI(window.location.href);
         }
         onRedirect(url || "/");
-    }, [continueOAuthFlow, onRedirect, url]);
+    }, [continueFlow, onRedirect, url]);
     return null;
 };
 const PUIPlaid = withThemeProvider(PUIPlaidOverlay);

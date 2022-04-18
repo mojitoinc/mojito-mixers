@@ -15,7 +15,16 @@ export declare const withInvalidErrorMessage: ({ label }: {
 export declare const withFullNameErrorMessage: ({ label }: {
     label: string;
 }) => string;
+export declare const withFullNameCharsetErrorMessage: ({ label }: {
+    label: string;
+}) => string;
 export declare const withPhoneErrorMessage: ({ label }: {
+    label: string;
+}) => string;
+export declare const withInvalidAddress: ({ variant }: {
+    variant: "form" | "selector";
+}) => string;
+export declare const withInvalidZipCode: ({ label }: {
     label: string;
 }) => string;
 export declare const withInvalidCardNumber: ({ label }: {

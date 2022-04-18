@@ -1,8 +1,8 @@
 import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useCallback } from "react";
-import { PUISuccess } from "../../lib";
-import { PLAYGROUND_LOGOS_SRC, PLAYGROUND_LOGOS_SX, PLAYGROUND_THEMES } from "../../utils/playground/playground.constants";
+import { MOJITO_LIGHT_THEME, PUISuccess } from "../../lib";
+import { PLAYGROUND_MOJITO_LOGO } from "../../utils/playground/playground.constants";
 
 const SuccessPage: NextPage = () => {
   const router = useRouter();
@@ -19,9 +19,8 @@ const SuccessPage: NextPage = () => {
 
   return (
     <PUISuccess
-      theme={PLAYGROUND_THEMES.light}
-      logoSrc={PLAYGROUND_LOGOS_SRC.light}
-      logoSx={PLAYGROUND_LOGOS_SX.light}
+      theme={MOJITO_LIGHT_THEME}
+      logoSrc={PLAYGROUND_MOJITO_LOGO}
       successImageSrc=""
       onRedirect={handleRedirect} />
   );

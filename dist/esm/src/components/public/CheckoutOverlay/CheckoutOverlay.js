@@ -12,26 +12,31 @@ import { PurchasingView } from '../../../views/Purchasing/PurchasingView.js';
 import { ErrorView } from '../../../views/Error/ErrorView.js';
 import { continuePlaidOAuthFlow, PlaidFlow } from '../../../hooks/usePlaid.js';
 import { useCheckoutModalState, CheckoutModalStepIndex } from './CheckoutOverlay.hooks.js';
-import { ERROR_LOADING_USER, ERROR_LOADING_PAYMENT_METHODS, ERROR_LOADING_INVOICE, DEFAULT_ERROR_AT } from '../../../domain/errors/errors.constants.js';
+import { ERROR_LOADING_USER, ERROR_LOADING_INVOICE, DEFAULT_ERROR_AT } from '../../../domain/errors/errors.constants.js';
 import { FullScreenOverlay } from '../../shared/FullScreenOverlay/FullScreenOverlay.js';
 import { withProviders } from '../../shared/ProvidersInjector/ProvidersInjector.js';
 import { transformCheckoutItemsFromInvoice } from '../../../domain/product/product.utils.js';
 import { useCreateInvoiceAndReservation } from '../../../hooks/useCreateInvoiceAndReservation.js';
 import { useCheckoutItemsCostTotal } from '../../../hooks/useCheckoutItemCostTotal.js';
 import { DictionaryProvider } from '../../../providers/DictionaryProvider.js';
-import { DEV_DEBUG_ENABLED_KEY, THREEDS_REDIRECT_DELAY_MS } from '../../../config/config.js';
+import { DEV_DEBUG_ENABLED_KEY, THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY, THREEDS_FLOW_SEARCH_PARAM_ERROR_KEY, THREEDS_REDIRECT_DELAY_MS } from '../../../config/config.js';
 import { NEW_WALLET_OPTION } from '../../../domain/wallet/wallet.constants.js';
 import { StatusIcon } from '../../shared/StatusIcon/StatusIcon.js';
+import { PUIStaticSuccessOverlay } from '../SuccessOverlay/StaticSuccessOverlay.js';
+import { PUIStaticErrorOverlay } from '../ErrorOverlay/StaticErrorOverlay.js';
+import { useCountdown } from '../../../hooks/useContdown.js';
 
 const DEV_DEBUG_ENABLED = process.browser && localStorage.getItem(DEV_DEBUG_ENABLED_KEY) === "true";
 const PUICheckoutOverlay = ({ 
 // Modal:
-open, onClose, onGoToCollection, 
+open, onClose, onGoTo, 
+// TODO: Move to dictionary:
+goToHref, goToLabel, 
 // Flow:
-guestCheckoutEnabled, productConfirmationEnabled, vertexEnabled = true, threeDSEnabled = true, 
+loaderMode: initialLoaderMode = "default", paymentErrorParam, onRemoveUrlParams, guestCheckoutEnabled, productConfirmationEnabled, vertexEnabled = true, threeDSEnabled = true, 
 // Personalization:
-logoSrc, logoSx, loaderImageSrc, purchasingImageSrc, purchasingMessages, errorImageSrc, userFormat, acceptedPaymentTypes, acceptedCreditCardNetworks, paymentLimits, // Not implemented yet. Used to show payment limits for some payment types.
-dictionary, network, 
+logoSrc, logoSx, loaderImageSrc, purchasingImageSrc, purchasingMessages, successImageSrc, errorImageSrc, userFormat, acceptedPaymentTypes, acceptedCreditCardNetworks, network, paymentLimits, // Not implemented yet. Used to show payment limits for some payment types.
+dictionary, 
 // Legal:
 consentType, 
 // Data:
@@ -39,8 +44,7 @@ orgID, invoiceID: initialInvoiceID, checkoutItems: parentCheckoutItems,
 // Authentication:
 onLogin, isAuthenticated, isAuthenticatedLoading, 
 // Other Events:
-debug: parentDebug, onEvent, onError, onMarketingOptInChange, // Not implemented yet. Used to let user subscribe / unsubscribe to marketing updates.
- }) => {
+debug: parentDebug, onEvent, onError, }) => {
     var _a, _b, _c;
     const [debug, setDebug] = useState(!!parentDebug);
     // Initialization, just to prevent issues with Next.js' SSR:
@@ -78,7 +82,7 @@ debug: parentDebug, onEvent, onError, onMarketingOptInChange, // Not implemented
             : userWallets;
     }, [meLoading, meData, network]);
     const { data: paymentMethodsData, loading: paymentMethodsLoading, error: paymentMethodsError, refetch: refetchPaymentMethods, } = useGetPaymentMethodListQuery({
-        skip: !isAuthenticated,
+        skip: !isAuthenticated || !orgID || !open,
         variables: { orgID },
     });
     // Get everything related to Payment UI routing, error and state handling, including resuming Plaid / 3DS flows:
@@ -88,12 +92,13 @@ debug: parentDebug, onEvent, onError, onMarketingOptInChange, // Not implemented
     // SelectedPaymentMethod:
     selectedPaymentMethod, setSelectedPaymentMethod, 
     // PurchaseState:
-    invoiceID, setInvoiceID, taxes, setTaxes, wallet, setWalletAddress, paymentID, circlePaymentID, setPayments, } = useCheckoutModalState({
+    invoiceID, invoiceCountdownStart, setInvoiceID, taxes, setTaxes, wallet, setWalletAddress, paymentID, processorPaymentID, setPayments, } = useCheckoutModalState({
         invoiceID: initialInvoiceID,
         productConfirmationEnabled,
         vertexEnabled,
         isAuthenticated,
         onError,
+        debug,
     });
     // Once we have an invoiceID, load the invoice:
     const { data: invoiceDetailsData, loading: invoiceDetailsLoading, error: invoiceDetailsError, refetch: refetchInvoiceDetails, } = useGetInvoiceDetailsQuery({
@@ -101,9 +106,44 @@ debug: parentDebug, onEvent, onError, onMarketingOptInChange, // Not implemented
         variables: { invoiceID },
     });
     // Modal loading state:
-    const isDialogLoading = isAuthenticatedLoading || meLoading || paymentMethodsLoading;
-    const isDialogInitializing = isDialogLoading || invoiceDetailsLoading || !invoiceID;
+    const isDialogLoading = !orgID || parentCheckoutItems.length === 0 || isAuthenticatedLoading || meLoading || paymentMethodsLoading;
+    const isDialogInitializing = isDialogLoading || invoiceDetailsLoading || !invoiceID || !invoiceCountdownStart;
     const isPlaidFlowLoading = continuePlaidOAuthFlow();
+    const [loaderMode, setLoaderMode] = useState(initialLoaderMode);
+    const isInvalidMode = loaderMode !== "default" && !open;
+    const showEspecialLoaders = open && isDialogInitializing && loaderMode !== "default" && checkoutStep !== "error";
+    useEffect(() => {
+        if (!isDialogInitializing || isInvalidMode) {
+            // Once we have finished loading data OR if `loaderMode` is not default but the modal is not opened (probably
+            // because the data in `localStorage` expired), we reset the loader mode:
+            setLoaderMode("default");
+        }
+    }, [isDialogInitializing, isInvalidMode]);
+    useEffect(() => {
+        if (showEspecialLoaders)
+            return;
+        const params = new URLSearchParams(location.search);
+        params.delete(THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY);
+        params.delete(THREEDS_FLOW_SEARCH_PARAM_ERROR_KEY);
+        const cleanParams = params.toString();
+        const cleanURL = location.href.replace(location.search, cleanParams ? `?${cleanParams}` : "");
+        if (cleanURL && cleanURL !== location.href)
+            onRemoveUrlParams(cleanURL);
+    }, [showEspecialLoaders, onRemoveUrlParams]);
+    useEffect(() => {
+        let emoji = "🔄";
+        if (isInvalidMode) {
+            emoji = "⚠️";
+        }
+        else if (loaderMode === "default") {
+            emoji = open ? "📬" : "📭";
+        }
+        else {
+            emoji = loaderMode === "success" ? "✔️" : "❌";
+        }
+        if (debug)
+            console.log(`${emoji} loaderMode = ${loaderMode} / isOpen = ${open}`);
+    }, [debug, isInvalidMode, loaderMode, open, onRemoveUrlParams]);
     // Payment methods and checkout items / invoice items transforms:
     const rawSavedPaymentMethods = paymentMethodsData === null || paymentMethodsData === void 0 ? void 0 : paymentMethodsData.getPaymentMethodList;
     const savedPaymentMethods = useMemo(() => transformRawSavedPaymentMethods(rawSavedPaymentMethods), [rawSavedPaymentMethods]);
@@ -120,7 +160,9 @@ debug: parentDebug, onEvent, onError, onMarketingOptInChange, // Not implemented
     }, [wallets, destinationAddress, setWalletAddress]);
     // Invoice creation & buy now lot reservation:
     const createInvoiceAndReservationCalledRef = useRef(false);
-    const { invoiceAndReservationState, createInvoiceAndReservation, countdownElementRef, } = useCreateInvoiceAndReservation({ orgID, checkoutItems, stop: checkoutStep === "confirmation", debug });
+    const { 
+    // TODO: Instead of returning state, just pass setError and setInvoiceID or return it from createInvoiceAndReservation.
+    invoiceAndReservationState, createInvoiceAndReservation, } = useCreateInvoiceAndReservation({ orgID, checkoutItems, debug });
     useEffect(() => {
         if (isDialogLoading || invoiceID === null || invoiceID || createInvoiceAndReservationCalledRef.current)
             return;
@@ -128,16 +170,22 @@ debug: parentDebug, onEvent, onError, onMarketingOptInChange, // Not implemented
         createInvoiceAndReservation();
     }, [isDialogLoading, invoiceID, createInvoiceAndReservation]);
     useEffect(() => {
-        if (invoiceAndReservationState.error) {
+        const { invoiceID, invoiceCountdownStart, error } = invoiceAndReservationState;
+        if (error) {
             // TODO: It would be great if we can keep track of the reservation expiration without changing the displayed error
             // if there's already once, so when clicking the action button for that one, on top of calling its respective error
             // handling code, we re-create the reservation:
-            setError(invoiceAndReservationState.error);
+            setError(error);
             return;
         }
-        if (invoiceAndReservationState.invoiceID)
-            setInvoiceID(invoiceAndReservationState.invoiceID);
+        if (invoiceID && invoiceCountdownStart)
+            setInvoiceID(invoiceID, invoiceCountdownStart);
     }, [invoiceAndReservationState, setError, setInvoiceID]);
+    // Reservation countdown:
+    const { countdownElementRef } = useCountdown({
+        invoiceCountdownStart: checkoutStep === "confirmation" || checkoutStep === "error" ? null : invoiceCountdownStart,
+        setError,
+    });
     // Init modal state once everything has been loaded:
     useEffect(() => {
         if (!isDialogLoading && open)
@@ -147,11 +195,15 @@ debug: parentDebug, onEvent, onError, onMarketingOptInChange, // Not implemented
     useEffect(() => {
         if (meError)
             setError(ERROR_LOADING_USER(meError));
-        if (paymentMethodsError)
-            setError(ERROR_LOADING_PAYMENT_METHODS(paymentMethodsError));
         if (invoiceDetailsError)
             setError(ERROR_LOADING_INVOICE(invoiceDetailsError));
+        if (paymentMethodsError) {
+            {
+                console.log("\n❌ (IGNORED) Error loading saved payment methods:\n\n", paymentMethodsError);
+            }
+        }
     }, [meError, paymentMethodsError, invoiceDetailsError, setError]);
+    // Analytics:
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const triggerAnalyticsEventRef = useRef((eventType) => { });
     triggerAnalyticsEventRef.current = (eventType) => {
@@ -163,7 +215,7 @@ debug: parentDebug, onEvent, onError, onMarketingOptInChange, // Not implemented
             const payment = savedPaymentMethods.find(({ id }) => id === paymentInfo);
             paymentType = payment === null || payment === void 0 ? void 0 : payment.type;
         }
-        else {
+        else if (paymentInfo) {
             paymentType = paymentInfo.type;
         }
         if (!eventType.startsWith("event:") && !eventType.includes(checkoutStep)) {
@@ -187,7 +239,7 @@ debug: parentDebug, onEvent, onError, onMarketingOptInChange, // Not implemented
             tax: taxAmount,
             total: subtotal + fees + taxAmount,
             // Order:
-            circlePaymentID,
+            processorPaymentID,
             paymentID,
         });
     };
@@ -245,9 +297,9 @@ debug: parentDebug, onEvent, onError, onMarketingOptInChange, // Not implemented
     // Delete payment methods:
     const [deletePaymentMethod] = useDeletePaymentMethodMutation();
     const handleSavedPaymentMethodDeleted = useCallback((addressIdOrPaymentMethodId) => __awaiter(void 0, void 0, void 0, function* () {
-        const idsToDelete = checkoutStep === "billing"
+        const idsToDelete = (checkoutStep === "billing"
             ? savedPaymentMethods.filter(({ addressId }) => addressId === addressIdOrPaymentMethodId).map(({ id }) => id)
-            : [addressIdOrPaymentMethodId];
+            : [addressIdOrPaymentMethodId]).filter(Boolean);
         if (idsToDelete.length === 0)
             return;
         // DELETE LOGIC:
@@ -280,7 +332,7 @@ debug: parentDebug, onEvent, onError, onMarketingOptInChange, // Not implemented
             });
         });
         yield Promise.allSettled(promises);
-        yield refetchPaymentMethods({ orgID });
+        yield refetchPaymentMethods().catch(() => { });
     }), [checkoutStep, deletePaymentMethod, orgID, refetchPaymentMethods, savedPaymentMethods, setSelectedPaymentMethod]);
     // Purchase:
     const handlePurchaseSuccess = useCallback((nextCirclePaymentID, nextPaymentID, redirectURL) => __awaiter(void 0, void 0, void 0, function* () {
@@ -295,16 +347,21 @@ debug: parentDebug, onEvent, onError, onMarketingOptInChange, // Not implemented
             return;
         }
         // After a successful purchase, a new payment method might have been created, so we reload them:
-        yield refetchPaymentMethods();
+        yield refetchPaymentMethods().catch(() => { });
         goNext();
     }), [setPayments, debug, refetchPaymentMethods, goNext]);
     const handlePurchaseError = useCallback((error) => __awaiter(void 0, void 0, void 0, function* () {
         setTimeout(() => triggerAnalyticsEventRef.current("event:paymentError"));
         // After a failed purchase, a new payment method might have been created anyway, so we reload them (createPaymentMethod
         // works but createPayment fails):
-        yield refetchPaymentMethods();
+        yield refetchPaymentMethods().catch(() => { });
         setError(error);
     }), [refetchPaymentMethods, setError]);
+    const handleGoTo = useCallback(() => {
+        if (onGoTo)
+            onGoTo();
+        onClose();
+    }, [onGoTo, onClose]);
     // Release reservation:
     const lastReleasedReservationID = useRef("");
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -316,7 +373,7 @@ debug: parentDebug, onEvent, onError, onMarketingOptInChange, // Not implemented
         },
     });
     const handleBeforeUnload = handleBeforeUnloadRef.current = useCallback((e) => {
-        if (paymentID || circlePaymentID)
+        if (paymentID || processorPaymentID || initialInvoiceID)
             return;
         if (orgID && invoiceID && invoiceID !== lastReleasedReservationID.current) {
             if (debug)
@@ -339,7 +396,7 @@ debug: parentDebug, onEvent, onError, onMarketingOptInChange, // Not implemented
             // The absence of a returnValue property on the event will guarantee the browser unload happens:
             delete e['returnValue'];
         }
-    }, [paymentID, circlePaymentID, orgID, invoiceID, debug, releaseReservationBuyNowLot]);
+    }, [paymentID, processorPaymentID, initialInvoiceID, orgID, invoiceID, debug, releaseReservationBuyNowLot]);
     useEffect(() => {
         if ((checkoutError === null || checkoutError === void 0 ? void 0 : checkoutError.at) === "reset")
             handleBeforeUnloadRef.current();
@@ -354,7 +411,7 @@ debug: parentDebug, onEvent, onError, onMarketingOptInChange, // Not implemented
         window.removeEventListener('beforeunload', handleBeforeUnload);
         handleBeforeUnload();
         createInvoiceAndReservationCalledRef.current = false;
-        setInvoiceID(null);
+        setInvoiceID(null, null);
         onClose();
     }, [handleBeforeUnload, setInvoiceID, onClose]);
     // Error handling:
@@ -363,9 +420,10 @@ debug: parentDebug, onEvent, onError, onMarketingOptInChange, // Not implemented
         if (at === "reset") {
             yield Promise.allSettled([
                 meRefetch(),
-                refetchPaymentMethods(),
+                refetchPaymentMethods().catch(() => { }),
                 createInvoiceAndReservation(),
             ]);
+            // TODO: Cancel previous reservation?
             goTo();
         }
         else {
@@ -373,7 +431,7 @@ debug: parentDebug, onEvent, onError, onMarketingOptInChange, // Not implemented
             // method has been created despite the error:
             yield Promise.allSettled([
                 meRefetch(),
-                refetchPaymentMethods(),
+                refetchPaymentMethods().catch(() => { }),
                 refetchInvoiceDetails(),
             ]);
             if (at !== "purchasing") {
@@ -397,6 +455,18 @@ debug: parentDebug, onEvent, onError, onMarketingOptInChange, // Not implemented
         goTo("purchasing");
     }, [initModalState, handlePaymentInfoSelected, goTo]);
     // Loading UI:
+    if (open && isDialogInitializing && loaderMode === "success" && checkoutStep !== "error") {
+        return (React__default.createElement(PUIStaticSuccessOverlay
+        // TODO: Add to dictionary:
+        , { 
+            // TODO: Add to dictionary:
+            successImageSrc: successImageSrc, logoSrc: logoSrc, logoSx: logoSx }));
+    }
+    if (open && isDialogInitializing && loaderMode === "error" && checkoutStep !== "error") {
+        return (React__default.createElement(PUIStaticErrorOverlay, { checkoutError: { errorMessage: paymentErrorParam || "" }, 
+            // TODO: Add to dictionary:
+            errorImageSrc: errorImageSrc, logoSrc: logoSrc, logoSx: logoSx }));
+    }
     if ((isDialogInitializing || isPlaidFlowLoading) && (checkoutStep !== "error")) {
         return (React__default.createElement(React__default.Fragment, null,
             isPlaidFlowLoading && React__default.createElement(PlaidFlow, { onSubmit: handlePlaidFlowCompleted }),
@@ -417,18 +487,19 @@ debug: parentDebug, onEvent, onError, onMarketingOptInChange, // Not implemented
     else if (checkoutStep === "billing") {
         checkoutStepElement = (React__default.createElement(BillingView, { vertexEnabled: vertexEnabled, checkoutItems: checkoutItems, savedPaymentMethods: savedPaymentMethods, selectedBillingInfo: selectedPaymentMethod.billingInfo, wallet: wallet, wallets: wallets, checkoutError: checkoutError, onBillingInfoSelected: handleBillingInfoSelected, onTaxesChange: setTaxes, onSavedPaymentMethodDeleted: handleSavedPaymentMethodDeleted, onWalletChange: setWalletAddress, onNext: goNext, onClose: handleClose, consentType: consentType, debug: debug }));
     }
-    else if (checkoutStep === "payment") {
-        checkoutStepElement = (React__default.createElement(PaymentView, { checkoutItems: checkoutItems, taxes: taxes, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethod: selectedPaymentMethod, wallet: wallet, wallets: wallets, checkoutError: checkoutError, onPaymentInfoSelected: handlePaymentInfoSelected, onCvvSelected: handleCvvSelected, onSavedPaymentMethodDeleted: handleSavedPaymentMethodDeleted, onWalletChange: setWalletAddress, onNext: goNext, onPrev: goBack, onClose: handleClose, acceptedPaymentTypes: acceptedPaymentTypes, acceptedCreditCardNetworks: acceptedCreditCardNetworks, consentType: consentType, debug: debug }));
+    else if (checkoutStep === "payment" && invoiceID && invoiceCountdownStart) {
+        checkoutStepElement = (React__default.createElement(PaymentView, { orgID: orgID, invoiceID: invoiceID, invoiceCountdownStart: invoiceCountdownStart, checkoutItems: checkoutItems, taxes: taxes, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethod: selectedPaymentMethod, wallet: wallet, wallets: wallets, checkoutError: checkoutError, onPaymentInfoSelected: handlePaymentInfoSelected, onCvvSelected: handleCvvSelected, onSavedPaymentMethodDeleted: handleSavedPaymentMethodDeleted, onWalletChange: setWalletAddress, onNext: goNext, onPrev: goBack, onClose: handleClose, acceptedPaymentTypes: acceptedPaymentTypes, acceptedCreditCardNetworks: acceptedCreditCardNetworks, consentType: consentType, debug: debug }));
     }
-    else if (checkoutStep === "purchasing" && invoiceID) {
+    else if (checkoutStep === "purchasing" && invoiceID && invoiceCountdownStart) {
         headerVariant = "purchasing";
-        checkoutStepElement = (React__default.createElement(PurchasingView, { threeDSEnabled: threeDSEnabled, purchasingImageSrc: purchasingImageSrc, purchasingMessages: purchasingMessages, orgID: orgID, invoiceID: invoiceID, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethod: selectedPaymentMethod, wallet: wallet, onPurchaseSuccess: handlePurchaseSuccess, onPurchaseError: handlePurchaseError, onDialogBlocked: setIsDialogBlocked, debug: debug }));
+        checkoutStepElement = (React__default.createElement(PurchasingView, { threeDSEnabled: threeDSEnabled, purchasingImageSrc: purchasingImageSrc, purchasingMessages: purchasingMessages, orgID: orgID, invoiceID: invoiceID, invoiceCountdownStart: invoiceCountdownStart, checkoutItems: checkoutItems, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethod: selectedPaymentMethod, wallet: wallet, onPurchaseSuccess: handlePurchaseSuccess, onPurchaseError: handlePurchaseError, onDialogBlocked: setIsDialogBlocked, debug: debug }));
     }
     else if (checkoutStep === "confirmation") {
         headerVariant = "logoOnly";
-        checkoutStepElement = (React__default.createElement(ConfirmationView, { checkoutItems: checkoutItems, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethod: selectedPaymentMethod, circlePaymentID: circlePaymentID, wallet: wallet, onGoToCollection: onGoToCollection, onNext: handleClose }));
+        checkoutStepElement = (React__default.createElement(ConfirmationView, { checkoutItems: checkoutItems, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethod: selectedPaymentMethod, processorPaymentID: processorPaymentID, wallet: wallet, onNext: handleClose, goToHref: goToHref, goToLabel: goToLabel, onGoTo: handleGoTo }));
     }
     else {
+        console.warn("Unknown checkoutStepElement!");
         // !checkoutStep or
         // checkoutStep === "error" && !checkoutError or
         // checkoutStep === "purchasing" && !invoiceID or

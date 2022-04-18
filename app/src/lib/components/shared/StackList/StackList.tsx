@@ -9,6 +9,7 @@ export interface BaseItemProps<T extends {} = any, A extends {} = any> {
   component?: HTMLRootTag;
   data: T;
   additionalProps?: A;
+  children?: React.ReactNode;
 }
 
 // eslint-disable-next-line @typescript-eslint/ban-types

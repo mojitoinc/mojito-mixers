@@ -86,6 +86,10 @@ mutation CreatePaymentMethod(
       id
       status
     }
+    ... on CryptoPaymentMethodOutput {
+      id
+      status
+    }
   }
 }
 
@@ -130,8 +134,10 @@ enum PaymentType {
   CreditCard
 }
 
-query PreparePaymentMethod {
-  preparePaymentMethod(paymentMethodType: ACH) {
+query PreparePaymentMethod(
+  $orgID: UUID1!
+) {
+  preparePaymentMethod(paymentMethodType: ACH, orgID: $orgID) {
     ... on ACHPaymentMethodPrepareStatementOutput {
       linkToken
     }
@@ -151,6 +157,10 @@ query GetPaymentMethodStatus(
       status
     }
     ... on WirePaymentMethodOutput {
+      id
+      status
+    }
+    ... on CryptoPaymentMethodOutput {
       id
       status
     }

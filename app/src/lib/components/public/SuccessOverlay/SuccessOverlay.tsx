@@ -3,7 +3,7 @@ import React, { useLayoutEffect } from "react";
 import { THREEDS_SUCCESS_REDIRECT_DELAY_MS } from "../../../config/config";
 import { getUrlWithSearchParams, isUrlPathname } from "../../../domain/url/url.utils";
 import { ThemeProviderProps, withThemeProvider } from "../../shared/ProvidersInjector/ProvidersInjector";
-import { getCheckoutModalState, persistReceivedRedirectUri3DS } from "../CheckoutOverlay/CheckoutOverlay.utils";
+import { getCheckoutModalState, persistCheckoutModalInfoRedirectURI } from "../CheckoutOverlay/CheckoutOverlay.utils";
 import { PUIStaticSuccessOverlay, PUIStaticSuccessOverlayProps } from "./StaticSuccessOverlay";
 
 export interface PUISuccessOverlayProps extends PUIStaticSuccessOverlayProps {
@@ -16,12 +16,12 @@ export const PUISuccessOverlay: React.FC<PUISuccessOverlayProps> = ({
   onRedirect,
   ...staticSuccessOverlayProps
 }) => {
-  const { purchaseSuccess, url = "" } = getCheckoutModalState();
+  const { purchaseSuccess, url = "" } = getCheckoutModalState(true);
   const isPathname = isUrlPathname(url);
 
   useLayoutEffect(() => {
     if (purchaseSuccess) {
-      if (isPathname) persistReceivedRedirectUri3DS(window.location.href);
+      if (isPathname) persistCheckoutModalInfoRedirectURI(window.location.href);
 
       return;
     }
@@ -37,7 +37,7 @@ export const PUISuccessOverlay: React.FC<PUISuccessOverlayProps> = ({
     if (purchaseSuccess) onRedirect(getUrlWithSearchParams(url));
   }, THREEDS_SUCCESS_REDIRECT_DELAY_MS);
 
-  return purchaseSuccess ? (<PUIStaticSuccessOverlay { ...staticSuccessOverlayProps } />) : null;
+  return <PUIStaticSuccessOverlay { ...staticSuccessOverlayProps } />;
 }
 
 export const PUISuccess: React.FC<PUISuccessProps> = withThemeProvider(PUISuccessOverlay);

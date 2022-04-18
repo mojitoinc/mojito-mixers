@@ -2,6 +2,7 @@ import { __rest } from '../../../../node_modules/tslib/tslib.es6.js';
 import { Dialog, DialogContent, Box } from '@mui/material';
 import React__default, { useRef, useEffect } from 'react';
 import { useShakeAnimation } from '../../../utils/animationUtils.js';
+import { NoTransition } from '../NoTransition/NoTransition.js';
 
 const centeredSx = {
     flex: 1,
@@ -23,7 +24,7 @@ const FullScreenOverlay = (_a) => {
             dialogScrollable.scrollTop = 0;
     }, [contentKey]);
     const [shakeSx, shake] = useShakeAnimation(paperRef.current);
-    return (React__default.createElement(Dialog, { open: isDialogBlocked ? true : open, onClose: isDialogBlocked ? shake : onClose, "aria-labelledby": "checkout-modal-header-title", scroll: "body", ref: dialogRootRef, PaperProps: { sx: shakeSx, ref: paperRef }, 
+    return (React__default.createElement(Dialog, { open: isDialogBlocked ? true : open, onClose: isDialogBlocked ? shake : onClose, "aria-labelledby": "checkout-modal-header-title", scroll: "body", ref: dialogRootRef, PaperProps: { sx: shakeSx, ref: paperRef }, TransitionComponent: NoTransition, 
         // Dialog only:
         // fullWidth
         // maxWidth="sm"
@@ -38,10 +39,11 @@ const FullScreenOverlay = (_a) => {
                 maxWidth: theme => theme.breakpoints.values.lg,
                 mx: "auto",
             } },
-            header,
-            children ? (React__default.createElement(Box, { sx: "centered" in variantProps && variantProps.centered ? centeredSx : undefined }, children)) : (("leftColumn" in variantProps || "rightColumn" in variantProps) && {
-            /* Implement 2-column layout using leftColumn and rightColumn */
-            }))));
+            React__default.createElement(React__default.Fragment, null,
+                header,
+                children ? (React__default.createElement(Box, { sx: "centered" in variantProps && variantProps.centered ? centeredSx : undefined }, children)) : (("leftColumn" in variantProps || "rightColumn" in variantProps) && {
+                /* Implement 2-column layout using leftColumn and rightColumn */
+                })))));
 };
 
 export { FullScreenOverlay };

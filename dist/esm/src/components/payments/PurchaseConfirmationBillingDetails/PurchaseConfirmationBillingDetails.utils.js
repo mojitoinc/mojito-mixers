@@ -1,7 +1,7 @@
 import { ACH_MASK_PREFIX, CREDIT_CARD_MASK_PREFIX } from '../../../domain/payment/payment.constants.js';
 
 function isSavedPaymentMethod(paymentMethodInfo) {
-    return paymentMethodInfo.hasOwnProperty("id");
+    return !!paymentMethodInfo && paymentMethodInfo.hasOwnProperty("id");
 }
 function getFormattedPaymentMethod(paymentMethodInfo) {
     let isMasked = false;
@@ -19,6 +19,10 @@ function getFormattedPaymentMethod(paymentMethodInfo) {
             displayValue = `${CREDIT_CARD_MASK_PREFIX} ${paymentMethodInfo.last4Digit}`;
             network = paymentMethodInfo.network;
         }
+    }
+    else if (paymentMethodInfo === null) {
+        isMasked = true;
+        displayValue = `${CREDIT_CARD_MASK_PREFIX} XXXX`;
     }
     else {
         displayValue = paymentMethodInfo.cardNumber;

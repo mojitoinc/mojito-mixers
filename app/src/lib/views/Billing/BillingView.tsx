@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Stack } from "@mui/material";
+import { Divider, Stack } from "@mui/material";
 
 import { CheckoutDeliveryAndItemCostBreakdown } from "../../components/payments/CheckoutDeliveryAndItemCostBreakdown/CheckoutDeliveryAndItemCostBreakdown";
 import { CheckoutStepper } from "../../components/payments/CheckoutStepper/CheckoutStepper";
@@ -19,10 +19,18 @@ import { ConsentType } from "../../components/shared/ConsentText/ConsentText";
 
 export type TaxStatus = "incomplete" | "loading" | "complete" | "error";
 
+export interface VertexSuggestions {
+  street?: string;
+  city?: string;
+  zipCode?: string;
+}
+
 export interface TaxesState {
   status: TaxStatus;
+  invalidZipCode?: boolean;
   taxRate?: number;
   taxAmount?: number;
+  vertexSuggestions?: VertexSuggestions;
 }
 
 interface BillingViewState {
@@ -92,6 +100,8 @@ export const BillingView: React.FC<BillingViewProps> = ({
   const calculateTaxes = useCallback(async (taxInfo: TaxInfo | BillingInfo) => {
     const calledAt = getTaxQuoteTimestampRef.current;
 
+    let invalidZipCode = false;
+
     const result = await getTaxQuote({
       variables: {
         input: {
@@ -105,20 +115,38 @@ export const BillingView: React.FC<BillingViewProps> = ({
           },
         },
       },
-    }).catch(() => ({ data: null }));
+    }).catch((err) => {
+      invalidZipCode = /invalid zipcode/i.test(err.message);
+
+      return { data: null };
+    });
 
     // Discard stale result:
     if (calledAt !== getTaxQuoteTimestampRef.current) return;
 
     const taxResult = result.data?.getTaxQuote || {} as TaxQuoteOutput;
-    const isValid = !!taxResult.verifiedAddress;
+    const { verifiedAddress } = taxResult;
+    const vertexSuggestions: VertexSuggestions = {};
 
-    setViewState((prevViewState) => ({ ...prevViewState, taxes: isValid ? {
+    if (!showSaved && verifiedAddress) {
+      // Vertex returns 5+4 zip codes, so we remove the last 4 digits to get the "normal" one:
+      const zipCode = (verifiedAddress?.postalCode || "").replace(/-\d{4}$/, "");
+
+      if (taxInfo.street !== verifiedAddress.street1) vertexSuggestions.street = verifiedAddress.street1;
+      if (taxInfo.city !== verifiedAddress.city) vertexSuggestions.city = verifiedAddress.city;
+      if (taxInfo.zipCode !== zipCode) vertexSuggestions.zipCode = zipCode;
+    }
+
+    setViewState((prevViewState) => ({ ...prevViewState, taxes: verifiedAddress ? {
       status: "complete",
       taxRate: 100 * taxResult.totalTaxAmount / taxResult.taxablePrice,
       taxAmount: taxResult.totalTaxAmount,
-    } : { status: "error"} }));
-  }, [getTaxQuote, total]);
+      vertexSuggestions,
+    } : {
+      status: "error",
+      invalidZipCode,
+    }}));
+  }, [getTaxQuote, total, showSaved]);
 
   const handleThrottledTaxInfoChange = useThrottledCallback((taxInfo: Partial<TaxInfo>) => {
     if (!vertexEnabled) return;
@@ -223,14 +251,10 @@ export const BillingView: React.FC<BillingViewProps> = ({
 
   return (
     <Stack
-      direction={{
-        xs: "column",
-        sm: "column",
-        md: "row",
-      }}
-      spacing={8.75}
-    >
-      <Stack sx={{ display: "flex", overflow: "hidden", width: { xs: "100%", md: "calc(50% - 35px)" } }}>
+      direction={{ xs: "column",  md: "row" }}
+      spacing={{ xs: 0,  md: 3.75 }}>
+
+      <Stack sx={{ display: "flex", overflow: "hidden", width: (theme) => ({ xs: "100%", md: `calc(50% - ${ theme.spacing(3.75 / 2) })` }) }}>
         <CheckoutStepper progress={ 50 } />
 
           { showSaved ? (
@@ -262,6 +286,8 @@ export const BillingView: React.FC<BillingViewProps> = ({
               debug={ debug } />
           ) }
       </Stack>
+
+      <Divider sx={{ display: { xs: "block", md: "none" } }} />
 
       <CheckoutDeliveryAndItemCostBreakdown
         checkoutItems={ checkoutItems }

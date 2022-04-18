@@ -13,7 +13,7 @@ export interface CheckoutEventData {
     fees: number;
     tax?: number;
     total: number;
-    circlePaymentID?: string;
+    processorPaymentID?: string;
     paymentID?: string;
 }
 export declare type CheckoutModalNavigateType = "navigate:authentication" | "navigate:billing" | "navigate:payment" | "navigate:purchasing" | "navigate:confirmation" | "navigate:error";

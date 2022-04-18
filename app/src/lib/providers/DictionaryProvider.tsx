@@ -6,6 +6,7 @@ export const DictionaryContext = createContext<PUIDictionary>(DEFAULT_DICTIONARY
 
 export interface DictionaryProviderProps {
   dictionary?: Partial<PUIDictionary>;
+  children?: React.ReactNode;
 }
 
 export const DictionaryProvider: React.FC<DictionaryProviderProps> = ({

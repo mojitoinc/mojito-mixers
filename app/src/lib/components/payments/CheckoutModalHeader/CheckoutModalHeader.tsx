@@ -36,7 +36,7 @@ export interface CheckoutModalHeaderProps {
   variant: CheckoutModalHeaderVariant;
   countdownElementRef?: React.RefObject<HTMLSpanElement>;
   title?: string;
-  logoSrc: string;
+  logoSrc?: string;
   logoSx?: SxProps<Theme>;
   user?: User;
   userFormat?: UserFormat;
@@ -104,14 +104,16 @@ export const CheckoutModalHeader: React.FC<CheckoutModalHeaderProps> = ({
       <Stack spacing={ 2 } direction="row" sx={{ justifyContent: "space-between", alignItems: "center", py: 2 }}>
         <Typography variant="h5" id="checkout-modal-header-title">{ title }</Typography>
 
-        <Img
-          src={ logoSrc }
-          onClick={ toggleDebug ? handleLogoClick : undefined }
-          sx={{
-            maxHeight: "32px",
-            maxWidth: { xs: "180px", sm: "240px" },
-            ...logoSx
-          }} />
+        { logoSrc && (
+          <Img
+            src={ logoSrc }
+            onClick={ toggleDebug ? handleLogoClick : undefined }
+            sx={{
+              maxHeight: "32px",
+              maxWidth: { xs: "180px", sm: "240px" },
+              ...logoSx
+            }} />
+        ) }
       </Stack>
 
       <Divider />

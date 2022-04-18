@@ -1,15 +1,10 @@
 import { useAuth0 } from "@auth0/auth0-react";
-import { Typography, Box, Stack, Button, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio, FormHelperText, TextField, Switch, Select, MenuItem, InputLabel, FormGroup, Checkbox, SelectChangeEvent } from "@mui/material";
-import { ErrorInfo, useCallback, useEffect, useRef, useState } from "react";
-import { PUICheckout, CheckoutModalError, PUICheckoutProps, PaymentType, useOpenCloseCheckoutModal } from "../lib";
+import { Typography, Box, Stack, Button, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio, TextField, Select, MenuItem, InputLabel, FormGroup, Checkbox, SelectChangeEvent } from "@mui/material";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { PaymentType, CheckoutComponentProps, useCheckoutOverlay } from "../lib";
 import { useMeQuery } from "../services/graphql/generated";
-import { PLAYGROUND_PARAGRAPHS_ARRAY, PLAYGROUND_AUTH_PRESET, PLAYGROUND_NO_AUTH_PRESET, PLAYGROUND_USER_FORMAT, PLAYGROUND_PURCHASING_IMAGE_SRC, PLAYGROUND_ERROR_IMAGE_SRC, PLAYGROUND_LOGOS_SRC, PLAYGROUND_LOGOS_SX, PLAYGROUND_LOADER_IMAGE_SRC, PLAYGROUND_MOCKED_AUCTION_LOT, PLAYGROUND_MOCKED_BUY_NOW_LOT, PLAYGROUND_PRIVACY_HREF, PLAYGROUND_TERMS_OF_USE_HREF, PLAYGROUND_THEMES } from "../utils/playground/playground.constants";
+import { PLAYGROUND_PARAGRAPHS_ARRAY, PLAYGROUND_MOCKED_AUCTION_LOT, PLAYGROUND_MOCKED_BUY_NOW_LOT } from "../utils/playground/playground.constants";
 import { PlaygroundFormData } from "../utils/playground/playground.interfaces";
-import { config } from "../utils/config/config.constants";
-import { CheckoutEventData, CheckoutEventType } from "../lib/domain/events/events.interfaces";
-import { isLocalhost } from "../lib/domain/url/url.utils";
-import { useRouter } from "next/router";
-import { THREEDS_FLOW_SEARCH_PARAM_ERROR_KEY, THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY } from "../lib/config/config";
 
 const DEFAULT_FORM_VALUES: PlaygroundFormData = {
   // Organization:
@@ -23,12 +18,6 @@ const DEFAULT_FORM_VALUES: PlaygroundFormData = {
   lotID: "",
   lotType: "buyNow",
   lotUnits: 1,
-
-  // Personalization:
-  theme: "light",
-  customImages: false,
-  notAuthPreset: "noAuthGuestDisabled",
-  authPresets: "authConfirmationDisabled",
 
   // Payment:
   paymentCC: true,
@@ -50,22 +39,95 @@ if (process.browser) {
 }
 
 const HomePage: React.FC = () => {
-  const router = useRouter();
-  const firstTimeRef = useRef(true);
-  const { loginWithPopup, isAuthenticated, isLoading: isAuthenticatedLoading, getIdTokenClaims } = useAuth0();
+  const { isAuthenticated, isLoading: isAuthenticatedLoading } = useAuth0();
   const { data: meData, loading: meLoading, error: meError } = useMeQuery({ skip: !isAuthenticated });
   const isLoading = isAuthenticatedLoading || meLoading;
   const organizations = isLoading ? [] : (meData?.me?.userOrgs || []).map(userOrg => userOrg.organization);
   const hasOrganizations = organizations.length > 0;
 
-  const paymentIdParam = router.query[THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY]?.toString();
-  const paymentErrorParam = router.query[THREEDS_FLOW_SEARCH_PARAM_ERROR_KEY]?.toString();
 
-  const { loaderMode, isOpen, onOpen, onClose } = useOpenCloseCheckoutModal({ paymentIdParam, paymentErrorParam });
+  // CHECKOUT OPENING & FORM VALUES:
 
-  const onRemoveUrlParams = useCallback((cleanURL: string) => {
-    router.replace(cleanURL, undefined, { shallow: true });
-  }, [router]);
+  const { open, setCheckoutComponentProps } = useCheckoutOverlay();
+
+  const [formValues, setFormValues] = useState<PlaygroundFormData>(DEFAULT_FORM_VALUES);
+
+  const getComponentPropsRef = useRef<() => CheckoutComponentProps>(() => ({}));
+
+  getComponentPropsRef.current = () => {
+    const lotType = formValues.lotType || DEFAULT_FORM_VALUES.lotType;
+
+    return {
+      // Personalization:
+      acceptedPaymentTypes: [
+        formValues.paymentCC ? "CreditCard" : "",
+        formValues.paymentACH ? "ACH" : "",
+        formValues.paymentWire ? "Wire" : "",
+        formValues.paymentCrypto ? "Crypto" : "",
+      ].filter(Boolean) as PaymentType[],
+      acceptedCreditCardNetworks: formValues.paymentCC ? ["visa", "mastercard"] : undefined,
+
+      // Data:
+      orgID: (formValues.orgID === "custom" ? formValues.customOrgID : formValues.orgID) || "",
+      invoiceID: (lotType === "auction" && formValues.invoiceID) || "",
+      checkoutItems: [{
+        ...(lotType === "buyNow" ? PLAYGROUND_MOCKED_BUY_NOW_LOT : PLAYGROUND_MOCKED_AUCTION_LOT),
+        lotID: formValues.lotID || DEFAULT_FORM_VALUES.lotID,
+        lotType,
+        units: lotType === "auction" ? 1 : (parseInt(`${formValues.lotUnits || DEFAULT_FORM_VALUES.lotUnits}`, 10) || 1),
+      }],
+    };
+  };
+
+  const handleOpenClicked = useCallback(() => open(getComponentPropsRef.current()), [open]);
+
+  useEffect(() => {
+    setCheckoutComponentProps(getComponentPropsRef.current());
+
+    setFormValues({
+      // Organization:
+      orgID: INITIAL_FORM_VALUES.orgID ?? DEFAULT_FORM_VALUES.orgID,
+      customOrgID: INITIAL_FORM_VALUES.customOrgID ?? DEFAULT_FORM_VALUES.customOrgID,
+
+      // Invoice (for won auction lots):
+      invoiceID: INITIAL_FORM_VALUES.invoiceID ?? DEFAULT_FORM_VALUES.invoiceID,
+
+      // Lot:
+      lotID: INITIAL_FORM_VALUES.lotID ?? DEFAULT_FORM_VALUES.lotID,
+      lotType: INITIAL_FORM_VALUES.lotType ?? DEFAULT_FORM_VALUES.lotType,
+      lotUnits: INITIAL_FORM_VALUES.lotUnits ?? DEFAULT_FORM_VALUES.lotUnits,
+
+      // Payment:
+      paymentCC: INITIAL_FORM_VALUES.paymentCC ?? DEFAULT_FORM_VALUES.paymentCC,
+      paymentACH: INITIAL_FORM_VALUES.paymentACH ?? DEFAULT_FORM_VALUES.paymentACH,
+      paymentWire: INITIAL_FORM_VALUES.paymentWire ?? DEFAULT_FORM_VALUES.paymentWire,
+      paymentCrypto: INITIAL_FORM_VALUES.paymentCrypto ?? DEFAULT_FORM_VALUES.paymentCrypto,
+    });
+  }, [setCheckoutComponentProps]);
+
+  const handleChange = ({ target }: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value, checked, type } = target;
+
+    setFormValues((prevFormValues) => ({
+      ...prevFormValues,
+      [name]: (type === "radio" || type === "checkbox") && value === "" ? checked : value,
+    }));
+  };
+
+  useEffect(() => {
+    setCheckoutComponentProps(getComponentPropsRef.current());
+
+    try {
+      localStorage.setItem(FORM_VALUES_KEY, JSON.stringify(formValues));
+    } catch (err) {
+      console.log(err);
+    }
+  }, [setCheckoutComponentProps, formValues]);
+
+
+  // AUTO-OPENING (FIRS-TIME ONLY):
+
+  const firstTimeRef = useRef(true);
 
   useEffect(() => {
     if (
@@ -80,179 +142,14 @@ const HomePage: React.FC = () => {
 
     firstTimeRef.current = false;
 
-    onOpen();
-  }, [isLoading, isAuthenticated, meData, hasOrganizations, onOpen]);
+    open();
+  }, [isLoading, isAuthenticated, meData, hasOrganizations, open]);
 
-  const handleGoToClicked = useCallback(() => {
-    router.push("/profile/invoices");
-  }, [router]);
-
-  const handleEvent = useCallback((eventType: CheckoutEventType, eventData: CheckoutEventData) => {
-    if (!isLocalhost()) console.log(`🎯 ${ eventType }`, eventData);
-
-    // console.log(`🎯 ${ eventType }`, eventData);
-  }, []);
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const handleError = useCallback((error: CheckoutModalError) => {
-    // console.log(error);
-  }, []);
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const handleCatch = useCallback((error: Error, errorInfo?: ErrorInfo): void | true => {
-    // console.log(error, errorInfo);
-    // return true;
-  }, []);
-
-  const handleLogin = useCallback(async () => {
-    await loginWithPopup({ prompt: "login" });
-
-    const token = await getIdTokenClaims();
-
-    console.log({ token });
-  }, [loginWithPopup, getIdTokenClaims]);
-
-  const [formValues, setFormValues] = useState<PlaygroundFormData>(DEFAULT_FORM_VALUES);
-
-  useEffect(() => {
-    setFormValues({
-      // Organization:
-      orgID: INITIAL_FORM_VALUES.orgID || DEFAULT_FORM_VALUES.orgID,
-      customOrgID: INITIAL_FORM_VALUES.customOrgID || DEFAULT_FORM_VALUES.customOrgID,
-
-      // Invoice (for won auction lots):
-      invoiceID: INITIAL_FORM_VALUES.invoiceID || DEFAULT_FORM_VALUES.invoiceID,
-
-      // Lot:
-      lotID: INITIAL_FORM_VALUES.lotID || DEFAULT_FORM_VALUES.lotID,
-      lotType: INITIAL_FORM_VALUES.lotType || DEFAULT_FORM_VALUES.lotType,
-      lotUnits: INITIAL_FORM_VALUES.lotUnits || DEFAULT_FORM_VALUES.lotUnits,
-
-      // Personalization:
-      theme: INITIAL_FORM_VALUES.theme || DEFAULT_FORM_VALUES.theme,
-      customImages: INITIAL_FORM_VALUES.customImages || DEFAULT_FORM_VALUES.customImages,
-      notAuthPreset: INITIAL_FORM_VALUES.notAuthPreset || DEFAULT_FORM_VALUES.notAuthPreset,
-      authPresets: INITIAL_FORM_VALUES.authPresets || DEFAULT_FORM_VALUES.authPresets,
-
-      // Payment:
-      paymentCC: INITIAL_FORM_VALUES.paymentCC || DEFAULT_FORM_VALUES.paymentCC,
-      paymentACH: INITIAL_FORM_VALUES.paymentACH || DEFAULT_FORM_VALUES.paymentACH,
-      paymentWire: INITIAL_FORM_VALUES.paymentWire || DEFAULT_FORM_VALUES.paymentWire,
-      paymentCrypto: INITIAL_FORM_VALUES.paymentCrypto || DEFAULT_FORM_VALUES.paymentCrypto,
-    });
-  }, []);
-
-  useEffect(() => {
-    try {
-      localStorage.setItem(FORM_VALUES_KEY, JSON.stringify(formValues));
-    } catch (err) {
-      console.log(err);
-    }
-  }, [formValues]);
-
-  const handleChange = ({ target }: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, checked, type } = target;
-
-    setFormValues((prevFormValues) => ({
-      ...prevFormValues,
-      [name]: (type === "radio" || type === "checkbox") && value === "" ? checked : value,
-    }));
-  };
-
-  const testPreset = (isAuthenticated ? PLAYGROUND_AUTH_PRESET[formValues.authPresets] : PLAYGROUND_NO_AUTH_PRESET[formValues.notAuthPreset]) || {};
-  const lotType = formValues.lotType || DEFAULT_FORM_VALUES.lotType;
-
-  const checkoutProps: PUICheckoutProps = {
-    // ProviderInjector:
-    uri: `${config.API_HOSTNAME}/query`,
-
-    // Modal:
-    open: isOpen,
-    onClose,
-    onGoTo: handleGoToClicked,
-
-    // Flow:
-    loaderMode,
-    paymentErrorParam,
-    onRemoveUrlParams,
-    guestCheckoutEnabled: testPreset.guestCheckoutEnabled,
-    productConfirmationEnabled: testPreset.productConfirmationEnabled,
-    // vertexEnabled: false,
-    // threeDSEnabled: false,
-
-    // Personalization:
-    theme: PLAYGROUND_THEMES[formValues.theme],
-
-    /*
-    themeOptions: {
-      // Reference App (https://github.com/mojitoinc/mojito-reference-app/) palette:
-      palette: {
-        primary: {
-          // main: "#FF00FF", // Magenta
-          // contrastText: "#FFFFFF",
-        },
-
-        paymentUI: {
-          // progressBar: "", // Use primary as fallback.
-          // paymentMethodSelectorBorder: "", // Use primary as fallback.
-          // paymentMethodSelectorBackground: "", // Use primary as fallback.
-          // mainButtonBackground: "", // Use primary as fallback.
-          // mainButtonBorderWidth: 0,
-        },
-      },
-    },
-    */
-
-    logoSrc: PLAYGROUND_LOGOS_SRC[formValues.theme],
-    logoSx: PLAYGROUND_LOGOS_SX[formValues.theme],
-    loaderImageSrc: formValues.customImages ? PLAYGROUND_LOADER_IMAGE_SRC : "",
-    purchasingImageSrc: formValues.customImages ? PLAYGROUND_PURCHASING_IMAGE_SRC : "",
-    purchasingMessages: undefined,
-    successImageSrc: "",
-    errorImageSrc: formValues.customImages ? PLAYGROUND_ERROR_IMAGE_SRC : "",
-    userFormat: PLAYGROUND_USER_FORMAT,
-    acceptedPaymentTypes: [
-      formValues.paymentCC ? "CreditCard" : "",
-      formValues.paymentACH ? "ACH" : "",
-      formValues.paymentWire ? "Wire" : "",
-      formValues.paymentCrypto ? "Crypto" : "",
-    ].filter(Boolean) as PaymentType[],
-    acceptedCreditCardNetworks: formValues.paymentCC ? ["visa", "mastercard"] : undefined,
-
-    dictionary: {
-      privacyHref: PLAYGROUND_PRIVACY_HREF,
-      termsOfUseHref: PLAYGROUND_TERMS_OF_USE_HREF,
-    },
-
-    // Legal:
-    consentType: "circle",
-
-    // Data:
-    orgID: (formValues.orgID === "custom" ? formValues.customOrgID : formValues.orgID) || "",
-    invoiceID: (lotType === "auction" && formValues.invoiceID) || "",
-    checkoutItems: [{
-      ...(lotType === "buyNow" ? PLAYGROUND_MOCKED_BUY_NOW_LOT : PLAYGROUND_MOCKED_AUCTION_LOT),
-      lotID: formValues.lotID || DEFAULT_FORM_VALUES.lotID,
-      lotType,
-      units: lotType === "auction" ? 1 : (parseInt(`${formValues.lotUnits || DEFAULT_FORM_VALUES.lotUnits}`, 10) || 1),
-    }],
-
-    // Authentication:
-    onLogin: handleLogin,
-    isAuthenticated,
-    isAuthenticatedLoading,
-
-    // Other Events:
-    debug: true,
-    onEvent: handleEvent,
-    onError: handleError,
-    onCatch: handleCatch,
-  };
 
   return (<>
     <Box sx={{ my: 4 }}>
       <Stack spacing={2} direction="row">
-        <Button variant="contained" onClick={onOpen} disabled={isLoading}>Open Checkout Modal</Button>
+        <Button variant="contained" onClick={handleOpenClicked} disabled={isLoading}>Open Checkout Modal</Button>
       </Stack>
     </Box>
 
@@ -349,37 +246,6 @@ const HomePage: React.FC = () => {
 
     <Box sx={{ my: 4 }}>
       <FormControl component="fieldset">
-        <FormLabel component="legend">Theme</FormLabel>
-        <RadioGroup
-          name="theme"
-          value={formValues.theme}
-          onChange={handleChange}
-        >
-          <FormControlLabel
-            value="light"
-            control={<Radio />}
-            label="Mojito Light"
-          />
-          <FormControlLabel
-            value="dark"
-            control={<Radio />}
-            label="Mojito Dark"
-          />
-        </RadioGroup>
-      </FormControl>
-    </Box>
-
-    <Box sx={{ my: 4 }}>
-      <FormControl component="fieldset">
-        <FormLabel component="legend">Images</FormLabel>
-        <FormControlLabel label="Custom Purchasing & Error images." control={
-          <Switch name="customImages" checked={formValues.customImages} value="" onChange={handleChange} />
-        } />
-      </FormControl>
-    </Box>
-
-    <Box sx={{ my: 4 }}>
-      <FormControl component="fieldset">
         <FormLabel component="legend">Payment Methods</FormLabel>
         <FormGroup>
           <FormControlLabel control={<Checkbox checked={formValues.paymentCC} value="" onChange={handleChange} name="paymentCC" />} label="Credit Card" />
@@ -390,41 +256,14 @@ const HomePage: React.FC = () => {
       </FormControl>
     </Box>
 
-    <Box sx={{ my: 4 }}>
-      <FormControl component="fieldset" disabled={isAuthenticatedLoading || isAuthenticated}>
-        <FormLabel component="legend">Not Authenticated Presets</FormLabel>
-        <RadioGroup
-          name="notAuthPreset"
-          value={formValues.notAuthPreset}
-          onChange={handleChange}>
-          <FormControlLabel value="noAuthGuestDisabled" control={<Radio />} label="Guest Checkout Disabled (and Product Confirmation Enabled)" />
-          <FormControlLabel value="noAuthGuestEnabled" control={<Radio />} label="Guest Checkout Enabled (and Product Confirmation Enabled)" />
-        </RadioGroup>
-        {(isAuthenticatedLoading || isAuthenticated) && <FormHelperText>You must not be authenticated.</FormHelperText>}
-      </FormControl>
-    </Box>
-
-    <Box sx={{ my: 4 }}>
-      <FormControl component="fieldset" disabled={isAuthenticatedLoading || !isAuthenticated}>
-        <FormLabel component="legend">Authenticated Presets</FormLabel>
-        <RadioGroup
-          name="authPresets"
-          value={formValues.authPresets}
-          onChange={handleChange}>
-          <FormControlLabel value="authConfirmationDisabled" control={<Radio />} label="Skip Product Confirmation" />
-          <FormControlLabel value="authConfirmationEnabledNoGuest" control={<Radio />} label="Guest Checkout Disabled + With Product Confirmation" />
-          <FormControlLabel value="authConfirmationEnabledGuest" control={<Radio />} label="Guest Checkout Enabled + With Product Confirmation (not implemented)" />
-        </RadioGroup>
-        {(isAuthenticatedLoading || !isAuthenticated) && <FormHelperText>You must be authenticated.</FormHelperText>}
-      </FormControl>
-    </Box>
 
     <Box sx={{ my: 4 }}>
       <Stack spacing={2} direction="row">
-        <Button variant="contained" onClick={onOpen} disabled={isLoading}>Open Checkout Modal</Button>
+        <Button variant="contained" onClick={handleOpenClicked} disabled={isLoading}>Open Checkout Modal</Button>
       </Stack>
     </Box>
 
+    { /*
     <Box component="pre" sx={{ my: 4, p: 2, overflow: "scroll", border: 2, borderRadius: "4px" }}>
       {JSON.stringify(checkoutProps, (key, value) => {
         if (typeof value === "function") return value.name ? `function ${value.name}` : "() => { ... }";
@@ -436,9 +275,10 @@ const HomePage: React.FC = () => {
 
     <Box sx={{ my: 4 }}>
       <Stack spacing={2} direction="row">
-        <Button variant="contained" onClick={onOpen} disabled={isLoading}>Open Checkout Modal</Button>
+        <Button variant="contained" onClick={handleOpenClicked} disabled={isLoading}>Open Checkout Modal</Button>
       </Stack>
     </Box>
+    */ }
 
     <Box sx={{ my: 2 }}>
       {PLAYGROUND_PARAGRAPHS_ARRAY.map((paragraph, index) => (
@@ -448,11 +288,9 @@ const HomePage: React.FC = () => {
 
     <Box sx={{ my: 4 }}>
       <Stack spacing={2} direction="row">
-        <Button variant="contained" onClick={onOpen} disabled={isLoading}>Open Checkout Modal</Button>
+        <Button variant="contained" onClick={handleOpenClicked} disabled={isLoading}>Open Checkout Modal</Button>
       </Stack>
     </Box>
-
-    <PUICheckout {...checkoutProps} />
   </>);
 };
 

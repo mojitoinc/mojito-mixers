@@ -2,18 +2,17 @@ import React__default, { useState, useEffect, useRef } from 'react';
 import { useFullPayment } from '../../hooks/useFullPayment.js';
 import { Box, Typography } from '@mui/material';
 import { useTimeout, useInterval } from '@swyg/corre';
-import { ERROR_PURCHASE_TIMEOUT, ERROR_PURCHASE } from '../../domain/errors/errors.constants.js';
+import { ERROR_PURCHASE_TIMEOUT } from '../../domain/errors/errors.constants.js';
 import { XS_MOBILE_MAX_WIDTH } from '../../config/theme/themeConstants.js';
 import { StatusIcon } from '../../components/shared/StatusIcon/StatusIcon.js';
 import { useGetPaymentNotificationQuery } from '../../queries/graphqlGenerated.js';
 import { persistCheckoutModalInfo } from '../../components/public/CheckoutOverlay/CheckoutOverlay.utils.js';
-import { PURCHASING_MIN_WAIT_MS, PAYMENT_NOTIFICATION_INTERVAL_MS, PAYMENT_CREATION_TIMEOUT_MS, PURCHASING_MESSAGES_DEFAULT, PURCHASING_MESSAGES_INTERVAL_MS } from '../../config/config.js';
-import { isLocalhost } from '../../domain/url/url.utils.js';
+import { PURCHASING_MIN_WAIT_MS, PAYMENT_NOTIFICATION_INTERVAL_MS, PAYMENT_CREATION_TIMEOUT_MS, PURCHASING_MESSAGES_DEFAULT, PURCHASING_MESSAGES_INTERVAL_MS, DEV_SKIP_3DS_IN_LOCALHOST } from '../../config/config.js';
 
-const PurchasingView = ({ threeDSEnabled, purchasingImageSrc, purchasingMessages: customPurchasingMessages, orgID, invoiceID, savedPaymentMethods, selectedPaymentMethod, wallet, onPurchaseSuccess, onPurchaseError, onDialogBlocked, debug, }) => {
+const PurchasingView = ({ threeDSEnabled, purchasingImageSrc, purchasingMessages: customPurchasingMessages, orgID, invoiceID, invoiceCountdownStart, checkoutItems, savedPaymentMethods, selectedPaymentMethod, wallet, onPurchaseSuccess, onPurchaseError, onDialogBlocked, debug, }) => {
     var _a, _b, _c;
     const { billingInfo, paymentInfo, cvv } = selectedPaymentMethod;
-    const isCreditCardPayment = cvv || (typeof paymentInfo === "object" && paymentInfo.type === "CreditCard");
+    const isCreditCardPayment = cvv || (paymentInfo !== null && typeof paymentInfo === "object" && paymentInfo.type === "CreditCard");
     // Minimum wait time:
     const [hasWaited, setHasWaited] = useState(false);
     useTimeout(() => {
@@ -65,29 +64,31 @@ const PurchasingView = ({ threeDSEnabled, purchasingImageSrc, purchasingMessages
         fullPayment();
     }, [fullPayment]);
     useEffect(() => {
-        const { paymentStatus, circlePaymentID, paymentID, paymentError } = fullPaymentState;
+        const { paymentStatus, processorPaymentID, paymentID, paymentError } = fullPaymentState;
         if (paymentStatus === "processing") {
             onDialogBlocked(true);
             return;
         }
         if (paymentStatus === "error" || paymentError) {
-            onPurchaseError(paymentError || ERROR_PURCHASE());
+            onPurchaseError(paymentError);
             return;
         }
         if (!hasWaited || redirectURL === "" || purchaseSuccessHandledRef.current)
             return;
         purchaseSuccessHandledRef.current = true;
-        const skipRedirect = isLocalhost();
+        const skipRedirect = DEV_SKIP_3DS_IN_LOCALHOST ;
         if (redirectURL && !skipRedirect) {
             persistCheckoutModalInfo({
                 invoiceID,
-                circlePaymentID,
+                invoiceCountdownStart,
+                processorPaymentID,
                 paymentID,
                 billingInfo,
-                paymentInfo,
+                paymentInfo: typeof paymentInfo === "string" ? paymentInfo : null,
+                checkoutItems,
             });
         }
-        onPurchaseSuccess(circlePaymentID, paymentID, skipRedirect ? "" : (redirectURL || ""));
+        onPurchaseSuccess(processorPaymentID, paymentID, (redirectURL || ""));
     }, [
         fullPaymentState,
         hasWaited,
@@ -99,6 +100,8 @@ const PurchasingView = ({ threeDSEnabled, purchasingImageSrc, purchasingMessages
         onDialogBlocked,
         onPurchaseSuccess,
         invoiceID,
+        invoiceCountdownStart,
+        checkoutItems,
         debug,
     ]);
     // Purchasing Messages:

@@ -41,6 +41,8 @@ var InvoiceStatus;
     InvoiceStatus["Canceled"] = "Canceled";
     InvoiceStatus["Delivered"] = "Delivered";
     InvoiceStatus["Draft"] = "Draft";
+    InvoiceStatus["Expired"] = "Expired";
+    InvoiceStatus["Failed"] = "Failed";
     InvoiceStatus["Paid"] = "Paid";
     InvoiceStatus["Pending"] = "Pending";
 })(InvoiceStatus || (InvoiceStatus = {}));
@@ -84,6 +86,7 @@ var PaymentType;
 (function (PaymentType) {
     PaymentType["Ach"] = "ACH";
     PaymentType["CreditCard"] = "CreditCard";
+    PaymentType["Crypto"] = "Crypto";
     PaymentType["Wire"] = "Wire";
 })(PaymentType || (PaymentType = {}));
 var Role;
@@ -148,7 +151,7 @@ const CreatePaymentDocument = gql `
   createPayment(paymentMethodID: $paymentMethodID, invoiceID: $invoiceID, metadata: $metadata) {
     id
     invoiceID
-    circlePaymentID
+    processorPaymentID
     status
     userID
   }
@@ -447,6 +450,10 @@ const CreatePaymentMethodDocument = gql `
       id
       status
     }
+    ... on CryptoPaymentMethodOutput {
+      id
+      status
+    }
   }
 }
     `;
@@ -500,8 +507,8 @@ function useDeletePaymentMethodMutation(baseOptions) {
     return Apollo.useMutation(DeletePaymentMethodDocument, options);
 }
 const PreparePaymentMethodDocument = gql `
-    query PreparePaymentMethod {
-  preparePaymentMethod(paymentMethodType: ACH) {
+    query PreparePaymentMethod($orgID: UUID1!) {
+  preparePaymentMethod(paymentMethodType: ACH, orgID: $orgID) {
     ... on ACHPaymentMethodPrepareStatementOutput {
       linkToken
     }
@@ -520,6 +527,7 @@ const PreparePaymentMethodDocument = gql `
  * @example
  * const { data, loading, error } = usePreparePaymentMethodQuery({
  *   variables: {
+ *      orgID: // value for 'orgID'
  *   },
  * });
  */
@@ -539,6 +547,10 @@ const GetPaymentMethodStatusDocument = gql `
       status
     }
     ... on WirePaymentMethodOutput {
+      id
+      status
+    }
+    ... on CryptoPaymentMethodOutput {
       id
       status
     }

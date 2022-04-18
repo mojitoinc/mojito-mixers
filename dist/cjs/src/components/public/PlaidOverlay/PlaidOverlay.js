@@ -3,17 +3,17 @@
 Object.defineProperty(exports, '__esModule', { value: true });
 
 var React = require('react');
-var plaid_utils = require('../../../domain/plaid/plaid.utils.js');
 var ProvidersInjector = require('../../shared/ProvidersInjector/ProvidersInjector.js');
+var CheckoutOverlay_utils = require('../CheckoutOverlay/CheckoutOverlay.utils.js');
 
 const PUIPlaidOverlay = ({ onRedirect, }) => {
-    const { continueOAuthFlow, url } = plaid_utils.getPlaidOAuthFlowState();
+    const { continueFlow, url } = CheckoutOverlay_utils.getCheckoutModalState(true);
     React.useLayoutEffect(() => {
-        if (continueOAuthFlow) {
-            plaid_utils.persistPlaidReceivedRedirectUri(window.location.href);
+        if (continueFlow) {
+            CheckoutOverlay_utils.persistCheckoutModalInfoRedirectURI(window.location.href);
         }
         onRedirect(url || "/");
-    }, [continueOAuthFlow, onRedirect, url]);
+    }, [continueFlow, onRedirect, url]);
     return null;
 };
 const PUIPlaid = ProvidersInjector.withThemeProvider(PUIPlaidOverlay);

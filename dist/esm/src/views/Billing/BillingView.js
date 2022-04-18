@@ -1,6 +1,6 @@
 import { __awaiter } from '../../../node_modules/tslib/tslib.es6.js';
 import React__default, { useRef, useMemo, useState, useEffect, useCallback } from 'react';
-import { Stack } from '@mui/material';
+import { Stack, Divider } from '@mui/material';
 import { CheckoutDeliveryAndItemCostBreakdown } from '../../components/payments/CheckoutDeliveryAndItemCostBreakdown/CheckoutDeliveryAndItemCostBreakdown.js';
 import { CheckoutStepper } from '../../components/payments/CheckoutStepper/CheckoutStepper.js';
 import { SavedBillingDetailsSelector } from '../../components/shared/SavedBillingDetailsSelector/SavedBillingDetailsSelector.js';
@@ -34,6 +34,7 @@ const BillingView = ({ vertexEnabled, checkoutItems, savedPaymentMethods: rawSav
     const calculateTaxes = useCallback((taxInfo) => __awaiter(void 0, void 0, void 0, function* () {
         var _a;
         const calledAt = getTaxQuoteTimestampRef.current;
+        let invalidZipCode = false;
         const result = yield getTaxQuote({
             variables: {
                 input: {
@@ -47,18 +48,36 @@ const BillingView = ({ vertexEnabled, checkoutItems, savedPaymentMethods: rawSav
                     },
                 },
             },
-        }).catch(() => ({ data: null }));
+        }).catch((err) => {
+            invalidZipCode = /invalid zipcode/i.test(err.message);
+            return { data: null };
+        });
         // Discard stale result:
         if (calledAt !== getTaxQuoteTimestampRef.current)
             return;
         const taxResult = ((_a = result.data) === null || _a === void 0 ? void 0 : _a.getTaxQuote) || {};
-        const isValid = !!taxResult.verifiedAddress;
-        setViewState((prevViewState) => (Object.assign(Object.assign({}, prevViewState), { taxes: isValid ? {
+        const { verifiedAddress } = taxResult;
+        const vertexSuggestions = {};
+        if (!showSaved && verifiedAddress) {
+            // Vertex returns 5+4 zip codes, so we remove the last 4 digits to get the "normal" one:
+            const zipCode = ((verifiedAddress === null || verifiedAddress === void 0 ? void 0 : verifiedAddress.postalCode) || "").replace(/-\d{4}$/, "");
+            if (taxInfo.street !== verifiedAddress.street1)
+                vertexSuggestions.street = verifiedAddress.street1;
+            if (taxInfo.city !== verifiedAddress.city)
+                vertexSuggestions.city = verifiedAddress.city;
+            if (taxInfo.zipCode !== zipCode)
+                vertexSuggestions.zipCode = zipCode;
+        }
+        setViewState((prevViewState) => (Object.assign(Object.assign({}, prevViewState), { taxes: verifiedAddress ? {
                 status: "complete",
                 taxRate: 100 * taxResult.totalTaxAmount / taxResult.taxablePrice,
                 taxAmount: taxResult.totalTaxAmount,
-            } : { status: "error" } })));
-    }), [getTaxQuote, total]);
+                vertexSuggestions,
+            } : {
+                status: "error",
+                invalidZipCode,
+            } })));
+    }), [getTaxQuote, total, showSaved]);
     const handleThrottledTaxInfoChange = useThrottledCallback((taxInfo) => {
         var _a, _b;
         if (!vertexEnabled)
@@ -138,18 +157,15 @@ const BillingView = ({ vertexEnabled, checkoutItems, savedPaymentMethods: rawSav
             onBillingInfoSelected(savedPaymentMethods[0].addressId);
         }
     }, [showSaved, savedPaymentMethods, selectedBillingInfo, onBillingInfoSelected /*, checkoutError*/]);
-    return (React__default.createElement(Stack, { direction: {
-            xs: "column",
-            sm: "column",
-            md: "row",
-        }, spacing: 8.75 },
-        React__default.createElement(Stack, { sx: { display: "flex", overflow: "hidden", width: { xs: "100%", md: "calc(50% - 35px)" } } },
+    return (React__default.createElement(Stack, { direction: { xs: "column", md: "row" }, spacing: { xs: 0, md: 3.75 } },
+        React__default.createElement(Stack, { sx: { display: "flex", overflow: "hidden", width: (theme) => ({ xs: "100%", md: `calc(50% - ${theme.spacing(3.75 / 2)})` }) } },
             React__default.createElement(CheckoutStepper, { progress: 50 }),
             showSaved ? (React__default.createElement(SavedBillingDetailsSelector, { showLoader: isDeleting, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethodAddressId: typeof selectedBillingInfo === "string" ? selectedBillingInfo : undefined, taxes: taxes, onNew: handleShowForm, onEdit: handleShowForm, onDelete: handleSavedPaymentMethodDeleted, onPick: onBillingInfoSelected, onNext: onNext, onClose: onClose, onAttemptSubmit: handleFormAttemptSubmit, consentType: consentType === "checkbox" ? undefined : consentType })) : (React__default.createElement(BillingInfoForm
             // variant="loggedIn"
             , { 
                 // variant="loggedIn"
                 defaultValues: typeof selectedBillingInfo === "string" ? undefined : selectedBillingInfo, checkoutError: checkoutError, taxes: taxes, onTaxInfoChange: handleTaxInfoChange, onSaved: savedPaymentMethods.length > 0 ? handleShowSaved : undefined, onClose: onClose, onSubmit: handleSubmit, onAttemptSubmit: handleFormAttemptSubmit, consentType: consentType === "checkbox" ? undefined : consentType, debug: debug }))),
+        React__default.createElement(Divider, { sx: { display: { xs: "block", md: "none" } } }),
         React__default.createElement(CheckoutDeliveryAndItemCostBreakdown, { checkoutItems: checkoutItems, taxes: vertexEnabled ? taxes : null, validatePersonalDeliveryAddress: formSubmitAttempted, wallets: wallets, wallet: wallet, onWalletChange: onWalletChange })));
 };
 

@@ -29,4 +29,6 @@ export interface SavedItemProps {
     onCvvChange?: React.ChangeEventHandler<HTMLInputElement>;
     boxProps?: BoxProps;
 }
-export declare const SavedItem: React.FC<SavedItemProps>;
+export declare const SavedItem: React.FC<SavedItemProps & {
+    children: React.ReactNode;
+}>;
