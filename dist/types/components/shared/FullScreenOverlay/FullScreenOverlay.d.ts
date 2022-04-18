@@ -10,6 +10,7 @@ interface FullScreenOverlayCommonProps extends FullScreenOverlayFunctionalProps 
 }
 export interface FullScreenOverlayNoColumnsProps extends FullScreenOverlayCommonProps {
     centered?: boolean;
+    children: React.ReactNode;
 }
 export interface FullScreenOverlayWithColumnsProps extends FullScreenOverlayCommonProps {
     leftColumn?: React.ReactElement;

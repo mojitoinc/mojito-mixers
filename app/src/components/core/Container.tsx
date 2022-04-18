@@ -13,6 +13,10 @@ const containerSx: SxProps<Theme> = {
   },
 };
 
-export const Container: React.FC = ({ children }) => {
+export interface ContainerProps {
+  children: React.ReactNode;
+}
+
+export const Container: React.FC<ContainerProps> = ({ children }) => {
   return <Box sx={ containerSx }>{children}</Box>;
 };

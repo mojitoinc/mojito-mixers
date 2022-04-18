@@ -39,10 +39,11 @@ const FullScreenOverlay = (_a) => {
                 maxWidth: theme => theme.breakpoints.values.lg,
                 mx: "auto",
             } },
-            header,
-            children ? (React__default.createElement(Box, { sx: "centered" in variantProps && variantProps.centered ? centeredSx : undefined }, children)) : (("leftColumn" in variantProps || "rightColumn" in variantProps) && {
-            /* Implement 2-column layout using leftColumn and rightColumn */
-            }))));
+            React__default.createElement(React__default.Fragment, null,
+                header,
+                children ? (React__default.createElement(Box, { sx: "centered" in variantProps && variantProps.centered ? centeredSx : undefined }, children)) : (("leftColumn" in variantProps || "rightColumn" in variantProps) && {
+                /* Implement 2-column layout using leftColumn and rightColumn */
+                })))));
 };
 
 export { FullScreenOverlay };

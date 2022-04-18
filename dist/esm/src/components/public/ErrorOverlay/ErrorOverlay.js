@@ -6,7 +6,7 @@ import { ERROR_PURCHASE } from '../../../domain/errors/errors.constants.js';
 import { isUrlPathname } from '../../../domain/url/url.utils.js';
 import { useGetPaymentNotificationQuery } from '../../../queries/graphqlGenerated.js';
 import { withProviders } from '../../shared/ProvidersInjector/ProvidersInjector.js';
-import { getCheckoutModalState, persistReceivedRedirectUri3DS, clearPersistedInfo } from '../CheckoutOverlay/CheckoutOverlay.utils.js';
+import { getCheckoutModalState, persistCheckoutModalInfoRedirectURI, clearPersistedInfo } from '../CheckoutOverlay/CheckoutOverlay.utils.js';
 import { PUIStaticErrorOverlay } from './StaticErrorOverlay.js';
 
 const PUIErrorOverlay = (_a) => {
@@ -25,7 +25,7 @@ const PUIErrorOverlay = (_a) => {
     useTimeout(() => {
         setErrorMessage(prevErrorMessage => prevErrorMessage || ERROR_PURCHASE.errorMessage);
     }, PAYMENT_NOTIFICATION_ERROR_MAX_WAIT_MS);
-    const { purchaseError, url = "" } = getCheckoutModalState();
+    const { purchaseError, url = "" } = getCheckoutModalState(true);
     useLayoutEffect(() => {
         // Users should only see this page if they completed a credit card payment and 3DS' verification went wrong.
         // Otherwise, they are immediately redirected to homepage:
@@ -35,7 +35,7 @@ const PUIErrorOverlay = (_a) => {
     const reviewData = useCallback((errorMessage) => __awaiter(void 0, void 0, void 0, function* () {
         const isPathname = isUrlPathname(url);
         if (isPathname)
-            persistReceivedRedirectUri3DS(window.location.href);
+            persistCheckoutModalInfoRedirectURI(window.location.href);
         // If there was an error, users can click the review button and go back to the Payment UI to review the data...:
         onRedirect(`${url}${THREEDS_FLOW_SEARCH_PARAM_ERROR}${encodeURIComponent(errorMessage)}`);
         return false;

@@ -101,6 +101,7 @@ declare type CheckoutModalStep = "authentication" | "billing" | "payment" | "pur
 interface AuthorizedApolloProviderProps {
     apolloClient?: ApolloClient<NormalizedCacheObject> | null;
     uri: string;
+    children?: React$1.ReactNode;
 }
 
 interface CommonProviderProps {
@@ -112,7 +113,7 @@ interface ThemeProviderProps extends CommonProviderProps {
 }
 declare type ProvidersInjectorProps = ThemeProviderProps & AuthorizedApolloProviderProps;
 
-declare type PUIDictionarySingleLine = string | React.ReactFragment;
+declare type PUIDictionarySingleLine = string | React.ReactElement;
 declare type PUIDictionaryMultiLine = PUIDictionarySingleLine[];
 declare type PUIDictionary = {
     walletInfo: PUIDictionarySingleLine;
@@ -212,54 +213,42 @@ interface PUIPlaidOverlayProps {
 declare type PUISuccessProps = PUIPlaidOverlayProps & ThemeProviderProps;
 declare const PUIPlaid: React$1.FC<PUISuccessProps>;
 
-interface PlaidInfo {
+declare type FlowType = "" | "3DS" | "Plaid";
+interface CheckoutModalInfoCommon {
     url?: string;
+    fromLocalhost?: boolean;
+    invoiceID: string;
+    invoiceCountdownStart: number;
+    billingInfo: string | BillingInfo;
+}
+interface CheckoutModalInfo3DS extends CheckoutModalInfoCommon {
+    processorPaymentID: string;
+    paymentID: string;
+    paymentInfo: string | null;
+    checkoutItems: CheckoutItemInfo[];
+}
+interface CheckoutModalInfoPlaid extends CheckoutModalInfoCommon {
     linkToken: string;
-    selectedBillingInfo: string | BillingInfo;
-    timestamp?: number;
 }
-interface PlaidOAuthFlowState extends PlaidInfo {
+interface CheckoutModalStateCommon extends CheckoutModalInfoCommon {
+    flowType: FlowType;
+    checkoutStep: CheckoutModalStep | "";
     receivedRedirectUri?: string;
-    continueOAuthFlow: boolean;
-    savedStateUsed: boolean;
+    savedInfoUsed: boolean;
+    continueFlow: boolean;
 }
-declare function persistPlaidReceivedRedirectUri(receivedRedirectUri: string): void;
-declare function getPlaidOAuthFlowState(): PlaidOAuthFlowState;
+interface CheckoutModalState3DS extends CheckoutModalStateCommon, CheckoutModalInfo3DS {
+    purchaseSuccess: boolean;
+    purchaseError: boolean;
+}
+declare type CheckoutModalStatePlaid = CheckoutModalStateCommon & CheckoutModalInfoPlaid;
+declare type CheckoutModalStateCombined = CheckoutModalState3DS & CheckoutModalStatePlaid;
 
 declare function continuePlaidOAuthFlow(): boolean;
 
-interface CheckoutModalInfo {
-    url?: string;
-    invoiceID: string;
-    invoiceCountdownStart: number;
-    processorPaymentID: string;
-    paymentID: string;
-    billingInfo: string | BillingInfo;
-    paymentInfo: string | null;
-    timestamp?: number;
-}
-interface CheckoutModalState3DS extends CheckoutModalInfo {
-    receivedRedirectUri?: string;
-    continue3DSFlow: boolean;
-    purchaseSuccess: boolean;
-    purchaseError: boolean;
-    savedStateUsed: boolean;
-}
-declare function persistReceivedRedirectUri3DS(receivedRedirectUri: string): void;
-declare function getCheckoutModalState(): CheckoutModalState3DS;
-declare function continueCheckout(noClear?: boolean): [boolean, CheckoutModalState3DS];
-declare type FlowType = "" | "3DS" | "Plaid";
-interface ContinueFlowsReturn {
-    flowType: FlowType;
-    checkoutStep: CheckoutModalStep | "";
-    invoiceID: string;
-    invoiceCountdownStart: number;
-    processorPaymentID: string;
-    paymentID: string;
-    billingInfo: string | BillingInfo;
-    paymentInfo: string | null;
-}
-declare function continueFlows(noClear?: boolean): ContinueFlowsReturn;
+declare function persistCheckoutModalInfoRedirectURI(redirectUri: string): void;
+declare function persistCheckoutModalInfoUsed(used?: boolean): void;
+declare function getCheckoutModalState(noClear?: boolean): CheckoutModalStateCombined;
 
 declare const extendDefaultTheme: (themeOptions?: ThemeOptions | undefined) => Theme;
 declare const MOJITO_LIGHT_THEME: Theme;
@@ -278,6 +267,7 @@ interface CheckoutOverlayContextProps {
 interface CheckoutOverlayProviderProps extends UseOpenCloseCheckoutModalOptions {
     checkoutComponent: React$1.ComponentType<CheckoutComponentWithRequiredProps>;
     doNotRenderPaymentUI?: boolean;
+    children: React$1.ReactNode;
 }
 declare const CheckoutOverlayProvider: React$1.FC<CheckoutOverlayProviderProps>;
 declare function useCheckoutOverlay(): CheckoutOverlayContextProps;
@@ -290,4 +280,4 @@ interface PalettePaymentUI {
     mainButtonBorderWidth?: number;
 }
 
-export { CheckoutComponentProps, CheckoutComponentWithRequiredProps, CheckoutEventData, CheckoutEventType, CheckoutItem, CheckoutModalError, CheckoutModalErrorAt, CheckoutOverlayContextProps, CheckoutOverlayProvider, CheckoutOverlayProviderProps, CircleFieldErrorAt, CircleFieldErrors, MOJITO_DARK_THEME, MOJITO_LIGHT_THEME, PUICheckout, PUICheckoutProps, PUIDictionary, PUIDictionaryKeys, PUIDictionaryMultiLine, PUIDictionarySingleLine, PUIError, PUIErrorProps, PUIPlaid, PUISuccess, PUISuccessProps$1 as PUISuccessProps, PalettePaymentUI, PaymentType, THREEDS_FLOW_SEARCH_PARAM_ERROR_KEY, THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY, UserFormat, continueCheckout, continueFlows, continuePlaidOAuthFlow, extendDefaultTheme, getCheckoutModalState, getPlaidOAuthFlowState, persistPlaidReceivedRedirectUri, persistReceivedRedirectUri3DS, useCheckoutOverlay };
+export { CheckoutComponentProps, CheckoutComponentWithRequiredProps, CheckoutEventData, CheckoutEventType, CheckoutItem, CheckoutModalError, CheckoutModalErrorAt, CheckoutOverlayContextProps, CheckoutOverlayProvider, CheckoutOverlayProviderProps, CircleFieldErrorAt, CircleFieldErrors, MOJITO_DARK_THEME, MOJITO_LIGHT_THEME, PUICheckout, PUICheckoutProps, PUIDictionary, PUIDictionaryKeys, PUIDictionaryMultiLine, PUIDictionarySingleLine, PUIError, PUIErrorProps, PUIPlaid, PUISuccess, PUISuccessProps$1 as PUISuccessProps, PalettePaymentUI, PaymentType, THREEDS_FLOW_SEARCH_PARAM_ERROR_KEY, THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY, UserFormat, continuePlaidOAuthFlow, extendDefaultTheme, getCheckoutModalState, persistCheckoutModalInfoRedirectURI, persistCheckoutModalInfoUsed, useCheckoutOverlay };

@@ -80,7 +80,7 @@ export const CheckoutModalFooter: React.FC<CheckoutModalFooterProps> = ({
 
   const showConsentError = isFormSubmitted && !isConsentChecked;
 
-  const handleConsentClicked = useCallback((_, checked: boolean) => {
+  const handleConsentClicked = useCallback((_: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
     setConsentState((prevConsentState) => ({
       isFormSubmitted: prevConsentState.isFormSubmitted,
       isFormLoading: prevConsentState.isFormLoading,

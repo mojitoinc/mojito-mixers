@@ -1,4 +1,4 @@
-export type PUIDictionarySingleLine = string | React.ReactFragment;
+export type PUIDictionarySingleLine = string | React.ReactElement;
 export type PUIDictionaryMultiLine = PUIDictionarySingleLine[];
 
 export type PUIDictionary = {

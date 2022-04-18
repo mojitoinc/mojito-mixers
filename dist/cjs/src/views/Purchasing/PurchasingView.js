@@ -12,13 +12,12 @@ var StatusIcon = require('../../components/shared/StatusIcon/StatusIcon.js');
 var graphqlGenerated = require('../../queries/graphqlGenerated.js');
 var CheckoutOverlay_utils = require('../../components/public/CheckoutOverlay/CheckoutOverlay.utils.js');
 var config = require('../../config/config.js');
-var url_utils = require('../../domain/url/url.utils.js');
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
 var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 
-const PurchasingView = ({ threeDSEnabled, purchasingImageSrc, purchasingMessages: customPurchasingMessages, orgID, invoiceID, invoiceCountdownStart, savedPaymentMethods, selectedPaymentMethod, wallet, onPurchaseSuccess, onPurchaseError, onDialogBlocked, debug, }) => {
+const PurchasingView = ({ threeDSEnabled, purchasingImageSrc, purchasingMessages: customPurchasingMessages, orgID, invoiceID, invoiceCountdownStart, checkoutItems, savedPaymentMethods, selectedPaymentMethod, wallet, onPurchaseSuccess, onPurchaseError, onDialogBlocked, debug, }) => {
     var _a, _b, _c;
     const { billingInfo, paymentInfo, cvv } = selectedPaymentMethod;
     const isCreditCardPayment = cvv || (paymentInfo !== null && typeof paymentInfo === "object" && paymentInfo.type === "CreditCard");
@@ -85,7 +84,7 @@ const PurchasingView = ({ threeDSEnabled, purchasingImageSrc, purchasingMessages
         if (!hasWaited || redirectURL === "" || purchaseSuccessHandledRef.current)
             return;
         purchaseSuccessHandledRef.current = true;
-        const skipRedirect = url_utils.isLocalhost();
+        const skipRedirect = config.DEV_SKIP_3DS_IN_LOCALHOST ;
         if (redirectURL && !skipRedirect) {
             CheckoutOverlay_utils.persistCheckoutModalInfo({
                 invoiceID,
@@ -94,9 +93,10 @@ const PurchasingView = ({ threeDSEnabled, purchasingImageSrc, purchasingMessages
                 paymentID,
                 billingInfo,
                 paymentInfo: typeof paymentInfo === "string" ? paymentInfo : null,
+                checkoutItems,
             });
         }
-        onPurchaseSuccess(processorPaymentID, paymentID, skipRedirect ? "" : (redirectURL || ""));
+        onPurchaseSuccess(processorPaymentID, paymentID, (redirectURL || ""));
     }, [
         fullPaymentState,
         hasWaited,
@@ -109,6 +109,7 @@ const PurchasingView = ({ threeDSEnabled, purchasingImageSrc, purchasingMessages
         onPurchaseSuccess,
         invoiceID,
         invoiceCountdownStart,
+        checkoutItems,
         debug,
     ]);
     // Purchasing Messages:

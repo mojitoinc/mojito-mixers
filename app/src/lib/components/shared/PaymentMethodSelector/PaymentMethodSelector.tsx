@@ -49,7 +49,7 @@ export const PaymentMethodSelector: React.FC<PaymentMethodSelectorProps> = ({
   const theme = useTheme();
   const wideViewport = useMediaQuery(theme.breakpoints.up("sm"));
 
-  const handleChange = useCallback((_, paymentMethod: PaymentType) => {
+  const handleChange = useCallback((_: React.MouseEvent<HTMLElement>, paymentMethod: PaymentType) => {
     if (paymentMethod) onPaymentMethodChange(paymentMethod);
   }, [onPaymentMethodChange]);
 
