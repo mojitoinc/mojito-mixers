@@ -13,7 +13,7 @@ const NavMenu: React.FC<NavMenuProps> = ({
   activeTab,
   setMenuTab,
 }) => {
-  const handleChange = useCallback((_, tab: string) => {
+  const handleChange = useCallback((_: React.MouseEvent<HTMLElement>, tab: string) => {
     if (tab) setMenuTab(tab);
   }, [setMenuTab]);
 

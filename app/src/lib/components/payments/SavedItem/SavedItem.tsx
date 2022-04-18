@@ -57,7 +57,7 @@ const DISPLAY_BOX_SX: SxProps<Theme> = {
   },
 };
 
-export const SavedItem: React.FC<SavedItemProps> = ({
+export const SavedItem: React.FC<SavedItemProps & { children: React.ReactNode }> = ({
   children,
   id,
   variant = "stacked",
