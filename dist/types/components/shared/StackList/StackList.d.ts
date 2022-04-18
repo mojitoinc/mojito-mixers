@@ -6,6 +6,7 @@ export interface BaseItemProps<T extends {} = any, A extends {} = any> {
     component?: HTMLRootTag;
     data: T;
     additionalProps?: A;
+    children?: React.ReactNode;
 }
 export interface StackListProps<T extends {} = any, A extends {} = any> {
     data: T[];

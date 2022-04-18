@@ -2,6 +2,7 @@ import { SavedPaymentMethod } from "../../domain/circle/circle.interfaces";
 import React from "react";
 import { CheckoutModalError, SelectedPaymentMethod } from "../../components/public/CheckoutOverlay/CheckoutOverlay.hooks";
 import { Wallet } from "../../domain/wallet/wallet.interfaces";
+import { CheckoutItemInfo } from "../../domain/product/product.interfaces";
 export interface PurchasingViewProps {
     threeDSEnabled?: boolean;
     purchasingImageSrc?: string;
@@ -9,6 +10,7 @@ export interface PurchasingViewProps {
     orgID: string;
     invoiceID: string;
     invoiceCountdownStart: number;
+    checkoutItems: CheckoutItemInfo[];
     savedPaymentMethods: SavedPaymentMethod[];
     selectedPaymentMethod: SelectedPaymentMethod;
     wallet: null | string | Wallet;

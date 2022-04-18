@@ -4,17 +4,17 @@ import React__default, { useLayoutEffect } from 'react';
 import { THREEDS_SUCCESS_REDIRECT_DELAY_MS } from '../../../config/config.js';
 import { isUrlPathname, getUrlWithSearchParams } from '../../../domain/url/url.utils.js';
 import { withThemeProvider } from '../../shared/ProvidersInjector/ProvidersInjector.js';
-import { getCheckoutModalState, persistReceivedRedirectUri3DS } from '../CheckoutOverlay/CheckoutOverlay.utils.js';
+import { getCheckoutModalState, persistCheckoutModalInfoRedirectURI } from '../CheckoutOverlay/CheckoutOverlay.utils.js';
 import { PUIStaticSuccessOverlay } from './StaticSuccessOverlay.js';
 
 const PUISuccessOverlay = (_a) => {
     var { onRedirect } = _a, staticSuccessOverlayProps = __rest(_a, ["onRedirect"]);
-    const { purchaseSuccess, url = "" } = getCheckoutModalState();
+    const { purchaseSuccess, url = "" } = getCheckoutModalState(true);
     const isPathname = isUrlPathname(url);
     useLayoutEffect(() => {
         if (purchaseSuccess) {
             if (isPathname)
-                persistReceivedRedirectUri3DS(window.location.href);
+                persistCheckoutModalInfoRedirectURI(window.location.href);
             return;
         }
         // Users should only see this page if they completed a credit card payment and 3DS' verification went ok.

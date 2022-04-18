@@ -11,7 +11,7 @@ import { usePlaid } from '../../hooks/usePlaid.js';
 import { checkNeedsGenericErrorMessage } from '../../hooks/useFormCheckoutError.js';
 
 const billingInfoItemBoxProps = { sx: { mt: 2.5 } };
-const PaymentView = ({ orgID, checkoutItems, taxes, savedPaymentMethods: rawSavedPaymentMethods, selectedPaymentMethod, wallets, wallet, checkoutError, onPaymentInfoSelected, onCvvSelected, onSavedPaymentMethodDeleted, onWalletChange, onNext, onPrev, onClose, acceptedPaymentTypes = ["CreditCard"], acceptedCreditCardNetworks, consentType, debug, }) => {
+const PaymentView = ({ orgID, invoiceID, invoiceCountdownStart, checkoutItems, taxes, savedPaymentMethods: rawSavedPaymentMethods, selectedPaymentMethod, wallets, wallet, checkoutError, onPaymentInfoSelected, onCvvSelected, onSavedPaymentMethodDeleted, onWalletChange, onNext, onPrev, onClose, acceptedPaymentTypes = ["CreditCard"], acceptedCreditCardNetworks, consentType, debug, }) => {
     const { billingInfo: selectedBillingInfo, paymentInfo: selectedPaymentInfo, } = selectedPaymentMethod;
     const savedPaymentMethods = useMemo(() => {
         if (typeof selectedBillingInfo !== "string")
@@ -57,8 +57,10 @@ const PaymentView = ({ orgID, checkoutItems, taxes, savedPaymentMethods: rawSave
         }
     }, [showSaved, onPaymentInfoSelected, savedPaymentMethods, selectedPaymentInfo /*, checkoutError*/]);
     // PLAIN LINKS:
-    const onPlaidLinkClicked = usePlaid({
+    const { loading: plaidLoading, error: plaidError, openLink: onPlaidLinkClicked, refetchLink: refetchPlaidLink, } = usePlaid({
         orgID,
+        invoiceID,
+        invoiceCountdownStart,
         selectedBillingInfo,
         skip: !acceptedPaymentTypes.includes("ACH"),
     });
@@ -70,7 +72,7 @@ const PaymentView = ({ orgID, checkoutItems, taxes, savedPaymentMethods: rawSave
             React__default.createElement(CheckoutStepper, { progress: 100 }),
             React__default.createElement(BillingInfoItem, { data: selectedPaymentMethodBillingInfo, additionalProps: { onEdit: onPrev, disabled: isDeleting, boxProps: billingInfoItemBoxProps } }),
             React__default.createElement(Divider, { sx: { mt: 2.5 } }),
-            showSaved ? (React__default.createElement(SavedPaymentDetailsSelector, { showLoader: isDeleting, acceptedCreditCardNetworks: acceptedCreditCardNetworks, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethodId: typeof selectedPaymentInfo === "string" ? selectedPaymentInfo : undefined, onNew: handleShowForm, onDelete: handleSavedPaymentMethodDeleted, onPick: onPaymentInfoSelected, onCvvSelected: onCvvSelected, onNext: onNext, onClose: onClose, onAttemptSubmit: handleFormAttemptSubmit, consentType: consentType })) : (React__default.createElement(PaymentMethodForm, { acceptedPaymentTypes: acceptedPaymentTypes, acceptedCreditCardNetworks: acceptedCreditCardNetworks, defaultValues: typeof selectedPaymentInfo === "string" || selectedPaymentInfo === null ? undefined : selectedPaymentInfo, checkoutError: checkoutError, onPlaidLinkClicked: onPlaidLinkClicked, onSaved: savedPaymentMethods.length > 0 ? handleShowSaved : undefined, onClose: onClose, onSubmit: handleSubmit, onAttemptSubmit: handleFormAttemptSubmit, consentType: consentType, debug: debug }))),
+            showSaved ? (React__default.createElement(SavedPaymentDetailsSelector, { showLoader: isDeleting, acceptedCreditCardNetworks: acceptedCreditCardNetworks, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethodId: typeof selectedPaymentInfo === "string" ? selectedPaymentInfo : undefined, onNew: handleShowForm, onDelete: handleSavedPaymentMethodDeleted, onPick: onPaymentInfoSelected, onCvvSelected: onCvvSelected, onNext: onNext, onClose: onClose, onAttemptSubmit: handleFormAttemptSubmit, consentType: consentType })) : (React__default.createElement(PaymentMethodForm, { acceptedPaymentTypes: acceptedPaymentTypes, acceptedCreditCardNetworks: acceptedCreditCardNetworks, defaultValues: typeof selectedPaymentInfo === "string" || selectedPaymentInfo === null ? undefined : selectedPaymentInfo, checkoutError: checkoutError, plaidLoading: plaidLoading, plaidError: plaidError, onPlaidLinkClicked: onPlaidLinkClicked, refetchPlaidLink: refetchPlaidLink, onSaved: savedPaymentMethods.length > 0 ? handleShowSaved : undefined, onClose: onClose, onSubmit: handleSubmit, onAttemptSubmit: handleFormAttemptSubmit, consentType: consentType, debug: debug }))),
         React__default.createElement(Divider, { sx: { display: { xs: "block", md: "none" } } }),
         React__default.createElement(CheckoutDeliveryAndItemCostBreakdown, { checkoutItems: checkoutItems, taxes: taxes, validatePersonalDeliveryAddress: formSubmitAttempted, wallets: wallets, wallet: wallet, onWalletChange: onWalletChange })));
 };

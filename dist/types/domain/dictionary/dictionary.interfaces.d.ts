@@ -1,5 +1,5 @@
 /// <reference types="react" />
-export declare type PUIDictionarySingleLine = string | React.ReactFragment;
+export declare type PUIDictionarySingleLine = string | React.ReactElement;
 export declare type PUIDictionaryMultiLine = PUIDictionarySingleLine[];
 export declare type PUIDictionary = {
     walletInfo: PUIDictionarySingleLine;

@@ -191,7 +191,7 @@ debug: parentDebug, onEvent, onError, }) => {
     }, [invoiceAndReservationState, setError, setInvoiceID]);
     // Reservation countdown:
     const { countdownElementRef } = useContdown.useCountdown({
-        invoiceCountdownStart: checkoutStep === "confirmation" ? null : invoiceCountdownStart,
+        invoiceCountdownStart: checkoutStep === "confirmation" || checkoutStep === "error" ? null : invoiceCountdownStart,
         setError,
     });
     // Init modal state once everything has been loaded:
@@ -381,7 +381,7 @@ debug: parentDebug, onEvent, onError, }) => {
         },
     });
     const handleBeforeUnload = handleBeforeUnloadRef.current = React.useCallback((e) => {
-        if (paymentID || processorPaymentID)
+        if (paymentID || processorPaymentID || initialInvoiceID)
             return;
         if (orgID && invoiceID && invoiceID !== lastReleasedReservationID.current) {
             if (debug)
@@ -404,7 +404,7 @@ debug: parentDebug, onEvent, onError, }) => {
             // The absence of a returnValue property on the event will guarantee the browser unload happens:
             delete e['returnValue'];
         }
-    }, [paymentID, processorPaymentID, orgID, invoiceID, debug, releaseReservationBuyNowLot]);
+    }, [paymentID, processorPaymentID, initialInvoiceID, orgID, invoiceID, debug, releaseReservationBuyNowLot]);
     React.useEffect(() => {
         if ((checkoutError === null || checkoutError === void 0 ? void 0 : checkoutError.at) === "reset")
             handleBeforeUnloadRef.current();
@@ -495,12 +495,12 @@ debug: parentDebug, onEvent, onError, }) => {
     else if (checkoutStep === "billing") {
         checkoutStepElement = (React__default["default"].createElement(BillingView.BillingView, { vertexEnabled: vertexEnabled, checkoutItems: checkoutItems, savedPaymentMethods: savedPaymentMethods, selectedBillingInfo: selectedPaymentMethod.billingInfo, wallet: wallet, wallets: wallets, checkoutError: checkoutError, onBillingInfoSelected: handleBillingInfoSelected, onTaxesChange: setTaxes, onSavedPaymentMethodDeleted: handleSavedPaymentMethodDeleted, onWalletChange: setWalletAddress, onNext: goNext, onClose: handleClose, consentType: consentType, debug: debug }));
     }
-    else if (checkoutStep === "payment") {
-        checkoutStepElement = (React__default["default"].createElement(PaymentView.PaymentView, { orgID: orgID, checkoutItems: checkoutItems, taxes: taxes, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethod: selectedPaymentMethod, wallet: wallet, wallets: wallets, checkoutError: checkoutError, onPaymentInfoSelected: handlePaymentInfoSelected, onCvvSelected: handleCvvSelected, onSavedPaymentMethodDeleted: handleSavedPaymentMethodDeleted, onWalletChange: setWalletAddress, onNext: goNext, onPrev: goBack, onClose: handleClose, acceptedPaymentTypes: acceptedPaymentTypes, acceptedCreditCardNetworks: acceptedCreditCardNetworks, consentType: consentType, debug: debug }));
+    else if (checkoutStep === "payment" && invoiceID && invoiceCountdownStart) {
+        checkoutStepElement = (React__default["default"].createElement(PaymentView.PaymentView, { orgID: orgID, invoiceID: invoiceID, invoiceCountdownStart: invoiceCountdownStart, checkoutItems: checkoutItems, taxes: taxes, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethod: selectedPaymentMethod, wallet: wallet, wallets: wallets, checkoutError: checkoutError, onPaymentInfoSelected: handlePaymentInfoSelected, onCvvSelected: handleCvvSelected, onSavedPaymentMethodDeleted: handleSavedPaymentMethodDeleted, onWalletChange: setWalletAddress, onNext: goNext, onPrev: goBack, onClose: handleClose, acceptedPaymentTypes: acceptedPaymentTypes, acceptedCreditCardNetworks: acceptedCreditCardNetworks, consentType: consentType, debug: debug }));
     }
     else if (checkoutStep === "purchasing" && invoiceID && invoiceCountdownStart) {
         headerVariant = "purchasing";
-        checkoutStepElement = (React__default["default"].createElement(PurchasingView.PurchasingView, { threeDSEnabled: threeDSEnabled, purchasingImageSrc: purchasingImageSrc, purchasingMessages: purchasingMessages, orgID: orgID, invoiceID: invoiceID, invoiceCountdownStart: invoiceCountdownStart, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethod: selectedPaymentMethod, wallet: wallet, onPurchaseSuccess: handlePurchaseSuccess, onPurchaseError: handlePurchaseError, onDialogBlocked: setIsDialogBlocked, debug: debug }));
+        checkoutStepElement = (React__default["default"].createElement(PurchasingView.PurchasingView, { threeDSEnabled: threeDSEnabled, purchasingImageSrc: purchasingImageSrc, purchasingMessages: purchasingMessages, orgID: orgID, invoiceID: invoiceID, invoiceCountdownStart: invoiceCountdownStart, checkoutItems: checkoutItems, savedPaymentMethods: savedPaymentMethods, selectedPaymentMethod: selectedPaymentMethod, wallet: wallet, onPurchaseSuccess: handlePurchaseSuccess, onPurchaseError: handlePurchaseError, onDialogBlocked: setIsDialogBlocked, debug: debug }));
     }
     else if (checkoutStep === "confirmation") {
         headerVariant = "logoOnly";

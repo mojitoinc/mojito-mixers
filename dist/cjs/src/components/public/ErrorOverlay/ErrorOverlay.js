@@ -33,7 +33,7 @@ const PUIErrorOverlay = (_a) => {
     corre.useTimeout(() => {
         setErrorMessage(prevErrorMessage => prevErrorMessage || errors_constants.ERROR_PURCHASE.errorMessage);
     }, config.PAYMENT_NOTIFICATION_ERROR_MAX_WAIT_MS);
-    const { purchaseError, url = "" } = CheckoutOverlay_utils.getCheckoutModalState();
+    const { purchaseError, url = "" } = CheckoutOverlay_utils.getCheckoutModalState(true);
     React.useLayoutEffect(() => {
         // Users should only see this page if they completed a credit card payment and 3DS' verification went wrong.
         // Otherwise, they are immediately redirected to homepage:
@@ -43,7 +43,7 @@ const PUIErrorOverlay = (_a) => {
     const reviewData = React.useCallback((errorMessage) => tslib_es6.__awaiter(void 0, void 0, void 0, function* () {
         const isPathname = url_utils.isUrlPathname(url);
         if (isPathname)
-            CheckoutOverlay_utils.persistReceivedRedirectUri3DS(window.location.href);
+            CheckoutOverlay_utils.persistCheckoutModalInfoRedirectURI(window.location.href);
         // If there was an error, users can click the review button and go back to the Payment UI to review the data...:
         onRedirect(`${url}${config.THREEDS_FLOW_SEARCH_PARAM_ERROR}${encodeURIComponent(errorMessage)}`);
         return false;

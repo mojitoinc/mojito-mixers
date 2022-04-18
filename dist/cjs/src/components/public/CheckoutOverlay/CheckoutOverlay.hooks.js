@@ -47,37 +47,27 @@ function useCheckoutModalState({ invoiceID: initialInvoiceID = null, productConf
         CheckoutStepper.resetStepperProgress();
         // Once authentication has loaded, we know if we need to skip the product confirmation step or not. Also, when the
         // modal is re-opened, we need to reset its state, taking into account if we need to resume a Plaid OAuth flow:s
-        const savedFlow = CheckoutOverlay_utils.continueFlows();
-        // if (savedFlow.flowType === "3DS") {
-        //   continueCheckout() already calls clearPersistedInfo().
-        //   clearPersistedInfo();
-        // } else if (savedFlow.flowType === "Plaid") {
-        //   This is handled in PaymentView.tsx, in the usePlaid() hook call.
-        //   clearPlaidInfo();
-        // } else if (savedFlow.checkoutStep !== "") {
-        //   TODO: Clear both as this is some kind of indeterminate / error state?
-        // }
+        const checkoutModalState = CheckoutOverlay_utils.getCheckoutModalState();
         setCheckoutModalState({
-            checkoutStep: savedFlow.checkoutStep || startAt,
-            // checkoutError: savedFlow.checkoutError,
+            checkoutStep: checkoutModalState.checkoutStep || startAt,
             isDialogBlocked: false,
         });
         // setCheckoutModalState({ checkoutStep: "error", checkoutError: { errorMessage: "test" } });
         // setCheckoutModalState({ checkoutStep: "purchasing" });
         setSelectedPaymentMethod({
-            billingInfo: savedFlow.billingInfo || "",
-            paymentInfo: savedFlow.paymentInfo || "",
+            billingInfo: checkoutModalState.billingInfo || "",
+            paymentInfo: checkoutModalState.paymentInfo || "",
             cvv: "",
         });
         setPurchaseState({
-            invoiceID: savedFlow.invoiceID || "",
-            invoiceCountdownStart: savedFlow.invoiceCountdownStart || null,
+            invoiceID: initialInvoiceID ? initialInvoiceID : (checkoutModalState.invoiceID || ""),
+            invoiceCountdownStart: initialInvoiceID ? Date.now() : (checkoutModalState.invoiceCountdownStart || null),
             taxes: vertexEnabled ? { status: "incomplete" } : null,
             wallet: null,
-            processorPaymentID: savedFlow.processorPaymentID || "",
-            paymentID: savedFlow.paymentID || ""
+            processorPaymentID: checkoutModalState.processorPaymentID || "",
+            paymentID: checkoutModalState.paymentID || ""
         });
-    }, [debug, startAt, vertexEnabled]);
+    }, [debug, startAt, initialInvoiceID, vertexEnabled]);
     const goBack = React.useCallback(() => {
         setCheckoutModalState(({ checkoutStep, checkoutError }) => ({
             checkoutStep: CHECKOUT_STEPS[Math.max(CHECKOUT_STEPS.indexOf(checkoutStep) - 1, 0)],

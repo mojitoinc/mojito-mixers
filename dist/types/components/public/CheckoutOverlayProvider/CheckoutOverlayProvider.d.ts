@@ -12,6 +12,7 @@ export declare const CheckoutOverlayContext: React.Context<CheckoutOverlayContex
 export interface CheckoutOverlayProviderProps extends UseOpenCloseCheckoutModalOptions {
     checkoutComponent: React.ComponentType<CheckoutComponentWithRequiredProps>;
     doNotRenderPaymentUI?: boolean;
+    children: React.ReactNode;
 }
 export declare const CheckoutOverlayProvider: React.FC<CheckoutOverlayProviderProps>;
 export declare function useCheckoutOverlay(): CheckoutOverlayContextProps;
