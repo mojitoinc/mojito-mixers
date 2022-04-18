@@ -12,8 +12,12 @@ DOING:
 - Persist product data.
 
 TODO:
+- CheckoutOverlayProps is an union with and without the page data.
+- Without will load data from localStorage or redirect if missing.
+- Once the confirmation has been show (3DS), we store the last page in case we need to redirect users there.
+
 - For 3DS, load confirmation in /success and redirect once users clicks something.
-- For Plaid, maybe add a URL param or read cookies?
+- For Plaid, maybe add a URL param or read cookies? Also continue flow on same page.
 
 */
 
@@ -64,12 +68,12 @@ export function isInitiallyOpen() {
   return getCheckoutModalState(true).checkoutStep !== "";
 }
 
-function isCheckoutModalInfo3DS(checkoutModalInfo: Partial<CheckoutModalInfo3DS | CheckoutModalInfoPlaid>): checkoutModalInfo is CheckoutModalInfo3DS {
-  return checkoutModalInfo.hasOwnProperty("paymentInfo") || checkoutModalInfo.hasOwnProperty("checkoutItems");
+export function isCheckoutModalInfo3DS(checkoutModalInfo: Partial<CheckoutModalInfo3DS | CheckoutModalInfoPlaid>): checkoutModalInfo is CheckoutModalInfo3DS {
+  return !!(checkoutModalInfo as any).paymentInfo && !!(checkoutModalInfo as any).checkoutItems;
 }
 
-function isCheckoutModalInfoPlaid(checkoutModalInfo: Partial<CheckoutModalInfo3DS | CheckoutModalInfoPlaid>): checkoutModalInfo is CheckoutModalInfoPlaid {
-  return checkoutModalInfo.hasOwnProperty("linkToken");
+export function isCheckoutModalInfoPlaid(checkoutModalInfo: Partial<CheckoutModalInfo3DS | CheckoutModalInfoPlaid>): checkoutModalInfo is CheckoutModalInfoPlaid {
+  return !!(checkoutModalInfo as any).linkToken;
 }
 
 export function getCheckoutModalState(noClear?: boolean): CheckoutModalStateCombined {
@@ -94,10 +98,7 @@ export function getCheckoutModalState(noClear?: boolean): CheckoutModalStateComb
     fromLocalhost = false,
     invoiceID = "",
     invoiceCountdownStart = -1,
-    // processorPaymentID = "",
-    // paymentID = "",
     billingInfo = "",
-    // paymentInfo = "",
   } = savedModalInfo;
 
   // Swap to test error flow:
@@ -108,9 +109,6 @@ export function getCheckoutModalState(noClear?: boolean): CheckoutModalStateComb
   let isValid = fromLocalhost || !!(url && invoiceID && billingInfo && receivedRedirectUri);
 
   if (isValid) {
-    const savedCheckoutModalState = {};
-    if (debug) console.log("💾 Continue 3DS Flow...", savedCheckoutModalState);
-
     if (!noClear) clearPersistedInfo();
 
     const commonModalState: CheckoutModalStateCommon = {
@@ -139,21 +137,25 @@ export function getCheckoutModalState(noClear?: boolean): CheckoutModalStateComb
       continueFlow: true,
     };
 
+    if (debug) console.log("💾 Continue Saved Flow...", commonModalState);
+
     if (isCheckoutModalInfo3DS(savedModalInfo)) {
       const {
+        processorPaymentID,
+        paymentID,
         paymentInfo,
         checkoutItems = [],
       } = savedModalInfo;
 
       isValid &&=
+        // TODO: URL param should match stored one.
         window.location.search.startsWith(THREEDS_FLOW_SEARCH_PARAM_SUCCESS) &&
-        // processorPaymentID &&
-        // paymentID &&
+        processorPaymentID !== undefined &&
+        paymentID !== undefined &&
         paymentInfo !== undefined &&
         checkoutItems.length > 0;
 
       if (isValid) {
-
         const purchaseError = receivedRedirectUri.includes("error") || receivedRedirectUri.includes("failure");
         const purchaseSuccess = !purchaseError && (receivedRedirectUri.includes("success") || receivedRedirectUri.includes(THREEDS_FLOW_SEARCH_PARAM_SUCCESS));
 
@@ -165,8 +167,8 @@ export function getCheckoutModalState(noClear?: boolean): CheckoutModalStateComb
           checkoutStep: purchaseSuccess ? "confirmation" : "payment",
 
           // The reference number of the payment:
-          // processorPaymentID,
-          // paymentID,
+          processorPaymentID,
+          paymentID,
 
           // The payment info id selected before starting the 3DS flow:
           paymentInfo,
@@ -204,6 +206,8 @@ export function getCheckoutModalState(noClear?: boolean): CheckoutModalStateComb
       }
     }
   }
+
+  // TODO: Move log here.
 
   // TODO: isValid && savedInfoUsed never reached:
   if ((isValid && savedInfoUsed) || (!isValid && cookieStorage.getItem(CHECKOUT_MODAL_INFO_KEY))) {

@@ -35,7 +35,7 @@ export const PUIErrorOverlay: React.FC<PUIErrorOverlayProps> = ({
     setErrorMessage(prevErrorMessage => prevErrorMessage || ERROR_PURCHASE.errorMessage);
   }, PAYMENT_NOTIFICATION_ERROR_MAX_WAIT_MS);
 
-  const { purchaseError, url = "" } = getCheckoutModalState();
+  const { purchaseError, url = "" } = getCheckoutModalState(true);
 
   useLayoutEffect(() => {
     // Users should only see this page if they completed a credit card payment and 3DS' verification went wrong.

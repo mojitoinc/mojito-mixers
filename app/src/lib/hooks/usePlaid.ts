@@ -5,7 +5,7 @@ import { PlaidLinkOnEvent, PlaidLinkOnExit, PlaidLinkOnSuccess, PlaidLinkOptions
 import { BillingInfo } from "../forms/BillingInfoForm";
 import { PaymentMethod } from "../domain/payment/payment.interfaces";
 import { isLocalhostOrStaging } from "../domain/url/url.utils";
-import { clearPersistedInfo, getCheckoutModalState, persistCheckoutModalInfo, persistCheckoutModalInfoUsed } from "../components/public/CheckoutOverlay/CheckoutOverlay.utils";
+import { clearPersistedInfo, getCheckoutModalState, isCheckoutModalInfoPlaid, persistCheckoutModalInfo, persistCheckoutModalInfoUsed } from "../components/public/CheckoutOverlay/CheckoutOverlay.utils";
 import { CheckoutModalStatePlaid } from "../components/public/CheckoutOverlay/CheckoutOverlay.types";
 import { FALLBACK_MODAL_STATE_COMMON } from "../components/public/CheckoutOverlay/CheckoutOverlay.constants";
 
@@ -36,7 +36,7 @@ export function isUsePlaidOptionsContinueFlow(options: UsePlaidOptions): options
 export let INITIAL_PLAID_OAUTH_FLOW_STATE = getCheckoutModalState(true);
 
 export function continuePlaidOAuthFlow() {
-  return INITIAL_PLAID_OAUTH_FLOW_STATE.continueFlow && !INITIAL_PLAID_OAUTH_FLOW_STATE.savedInfoUsed;
+  return INITIAL_PLAID_OAUTH_FLOW_STATE.continueFlow && !INITIAL_PLAID_OAUTH_FLOW_STATE.savedInfoUsed && isCheckoutModalInfoPlaid(INITIAL_PLAID_OAUTH_FLOW_STATE);
 }
 
 export function usePlaid(options: UsePlaidOptions) {
