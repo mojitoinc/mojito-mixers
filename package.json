@@ -8,7 +8,7 @@
   "files": [
     "dist"
   ],
-  "private": true,
+  "private": false,
   "scripts": {
     "dev": "yarn --cwd app dev",
     "build": "yarn --cwd app  build",
