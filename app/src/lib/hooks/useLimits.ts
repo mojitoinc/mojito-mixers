@@ -1,19 +1,32 @@
-import { useCallback, useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 
-import { transformRawRemainingItemLimit } from "../domain/payment/payment.utils";
+import { PaymentLimits, transformRawRemainingItemLimit } from "../domain/payment/payment.utils";
 import { CheckoutItem } from "../domain/product/product.interfaces";
 import { PaymentType } from "../domain/payment/payment.interfaces";
 import {
   useCollectionItemByIdQuery,
   useValidatePaymentLimitQuery,
-  ValidatePaymentLimitOutput,
 } from "../queries/graphqlGenerated";
 import { PAYMENT_METHOD_OPTION_PROPS } from "@components/shared/PaymentMethodSelector/PaymentMethodSelector";
 
-export const useLimits = (checkoutItem: CheckoutItem) => {
+export interface UseLimitsReturn {
+  limits?: PaymentLimits;
+  loading: boolean;
+  refetch: () => void;
+  limitExceededMessage: string;
+}
+
+export function useLimits(
+  checkoutItem: CheckoutItem,
+  acceptedPaymentTypes: PaymentType[],
+  paymentType?: PaymentType,
+): UseLimitsReturn {
   const itemsCount = checkoutItem?.units || 0;
 
-  const { data: collectionItemData } = useCollectionItemByIdQuery({
+  const {
+    data: collectionItemData,
+    loading: collectionItemLoading,
+  } = useCollectionItemByIdQuery({
     skip: !checkoutItem?.collectionItemId,
     variables: {
       id: checkoutItem?.collectionItemId,
@@ -24,8 +37,8 @@ export const useLimits = (checkoutItem: CheckoutItem) => {
 
   const {
     data: paymentLimitData,
+    loading: paymentLimitLoading,
     refetch,
-    loading,
   } = useValidatePaymentLimitQuery({
     skip: !collectionId,
     variables: {
@@ -35,51 +48,53 @@ export const useLimits = (checkoutItem: CheckoutItem) => {
     notifyOnNetworkStatusChange: true,
   });
 
+  useEffect(() => {
+    refetch();
+  }, [refetch, paymentType]);
+
   const rawRemainingItemLimit = paymentLimitData?.validatePaymentLimit;
 
-  const itemLimits: Record<PaymentType, number> = useMemo(
-    () =>
-      transformRawRemainingItemLimit(
-        rawRemainingItemLimit as ValidatePaymentLimitOutput,
-        itemsCount
-      ),
-    [rawRemainingItemLimit, itemsCount]
-  );
+  const lastLimitsRef = useRef<undefined | Record<PaymentType, number>>();
 
-  const getItemLimitFor = useCallback(
-    (paymentType: PaymentType) =>
-      (!!itemLimits && itemLimits[paymentType]) ?? Infinity,
-    [itemLimits]
-  );
+  const limits: undefined | Record<PaymentType, number> = useMemo(() => {
+    if (!rawRemainingItemLimit) return lastLimitsRef.current;
 
-  const limitExceededFor = useCallback(
-    (paymentType: PaymentType) => itemsCount > getItemLimitFor(paymentType),
-    [itemsCount, getItemLimitFor]
-  );
+    return lastLimitsRef.current = transformRawRemainingItemLimit(
+      rawRemainingItemLimit,
+      itemsCount,
+    );
+  }, [rawRemainingItemLimit, itemsCount]);
 
-  const getItemLimitExceededMessageFor = useCallback(
-    (selectedPaymentType: PaymentType, acceptedPaymentTypes: PaymentType[]) => {
-      const otherPaymentMethodsWithLimit = acceptedPaymentTypes.filter(
-        (paymentType: PaymentType) => paymentType !== selectedPaymentType && !limitExceededFor(paymentType)
-      )
-      .map(
-        (paymentType: PaymentType) =>
-          PAYMENT_METHOD_OPTION_PROPS[paymentType].label
-      );
+  const limitExceededMessage = useMemo(() => {
+    if (!limits || !paymentType) return "";
 
-      if (otherPaymentMethodsWithLimit.length > 0)
-        return `You can't buy more than ${getItemLimitFor(
-          selectedPaymentType
-        )} items with ${
-          PAYMENT_METHOD_OPTION_PROPS[selectedPaymentType].label
-        }. Use ${otherPaymentMethodsWithLimit.join(", ")} instead.`;
+    const paymentTypeLimit = limits[paymentType];
 
-      return `You have already bought the maximum ${getItemLimitFor(
-        selectedPaymentType
-      )} items allowed for this sale.`;
-    },
-    [getItemLimitFor, limitExceededFor]
-  );
+    if (itemsCount <= limits[paymentType]) return "";
 
-  return { itemLimits, refetch, loading, limitExceededFor, getItemLimitExceededMessageFor };
+    const alternativePaymentMethods = acceptedPaymentTypes.filter((acceptedPaymentType: PaymentType) => {
+      return acceptedPaymentType !== paymentType && itemsCount <= limits[paymentType];
+    }).map((paymentType: PaymentType) => {
+      return PAYMENT_METHOD_OPTION_PROPS[paymentType].label;
+    });
+
+    if (alternativePaymentMethods.length > 0) {
+      const [lastAlternativePaymentMethod, ...otherAlternativePaymentMethods] = alternativePaymentMethods.slice(0).reverse();
+
+      return `You can't buy more than ${
+        paymentTypeLimit
+      } items with ${
+        PAYMENT_METHOD_OPTION_PROPS[paymentType].label
+      }. Use ${ otherAlternativePaymentMethods.join(", ") }${ otherAlternativePaymentMethods.length ? " or " : "" }${ lastAlternativePaymentMethod } instead.`;
+    }
+
+    return `You have already bought the maximum${ paymentTypeLimit === Infinity ? "" : ` ${ paymentTypeLimit }` } items allowed for this sale.`;
+  }, [limits, paymentType, itemsCount, acceptedPaymentTypes]);
+
+  return {
+    limits,
+    loading: collectionItemLoading || paymentLimitLoading || !limits,
+    refetch,
+    limitExceededMessage,
+  };
 };

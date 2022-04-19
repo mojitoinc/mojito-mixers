@@ -371,30 +371,25 @@ export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
 
   // Item Limits:
 
-  const { itemLimits, refetch: refetchItemLimits, loading: loadingItemLimits, limitExceededFor, getItemLimitExceededMessageFor } = useLimits(firstCheckoutItem);
+  const selectedPaymentMethod = watch("type") as PaymentType;
+
+  const {
+    limits,
+    loading: loadingItemLimits,
+    limitExceededMessage,
+  } = useLimits(firstCheckoutItem, acceptedPaymentTypes, selectedPaymentMethod);
 
   const handleSelectedPaymentMethodChange = useCallback((paymentType: PaymentType) => {
     reset({ ...PAYMENT_TYPE_FORM_DATA[paymentType].defaultValues(consentType) });
 
     if (paymentType === "ACH" && !!plaidError) refetchPlaidLink();
+  }, [reset, consentType, plaidError, refetchPlaidLink]);
 
-    refetchItemLimits();
-  }, [reset, consentType, plaidError, refetchPlaidLink, refetchItemLimits]);
-
-  const selectedPaymentMethod = watch("type") as PaymentType;
   const Fields = PAYMENT_TYPE_FORM_DATA[selectedPaymentMethod].fields;
   const submitForm = handleSubmit(onSubmit);
   const checkoutErrorMessage = useFormCheckoutError({ formKey: "payment", checkoutError, fields: FIELD_NAMES, setError, deps: [selectedPaymentMethod] });
 
   const acceptsManyPaymentMethods = acceptedPaymentTypes.length > 1;
-
-  const itemLimitExceeded = limitExceededFor(selectedPaymentMethod);
-
-  const itemLimitExceededMessage = useMemo(
-    () => getItemLimitExceededMessageFor(selectedPaymentMethod, acceptedPaymentTypes),
-    [getItemLimitExceededMessageFor, selectedPaymentMethod, acceptedPaymentTypes]
-  );
-
   const creditCardNumber = watch("cardNumber") as string;
   const creditCardNetwork = getCreditCardNetworkFromNumber(creditCardNumber || "");
   const cvvLabel = getCardTypeByType(creditCardNetwork).code.name;
@@ -420,7 +415,6 @@ export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
   }, [onAttemptSubmit, selectedPaymentMethod, onPlaidLinkClicked, submitForm, trigger]);
 
   const addSpacing = !onSaved && acceptedPaymentTypes.length <= 1;
-  const showLimitError = !loadingItemLimits && itemLimitExceeded;
   const showPlaidError = selectedPaymentMethod === "ACH" && !!plaidError;
 
   return (
@@ -443,14 +437,14 @@ export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
         />
       </>) }
 
-      { addSpacing && !showLimitError ? (
+      { addSpacing && !limitExceededMessage ? (
         <Box sx={{ mt: 1 }} />
       ) : null }
 
-      { showLimitError ? (
+      { limitExceededMessage ? (
         <DisplayBox sx={{ mt: addSpacing ? 1 : 0, mb: 2.5 }}>
           <Typography sx={{ fontWeight: "500" }}>
-            {itemLimitExceededMessage}
+            {limitExceededMessage}
           </Typography>
         </DisplayBox>
       ) : null }
@@ -475,7 +469,7 @@ export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
           { "\n\n" }
           { JSON.stringify(formState.errors, null, 2) }
           { "\n\n" }
-          { JSON.stringify(itemLimits, null, 2) }
+          { JSON.stringify(limits, null, 2) }
         </DebugBox>
       ) }
 
@@ -483,8 +477,8 @@ export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
         variant={ selectedPaymentMethod === "ACH" ? "toPlaid" : "toConfirmation" }
         consentType={ consentType === "checkbox" ? undefined : consentType }
         submitLabel={ loadingItemLimits ? "Verifying purchase..." : undefined }
-        submitDisabled={ selectedPaymentMethod === "Crypto" || showPlaidError || loadingItemLimits || itemLimitExceeded }
-        submitLoading={ plaidLoading }
+        submitDisabled={ selectedPaymentMethod === "Crypto" || showPlaidError || loadingItemLimits || !!limitExceededMessage }
+        submitLoading={ plaidLoading || loadingItemLimits }
         onCloseClicked={ onClose } />
     </form>
   );

@@ -35,7 +35,7 @@ export function standaloneGetCardImageProps(network = "") {
 
 export const getExpiryDateIsValid = (expiryDate?: string) => !getExpiryDateError(expiryDate);
 
-export const getCvvIsValid = (cvv = "", network: "" | CreditCardNetwork = "", networks: CreditCardNetwork[] = [], required = true) => {
+export function getCvvIsValid (cvv = "", network: "" | CreditCardNetwork = "", networks: CreditCardNetwork[] = [], required = true) {
   // if (required && !cvv) return false;
   // if (!required && !cvv) return true;
 
@@ -58,11 +58,21 @@ export const getCvvIsValid = (cvv = "", network: "" | CreditCardNetwork = "", ne
     cvvExpectedLength,
     isCvvValid: !required,
   };
-};
+}
 
-export const transformRawRemainingItemLimit = (rawRemainingItemLimit: ValidatePaymentLimitOutput, itemsCount: number) => ({
-  CreditCard: (rawRemainingItemLimit?.creditCard?.remainingTransaction ?? Infinity) + itemsCount,
-  ACH: (rawRemainingItemLimit?.ach?.remainingTransaction ?? Infinity) + itemsCount,
-  Wire: (rawRemainingItemLimit?.wire?.remainingTransaction ?? Infinity) + itemsCount,
-  Crypto: (Infinity) + itemsCount // TODO: Add crypto when added to ValidatePaymentLimitOutput
-});
+export interface PaymentLimits {
+  CreditCard: number;
+  ACH: number;
+  Wire: number;
+  Crypto: number;
+}
+
+export function transformRawRemainingItemLimit(rawRemainingItemLimit?: ValidatePaymentLimitOutput, itemsCount = 0): PaymentLimits {
+  return {
+    CreditCard: (rawRemainingItemLimit?.creditCard?.remainingTransaction ?? Infinity) + itemsCount,
+    ACH: (rawRemainingItemLimit?.ach?.remainingTransaction ?? Infinity) + itemsCount,
+    Wire: (rawRemainingItemLimit?.wire?.remainingTransaction ?? Infinity) + itemsCount,
+    // TODO: Update once crypto is added to ValidatePaymentLimitOutput:
+    Crypto: ((rawRemainingItemLimit as any)?.crypto?.remainingTransaction ?? Infinity) + itemsCount,
+  };
+};

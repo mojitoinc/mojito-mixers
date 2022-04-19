@@ -120,7 +120,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   successImageSrc,
   errorImageSrc,
   userFormat,
-  acceptedPaymentTypes,
+  acceptedPaymentTypes = ["CreditCard"],
   acceptedCreditCardNetworks,
   network,
   dictionary,

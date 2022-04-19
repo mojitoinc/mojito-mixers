@@ -44,7 +44,7 @@ export interface PaymentViewProps {
   onNext: () => void;
   onPrev: () => void;
   onClose: () => void;
-  acceptedPaymentTypes?: PaymentType[];
+  acceptedPaymentTypes: PaymentType[];
   acceptedCreditCardNetworks?: CreditCardNetwork[];
   consentType?: ConsentType;
   debug?: boolean;
@@ -68,7 +68,7 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
   onNext,
   onPrev,
   onClose,
-  acceptedPaymentTypes = ["CreditCard"],
+  acceptedPaymentTypes,
   acceptedCreditCardNetworks,
   consentType,
   debug,

@@ -66,26 +66,24 @@ export const SavedPaymentDetailsSelector: React.FC<SavedPaymentDetailsSelectorPr
 }) => {
   const firstCheckoutItem = checkoutItems[0];
 
+  const selectedPaymentMethod = useMemo(() => {
+    return savedPaymentMethods.find(savedPaymentMethod => savedPaymentMethod.id === selectedPaymentMethodId);
+  }, [savedPaymentMethods, selectedPaymentMethodId]);
+
   // Item Limits:
 
-  const { itemLimits, refetch: refetchItemLimits, loading: loadingItemLimits, limitExceededFor, getItemLimitExceededMessageFor } = useLimits(firstCheckoutItem);
+  const {
+    limits,
+    loading: loadingItemLimits,
+    refetch: refetchItemLimits,
+    limitExceededMessage,
+  } = useLimits(firstCheckoutItem, acceptedPaymentTypes, selectedPaymentMethod?.type);
 
   const handlePick = useCallback((paymentMethodId: string) => {
     onPick(paymentMethodId);
+
     refetchItemLimits();
   }, [onPick, refetchItemLimits]);
-
-  const selectedPaymentMethod = useMemo(
-    () => savedPaymentMethods.find(savedPaymentMethod => savedPaymentMethod.id === selectedPaymentMethodId),
-    [savedPaymentMethods, selectedPaymentMethodId]
-  );
-
-  const itemLimitExceeded = selectedPaymentMethod ? limitExceededFor(selectedPaymentMethod.type) : false;
-
-  const itemLimitExceededMessage = useMemo(
-    () => selectedPaymentMethod ? getItemLimitExceededMessageFor(selectedPaymentMethod.type, acceptedPaymentTypes) : undefined,
-    [getItemLimitExceededMessageFor, selectedPaymentMethod, acceptedPaymentTypes]
-  );
 
   const { creditCardNetwork, cvvLabel, isCvvRequired } = useMemo((): CreditCardInfo => {
     if (!selectedPaymentMethod || selectedPaymentMethod.type !== "CreditCard") {
@@ -163,10 +161,10 @@ export const SavedPaymentDetailsSelector: React.FC<SavedPaymentDetailsSelectorPr
 
       <InputGroupLabel sx={{ mt: 2.5, mb: 1.5 }}>Saved Payment Methods</InputGroupLabel>
 
-      { !loadingItemLimits && itemLimitExceeded ? (
+      { limitExceededMessage ? (
         <DisplayBox sx={{ mb: 2 }}>
           <Typography sx={{ fontWeight: "500" }}>
-            {itemLimitExceededMessage}
+            {limitExceededMessage}
           </Typography>
         </DisplayBox>
       ) : null }
@@ -208,7 +206,7 @@ export const SavedPaymentDetailsSelector: React.FC<SavedPaymentDetailsSelectorPr
 
       { debug ? (
         <DebugBox sx={{ mt: 2.5 }}>
-          { JSON.stringify(itemLimits, null, 2)}
+          { JSON.stringify(limits, null, 2)}
         </DebugBox>
       ) : null }
 
@@ -218,7 +216,8 @@ export const SavedPaymentDetailsSelector: React.FC<SavedPaymentDetailsSelectorPr
       variant="toConfirmation"
       consentType={ consentType }
       submitLabel={ loadingItemLimits ? "Verifying purchase..." : undefined }
-      submitDisabled={ loadingItemLimits || itemLimitExceeded }
+      submitDisabled={ loadingItemLimits || !!limitExceededMessage }
+      submitLoading={ loadingItemLimits }
       onSubmitClicked={ handleNextClicked }
       onCloseClicked={ onClose } />
   </>);
