@@ -4,7 +4,7 @@ import {
   SelectOption,
   SelectProps,
 } from "../../Select/Select";
-import { SelectChangeEvent } from "@mui/material/Select";
+import { SelectChangeEvent } from "@mui/material";
 import { Wallet } from "../../../../domain/wallet/wallet.interfaces";
 import { isCustomWalletAddress, isSpecialWalletAddressValue } from "../../../../domain/wallet/wallet.utils";
 import { CUSTOM_WALLET_OPTION, NEW_WALLET_OPTION } from "../../../../domain/wallet/wallet.constants";

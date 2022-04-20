@@ -1,10 +1,9 @@
-import ContentCopyIcon from '@mui/icons-material/ContentCopy'
-import IconButton from '@mui/material/IconButton'
-import { SxProps, Theme } from '@mui/material/styles'
-import Tooltip from '@mui/material/Tooltip'
-import { useTimeout } from '@swyg/corre'
-import { FunctionComponent, useCallback, useState } from 'react'
-import { wait } from '../../../utils/promiseUtils'
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import { SxProps, Theme } from '@mui/material/styles';
+import { Tooltip, IconButton } from '@mui/material';
+import { useTimeout } from '@swyg/corre';
+import { FunctionComponent, useCallback, useState } from 'react';
+import { wait } from '../../../utils/promiseUtils';
 import React from "react";
 
 type CopyButtonSize = "small" | "medium";
