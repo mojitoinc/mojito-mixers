@@ -27,8 +27,6 @@ export const ProviderInjector: React.FC<ProvidersInjectorProps> = ({
   themeOptions,
   children,
 }) => {
-  console.log("ProviderInjector = ", uri);
-
   const theme = useMemo(() => parentTheme ?? extendDefaultTheme(themeOptions), [parentTheme, themeOptions]);
 
   useEffect(() => {
@@ -64,8 +62,6 @@ export function withThemeProvider<P extends object>(Component: React.ComponentTy
     onCatch,
     ...componentProps
   }) => {
-  console.log("withThemeProvider = ");
-
     return (
       <ErrorBoundary onCatch={ onCatch }>
         <ProviderInjector apolloClient={null} uri="" getAuthenticationToken={null} theme={theme} themeOptions={themeOptions}>
@@ -90,8 +86,6 @@ export function withProviders<P extends object>(Component: React.ComponentType<P
     onCatch,
     ...componentProps
   }) => {
-    console.log("withProviders = ", uri);
-
     return (
       <ErrorBoundary onCatch={onCatch}>
         <ProviderInjector apolloClient={apolloClient} uri={uri} getAuthenticationToken={getAuthenticationToken} theme={theme} themeOptions={themeOptions}>
