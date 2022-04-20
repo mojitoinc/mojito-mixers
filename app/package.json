@@ -1,7 +1,14 @@
 {
   "name": "@mojitonft/mojito-mixers-app",
-  "version": "1.0.0-alpha",
-  "description": "",
+  "version": "1.0.0",
+  "description": "🍸 Payment sandbox / test app for the Mojito Platform.",
+  "keywords": ["react", "typescript", "crypto", "checkout", "payment", "payments", "cryptocurrency", "circle", "wallet", "plaid", "mojito", "3ds"],
+  "homepage": "https://payments-staging.mojito.xyz/",
+  "repository": "github:mojitoinc/mojito-mixers",
+  "bugs": {
+    "url" : "https://github.com/mojitoinc/mojito-mixers/issues",
+    "email" : "dev-support@mojito.xyz"
+  },
   "private": true,
   "scripts": {
     "dev": "next dev",
