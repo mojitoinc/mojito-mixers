@@ -16,7 +16,7 @@
 
 <p align="center">
   <a href="https://payments-staging.mojito.xyz/" target="_blank">
-    <img src="./app/public/img/og-images/mojito-payment-ui.png" width="1280" />
+    <img src="https://raw.githubusercontent.com/mojitoinc/mojito-mixers/main/app/public/img/og-images/mojito-payment-ui.png" width="1280" />
   </a>
 </p>
 
@@ -29,7 +29,7 @@
 
 While this project will be installed as a dependency in other apps, it also provides a development/test playground to speed up development and improve DX. In order to use it:
 
-1. First, duplicate [`app/.env`](./app/.env) to [`app/.env.local`](./app/.env.local) and add the two missing values.
+1. First, duplicate [`app/.env`](https://github.com/mojitoinc/mojito-mixers/blob/main/app/.env) to [`app/.env.local`](https://github.com/mojitoinc/mojito-mixers/blob/main/app/.env.local) and add the two missing values.
 
 2. To start the Next.js development playground:
 
@@ -38,7 +38,7 @@ While this project will be installed as a dependency in other apps, it also prov
     yarn dev
     ```
 
-    This will install the dependencies defined in [`app/package.json`](./app/package.json) and run the Next.js app inside `./app`.
+    This will install the dependencies defined in [`app/package.json`](https://github.com/mojitoinc/mojito-mixers/blob/main/app/package.json) and run the Next.js app inside `./app`.
     
 3. Access the project at [http://localhost:3000](http://localhost:3000).
 
@@ -100,8 +100,8 @@ This builds the library using the Rollup setup at the root of the project and th
 
 Automatically generated types and hooks from the Mojito GraphQL API:
 
-- [`app/src/services/graphql/generated.tsx`](./app/src/services/graphql/generated.tsx)
-- [`app/src/lib/queries/graphqlGenerated.tsx`](./app/src/lib/queries/graphqlGenerated.tsx)
+- [`app/src/services/graphql/generated.tsx`](https://github.com/mojitoinc/mojito-mixers/blob/main/app/src/services/graphql/generated.tsx)
+- [`app/src/lib/queries/graphqlGenerated.tsx`](https://github.com/mojitoinc/mojito-mixers/blob/main/app/src/lib/queries/graphqlGenerated.tsx)
 
 To update these, first ensure that you're running a local instance of
 `mojito-api` (or change `codegen.yml`'s `schema` property to point to the production API) and then run:
@@ -110,7 +110,7 @@ To update these, first ensure that you're running a local instance of
 yarn codegen
 ```
 
-To create new queries or mutations, create a `.graphql` file (for example [`app/src/lib/queries/me.graphql`](./app/src/lib/queries/me.graphql)) and then run
+To create new queries or mutations, create a `.graphql` file (for example [`app/src/lib/queries/me.graphql`](https://github.com/mojitoinc/mojito-mixers/blob/main/app/src/lib/queries/me.graphql)) and then run
 `yarn codegen` again, and it will automatically find all `.graphql` files in the repo and create typed React hooks from
 them. If, for example, the query is called `Organization`, then the auto-generated hook will be called `useOrganizationQuery`.
 
@@ -177,7 +177,7 @@ In your App's entry point (`_app.tsx` in Next.js), you need to add the `Checkout
 Where `CheckoutComponent: React.FC<CheckoutComponentWithRequiredProps>` is a component you need to create that renders
 `PUICheckout` with your custom configuration and its props. Simply copy the following file and adapt it to your needs:
 
-[app/src/components/checkout-component/CheckoutComponent.tsx](./app/src/components/checkout-component/CheckoutComponent.tsx)
+[app/src/components/checkout-component/CheckoutComponent.tsx](https://github.com/mojitoinc/mojito-mixers/blob/main/app/src/components/checkout-component/CheckoutComponent.tsx)
 
 Lastly, in the pages where you'd like to use the Payment UI, you need to use the `useCheckoutOverlay` to customize and
 open the Payment UI:
@@ -223,7 +223,7 @@ open the Payment UI:
 
 You can see an example here:
 
-[app/src/pages/index.tsx](./app/src/pages/index.tsx).
+[app/src/pages/index.tsx](https://github.com/mojitoinc/mojito-mixers/blob/main/app/src/pages/index.tsx).
 
 **Make sure you check the setup steps below for Vertex, 3DS and Plaid.**
 
@@ -238,7 +238,7 @@ https://developers.circle.com/docs/supported-countries
 
 We use the following script to compile the list of excluded countries:
 
-[app/src/lib/hooks/useCountryOptionsBlacklistScript.js](./app/src/lib/hooks/useCountryOptionsBlacklistScript.js)
+[app/src/lib/hooks/useCountryOptionsBlacklistScript.js](https://github.com/mojitoinc/mojito-mixers/blob/main/app/src/lib/hooks/useCountryOptionsBlacklistScript.js)
 
 <br />
 
@@ -258,14 +258,14 @@ Alternatively, set the following prop to disable those calls to the backend: `ve
 Additionally, when using 3DS for Credit Card payments you need to add a success and error page into your app. The URL can
 be anything you want as long as you configure that in your 3DS account. In this repo, those pages are:
 
-- `/payments/success` => [app/src/pages/payments/success.tsx](./app/src/pages/payments/success.tsx).
-- `/payments/error` => [app/src/pages/payments/error.tsx](./app/src/pages/payments/error.tsx).
+- `/payments/success` => [app/src/pages/payments/success.tsx](https://github.com/mojitoinc/mojito-mixers/blob/main/app/src/pages/payments/success.tsx).
+- `/payments/error` => [app/src/pages/payments/error.tsx](https://github.com/mojitoinc/mojito-mixers/blob/main/app/src/pages/payments/error.tsx).
 
 Alternatively, `/payments/failure` is also valid.
 
 You can just copy-paste those into your project as a starting point, only minor changes are needed there. As you can see,
 most of the logic in those pages is already provided by this library in the
-[`PUISuccess`](./app/src/lib/components/public/SuccessOverlay/SuccessOverlay.tsx) and
+[`PUISuccess`](https://github.com/mojitoinc/mojito-mixers/blob/main/app/src/lib/components/public/SuccessOverlay/SuccessOverlay.tsx) and
 [`PUIError`](app/src/lib/components/public/ErrorOverlay/ErrorOverlay.tsx) components.
 
 If you don't have a 3DS account and just want to disable that step, you can do that with the following prop: `threeDSEnabled = false`.
@@ -402,14 +402,14 @@ Note that using MUI's `ThemeProvider` from your project won't work as expected a
 
 There are some texts inside the Payment UI that you can customize using `PUICheckout`'s `dictionary` prop (more to come, ideally all texts should be customizable). You can find them all with their respective default values here:
 
-[`app/src/lib/domain/dictionary/dictionary.constants.tsx`](./app/src/lib/domain/dictionary/dictionary.constants.tsx).
+[`app/src/lib/domain/dictionary/dictionary.constants.tsx`](https://github.com/mojitoinc/mojito-mixers/blob/main/app/src/lib/domain/dictionary/dictionary.constants.tsx).
 
 <br />
 
 
 ### Errors, Exceptions and Validation Messages
 
-Error, exception and validation messages in the Payment UI are displayed in the [`ErrorView`](./app/src/lib/views/Error/ErrorView.tsx)
+Error, exception and validation messages in the Payment UI are displayed in the [`ErrorView`](https://github.com/mojitoinc/mojito-mixers/blob/main/app/src/lib/views/Error/ErrorView.tsx)
 and have a configurable button text and action (what the button does or where it takes users when clicking it). Particularly,
 those actions are:
 
@@ -424,7 +424,7 @@ those actions are:
 
 **Error messages**
 
-Defined in [`app/src/lib/domain/errors/errors.constants.ts`](./app/src/lib/domain/errors/errors.constants.ts):
+Defined in [`app/src/lib/domain/errors/errors.constants.ts`](https://github.com/mojitoinc/mojito-mixers/blob/main/app/src/lib/domain/errors/errors.constants.ts):
 
 - `ERROR_GENERIC = ` An unexpected error happened.
 
@@ -515,7 +515,7 @@ Additionally, there are some backend errors that are mapped to frontend ones:
 
 **Exceptions messages**
 
-Defined in [`app/src/lib/domain/errors/exceptions.constants.ts`](./app/src/lib/domain/errors/exceptions.constants.ts):
+Defined in [`app/src/lib/domain/errors/exceptions.constants.ts`](https://github.com/mojitoinc/mojito-mixers/blob/main/app/src/lib/domain/errors/exceptions.constants.ts):
 
 - `DEV.THEME_PROVIDER = ` (DEV) You can't use both `themeOptions` and `theme`. Please, use only one. `themeOptions` is preferred.
 
@@ -543,7 +543,7 @@ Note those prefixed with `(DEV)` will never be shown to regular users. Instead, 
 
 **Validation Messages**
 
-Defined in [`app/src/lib/utils/validationUtils.ts`](./app/src/lib/utils/validationUtils.ts):
+Defined in [`app/src/lib/utils/validationUtils.ts`](https://github.com/mojitoinc/mojito-mixers/blob/main/app/src/lib/utils/validationUtils.ts):
 
 - `withRequiredErrorMessage = ` `{ label }` is required.
 
@@ -619,7 +619,7 @@ declare module "@mui/material/styles" {
 }
 ```
 
-You can see an example here: [`app/src/lib/domain/mui/mui.d.ts`](./app/src/lib/domain/mui/mui.d.ts)
+You can see an example here: [`app/src/lib/domain/mui/mui.d.ts`](https://github.com/mojitoinc/mojito-mixers/blob/main/app/src/lib/domain/mui/mui.d.ts)
 
 <br />
 
@@ -628,7 +628,7 @@ You can see an example here: [`app/src/lib/domain/mui/mui.d.ts`](./app/src/lib/d
 
 All components exported by this library are wrapped in a custom [`ErrorBoundary`](https://reactjs.org/docs/error-boundaries.html) so that, in the event of an unexpected error in the library, it doesn't crash your app as well. You can find it here:
 
-[`app/src/lib/components/public/ErrorBoundary/ErrorBoundary.tsx`](./app/src/lib/components/public/ErrorBoundary/ErrorBoundary.tsx).
+[`app/src/lib/components/public/ErrorBoundary/ErrorBoundary.tsx`](https://github.com/mojitoinc/mojito-mixers/blob/main/app/src/lib/components/public/ErrorBoundary/ErrorBoundary.tsx).
 
 By default, if an unexpected error occurs, a confirm window/modal will be presented to the users asking them if they want to re-open the Payment UI:
 
@@ -729,7 +729,7 @@ The following images are loaded directly from GitHub to avoid bundling them with
 <br/>
 <p align="center">
   <a href="https://github.com/mojitoinc/mojito-mixers/blob/main/app/src/lib/assets/mojito-loader.gif">
-    <img src="./app/src/lib/assets/mojito-loader.gif" width="128" />
+    <img src="https://raw.githubusercontent.com/mojitoinc/mojito-mixers/main/app/src/lib/assets/mojito-loader.gif" width="128" />
   </a>
 </p>
 <br/>
@@ -747,7 +747,7 @@ The following images are loaded directly from GitHub to avoid bundling them with
 <br/>
 <p align="center">
   <a href="https://github.com/mojitoinc/mojito-mixers/blob/main/app/src/lib/assets/mojito-error-loader.gif">
-    <img src="./app/src/lib/assets/mojito-error-loader.gif" width="128" />
+    <img src="https://raw.githubusercontent.com/mojitoinc/mojito-mixers/main/app/src/lib/assets/mojito-error-loader.gif" width="128" />
   </a>
 </p>
 <br/>
@@ -765,7 +765,7 @@ Alternative static version:
 <br/>
 <p align="center">
   <a href="https://github.com/mojitoinc/mojito-mixers/blob/main/app/src/lib/assets/mojito-error-loader-static.png">
-    <img src="./app/src/lib/assets/mojito-error-loader-static.png" width="128" />
+    <img src="https://raw.githubusercontent.com/mojitoinc/mojito-mixers/main/app/src/lib/assets/mojito-error-loader-static.png" width="128" />
   </a>
 </p>
 <br/>
@@ -783,7 +783,7 @@ Alternative static version:
 <br/>
 <p align="center">
   <a href="https://raw.githubusercontent.com/mojitoinc/mojito-mixers/main/app/src/lib/assets/circle.png">
-    <img src="./app/src/lib/assets/circle.png" height="20" />
+    <img src="https://raw.githubusercontent.com/mojitoinc/mojito-mixers/main/app/src/lib/assets/circle.png" height="20" />
   </a>
 </p>
 <br/>
