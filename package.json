@@ -1,13 +1,26 @@
 {
   "name": "@mojitonft/mojito-mixers",
-  "version": "1.3.8",
+  "version": "1.3.9",
   "description": "🍸 React components for the Mojito Platform, Reference App and third-party projects.",
-  "keywords": ["react", "typescript", "crypto", "checkout", "payment", "payments", "cryptocurrency", "circle", "wallet", "plaid", "mojito", "3ds"],
+  "keywords": [
+    "react",
+    "typescript",
+    "crypto",
+    "checkout",
+    "payment",
+    "payments",
+    "cryptocurrency",
+    "circle",
+    "wallet",
+    "plaid",
+    "mojito",
+    "3ds"
+  ],
   "homepage": "https://developers.mojito.xyz/reference/",
   "repository": "github:mojitoinc/mojito-mixers",
   "bugs": {
-    "url" : "https://github.com/mojitoinc/mojito-mixers/issues",
-    "email" : "dev-support@mojito.xyz"
+    "url": "https://github.com/mojitoinc/mojito-mixers/issues",
+    "email": "dev-support@mojito.xyz"
   },
   "main": "dist/cjs/src/index.js",
   "module": "dist/esm/src/index.js",
