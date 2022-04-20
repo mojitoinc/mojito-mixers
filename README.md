@@ -1,14 +1,22 @@
-<h1 align="center">Mojito Payment UI</h1>
+<br />
 
+
+<h1 align="center">🍸 Mojito Mixers</h1>
 
 <br /><br />
 
+
 <p align="center">
-  👨‍💻 Mojito Payment UI modal & playground UI to easily test payments with credit card, ACH, Wire and Crypto payments with Circle, 3DS, Plaid and Vertex integrations.
+  👨‍💻 React components for the Mojito Platform, Reference App and third-party projects, including Mojito's Checkout / Payment UI  and payment sandbox / test app to easily test credit card, ACH, Wire and Crypto payments with Circle, 3DS, Plaid, Vertex and TaxJar integrations.
 </p><p align="center">
   🚀 Check it out at <a href="https://payments-staging.mojito.xyz/" target="_blank">https://payments-staging.mojito.xyz/</a>!
-</p><p align="center">
-  ⚠️ This is still in alpha, use with caution.
+</p>
+
+<br />
+
+
+<p align="center">
+  <img src="https://img.shields.io/npm/v/@mojitonft/mojito-mixers?color=%23CC3534&style=for-the-badge" />
 </p>
 
 <br />
