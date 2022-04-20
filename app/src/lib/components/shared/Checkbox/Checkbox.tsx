@@ -1,8 +1,4 @@
-import { FormControl, FormHelperText } from "@mui/material";
-import MuiCheckbox, {
-  CheckboxProps as MuiCheckboxProps
-} from "@mui/material/Checkbox";
-import FormControlLabel from "@mui/material/FormControlLabel";
+import { FormControl, FormHelperText, FormControlLabel, Checkbox as MuiCheckbox, CheckboxProps as MuiCheckboxProps } from "@mui/material";
 import React from "react";
 import { Control, Controller } from "react-hook-form";
 import { CheckboxIconUnchecked } from "./CheckboxIconUnchecked/CheckboxIconUnchecked";

@@ -31,107 +31,17 @@
 <br />
 
 
-## Working on the project
+## Using this library in your project
 
-### Next.js development playground:
+You can install this project with one of these commands:
 
-While this project will be installed as a dependency in other apps, it also provides a development/test playground to speed up development and improve DX. In order to use it:
+    npm install --save @mojitonft/mojito-mixers
+    yarn add @mojitonft/mojito-mixers
 
-1. First, duplicate [`app/.env`](https://github.com/mojitoinc/mojito-mixers/blob/main/app/.env) to [`app/.env.local`](https://github.com/mojitoinc/mojito-mixers/blob/main/app/.env.local) and add the two missing values.
-
-2. To start the Next.js development playground:
-
-    ```bash
-    yarn --cwd app install
-    yarn dev
-    ```
-
-    This will install the dependencies defined in [`app/package.json`](https://github.com/mojitoinc/mojito-mixers/blob/main/app/package.json) and run the Next.js app inside `./app`.
-    
-3. Access the project at [http://localhost:3000](http://localhost:3000).
-
-4.  Before committing, be sure to run:
-
-    ```bash
-    yarn lint
-    ```
-
-    There is also `yarn lint:fix` which can automatically fix some lint issues.
-
-    Do not run `yarn deprecated:prettier`, that will be either updated or removed from the project later.
-
-<br />
-
-
-### Test data and environments:
-
-When testing the purchase flow, you need to make sure to:
-
-- Use a real `orgID` and `lotID` that exists in your Mojito account.
-
-  This can either be a Buy Now lot ot an Auction lot that the test user that you are going to use to make the purchase won.
-
-  You can find them using:
-
-    - **Mojito Mint** - [`https://mint.dev.mojito.xyz/`](https://mint.dev.mojito.xyz/).
-
-    - **Mojito API GraphQL Playground** - [`https://api.dev.mojito.xyz/query`](https://api.dev.mojito.xyz/query)
-
-- When paying with credit card, use [Circle's](https://developers.circle.com/docs/introducing-circle-apis) [Test card numbers](https://developers.circle.com/docs/test-card-numbers). As you can see, only Visa and MasterCard are supported.
-
-- If you want to verify the validation of other credit card networks or the functionality of the `PaymentMethodForm` in general, you can use these [test card numbers](https://www.paypalobjects.com/en_GB/vhelp/paypalmanager_help/credit_card_numbers.htm).
-
-- If you want to check 3DS' error handling, see [3DS in Sandbox](https://developers.circle.com/docs/3d-secure-authentication#3d-secure-in-sandbox) on how to force those errors to be triggered in the sandbox environment.
-
-- When paying with ACH, refer to [Plaid's](https://plaid.com/docs/) - [Testing OAuth documentation](https://plaid.com/docs/link/oauth/#testing-oauth).
-
-<br />
-
-
-## Building this project as a library
-
-The project includes a separated Rollup build to build it as a library that can be installed and consumed by other projects.
-
-To build the lib:
-
-```bash
-yarn install
-yarn dist:build
-```
-
-This builds the library using the Rollup setup at the root of the project and the dependencies defined in [`package.json`](./package.json). It does so by temporarily `mv app/src/lib src`, and undoing that once the lib has been built.
-
-<br />
-
-
-## GraphQL Codegen
-
-Automatically generated types and hooks from the Mojito GraphQL API:
-
-- [`app/src/services/graphql/generated.tsx`](https://github.com/mojitoinc/mojito-mixers/blob/main/app/src/services/graphql/generated.tsx)
-- [`app/src/lib/queries/graphqlGenerated.tsx`](https://github.com/mojitoinc/mojito-mixers/blob/main/app/src/lib/queries/graphqlGenerated.tsx)
-
-To update these, first ensure that you're running a local instance of
-`mojito-api` (or change `codegen.yml`'s `schema` property to point to the production API) and then run:
-
-```bash
-yarn codegen
-```
-
-To create new queries or mutations, create a `.graphql` file (for example [`app/src/lib/queries/me.graphql`](https://github.com/mojitoinc/mojito-mixers/blob/main/app/src/lib/queries/me.graphql)) and then run
-`yarn codegen` again, and it will automatically find all `.graphql` files in the repo and create typed React hooks from
-them. If, for example, the query is called `Organization`, then the auto-generated hook will be called `useOrganizationQuery`.
-
-<br />
-
-
-## Using this project as a library
-
-Once you've built the library using `yarn dist:build`, you can install it in another project with one of these options
-(until it's published in NPM):
+Alternatively, once you've built the library using `yarn dist:build`, you can install it locally in another project adding
+this line to your `package.json`'s dependencies:
 
     "@mojitoinc/mojito-mixers": "file:../mojito-mixers"
-    "@mojitoinc/mojito-mixers": "git+ssh://git@github.com/mojitoinc/mojito-mixers"
 
 Also, make sure you install the following dependencies:
 
@@ -800,4 +710,100 @@ Alternative static version:
     > Repo: https://github.com/mojitoinc/mojito-mixers/blob/main/app/src/lib/assets/circle.png (add `?raw=true` to get the CDN URL below)
 
     > CDN URL: https://raw.githubusercontent.com/mojitoinc/mojito-mixers/main/app/src/lib/assets/circle.png
+
+<br/>
+
+
+## Contributing
+
+### Next.js development playground:
+
+While this project will be installed as a dependency in other apps, it also provides a development/test playground to speed up development and improve DX. In order to use it:
+
+1. First, duplicate [`app/.env`](https://github.com/mojitoinc/mojito-mixers/blob/main/app/.env) to [`app/.env.local`](https://github.com/mojitoinc/mojito-mixers/blob/main/app/.env.local) and add the two missing values.
+
+2. To start the Next.js development playground:
+
+    ```bash
+    yarn --cwd app install
+    yarn dev
+    ```
+
+    This will install the dependencies defined in [`app/package.json`](https://github.com/mojitoinc/mojito-mixers/blob/main/app/package.json) and run the Next.js app inside `./app`.
+    
+3. Access the project at [http://localhost:3000](http://localhost:3000).
+
+4.  Before committing, be sure to run:
+
+    ```bash
+    yarn lint
+    ```
+
+    There is also `yarn lint:fix` which can automatically fix some lint issues.
+
+    Do not run `yarn deprecated:prettier`, that will be either updated or removed from the project later.
+
+<br />
+
+
+### Test data and environments:
+
+When testing the purchase flow, you need to make sure to:
+
+- Use a real `orgID` and `lotID` that exists in your Mojito account.
+
+  This can either be a Buy Now lot ot an Auction lot that the test user that you are going to use to make the purchase won.
+
+  You can find them using:
+
+    - **Mojito Mint** - [`https://mint.dev.mojito.xyz/`](https://mint.dev.mojito.xyz/).
+
+    - **Mojito API GraphQL Playground** - [`https://api.dev.mojito.xyz/query`](https://api.dev.mojito.xyz/query)
+
+- When paying with credit card, use [Circle's](https://developers.circle.com/docs/introducing-circle-apis) [Test card numbers](https://developers.circle.com/docs/test-card-numbers). As you can see, only Visa and MasterCard are supported.
+
+- If you want to verify the validation of other credit card networks or the functionality of the `PaymentMethodForm` in general, you can use these [test card numbers](https://www.paypalobjects.com/en_GB/vhelp/paypalmanager_help/credit_card_numbers.htm).
+
+- If you want to check 3DS' error handling, see [3DS in Sandbox](https://developers.circle.com/docs/3d-secure-authentication#3d-secure-in-sandbox) on how to force those errors to be triggered in the sandbox environment.
+
+- When paying with ACH, refer to [Plaid's](https://plaid.com/docs/) - [Testing OAuth documentation](https://plaid.com/docs/link/oauth/#testing-oauth).
+
+<br />
+
+
+## Building this project as a library
+
+The project includes a separated Rollup build to build it as a library that can be installed and consumed by other projects.
+
+To build the lib:
+
+```bash
+yarn install
+yarn dist:build
+```
+
+This builds the library using the Rollup setup at the root of the project and the dependencies defined in [`package.json`](./package.json). It does so by temporarily `mv app/src/lib src`, and undoing that once the lib has been built.
+
+<br />
+
+
+## GraphQL Codegen
+
+Automatically generated types and hooks from the Mojito GraphQL API:
+
+- [`app/src/services/graphql/generated.tsx`](https://github.com/mojitoinc/mojito-mixers/blob/main/app/src/services/graphql/generated.tsx)
+- [`app/src/lib/queries/graphqlGenerated.tsx`](https://github.com/mojitoinc/mojito-mixers/blob/main/app/src/lib/queries/graphqlGenerated.tsx)
+
+To update these, first ensure that you're running a local instance of
+`mojito-api` (or change `codegen.yml`'s `schema` property to point to the production API) and then run:
+
+```bash
+yarn codegen
+```
+
+To create new queries or mutations, create a `.graphql` file (for example [`app/src/lib/queries/me.graphql`](https://github.com/mojitoinc/mojito-mixers/blob/main/app/src/lib/queries/me.graphql)) and then run
+`yarn codegen` again, and it will automatically find all `.graphql` files in the repo and create typed React hooks from
+them. If, for example, the query is called `Organization`, then the auto-generated hook will be called `useOrganizationQuery`.
+
+<br />
 

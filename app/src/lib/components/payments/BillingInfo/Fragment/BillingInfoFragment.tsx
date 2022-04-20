@@ -1,7 +1,6 @@
-import Typography from "@mui/material/Typography";
 import { SavedPaymentMethod, SavedPaymentMethodBillingInfo } from "../../../../domain/circle/circle.interfaces";
 import React from "react";
-import { Box } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 
 export interface BillingInfoFragmentProps {
   savedPaymentMethod: SavedPaymentMethod | SavedPaymentMethodBillingInfo;
