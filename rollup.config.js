@@ -13,7 +13,7 @@ import pkg from "./package.json";
 // Exclude dev dependencies:
 const EXTERNAL = [
   ...Object.keys(pkg.devDependencies),
-  ...Object.keys(pkg.dependencies),
+  ...Object.keys(pkg.dependencies).filter(dep => dep !== "tslib"),
   ...Object.keys(pkg.peerDependencies),
   "react/jsx-runtime",
 
