@@ -24,6 +24,7 @@ const EXTERNAL = [
   "@hookform/resolvers/yup",
   "react-payment-inputs/images",
   "@mui/material/styles",
+  "country-region-data/dist/data-umd",
   /@mui\/icons\-material\/.*/,
 ];
 
