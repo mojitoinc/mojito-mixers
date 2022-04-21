@@ -23,6 +23,7 @@ const EXTERNAL = [
   "react-is",
   "@hookform/resolvers/yup",
   "react-payment-inputs/images",
+  "@mui/material/styles",
   /@mui\/icons\-material\/.*/,
 ];
 
