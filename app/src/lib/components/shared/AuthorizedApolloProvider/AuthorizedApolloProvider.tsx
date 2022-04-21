@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useCallback, useMemo } from "react";
 import {
   ApolloClient,
   ApolloProvider,
@@ -8,23 +8,33 @@ import {
   Context,
 } from "@apollo/client";
 import { setContext } from "@apollo/client/link/context";
-import { useAuth0 } from "@auth0/auth0-react";
 import { isLocalhost } from "../../../domain/url/url.utils";
+import { useAuth0 } from "@auth0/auth0-react";
 
 const cache = new InMemoryCache();
 
 export interface AuthorizedApolloProviderProps {
   apolloClient?: ApolloClient<NormalizedCacheObject> | null;
   uri: string;
+  getAuthenticationToken: (() => Promise<string | undefined>) | null;
   children?: React.ReactNode;
 }
 
 export const AuthorizedApolloProvider: React.FC<AuthorizedApolloProviderProps> = ({
   apolloClient: parentApolloClient,
   uri,
+  getAuthenticationToken: parentGetAuthenticationToken,
   children,
 }) => {
   const { getIdTokenClaims } = useAuth0();
+
+  const defaultGetAuthenticationToken = useCallback(async () => {
+    const token = await getIdTokenClaims();
+
+    return token?.__raw;
+  }, [getIdTokenClaims]);
+
+  const getAuthenticationToken = parentGetAuthenticationToken || defaultGetAuthenticationToken;
 
   const apolloClient = useMemo(() => {
     if (parentApolloClient) return parentApolloClient;
@@ -34,12 +44,12 @@ export const AuthorizedApolloProvider: React.FC<AuthorizedApolloProviderProps> =
     const httpLink = createHttpLink({ uri });
 
     const authLink = setContext(async (_, { headers }) => {
-      const token = await getIdTokenClaims();
+      const token = await getAuthenticationToken();
 
       const context: Context = {
         headers: {
           ...headers,
-          authorization: token ? `Bearer ${ token.__raw }` : "",
+          authorization: token ? `Bearer ${ token }` : "",
         },
       };
 
@@ -51,7 +61,7 @@ export const AuthorizedApolloProvider: React.FC<AuthorizedApolloProviderProps> =
     const link = authLink.concat(httpLink);
 
     return new ApolloClient({ uri, link, cache });
-  }, [parentApolloClient, uri, getIdTokenClaims]);
+  }, [parentApolloClient, uri, getAuthenticationToken]);
 
   return apolloClient ? <ApolloProvider client={ apolloClient }>{ children }</ApolloProvider> : <>{ children }</>;
 }

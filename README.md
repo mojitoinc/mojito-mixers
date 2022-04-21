@@ -39,9 +39,10 @@ You can install this project with one of these commands:
     yarn add @mojitonft/mojito-mixers
 
 Alternatively, once you've built the library using `yarn dist:build`, you can install it locally in another project adding
-this line to your `package.json`'s dependencies:
+this line to your `package.json`'s dependencies. If you update it, make sure you remove the entry from `yarn.lock` and
+re-install it.
 
-    "@mojitoinc/mojito-mixers": "file:../mojito-mixers"
+    "@mojitonft/mojito-mixers": "file:../mojito-mixers"
 
 Also, make sure you install the following dependencies:
 
