@@ -2,7 +2,7 @@ import commonjs from "@rollup/plugin-commonjs";
 import dts from "rollup-plugin-dts"
 import resolve from "@rollup/plugin-node-resolve";
 import typescript from "rollup-plugin-typescript2"
-import { terser } from "rollup-plugin-terser";
+// import { terser } from "rollup-plugin-terser";
 // import { babel } from "@rollup/plugin-babel";
 // import externals from "rollup-plugin-node-externals";
 
@@ -17,6 +17,9 @@ const EXTERNAL = [
   ...Object.keys(pkg.dependencies),
   ...Object.keys(pkg.peerDependencies),
   "react/jsx-runtime",
+
+  // See issue: https://github.com/rollup/rollup/issues/3684:
+  "@mui/icons-material",
 ];
 
 export default [{
@@ -68,7 +71,7 @@ export default [{
     //   exclude: "node_modules/**",
     // }),
 
-    terser(),
+    // terser(),
   ],
 
 }, {
