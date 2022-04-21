@@ -22,25 +22,7 @@ const EXTERNAL = [
   "prop-types",
   "react-is",
   "@hookform/resolvers/yup",
-  // Doesn't work....:
-  "@mui/icons-material/*",
-  // So...:
-  "@mui/icons-material/ChevronLeft",
-  "@mui/icons-material/Close",
-  "@mui/icons-material/WarningAmber",
-  "@mui/icons-material/Check",
-  "@mui/icons-material/Autorenew",
-  "@mui/icons-material/Book",
-  "@mui/icons-material/Add",
-  "@mui/icons-material/AccountBalance",
-  "@mui/icons-material/CreditCard",
-  "@mui/icons-material/Language",
-  "@mui/icons-material/Lock",
-  "@mui/icons-material/ChevronRight",
-  "@mui/icons-material/ContentCopy",
-  "@mui/icons-material/Edit",
-  "@mui/icons-material/Delete",
-  "@mui/icons-material/InfoOutlined",
+  /@mui\/icons\-material\/.*/,
 ];
 
 export default [{
