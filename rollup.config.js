@@ -16,10 +16,13 @@ const EXTERNAL = [
   ...Object.keys(pkg.devDependencies),
   ...Object.keys(pkg.dependencies),
   ...Object.keys(pkg.peerDependencies),
-  "react/jsx-runtime",
 
-  // See issue: https://github.com/rollup/rollup/issues/3684:
-  "@mui/icons-material",
+  // See issues https://github.com/rollup/rollup/issues/3684, https://rollupjs.org/guide/en/#warning-treating-module-as-external-dependency:
+  "react/jsx-runtime",
+  "prop-types",
+  "react-is",
+  "@hookform/resolvers/yup",
+  /@mui\/icons\-material\/.*/,
 ];
 
 export default [{
@@ -51,7 +54,10 @@ export default [{
     // peerDepsExternal(), // https://rollupjs.org/guide/en/#peer-dependencies
     // externals(), // https://www.npmjs.com/package/rollup-plugin-node-externals.
 
-    resolve(),
+    resolve({
+      // Warn if some modules are not going to be imported properly (such as the ones added manually to the EXTERNAL array above):
+      modulesOnly: true,
+    }),
 
     commonjs({
       ignoreGlobal: true,
