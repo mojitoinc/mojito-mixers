@@ -1,0 +1,19 @@
+name: "Bump Version"
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  version:
+    name: Bump Version
+    runs-on: ubuntu-latest
+    if: "!startsWith(github.event.head_commit.message, '[RELEASE]')"
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
+      - run: git config --global user.name 'Mojito Inc. GitHub Action'
+      - run: git config --global user.email 'dev-support@mojito.xyz'
+      - run: npm version patch -m "[RELEASE] %s"
+      - run: git push origin main --follow-tags

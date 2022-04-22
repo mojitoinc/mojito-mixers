@@ -6,7 +6,7 @@ import {
   SelectOption,
   SelectProps
 } from "../../../shared/Select/Select";
-import { SelectChangeEvent } from "@mui/material/Select";
+import { SelectChangeEvent } from "@mui/material";
 import { useCountryOptions } from "../../../../hooks/useCountryOptions";
 
 export interface StateSelectorProps extends Omit<SelectProps, "value" | "options"> {

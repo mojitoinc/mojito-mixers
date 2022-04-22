@@ -39,7 +39,7 @@ function MyApp({ Component, pageProps }: AppProps) {
         <link href="/fonts/style.css" rel="stylesheet" />
       </Head>
 
-      <AuthorizedApolloProvider uri={ `${ config.API_HOSTNAME }/query` }>
+      <AuthorizedApolloProvider uri={ `${ config.API_HOSTNAME }/query` } getAuthenticationToken={ null }>
         <ThemeProvider theme={ defaultTheme }>
           <GlobalStyles styles={ GLOBAL_STYLES } />
 

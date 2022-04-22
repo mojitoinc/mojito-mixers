@@ -20,6 +20,7 @@ export const ProviderInjector: React.FC<ProvidersInjectorProps> = ({
   // AuthorizedApolloProviderProps:
   apolloClient,
   uri,
+  getAuthenticationToken,
 
   // ThemeProvider:
   theme: parentTheme,
@@ -48,7 +49,7 @@ export const ProviderInjector: React.FC<ProvidersInjectorProps> = ({
   }, [apolloClient, uri]);
 
   return (
-    <AuthorizedApolloProvider apolloClient={apolloClient} uri={uri}>
+    <AuthorizedApolloProvider apolloClient={apolloClient} uri={uri} getAuthenticationToken={getAuthenticationToken}>
       {theme ? <ThemeProvider theme={theme}>{children}</ThemeProvider> : children}
     </AuthorizedApolloProvider>
   );
@@ -63,7 +64,7 @@ export function withThemeProvider<P extends object>(Component: React.ComponentTy
   }) => {
     return (
       <ErrorBoundary onCatch={ onCatch }>
-        <ProviderInjector apolloClient={null} uri="" theme={theme} themeOptions={themeOptions}>
+        <ProviderInjector apolloClient={null} uri="" getAuthenticationToken={null} theme={theme} themeOptions={themeOptions}>
           <Component {...componentProps as P} />
         </ProviderInjector>
       </ErrorBoundary>
@@ -79,6 +80,7 @@ export function withProviders<P extends object>(Component: React.ComponentType<P
   const WithProviders: React.FC<P & ProvidersInjectorProps> = ({
     apolloClient,
     uri,
+    getAuthenticationToken,
     theme,
     themeOptions,
     onCatch,
@@ -86,7 +88,7 @@ export function withProviders<P extends object>(Component: React.ComponentType<P
   }) => {
     return (
       <ErrorBoundary onCatch={onCatch}>
-        <ProviderInjector apolloClient={apolloClient} uri={uri} theme={theme} themeOptions={themeOptions}>
+        <ProviderInjector apolloClient={apolloClient} uri={uri} getAuthenticationToken={getAuthenticationToken} theme={theme} themeOptions={themeOptions}>
           <Component {...componentProps as P} />
         </ProviderInjector>
       </ErrorBoundary>

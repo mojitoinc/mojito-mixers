@@ -13,6 +13,12 @@ export const CheckoutComponent: React.FC<CheckoutComponentWithRequiredProps> = (
 
   const { loginWithPopup, isAuthenticated, isLoading: isAuthenticatedLoading, getIdTokenClaims } = useAuth0();
 
+  const getAuthenticationToken = useCallback(async () => {
+    const token = await getIdTokenClaims();
+
+    return token?.__raw || "";
+  }, [getIdTokenClaims]);
+
   const onGoTo = useCallback(() => {
     router.push("/profile/invoices");
   }, [router]);
@@ -51,6 +57,7 @@ export const CheckoutComponent: React.FC<CheckoutComponentWithRequiredProps> = (
 
     // ProviderInjector:
     uri: `${config.API_HOSTNAME}/query`,
+    getAuthenticationToken,
 
     // Modal:
     // open,

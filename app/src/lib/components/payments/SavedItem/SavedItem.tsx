@@ -1,8 +1,7 @@
-import Box, { BoxProps } from "@mui/material/Box";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { SecondaryButton } from "../../shared/SecondaryButton/SecondaryButton";
-import { Chip, Stack, Tooltip } from "@mui/material";
+import { Chip, Stack, Tooltip, Box, BoxProps } from "@mui/material";
 import React, { useCallback } from "react";
 import { ThemeColors } from "../../../domain/mui/mui.interfaces";
 import { DisplayBox } from "../DisplayBox/DisplayBox";
