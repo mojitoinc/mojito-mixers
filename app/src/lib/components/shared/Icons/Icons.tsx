@@ -1,5 +1,5 @@
 import { SvgIcon, SvgIconProps } from "@mui/material";
-import { SxProps } from "@mui/system";
+import { SxProps } from "@mui/material/styles";
 import { standaloneGetCardImageProps } from "../../../domain/payment/payment.utils";
 import React from "react";
 import { Theme } from "@mui/material/styles";
