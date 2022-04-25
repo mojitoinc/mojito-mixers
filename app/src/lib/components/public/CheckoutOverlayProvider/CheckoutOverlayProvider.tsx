@@ -1,78 +1,80 @@
-import React, { createContext, useCallback, useContext, useState } from "react";
-import { PUICheckoutProps } from "../CheckoutOverlay/CheckoutOverlay";
-import { useOpenCloseCheckoutModal, UseOpenCloseCheckoutModalOptions } from "../useOpenCloseCheckoutModal/useOpenCloseCheckoutModal";
+export const test = 1;
 
-export type CheckoutComponentProps = Partial<Omit<
-  PUICheckoutProps,
-  "open" | "onClose" | "loaderMode" | "paymentErrorParam"
->>;
+// import React, { createContext, useCallback, useContext, useState } from "react";
+// import { PUICheckoutProps } from "../CheckoutOverlay/CheckoutOverlay";
+// import { useOpenCloseCheckoutModal, UseOpenCloseCheckoutModalOptions } from "../useOpenCloseCheckoutModal/useOpenCloseCheckoutModal";
 
-export type CheckoutComponentWithRequiredProps = Partial<PUICheckoutProps> & Pick<
-  PUICheckoutProps,
-  "open" | "onClose" | "loaderMode" | "paymentErrorParam"
->;
+// export type CheckoutComponentProps = Partial<Omit<
+//   PUICheckoutProps,
+//   "open" | "onClose" | "loaderMode" | "paymentErrorParam"
+// >>;
 
-export interface CheckoutOverlayContextProps {
-  open: (checkoutComponentProps?: CheckoutComponentProps) => void;
-  close: () => void;
-  setCheckoutComponentProps: React.Dispatch<React.SetStateAction<CheckoutComponentProps>>;
-}
+// export type CheckoutComponentWithRequiredProps = Partial<PUICheckoutProps> & Pick<
+//   PUICheckoutProps,
+//   "open" | "onClose" | "loaderMode" | "paymentErrorParam"
+// >;
 
-export const CheckoutOverlayContext = createContext<CheckoutOverlayContextProps>({
-  open: () => { /* Do nothing */ },
-  close: () => { /* Do nothing */ },
-  setCheckoutComponentProps: () => { /* Do nothing */ },
-});
+// export interface CheckoutOverlayContextProps {
+//   open: (checkoutComponentProps?: CheckoutComponentProps) => void;
+//   close: () => void;
+//   setCheckoutComponentProps: React.Dispatch<React.SetStateAction<CheckoutComponentProps>>;
+// }
 
-export interface CheckoutOverlayProviderProps extends UseOpenCloseCheckoutModalOptions {
-  checkoutComponent: React.ComponentType<CheckoutComponentWithRequiredProps>;
-  doNotRenderPaymentUI?: boolean;
-  children: React.ReactNode;
-}
+// export const CheckoutOverlayContext = createContext<CheckoutOverlayContextProps>({
+//   open: () => { /* Do nothing */ },
+//   close: () => { /* Do nothing */ },
+//   setCheckoutComponentProps: () => { /* Do nothing */ },
+// });
 
-export const CheckoutOverlayProvider: React.FC<CheckoutOverlayProviderProps> = ({
-  paymentIdParam,
-  paymentErrorParam,
-  checkoutComponent: CheckoutComponent,
-  doNotRenderPaymentUI,
-  children,
-}) => {
-  const { loaderMode, isOpen, onOpen, onClose } = useOpenCloseCheckoutModal({ paymentIdParam, paymentErrorParam });
+// export interface CheckoutOverlayProviderProps extends UseOpenCloseCheckoutModalOptions {
+//   checkoutComponent: React.ComponentType<CheckoutComponentWithRequiredProps>;
+//   doNotRenderPaymentUI?: boolean;
+//   children: React.ReactNode;
+// }
 
-  const [checkoutComponentProps, setCheckoutComponentProps] = useState<CheckoutComponentProps>({ });
+// export const CheckoutOverlayProvider: React.FC<CheckoutOverlayProviderProps> = ({
+//   paymentIdParam,
+//   paymentErrorParam,
+//   checkoutComponent: CheckoutComponent,
+//   doNotRenderPaymentUI,
+//   children,
+// }) => {
+//   const { loaderMode, isOpen, onOpen, onClose } = useOpenCloseCheckoutModal({ paymentIdParam, paymentErrorParam });
 
-  const handleOnClose = useCallback(() => {
-    onClose();
+//   const [checkoutComponentProps, setCheckoutComponentProps] = useState<CheckoutComponentProps>({ });
 
-    // setCheckoutComponentProps({});
-  }, [onClose]);
+//   const handleOnClose = useCallback(() => {
+//     onClose();
 
-  const open = useCallback((nextCheckoutComponentProps?: CheckoutComponentProps) => {
-    if (nextCheckoutComponentProps) setCheckoutComponentProps(nextCheckoutComponentProps);
+//     // setCheckoutComponentProps({});
+//   }, [onClose]);
 
-    onOpen();
-  }, [onOpen]);
+//   const open = useCallback((nextCheckoutComponentProps?: CheckoutComponentProps) => {
+//     if (nextCheckoutComponentProps) setCheckoutComponentProps(nextCheckoutComponentProps);
 
-  const close = useCallback(() => {
-    handleOnClose();
-  }, [handleOnClose]);
+//     onOpen();
+//   }, [onOpen]);
 
-  if (doNotRenderPaymentUI) return <>{ children }</>;
+//   const close = useCallback(() => {
+//     handleOnClose();
+//   }, [handleOnClose]);
 
-  return (
-    <CheckoutOverlayContext.Provider value={ { open, close, setCheckoutComponentProps } }>
-      { children }
+//   if (doNotRenderPaymentUI) return <>{ children }</>;
 
-      <CheckoutComponent
-        { ...checkoutComponentProps }
-        open={ isOpen }
-        onClose={ handleOnClose }
-        loaderMode={ loaderMode }
-        paymentErrorParam={ paymentErrorParam } />
-    </CheckoutOverlayContext.Provider>
-  );
-}
+//   return (
+//     <CheckoutOverlayContext.Provider value={ { open, close, setCheckoutComponentProps } }>
+//       { children }
 
-export function useCheckoutOverlay() {
-  return useContext(CheckoutOverlayContext);
-}
+//       <CheckoutComponent
+//         { ...checkoutComponentProps }
+//         open={ isOpen }
+//         onClose={ handleOnClose }
+//         loaderMode={ loaderMode }
+//         paymentErrorParam={ paymentErrorParam } />
+//     </CheckoutOverlayContext.Provider>
+//   );
+// }
+
+// export function useCheckoutOverlay() {
+//   return useContext(CheckoutOverlayContext);
+// }

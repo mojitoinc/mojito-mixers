@@ -3,12 +3,13 @@ import { useRouter } from "next/router";
 import React, { ErrorInfo, useCallback } from "react";
 import { CheckoutEventData, CheckoutEventType, CheckoutModalError, MOJITO_LIGHT_THEME } from "../../lib";
 import { PUICheckout, PUICheckoutProps } from "../../lib/components/public/CheckoutOverlay/CheckoutOverlay";
-import { CheckoutComponentWithRequiredProps } from "../../lib/components/public/CheckoutOverlayProvider/CheckoutOverlayProvider";
 import { isLocalhost } from "../../lib/domain/url/url.utils";
 import { config } from "../../utils/config/config.constants";
 import { PLAYGROUND_MOJITO_LOGO, PLAYGROUND_USER_FORMAT } from "../../utils/playground/playground.constants";
 
-export const CheckoutComponent: React.FC<CheckoutComponentWithRequiredProps> = (checkoutComponentProps) => {
+export type CheckoutComponentProps = PUICheckoutProps;
+
+export const CheckoutComponent: React.FC<CheckoutComponentProps> = (checkoutComponentProps) => {
   const router = useRouter();
 
   const { loginWithPopup, isAuthenticated, isLoading: isAuthenticatedLoading, getIdTokenClaims } = useAuth0();

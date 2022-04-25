@@ -1,6 +1,19 @@
 <br />
 
 
+
+- Remove CheckoutProvider!
+- Use CheckoutOverlay in success page + Load data from cookie or redirect (or show error there). Need to pass params.
+- Use cookie path for 3DS.
+- Add 5 seconds wait logic there.
+- Delete SuccessOverlay (only need StaticSuccessOverlay).
+- Persist cookie with paymentID in the key.
+
+- Chip variants in Mint.
+- Document queries (origin-overwrite) and flow.
+
+
+
 <h1 align="center">🍸 Mojito Mixers</h1>
 
 <br /><br />
@@ -711,6 +724,25 @@ Alternative static version:
     > Repo: https://github.com/mojitoinc/mojito-mixers/blob/main/app/src/lib/assets/circle.png (add `?raw=true` to get the CDN URL below)
 
     > CDN URL: https://raw.githubusercontent.com/mojitoinc/mojito-mixers/main/app/src/lib/assets/circle.png
+
+<br/>
+
+
+## Troubleshooting
+
+### API parameter invalid error:
+
+`createPayment` mutation returns:
+
+    "message": "Circle API return non 200 response with body: {\"code\":2,\"message\":\"API parameter invalid\"}",
+
+Make sure:
+
+- You have a 3DS account configured on the backend for the environment you are using (contact support).
+
+- If you are using a GraphQL playground to play around with the API, make sure you use `https://api.dev.mojito.xyz/`.
+
+- If you are triggering the mutation from your app in localhost, make sure you add the header `"origin-overwrite": "https://yourdomain.com"`.
 
 <br/>
 

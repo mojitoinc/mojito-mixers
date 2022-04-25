@@ -1,5 +1,5 @@
-mutation CreatePayment($paymentMethodID: UUID1!, $invoiceID: UUID1!) {
-  createPayment(paymentMethodID: $paymentMethodID, invoiceID: $invoiceID) {
+mutation CreatePayment($paymentMethodID: UUID1!, $invoiceID: UUID1!, $metadata: CreatePaymentMetadataInput) {
+  createPayment(paymentMethodID: $paymentMethodID, invoiceID: $invoiceID, metadata: $metadata) {
     id
     invoiceID
     processorPaymentID

@@ -146,6 +146,8 @@ const HomePage: React.FC = () => {
   }, [isLoading, isAuthenticated, meData, hasOrganizations, open]);
 
 
+  // TODO: Add CheckoutComponent in here.
+
   return (<>
     <Box sx={{ my: 4 }}>
       <Stack spacing={2} direction="row">
