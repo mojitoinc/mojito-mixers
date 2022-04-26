@@ -1,14 +1,16 @@
-import { GetInvoiceDetailsQuery } from "../../queries/graphqlGenerated";
-import { CheckoutItem, CheckoutItemInfo } from "./product.interfaces";
+import { CheckoutItem, CheckoutItemInfo, RawCheckoutItemInfo } from "./product.interfaces";
 
 export function transformCheckoutItemsFromInvoice(
-  checkoutItems: CheckoutItemInfo[],
-  invoiceItems: GetInvoiceDetailsQuery["getInvoiceDetails"]["items"] = [],
+  parentCheckoutItems: CheckoutItemInfo[],
+  initialCheckoutItems: CheckoutItemInfo[],
+  invoiceItems: RawCheckoutItemInfo[] = [],
 ): CheckoutItem[] {
   // TODO: This function should later be updated to give precedence to whatever's in the invoice, but right now it's
   // not possible to get the required data (lotID, title, description...) from that query:
 
-  return checkoutItems.map((checkoutItem, i) => {
+  const mainCheckoutItems = parentCheckoutItems.length > 0 ? parentCheckoutItems : initialCheckoutItems;
+
+  return mainCheckoutItems.map((checkoutItem, i) => {
     // TODO: We should find the match based on ID, not index, but it's ok for now as we never buy more than 1 item at a time:
     const invoiceItem = invoiceItems[i];
 

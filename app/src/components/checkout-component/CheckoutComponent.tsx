@@ -1,13 +1,16 @@
 import { useAuth0 } from "@auth0/auth0-react";
 import { useRouter } from "next/router";
 import React, { ErrorInfo, useCallback } from "react";
-import { CheckoutEventData, CheckoutEventType, CheckoutModalError, MOJITO_LIGHT_THEME } from "../../lib";
+import { CheckoutEventData, CheckoutEventType, CheckoutModalError, MOJITO_LIGHT_THEME, PUIRouterOptions } from "../../lib";
 import { PUICheckout, PUICheckoutProps } from "../../lib/components/public/CheckoutOverlay/CheckoutOverlay";
 import { isLocalhost } from "../../lib/domain/url/url.utils";
 import { config } from "../../utils/config/config.constants";
 import { PLAYGROUND_MOJITO_LOGO, PLAYGROUND_USER_FORMAT } from "../../utils/playground/playground.constants";
 
-export type CheckoutComponentProps = PUICheckoutProps;
+export type CheckoutComponentProps = Partial<PUICheckoutProps> & Pick<
+  PUICheckoutProps,
+  "open" | "onClose" | "loaderMode" | "paymentErrorParam"
+>;
 
 export const CheckoutComponent: React.FC<CheckoutComponentProps> = (checkoutComponentProps) => {
   const router = useRouter();
@@ -20,12 +23,16 @@ export const CheckoutComponent: React.FC<CheckoutComponentProps> = (checkoutComp
     return token?.__raw || "";
   }, [getIdTokenClaims]);
 
-  const onGoTo = useCallback(() => {
-    router.push("/profile/invoices");
-  }, [router]);
+  const onGoTo = useCallback((pathnameOrUrl: string, { replace, ...options }: PUIRouterOptions = {}) => {
+    console.log(`Redirect to ${pathnameOrUrl}...`);
 
-  const onRemoveUrlParams = useCallback((cleanURL: string) => {
-    router.replace(cleanURL, undefined, { shallow: true });
+    if (pathnameOrUrl && pathnameOrUrl.startsWith("http")) {
+      window.location.replace(pathnameOrUrl);
+    } else if (replace) {
+      router.replace(pathnameOrUrl || "/", undefined, options);
+    } else {
+      router.push(pathnameOrUrl || "/", undefined, options);
+    }
   }, [router]);
 
   const handleLogin = useCallback(async () => {
@@ -69,8 +76,9 @@ export const CheckoutComponent: React.FC<CheckoutComponentProps> = (checkoutComp
 
     // Flow:
     // loaderMode,
+    // TODO: Finish implementing this (pass them down to utils to validate):
+    // paymentIdParam,
     // paymentErrorParam,
-    onRemoveUrlParams,
     guestCheckoutEnabled: false,
     productConfirmationEnabled: false,
     vertexEnabled: true,

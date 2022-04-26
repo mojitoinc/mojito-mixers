@@ -1,6 +1,7 @@
 <br />
 
 
+- Back to Marketplace button should also have href.
 
 - Remove CheckoutProvider!
 - Use CheckoutOverlay in success page + Load data from cookie or redirect (or show error there). Need to pass params.
@@ -29,7 +30,9 @@
 
 
 <p align="center">
-  <img src="https://img.shields.io/npm/v/@mojitonft/mojito-mixers?color=%23CC3534&style=for-the-badge" />
+  <a href="https://www.npmjs.com/package/@mojitonft/mojito-mixers" target="_blank">
+    <img src="https://img.shields.io/npm/v/@mojitonft/mojito-mixers?color=%23CC3534&style=for-the-badge" />
+  </a>
 </p>
 
 <br />

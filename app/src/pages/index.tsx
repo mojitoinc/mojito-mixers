@@ -1,7 +1,9 @@
 import { useAuth0 } from "@auth0/auth0-react";
 import { Typography, Box, Stack, Button, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio, TextField, Select, MenuItem, InputLabel, FormGroup, Checkbox, SelectChangeEvent } from "@mui/material";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { PaymentType, CheckoutComponentProps, useCheckoutOverlay } from "../lib";
+import { useEffect, useRef, useState } from "react";
+import { CheckoutComponent, CheckoutComponentProps } from "../components/checkout-component/CheckoutComponent";
+import { PaymentType } from "../lib";
+import { useOpenCloseCheckoutModal } from "../lib/components/public/useOpenCloseCheckoutModal/useOpenCloseCheckoutModal";
 import { useMeQuery } from "../services/graphql/generated";
 import { PLAYGROUND_PARAGRAPHS_ARRAY, PLAYGROUND_MOCKED_AUCTION_LOT, PLAYGROUND_MOCKED_BUY_NOW_LOT } from "../utils/playground/playground.constants";
 import { PlaygroundFormData } from "../utils/playground/playground.interfaces";
@@ -48,41 +50,51 @@ const HomePage: React.FC = () => {
 
   // CHECKOUT OPENING & FORM VALUES:
 
-  const { open, setCheckoutComponentProps } = useCheckoutOverlay();
+  // const { open, setCheckoutComponentProps } = useCheckoutOverlay();
+
+  const { loaderMode, isOpen, onOpen, onClose } = useOpenCloseCheckoutModal({
+    paymentIdParam: undefined,
+    paymentErrorParam: undefined,
+  });
 
   const [formValues, setFormValues] = useState<PlaygroundFormData>(DEFAULT_FORM_VALUES);
 
-  const getComponentPropsRef = useRef<() => CheckoutComponentProps>(() => ({}));
+  // const getComponentPropsRef = useRef<() => CheckoutComponentProps>(() => ({}));
 
-  getComponentPropsRef.current = () => {
-    const lotType = formValues.lotType || DEFAULT_FORM_VALUES.lotType;
+  const lotType = formValues.lotType || DEFAULT_FORM_VALUES.lotType;
 
-    return {
-      // Personalization:
-      acceptedPaymentTypes: [
-        formValues.paymentCC ? "CreditCard" : "",
-        formValues.paymentACH ? "ACH" : "",
-        formValues.paymentWire ? "Wire" : "",
-        formValues.paymentCrypto ? "Crypto" : "",
-      ].filter(Boolean) as PaymentType[],
-      acceptedCreditCardNetworks: formValues.paymentCC ? ["visa", "mastercard"] : undefined,
+  const checkoutComponentProps: CheckoutComponentProps = {
+    // Modal:
+    open: isOpen,
+    onClose,
 
-      // Data:
-      orgID: (formValues.orgID === "custom" ? formValues.customOrgID : formValues.orgID) || "",
-      invoiceID: (lotType === "auction" && formValues.invoiceID) || "",
-      checkoutItems: [{
-        ...(lotType === "buyNow" ? PLAYGROUND_MOCKED_BUY_NOW_LOT : PLAYGROUND_MOCKED_AUCTION_LOT),
-        lotID: formValues.lotID || DEFAULT_FORM_VALUES.lotID,
-        lotType,
-        units: lotType === "auction" ? 1 : (parseInt(`${formValues.lotUnits || DEFAULT_FORM_VALUES.lotUnits}`, 10) || 1),
-      }],
-    };
+    // Flow:
+    loaderMode,
+
+    // Personalization:
+    acceptedPaymentTypes: [
+      formValues.paymentCC ? "CreditCard" : "",
+      formValues.paymentACH ? "ACH" : "",
+      formValues.paymentWire ? "Wire" : "",
+      formValues.paymentCrypto ? "Crypto" : "",
+    ].filter(Boolean) as PaymentType[],
+    acceptedCreditCardNetworks: formValues.paymentCC ? ["visa", "mastercard"] : undefined,
+
+    // Data:
+    orgID: (formValues.orgID === "custom" ? formValues.customOrgID : formValues.orgID) || "",
+    invoiceID: (lotType === "auction" && formValues.invoiceID) || "",
+    checkoutItems: [{
+      ...(lotType === "buyNow" ? PLAYGROUND_MOCKED_BUY_NOW_LOT : PLAYGROUND_MOCKED_AUCTION_LOT),
+      lotID: formValues.lotID || DEFAULT_FORM_VALUES.lotID,
+      lotType,
+      units: lotType === "auction" ? 1 : (parseInt(`${formValues.lotUnits || DEFAULT_FORM_VALUES.lotUnits}`, 10) || 1),
+    }],
   };
 
-  const handleOpenClicked = useCallback(() => open(getComponentPropsRef.current()), [open]);
+  // const onOpen = useCallback(() => open(getComponentPropsRef.current()), [open]);
 
   useEffect(() => {
-    setCheckoutComponentProps(getComponentPropsRef.current());
+    // setCheckoutComponentProps(getComponentPropsRef.current());
 
     setFormValues({
       // Organization:
@@ -103,7 +115,7 @@ const HomePage: React.FC = () => {
       paymentWire: INITIAL_FORM_VALUES.paymentWire ?? DEFAULT_FORM_VALUES.paymentWire,
       paymentCrypto: INITIAL_FORM_VALUES.paymentCrypto ?? DEFAULT_FORM_VALUES.paymentCrypto,
     });
-  }, [setCheckoutComponentProps]);
+  }, []);
 
   const handleChange = ({ target }: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, checked, type } = target;
@@ -115,14 +127,14 @@ const HomePage: React.FC = () => {
   };
 
   useEffect(() => {
-    setCheckoutComponentProps(getComponentPropsRef.current());
+    // setCheckoutComponentProps(getComponentPropsRef.current());
 
     try {
       localStorage.setItem(FORM_VALUES_KEY, JSON.stringify(formValues));
     } catch (err) {
       console.log(err);
     }
-  }, [setCheckoutComponentProps, formValues]);
+  }, [formValues]);
 
 
   // AUTO-OPENING (FIRS-TIME ONLY):
@@ -142,8 +154,8 @@ const HomePage: React.FC = () => {
 
     firstTimeRef.current = false;
 
-    open();
-  }, [isLoading, isAuthenticated, meData, hasOrganizations, open]);
+    onOpen();
+  }, [isLoading, isAuthenticated, meData, hasOrganizations, onOpen]);
 
 
   // TODO: Add CheckoutComponent in here.
@@ -151,7 +163,7 @@ const HomePage: React.FC = () => {
   return (<>
     <Box sx={{ my: 4 }}>
       <Stack spacing={2} direction="row">
-        <Button variant="contained" onClick={handleOpenClicked} disabled={isLoading}>Open Checkout Modal</Button>
+        <Button variant="contained" onClick={onOpen} disabled={isLoading}>Open Checkout Modal</Button>
       </Stack>
     </Box>
 
@@ -261,7 +273,7 @@ const HomePage: React.FC = () => {
 
     <Box sx={{ my: 4 }}>
       <Stack spacing={2} direction="row">
-        <Button variant="contained" onClick={handleOpenClicked} disabled={isLoading}>Open Checkout Modal</Button>
+        <Button variant="contained" onClick={onOpen} disabled={isLoading}>Open Checkout Modal</Button>
       </Stack>
     </Box>
 
@@ -277,7 +289,7 @@ const HomePage: React.FC = () => {
 
     <Box sx={{ my: 4 }}>
       <Stack spacing={2} direction="row">
-        <Button variant="contained" onClick={handleOpenClicked} disabled={isLoading}>Open Checkout Modal</Button>
+        <Button variant="contained" onClick={onOpen} disabled={isLoading}>Open Checkout Modal</Button>
       </Stack>
     </Box>
     */ }
@@ -290,9 +302,11 @@ const HomePage: React.FC = () => {
 
     <Box sx={{ my: 4 }}>
       <Stack spacing={2} direction="row">
-        <Button variant="contained" onClick={handleOpenClicked} disabled={isLoading}>Open Checkout Modal</Button>
+        <Button variant="contained" onClick={onOpen} disabled={isLoading}>Open Checkout Modal</Button>
       </Stack>
     </Box>
+
+    <CheckoutComponent { ... checkoutComponentProps } />
   </>);
 };
 

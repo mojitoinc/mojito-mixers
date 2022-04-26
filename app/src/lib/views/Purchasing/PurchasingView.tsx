@@ -147,6 +147,7 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
 
     if (redirectURL && !skipRedirect) {
       persistCheckoutModalInfo({
+        orgID,
         invoiceID,
         invoiceCountdownStart,
         processorPaymentID,
@@ -168,6 +169,7 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
     onPurchaseError,
     onDialogBlocked,
     onPurchaseSuccess,
+    orgID,
     invoiceID,
     invoiceCountdownStart,
     checkoutItems,

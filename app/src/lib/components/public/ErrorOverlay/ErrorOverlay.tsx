@@ -50,6 +50,7 @@ export const PUIErrorOverlay: React.FC<PUIErrorOverlayProps> = ({
 
     // If there was an error, users can click the review button and go back to the Payment UI to review the data...:
 
+    // TODO: Use cookies instead?
     onRedirect(`${ url }${ THREEDS_FLOW_SEARCH_PARAM_ERROR }${ encodeURIComponent(errorMessage) }`);
 
     return false;

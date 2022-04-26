@@ -168,11 +168,12 @@ export function usePlaid(options: UsePlaidOptions): UsePlaidReturn {
   }, [continueFlow, plaidLinkReady, plaidLinkOpen]);
 
   const openLink = useCallback(() => {
-    if (!plaidLinkReady || isPreparePaymentMethodLoading || !invoiceID || !invoiceCountdownStart || !selectedBillingInfo || !linkToken) return;
+    if (!plaidLinkReady || isPreparePaymentMethodLoading || !orgID || !invoiceID || !invoiceCountdownStart || !selectedBillingInfo || !linkToken) return;
 
     if (isLocalhostOrStaging()) console.log("Open plain link manually", linkToken);
 
     persistCheckoutModalInfo({
+      orgID,
       invoiceID,
       invoiceCountdownStart,
       billingInfo: selectedBillingInfo,
@@ -185,6 +186,7 @@ export function usePlaid(options: UsePlaidOptions): UsePlaidReturn {
     isPreparePaymentMethodLoading,
     linkToken,
     selectedBillingInfo,
+    orgID,
     invoiceID,
     invoiceCountdownStart,
     plaidLinkOpen,

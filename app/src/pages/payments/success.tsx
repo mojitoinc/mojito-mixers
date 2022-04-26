@@ -1,15 +1,24 @@
-import { NextPage } from "next";
+import { GetServerSidePropsContext, GetServerSidePropsResult, NextPage } from "next";
 import { useRouter } from "next/router";
-import { useCallback } from "react";
-import { MOJITO_LIGHT_THEME } from "../../lib";
-import { PLAYGROUND_MOJITO_LOGO } from "../../utils/playground/playground.constants";
+import { useCallback, useEffect } from "react";
+import { CheckoutComponent } from "../../components/checkout-component/CheckoutComponent";
+import { THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY } from "../../lib";
 
 const SuccessPage: NextPage = () => {
   const router = useRouter();
   const paymentIdParam = router.query[THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY]?.toString();
-  const paymentErrorParam = router.query[THREEDS_FLOW_SEARCH_PARAM_ERROR_KEY]?.toString();
+  // const paymentErrorParam = router.query[THREEDS_FLOW_SEARCH_PARAM_ERROR_KEY]?.toString();
 
-  const handleRedirect = useCallback((pathnameOrUrl: string) => {
+  useEffect(() => {
+    if (!paymentIdParam) {
+      debugger;
+
+      router.replace("/");
+    }
+  }, [paymentIdParam, router]);
+
+  /*
+  const handleGoTo = useCallback((pathnameOrUrl: string) => {
     console.log(`Redirect to ${pathnameOrUrl}...`);
 
     if (pathnameOrUrl && pathnameOrUrl.startsWith("http")) {
@@ -18,14 +27,33 @@ const SuccessPage: NextPage = () => {
       router.replace(pathnameOrUrl || "/");
     }
   }, [router]);
+  */
 
-  return (
-    <CheckoutComponent
-      theme={MOJITO_LIGHT_THEME}
-      logoSrc={PLAYGROUND_MOJITO_LOGO}
-      successImageSrc=""
-      onRedirect={handleRedirect} />
-  );
+  const handleClose = useCallback(() => {
+    // TODO: Redirect to original item page (storage).
+  }, []);
+
+  return paymentIdParam ? (
+    <CheckoutComponent loaderMode="success" open onClose={ handleClose } />
+  ) : null;
 }
 
 export default SuccessPage;
+
+export function getServerSideProps(context: GetServerSidePropsContext): GetServerSidePropsResult<Record<string, never>> {
+  const paymentIdParam = context.query[THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY]?.toString();
+
+  console.log("paymentIdParam =", paymentIdParam);
+
+  // TODO: Validate paymentIdParam value.
+  // TODO: Make sure these checks work with and without SSR.
+
+  if (paymentIdParam) return { props: {} };
+
+  return {
+    redirect: {
+      destination: "/",
+      permanent: false,
+    },
+  };
+}

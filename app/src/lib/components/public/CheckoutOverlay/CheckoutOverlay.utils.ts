@@ -79,6 +79,7 @@ export function getCheckoutModalState(noClear?: boolean): CheckoutModalStateComb
   const {
     url = "",
     fromLocalhost = false,
+    orgID = "",
     invoiceID = "",
     invoiceCountdownStart = -1,
     billingInfo = "",
@@ -89,7 +90,7 @@ export function getCheckoutModalState(noClear?: boolean): CheckoutModalStateComb
   const receivedRedirectUri = savedReceivedRedirectUri || window.location.href;
 
   // In dev, this works fine even if there's nothing in cookieStorage, which helps with testing across some other domain and localhost:
-  let isValid = fromLocalhost || !!(url && invoiceID && billingInfo && receivedRedirectUri);
+  let isValid = fromLocalhost || !!(url && orgID && invoiceID && billingInfo && receivedRedirectUri);
 
   if (isValid && !savedInfoUsed) {
     if (!noClear) clearPersistedInfo();
@@ -99,7 +100,8 @@ export function getCheckoutModalState(noClear?: boolean): CheckoutModalStateComb
       url: urlToPathnameWhenPossible(url || (fromLocalhost ? "http://localhost:3000" : "")),
       fromLocalhost,
 
-      // The invoiceID we need to re-load the products and units:
+      // The orgID and invoiceID we need to re-load the products and units and resume the checkout:
+      orgID,
       invoiceID,
       invoiceCountdownStart: invoiceCountdownStart === -1 ? Date.now() : invoiceCountdownStart,
 
