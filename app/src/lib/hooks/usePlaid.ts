@@ -34,7 +34,7 @@ export function isUsePlaidOptionsContinueFlow(options: UsePlaidOptions): options
 
 // Load the initial OAuth flow state from localStorage to initialize the ref. Note `getPlaidOAuthFlowState` will
 // automatically discard the saved data if it's invalid (`continueFlow && savedStateUsed`):
-export let INITIAL_PLAID_OAUTH_FLOW_STATE = getCheckoutModalState(true);
+export let INITIAL_PLAID_OAUTH_FLOW_STATE = getCheckoutModalState({ noClear: true });
 
 export function continuePlaidOAuthFlow() {
   return INITIAL_PLAID_OAUTH_FLOW_STATE.continueFlow && !INITIAL_PLAID_OAUTH_FLOW_STATE.savedInfoUsed && isCheckoutModalInfoPlaid(INITIAL_PLAID_OAUTH_FLOW_STATE);

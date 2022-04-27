@@ -1,4 +1,4 @@
-export function getUrlWithoutParams() {
+export function getUrlWithoutParams(): string {
   if (!process.browser) return "/";
 
   const { href, search } = window.location;
@@ -12,6 +12,10 @@ export function urlToPathnameWhenPossible(url: string): string {
   const { origin } = window.location;
 
   return (url.startsWith(origin) ? url.replace(origin, "") : url) || "/";
+}
+
+export function getPathnameWithoutParams(): string {
+  return urlToPathnameWhenPossible(getUrlWithoutParams());
 }
 
 export function isUrlPathname(url: string): boolean {

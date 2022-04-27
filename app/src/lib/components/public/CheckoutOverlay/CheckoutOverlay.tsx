@@ -46,8 +46,6 @@ export interface PUICheckoutOverlayProps {
   open: boolean;
   onClose: () => void;
   onGoTo: (pathnameOrUrl: string, options?: PUIRouterOptions) => void;
-  goToHref?: string;
-  goToLabel?: string;
 
   // Flow:
   loaderMode?: LoaderMode;
@@ -101,9 +99,6 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   open,
   onClose,
   onGoTo,
-  // TODO: Move to dictionary:
-  goToHref,
-  goToLabel,
 
   // Flow:
   loaderMode: initialLoaderMode = "default",
@@ -127,7 +122,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   acceptedCreditCardNetworks,
   network,
   paymentLimits, // Not implemented yet. Used to show payment limits for some payment types.
-  dictionary,
+  dictionary: parentDictionary,
 
   // Legal:
   consentType,
@@ -216,6 +211,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     // Data that can be persisted:
     orgID,
     checkoutItems: initialCheckoutItems,
+    goToMarketplaceHref,
 
     // SelectedPaymentMethod:
     selectedPaymentMethod,
@@ -235,12 +231,15 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   } = useCheckoutModalState({
     orgID: parentOrgID,
     invoiceID: parentInvoiceID,
+    paymentIdParam,
     productConfirmationEnabled,
     vertexEnabled,
     isAuthenticated,
     onError,
     debug,
   });
+
+  const dictionary = useMemo(() => ({ ...parentDictionary, goToMarketplaceHref }), [parentDictionary, goToMarketplaceHref]);
 
 
   // Get saved payment methods:
@@ -312,8 +311,6 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   const isInvalidMode = loaderMode !== "default" && !open;
   const showEspecialLoaders = open && isDialogInitializing && loaderMode !== "default" && checkoutStep !== "error";
 
-  console.log("isPlaidFlowLoading =", isPlaidFlowLoading);
-
   /*
   console.log("");
   console.log("");
@@ -342,6 +339,8 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
 
   useEffect(() => {
     if (!isDialogInitializing || isInvalidMode) {
+      console.log("INVALID");
+
       // Once we have finished loading data OR if `loaderMode` is not default but the modal is not opened (probably
       // because the data in `localStorage` expired), we reset the loader mode:
       setLoaderMode("default");
@@ -665,12 +664,6 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     setError(error);
   }, [refetchPaymentMethods, setError]);
 
-  const handleGoTo = useCallback(() => {
-    onGoTo("/profile/invoices");
-
-    onClose();
-  }, [onGoTo, onClose]);
-
 
   // Release reservation:
 
@@ -738,6 +731,12 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
 
     onClose();
   }, [handleBeforeUnload, setInvoiceID, onClose]);
+
+  const handleGoTo = useCallback((pathnameOrUrl: string) => {
+    console.log(`handleGoTo(${ pathnameOrUrl })`);
+
+    onGoTo(pathnameOrUrl || "/");
+  }, [onGoTo]);
 
 
   // Error handling:
@@ -940,8 +939,6 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
         processorPaymentID={ processorPaymentID }
         wallet={ wallet }
         onNext={ handleClose }
-        goToHref={ goToHref }
-        goToLabel={ goToLabel }
         onGoTo={ handleGoTo } />
     );
   } else {

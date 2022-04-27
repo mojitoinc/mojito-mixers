@@ -24,6 +24,7 @@ export interface CheckoutModalFooterProps {
   consentType?: ConsentType;
 
   // Submit button:
+  submitHref?: string;
   submitLabel?: string;
   submitDisabled?: boolean;
   submitLoading?: boolean;
@@ -37,7 +38,7 @@ export interface CheckoutModalFooterProps {
   // Collection button:
   goToHref?: string;
   goToLabel?: string;
-  onGoTo?: () => void;
+  onGoTo?: (pathnameOrUrl: string) => void;
 }
 
 const VARIANTS_WITH_DISCLAIMER: CheckoutModalFooterVariant[] = ["toPayment", "toPlaid", "toConfirmation"]
@@ -49,6 +50,7 @@ export const CheckoutModalFooter: React.FC<CheckoutModalFooterProps> = ({
   consentType,
 
   // Submit button:
+  submitHref,
   submitLabel,
   submitDisabled,
   submitLoading,
@@ -60,8 +62,8 @@ export const CheckoutModalFooter: React.FC<CheckoutModalFooterProps> = ({
   onCloseClicked,
 
   // Secondary button:
-  goToHref = "/profile/invoices",
-  goToLabel = "View Invoices",
+  goToHref,
+  goToLabel,
   onGoTo,
 }) => {
   // CONSENT:
@@ -102,7 +104,7 @@ export const CheckoutModalFooter: React.FC<CheckoutModalFooterProps> = ({
       e.stopPropagation();
     }
 
-    if (onGoTo) onGoTo();
+    if (onGoTo) onGoTo((e.currentTarget as unknown as HTMLAnchorElement).href || "");
   }, [onGoTo]);
 
 
@@ -172,7 +174,7 @@ export const CheckoutModalFooter: React.FC<CheckoutModalFooterProps> = ({
         <PrimaryButton
           onClickCapture={ handleGoToClicked }
           disabled={ isPrimaryButtonDisabled }
-          href={ goToHref }
+          href={ goToHref || undefined }
           sx={{ mb: 2 }}>
           { goToLabel }
         </PrimaryButton>
@@ -181,9 +183,10 @@ export const CheckoutModalFooter: React.FC<CheckoutModalFooterProps> = ({
       {primaryButtonVisible && (
         <PrimaryButton
           onClick={onSubmitClicked ? handleSubmitClicked : undefined}
+          disabled={ isPrimaryButtonDisabled }
+          href={submitHref || undefined }
           type={onSubmitClicked ? "button" : "submit"}
-          endIcon={isFormLoading || submitLoading ? <CircularProgress color="inherit" size="1em" /> : (PrimaryButtonIcon && <PrimaryButtonIcon />)}
-          disabled={ isPrimaryButtonDisabled }>
+          endIcon={isFormLoading || submitLoading ? <CircularProgress color="inherit" size="1em" /> : (PrimaryButtonIcon && <PrimaryButtonIcon />)}>
           {primaryButtonLabel}
         </PrimaryButton>
       )}

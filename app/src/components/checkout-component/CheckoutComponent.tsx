@@ -1,7 +1,7 @@
 import { useAuth0 } from "@auth0/auth0-react";
 import { useRouter } from "next/router";
 import React, { ErrorInfo, useCallback } from "react";
-import { CheckoutEventData, CheckoutEventType, CheckoutModalError, MOJITO_LIGHT_THEME, PUIRouterOptions } from "../../lib";
+import { CheckoutEventData, CheckoutEventType, CheckoutModalError, MOJITO_LIGHT_THEME, PUIRouterOptions, THREEDS_FLOW_SEARCH_PARAM_ERROR_KEY, THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY } from "../../lib";
 import { PUICheckout, PUICheckoutProps } from "../../lib/components/public/CheckoutOverlay/CheckoutOverlay";
 import { isLocalhost } from "../../lib/domain/url/url.utils";
 import { config } from "../../utils/config/config.constants";
@@ -14,6 +14,8 @@ export type CheckoutComponentProps = Partial<PUICheckoutProps> & Pick<
 
 export const CheckoutComponent: React.FC<CheckoutComponentProps> = (checkoutComponentProps) => {
   const router = useRouter();
+  const paymentIdParam = router.query[THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY]?.toString();
+  const paymentErrorParam = router.query[THREEDS_FLOW_SEARCH_PARAM_ERROR_KEY]?.toString();
 
   const { loginWithPopup, isAuthenticated, isLoading: isAuthenticatedLoading, getIdTokenClaims } = useAuth0();
 
@@ -76,9 +78,8 @@ export const CheckoutComponent: React.FC<CheckoutComponentProps> = (checkoutComp
 
     // Flow:
     // loaderMode,
-    // TODO: Finish implementing this (pass them down to utils to validate):
-    // paymentIdParam,
-    // paymentErrorParam,
+    paymentIdParam,
+    paymentErrorParam,
     guestCheckoutEnabled: false,
     productConfirmationEnabled: false,
     vertexEnabled: true,

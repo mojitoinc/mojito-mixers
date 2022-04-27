@@ -37,6 +37,7 @@ export enum CheckoutModalStepIndex {
 export interface CheckoutModalStateOptions {
   orgID: string;
   invoiceID?: string | null;
+  paymentIdParam?: string;
   productConfirmationEnabled?: boolean;
   vertexEnabled?: boolean;
   isAuthenticated?: boolean;
@@ -53,6 +54,7 @@ export interface CheckoutModalState {
 export interface PersistedData {
   orgID: string;
   checkoutItems: CheckoutItemInfo[];
+  goToMarketplaceHref: string;
 }
 
 export interface SelectedPaymentMethod {
@@ -98,6 +100,7 @@ const WALLET_ADDRESS_FIELD_STEPS = ["billing", "payment"];
 export function useCheckoutModalState({
   orgID: parentOrgID,
   invoiceID: parentInvoiceID = null,
+  paymentIdParam,
   productConfirmationEnabled,
   vertexEnabled,
   isAuthenticated,
@@ -115,7 +118,11 @@ export function useCheckoutModalState({
     isDialogBlocked: false,
   });
 
-  const [persistedData, setPersistedData] = useState<PersistedData>({ orgID: parentOrgID, checkoutItems: [] });
+  const [persistedData, setPersistedData] = useState<PersistedData>({
+    orgID: parentOrgID,
+    checkoutItems: [],
+    goToMarketplaceHref: "",
+  });
 
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<SelectedPaymentMethod>({
     billingInfo: "",
@@ -147,7 +154,7 @@ export function useCheckoutModalState({
 
     // Once authentication has loaded, we know if we need to skip the product confirmation step or not. Also, when the
     // modal is re-opened, we need to reset its state, taking into account if we need to resume a Plaid OAuth flow:s
-    const checkoutModalState = getCheckoutModalState();
+    const checkoutModalState = getCheckoutModalState({ paymentIdParam });
 
     setCheckoutModalState({
       checkoutStep: checkoutModalState.checkoutStep || startAt,
@@ -157,6 +164,7 @@ export function useCheckoutModalState({
     setPersistedData({
       orgID: checkoutModalState.orgID,
       checkoutItems: checkoutModalState.checkoutItems,
+      goToMarketplaceHref: checkoutModalState.url || "",
     });
 
     // setCheckoutModalState({ checkoutStep: "error", checkoutError: { errorMessage: "test" } });
@@ -176,7 +184,7 @@ export function useCheckoutModalState({
       processorPaymentID: checkoutModalState.processorPaymentID || "",
       paymentID: checkoutModalState.paymentID || ""
     });
-  }, [debug, startAt, parentInvoiceID, vertexEnabled]);
+  }, [debug, startAt, parentInvoiceID, paymentIdParam, vertexEnabled]);
 
   const goBack = useCallback(() => {
     setCheckoutModalState(({ checkoutStep, checkoutError }) => ({
@@ -301,6 +309,7 @@ export function useCheckoutModalState({
     // Data that can be persisted:
     orgID: persistedData.orgID || parentOrgID,
     checkoutItems: persistedData.checkoutItems,
+    goToMarketplaceHref: persistedData.goToMarketplaceHref,
 
     // SelectedPaymentMethod:
     selectedPaymentMethod,

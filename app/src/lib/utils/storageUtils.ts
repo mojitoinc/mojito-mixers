@@ -111,6 +111,20 @@ function deleteCookie(key: string, params: CookieParams = {}) {
   return hasCookieResult;
 }
 
+function deleteCookies(key: string | RegExp, params: CookieParams = {}) {
+  if (typeof key === "string") return deleteCookie(key, params);
+
+  let cookiesDeleted = 0;
+
+  Object.keys(getCookies()).forEach((cookieKey) => {
+    if (key.test(cookieKey)) {
+      cookiesDeleted += deleteCookie(cookieKey, params) ? 1 : 0;
+    }
+  });
+
+  return cookiesDeleted;
+}
+
 export type ProxyStorageType = "localStorage" | "cookieStorage" | "sessionStorage" | "memoryStorage";
 
 export class ProxyStorage {
@@ -140,8 +154,8 @@ export class ProxyStorage {
    * Deletes an item from the storage.
    * The options parameter is used only with instances of cookieStorage.
    */
-  removeItem(key: string, options?: CookieParams) {
-    return deleteCookie(key, options);
+  removeItem(key: string | RegExp, options?: CookieParams) {
+    return deleteCookies(key, options);
   }
 
   /**

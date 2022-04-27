@@ -9,10 +9,9 @@ const SuccessPage: NextPage = () => {
   const paymentIdParam = router.query[THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY]?.toString();
   // const paymentErrorParam = router.query[THREEDS_FLOW_SEARCH_PARAM_ERROR_KEY]?.toString();
 
+  // TODO: CheckoutOverlay should automatically call goTo:
   useEffect(() => {
     if (!paymentIdParam) {
-      debugger;
-
       router.replace("/");
     }
   }, [paymentIdParam, router]);

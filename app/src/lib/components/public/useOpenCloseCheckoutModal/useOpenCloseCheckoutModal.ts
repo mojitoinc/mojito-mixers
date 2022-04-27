@@ -33,7 +33,7 @@ export function useOpenCloseCheckoutModal({
   });
 
   useEffect(() => {
-    setState(({ loaderMode }) => ({ loaderMode, isOpen: isInitiallyOpen() }));
+    setState(({ loaderMode }) => ({ loaderMode, isOpen: isInitiallyOpen(paymentIdParam) }));
   }, []);
 
   useEffect(() => {

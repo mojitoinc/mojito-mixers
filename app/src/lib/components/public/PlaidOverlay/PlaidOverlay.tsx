@@ -11,7 +11,7 @@ export type PUISuccessProps = PUIPlaidOverlayProps & ThemeProviderProps;
 export const PUIPlaidOverlay: React.FC<PUIPlaidOverlayProps> = ({
   onRedirect,
 }) => {
-  const { continueFlow, url } = getCheckoutModalState(true);
+  const { continueFlow, url } = getCheckoutModalState({ noClear: true });
 
   useLayoutEffect(() => {
     if (continueFlow) {

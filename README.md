@@ -1,18 +1,27 @@
 <br />
 
-
+DONE:
 - Back to Marketplace button should also have href.
+- Use cookie path for 3DS and Plaid.
+- Persist cookie with paymentID in the key.
+- Use CheckoutOverlay in success page and load orgID, checkoutItems... from cookie.
+
+DOING:
+
+- Implement validation redirects for SuccessOverlay and ErrorOverlay in CheckoutOverlay.
+
+- Review usages of receivedRedirectUri. ErrorOverlay should just redirect to item page or / without params.
+- Review clearing of error param and useOpenCloseCheckoutModal().
+- Do not pass error param. Just redirect to the billing view.
 
 - Remove CheckoutProvider!
-- Use CheckoutOverlay in success page + Load data from cookie or redirect (or show error there). Need to pass params.
-- Use cookie path for 3DS.
+
+TODO:
 - Add 5 seconds wait logic there.
 - Delete SuccessOverlay (only need StaticSuccessOverlay).
-- Persist cookie with paymentID in the key.
-
-- Chip variants in Mint.
 - Document queries (origin-overwrite) and flow.
-
+- Why closing the modal shows loader.
+- Chip variants in Mint (new PR).
 
 
 <h1 align="center">🍸 Mojito Mixers</h1>
