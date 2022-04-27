@@ -43,7 +43,8 @@ export function clearPersistedInfo() {
   if (debug) console.log(`💾 Clearing state...`);
 
   if (process.browser) {
-    cookieStorage.removeItem(new RegExp(`^${ CHECKOUT_MODAL_INFO_KEY_PREFIX }`));
+    cookieStorage.removeItem(new RegExp(`^${ CHECKOUT_MODAL_INFO_KEY_PREFIX }`), { path: "/payments" }); // 3DS
+    cookieStorage.removeItem(`${ CHECKOUT_MODAL_INFO_KEY_PREFIX }${ CHECKOUT_MODAL_INFO_KEY_PLAID_SUFFIX }`, { path: "/" }); // Plaid
     cookieStorage.removeItem(CHECKOUT_MODAL_INFO_REDIRECT_URI_KEY);
     cookieStorage.removeItem(CHECKOUT_MODAL_INFO_USED_KEY);
   }
@@ -80,8 +81,6 @@ export function getCheckoutModalState({
   let savedInfoUsed = false;
 
   try {
-    debugger;
-
     const rawSavedModalInfo =
       cookieStorage.getItem(`${ CHECKOUT_MODAL_INFO_KEY_PREFIX }${ paymentIdParam || "" }`) ||
       cookieStorage.getItem(`${ CHECKOUT_MODAL_INFO_KEY_PREFIX }${ CHECKOUT_MODAL_INFO_KEY_PLAID_SUFFIX }`);

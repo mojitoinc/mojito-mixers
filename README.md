@@ -5,18 +5,19 @@ DONE:
 - Use cookie path for 3DS and Plaid.
 - Persist cookie with paymentID in the key.
 - Use CheckoutOverlay in success page and load orgID, checkoutItems... from cookie.
+- Add param validation and redirects in SuccessOverlay (implemented in its getServerSide props and CheckoutOverlay).
 
 DOING:
 
-- Implement validation redirects for SuccessOverlay and ErrorOverlay in CheckoutOverlay.
+- Add param validation and redirects in ErrorOverlay in CheckoutOverlay.
 
 - Review usages of receivedRedirectUri. ErrorOverlay should just redirect to item page or / without params.
 - Review clearing of error param and useOpenCloseCheckoutModal().
 - Do not pass error param. Just redirect to the billing view.
-
 - Remove CheckoutProvider!
 
 TODO:
+- Are close with ESC + isDialogBlocked working?
 - Add 5 seconds wait logic there.
 - Delete SuccessOverlay (only need StaticSuccessOverlay).
 - Document queries (origin-overwrite) and flow.

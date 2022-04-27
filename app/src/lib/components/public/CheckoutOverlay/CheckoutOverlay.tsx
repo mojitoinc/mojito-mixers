@@ -352,6 +352,8 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
 
     if (showEspecialLoaders || loaderMode !== "error") return;
 
+    console.log("CLEAN URL");
+
     const params = new URLSearchParams(location.search);
 
     params.delete(THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY);
@@ -427,7 +429,11 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   useEffect(() => {
     if (!hasBeenInitRef.current) return;
 
-    if (!open || isAuthLoading) hasBeenInitRef.current = false;
+    if (!open || isAuthLoading) {
+      console.log("RESET INIT");
+
+      hasBeenInitRef.current = false;
+    }
   }, [isAuthLoading, open]);
 
   useEffect(() => {
@@ -436,9 +442,11 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     if ((loaderMode === "default" && !isDialogLoading) || (loaderMode !== "default" && isDialogLoading)) {
       hasBeenInitRef.current = true;
 
-      initModalState();
+      const { flowType, url } = initModalState();
+
+      if (flowType === "" && loaderMode !== "default") onGoTo(url || "/", { replace: true });
     }
-  }, [open, isAuthLoading, loaderMode, isDialogLoading, initModalState]);
+  }, [open, isAuthLoading, loaderMode, isDialogLoading, initModalState, onGoTo]);
 
 
   // Data loading error handling:
@@ -721,6 +729,8 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   }, [handleBeforeUnload]);
 
   const handleClose = useCallback(() => {
+    console.log(`handleClose()`);
+
     window.removeEventListener('beforeunload', handleBeforeUnload);
 
     handleBeforeUnload();
@@ -735,8 +745,12 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   const handleGoTo = useCallback((pathnameOrUrl: string) => {
     console.log(`handleGoTo(${ pathnameOrUrl })`);
 
+    window.removeEventListener('beforeunload', handleBeforeUnload);
+
+    handleBeforeUnload();
+
     onGoTo(pathnameOrUrl || "/");
-  }, [onGoTo]);
+  }, [handleBeforeUnload, onGoTo]);
 
 
   // Error handling:

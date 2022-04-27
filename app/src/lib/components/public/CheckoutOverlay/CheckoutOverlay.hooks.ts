@@ -11,6 +11,7 @@ import { BillingInfo } from "../../../forms/BillingInfoForm";
 import { fullTrim } from "../../../utils/formatUtils";
 import { TaxesState } from "../../../views/Billing/BillingView";
 import { resetStepperProgress } from "../../payments/CheckoutStepper/CheckoutStepper";
+import { CheckoutModalStateCombined } from "./CheckoutOverlay.types";
 import { getCheckoutModalState } from "./CheckoutOverlay.utils";
 
 // TODO: Add a "close" value here:
@@ -75,7 +76,7 @@ export interface PurchaseState {
 export interface CheckoutModalStateReturn extends CheckoutModalState, PersistedData, PurchaseState {
   // CheckoutModalState (+ inherited stuff):
   startAt: CheckoutModalStep;
-  initModalState: () => void;
+  initModalState: () => CheckoutModalStateCombined;
   goBack: () => void;
   goNext: () => void;
   goTo: (checkoutStep?: CheckoutModalStep, checkoutError?: CheckoutModalError) => void;
@@ -184,6 +185,8 @@ export function useCheckoutModalState({
       processorPaymentID: checkoutModalState.processorPaymentID || "",
       paymentID: checkoutModalState.paymentID || ""
     });
+
+    return checkoutModalState;
   }, [debug, startAt, parentInvoiceID, paymentIdParam, vertexEnabled]);
 
   const goBack = useCallback(() => {
