@@ -38,6 +38,7 @@ import { PUIStaticSuccessOverlay } from "../SuccessOverlay/StaticSuccessOverlay"
 import { PUIStaticErrorOverlay } from "../ErrorOverlay/StaticErrorOverlay";
 import { useCountdown } from "../../../hooks/useContdown";
 import { PUIRouterOptions } from "../../../domain/router/router.types";
+import { getPathnameWithParams } from "../../../domain/url/url.utils";
 
 export type LoaderMode = "default" | "success" | "error";
 
@@ -195,6 +196,9 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
 
   // Get everything related to Payment UI routing, error and state handling, including resuming Plaid / 3DS flows:
 
+  const paymentIdParamRef = useRef(paymentIdParam);
+  const paymentErrorParamRef = useRef(paymentErrorParam);
+
   const {
     // CheckoutModalState:
     startAt,
@@ -231,7 +235,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   } = useCheckoutModalState({
     orgID: parentOrgID,
     invoiceID: parentInvoiceID,
-    paymentIdParam,
+    paymentIdParam: paymentIdParamRef.current,
     productConfirmationEnabled,
     vertexEnabled,
     isAuthenticated,
@@ -292,14 +296,6 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
 
   const { total: subtotal, fees, taxAmount } = useCheckoutItemsCostTotal(checkoutItems);
 
-  /*
-  console.log({
-    initialCheckoutItems,
-    invoiceItems,
-    checkoutItems,
-  });
-  */
-
 
   // Modal loading state:
 
@@ -308,76 +304,33 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   const isDialogInitializing = isDialogLoading || paymentMethodsLoading || invoiceDetailsLoading || !invoiceID || !invoiceCountdownStart;
   const isPlaidFlowLoading = continuePlaidOAuthFlow();
   const [loaderMode, setLoaderMode] = useState(initialLoaderMode);
-  const isInvalidMode = loaderMode !== "default" && !open;
   const showEspecialLoaders = open && isDialogInitializing && loaderMode !== "default" && checkoutStep !== "error";
 
-  /*
-  console.log("");
-  console.log("");
-
-  console.log("isDialogLoading", {
-    orgID,
-    checkoutItems,
-    isAuthenticatedLoading,
-    meLoading,
-    paymentMethodsLoading,
-  });
-
-  console.log("isDialogInitializing", {
-    isDialogLoading,
-    invoiceDetailsLoading,
-    invoiceID,
-    invoiceCountdownStart,
-  });
-
-  console.log("MISC", {
-    loaderMode,
-    isInvalidMode,
-    showEspecialLoaders,
-  });
-  */
-
   useEffect(() => {
-    if (!isDialogInitializing || isInvalidMode) {
-      console.log("INVALID");
+    if (loaderMode === "default") return;
 
-      // Once we have finished loading data OR if `loaderMode` is not default but the modal is not opened (probably
-      // because the data in `localStorage` expired), we reset the loader mode:
+    if (!isDialogInitializing || !open) {
+      // Once we have finished loading data OR if the modal is not opened (probably
+      // because the stored data expired) or is closed, we reset the loader mode:
       setLoaderMode("default");
     }
-  }, [isDialogInitializing, isInvalidMode]);
+  }, [loaderMode, isDialogInitializing, open]);
 
   useEffect(() => {
-    // TODO: Only for errors:
-
-    if (showEspecialLoaders || loaderMode !== "error") return;
-
-    console.log("CLEAN URL");
-
     const params = new URLSearchParams(location.search);
 
     params.delete(THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY);
     params.delete(THREEDS_FLOW_SEARCH_PARAM_ERROR_KEY);
 
     const cleanParams = params.toString();
-    const cleanURL = location.href.replace(location.search, cleanParams ? `?${ cleanParams }` : "");
+    const cleanPathname = `${ window.location.pathname }${ cleanParams ? `?${ cleanParams }` : "" }`;
 
-    if (cleanURL && cleanURL !== location.href) onGoTo(cleanURL, { replace: true, shallow: true });
-  }, [showEspecialLoaders, loaderMode, onGoTo]);
-
-  useEffect(() => {
-    let emoji = "🔄";
-
-    if (isInvalidMode) {
-      emoji = "⚠️";
-    } else if (loaderMode === "default") {
-      emoji = open ? "📬" : "📭";
-    } else {
-      emoji = loaderMode === "success" ? "✔️" : "❌";
+    if (cleanPathname && cleanPathname !== getPathnameWithParams()) {
+      // As soon as we find these params, we remove them from the URL (they are stored in a Ref to avoid losing them
+      // before we get a change to use them):
+      onGoTo(cleanPathname, { replace: true, shallow: true });
     }
-
-    if (debug) console.log(`${ emoji } loaderMode = ${ loaderMode } / isOpen = ${ open }`);
-  }, [debug, isInvalidMode, loaderMode, open]);
+  }, [onGoTo]);
 
 
   // Invoice creation & buy now lot reservation:
@@ -427,14 +380,8 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   const hasBeenInitRef = useRef(false);
 
   useEffect(() => {
-    if (!hasBeenInitRef.current) return;
-
-    if (!open || isAuthLoading) {
-      console.log("RESET INIT");
-
-      hasBeenInitRef.current = false;
-    }
-  }, [isAuthLoading, open]);
+    if (hasBeenInitRef.current && (!open || isAuthLoading)) hasBeenInitRef.current = false;
+  }, [open, isAuthLoading, debug]);
 
   useEffect(() => {
     if (!open || isAuthLoading || hasBeenInitRef.current) return;
@@ -444,7 +391,11 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
 
       const { flowType, url } = initModalState();
 
-      if (flowType === "" && loaderMode !== "default") onGoTo(url || "/", { replace: true });
+      if (flowType === "" && loaderMode !== "default") {
+        console.log("BAD INIT");
+
+        onGoTo(url || "/", { replace: true });
+      }
     }
   }, [open, isAuthLoading, loaderMode, isDialogLoading, initModalState, onGoTo]);
 
@@ -460,12 +411,12 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
 
     if (paymentMethodsError) {
       if (ignorePaymentMethodsError) {
-        console.log("\n❌ (IGNORED) Error loading saved payment methods:\n\n", paymentMethodsError);
+        if (debug) console.log("\n❌ (IGNORED) Error loading saved payment methods:\n\n", paymentMethodsError);
       } else {
         setError(ERROR_LOADING_PAYMENT_METHODS(paymentMethodsError));
       }
     }
-  }, [meError, paymentMethodsError, invoiceDetailsError, setError]);
+  }, [meError, invoiceDetailsError, paymentMethodsError, debug, setError]);
 
 
   // Analytics:
@@ -743,14 +694,22 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   }, [handleBeforeUnload, setInvoiceID, onClose]);
 
   const handleGoTo = useCallback((pathnameOrUrl: string) => {
-    console.log(`handleGoTo(${ pathnameOrUrl })`);
+    if (pathnameOrUrl === window.location.href || pathnameOrUrl === window.location.pathname) {
+      handleClose();
+
+      return;
+    }
 
     window.removeEventListener('beforeunload', handleBeforeUnload);
 
     handleBeforeUnload();
 
-    onGoTo(pathnameOrUrl || "/");
-  }, [handleBeforeUnload, onGoTo]);
+    onGoTo(pathnameOrUrl || "/", { replace: true });
+  }, [handleClose, handleBeforeUnload, onGoTo]);
+
+  const handlePurchaseCompleted = useCallback(() => {
+    handleGoTo(goToMarketplaceHref)
+  }, [handleGoTo, goToMarketplaceHref]);
 
 
   // Error handling:
@@ -809,7 +768,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
 
   // Loading UI:
 
-  if (open && isDialogInitializing && loaderMode === "success" && checkoutStep !== "error") {
+  if (showEspecialLoaders && loaderMode === "success") {
     return (
       <PUIStaticSuccessOverlay
         // TODO: Add to dictionary:
@@ -819,10 +778,10 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     );
   }
 
-  if (open && isDialogInitializing && loaderMode === "error" && checkoutStep !== "error") {
+  if (showEspecialLoaders && loaderMode === "error") {
     return (
       <PUIStaticErrorOverlay
-        checkoutError={{ errorMessage: paymentErrorParam || "" }}
+        checkoutError={{ errorMessage: paymentErrorParamRef.current || "" }}
         // TODO: Add to dictionary:
         errorImageSrc={ errorImageSrc }
         logoSrc={ logoSrc }
@@ -952,7 +911,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
         selectedPaymentMethod={ selectedPaymentMethod }
         processorPaymentID={ processorPaymentID }
         wallet={ wallet }
-        onNext={ handleClose }
+        onNext={ handlePurchaseCompleted }
         onGoTo={ handleGoTo } />
     );
   } else {

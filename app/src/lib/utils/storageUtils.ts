@@ -32,7 +32,7 @@ function getCookieSecurityParams(params: CookieParams = {}) {
 
   const securityParams = [];
 
-  if (secure || (secure === undefined && !isLocalhost())) {
+  if (secure && !isLocalhost()) {
     securityParams.push("secure");
   }
 
@@ -87,17 +87,30 @@ function getCookies(): Record<string, string> {
   );
 }
 
-function hasCookie(key: string): boolean {
-  return getCookies()[key] !== undefined;
-}
+function getCookie<T = any>(name: string | RegExp, options: CookieOptions = {}): T | string | undefined {
+  const cookies = getCookies();
 
-function getCookie<T = any>(name: string, options: CookieOptions = {}): T | string | undefined {
-  const rawCookie = getCookies()[name] || undefined;
+  let rawCookie: string | undefined = undefined;
+
+  if (typeof name === "string") {
+    rawCookie = cookies[name];
+  } else {
+    // Recent first:
+    const matchingKey = Object.keys(cookies).reverse().find((cookieKey) => {
+      return name.test(cookieKey);
+    });
+
+    if (matchingKey) rawCookie = cookies[matchingKey];
+  }
 
   if (rawCookie === undefined) return undefined;
   if (options.noParse) return rawCookie;
 
   return parseCookie(rawCookie);
+}
+
+function hasCookie(key: string | RegExp): boolean {
+  return getCookie(key, { noParse: true }) !== undefined;
 }
 
 function deleteCookie(key: string, params: CookieParams = {}) {
@@ -146,7 +159,7 @@ export class ProxyStorage {
    * Retrieves a value by its key name.
    * If noParse is true then the value retrieved is not parsed with JSON.parse.
    */
-  getItem(key: string, options: CookieOptions = {}) {
+  getItem(key: string | RegExp, options: CookieOptions = {}) {
     return getCookie(key, options)
   }
 

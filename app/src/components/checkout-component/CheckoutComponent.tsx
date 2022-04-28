@@ -26,14 +26,30 @@ export const CheckoutComponent: React.FC<CheckoutComponentProps> = (checkoutComp
   }, [getIdTokenClaims]);
 
   const onGoTo = useCallback((pathnameOrUrl: string, { replace, ...options }: PUIRouterOptions = {}) => {
-    console.log(`Redirect to ${pathnameOrUrl}...`);
-
-    if (pathnameOrUrl && pathnameOrUrl.startsWith("http")) {
-      window.location.replace(pathnameOrUrl);
-    } else if (replace) {
-      router.replace(pathnameOrUrl || "/", undefined, options);
+    if (!pathnameOrUrl) {
+      if (replace) {
+        router.replace("/");
+      } else {
+        router.push("/");
+      }
     } else {
-      router.push(pathnameOrUrl || "/", undefined, options);
+      if (pathnameOrUrl.startsWith("http")) {
+        if (replace) {
+          console.log(`Replace URL with ${pathnameOrUrl}`);
+          window.location.replace(pathnameOrUrl);
+        } else {
+          console.log(`Push URL ${pathnameOrUrl}`);
+          window.location.href = pathnameOrUrl;
+        }
+      } else {
+        if (replace) {
+          console.log(`Replace route with ${pathnameOrUrl}`);
+          router.replace(pathnameOrUrl || "/", undefined, options);
+        } else {
+          console.log(`Push route ${pathnameOrUrl}`);
+          router.push(pathnameOrUrl || "/", undefined, options);
+        }
+      }
     }
   }, [router]);
 

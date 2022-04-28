@@ -6,23 +6,33 @@ DONE:
 - Persist cookie with paymentID in the key.
 - Use CheckoutOverlay in success page and load orgID, checkoutItems... from cookie.
 - Add param validation and redirects in SuccessOverlay (implemented in its getServerSide props and CheckoutOverlay).
+- Add param validation and redirects in ErrorOverlay.
+- Fix CheckoutModalFooter missing close link and main action href (context: ErrorView).
+- Make sure ErrorOverlay passes error message as URL param.
+- Make sure 3DS error flow is resumed properly (show error loader variant, display previous data, timer continues, keep item and units...).
+- Remove CheckoutProvider.
+
 
 DOING:
+- Keep and document SuccessOverlay as alternative (redirect before confirmation screen).
+- Investigate 3DS paymentId mismatch issue.
+- Document queries, flows, origin-overwrite header...
 
-- Add param validation and redirects in ErrorOverlay in CheckoutOverlay.
-
-- Review usages of receivedRedirectUri. ErrorOverlay should just redirect to item page or / without params.
-- Review clearing of error param and useOpenCloseCheckoutModal().
-- Do not pass error param. Just redirect to the billing view.
-- Remove CheckoutProvider!
 
 TODO:
-- Are close with ESC + isDialogBlocked working?
-- Add 5 seconds wait logic there.
-- Delete SuccessOverlay (only need StaticSuccessOverlay).
-- Document queries (origin-overwrite) and flow.
-- Why closing the modal shows loader.
-- Chip variants in Mint (new PR).
+- NEW PR 1: Persist wallet address (Plaid too) and use it when coming back from 3DS... Also add walletAddress to other payment methods. 
+
+- NEW PR 2: BillingView button should be initially disabled if there's already data to validate (so unless form is empty).
+- NEW PR 2: When going  BillingView or PaymentView, the selected saved item blinks as it's initially not selected.
+
+- NEW PR 3: Are close with ESC + isDialogBlocked working?
+- NEW PR 3: Why closing the modal shows loader.
+
+- NEW PR 4: Chip variants in Mint (new PR).
+
+- NEW PR 5: Move success/error/failure to constants, props or env variables.
+- NEW PR 5: Fix confirmation handling when pressing back (browser button) after a 3DS error. Should the confirmation screen be shown anyway?
+
 
 
 <h1 align="center">🍸 Mojito Mixers</h1>
@@ -287,7 +297,7 @@ const PlaidOAuthPage = () => {
 
   useLayoutEffect(() => {
     if (continueOAuthFlow) {
-      persistPlaidReceivedRedirectUri(window.location.href);
+      persistCheckoutModalInfoRedirectURI(window.location.href);
     }
 
     router.replace(url || "/");

@@ -1,13 +1,15 @@
 import { GetServerSidePropsContext, GetServerSidePropsResult, NextPage } from "next";
 import { useRouter } from "next/router";
+import { useRef } from "react";
 import { CheckoutComponent } from "../../components/checkout-component/CheckoutComponent";
 import { THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY } from "../../lib";
-import { CHECKOUT_MODAL_INFO_KEY_PREFIX } from "../../lib/config/config";
+import { CHECKOUT_MODAL_INFO_KEY } from "../../lib/config/config";
 import { NOOP } from "../../lib/utils/miscUtils";
 
 const SuccessPage: NextPage = () => {
   const router = useRouter();
-  const paymentIdParam = router.query[THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY]?.toString();
+  const paymentIdParamRef = useRef(router.query[THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY]?.toString());
+  const paymentIdParam = paymentIdParamRef.current;
 
   return paymentIdParam ? (
     <CheckoutComponent
@@ -22,7 +24,9 @@ export default SuccessPage;
 
 export function getServerSideProps(context: GetServerSidePropsContext): GetServerSidePropsResult<Record<string, never>> {
   const paymentIdParam = context.query[THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY]?.toString();
-  const hasCheckoutModalInfo = context.req.headers.cookie?.includes(`${ CHECKOUT_MODAL_INFO_KEY_PREFIX }${ paymentIdParam }`);
+
+  // TODO: Replace with cookie utils that automatically encodes key:
+  const hasCheckoutModalInfo = context.req.headers.cookie?.includes(CHECKOUT_MODAL_INFO_KEY(paymentIdParam));
 
   // TODO: Theses checks could be improved to use the logic in CheckoutOverlay.utils.ts.
 

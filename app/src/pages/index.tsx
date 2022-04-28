@@ -1,8 +1,9 @@
 import { useAuth0 } from "@auth0/auth0-react";
 import { Typography, Box, Stack, Button, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio, TextField, Select, MenuItem, InputLabel, FormGroup, Checkbox, SelectChangeEvent } from "@mui/material";
+import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 import { CheckoutComponent, CheckoutComponentProps } from "../components/checkout-component/CheckoutComponent";
-import { PaymentType } from "../lib";
+import { PaymentType, THREEDS_FLOW_SEARCH_PARAM_ERROR_KEY, THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY } from "../lib";
 import { useOpenCloseCheckoutModal } from "../lib/components/public/useOpenCloseCheckoutModal/useOpenCloseCheckoutModal";
 import { useMeQuery } from "../services/graphql/generated";
 import { PLAYGROUND_PARAGRAPHS_ARRAY, PLAYGROUND_MOCKED_AUCTION_LOT, PLAYGROUND_MOCKED_BUY_NOW_LOT } from "../utils/playground/playground.constants";
@@ -41,6 +42,10 @@ if (process.browser) {
 }
 
 const HomePage: React.FC = () => {
+  const router = useRouter();
+  const paymentIdParam = router.query[THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY]?.toString();
+  const paymentErrorParam = router.query[THREEDS_FLOW_SEARCH_PARAM_ERROR_KEY]?.toString();
+
   const { isAuthenticated, isLoading: isAuthenticatedLoading } = useAuth0();
   const { data: meData, loading: meLoading, error: meError } = useMeQuery({ skip: !isAuthenticated });
   const isLoading = isAuthenticatedLoading || meLoading;
@@ -53,8 +58,8 @@ const HomePage: React.FC = () => {
   // const { open, setCheckoutComponentProps } = useCheckoutOverlay();
 
   const { loaderMode, isOpen, onOpen, onClose } = useOpenCloseCheckoutModal({
-    paymentIdParam: undefined,
-    paymentErrorParam: undefined,
+    paymentIdParam,
+    paymentErrorParam,
   });
 
   const [formValues, setFormValues] = useState<PlaygroundFormData>(DEFAULT_FORM_VALUES);

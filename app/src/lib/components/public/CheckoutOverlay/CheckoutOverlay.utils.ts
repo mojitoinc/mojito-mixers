@@ -1,4 +1,4 @@
-import { THREEDS_FLOW_SEARCH_PARAM_SUCCESS, CHECKOUT_MODAL_INFO_REDIRECT_URI_KEY, CHECKOUT_MODAL_INFO_USED_KEY, CHECKOUT_MODAL_INFO_KEY_PREFIX, PLAID_OAUTH_FLOW_URL_SEARCH, CHECKOUT_MODAL_INFO_KEY_PLAID_SUFFIX, PLAID_STORAGE_EXPIRATION_MS, THREEDS_STORAGE_EXPIRATION_MS } from "../../../config/config";
+import { THREEDS_FLOW_SEARCH_PARAM_SUCCESS, CHECKOUT_MODAL_INFO_REDIRECT_URI_KEY, CHECKOUT_MODAL_INFO_USED_KEY, CHECKOUT_MODAL_INFO_KEY, PLAID_OAUTH_FLOW_URL_SEARCH, CHECKOUT_MODAL_INFO_KEY_PLAID_SUFFIX, PLAID_STORAGE_EXPIRATION_MS, THREEDS_STORAGE_EXPIRATION_MS, CHECKOUT_MODAL_INFO_KEY_REGEXP } from "../../../config/config";
 import { getUrlWithoutParams, isLocalhost, isLocalhostOrStaging, urlToPathnameWhenPossible } from "../../../domain/url/url.utils";
 import { cookieStorage } from "../../../utils/storageUtils";
 import { FALLBACK_MODAL_STATE_COMMON } from "./CheckoutOverlay.constants";
@@ -9,21 +9,17 @@ const debug = isLocalhostOrStaging();
 export function persistCheckoutModalInfo(info: CheckoutModalInfo) {
   if (!process.browser) return;
 
-  console.log("PERSIST", info);
+  if (isCheckoutModalInfo3DS(info)) console.log("PERSIST =", info.processorPaymentID, "/", info.paymentID)
 
   try {
     const url = info.url || getUrlWithoutParams();
 
     // Multiple cookies for different 3DS payments can co-exist for a brief time. Plaid ones can't, as they share the same key:
-    cookieStorage.setItem(`${ CHECKOUT_MODAL_INFO_KEY_PREFIX }${ isCheckoutModalInfo3DS(info) ? info.processorPaymentID : CHECKOUT_MODAL_INFO_KEY_PLAID_SUFFIX }`, {
+    cookieStorage.setItem(CHECKOUT_MODAL_INFO_KEY(isCheckoutModalInfo3DS(info) ? info.processorPaymentID : CHECKOUT_MODAL_INFO_KEY_PLAID_SUFFIX), {
       ...info,
       url,
       fromLocalhost: info.fromLocalhost ?? isLocalhost(),
     }, {
-      // domain: "",
-      path: isCheckoutModalInfo3DS(info) ? "/payments" : "/",
-      // secure: !isLocalhost(),
-      // expires: { minutes: THREEDS_STORAGE_EXPIRATION_MIN },
       expirationDate: new Date(Date.now() + (isCheckoutModalInfo3DS(info) ? THREEDS_STORAGE_EXPIRATION_MS : PLAID_STORAGE_EXPIRATION_MS))
     });
   } catch (err) {
@@ -43,8 +39,8 @@ export function clearPersistedInfo() {
   if (debug) console.log(`💾 Clearing state...`);
 
   if (process.browser) {
-    cookieStorage.removeItem(new RegExp(`^${ CHECKOUT_MODAL_INFO_KEY_PREFIX }`), { path: "/payments" }); // 3DS
-    cookieStorage.removeItem(`${ CHECKOUT_MODAL_INFO_KEY_PREFIX }${ CHECKOUT_MODAL_INFO_KEY_PLAID_SUFFIX }`, { path: "/" }); // Plaid
+    cookieStorage.removeItem(CHECKOUT_MODAL_INFO_KEY_REGEXP); // 3DS
+    cookieStorage.removeItem(CHECKOUT_MODAL_INFO_KEY(CHECKOUT_MODAL_INFO_KEY_PLAID_SUFFIX)); // Plaid
     cookieStorage.removeItem(CHECKOUT_MODAL_INFO_REDIRECT_URI_KEY);
     cookieStorage.removeItem(CHECKOUT_MODAL_INFO_USED_KEY);
   }
@@ -82,8 +78,9 @@ export function getCheckoutModalState({
 
   try {
     const rawSavedModalInfo =
-      cookieStorage.getItem(`${ CHECKOUT_MODAL_INFO_KEY_PREFIX }${ paymentIdParam || "" }`) ||
-      cookieStorage.getItem(`${ CHECKOUT_MODAL_INFO_KEY_PREFIX }${ CHECKOUT_MODAL_INFO_KEY_PLAID_SUFFIX }`);
+      cookieStorage.getItem(CHECKOUT_MODAL_INFO_KEY(paymentIdParam)) ||
+      cookieStorage.getItem(CHECKOUT_MODAL_INFO_KEY(CHECKOUT_MODAL_INFO_KEY_PLAID_SUFFIX)) ||
+      cookieStorage.getItem(CHECKOUT_MODAL_INFO_KEY_REGEXP);
 
     hasSavedModalInfo = !!rawSavedModalInfo;
     savedModalInfo = rawSavedModalInfo || {}
@@ -102,8 +99,6 @@ export function getCheckoutModalState({
     billingInfo = "",
   } = savedModalInfo;
 
-  // Swap to test error flow:
-  // const receivedRedirectUri = "localhost:3000/payments/error";
   const receivedRedirectUri = savedReceivedRedirectUri || window.location.href;
 
   // In dev, this works fine even if there's nothing in cookieStorage, which helps with testing across some other domain and localhost:
@@ -148,8 +143,6 @@ export function getCheckoutModalState({
       } = savedModalInfo;
 
       isValid &&=
-        // TODO: URL param (paymentID) should match stored one.
-        window.location.search.startsWith(THREEDS_FLOW_SEARCH_PARAM_SUCCESS) &&
         processorPaymentID !== undefined &&
         paymentID !== undefined &&
         paymentInfo !== undefined &&
@@ -211,8 +204,8 @@ export function getCheckoutModalState({
     if (debug) console.log("💾 Discard saved flow...", modalState);
 
     clearPersistedInfo();
-  } else if (debug) {
-    console.log("💾 Continue saved flow...", modalState);
+  } else if (isValid && debug) {
+    console.log(`💾 ${ noClear ? "Peak" : "Continue" } saved flow...`, modalState);
   }
 
   return modalState;

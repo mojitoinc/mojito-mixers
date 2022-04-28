@@ -14,8 +14,8 @@ export function urlToPathnameWhenPossible(url: string): string {
   return (url.startsWith(origin) ? url.replace(origin, "") : url) || "/";
 }
 
-export function getPathnameWithoutParams(): string {
-  return urlToPathnameWhenPossible(getUrlWithoutParams());
+export function getPathnameWithParams(): string {
+  return `${ window.location.pathname }${ window.location.search }`;
 }
 
 export function isUrlPathname(url: string): boolean {
