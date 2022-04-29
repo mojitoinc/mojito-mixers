@@ -78,7 +78,8 @@ export function getCheckoutModalState({
 
   try {
     const rawSavedModalInfo =
-      cookieStorage.getItem(CHECKOUT_MODAL_INFO_KEY(paymentIdParam)) ||
+      // For now, ignore the paymentId param as we seem to get mismatching ones:
+      // cookieStorage.getItem(CHECKOUT_MODAL_INFO_KEY(paymentIdParam)) ||
       cookieStorage.getItem(CHECKOUT_MODAL_INFO_KEY(CHECKOUT_MODAL_INFO_KEY_PLAID_SUFFIX)) ||
       cookieStorage.getItem(CHECKOUT_MODAL_INFO_KEY_REGEXP);
 
@@ -144,6 +145,8 @@ export function getCheckoutModalState({
 
       const purchaseError = THREEDS_ERROR_URL_REG_EXP.test(receivedRedirectUri);
       const purchaseSuccess = !purchaseError && (THREEDS_SUCCESS_URL_REG_EXP.test(receivedRedirectUri) || receivedRedirectUri.includes(THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY));
+
+      // TODO: if !purchaseError && !purchaseSuccess && url === current URL, show an error.
 
       isValid &&=
         processorPaymentID !== undefined &&
