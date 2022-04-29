@@ -78,7 +78,7 @@ export function getCheckoutModalState({
 
   try {
     const rawSavedModalInfo =
-      // For now, ignore the paymentId param as we seem to get mismatching ones:
+      // TODO: For now, ignore the paymentId param as we seem to get mismatching ones:
       // cookieStorage.getItem(CHECKOUT_MODAL_INFO_KEY(paymentIdParam)) ||
       cookieStorage.getItem(CHECKOUT_MODAL_INFO_KEY(CHECKOUT_MODAL_INFO_KEY_PLAID_SUFFIX)) ||
       cookieStorage.getItem(CHECKOUT_MODAL_INFO_KEY_REGEXP);
