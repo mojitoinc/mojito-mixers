@@ -1,21 +1,6 @@
 <br />
 
 
-TODO:
-- NEW PR 1: Persist wallet address (Plaid too) and use it when coming back from 3DS... Also add walletAddress to other payment methods. 
-
-- NEW PR 2: BillingView button should be initially disabled if there's already data to validate (so unless form is empty).
-- NEW PR 2: When going  BillingView or PaymentView, the selected saved item blinks as it's initially not selected.
-
-- NEW PR 3: Are close with ESC + isDialogBlocked working?
-- NEW PR 3: Why closing the modal shows loader.
-
-- NEW PR 4: Chip variants in Mint (new PR).
-
-- NEW PR 5: Fix confirmation handling when pressing back (browser button) after a 3DS error. Should the confirmation screen be shown anyway?
-
-
-
 <h1 align="center">🍸 Mojito Mixers</h1>
 
 <br /><br />
