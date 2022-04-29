@@ -11,9 +11,12 @@ DONE:
 - Make sure ErrorOverlay passes error message as URL param.
 - Make sure 3DS error flow is resumed properly (show error loader variant, display previous data, timer continues, keep item and units...).
 - Remove CheckoutProvider.
+- Fix issue: Pay, redirect to 3DS, press back or go back manually. It continues the flow without having visited the success page.
+- Move success/error/failure to constants, props or env variables.
 
 
 DOING:
+
 - Keep and document SuccessOverlay as alternative (redirect before confirmation screen).
 - Investigate 3DS paymentId mismatch issue.
 - Document queries, flows, origin-overwrite header...
@@ -30,7 +33,6 @@ TODO:
 
 - NEW PR 4: Chip variants in Mint (new PR).
 
-- NEW PR 5: Move success/error/failure to constants, props or env variables.
 - NEW PR 5: Fix confirmation handling when pressing back (browser button) after a 3DS error. Should the confirmation screen be shown anyway?
 
 

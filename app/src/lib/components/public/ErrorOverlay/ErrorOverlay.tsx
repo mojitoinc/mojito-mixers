@@ -1,6 +1,6 @@
 import { useTimeout } from "@swyg/corre";
 import React, { useCallback, useLayoutEffect, useState, useEffect } from "react";
-import { PAYMENT_NOTIFICATION_ERROR_MAX_WAIT_MS, PAYMENT_NOTIFICATION_INTERVAL_MS, THREEDS_FLOW_SEARCH_PARAM_ERROR } from "../../../config/config";
+import { PAYMENT_NOTIFICATION_ERROR_MAX_WAIT_MS, PAYMENT_NOTIFICATION_INTERVAL_MS, THREEDS_FLOW_SEARCH_PARAM_ERROR_KEY } from "../../../config/config";
 import { ERROR_PURCHASE } from "../../../domain/errors/errors.constants";
 import { PUIRouterOptions } from "../../../domain/router/router.types";
 import { isUrlPathname } from "../../../domain/url/url.utils";
@@ -45,7 +45,7 @@ export const PUIErrorOverlay: React.FC<PUIErrorOverlayProps> = ({
     if (!purchaseError) onGoTo("/", { replace: true });
   }, [purchaseError, onGoTo]);
 
-  const reviewHref = `${ url || "/" }${ THREEDS_FLOW_SEARCH_PARAM_ERROR }${ encodeURIComponent(errorMessage) }`;
+  const reviewHref = `${ url || "/" }?${ THREEDS_FLOW_SEARCH_PARAM_ERROR_KEY }=${ encodeURIComponent(errorMessage) }`;
 
   const reviewData = useCallback(async (): Promise<false> => {
     const isPathname = isUrlPathname(reviewHref);

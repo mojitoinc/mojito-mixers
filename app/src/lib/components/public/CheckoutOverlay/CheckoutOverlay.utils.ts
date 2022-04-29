@@ -1,4 +1,4 @@
-import { THREEDS_FLOW_SEARCH_PARAM_SUCCESS, CHECKOUT_MODAL_INFO_REDIRECT_URI_KEY, CHECKOUT_MODAL_INFO_USED_KEY, CHECKOUT_MODAL_INFO_KEY, PLAID_OAUTH_FLOW_URL_SEARCH, CHECKOUT_MODAL_INFO_KEY_PLAID_SUFFIX, PLAID_STORAGE_EXPIRATION_MS, THREEDS_STORAGE_EXPIRATION_MS, CHECKOUT_MODAL_INFO_KEY_REGEXP } from "../../../config/config";
+import { THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY, CHECKOUT_MODAL_INFO_REDIRECT_URI_KEY, CHECKOUT_MODAL_INFO_USED_KEY, CHECKOUT_MODAL_INFO_KEY, PLAID_OAUTH_FLOW_URL_SEARCH, CHECKOUT_MODAL_INFO_KEY_PLAID_SUFFIX, PLAID_STORAGE_EXPIRATION_MS, THREEDS_STORAGE_EXPIRATION_MS, CHECKOUT_MODAL_INFO_KEY_REGEXP, THREEDS_ERROR_URL_REG_EXP, THREEDS_SUCCESS_URL_REG_EXP } from "../../../config/config";
 import { getUrlWithoutParams, isLocalhost, isLocalhostOrStaging, urlToPathnameWhenPossible } from "../../../domain/url/url.utils";
 import { cookieStorage } from "../../../utils/storageUtils";
 import { FALLBACK_MODAL_STATE_COMMON } from "./CheckoutOverlay.constants";
@@ -142,15 +142,17 @@ export function getCheckoutModalState({
         checkoutItems = [],
       } = savedModalInfo;
 
+      const purchaseError = THREEDS_ERROR_URL_REG_EXP.test(receivedRedirectUri);
+      const purchaseSuccess = !purchaseError && (THREEDS_SUCCESS_URL_REG_EXP.test(receivedRedirectUri) || receivedRedirectUri.includes(THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY));
+
       isValid &&=
         processorPaymentID !== undefined &&
         paymentID !== undefined &&
         paymentInfo !== undefined &&
-        checkoutItems.length > 0;
+        checkoutItems.length > 0 &&
+        (purchaseError || purchaseSuccess);
 
       if (isValid) {
-        const purchaseError = receivedRedirectUri.includes("error") || receivedRedirectUri.includes("failure");
-        const purchaseSuccess = !purchaseError && (receivedRedirectUri.includes("success") || receivedRedirectUri.includes(THREEDS_FLOW_SEARCH_PARAM_SUCCESS));
 
         modalState = {
           ...FALLBACK_MODAL_STATE_COMMON,
