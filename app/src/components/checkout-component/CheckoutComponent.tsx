@@ -26,6 +26,8 @@ export const CheckoutComponent: React.FC<CheckoutComponentProps> = (checkoutComp
   }, [getIdTokenClaims]);
 
   const onGoTo = useCallback((pathnameOrUrl: string, { replace, ...options }: PUIRouterOptions = {}) => {
+    console.log("onGoTo =>", pathnameOrUrl);
+
     if (!pathnameOrUrl) {
       if (replace) {
         router.replace("/");

@@ -326,6 +326,8 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     const cleanPathname = `${ window.location.pathname }${ cleanParams ? `?${ cleanParams }` : "" }`;
 
     if (cleanPathname && cleanPathname !== getPathnameWithParams()) {
+      console.log("CLEAN URL");
+
       // As soon as we find these params, we remove them from the URL (they are stored in a Ref to avoid losing them
       // before we get a change to use them):
       onGoTo(cleanPathname, { replace: true, shallow: true });

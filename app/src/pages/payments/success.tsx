@@ -1,25 +1,31 @@
 import { NextPage } from "next";
 import { useRouter } from "next/router";
-import { useEffect, useRef } from "react";
+import { useEffect, useState } from "react";
 import { CheckoutComponent } from "../../components/checkout-component/CheckoutComponent";
 import { THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY } from "../../lib";
 import { NOOP } from "../../lib/utils/miscUtils";
 
 const SuccessPage: NextPage = () => {
   const router = useRouter();
-  const paymentIdParamRef = useRef(router.query[THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY]?.toString());
-  const paymentIdParam = paymentIdParamRef.current;
+  const [paymentId, setPaymentId] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!paymentIdParam) router.replace("/");
-  }, [paymentIdParam, router]);
+    const params = new URLSearchParams(location.search);
+    const paymentIdParam = params.get(THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY) || "";
 
-  return paymentIdParam ? (
+    setPaymentId(paymentIdParam);
+  }, []);
+
+  useEffect(() => {
+    if (paymentId === "") router.replace("/");
+  }, [paymentId, router]);
+
+  return paymentId ? (
     <CheckoutComponent
       loaderMode="success"
       open
       onClose={ NOOP }
-      paymentIdParam={ paymentIdParam } />
+      paymentIdParam={ paymentId } />
   ) : null;
 }
 
