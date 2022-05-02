@@ -55,16 +55,12 @@ const HomePage: React.FC = () => {
 
   // CHECKOUT OPENING & FORM VALUES:
 
-  // const { open, setCheckoutComponentProps } = useCheckoutOverlay();
-
   const { loaderMode, isOpen, onOpen, onClose } = useOpenCloseCheckoutModal({
     paymentIdParam,
     paymentErrorParam,
   });
 
   const [formValues, setFormValues] = useState<PlaygroundFormData>(DEFAULT_FORM_VALUES);
-
-  // const getComponentPropsRef = useRef<() => CheckoutComponentProps>(() => ({}));
 
   const lotType = formValues.lotType || DEFAULT_FORM_VALUES.lotType;
 
@@ -96,11 +92,7 @@ const HomePage: React.FC = () => {
     }],
   };
 
-  // const onOpen = useCallback(() => open(getComponentPropsRef.current()), [open]);
-
   useEffect(() => {
-    // setCheckoutComponentProps(getComponentPropsRef.current());
-
     setFormValues({
       // Organization:
       orgID: INITIAL_FORM_VALUES.orgID ?? DEFAULT_FORM_VALUES.orgID,
@@ -132,8 +124,6 @@ const HomePage: React.FC = () => {
   };
 
   useEffect(() => {
-    // setCheckoutComponentProps(getComponentPropsRef.current());
-
     try {
       localStorage.setItem(FORM_VALUES_KEY, JSON.stringify(formValues));
     } catch (err) {

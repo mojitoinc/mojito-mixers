@@ -196,10 +196,10 @@ export const CheckoutModalFooter: React.FC<CheckoutModalFooterProps> = ({
         <PrimaryButton
           onClickCapture={ handleSubmitClicked }
           disabled={ isPrimaryButtonDisabled }
-          href={submitHref || undefined }
-          type={onSubmitClicked ? "button" : "submit"}
-          endIcon={isFormLoading || submitLoading ? <CircularProgress color="inherit" size="1em" /> : (PrimaryButtonIcon && <PrimaryButtonIcon />)}>
-          {primaryButtonLabel}
+          href={ submitHref || undefined }
+          type={ onSubmitClicked ? "button" : "submit" }
+          endIcon={ isFormLoading || submitLoading ? <CircularProgress color="inherit" size="1em" /> : (PrimaryButtonIcon && <PrimaryButtonIcon />) }>
+          { primaryButtonLabel }
         </PrimaryButton>
       )}
 
