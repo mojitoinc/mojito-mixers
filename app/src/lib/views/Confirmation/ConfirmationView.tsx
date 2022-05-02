@@ -9,6 +9,7 @@ import { billingInfoToSavedPaymentMethodBillingInfo } from "../../domain/circle/
 import { CheckoutItem } from "../../domain/product/product.interfaces";
 import { SelectedPaymentMethod } from "../../components/public/CheckoutOverlay/CheckoutOverlay.hooks";
 import { Wallet } from "../../domain/wallet/wallet.interfaces";
+import { useDictionary } from "../../hooks/useDictionary";
 
 export interface ConfirmationViewProps {
   checkoutItems: CheckoutItem[];
@@ -17,9 +18,7 @@ export interface ConfirmationViewProps {
   processorPaymentID: string;
   wallet: null | string | Wallet;
   onNext: () => void;
-  goToHref?: string;
-  goToLabel?: string;
-  onGoTo?: () => void;
+  onGoTo?: (pathnameOrUrl: string) => void;
 }
 
 export const ConfirmationView: React.FC<ConfirmationViewProps> = ({
@@ -29,10 +28,15 @@ export const ConfirmationView: React.FC<ConfirmationViewProps> = ({
   processorPaymentID,
   wallet,
   onNext,
-  goToHref,
-  goToLabel,
   onGoTo,
 }) => {
+  const {
+    goToMarketplaceHref,
+    goToMarketplaceLabel,
+    goToHref,
+    goToLabel,
+  } = useDictionary();
+
   const {
     billingInfo: selectedBillingInfo,
     paymentInfo: selectedPaymentInfo,
@@ -82,6 +86,8 @@ export const ConfirmationView: React.FC<ConfirmationViewProps> = ({
         <CheckoutModalFooter
           variant="toMarketplace"
           onSubmitClicked={onNext}
+          submitHref={goToMarketplaceHref}
+          submitLabel={goToMarketplaceLabel}
           goToHref={goToHref}
           goToLabel={goToLabel}
           onGoTo={onGoTo} />

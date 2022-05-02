@@ -34,7 +34,7 @@ export function isUsePlaidOptionsContinueFlow(options: UsePlaidOptions): options
 
 // Load the initial OAuth flow state from localStorage to initialize the ref. Note `getPlaidOAuthFlowState` will
 // automatically discard the saved data if it's invalid (`continueFlow && savedStateUsed`):
-export let INITIAL_PLAID_OAUTH_FLOW_STATE = getCheckoutModalState(true);
+export let INITIAL_PLAID_OAUTH_FLOW_STATE = getCheckoutModalState({ noClear: true });
 
 export function continuePlaidOAuthFlow() {
   return INITIAL_PLAID_OAUTH_FLOW_STATE.continueFlow && !INITIAL_PLAID_OAUTH_FLOW_STATE.savedInfoUsed && isCheckoutModalInfoPlaid(INITIAL_PLAID_OAUTH_FLOW_STATE);
@@ -168,11 +168,12 @@ export function usePlaid(options: UsePlaidOptions): UsePlaidReturn {
   }, [continueFlow, plaidLinkReady, plaidLinkOpen]);
 
   const openLink = useCallback(() => {
-    if (!plaidLinkReady || isPreparePaymentMethodLoading || !invoiceID || !invoiceCountdownStart || !selectedBillingInfo || !linkToken) return;
+    if (!plaidLinkReady || isPreparePaymentMethodLoading || !orgID || !invoiceID || !invoiceCountdownStart || !selectedBillingInfo || !linkToken) return;
 
     if (isLocalhostOrStaging()) console.log("Open plain link manually", linkToken);
 
     persistCheckoutModalInfo({
+      orgID,
       invoiceID,
       invoiceCountdownStart,
       billingInfo: selectedBillingInfo,
@@ -185,6 +186,7 @@ export function usePlaid(options: UsePlaidOptions): UsePlaidReturn {
     isPreparePaymentMethodLoading,
     linkToken,
     selectedBillingInfo,
+    orgID,
     invoiceID,
     invoiceCountdownStart,
     plaidLinkOpen,

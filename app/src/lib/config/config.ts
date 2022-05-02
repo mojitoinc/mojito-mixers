@@ -34,21 +34,24 @@ export const PAYMENT_NOTIFICATION_ERROR_MAX_WAIT_MS = ASYNC_ERROR_MAX_WAIT_MS - 
 
 
 // Storage:
-export const CHECKOUT_MODAL_INFO_KEY = "CHECKOUT_MODAL_INFO";
+export const CHECKOUT_MODAL_INFO_KEY_PREFIX = "CHECKOUT_MODAL_INFO__";
+export const CHECKOUT_MODAL_INFO_KEY_REGEXP = /^CHECKOUT_MODAL_INFO__/;
+export const CHECKOUT_MODAL_INFO_KEY = (key = "") => `${ CHECKOUT_MODAL_INFO_KEY_PREFIX }${ key }`;
+export const CHECKOUT_MODAL_INFO_KEY_PLAID_SUFFIX = "PLAID";
 export const CHECKOUT_MODAL_INFO_REDIRECT_URI_KEY = "CHECKOUT_MODAL_INFO_REDIRECT_URI";
 export const CHECKOUT_MODAL_INFO_USED_KEY = "CHECKOUT_MODAL_INFO_USED";
 
 // Plaid:
-export const PLAID_STORAGE_EXPIRATION_MS = 1000 * 60 * 15; // 15 minutes (Plaid requires filling in some data).
+export const PLAID_STORAGE_EXPIRATION_MS = 15 * 60000; // 15 minutes (Plaid requires filling in some data).
 export const PLAID_OAUTH_FLOW_URL_SEARCH = "?oauth_state_id=";
 
 
 // 3DS:
-export const THREEDS_STORAGE_EXPIRATION_MIN = 7; // 7 minutes (3DS will also ask for some information (in PROD only)).
+export const THREEDS_STORAGE_EXPIRATION_MS = 7 * 60000; // 7 minutes (3DS will also ask for some information (in PROD only)).
 export const THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY = "paymentId";
 export const THREEDS_FLOW_SEARCH_PARAM_ERROR_KEY = "paymentError";
-export const THREEDS_FLOW_SEARCH_PARAM_SUCCESS = `?${ THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY }=`;
-export const THREEDS_FLOW_SEARCH_PARAM_ERROR = `?${ THREEDS_FLOW_SEARCH_PARAM_ERROR_KEY }=`;
+export const THREEDS_SUCCESS_URL_REG_EXP = /success/;
+export const THREEDS_ERROR_URL_REG_EXP = /payments\/(error|failure)/;
 
 export const THREEDS_REDIRECT_DELAY_MS = 1000; // (1 sec) Small delay before redirecting users to 3DS' page (PurchasingView => 3DS)
 

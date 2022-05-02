@@ -10,6 +10,7 @@ export type FlowType = "" | "3DS" | "Plaid";
 export interface CheckoutModalInfoCommon {
   url?: string;
   fromLocalhost?: boolean;
+  orgID: string;
   invoiceID: string;
   invoiceCountdownStart: number;
   billingInfo: string | BillingInfo;

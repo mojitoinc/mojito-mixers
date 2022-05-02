@@ -24,12 +24,14 @@ export interface CheckoutModalFooterProps {
   consentType?: ConsentType;
 
   // Submit button:
+  submitHref?: string;
   submitLabel?: string;
   submitDisabled?: boolean;
   submitLoading?: boolean;
   onSubmitClicked?: (canSubmit: boolean) => void | Promise<void | false>;
 
   // Close link:
+  closeHref?: string;
   closeLabel?: string;
   closeDisabled?: boolean;
   onCloseClicked?: () => void;
@@ -37,7 +39,7 @@ export interface CheckoutModalFooterProps {
   // Collection button:
   goToHref?: string;
   goToLabel?: string;
-  onGoTo?: () => void;
+  onGoTo?: (pathnameOrUrl: string) => void;
 }
 
 const VARIANTS_WITH_DISCLAIMER: CheckoutModalFooterVariant[] = ["toPayment", "toPlaid", "toConfirmation"]
@@ -49,19 +51,21 @@ export const CheckoutModalFooter: React.FC<CheckoutModalFooterProps> = ({
   consentType,
 
   // Submit button:
+  submitHref,
   submitLabel,
   submitDisabled,
   submitLoading,
   onSubmitClicked,
 
   // Close link:
+  closeHref = "",
   closeLabel,
   closeDisabled,
   onCloseClicked,
 
   // Secondary button:
-  goToHref = "/profile/invoices",
-  goToLabel = "View Invoices",
+  goToHref,
+  goToLabel,
   onGoTo,
 }) => {
   // CONSENT:
@@ -102,7 +106,7 @@ export const CheckoutModalFooter: React.FC<CheckoutModalFooterProps> = ({
       e.stopPropagation();
     }
 
-    if (onGoTo) onGoTo();
+    if (onGoTo) onGoTo((e.currentTarget as unknown as HTMLAnchorElement).href || "");
   }, [onGoTo]);
 
 
@@ -113,8 +117,13 @@ export const CheckoutModalFooter: React.FC<CheckoutModalFooterProps> = ({
   const isPrimaryButtonDisabled = submitDisabled || isFormLoading;
   const PrimaryButtonIcon = ICONS_BY_VARIANT[variant];
 
-  const handleSubmitClicked = useCallback(async () => {
-    if (!onSubmitClicked) return;
+  const handleSubmitClicked = useCallback(async (e: React.MouseEvent<HTMLButtonElement>) => {
+    if ((!e.ctrlKey && !e.metaKey) || isPrimaryButtonDisabled) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+
+    if (!onSubmitClicked || isPrimaryButtonDisabled) return;
 
     setConsentState({
       isFormSubmitted: true,
@@ -133,20 +142,25 @@ export const CheckoutModalFooter: React.FC<CheckoutModalFooterProps> = ({
       isFormLoading: false,
       isConsentChecked,
     });
-  }, [isConsentChecked, onSubmitClicked]);
+  }, [isPrimaryButtonDisabled, isConsentChecked, onSubmitClicked]);
 
 
   // CANCEL LINK:
 
   const cancelLinkLabel = closeLabel || "Cancel and Return to Marketplace";
-  const cancelLinkColor = closeDisabled ? "text.disabled" : "text.primary"; // TODO: Create custom Link component with this functionality.
   const isCancelLinkDisabled = closeDisabled || isFormLoading;
+  const cancelLinkColor = isCancelLinkDisabled ? "text.disabled" : "text.primary"; // TODO: Create custom Link component with this functionality.
 
   const handleCancelClicked = useCallback((e: React.MouseEvent<HTMLAnchorElement>) => {
-    e.preventDefault();
+    if ((!e.ctrlKey && !e.metaKey) || isCancelLinkDisabled) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
 
-    if (onCloseClicked && !isCancelLinkDisabled) onCloseClicked();
-  }, [onCloseClicked, isCancelLinkDisabled]);
+    if (!onCloseClicked || isCancelLinkDisabled) return;
+
+    onCloseClicked();
+  }, [isCancelLinkDisabled, onCloseClicked]);
 
   return (
     <Box
@@ -172,7 +186,7 @@ export const CheckoutModalFooter: React.FC<CheckoutModalFooterProps> = ({
         <PrimaryButton
           onClickCapture={ handleGoToClicked }
           disabled={ isPrimaryButtonDisabled }
-          href={ goToHref }
+          href={ goToHref || undefined }
           sx={{ mb: 2 }}>
           { goToLabel }
         </PrimaryButton>
@@ -180,18 +194,22 @@ export const CheckoutModalFooter: React.FC<CheckoutModalFooterProps> = ({
 
       {primaryButtonVisible && (
         <PrimaryButton
-          onClick={onSubmitClicked ? handleSubmitClicked : undefined}
-          type={onSubmitClicked ? "button" : "submit"}
-          endIcon={isFormLoading || submitLoading ? <CircularProgress color="inherit" size="1em" /> : (PrimaryButtonIcon && <PrimaryButtonIcon />)}
-          disabled={ isPrimaryButtonDisabled }>
-          {primaryButtonLabel}
+          onClickCapture={ handleSubmitClicked }
+          disabled={ isPrimaryButtonDisabled }
+          href={ submitHref || undefined }
+          type={ onSubmitClicked ? "button" : "submit" }
+          endIcon={ isFormLoading || submitLoading ? <CircularProgress color="inherit" size="1em" /> : (PrimaryButtonIcon && <PrimaryButtonIcon />) }>
+          { primaryButtonLabel }
         </PrimaryButton>
       )}
 
       {variant !== "toMarketplace" && (onCloseClicked || closeDisabled) && (
         <Typography sx={{ color: cancelLinkColor, pt: primaryButtonVisible ? 2 : 0 }}>
           {primaryButtonVisible ? "or " : null}
-          <Link sx={{ color: cancelLinkColor, cursor: isCancelLinkDisabled ? "not-allowed" : "pointer" }} href="" onClick={handleCancelClicked}>
+          <Link
+            sx={{ color: cancelLinkColor, cursor: isCancelLinkDisabled ? "not-allowed" : "pointer" }}
+            href={ closeHref }
+            onClickCapture={handleCancelClicked}>
             { cancelLinkLabel }
           </Link>
         </Typography>

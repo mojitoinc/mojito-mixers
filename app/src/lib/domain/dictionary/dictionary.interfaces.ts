@@ -10,6 +10,12 @@ export type PUIDictionary = {
 
   privacyHref?: string;
   termsOfUseHref?: string;
+
+  goToMarketplaceHref?: string;
+  goToMarketplaceLabel?: string;
+
+  goToHref?: string;
+  goToLabel?: string;
 };
 
 export type PUIDictionaryKeys = keyof PUIDictionary;

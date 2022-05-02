@@ -1,15 +1,15 @@
 import { useAuth0 } from "@auth0/auth0-react";
 import { useRouter } from "next/router";
 import React, { ErrorInfo, useCallback } from "react";
-import { CheckoutEventData, CheckoutEventType, CheckoutModalError, MOJITO_LIGHT_THEME } from "../../lib";
-import { PUICheckout, PUICheckoutProps } from "../../lib/components/public/CheckoutOverlay/CheckoutOverlay";
-import { CheckoutComponentWithRequiredProps } from "../../lib/components/public/CheckoutOverlayProvider/CheckoutOverlayProvider";
+import { PUICheckoutComponentProps, CheckoutEventData, CheckoutEventType, CheckoutModalError, MOJITO_LIGHT_THEME, PUIRouterOptions, THREEDS_FLOW_SEARCH_PARAM_ERROR_KEY, THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY, PUICheckoutProps, PUICheckout } from "../../lib";
 import { isLocalhost } from "../../lib/domain/url/url.utils";
 import { config } from "../../utils/config/config.constants";
 import { PLAYGROUND_MOJITO_LOGO, PLAYGROUND_USER_FORMAT } from "../../utils/playground/playground.constants";
 
-export const CheckoutComponent: React.FC<CheckoutComponentWithRequiredProps> = (checkoutComponentProps) => {
+export const CheckoutComponent: React.FC<PUICheckoutComponentProps> = (checkoutComponentProps) => {
   const router = useRouter();
+  const paymentIdParam = router.query[THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY]?.toString();
+  const paymentErrorParam = router.query[THREEDS_FLOW_SEARCH_PARAM_ERROR_KEY]?.toString();
 
   const { loginWithPopup, isAuthenticated, isLoading: isAuthenticatedLoading, getIdTokenClaims } = useAuth0();
 
@@ -19,12 +19,24 @@ export const CheckoutComponent: React.FC<CheckoutComponentWithRequiredProps> = (
     return token?.__raw || "";
   }, [getIdTokenClaims]);
 
-  const onGoTo = useCallback(() => {
-    router.push("/profile/invoices");
-  }, [router]);
-
-  const onRemoveUrlParams = useCallback((cleanURL: string) => {
-    router.replace(cleanURL, undefined, { shallow: true });
+  const onGoTo = useCallback((pathnameOrUrl: string, { replace, reason, ...options }: PUIRouterOptions = {}) => {
+    if (pathnameOrUrl.startsWith("http")) {
+      if (replace) {
+        console.log(`Replace URL with ${pathnameOrUrl}`, reason);
+        window.location.replace(pathnameOrUrl);
+      } else {
+        console.log(`Push URL ${pathnameOrUrl}`, reason);
+        window.location.href = pathnameOrUrl;
+      }
+    } else {
+      if (replace) {
+        console.log(`Replace route with ${pathnameOrUrl}`, reason);
+        router.replace(pathnameOrUrl || "/", undefined, options);
+      } else {
+        console.log(`Push route ${pathnameOrUrl}`, reason);
+        router.push(pathnameOrUrl || "/", undefined, options);
+      }
+    }
   }, [router]);
 
   const handleLogin = useCallback(async () => {
@@ -68,8 +80,8 @@ export const CheckoutComponent: React.FC<CheckoutComponentWithRequiredProps> = (
 
     // Flow:
     // loaderMode,
-    // paymentErrorParam,
-    onRemoveUrlParams,
+    paymentIdParam,
+    paymentErrorParam,
     guestCheckoutEnabled: false,
     productConfirmationEnabled: false,
     vertexEnabled: true,
