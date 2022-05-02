@@ -1,9 +1,8 @@
 import { useAuth0 } from "@auth0/auth0-react";
-import { GetServerSidePropsContext, GetServerSidePropsResult, NextPage } from "next";
+import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useCallback } from "react";
 import { MOJITO_LIGHT_THEME, PUIError, PUIRouterOptions } from "../../lib";
-import { CHECKOUT_MODAL_INFO_KEY_PREFIX } from "../../lib/config/config";
 import { config } from "../../utils/config/config.constants";
 import { PLAYGROUND_MOJITO_LOGO } from "../../utils/playground/playground.constants";
 
@@ -58,6 +57,9 @@ const ErrorPage: NextPage = () => {
 
 export default ErrorPage;
 
+// Uncomment if SSR enabled:
+
+/*
 export function getServerSideProps(context: GetServerSidePropsContext): GetServerSidePropsResult<Record<string, never>> {
   const hasCheckoutModalInfo = context.req.headers.cookie?.includes(CHECKOUT_MODAL_INFO_KEY_PREFIX);
 
@@ -72,3 +74,4 @@ export function getServerSideProps(context: GetServerSidePropsContext): GetServe
     },
   };
 }
+*/

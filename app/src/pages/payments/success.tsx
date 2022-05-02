@@ -1,9 +1,8 @@
-import { GetServerSidePropsContext, GetServerSidePropsResult, NextPage } from "next";
+import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useRef } from "react";
 import { CheckoutComponent } from "../../components/checkout-component/CheckoutComponent";
 import { THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY } from "../../lib";
-import { CHECKOUT_MODAL_INFO_KEY_PREFIX } from "../../lib/config/config";
 import { NOOP } from "../../lib/utils/miscUtils";
 
 const SuccessPage: NextPage = () => {
@@ -22,6 +21,9 @@ const SuccessPage: NextPage = () => {
 
 export default SuccessPage;
 
+// Uncomment if SSR enabled:
+
+/*
 export function getServerSideProps(context: GetServerSidePropsContext): GetServerSidePropsResult<Record<string, never>> {
   // const paymentIdParam = context.query[THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY]?.toString();
   // const hasCheckoutModalInfo = context.req.headers.cookie?.includes(CHECKOUT_MODAL_INFO_KEY(paymentIdParam));
@@ -40,3 +42,4 @@ export function getServerSideProps(context: GetServerSidePropsContext): GetServe
     },
   };
 }
+*/

@@ -1,4 +1,3 @@
-import App, { AppContext } from "next/app";
 import { Auth0Provider } from "@auth0/auth0-react";
 import { config } from "../utils/config/config.constants";
 import { AppProps } from "next/app";
@@ -41,11 +40,13 @@ function MyApp({ Component, pageProps }: AppProps) {
   );
 }
 
+/*
 MyApp.getInitialProps = async (appContext: AppContext) => {
   // calls page's `getInitialProps` and fills `appProps.pageProps`
   const appProps = await App.getInitialProps(appContext);
 
   return { ...appProps };
 };
+*/
 
 export default MyApp;
