@@ -326,11 +326,9 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     const cleanPathname = `${ window.location.pathname }${ cleanParams ? `?${ cleanParams }` : "" }`;
 
     if (cleanPathname && cleanPathname !== getPathnameWithParams()) {
-      console.log("CLEAN URL");
-
       // As soon as we find these params, we remove them from the URL (they are stored in a Ref to avoid losing them
       // before we get a change to use them):
-      onGoTo(cleanPathname, { replace: true, shallow: true });
+      onGoTo(cleanPathname, { replace: true, shallow: true, reason: "Clean URL."});
     }
   }, [onGoTo]);
 
@@ -394,9 +392,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
       const { flowType, url } = initModalState();
 
       if (flowType === "" && loaderMode !== "default") {
-        console.log("BAD INIT");
-
-        onGoTo(url || "/", { replace: true });
+        onGoTo(url || "/", { replace: true, reason: "Invalid modal state." });
       }
     }
   }, [open, isAuthLoading, loaderMode, isDialogLoading, initModalState, onGoTo]);
@@ -682,8 +678,6 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   }, [handleBeforeUnload]);
 
   const handleClose = useCallback(() => {
-    console.log(`handleClose()`);
-
     window.removeEventListener('beforeunload', handleBeforeUnload);
 
     handleBeforeUnload();

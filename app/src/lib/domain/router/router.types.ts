@@ -3,4 +3,5 @@ export interface PUIRouterOptions {
   locale?: string | false;
   scroll?: boolean;
   replace?: boolean;
+  reason?: string;
 }

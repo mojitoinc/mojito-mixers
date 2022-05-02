@@ -16,30 +16,22 @@ const ErrorPage: NextPage = () => {
     return token?.__raw || "";
   }, [getIdTokenClaims]);
 
-  const onGoTo = useCallback((pathnameOrUrl: string, { replace, ...options }: PUIRouterOptions = {}) => {
-    if (!pathnameOrUrl) {
+  const onGoTo = useCallback((pathnameOrUrl: string, { replace, reason, ...options }: PUIRouterOptions = {}) => {
+    if (pathnameOrUrl.startsWith("http")) {
       if (replace) {
-        router.replace("/");
+        console.log(`Replace URL with ${pathnameOrUrl}`, reason);
+        window.location.replace(pathnameOrUrl);
       } else {
-        router.push("/");
+        console.log(`Push URL ${pathnameOrUrl}`, reason);
+        window.location.href = pathnameOrUrl;
       }
     } else {
-      if (pathnameOrUrl.startsWith("http")) {
-        if (replace) {
-          console.log(`Replace URL with ${pathnameOrUrl}`);
-          window.location.replace(pathnameOrUrl);
-        } else {
-          console.log(`Push URL ${pathnameOrUrl}`);
-          window.location.href = pathnameOrUrl;
-        }
+      if (replace) {
+        console.log(`Replace route with ${pathnameOrUrl}`, reason);
+        router.replace(pathnameOrUrl || "/", undefined, options);
       } else {
-        if (replace) {
-          console.log(`Replace route with ${pathnameOrUrl}`);
-          router.replace(pathnameOrUrl || "/", undefined, options);
-        } else {
-          console.log(`Push route ${pathnameOrUrl}`);
-          router.push(pathnameOrUrl || "/", undefined, options);
-        }
+        console.log(`Push route ${pathnameOrUrl}`, reason);
+        router.push(pathnameOrUrl || "/", undefined, options);
       }
     }
   }, [router]);

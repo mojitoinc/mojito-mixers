@@ -42,7 +42,7 @@ export const PUIErrorOverlay: React.FC<PUIErrorOverlayProps> = ({
   useLayoutEffect(() => {
     // Users should only see this page if they completed a credit card payment and 3DS' verification went wrong.
     // Otherwise, they are immediately redirected to homepage:
-    if (!purchaseError) onGoTo("/", { replace: true });
+    if (!purchaseError) onGoTo("/", { replace: true, reason: "No purchase error." });
   }, [purchaseError, onGoTo]);
 
   const reviewHref = `${ url || "/" }?${ THREEDS_FLOW_SEARCH_PARAM_ERROR_KEY }=${ encodeURIComponent(errorMessage) }`;

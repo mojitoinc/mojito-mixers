@@ -9,8 +9,6 @@ const debug = isLocalhostOrStaging();
 export function persistCheckoutModalInfo(info: CheckoutModalInfo) {
   if (!process.browser) return;
 
-  if (isCheckoutModalInfo3DS(info)) console.log("PERSIST =", info.processorPaymentID, "/", info.paymentID)
-
   try {
     const url = info.url || getUrlWithoutParams();
 
@@ -145,8 +143,6 @@ export function getCheckoutModalState({
 
       const purchaseError = THREEDS_ERROR_URL_REG_EXP.test(receivedRedirectUri);
       const purchaseSuccess = !purchaseError && (THREEDS_SUCCESS_URL_REG_EXP.test(receivedRedirectUri) || receivedRedirectUri.includes(THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY));
-
-      // debugger;
 
       // TODO: if !purchaseError && !purchaseSuccess && url === current URL, show an error.
 
