@@ -1,6 +1,6 @@
 import { NextPage } from "next";
 import { useRouter } from "next/router";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { CheckoutComponent } from "../../components/checkout-component/CheckoutComponent";
 import { THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY } from "../../lib";
 import { NOOP } from "../../lib/utils/miscUtils";
@@ -9,6 +9,10 @@ const SuccessPage: NextPage = () => {
   const router = useRouter();
   const paymentIdParamRef = useRef(router.query[THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY]?.toString());
   const paymentIdParam = paymentIdParamRef.current;
+
+  useEffect(() => {
+    if (!paymentIdParam) router.replace("/");
+  }, [paymentIdParam, router]);
 
   return paymentIdParam ? (
     <CheckoutComponent
@@ -29,7 +33,7 @@ export function getServerSideProps(context: GetServerSidePropsContext): GetServe
   // const hasCheckoutModalInfo = context.req.headers.cookie?.includes(CHECKOUT_MODAL_INFO_KEY(paymentIdParam));
 
   // TODO: For now, ignore the paymentId param as we seem to get mismatching ones:
-  const hasCheckoutModalInfo = context.req.headers.cookie?.includes(CHECKOUT_MODAL_INFO_KEY_PREFIX);
+  const hasCheckoutModalInfo = paymentIdParam && context.req.headers.cookie?.includes(CHECKOUT_MODAL_INFO_KEY_PREFIX);
 
   // TODO: Theses checks could be improved to use the logic in CheckoutOverlay.utils.ts.
 
