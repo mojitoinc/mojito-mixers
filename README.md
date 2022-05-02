@@ -71,7 +71,43 @@ And also, keep in mind:
 
 ## Usage:
 
-In your App's entry point (`_app.tsx` in Next.js), you need to add the `CheckoutOverlayProvider`:
+Fist, you need to create a `CheckoutComponent: React.FC<PUICheckoutComponentProps>` component that renders `PUICheckout`
+and passes it all required props. Simply copy the following file and adapt it to your needs:
+
+You can find an example here: [app/src/components/checkout-component/CheckoutComponent.tsx](https://github.com/mojitoinc/mojito-mixers/blob/main/app/src/components/checkout-component/CheckoutComponent.tsx).
+
+You'll use this `CheckoutComponent` component in your code instead of `PUICheckout` just so that you don't have to
+repeat properties that rarely change, like the theme.
+
+Next, add this component to any page where you'd like to show the payment UI, passing it the props returned by the
+`useOpenCloseCheckoutModal` hook from this library. It should look something like this:
+
+```TSX
+  const router = useRouter();
+  const paymentIdParam = router.query[THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY]?.toString();
+  const paymentErrorParam = router.query[THREEDS_FLOW_SEARCH_PARAM_ERROR_KEY]?.toString();
+  const { loaderMode, isOpen, onOpen, onClose } = useOpenCloseCheckoutModal({
+    paymentIdParam,
+    paymentErrorParam,
+  });
+
+  useEffect(() => {
+    onOpen();
+  }, [onOpen])
+
+  return (
+    <CheckoutComponent
+      loaderMode={ loaderMode }
+      open={ isOpen }
+      onClose={ onClose }
+      { ...otherPageSpecificProps } />
+  );
+```
+
+While you might feel tempted to wrap this logic in a provider and call it using context and a custom hook, note that's
+usually a bad idea, as you'll have to add the provider in your App's entry point (`_app.tsx` in Next.js), which will
+make all your pages heavier, even if the Payment UI is not used. You should only do this if you App is a SPA, in which
+case it will look something like this: 
 
 ```TSX
   const router = useRouter();
@@ -80,9 +116,6 @@ In your App's entry point (`_app.tsx` in Next.js), you need to add the `Checkout
 
   // Add any other pages where you don't want the Payment UI to be rendered:
   const doNotRenderPaymentUI = ["/payments/success", "/payments/error", "/payments/failure"].includes(router.pathname);
-
-  // Debug information in case you need it:
-  // console.log({ pathname: router.asPath, paymentIdParam, paymentErrorParam, doNotRenderPaymentUI });
 
   return (
     <CheckoutOverlayProvider
@@ -95,13 +128,8 @@ In your App's entry point (`_app.tsx` in Next.js), you need to add the `Checkout
   );
 ```
 
-Where `CheckoutComponent: React.FC<CheckoutComponentWithRequiredProps>` is a component you need to create that renders
-`PUICheckout` with your custom configuration and its props. Simply copy the following file and adapt it to your needs:
-
-[app/src/components/checkout-component/CheckoutComponent.tsx](https://github.com/mojitoinc/mojito-mixers/blob/main/app/src/components/checkout-component/CheckoutComponent.tsx)
-
-Lastly, in the pages where you'd like to use the Payment UI, you need to use the `useCheckoutOverlay` to customize and
-open the Payment UI:
+And in the pages where you'd like to use the Payment UI, you need to use your own custom hook (`useCheckoutOverlay` in
+this example) to customize and open the Payment UI like this:
 
 ```TSX
   const { open, setCheckoutComponentProps } = useCheckoutOverlay();
@@ -142,10 +170,6 @@ open the Payment UI:
 
 ```
 
-You can see an example here:
-
-[app/src/pages/index.tsx](https://github.com/mojitoinc/mojito-mixers/blob/main/app/src/pages/index.tsx).
-
 **Make sure you check the setup steps below for Vertex, 3DS and Plaid.**
 
 <br />
@@ -176,7 +200,7 @@ Alternatively, set the following prop to disable those calls to the backend: `ve
 
 ### Credit Card payments with 3DS
 
-Additionally, when using 3DS for Credit Card payments you need to add a success and error page into your app. The URL can
+When using 3DS for Credit Card payments you need to add a success and error page into your app. The URL can
 be anything you want as long as you configure that in your 3DS account. In this repo, those pages are:
 
 - `/payments/success` => [app/src/pages/payments/success.tsx](https://github.com/mojitoinc/mojito-mixers/blob/main/app/src/pages/payments/success.tsx).
@@ -185,95 +209,19 @@ be anything you want as long as you configure that in your 3DS account. In this 
 Alternatively, `/payments/failure` is also valid.
 
 You can just copy-paste those into your project as a starting point, only minor changes are needed there. As you can see,
-most of the logic in those pages is already provided by this library in the
-[`PUISuccess`](https://github.com/mojitoinc/mojito-mixers/blob/main/app/src/lib/components/public/SuccessOverlay/SuccessOverlay.tsx) and
-[`PUIError`](app/src/lib/components/public/ErrorOverlay/ErrorOverlay.tsx) components.
+most of the logic in those pages is already provided by this library in your custom `CheckoutComponent` component or in
+[`PUIError`](https://github.com/mojitoinc/mojito-mixers/blob/main/app/src/lib/components/public/ErrorOverlay/ErrorOverlay.tsx).
 
-If you don't have a 3DS account and just want to disable that step, you can do that with the following prop: `threeDSEnabled = false`.
-
-```TSX
-// /payments/success:
-
-const CreditCardPaymentSuccessPage: React.FC = () => {
-  const router = useRouter();
-
-  const handleRedirect = useCallback((pathnameOrUrl: string) => {
-    if (pathnameOrUrl && pathnameOrUrl.startsWith("http")) {
-      window.location.replace(pathnameOrUrl);
-    } else {
-      router.replace(pathnameOrUrl || "/");
-    }
-  }, [router]);
-
-  return (
-    <PUISuccess
-      themeOptions={ YOUR_CUSTOM_THEME_OPTIONS }
-      logoSrc="https://..."
-      logoSx={ ... }
-      successImageSrc="https://..."
-      onRedirect={ handleRedirect } />
-  );
-};
-
-export default CreditCardPaymentSuccessPage;
-```
-
-```TSX
-
-// /payments/error:
-
-const CreditCardPaymentErrorPage: React.FC = () => {
-  const router = useRouter();
-
-  const handleRedirect = useCallback((pathnameOrUrl: string) => {
-    if (pathnameOrUrl && pathnameOrUrl.startsWith("http")) {
-      window.location.replace(pathnameOrUrl);
-    } else {
-      router.replace(pathnameOrUrl || "/");
-    }
-  }, [router]);
-
-  return (
-    <PUIError
-      themeOptions={ YOUR_CUSTOM_THEME_OPTIONS }
-      logoSrc="https://..."
-      logoSx={ ... }
-      errorImageSrc="https://..."
-      onRedirect={ handleRedirect } />
-  );
-};
-
-export default CreditCardPaymentErrorPage;
-```
+If you don't have a 3DS account and just want to disable that step, you can do that passing `threeDSEnabled={ false }` to `PUICheckout`.
 
 <br />
 
 
 ### ACH payments with Plaid: 
 
-Additionally, when using Plaid for ACH payments you need to add an `/oauth` page with the following logic to be able
-to resume Plaid's OAuth flow when users are redirected back to your app:
+Additionally, when using Plaid for ACH payments you need to add an `/oauth` page with the following content:
 
-```TSX
-
-const PlaidOAuthPage = () => {
-  const router = useRouter();
-
-  const { continueOAuthFlow, url } = getPlaidOAuthFlowState();
-
-  useLayoutEffect(() => {
-    if (continueOAuthFlow) {
-      persistCheckoutModalInfoRedirectURI(window.location.href);
-    }
-
-    router.replace(url || "/");
-  }, [continueOAuthFlow, router, url]);
-
-  return null;
-};
-
-export default PlaidOAuthPage;
-```
+- `/oauth` => [app/src/pages/oauth.tsx](https://github.com/mojitoinc/mojito-mixers/blob/main/app/src/pages/oauth.tsx).
 
 <br />
 

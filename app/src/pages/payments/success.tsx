@@ -3,7 +3,6 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { CheckoutComponent } from "../../components/checkout-component/CheckoutComponent";
 import { THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY } from "../../lib";
-import { NOOP } from "../../lib/utils/miscUtils";
 
 const SuccessPage: NextPage = () => {
   const router = useRouter();
@@ -24,7 +23,6 @@ const SuccessPage: NextPage = () => {
     <CheckoutComponent
       loaderMode="success"
       open
-      onClose={ NOOP }
       paymentIdParam={ paymentId } />
   ) : null;
 }

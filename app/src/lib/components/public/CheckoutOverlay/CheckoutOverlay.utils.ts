@@ -144,8 +144,6 @@ export function getCheckoutModalState({
       const purchaseError = THREEDS_ERROR_URL_REG_EXP.test(receivedRedirectUri);
       const purchaseSuccess = !purchaseError && (THREEDS_SUCCESS_URL_REG_EXP.test(receivedRedirectUri) || receivedRedirectUri.includes(THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY));
 
-      // TODO: if !purchaseError && !purchaseSuccess && url === current URL, show an error.
-
       isValid &&=
         processorPaymentID !== undefined &&
         paymentID !== undefined &&
@@ -154,7 +152,6 @@ export function getCheckoutModalState({
         (purchaseError || purchaseSuccess);
 
       if (isValid) {
-
         modalState = {
           ...FALLBACK_MODAL_STATE_COMMON,
           ...commonModalState,
@@ -176,6 +173,9 @@ export function getCheckoutModalState({
           purchaseSuccess,
           purchaseError,
         };
+      } else if (!purchaseError && !purchaseSuccess && url === getUrlWithoutParams()) {
+        // TODO: To be implemented.
+        // TODO: Show error stating that the payment could not be completed.
       }
     }
 

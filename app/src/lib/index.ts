@@ -9,7 +9,7 @@ export { extendDefaultTheme, MOJITO_LIGHT_THEME, MOJITO_DARK_THEME } from "./con
 export { THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY, THREEDS_FLOW_SEARCH_PARAM_ERROR_KEY } from "./config/config";
 
 export type { Theme as CheckoutModalTheme, ThemeOptions as CheckoutModalThemeOptions } from "@mui/material/styles";
-export type { PUICheckoutProps, LoaderMode } from "./components/public/CheckoutOverlay/CheckoutOverlay";
+export type { PUICheckoutProps, PUICheckoutComponentProps, LoaderMode } from "./components/public/CheckoutOverlay/CheckoutOverlay";
 export type { PUISuccessProps } from "./components/public/SuccessOverlay/SuccessOverlay";
 export type { PUIErrorProps } from "./components/public/ErrorOverlay/ErrorOverlay";
 export type { CheckoutModalErrorAt, CheckoutModalError } from "./components/public/CheckoutOverlay/CheckoutOverlay.hooks";

@@ -1,18 +1,12 @@
 import { useAuth0 } from "@auth0/auth0-react";
 import { useRouter } from "next/router";
 import React, { ErrorInfo, useCallback } from "react";
-import { CheckoutEventData, CheckoutEventType, CheckoutModalError, MOJITO_LIGHT_THEME, PUIRouterOptions, THREEDS_FLOW_SEARCH_PARAM_ERROR_KEY, THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY } from "../../lib";
-import { PUICheckout, PUICheckoutProps } from "../../lib/components/public/CheckoutOverlay/CheckoutOverlay";
+import { PUICheckoutComponentProps, CheckoutEventData, CheckoutEventType, CheckoutModalError, MOJITO_LIGHT_THEME, PUIRouterOptions, THREEDS_FLOW_SEARCH_PARAM_ERROR_KEY, THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY, PUICheckoutProps, PUICheckout } from "../../lib";
 import { isLocalhost } from "../../lib/domain/url/url.utils";
 import { config } from "../../utils/config/config.constants";
 import { PLAYGROUND_MOJITO_LOGO, PLAYGROUND_USER_FORMAT } from "../../utils/playground/playground.constants";
 
-export type CheckoutComponentProps = Partial<PUICheckoutProps> & Pick<
-  PUICheckoutProps,
-  "open" | "onClose" | "loaderMode" | "paymentErrorParam"
->;
-
-export const CheckoutComponent: React.FC<CheckoutComponentProps> = (checkoutComponentProps) => {
+export const CheckoutComponent: React.FC<PUICheckoutComponentProps> = (checkoutComponentProps) => {
   const router = useRouter();
   const paymentIdParam = router.query[THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY]?.toString();
   const paymentErrorParam = router.query[THREEDS_FLOW_SEARCH_PARAM_ERROR_KEY]?.toString();

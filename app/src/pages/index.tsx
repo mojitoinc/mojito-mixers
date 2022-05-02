@@ -2,8 +2,8 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { Typography, Box, Stack, Button, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio, TextField, Select, MenuItem, InputLabel, FormGroup, Checkbox, SelectChangeEvent } from "@mui/material";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
-import { CheckoutComponent, CheckoutComponentProps } from "../components/checkout-component/CheckoutComponent";
-import { PaymentType, THREEDS_FLOW_SEARCH_PARAM_ERROR_KEY, THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY } from "../lib";
+import { CheckoutComponent } from "../components/checkout-component/CheckoutComponent";
+import { PaymentType, PUICheckoutComponentProps, THREEDS_FLOW_SEARCH_PARAM_ERROR_KEY, THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY } from "../lib";
 import { useOpenCloseCheckoutModal } from "../lib/components/public/useOpenCloseCheckoutModal/useOpenCloseCheckoutModal";
 import { useMeQuery } from "../services/graphql/generated";
 import { PLAYGROUND_PARAGRAPHS_ARRAY, PLAYGROUND_MOCKED_AUCTION_LOT, PLAYGROUND_MOCKED_BUY_NOW_LOT } from "../utils/playground/playground.constants";
@@ -64,7 +64,7 @@ const HomePage: React.FC = () => {
 
   const lotType = formValues.lotType || DEFAULT_FORM_VALUES.lotType;
 
-  const checkoutComponentProps: CheckoutComponentProps = {
+  const checkoutComponentProps: PUICheckoutComponentProps = {
     // Modal:
     open: isOpen,
     onClose,
@@ -299,7 +299,7 @@ const HomePage: React.FC = () => {
       </Stack>
     </Box>
 
-    <CheckoutComponent { ... checkoutComponentProps } />
+    <CheckoutComponent { ...checkoutComponentProps } />
   </>);
 };
 

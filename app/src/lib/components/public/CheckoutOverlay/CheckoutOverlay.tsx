@@ -45,7 +45,7 @@ export type LoaderMode = "default" | "success" | "error";
 export interface PUICheckoutOverlayProps {
   // Modal:
   open: boolean;
-  onClose: () => void;
+  onClose?: () => void;
   onGoTo: (pathnameOrUrl: string, options?: PUIRouterOptions) => void;
 
   // Flow:
@@ -92,6 +92,11 @@ export interface PUICheckoutOverlayProps {
 }
 
 export type PUICheckoutProps = PUICheckoutOverlayProps & ProvidersInjectorProps;
+
+export type PUICheckoutComponentProps = Partial<PUICheckoutProps> & Pick<
+  PUICheckoutProps,
+  "open" | "loaderMode" | "paymentErrorParam"
+>;
 
 const DEV_DEBUG_ENABLED = process.browser && localStorage.getItem(DEV_DEBUG_ENABLED_KEY) === "true";
 
@@ -678,6 +683,8 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   }, [handleBeforeUnload]);
 
   const handleClose = useCallback(() => {
+    if (!onClose) return;
+
     window.removeEventListener('beforeunload', handleBeforeUnload);
 
     handleBeforeUnload();
