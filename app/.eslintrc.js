@@ -66,12 +66,14 @@ module.exports = {
     "array-element-newline": [2, "consistent"],
     "arrow-body-style": 0,
     "no-prototype-builtins": 0,
+    "default-param-last": 0,
     "no-multi-assign": 0,
     "no-nested-ternary": TEMPORARILY_DISABLED,
     "no-mixed-operators": [2, { allowSamePrecedence: true }],
     "function-paren-newline": [2, "consistent"],
     "no-param-reassign": [2, { props: true, ignorePropertyModificationsForRegex: ["Acc$"] }],
     "operator-linebreak": [2, "after", { overrides: { "?": "before", ":": "before" } }],
+    "no-shadow": 0,
 
 
     // eslint-plugin-import:
@@ -123,7 +125,7 @@ module.exports = {
     // typescript-eslint:
 
     "@typescript-eslint/no-explicit-any": TEMPORARILY_DISABLED,
-
+    "@typescript-eslint/no-shadow": 2,
 
     // next/recommended:
 

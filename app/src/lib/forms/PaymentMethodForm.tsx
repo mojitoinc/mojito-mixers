@@ -2,10 +2,12 @@ import { Control, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { boolean, object, string, ValidationError } from "yup";
 import { ObjectShape } from "yup/lib/object";
-import { Grid, Box } from "@mui/material";
+import { Grid, Box, Typography } from "@mui/material";
 import BookIcon from "@mui/icons-material/Book";
 import React, { useCallback, useMemo } from "react";
-import { CheckoutModalFooter} from "../components/payments/CheckoutModalFooter/CheckoutModalFooter";
+import { getCardNumberError } from "react-payment-inputs";
+import { ApolloError } from "@apollo/client";
+import { CheckoutModalFooter } from "../components/payments/CheckoutModalFooter/CheckoutModalFooter";
 import { ControlledTextField } from "../components/shared/TextField/TextField";
 import { ControlledCardNumberField } from "../components/shared/CardNumberField/CardNumberField";
 import { ControlledCardExpiryDateField } from "../components/shared/CardExpiryDateField/CardExpiryDateField";
@@ -32,7 +34,6 @@ import {
   getCvvIsValid,
   getCreditCardNetworkFromNumber,
 } from "../domain/payment/payment.utils";
-import { Typography } from "@mui/material";
 import { DisplayBox } from "../components/payments/DisplayBox/DisplayBox";
 import { DebugBox } from "../components/payments/DebugBox/DebugBox";
 import { ControlledCheckbox } from "../components/shared/Checkbox/Checkbox";
@@ -43,8 +44,6 @@ import { useFormCheckoutError } from "../hooks/useFormCheckoutError";
 import { PUIDictionary } from "../domain/dictionary/dictionary.interfaces";
 import { useDictionary } from "../hooks/useDictionary";
 import { CreditCardNetwork, getCardTypeByType } from "../domain/react-payment-inputs/react-payment-inputs.utils";
-import { getCardNumberError } from "react-payment-inputs";
-import { ApolloError } from "@apollo/client";
 import { FormErrorsCaption } from "../components/shared/FormErrorCaption/FormErrorCaption";
 
 interface PaymentTypeFormProps {
@@ -76,21 +75,21 @@ const isWireThenRequireSchema = requireSchemaWhenKeyIs("Wire");
 
 const PAYMENT_TYPE_FORM_DATA: Record<PaymentType, PaymentTypeFormData> = {
   CreditCard: {
-    defaultValues: (consentType) => ({
+    defaultValues: consentType => ({
       type: "CreditCard",
       cardNumber: "",
       expiryDate: "",
       secureCode: "",
       nameOnCard: "",
-      consent: consentType === "checkbox" ? false: true,
+      consent: consentType !== "checkbox",
     }),
-    schemaShape: (acceptedCreditCardNetworks) => ({
+    schemaShape: acceptedCreditCardNetworks => ({
       cardNumber: string()
         .label(FIELD_LABELS.cardNumber)
         .when("type", {
           is: "CreditCard",
-          then: (schema) =>
-            schema.required(withRequiredErrorMessage).test({
+          then: (schema) => {
+            return schema.required(withRequiredErrorMessage).test({
               name: "is-valid-card-number",
               test: (cardNumber, context) => {
                 const creditCardNumberError = getCardNumberError(cardNumber);
@@ -117,25 +116,27 @@ const PAYMENT_TYPE_FORM_DATA: Record<PaymentType, PaymentTypeFormData> = {
 
                 return true;
               },
-            })
+            });
+          },
         }),
       expiryDate: string()
         .label(FIELD_LABELS.expiryDate)
         .when("type", {
           is: "CreditCard",
-          then: (schema) =>
-            schema.required(withRequiredErrorMessage).test({
+          then: (schema) => {
+            return schema.required(withRequiredErrorMessage).test({
               name: "is-valid-expiry-date",
               test: getExpiryDateIsValid,
               message: withInvalidErrorMessage
-            })
+            });
+          }
         }),
       secureCode: string()
         // .label(FIELD_LABELS.secureCode)
         .when("type", {
           is: "CreditCard",
-          then: (schema) =>
-            schema.test({
+          then: (schema) => {
+            return schema.test({
               name: "is-valid-cvv",
               test: (cvv, context) => {
                 const creditCardNetwork = getCreditCardNetworkFromNumber(context.parent.cardNumber || "");
@@ -166,82 +167,87 @@ const PAYMENT_TYPE_FORM_DATA: Record<PaymentType, PaymentTypeFormData> = {
 
                 return true;
               },
-            }),
+            });
+          }
         }),
       nameOnCard: string()
         .label(FIELD_LABELS.nameOnCard)
         .when("type", isCreditCardThenRequireSchema),
     }),
-    fields: ({ control, cvvLabel, consentType }) => (<>
-      <ControlledCardNumberField
-        name="cardNumber"
-        control={control}
-        label={FIELD_LABELS.cardNumber} />
-
-      <Grid
-        container
-        columnSpacing={2}
-        direction={{
-          xs: "column",
-          sm: "row"
-        }}>
-        <Grid item sm={6} zeroMinWidth>
-          <ControlledCardExpiryDateField
-            name="expiryDate"
-            control={control}
-            label={FIELD_LABELS.expiryDate} />
-        </Grid>
-        <Grid item sm={6}>
-          <ControlledCardSecureCodeField
-            name="secureCode"
-            control={control}
-            label={cvvLabel} />
-        </Grid>
-      </Grid>
-
-      <ControlledTextField
-        name="nameOnCard"
-        control={control}
-        label={FIELD_LABELS.nameOnCard}
-      />
-
-      { consentType === "checkbox" && (
-        <ControlledCheckbox
-          name="consent"
+    fields: ({ control, cvvLabel, consentType }) => (
+      <>
+        <ControlledCardNumberField
+          name="cardNumber"
           control={control}
-          label={ <>I <ConsentText /></> } />
-      ) }
-    </>),
+          label={FIELD_LABELS.cardNumber} />
+
+        <Grid
+          container
+          columnSpacing={2}
+          direction={{
+            xs: "column",
+            sm: "row"
+          }}>
+          <Grid item sm={6} zeroMinWidth>
+            <ControlledCardExpiryDateField
+              name="expiryDate"
+              control={control}
+              label={FIELD_LABELS.expiryDate} />
+          </Grid>
+          <Grid item sm={6}>
+            <ControlledCardSecureCodeField
+              name="secureCode"
+              control={control}
+              label={cvvLabel} />
+          </Grid>
+        </Grid>
+
+        <ControlledTextField
+          name="nameOnCard"
+          control={control}
+          label={FIELD_LABELS.nameOnCard}
+        />
+
+        { consentType === "checkbox" && (
+          <ControlledCheckbox
+            name="consent"
+            control={control}
+            label={ <>I <ConsentText /></> } />
+        ) }
+      </>
+    ),
   },
   ACH: {
-    defaultValues: (consentType) => ({
+    defaultValues: consentType => ({
       type: "ACH",
       accountId: "",
       publicToken: "",
-      consent: consentType === "checkbox" ? false: true,
+      consent: consentType !== "checkbox",
     }),
     schemaShape: () => ({}),
-    fields: ({ control, consentType }) => (<>
-      <DisplayBox sx={{ mt: 1.5, mb: consentType === "checkbox" ? 1 : 0 }}>
-        <Typography variant="body1">
-          We use Plaid to connect to your account.
-        </Typography>
-      </DisplayBox>
+    fields: ({ control, consentType }) => (
+      <>
+        <DisplayBox sx={{ mt: 1.5, mb: consentType === "checkbox" ? 1 : 0 }}>
+          <Typography variant="body1">
+            We use Plaid to connect to your account.
+          </Typography>
+        </DisplayBox>
 
-      { consentType === "checkbox" && (
-        <ControlledCheckbox
-          name="consent"
-          control={control}
-          label={ <>I <ConsentText /></> } />
-      ) }
-    </>),
+        { consentType === "checkbox" && (
+          <ControlledCheckbox
+            name="consent"
+            control={control}
+            label={ <>I <ConsentText /></> } />
+        ) }
+      </>
+    ),
   },
   Wire: {
-    defaultValues: (consentType) => ({
+    defaultValues: consentType => ({
       type: "Wire",
       accountNumber: "",
       routingNumber: "",
-      consent: consentType === "checkbox" ? false: true,
+      consent: consentType !== "checkbox",
     }),
     schemaShape: () => ({
       accountNumber: string()
@@ -251,51 +257,56 @@ const PAYMENT_TYPE_FORM_DATA: Record<PaymentType, PaymentTypeFormData> = {
         .label(FIELD_LABELS.routingNumber)
         .when("type", isWireThenRequireSchema),
     }),
-    fields: ({ control, consentType, dictionary }) => (<>
-      <ControlledTextField
+    fields: ({ control, consentType, dictionary }) => (
+      <>
+        <ControlledTextField
           name="accountNumber"
           control={control}
-          label={FIELD_LABELS.accountNumber}
-        />
+          label={FIELD_LABELS.accountNumber} />
+
         <ControlledTextField
           name="routingNumber"
           control={control}
-          label={FIELD_LABELS.routingNumber}
-        />
-      { consentType === "checkbox" && (
-        <ControlledCheckbox
-          name="consent"
-          control={control}
-          label={ <>I <ConsentText /></> } />
-      ) }
+          label={FIELD_LABELS.routingNumber} />
 
-      <DisplayBox sx={{ mt: 1.5 }}>
-        { dictionary.wirePaymentsDisclaimer.map((line, i) => (
-          <Typography key={ i } variant="body1" sx={ i === 0 ? undefined : { mt: 1.5 } }>{ line }</Typography>
-        )) }
-      </DisplayBox>
-    </>),
+        { consentType === "checkbox" && (
+          <ControlledCheckbox
+            name="consent"
+            control={control}
+            label={ <>I <ConsentText /></> } />
+        ) }
+
+        <DisplayBox sx={{ mt: 1.5 }}>
+          { dictionary.wirePaymentsDisclaimer.map((line, i) => (
+            // eslint-disable-next-line react/no-array-index-key
+            <Typography key={ i } variant="body1" sx={ i === 0 ? undefined : { mt: 1.5 } }>{ line }</Typography>
+          )) }
+        </DisplayBox>
+      </>
+    ),
   },
   Crypto: {
-    defaultValues: (consentType) => ({
+    defaultValues: consentType => ({
       type: "Crypto",
-      consent: consentType === "checkbox" ? false: true,
+      consent: consentType !== "checkbox",
     }),
     schemaShape: () => ({}),
-    fields: ({ control, consentType }) => (<>
-      <DisplayBox sx={{ mt: 1.5, mb: consentType === "checkbox" ? 1 : 0 }}>
-        <Typography variant="body1">
-          Not supported yet.
-        </Typography>
-      </DisplayBox>
+    fields: ({ control, consentType }) => (
+      <>
+        <DisplayBox sx={{ mt: 1.5, mb: consentType === "checkbox" ? 1 : 0 }}>
+          <Typography variant="body1">
+            Not supported yet.
+          </Typography>
+        </DisplayBox>
 
-      { consentType === "checkbox" && (
-        <ControlledCheckbox
-          name="consent"
-          control={control}
-          label={ <>I <ConsentText /></> } />
-      ) }
-    </>),
+        { consentType === "checkbox" && (
+          <ControlledCheckbox
+            name="consent"
+            control={control}
+            label={ <>I <ConsentText /></> } />
+        ) }
+      </>
+    ),
   },
 };
 
@@ -340,7 +351,9 @@ export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
     return object().shape({
       type: string().required(withRequiredErrorMessage),
       consent: boolean().oneOf([true], CONSENT_ERROR_MESSAGE),
-      ...Object.values(PAYMENT_TYPE_FORM_DATA).reduce((objectShape, { schemaShape }) => ({ ...objectShape, ...schemaShape(acceptedCreditCardNetworks) }), {} as ObjectShape),
+      ...Object.values(PAYMENT_TYPE_FORM_DATA).reduce((objectShape, { schemaShape }) => {
+        return ({ ...objectShape, ...schemaShape(acceptedCreditCardNetworks) });
+      }, {} as ObjectShape),
     });
   }, [acceptedCreditCardNetworks]);
 
@@ -410,7 +423,8 @@ export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
         </Box>
       )}
 
-      { acceptedPaymentTypes.length > 1 && (<>
+      { acceptedPaymentTypes.length > 1 && (
+      <>
         <InputGroupLabel sx={{ m: 0, pt: 2, pb: 1.5 }}>Payment Method</InputGroupLabel>
 
         <PaymentMethodSelector
@@ -418,7 +432,8 @@ export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
           onPaymentMethodChange={handleSelectedPaymentMethodChange}
           paymentMethods={acceptedPaymentTypes}
         />
-      </>) }
+      </>
+      ) }
 
       { !onSaved && acceptedPaymentTypes.length <= 1 && (
         <Box sx={{ mt: 1 }} />
