@@ -7,16 +7,16 @@ export type ErrorMessageParams = Partial<MessageParams> & { label: string };
 
 // Generic:
 
-export const requireSchemaWhenKeyIs = (key: string) => ({
-  is: key,
-  then: (schema: AnySchema) => schema.required(withRequiredErrorMessage)
-});
+export const CONSENT_ERROR_MESSAGE = "You must accept the terms and conditions of the sale.";
 
 export const withRequiredErrorMessage = ({ label }: ErrorMessageParams) => `${ label } is required.`;
 
 export const withInvalidErrorMessage = ({ label }: ErrorMessageParams) => `${ label } is not valid.`;
 
-export const CONSENT_ERROR_MESSAGE = "You must accept the terms and conditions of the sale.";
+export const requireSchemaWhenKeyIs = (key: string) => ({
+  is: key,
+  then: (schema: AnySchema) => schema.required(withRequiredErrorMessage),
+});
 
 
 // Billing Information:
@@ -44,16 +44,23 @@ export const withInvalidZipCode = ({ label }: ErrorMessageParams) => `The ${ lab
 
 export const withInvalidCardNumber = ({ label }: ErrorMessageParams) => `${ label } is invalid.`;
 
-export const withInvalidCVV = ({ cvvLabel, cvvExpectedLength }: { cvvLabel: string, cvvExpectedLength: 3 | 4 | "3 or 4" }) => {
-  return `${ cvvLabel } must have ${ cvvExpectedLength } digits.`;
-};
+export const withInvalidCVV = ({ cvvLabel, cvvExpectedLength }: { cvvLabel: string, cvvExpectedLength: 3 | 4 | "3 or 4" }) => `${ cvvLabel } must have ${ cvvExpectedLength } digits.`;
 
 export const withInvalidCreditCardNetwork = ({ acceptedCreditCardNetworks }: { acceptedCreditCardNetworks: CreditCardNetwork[] }) => {
-  const [ acceptedCreditCardName, ...otherAcceptedCreditCardNames] = acceptedCreditCardNetworks.map((acceptedCreditCardNetwork) => {
-    return getCardNameByType(acceptedCreditCardNetwork);
-  });
+  const [
+    acceptedCreditCardName,
+    ...otherAcceptedCreditCardNames
+  ] = acceptedCreditCardNetworks.map(acceptedCreditCardNetwork => getCardNameByType(acceptedCreditCardNetwork));
 
-  return `Only ${ otherAcceptedCreditCardNames.join(", ") }${ otherAcceptedCreditCardNames.length ? " and " : "" }${ acceptedCreditCardName } ${ acceptedCreditCardNetworks.length === 1 ? "is" : "are" } accepted.`;
+  return `Only ${
+    otherAcceptedCreditCardNames.join(", ")
+  }${
+    otherAcceptedCreditCardNames.length ? " and " : ""
+  }${
+    acceptedCreditCardName
+  } ${
+    acceptedCreditCardNetworks.length === 1 ? "is" : "are"
+  } accepted.`;
 };
 
 

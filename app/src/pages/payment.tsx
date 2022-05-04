@@ -1,15 +1,17 @@
+import React, { memo } from "react";
 import { ProtectedPageContainer } from "../components/auth/ProtectedPageContainer";
 import { PaymentView } from "../views/payment/PaymentView";
-import { memo } from "react";
 
-const PaymentMemorised = memo(function PaymentMemorised() {
+const PaymentMemoized = memo(() => {
   return <PaymentView />;
 });
 
-export default function Payment() {
+const Payment: React.FC = () => {
   return (
     <ProtectedPageContainer>
-      <PaymentMemorised />
+      <PaymentMemoized />
     </ProtectedPageContainer>
   );
 }
+
+export default Payment;

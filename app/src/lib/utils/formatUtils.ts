@@ -1,5 +1,5 @@
 // Non-Breaking Space (&nbsp):
-export const NBSP = '\u00A0';
+export const NBSP = "\u00A0";
 
 /**
  * Capitalize first letter and enforce a dot at the end.
@@ -40,5 +40,5 @@ export function formatTaxRate(taxRate: number): string {
  * Remove duplicate, leading or trailing spaces:
  */
 export function fullTrim(str: string): string {
-  return str.replace(/\s+/g, " ").trim()
+  return str.replace(/\s+/g, " ").trim();
 }

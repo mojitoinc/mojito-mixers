@@ -20,4 +20,4 @@ export const DictionaryProvider: React.FC<DictionaryProviderProps> = ({
       { children }
     </DictionaryContext.Provider>
   );
-}
+};

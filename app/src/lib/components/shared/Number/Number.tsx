@@ -5,7 +5,7 @@ interface NumberProps {
   children: number;
   prefix?: string;
   suffix?: string;
-};
+}
 
 export const Number: React.FC<NumberProps> = ({
   as: Wrapper = "span",

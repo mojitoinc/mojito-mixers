@@ -1,7 +1,7 @@
 import { useCallback } from "react";
+import { FetchResult, MutationResult } from "@apollo/client";
 import { CreatePaymentMethodMutation, PaymentType, useCreatePaymentMethodMutation, AchMetadata, CreditCardMetadata, CreditCardBillingDetails, useGetPaymentMethodStatusLazyQuery } from "../queries/graphqlGenerated";
 import { BillingInfo } from "../forms/BillingInfoForm";
-import { FetchResult, MutationResult } from "@apollo/client";
 import { PaymentMethod } from "../domain/payment/payment.interfaces";
 import { useEncryptCardData } from "./useEncryptCard";
 import { formatPhoneAsE123 } from "../domain/circle/circle.utils";
@@ -102,8 +102,8 @@ export function useCreatePaymentMethod({
     let lastPaymentMethodStatusCheck: number;
 
     const paymentMethodCreatedAt = lastPaymentMethodStatusCheck = Date.now();
-    const createPaymentMethodResult = createPaymentMethodPromise ? await createPaymentMethodPromise : null;
-    const createPaymentMethodResultData: { id?: string; status?: string } = createPaymentMethodResult?.data?.createPaymentMethod || {};
+    const createPaymentMethodPromiseResult = createPaymentMethodPromise ? await createPaymentMethodPromise : null;
+    const createPaymentMethodResultData: { id?: string; status?: string } = createPaymentMethodPromiseResult?.data?.createPaymentMethod || {};
     const paymentMethodID = createPaymentMethodResultData.id;
 
     let status: PaymentMethodStatus = createPaymentMethodResultData.status as PaymentMethodStatus;
@@ -117,12 +117,20 @@ export function useCreatePaymentMethod({
 
       totalWaitTimeSoFar = now - paymentMethodCreatedAt;
 
-      if (debug) console.log(`    👀 getPaymentMethodStatus (${ totalWaitTimeSoFar / 1000 | 0 } / ${ PAYMENT_CREATION_MAX_WAIT_MS / 1000 | 0 } sec.)`, { paymentMethodID });
+      if (debug) {
+        console.log(`    👀 getPaymentMethodStatus (${
+          totalWaitTimeSoFar / 1000 | 0
+        } / ${
+          PAYMENT_CREATION_MAX_WAIT_MS / 1000 | 0
+        } sec.)`, { paymentMethodID });
+      }
 
+      // eslint-disable-next-line no-await-in-loop
       if (paymentMethodStatusWaitTime > 0) await wait(paymentMethodStatusWaitTime);
 
       lastPaymentMethodStatusCheck = Date.now();
 
+      // eslint-disable-next-line no-await-in-loop
       const paymentMethodStatusResult = await getPaymentMethodStatus({
         variables: { paymentMethodID },
       });

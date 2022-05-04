@@ -1,9 +1,9 @@
+import React from "react";
 import { render, screen } from "@testing-library/react";
 import { CUSTOM_WALLET_OPTION, NEW_WALLET_OPTION } from "../../../../domain/wallet/wallet.constants";
 import { DeliveryWalletSelector, DeliveryWalletSelectorProps } from "./DeliveryWalletSelector";
 
 describe("DeliveryWalletSelector", () => {
-
   Object.defineProperty(navigator, "clipboard", {
     value: {
       writeText: () => { /* Do nothing */ },

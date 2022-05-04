@@ -1,8 +1,8 @@
 import { useAuth0 } from "@auth0/auth0-react";
-import { config } from "../../utils/config/config.constants";
-import { useCallback } from "react";
+import React, { useCallback } from "react";
 import { Box, Button, Typography } from "@mui/material";
 import { Theme, SxProps } from "@mui/material/styles";
+import { config } from "../../utils/config/config.constants";
 
 const buttonSx: SxProps<Theme> = {
   py: 0,
@@ -11,8 +11,7 @@ const buttonSx: SxProps<Theme> = {
   alignItems: "center",
 };
 
-
-export function AuthButton() {
+export const AuthButton: React.FC = () => {
   const { logout, loginWithPopup, isAuthenticated, isLoading, getIdTokenClaims } = useAuth0();
 
   const handleLogin = useCallback(async () => {

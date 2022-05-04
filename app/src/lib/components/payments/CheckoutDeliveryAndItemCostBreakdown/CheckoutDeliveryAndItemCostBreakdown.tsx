@@ -24,7 +24,7 @@ export const CheckoutDeliveryAndItemCostBreakdown: React.FC<CheckoutDeliveryAndI
   wallet,
   onWalletChange,
 }) => (
-  <Stack sx={{ display: "flex", width: (theme) => ({ xs: "100%", md: `calc(50% - ${ theme.spacing(3.75 / 2) })` }) }}>
+  <Stack sx={{ display: "flex", width: theme => ({ xs: "100%", md: `calc(50% - ${ theme.spacing(3.75 / 2) })` }) }}>
     <DeliveryWalletSelector
       validatePersonalAddress={ validatePersonalDeliveryAddress }
       wallets={ wallets }

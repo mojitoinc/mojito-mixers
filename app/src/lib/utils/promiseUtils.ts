@@ -4,6 +4,7 @@ export function wait(ms: number) {
   });
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function isPromise(maybePromise: any): maybePromise is Promise<any> {
-  return maybePromise && typeof maybePromise === 'object' && typeof maybePromise.then === 'function';
+  return maybePromise && typeof maybePromise === "object" && typeof maybePromise.then === "function";
 }

@@ -1,10 +1,6 @@
 import React, { useCallback, useEffect, useMemo } from "react";
-import {
-  Select,
-  SelectOption,
-  SelectProps,
-} from "../../Select/Select";
 import { SelectChangeEvent } from "@mui/material";
+import { Select, SelectProps } from "../Select";
 import { Wallet } from "../../../../domain/wallet/wallet.interfaces";
 import { isCustomWalletAddress, isSpecialWalletAddressValue } from "../../../../domain/wallet/wallet.utils";
 import { CUSTOM_WALLET_OPTION, NEW_WALLET_OPTION } from "../../../../domain/wallet/wallet.constants";
@@ -14,16 +10,16 @@ const mapWalletAddressToSelectOption = (wallet: Wallet) => ({
   label: `${ wallet.name } (${ wallet.address })`,
 });
 
-const reduceWalletsByID = (walletsMap: Record<string, Wallet>, wallet: Wallet) => {
-  walletsMap[wallet.id] = wallet;
+const reduceWalletsByID = (walletsAcc: Record<string, Wallet>, wallet: Wallet) => {
+  walletsAcc[wallet.id] = wallet;
 
-  return walletsMap;
+  return walletsAcc;
 };
 
-const reduceWalletsByAddress = (walletsMap: Record<string, Wallet>, wallet: Wallet) => {
-  walletsMap[wallet.address] = wallet;
+const reduceWalletsByAddress = (walletsAcc: Record<string, Wallet>, wallet: Wallet) => {
+  walletsAcc[wallet.address] = wallet;
 
-  return walletsMap;
+  return walletsAcc;
 };
 
 export interface WalletAddressSelectorProps extends Omit<SelectProps, "value" | "options"> {
@@ -42,13 +38,11 @@ export const WalletAddressSelector: React.FC<WalletAddressSelectorProps> = ({
   helperText,
   ...props
 }) => {
-  const { options, walletsByID, walletsByAddress } = useMemo(() => {
-    const options: SelectOption[] = [NEW_WALLET_OPTION, CUSTOM_WALLET_OPTION, ...(wallets || []).map(mapWalletAddressToSelectOption)];
-    const walletsByID: Record<string, Wallet> = (wallets || []).reduce(reduceWalletsByID, {});
-    const walletsByAddress: Record<string, Wallet> = (wallets || []).reduce(reduceWalletsByAddress, {});
-
-    return { options, walletsByID, walletsByAddress };
-  }, [wallets]);
+  const { options, walletsByID, walletsByAddress } = useMemo(() => ({
+    options: [NEW_WALLET_OPTION, CUSTOM_WALLET_OPTION, ...(wallets || []).map(mapWalletAddressToSelectOption)],
+    walletsByID: (wallets || []).reduce(reduceWalletsByID, {}),
+    walletsByAddress: (wallets || []).reduce(reduceWalletsByAddress, {}),
+  }), [wallets]);
 
   const handleChange = useCallback((e: SelectChangeEvent<string | number>) => {
     const value = e.target.value as string;

@@ -2,9 +2,8 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { SxProps, Theme } from '@mui/material/styles';
 import { Tooltip, IconButton } from '@mui/material';
 import { useTimeout } from '@swyg/corre';
-import { FunctionComponent, useCallback, useState } from 'react';
+import React, { FunctionComponent, useCallback, useState } from 'react';
 import { wait } from '../../../utils/promiseUtils';
-import React from "react";
 
 type CopyButtonSize = "small" | "medium";
 
@@ -20,7 +19,7 @@ interface CopyButtonState {
 }
 
 const ICON_BUTTON_SX: Record<string, SxProps<Theme>> = {
-  small: { p: 1, ml: 0.5, mr: -0.5},
+  small: { p: 1, ml: 0.5, mr: -0.5 },
   medium: { p: 1, ml: 0.5 },
 };
 
@@ -55,11 +54,11 @@ export const CopyButton: FunctionComponent<CopyButtonProps> = ({
   }, [value, confirmationLabel]);
 
   const handleOpen = useCallback(() => {
-    setState(({ title, open }) => ({ title, open: title === tooltipLabel ? true : open }));
+    setState(({ title: prevTitle, open: prevOpen }) => ({ title: prevTitle, open: prevTitle === tooltipLabel ? true : prevOpen }));
   }, [tooltipLabel]);
 
   const handleClose = useCallback(() => {
-    setState(({ title, open }) => ({ title, open: title === tooltipLabel ? false : open }));
+    setState(({ title: prevTitle, open: prevOpen }) => ({ title: prevTitle, open: prevTitle === tooltipLabel ? false : prevOpen }));
   }, [tooltipLabel]);
 
   useTimeout(async () => {
@@ -70,7 +69,7 @@ export const CopyButton: FunctionComponent<CopyButtonProps> = ({
     // Wait to allow the tooltip close animation to play before the title is reset back to the default one:
     await wait(250);
 
-    setState(({ open }) => ({ title: tooltipLabel, open: open || false }));
+    setState(({ open: prevOpen }) => ({ title: tooltipLabel, open: prevOpen || false }));
   }, 3000, [title, open, tooltipLabel, confirmationLabel]);
 
   const buttonElement = (
@@ -85,7 +84,7 @@ export const CopyButton: FunctionComponent<CopyButtonProps> = ({
       open={ open }
       onOpen={ handleOpen }
       onClose={ handleClose }
-      onClick={ onTooltipClick } >
+      onClick={ onTooltipClick }>
       { buttonElement }
     </Tooltip>
   );

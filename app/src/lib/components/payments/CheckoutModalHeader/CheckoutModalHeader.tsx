@@ -1,14 +1,14 @@
 import { Box, Typography, Divider, Stack } from "@mui/material";
 import { Theme, SxProps } from "@mui/material/styles";
-import { PrimaryButton } from "../../shared/PrimaryButton/PrimaryButton";
-import { OutlinedSecondaryButton } from "../../shared/OutlinedSecondaryButton/OutlinedSecondaryButton";
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import CloseIcon from '@mui/icons-material/Close';
+import React, { useRef, useCallback } from "react";
+import { PrimaryButton } from "../../shared/PrimaryButton/PrimaryButton";
+import { OutlinedSecondaryButton } from "../../shared/OutlinedSecondaryButton/OutlinedSecondaryButton";
 import { NBSP } from "../../../utils/formatUtils";
 import { UserFormat } from "../../../domain/auth/authentication.interfaces";
 import { getFormattedUser } from "./CheckoutModalHeader.utils";
 import { User } from "../../../queries/graphqlGenerated";
-import React, { useRef, useCallback } from "react";
 import { DEV_DEBUG_COUNTER_CLICKS_NEEDED, DEV_DEBUG_COUNTER_EXPIRATION_MS, RESERVATION_COUNTDOWN_FROM_MIN } from "../../../config/config";
 import { Img } from "../../shared/Img/Img";
 
@@ -118,31 +118,37 @@ export const CheckoutModalHeader: React.FC<CheckoutModalHeaderProps> = ({
 
       <Divider />
 
-      { showControls ? (<>
-        <Stack spacing={ 2 } direction="row" sx={{ justifyContent: "space-between", alignItems: "center", py: 2 }}>
-          { (variant === "anonymous"  && onLogin) ? (<>
-              <Typography sx={{ fontWeight: "500" }}>Already have an account?</Typography>
-              <PrimaryButton onClick={ onLogin }>Log in</PrimaryButton>
-          </>) : null }
+      { showControls ? (
+        <>
+          <Stack spacing={ 2 } direction="row" sx={{ justifyContent: "space-between", alignItems: "center", py: 2 }}>
+            { (variant === "anonymous" && onLogin) ? (
+              <>
+                <Typography sx={{ fontWeight: "500" }}>Already have an account?</Typography>
+                <PrimaryButton onClick={ onLogin }>Log in</PrimaryButton>
+              </>
+            ) : null }
 
-          { (variant !== "anonymous" && displayUsername) ? (<>
-              { onClose && <OutlinedSecondaryButton onClick={ onClose }><CloseIcon /></OutlinedSecondaryButton> }
-              { onPrev && <OutlinedSecondaryButton onClick={ onPrev }><ChevronLeftIcon /></OutlinedSecondaryButton> }
-              { variant === "loggedIn" && countdownElementRef ? (
-                <Typography sx={{ fontWeight: "500" }}>
-                  Time left: { " " }
-                  <Box component="span" sx={ COUNTDOWN_CONTAINER_SX }>
-                    00:00
-                    <Box component="span" ref={ countdownElementRef } sx={ COUNTDOWN_SX }>{ RESERVATION_COUNTDOWN_FROM_MIN }:00</Box>
-                  </Box>
-                </Typography>
-              ) : null }
-              <Typography sx={{ fontWeight: "500", minHeight: 40, display: "flex", alignItems: "center" }}>{ displayUsername }</Typography>
-          </>) : null }
-        </Stack>
+            { (variant !== "anonymous" && displayUsername) ? (
+              <>
+                { onClose && <OutlinedSecondaryButton onClick={ onClose }><CloseIcon /></OutlinedSecondaryButton> }
+                { onPrev && <OutlinedSecondaryButton onClick={ onPrev }><ChevronLeftIcon /></OutlinedSecondaryButton> }
+                { variant === "loggedIn" && countdownElementRef ? (
+                  <Typography sx={{ fontWeight: "500" }}>
+                    Time left: { " " }
+                    <Box component="span" sx={ COUNTDOWN_CONTAINER_SX }>
+                      00:00
+                      <Box component="span" ref={ countdownElementRef } sx={ COUNTDOWN_SX }>{ RESERVATION_COUNTDOWN_FROM_MIN }:00</Box>
+                    </Box>
+                  </Typography>
+                ) : null }
+                <Typography sx={{ fontWeight: "500", minHeight: 40, display: "flex", alignItems: "center" }}>{ displayUsername }</Typography>
+              </>
+            ) : null }
+          </Stack>
 
-        <Divider />
-      </>) : null }
+          <Divider />
+        </>
+      ) : null }
     </Box>
   );
 }

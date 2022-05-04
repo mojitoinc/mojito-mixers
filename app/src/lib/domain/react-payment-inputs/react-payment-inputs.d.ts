@@ -4,7 +4,7 @@ declare module "react-payment-inputs" {
 
   export interface PaymentInputsProps extends TextFieldProps {
     ref: React.Ref<any>;
-  };
+  }
 
   export type CreditCardSvgProps = SvgIconProps & { network: CreditCardNetwork };
 
@@ -25,8 +25,7 @@ declare module "react-payment-inputs/images" {
   import React from "react";
   import { CreditCardNetwork } from "react-payment-inputs";
 
-  const _exported: Record<CreditCardNetwork, React.ReactSVGElement>;
+  const exported: Record<CreditCardNetwork, React.ReactSVGElement>;
 
-  export default _exported;
+  export default exported;
 }
-

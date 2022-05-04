@@ -1,8 +1,8 @@
+import React from "react";
 import { render, screen } from "@testing-library/react";
 import { DeliveryWalletDetails, DeliveryWalletDetailsProps } from "./DeliveryWalletDetails";
 
 describe("DeliveryWalletDetails", () => {
-
   Object.defineProperty(navigator, "clipboard", {
     value: {
       writeText: () => { /* Do nothing */ },

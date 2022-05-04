@@ -6,7 +6,11 @@ import { isLocalhost } from "../../lib/domain/url/url.utils";
 import { config } from "../../utils/config/config.constants";
 import { PLAYGROUND_MOJITO_LOGO, PLAYGROUND_USER_FORMAT } from "../../utils/playground/playground.constants";
 
-export const CheckoutComponent: React.FC<PUICheckoutComponentProps> = (checkoutComponentProps) => {
+export const CheckoutComponent: React.FC<PUICheckoutComponentProps> = ({
+  orgID,
+  checkoutItems,
+  ...checkoutComponentProps
+}) => {
   const router = useRouter();
   const paymentIdParam = router.query[THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY]?.toString();
   const paymentErrorParam = router.query[THREEDS_FLOW_SEARCH_PARAM_ERROR_KEY]?.toString();
@@ -16,6 +20,7 @@ export const CheckoutComponent: React.FC<PUICheckoutComponentProps> = (checkoutC
   const getAuthenticationToken = useCallback(async () => {
     const token = await getIdTokenClaims();
 
+    // eslint-disable-next-line no-underscore-dangle
     return token?.__raw || "";
   }, [getIdTokenClaims]);
 
@@ -28,14 +33,12 @@ export const CheckoutComponent: React.FC<PUICheckoutComponentProps> = (checkoutC
         console.log(`Push URL ${pathnameOrUrl}`, reason);
         window.location.href = pathnameOrUrl;
       }
+    } else if (replace) {
+      console.log(`Replace route with ${pathnameOrUrl}`, reason);
+      router.replace(pathnameOrUrl || "/", undefined, options);
     } else {
-      if (replace) {
-        console.log(`Replace route with ${pathnameOrUrl}`, reason);
-        router.replace(pathnameOrUrl || "/", undefined, options);
-      } else {
-        console.log(`Push route ${pathnameOrUrl}`, reason);
-        router.push(pathnameOrUrl || "/", undefined, options);
-      }
+      console.log(`Push route ${pathnameOrUrl}`, reason);
+      router.push(pathnameOrUrl || "/", undefined, options);
     }
   }, [router]);
 
@@ -132,9 +135,9 @@ export const CheckoutComponent: React.FC<PUICheckoutComponentProps> = (checkoutC
     consentType: "circle",
 
     // Data:
-    orgID: checkoutComponentProps.orgID || "",
+    orgID: orgID || "",
     // invoiceID,
-    checkoutItems: checkoutComponentProps.checkoutItems || [],
+    checkoutItems: checkoutItems || [],
 
     // Authentication:
     onLogin: handleLogin,

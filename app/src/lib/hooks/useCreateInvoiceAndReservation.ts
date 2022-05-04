@@ -50,9 +50,10 @@ export function useCreateInvoiceAndReservation({
     } = firstCheckoutItem || {};
 
     if (debug) {
-      console.log(firstCheckoutItem
-        ? `\n🎫 Making reservation / creating invoice for ${ units } × ${ lotType } lot${ units > 1 ? "s" : "" } ${ lotID } (orgID = ${ orgID })...\n`
-        : `\n🎫 Aborting reservation / creating invoice for unknown lot (orgID = ${ orgID })...\n`
+      console.log(
+        firstCheckoutItem
+          ? `\n🎫 Making reservation / creating invoice for ${ units } × ${ lotType } lot${ units > 1 ? "s" : "" } ${ lotID } (orgID = ${ orgID })...\n`
+          : `\n🎫 Aborting reservation / creating invoice for unknown lot (orgID = ${ orgID })...\n`
       );
     }
 
@@ -75,7 +76,7 @@ export function useCreateInvoiceAndReservation({
     }
 
     let invoiceID = "";
-    let mutationError: ApolloError | Error | undefined = undefined;
+    let mutationError: ApolloError | Error | undefined;
 
     if (lotType === "buyNow") {
       if (debug) {

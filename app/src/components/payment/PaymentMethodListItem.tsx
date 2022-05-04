@@ -1,5 +1,6 @@
 import { SxProps, Theme } from "@mui/material/styles";
 import { Box } from "@mui/material";
+import React from "react";
 
 const paymentMethodListItemSx: SxProps<Theme> = {
   margin: "5px 0",

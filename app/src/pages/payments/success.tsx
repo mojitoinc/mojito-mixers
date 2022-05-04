@@ -1,6 +1,6 @@
 import { NextPage } from "next";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { CheckoutComponent } from "../../components/checkout-component/CheckoutComponent";
 import { THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY } from "../../lib";
 
@@ -9,7 +9,7 @@ const SuccessPage: NextPage = () => {
   const [paymentId, setPaymentId] = useState<string | null>(null);
 
   useEffect(() => {
-    const params = new URLSearchParams(location.search);
+    const params = new URLSearchParams(window.location.search);
     const paymentIdParam = params.get(THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY) || "";
 
     setPaymentId(paymentIdParam);

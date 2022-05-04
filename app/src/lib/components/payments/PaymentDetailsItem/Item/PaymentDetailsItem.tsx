@@ -1,10 +1,9 @@
-
+import React from "react";
 import { BaseItemProps } from "../../../shared/StackList/StackList";
 import { PaymentDetailsFragment } from "../Fragment/PaymentDetailsFragment";
 import { SavedItem, SavedItemProps, SavedItemLabels, SavedItemStatus } from "../../SavedItem/SavedItem";
 import { SavedPaymentMethod } from "../../../../domain/circle/circle.interfaces";
 import { PaymentType } from "../../../../domain/payment/payment.interfaces";
-import React from "react";
 
 const PAYMENT_METHOD_CC_ITEM_LABELS: SavedItemLabels = {
   select: "Use Card",
@@ -34,12 +33,14 @@ export type PaymentDetailsItemProps = BaseItemProps<SavedPaymentMethod, SavedIte
 export const PaymentDetailsItem: React.FC<PaymentDetailsItemProps> = ({
   data: savedPaymentMethod,
   additionalProps: savedItemProps,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   children,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   index,
   ...boxProps
 }) => {
   let disabled = savedItemProps?.disabled;
-  let status: SavedItemStatus | undefined = undefined;
+  let status: SavedItemStatus | undefined;
 
   if (savedPaymentMethod.status === "pending") {
     disabled = disabled || "selectOnly";

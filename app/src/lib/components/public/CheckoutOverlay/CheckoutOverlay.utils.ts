@@ -6,6 +6,14 @@ import { CheckoutModalInfo, CheckoutModalInfo3DS, CheckoutModalInfoPlaid, Checko
 
 const debug = isLocalhostOrStaging();
 
+export function isCheckoutModalInfo3DS(checkoutModalInfo: Partial<CheckoutModalInfo3DS | CheckoutModalInfoPlaid>): checkoutModalInfo is CheckoutModalInfo3DS {
+  return !!(checkoutModalInfo as any).paymentInfo && !!(checkoutModalInfo as any).checkoutItems;
+}
+
+export function isCheckoutModalInfoPlaid(checkoutModalInfo: Partial<CheckoutModalInfo3DS | CheckoutModalInfoPlaid>): checkoutModalInfo is CheckoutModalInfoPlaid {
+  return !!(checkoutModalInfo as any).linkToken;
+}
+
 export function persistCheckoutModalInfo(info: CheckoutModalInfo) {
   if (!process.browser) return;
 
@@ -44,24 +52,13 @@ export function clearPersistedInfo() {
   }
 }
 
-export function isInitiallyOpen(paymentIdParam?: string) {
-  return getCheckoutModalState({ paymentIdParam, noClear: true }).checkoutStep !== "";
-}
-
-export function isCheckoutModalInfo3DS(checkoutModalInfo: Partial<CheckoutModalInfo3DS | CheckoutModalInfoPlaid>): checkoutModalInfo is CheckoutModalInfo3DS {
-  return !!(checkoutModalInfo as any).paymentInfo && !!(checkoutModalInfo as any).checkoutItems;
-}
-
-export function isCheckoutModalInfoPlaid(checkoutModalInfo: Partial<CheckoutModalInfo3DS | CheckoutModalInfoPlaid>): checkoutModalInfo is CheckoutModalInfoPlaid {
-  return !!(checkoutModalInfo as any).linkToken;
-}
-
 export interface GetCheckoutModalStateOptions {
   paymentIdParam?: string;
   noClear?: boolean;
 }
 
 export function getCheckoutModalState({
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   paymentIdParam,
   noClear,
 }: GetCheckoutModalStateOptions): CheckoutModalStateCombined {
@@ -142,7 +139,8 @@ export function getCheckoutModalState({
       } = savedModalInfo;
 
       const purchaseError = THREEDS_ERROR_URL_REG_EXP.test(receivedRedirectUri);
-      const purchaseSuccess = !purchaseError && (THREEDS_SUCCESS_URL_REG_EXP.test(receivedRedirectUri) || receivedRedirectUri.includes(THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY));
+      const purchaseSuccess = !purchaseError &&
+        (THREEDS_SUCCESS_URL_REG_EXP.test(receivedRedirectUri) || receivedRedirectUri.includes(THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY));
 
       isValid &&=
         processorPaymentID !== undefined &&
@@ -212,4 +210,8 @@ export function getCheckoutModalState({
   }
 
   return modalState;
+}
+
+export function isInitiallyOpen(paymentIdParam?: string) {
+  return getCheckoutModalState({ paymentIdParam, noClear: true }).checkoutStep !== "";
 }

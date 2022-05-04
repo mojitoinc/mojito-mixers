@@ -1,6 +1,6 @@
 import { NextPage } from "next";
 import { useRouter } from "next/router";
-import { useCallback } from "react";
+import React, { useCallback } from "react";
 import { MOJITO_LIGHT_THEME, PUIPlaid } from "../lib";
 
 const PlaidOAuthPage: NextPage = () => {

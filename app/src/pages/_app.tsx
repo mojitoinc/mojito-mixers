@@ -1,17 +1,18 @@
 import { Auth0Provider } from "@auth0/auth0-react";
-import { config } from "../utils/config/config.constants";
 import { AppProps } from "next/app";
-import { Header } from "../components/core/Header";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
+import React from "react";
 import Head from "next/head";
-import { AuthorizedApolloProvider } from "../lib/components/shared/AuthorizedApolloProvider/AuthorizedApolloProvider";
 import { GlobalStyles } from "@mui/material";
+import { AuthorizedApolloProvider } from "../lib/components/shared/AuthorizedApolloProvider/AuthorizedApolloProvider";
+import { Header } from "../components/core/Header";
+import { config } from "../utils/config/config.constants";
 import { GLOBAL_STYLES } from "../components/core/global-styles.constants";
 import { Container } from "../components/core/Container";
 
 const defaultTheme = createTheme();
 
-function MyApp({ Component, pageProps }: AppProps) {
+const MyApp: React.FC<AppProps> = ({ Component, pageProps }) => {
   return (
     <Auth0Provider
       domain={ config.AUTH0_DOMAIN }
@@ -20,7 +21,10 @@ function MyApp({ Component, pageProps }: AppProps) {
 
       <Head>
         <title>Mojito - Payment UI Playground</title>
+
         <link rel="shortcut icon" href="/favicon.png" />
+
+        { /* eslint-disable-next-line @next/next/no-css-tags */ }
         <link href="/fonts/style.css" rel="stylesheet" />
       </Head>
 

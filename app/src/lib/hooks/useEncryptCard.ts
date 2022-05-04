@@ -46,5 +46,4 @@ export function useEncryptCardData({ orgID }: UseEncryptCardDataOptions): [
   }, [fetchPaymentKey, orgID]);
 
   return [encryptCardData, fetchPaymentKeyResult];
-
 }

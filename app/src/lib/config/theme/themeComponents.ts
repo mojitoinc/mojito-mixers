@@ -1,3 +1,5 @@
+/* eslint quote-props: 0 */
+
 import { Theme } from "@mui/material/styles";
 import { Components as ComponentsOptions } from "@mui/material/styles/components";
 import { BORDER_THICKNESS, MD_BORDER_RADIUS } from "./themeConstants";

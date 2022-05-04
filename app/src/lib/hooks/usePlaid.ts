@@ -1,14 +1,13 @@
-
 import { useCallback, useEffect, useRef } from "react";
-import { usePreparePaymentMethodQuery } from "../queries/graphqlGenerated";
 import { PlaidLinkOnEvent, PlaidLinkOnExit, PlaidLinkOnSuccess, PlaidLinkOptions, usePlaidLink } from "react-plaid-link";
+import { ApolloError } from "@apollo/client";
+import { usePreparePaymentMethodQuery } from "../queries/graphqlGenerated";
 import { BillingInfo } from "../forms/BillingInfoForm";
 import { PaymentMethod } from "../domain/payment/payment.interfaces";
 import { isLocalhostOrStaging } from "../domain/url/url.utils";
 import { clearPersistedInfo, getCheckoutModalState, isCheckoutModalInfoPlaid, persistCheckoutModalInfo, persistCheckoutModalInfoUsed } from "../components/public/CheckoutOverlay/CheckoutOverlay.utils";
 import { CheckoutModalStatePlaid } from "../components/public/CheckoutOverlay/CheckoutOverlay.types";
 import { FALLBACK_MODAL_STATE_COMMON } from "../components/public/CheckoutOverlay/CheckoutOverlay.constants";
-import { ApolloError } from "@apollo/client";
 
 export interface UsePlaidOptionsStartFlow {
   orgID: string;
@@ -34,10 +33,12 @@ export function isUsePlaidOptionsContinueFlow(options: UsePlaidOptions): options
 
 // Load the initial OAuth flow state from localStorage to initialize the ref. Note `getPlaidOAuthFlowState` will
 // automatically discard the saved data if it's invalid (`continueFlow && savedStateUsed`):
-export let INITIAL_PLAID_OAUTH_FLOW_STATE = getCheckoutModalState({ noClear: true });
+let INITIAL_PLAID_OAUTH_FLOW_STATE = getCheckoutModalState({ noClear: true });
 
 export function continuePlaidOAuthFlow() {
-  return INITIAL_PLAID_OAUTH_FLOW_STATE.continueFlow && !INITIAL_PLAID_OAUTH_FLOW_STATE.savedInfoUsed && isCheckoutModalInfoPlaid(INITIAL_PLAID_OAUTH_FLOW_STATE);
+  return INITIAL_PLAID_OAUTH_FLOW_STATE.continueFlow &&
+    !INITIAL_PLAID_OAUTH_FLOW_STATE.savedInfoUsed &&
+    isCheckoutModalInfoPlaid(INITIAL_PLAID_OAUTH_FLOW_STATE);
 }
 
 export interface UsePlaidReturn {
@@ -61,7 +62,7 @@ export function usePlaid(options: UsePlaidOptions): UsePlaidReturn {
     invoiceCountdownStart = options.invoiceCountdownStart;
     selectedBillingInfo = options.selectedBillingInfo;
     skip = options.skip || !orgID;
-  } else if (isUsePlaidOptionsContinueFlow(options) ) {
+  } else if (isUsePlaidOptionsContinueFlow(options)) {
     onSubmit = options.onSubmit;
     skip = true;
   }
@@ -96,7 +97,7 @@ export function usePlaid(options: UsePlaidOptions): UsePlaidReturn {
 
   const linkToken = (continueFlow ? savedLinkToken : preparePaymentMethodData?.preparePaymentMethod?.linkToken) || "";
 
-  const onSuccess = useCallback<PlaidLinkOnSuccess>((public_token, metadata) => {
+  const onSuccess = useCallback<PlaidLinkOnSuccess>((publicToken, metadata) => {
     // Reset in case purchase fails and we need to try again:
     clearPersistedInfo();
 
@@ -108,7 +109,7 @@ export function usePlaid(options: UsePlaidOptions): UsePlaidReturn {
     onSubmit({
       type: "ACH",
       accountId: metadata.accounts[0].id || (metadata as any).account_id,
-      publicToken: public_token,
+      publicToken,
     });
   }, [onSubmit]);
 

@@ -23,6 +23,7 @@ export const PurchaseConfirmationItemDetails: React.FC<PurchaseConfirmationItemD
       <Typography sx={{ mt: 6 }}>Purchase confirmed!</Typography>
 
       { dictionary.purchaseInstructions.map((line, i) => (
+        // eslint-disable-next-line react/no-array-index-key
         <Typography key={ i } sx={{ mt: 1 }}>{ line }</Typography>
       )) }
     </Stack>

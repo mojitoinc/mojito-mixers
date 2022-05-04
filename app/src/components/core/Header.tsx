@@ -1,5 +1,6 @@
 import { Box } from "@mui/material";
 import { Theme, SxProps } from "@mui/material/styles";
+import React from "react";
 import Link from "next/link";
 import { AuthButton } from "../auth/AuthButton";
 
@@ -16,16 +17,14 @@ const headerSx: SxProps<Theme> = {
   borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
 };
 
-export function Header() {
-  return (
-    <Box sx={ headerSx } component="header">
-      <AuthButton />
+export const Header: React.FC = () => (
+  <Box sx={ headerSx } component="header">
+    <AuthButton />
 
-      <Link href="/">
-        <a style={{ display: "block" }}>
-          <img src="/img/logos/mojito-light-logo.svg" style={{ display: "block", height: "32px" }} />
-        </a>
-      </Link>
-    </Box>
-  );
-}
+    <Link href="/">
+      <a style={{ display: "block" }}>
+        <img src="/img/logos/mojito-light-logo.svg" alt="Mojito Logo" style={{ display: "block", height: "32px" }} />
+      </a>
+    </Link>
+  </Box>
+);

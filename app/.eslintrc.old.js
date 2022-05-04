@@ -21,7 +21,8 @@ module.exports = {
     "func-style": ["off", "declaration"],
     "no-prototype-builtins": "off",
 
-    // @TODO/temp Non-critical stuff we should clean up, but hiding for now to clear clutter in order to see more important issues:
+    // @TODO/temp Non-critical stuff we should clean up, but hiding for now to clear clutter in order to see
+    // more important issues:
     "@typescript-eslint/explicit-module-boundary-types": "off",
   },
   ignorePatterns: ["dist/*"],

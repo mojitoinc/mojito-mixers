@@ -1,5 +1,5 @@
 declare module "country-region-data/dist/data-umd" {
-  const _exported: {
+  const exported: {
     countryName: string;
     countryShortCode: string;
     regions: {
@@ -8,5 +8,5 @@ declare module "country-region-data/dist/data-umd" {
     }[];
   }[];
 
-  export default _exported;
+  export default exported;
 }

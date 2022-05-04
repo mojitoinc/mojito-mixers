@@ -1,8 +1,8 @@
-import { BillingInfo } from "../../forms/BillingInfoForm";
-import { CircleError, CircleFieldError, RawSavedPaymentMethod, SavedPaymentMethod, SavedPaymentMethodBillingInfo } from "./circle.interfaces";
 import countryRegionData from "country-region-data/dist/data-umd";
 import { customList } from "country-codes-list";
 import { ApolloError } from "@apollo/client";
+import { CircleError, CircleFieldError, RawSavedPaymentMethod, SavedPaymentMethod, SavedPaymentMethodBillingInfo } from "./circle.interfaces";
+import { BillingInfo } from "../../forms/BillingInfoForm";
 import { formatSentence, fullTrim } from "../../utils/formatUtils";
 import { BUILT_IN_ERRORS } from "../errors/errors.constants";
 
@@ -28,6 +28,24 @@ export function formatPhoneAsE123(phoneNumber: string, countryCode: string) {
 
   // Otherwise, we add it based on the country code:
   return `${ getPhonePrefix(countryCode) }${ parsedPhoneNumber }`;
+}
+
+export function getSavedPaymentMethodAddressId({ billingDetails, metadata }: SavedPaymentMethodBillingInfo): string {
+  return [
+    billingDetails.name,
+    billingDetails.address1,
+    billingDetails.address2,
+    billingDetails.city,
+    `${ billingDetails.district.label }`,
+    billingDetails.postalCode,
+    `${ billingDetails.country.value }`,
+    metadata.email,
+    formatPhoneAsE123(metadata.phoneNumber, `${ billingDetails.country.value }`),
+  ].map((value = "") => {
+    // - Duplicate, leading or trailing spaces don't make a value different.
+    // - Casing doesn't make a value different.
+    return fullTrim(value).toUpperCase();
+  }).join("|");
 }
 
 export function transformRawSavedPaymentMethods(rawSavedPaymentMethods: RawSavedPaymentMethod[] = []): SavedPaymentMethod[] {
@@ -82,24 +100,6 @@ export function transformRawSavedPaymentMethods(rawSavedPaymentMethods: RawSaved
 
     return savedPaymentMethod;
   }).filter(Boolean) as SavedPaymentMethod[];
-}
-
-export function getSavedPaymentMethodAddressId({ billingDetails, metadata }: SavedPaymentMethodBillingInfo): string {
-  return [
-    billingDetails.name,
-    billingDetails.address1,
-    billingDetails.address2,
-    billingDetails.city,
-    `${ billingDetails.district.label }`,
-    billingDetails.postalCode,
-    `${ billingDetails.country.value }`,
-    metadata.email,
-    formatPhoneAsE123(metadata.phoneNumber, `${ billingDetails.country.value }`),
-  ].map((value = "") => {
-    // - Duplicate, leading or trailing spaces don't make a value different.
-    // - Casing doesn't make a value different.
-    return fullTrim(value).toUpperCase();
-  }).join("|");
 }
 
 // TODO: Change interface of the form to closely resemble this one:
@@ -201,7 +201,7 @@ export function parseCircleError(error: ApolloError | Error): CircleFieldErrors 
       };
 
       if (isCircleFieldErrorArray(parsedCircleErrors)) {
-        parsedCircleErrors.forEach(({ location, message }) => {
+        parsedCircleErrors.forEach(({ location, message: circleErrorMessage }) => {
           const [at, inputName, inputLabel] = CIRCLE_FIELD_TO_FORM_FIELD[location] || ["unknown", location, location];
           const searchRegExp = new RegExp(location, "g");
           const sectionFieldErrors = circleFieldErrors[at];
@@ -210,7 +210,7 @@ export function parseCircleError(error: ApolloError | Error): CircleFieldErrors 
 
           sectionFieldErrors[inputName] = [
             sectionFieldErrors[inputName],
-            formatSentence(message.replace(searchRegExp, inputLabel).replace(" (was )", "")),
+            formatSentence(circleErrorMessage.replace(searchRegExp, inputLabel).replace(" (was )", "")),
           ].filter(Boolean).join(" / ");
 
           circleFieldErrors.summary = circleFieldErrors.summary.replace(searchRegExp, inputLabel).replace(" (was )", "");

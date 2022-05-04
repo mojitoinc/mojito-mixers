@@ -1,5 +1,4 @@
 import React, { useCallback } from "react";
-import { PaymentType } from "../../../domain/payment/payment.interfaces";
 import { Typography, Stack, useMediaQuery, Tooltip, ToggleButton, ToggleButtonGroup } from "@mui/material";
 import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
 import CreditCardIcon from "@mui/icons-material/CreditCard";
@@ -7,6 +6,7 @@ import LanguageIcon from "@mui/icons-material/Language";
 import Icon from "@mdi/react";
 import { mdiEthereum } from '@mdi/js';
 import { useTheme } from "@mui/material/styles";
+import { PaymentType } from "../../../domain/payment/payment.interfaces";
 
 type PaymentMethodSelectorProps = {
   paymentMethods: PaymentType[];

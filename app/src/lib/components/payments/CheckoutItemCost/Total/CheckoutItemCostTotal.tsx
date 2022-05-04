@@ -1,9 +1,9 @@
 import { Box, Tooltip, Typography } from "@mui/material";
 import React from "react";
+import { SxProps, Theme } from "@mui/material/styles";
 import { formatTaxRate } from "../../../../utils/formatUtils";
 import { TaxesState } from "../../../../views/Billing/BillingView";
 import { Number } from "../../../shared/Number/Number";
-import { SxProps, Theme } from "@mui/material/styles";
 
 const TAX_RATE_PLACEHOLDER_SX: SxProps<Theme> = {
   background: theme => theme.palette.grey[100],
@@ -71,7 +71,7 @@ export const CheckoutItemCostTotal: React.FC<CheckoutItemCostTotalProps> = ({
       taxRateElement = <Tooltip title="Calculating taxes..."><span>(<Box component="span" sx={ TAX_RATE_PLACEHOLDER_SX }>00.00</Box> %)</span></Tooltip>;
       taxAmountElement = <Tooltip title="Calculating taxes..."><span><Box component="span" sx={ TAX_AMOUNT_PLACEHOLDER_SX }>{ `${ (total + feesValue) * 0.10 | 0 }`.replace(/./, "0") }.00</Box> USD</span></Tooltip>;
       totalElement = <Tooltip title="Calculating total..."><span><Box component="span" sx={ TOTAL_PLACEHOLDER_SX }>{ `${ (total + feesValue) * 1.10 | 0 }`.replace(/./, "0") }.00</Box> USD</span></Tooltip>;
-    } else if (status === "complete" && taxAmount !== undefined ) {
+    } else if (status === "complete" && taxAmount !== undefined) {
       taxRateElement = `(${ formatTaxRate(taxRate) })`;
       taxAmountElement = <Number suffix=" USD">{ taxAmount }</Number>;
       totalElement = <Number suffix=" USD">{ total + feesValue + taxAmount }</Number>;
@@ -83,7 +83,7 @@ export const CheckoutItemCostTotal: React.FC<CheckoutItemCostTotalProps> = ({
 
     taxRowElement = (
       <Box sx={ ROW_SX }>
-        <Typography sx={(theme) => ({ color: theme.palette.grey["500"] })}>Taxes { taxRateElement }</Typography>
+        <Typography sx={theme => ({ color: theme.palette.grey["500"] })}>Taxes { taxRateElement }</Typography>
         <Typography>{ taxAmountElement }</Typography>
       </Box>
     );
@@ -91,21 +91,23 @@ export const CheckoutItemCostTotal: React.FC<CheckoutItemCostTotalProps> = ({
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", mt: { xs: 3, sm: 0.5 } }}>
-      { withDetails && (<>
-        <Box sx={ ROW_SX }>
-          <Typography>Subtotal</Typography>
-          <Typography><Number suffix=" USD">{ total }</Number></Typography>
-        </Box>
-
-        { fees === null ? null : (
+      { withDetails && (
+        <>
           <Box sx={ ROW_SX }>
-            <Typography sx={(theme) => ({ color: theme.palette.grey["500"] })}>Fees</Typography>
-            <Typography><Number suffix=" USD">{fees}</Number></Typography>
+            <Typography>Subtotal</Typography>
+            <Typography><Number suffix=" USD">{ total }</Number></Typography>
           </Box>
-        ) }
 
-        { taxRowElement }
-      </>) }
+          { fees === null ? null : (
+            <Box sx={ ROW_SX }>
+              <Typography sx={theme => ({ color: theme.palette.grey["500"] })}>Fees</Typography>
+              <Typography><Number suffix=" USD">{fees}</Number></Typography>
+            </Box>
+          ) }
+
+          { taxRowElement }
+        </>
+      ) }
 
       <Box
         sx={{
@@ -114,11 +116,12 @@ export const CheckoutItemCostTotal: React.FC<CheckoutItemCostTotalProps> = ({
           flex: 1,
           justifyContent: "space-between",
           alignItems: "center",
-        }}
-      >
+        }}>
+
         <Typography sx={{ fontWeight: "500" }}>
           {withDetails ? "Total Amount (USD)" : "Total Amount Paid (USD)"}
         </Typography>
+
         <Typography
           variant="subtitle1"
           sx={{
@@ -127,6 +130,7 @@ export const CheckoutItemCostTotal: React.FC<CheckoutItemCostTotalProps> = ({
           }}>
           { totalElement }
         </Typography>
+
       </Box>
     </Box>
   );

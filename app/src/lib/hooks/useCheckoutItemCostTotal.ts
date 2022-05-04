@@ -14,13 +14,13 @@ export interface UseCheckoutItemsCostTotalResult extends UseCheckoutItemsCostTot
 
 export const useCheckoutItemsCostTotal = (checkoutItems: CheckoutItem[]): UseCheckoutItemsCostTotalResult => {
   return useMemo(() => {
-    const reduceResult = checkoutItems.reduce((result, checkoutItem) => {
+    const reduceResult = checkoutItems.reduce((resultAcc, checkoutItem) => {
       // result.total += checkoutItem.unitPrice * checkoutItem.units;
-      result.total += checkoutItem.totalPrice;
-      result.fees += checkoutItem.fee;
-      result.taxAmount += checkoutItem.taxes;
+      resultAcc.total += checkoutItem.totalPrice;
+      resultAcc.fees += checkoutItem.fee;
+      resultAcc.taxAmount += checkoutItem.taxes;
 
-      return result;
+      return resultAcc;
     }, to<UseCheckoutItemsCostTotalReduceResult>({ total: 0, fees: 0, taxAmount: 0 }));
 
     return { ...reduceResult, taxRate: 100 * reduceResult.taxAmount / (reduceResult.total || 1) };

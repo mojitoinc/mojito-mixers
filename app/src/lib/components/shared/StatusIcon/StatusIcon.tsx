@@ -1,12 +1,13 @@
-export type StatusIconVariant = "loading" | "success" | "error";
 import { Box, BoxProps, SvgIcon } from "@mui/material";
 import { Theme } from "@mui/material/styles";
 import React from "react";
-import { DEFAULT_ERROR_IMAGE_SRC, DEFAULT_PURCHASING_IMAGE_SRC, ROUNDED_BORDER_RADIUS } from "../../../config/theme/themeConstants";
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import CheckIcon from '@mui/icons-material/Check';
 import AutoRenewIcon from '@mui/icons-material/Autorenew';
+import { DEFAULT_ERROR_IMAGE_SRC, DEFAULT_PURCHASING_IMAGE_SRC, ROUNDED_BORDER_RADIUS } from "../../../config/theme/themeConstants";
 import { Img } from "../Img/Img";
+
+export type StatusIconVariant = "loading" | "success" | "error";
 
 export interface StatusIconProps extends BoxProps {
   variant?: StatusIconVariant;

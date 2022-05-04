@@ -95,8 +95,6 @@
     "@types/btoa": "^1.2.3",
     "@types/react": "^18.0.5",
     "@types/react-dom": "^18.0.1",
-    "@typescript-eslint/eslint-plugin": "^5.19.0",
-    "@typescript-eslint/parser": "^5.19.0",
     "ansi-regex": "^5.0.1",
     "node-fetch": "^2.6.7",
     "rollup": "^2.70.2",

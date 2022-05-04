@@ -29,13 +29,15 @@ export const AuthenticationView: React.FC<AuthenticationViewProps> = ({
     resetStepperProgress();
   }, []);
 
-  return (<Stack sx={{ mt: 5 }}>
-    <CheckoutItemCostBreakdown checkoutItems={ checkoutItems } taxes={ taxes } />
+  return (
+    <Stack sx={{ mt: 5 }}>
+      <CheckoutItemCostBreakdown checkoutItems={ checkoutItems } taxes={ taxes } />
 
-    <CheckoutModalFooter
-      variant={ isAuthenticated ? "toPayment" : "toGuestCheckout" }
-      guestCheckoutEnabled={ guestCheckoutEnabled }
-      onSubmitClicked={ onGuestClicked }
-      onCloseClicked={ onCloseClicked } />
-  </Stack>);
+      <CheckoutModalFooter
+        variant={ isAuthenticated ? "toPayment" : "toGuestCheckout" }
+        guestCheckoutEnabled={ guestCheckoutEnabled }
+        onSubmitClicked={ onGuestClicked }
+        onCloseClicked={ onCloseClicked } />
+    </Stack>
+  );
 };

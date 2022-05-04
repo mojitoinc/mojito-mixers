@@ -1,12 +1,12 @@
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { SecondaryButton } from "../../shared/SecondaryButton/SecondaryButton";
 import { Chip, Stack, Tooltip, Box, BoxProps } from "@mui/material";
 import React, { useCallback } from "react";
+import { Theme, SxProps } from "@mui/material/styles";
+import { SecondaryButton } from "../../shared/SecondaryButton/SecondaryButton";
 import { ThemeColors } from "../../../domain/mui/mui.interfaces";
 import { DisplayBox } from "../DisplayBox/DisplayBox";
 import { InlineField } from "../../shared/InlineField/InlineField";
-import { Theme, SxProps } from "@mui/material/styles";
 
 export interface SavedItemLabels {
   active?: string;
@@ -77,7 +77,7 @@ export const SavedItem: React.FC<SavedItemProps & { children: React.ReactNode }>
 
   const handleClick = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
     const { currentTarget } = e;
-    const action = currentTarget.dataset.action;
+    const { action } = currentTarget.dataset;
 
     if (!action) return;
 
@@ -102,11 +102,13 @@ export const SavedItem: React.FC<SavedItemProps & { children: React.ReactNode }>
       </Tooltip>
     );
   } else if (active) {
-    mainControlElement = (<>
-      <Chip size="small" color="success" label="Active" variant="outlined" />
+    mainControlElement = (
+      <>
+        <Chip size="small" color="success" label="Active" variant="outlined" />
 
-      { onCvvChange && <InlineField onChange={ onCvvChange } placeholder={ cvvLabel } error={ cvvError } sx={{ width: "52px" }} /> }
-    </>);
+        { onCvvChange && <InlineField onChange={ onCvvChange } placeholder={ cvvLabel } error={ cvvError } sx={{ width: "52px" }} /> }
+      </>
+    );
   } else if (onPick) {
     mainControlElement = (
       <SecondaryButton onClick={ handleClick } disabled={ disabledSelect } data-action="pick">
@@ -145,7 +147,7 @@ export const SavedItem: React.FC<SavedItemProps & { children: React.ReactNode }>
 
           { mainControlElement }
 
-          <Box sx={{ mr: "auto !important", mb: "auto !important", display: { sm: variant === "row" ? "none" : "block" } }}></Box>
+          <Box sx={{ mr: "auto !important", mb: "auto !important", display: { sm: variant === "row" ? "none" : "block" } }} />
 
           <Stack direction="row" spacing={ 1 } sx={{ pt: variant === "stacked" ? { xs: 0, sm: 1 } : 0 }}>
             { onEdit && (
@@ -157,7 +159,7 @@ export const SavedItem: React.FC<SavedItemProps & { children: React.ReactNode }>
             { onDelete && (
               <Tooltip title={ labels.delete }>
                 <SecondaryButton onClick={ handleClick } disabled={ disabledOther } data-action="delete">
-                  <DeleteIcon  />
+                  <DeleteIcon />
                 </SecondaryButton>
               </Tooltip>
             ) }

@@ -1,7 +1,7 @@
 import { SvgIcon } from "@mui/material";
-import { CheckoutModalFooterVariant } from "./CheckoutModalFooter";
 import LockIcon from '@mui/icons-material/Lock';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import { CheckoutModalFooterVariant } from "./CheckoutModalFooter";
 
 export const LABELS_BY_VARIANT: Record<CheckoutModalFooterVariant, string> = {
   toGuestCheckout: "Guest Check Out",

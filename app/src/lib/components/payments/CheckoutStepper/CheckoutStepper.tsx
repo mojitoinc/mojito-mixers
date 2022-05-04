@@ -24,10 +24,10 @@ export const CheckoutStepper: React.FC<CheckoutStepperProps> = ({
   return (
     <Box sx={{ position: "relative" }}>
       <Stack spacing={ 2 } direction="row" sx={{ justifyContent: "space-between", alignItems: "center", pt: 2, pb: 1 }}>
-        <Typography variant="subtitle2" sx={{ width: "100%", color: theme => theme.palette.grey[progress === 50 ? "700" : "600"] }} >
+        <Typography variant="subtitle2" sx={{ width: "100%", color: theme => theme.palette.grey[progress === 50 ? "700" : "600"] }}>
           Billing Information
         </Typography>
-        <Typography variant="subtitle2" sx={{ width: "100%", color: theme => theme.palette.grey[progress === 50 ? "600" : "700"] }} >
+        <Typography variant="subtitle2" sx={{ width: "100%", color: theme => theme.palette.grey[progress === 50 ? "600" : "700"] }}>
           Payment and Delivery
         </Typography>
       </Stack>

@@ -1,9 +1,8 @@
-
-import { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { BoxProps, Divider, Stack } from "@mui/material";
 import { CheckoutDeliveryAndItemCostBreakdown } from "../../components/payments/CheckoutDeliveryAndItemCostBreakdown/CheckoutDeliveryAndItemCostBreakdown";
 import { CheckoutStepper } from "../../components/payments/CheckoutStepper/CheckoutStepper";
 import { CheckoutItem } from "../../domain/product/product.interfaces";
-import React from "react";
 import { PaymentMethodForm } from "../../forms/PaymentMethodForm";
 import { PaymentMethod, PaymentType } from "../../domain/payment/payment.interfaces";
 import { SavedPaymentDetailsSelector } from "../../components/shared/SavedPaymentDetailsSelector/SavedPaymentDetailsSelector";
@@ -11,7 +10,6 @@ import { BillingInfoItem } from "../../components/payments/BillingInfo/Item/Bill
 import { SavedPaymentMethod } from "../../domain/circle/circle.interfaces";
 import { billingInfoToSavedPaymentMethodBillingInfo } from "../../domain/circle/circle.utils";
 import { CheckoutModalError, SelectedPaymentMethod } from "../../components/public/CheckoutOverlay/CheckoutOverlay.hooks";
-import { BoxProps, Divider, Stack } from "@mui/material";
 import { usePlaid } from "../../hooks/usePlaid";
 import { ConsentType } from "../../components/shared/ConsentText/ConsentText";
 import { checkNeedsGenericErrorMessage } from "../../hooks/useFormCheckoutError";
@@ -133,7 +131,7 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
     if (showSaved && !selectedPaymentInfoMatch && lastActiveSavedPaymentMethod /* && savedPaymentMethods.length > 0 && !checkoutError */) {
       onPaymentInfoSelected(lastActiveSavedPaymentMethod.id);
     }
-  }, [showSaved, onPaymentInfoSelected, savedPaymentMethods, selectedPaymentInfo/*, checkoutError*/]);
+  }, [showSaved, onPaymentInfoSelected, savedPaymentMethods, selectedPaymentInfo/* , checkoutError */]);
 
   // PLAIN LINKS:
   const {
@@ -154,49 +152,49 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
 
   return (
     <Stack
-      direction={{ xs: "column",  md: "row" }}
-      spacing={{ xs: 0,  md: 3.75 }}>
+      direction={{ xs: "column", md: "row" }}
+      spacing={{ xs: 0, md: 3.75 }}>
 
-      <Stack sx={{ display: "flex", overflow: "hidden", width: (theme) => ({ xs: "100%", md: `calc(50% - ${ theme.spacing(3.75 / 2) })` }) }}>
-        <CheckoutStepper progress={100} />
+      <Stack sx={{ display: "flex", overflow: "hidden", width: theme => ({ xs: "100%", md: `calc(50% - ${ theme.spacing(3.75 / 2) })` }) }}>
+        <CheckoutStepper progress={ 100 } />
 
         <BillingInfoItem
-          data={selectedPaymentMethodBillingInfo}
+          data={ selectedPaymentMethodBillingInfo }
           additionalProps={{ onEdit: onPrev, disabled: isDeleting, boxProps: billingInfoItemBoxProps }} />
 
         <Divider sx={{ mt: 2.5 }} />
 
-        {showSaved ? (
+        { showSaved ? (
           <SavedPaymentDetailsSelector
-            showLoader={isDeleting}
-            acceptedCreditCardNetworks={acceptedCreditCardNetworks}
-            savedPaymentMethods={savedPaymentMethods}
-            selectedPaymentMethodId={typeof selectedPaymentInfo === "string" ? selectedPaymentInfo : undefined}
-            onNew={handleShowForm}
-            onDelete={handleSavedPaymentMethodDeleted}
-            onPick={onPaymentInfoSelected}
-            onCvvSelected={onCvvSelected}
-            onNext={onNext}
-            onClose={onClose}
-            onAttemptSubmit={handleFormAttemptSubmit}
-            consentType={consentType} />
+            showLoader={ isDeleting }
+            acceptedCreditCardNetworks={ acceptedCreditCardNetworks }
+            savedPaymentMethods={ savedPaymentMethods }
+            selectedPaymentMethodId={ typeof selectedPaymentInfo === "string" ? selectedPaymentInfo : undefined }
+            onNew={ handleShowForm }
+            onDelete={ handleSavedPaymentMethodDeleted }
+            onPick={ onPaymentInfoSelected }
+            onCvvSelected={ onCvvSelected }
+            onNext={ onNext }
+            onClose={ onClose }
+            onAttemptSubmit={ handleFormAttemptSubmit }
+            consentType={ consentType } />
         ) : (
           <PaymentMethodForm
-            acceptedPaymentTypes={acceptedPaymentTypes}
-            acceptedCreditCardNetworks={acceptedCreditCardNetworks}
-            defaultValues={typeof selectedPaymentInfo === "string" || selectedPaymentInfo === null ? undefined : selectedPaymentInfo}
-            checkoutError={checkoutError}
-            plaidLoading={plaidLoading}
-            plaidError={plaidError}
-            onPlaidLinkClicked={onPlaidLinkClicked}
-            refetchPlaidLink={refetchPlaidLink}
-            onSaved={savedPaymentMethods.length > 0 ? handleShowSaved : undefined}
-            onClose={onClose}
-            onSubmit={handleSubmit}
-            onAttemptSubmit={handleFormAttemptSubmit}
-            consentType={consentType}
-            debug={debug} />
-        )}
+            acceptedPaymentTypes={ acceptedPaymentTypes }
+            acceptedCreditCardNetworks={ acceptedCreditCardNetworks }
+            defaultValues={ typeof selectedPaymentInfo === "string" || selectedPaymentInfo === null ? undefined : selectedPaymentInfo }
+            checkoutError={ checkoutError }
+            plaidLoading={ plaidLoading }
+            plaidError={ plaidError }
+            onPlaidLinkClicked={ onPlaidLinkClicked }
+            refetchPlaidLink={ refetchPlaidLink }
+            onSaved={ savedPaymentMethods.length > 0 ? handleShowSaved : undefined }
+            onClose={ onClose }
+            onSubmit={ handleSubmit }
+            onAttemptSubmit={ handleFormAttemptSubmit }
+            consentType={ consentType }
+            debug={ debug } />
+        ) }
       </Stack>
 
       <Divider sx={{ display: { xs: "block", md: "none" } }} />
@@ -207,7 +205,7 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
         validatePersonalDeliveryAddress={ formSubmitAttempted }
         wallets={ wallets }
         wallet={ wallet }
-        onWalletChange={onWalletChange} />
+        onWalletChange={ onWalletChange } />
     </Stack>
   );
 };

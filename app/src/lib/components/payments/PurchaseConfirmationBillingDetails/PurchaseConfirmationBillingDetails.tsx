@@ -1,5 +1,6 @@
 import { Box, Chip, InputAdornment, Stack, Typography } from "@mui/material";
 import React from "react";
+import CheckIcon from "@mui/icons-material/Check";
 import { SavedPaymentMethod, SavedPaymentMethodBillingInfo } from "../../../domain/circle/circle.interfaces";
 import { PaymentMethod } from "../../../domain/payment/payment.interfaces";
 import { CheckoutItem } from "../../../domain/product/product.interfaces";
@@ -8,7 +9,6 @@ import { ReadOnlyField, ReadOnlyCardField } from "../../shared/ReadOnlyField/Rea
 import { CheckoutItemCostPurchase } from "../CheckoutItemCost/Purchase/CheckoutItemCostPurchase";
 import { PAYMENT_TYPE_LABEL } from "./PurchaseConfirmationBillingDetails.constants";
 import { getFormattedPaymentMethod } from "./PurchaseConfirmationBillingDetails.utils";
-import CheckIcon from "@mui/icons-material/Check";
 import { DeliveryWalletDetails } from "../DeliveryWallet/DeliveryWalletDetails/DeliveryWalletDetails";
 import { CopyButton } from "../../shared/CopyButton/CopyButton";
 import { Wallet } from "../../../domain/wallet/wallet.interfaces";
@@ -55,10 +55,12 @@ export const PurchaseConfirmationBillingDetails: React.FC<PurchaseConfirmationBi
         <Chip
           size="small"
           color="success"
-          label={ (<>
-            Payment Processed
-            <CheckIcon sx={{ height: "24px", ml: 1.5 }} />
-          </>) } />
+          label={ (
+            <>
+              Payment Processed
+              <CheckIcon sx={{ height: "24px", ml: 1.5 }} />
+            </>
+          ) } />
       </Stack>
 
       <Stack

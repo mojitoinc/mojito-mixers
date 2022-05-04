@@ -1,4 +1,3 @@
-
 export { PUICheckout } from "./components/public/CheckoutOverlay/CheckoutOverlay";
 export { PUISuccess } from "./components/public/SuccessOverlay/SuccessOverlay";
 export { PUIError } from "./components/public/ErrorOverlay/ErrorOverlay";
@@ -28,4 +27,3 @@ if (process.env.NODE_ENV === "development" && process.browser) {
   // (window as any)._React = React;
   // (window as any)._ThemeProvider = ThemeProvider;
 }
-

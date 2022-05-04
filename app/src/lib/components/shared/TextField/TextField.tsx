@@ -11,13 +11,13 @@ export type ControlledFieldProps = TextFieldProps & { name: string; control: Con
 
 export const controlledFieldFrom = (FieldComponent: React.ComponentType<TextFieldProps>) => {
   const ControlledField: React.FC<ControlledFieldProps> = ({
-    name,
+    name: parentName,
     label,
     control,
     ...props
   }) => (
     <Controller
-      name={name}
+      name={parentName}
       control={control}
       render={({ field: { name, ref, ...field }, fieldState: { error } }) => (
         <FieldComponent
@@ -39,7 +39,11 @@ export const controlledFieldFrom = (FieldComponent: React.ComponentType<TextFiel
 }
 
 
-export const TextField: React.FC<TextFieldProps> = (props) => (
+export const TextField: React.FC<TextFieldProps> = ({
+  InputProps,
+  InputLabelProps,
+  ...props
+}) => (
   <MUITextField
     fullWidth
     variant="filled"
@@ -47,12 +51,12 @@ export const TextField: React.FC<TextFieldProps> = (props) => (
     {...props}
     InputProps={
       {
-        ...props.InputProps,
+        ...InputProps,
         disableUnderline: true
       } as any
     }
     InputLabelProps={{
-      ...props.InputLabelProps,
+      ...InputLabelProps,
       shrink: true
     }}
   />

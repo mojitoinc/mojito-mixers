@@ -1,11 +1,10 @@
 import { Typography } from "@mui/material";
-import React from "react";
+import React, { useCallback } from "react";
 import { DisplayBox } from "../../DisplayBox/DisplayBox";
 import { InputGroupLabel } from "../../../shared/InputGroupLabel/InputGroupLabel";
 import { TextField } from "../../../shared/TextField/TextField";
 import { withInvalidErrorMessage } from "../../../../utils/validationUtils";
 import { isCustomWalletAddress, isValidWalletAddress } from "../../../../domain/wallet/wallet.utils";
-import { useCallback } from "react";
 import { WalletAddressSelector } from "../../../shared/Select/WalletAddressSelector/WalletAddressSelector";
 import { Wallet } from "../../../../domain/wallet/wallet.interfaces";
 import { useDictionary } from "../../../../hooks/useDictionary";
@@ -60,23 +59,25 @@ export const DeliveryWalletSelector: React.FC<DeliveryWalletSelectorProps> = ({
           error={ showAddressError }
           helperText={ showAddressError ? INVALID_WALLET_ADDRESS_MESSAGE : undefined } />
 
-        { isCustomWalletAddress(wallet) && (<>
-          <Typography variant="body1" sx={{ my: 1.5 }}>
-            Once minted, this is where your items will be delivered:
-          </Typography>
+        { isCustomWalletAddress(wallet) && (
+          <>
+            <Typography variant="body1" sx={{ my: 1.5 }}>
+              Once minted, this is where your items will be delivered:
+            </Typography>
 
-          <TextField
-            margin="none"
-            label={ WALLET_ADDRESS_FIELD_LABEL }
-            onChange={ handleInputChange }
-            value={ wallet }
-            error={ showAddressError }
-            helperText={ showAddressError ? INVALID_WALLET_ADDRESS_MESSAGE : undefined } />
+            <TextField
+              margin="none"
+              label={ WALLET_ADDRESS_FIELD_LABEL }
+              onChange={ handleInputChange }
+              value={ wallet }
+              error={ showAddressError }
+              helperText={ showAddressError ? INVALID_WALLET_ADDRESS_MESSAGE : undefined } />
 
-          <Typography variant="body2" sx={{ mt: 1.5 }}>
-            (IMPORTANT: Please make sure the wallet address you provide is correct)
-          </Typography>
-        </>) }
+            <Typography variant="body2" sx={{ mt: 1.5 }}>
+              (IMPORTANT: Please make sure the wallet address you provide is correct)
+            </Typography>
+          </>
+        ) }
       </DisplayBox>
     </>
   );

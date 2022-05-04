@@ -1,12 +1,7 @@
 import React, { useCallback, useEffect } from "react";
 import { Control, Controller, FieldError } from "react-hook-form";
-import {
-  EMPTY_OPTION,
-  Select,
-  SelectOption,
-  SelectProps
-} from "../../Select/Select";
 import { SelectChangeEvent } from "@mui/material";
+import { EMPTY_OPTION, Select, SelectOption, SelectProps } from "../Select";
 import { useCountryOptions } from "../../../../hooks/useCountryOptions";
 
 export interface CountrySelectorProps extends Omit<SelectProps, "value" | "options"> {
@@ -46,7 +41,7 @@ export const CountrySelector: React.FC<CountrySelectorProps> = ({
 
     const option = selectedValue
       ? optionsMap[selectedValue]
-      : options.find((option) => option.label === selectedLabel);
+      : options.find(opt => opt.label === selectedLabel);
 
     setTimeout(() => onSelectCountry(option || EMPTY_OPTION));
   }, [value, optionsMap, options, onSelectCountry]);
@@ -69,12 +64,12 @@ export const CountrySelector: React.FC<CountrySelectorProps> = ({
 export type ControlledCountrySelectorProps = Omit<SelectProps, "value" | "options"> & { name: string; control: Control<any>; };
 
 export const ControlledCountrySelector: React.FC<ControlledCountrySelectorProps> = ({
-  name,
+  name: parentName,
   control,
   label,
 }) => (
   <Controller
-    name={name}
+    name={parentName}
     control={control}
     render={({ field: { name, onChange, ref, ...field }, fieldState }) => {
       const error = fieldState?.error;

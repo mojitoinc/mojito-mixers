@@ -1,8 +1,8 @@
 import React from "react";
 import { Box, Typography, Grid, Avatar, Divider, Stack } from "@mui/material";
+import { SxProps, Theme } from "@mui/material/styles";
 import { Number } from "../../../shared/Number/Number";
 import { CheckoutItem } from "../../../../domain/product/product.interfaces";
-import { SxProps, Theme } from "@mui/material/styles";
 
 interface CheckoutItemListProps {
   sx?: SxProps<Theme>;
@@ -19,11 +19,11 @@ export const CheckoutItemList: React.FC<CheckoutItemListProps> = ({
 }) => (
   <Stack
     sx={sx}
-    divider={
+    divider={(
       <Box sx={{ py: 1.25 }}>
         {withSeparators && <Divider sx={{ my: 2.5 }} />}
       </Box>
-    }
+    )}
   >
     {checkoutItems.map(
       ({ lotID, name, imageSrc, imageBackground, totalSupply, remainingSupply, units, unitPrice }) => (
@@ -42,8 +42,7 @@ export const CheckoutItemList: React.FC<CheckoutItemListProps> = ({
               src={imageSrc}
               variant="square"
               sx={{
-                background: (theme) =>
-                  imageBackground || theme.palette.grey["300"],
+                background: theme => imageBackground || theme.palette.grey["300"],
                 width: 80,
                 height: 80,
                 flex: "0 0 auto",
@@ -65,9 +64,11 @@ export const CheckoutItemList: React.FC<CheckoutItemListProps> = ({
                 <Typography sx={{ pb: 0.5 }}>
                   # { units === 1 ? (
                     <Number>{totalSupply - remainingSupply + 1}</Number>
-                  ) : (<>
+                ) : (
+                  <>
                     <Number>{totalSupply - remainingSupply + 1}</Number>-<Number>{totalSupply - remainingSupply + units}</Number>
-                  </>) } / <Number>{totalSupply}</Number>
+                  </>
+                ) } / <Number>{totalSupply}</Number>
                 </Typography>
               ) }
 
