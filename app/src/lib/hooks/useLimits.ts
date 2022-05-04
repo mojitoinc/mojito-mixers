@@ -3,11 +3,8 @@ import { useEffect, useMemo, useRef } from "react";
 import { PaymentLimits, transformRawRemainingItemLimit } from "../domain/payment/payment.utils";
 import { CheckoutItem } from "../domain/product/product.interfaces";
 import { PaymentType } from "../domain/payment/payment.interfaces";
-import {
-  useCollectionItemByIdQuery,
-  useValidatePaymentLimitQuery,
-} from "../queries/graphqlGenerated";
-import { PAYMENT_METHOD_OPTION_PROPS } from "@components/shared/PaymentMethodSelector/PaymentMethodSelector";
+import { PAYMENT_METHOD_OPTION_PROPS } from "../components/shared/PaymentMethodSelector/PaymentMethodSelector";
+import { useCollectionItemByIdQuery, useValidatePaymentLimitQuery } from "../queries/graphqlGenerated";
 
 export interface UseLimitsReturn {
   limits?: PaymentLimits;
@@ -22,14 +19,15 @@ export function useLimits(
   paymentType?: PaymentType,
 ): UseLimitsReturn {
   const itemsCount = checkoutItem?.units || 0;
+  const collectionItemId = checkoutItem?.collectionItemId || "";
 
   const {
     data: collectionItemData,
     loading: collectionItemLoading,
   } = useCollectionItemByIdQuery({
-    skip: !checkoutItem?.collectionItemId,
+    skip: !collectionItemId,
     variables: {
-      id: checkoutItem?.collectionItemId,
+      id: collectionItemId,
     },
   });
 
@@ -57,12 +55,14 @@ export function useLimits(
   const lastLimitsRef = useRef<undefined | Record<PaymentType, number>>();
 
   const limits: undefined | Record<PaymentType, number> = useMemo(() => {
-    if (!rawRemainingItemLimit) return lastLimitsRef.current;
+    if (rawRemainingItemLimit) {
+      lastLimitsRef.current = transformRawRemainingItemLimit(
+        rawRemainingItemLimit,
+        itemsCount,
+      );
+    }
 
-    return lastLimitsRef.current = transformRawRemainingItemLimit(
-      rawRemainingItemLimit,
-      itemsCount,
-    );
+    return lastLimitsRef.current;
   }, [rawRemainingItemLimit, itemsCount]);
 
   const limitExceededMessage = useMemo(() => {
@@ -74,8 +74,8 @@ export function useLimits(
 
     const alternativePaymentMethods = acceptedPaymentTypes.filter((acceptedPaymentType: PaymentType) => {
       return acceptedPaymentType !== paymentType && itemsCount <= limits[paymentType];
-    }).map((paymentType: PaymentType) => {
-      return PAYMENT_METHOD_OPTION_PROPS[paymentType].label;
+    }).map((alternativePaymentMethodType: PaymentType) => {
+      return PAYMENT_METHOD_OPTION_PROPS[alternativePaymentMethodType].label;
     });
 
     if (alternativePaymentMethods.length > 0) {
@@ -97,4 +97,4 @@ export function useLimits(
     refetch,
     limitExceededMessage,
   };
-};
+}
