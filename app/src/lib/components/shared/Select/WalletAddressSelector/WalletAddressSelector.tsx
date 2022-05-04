@@ -88,14 +88,14 @@ export const WalletAddressSelector: React.FC<WalletAddressSelectorProps> = ({
 
   return (
     <Select
-      {...props}
-      label={label}
-      options={options}
-      onChange={handleChange}
+      { ...props }
+      label={ label }
+      options={ options }
+      onChange={ handleChange }
       value={ selectValue }
       disabled={ disabled }
       error={ showError ? error : undefined }
-      helperText={ showError ? helperText : undefined}
+      helperText={ showError ? helperText : undefined }
       displayEmpty
     />
   );

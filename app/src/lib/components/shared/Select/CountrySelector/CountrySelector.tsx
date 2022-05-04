@@ -56,7 +56,7 @@ export const CountrySelector: React.FC<CountrySelectorProps> = ({
       label={ label }
       options={ options }
       onChange={ handleChange }
-      value={ optionsMap[selectedValue] ? selectedValue : ""}
+      value={ optionsMap[selectedValue] ? selectedValue : "" }
       disabled={ isDisabled } />
   );
 };
@@ -69,26 +69,26 @@ export const ControlledCountrySelector: React.FC<ControlledCountrySelectorProps>
   label,
 }) => (
   <Controller
-    name={parentName}
-    control={control}
-    render={({ field: { name, onChange, ref, ...field }, fieldState }) => {
+    name={ parentName }
+    control={ control }
+    render={ ({ field: { name, onChange, ref, ...field }, fieldState }) => {
       const error = fieldState?.error;
       const fieldError = error ? (error.hasOwnProperty("message") ? error.message : (error as unknown as { value: FieldError }).value?.message) || "" : "";
 
       return (
         <CountrySelector
-          id={name}
-          name={name}
+          id={ name }
+          name={ name }
           autoComplete="country"
-          label={label}
-          onSelectCountry={onChange}
+          label={ label }
+          onSelectCountry={ onChange }
           fullWidth
-          inputRef={ref}
-          error={!!fieldError}
-          helperText={fieldError}
-          {...field}
+          inputRef={ ref }
+          error={ !!fieldError }
+          helperText={ fieldError }
+          { ...field }
         />
       );
-    }}
+    } }
   />
 );

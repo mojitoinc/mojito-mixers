@@ -172,15 +172,15 @@ export const CheckoutModalFooter: React.FC<CheckoutModalFooterProps> = ({
         pb: 5,
       }}>
 
-      {showConsent && consentType === "checkbox" && (
+      { showConsent && consentType === "checkbox" && (
         <Checkbox
-          label={<>I {consentTextElement}</>}
-          checked={isConsentChecked}
-          onChange={handleConsentClicked}
-          error={showConsentError}
-          helperText={showConsentError ? CONSENT_ERROR_MESSAGE : undefined}
+          label={ <>I { consentTextElement }</> }
+          checked={ isConsentChecked }
+          onChange={ handleConsentClicked }
+          error={ showConsentError }
+          helperText={ showConsentError ? CONSENT_ERROR_MESSAGE : undefined }
           sx={{ alignSelf: "flex-start", mb: 5 }} />
-      )}
+      ) }
 
       { goToLabel && onGoTo && (
         <PrimaryButton
@@ -192,7 +192,7 @@ export const CheckoutModalFooter: React.FC<CheckoutModalFooterProps> = ({
         </PrimaryButton>
       ) }
 
-      {primaryButtonVisible && (
+      { primaryButtonVisible && (
         <PrimaryButton
           onClickCapture={ onSubmitClicked ? handleSubmitClicked : undefined }
           disabled={ isPrimaryButtonDisabled }
@@ -201,31 +201,31 @@ export const CheckoutModalFooter: React.FC<CheckoutModalFooterProps> = ({
           endIcon={ isFormLoading || submitLoading ? <CircularProgress color="inherit" size="1em" /> : (PrimaryButtonIcon && <PrimaryButtonIcon />) }>
           { primaryButtonLabel }
         </PrimaryButton>
-      )}
+      ) }
 
-      {variant !== "toMarketplace" && (onCloseClicked || closeDisabled) && (
+      { variant !== "toMarketplace" && (onCloseClicked || closeDisabled) && (
         <Typography sx={{ color: cancelLinkColor, pt: primaryButtonVisible ? 2 : 0 }}>
-          {primaryButtonVisible ? "or " : null}
+          { primaryButtonVisible ? "or " : null }
           <Link
             sx={{ color: cancelLinkColor, cursor: isCancelLinkDisabled ? "not-allowed" : "pointer" }}
             href={ closeHref }
-            onClickCapture={handleCancelClicked}>
+            onClickCapture={ handleCancelClicked }>
             { cancelLinkLabel }
           </Link>
         </Typography>
-      )}
+      ) }
 
-      {showConsent && consentType === "disclaimer" && (
+      { showConsent && consentType === "disclaimer" && (
       <>
         <Divider sx={{ my: 5, width: "100%" }} />
 
         <Typography sx={{ maxWidth: SM_MOBILE_MAX_WIDTH }} align="center">
-          By placing an order you affirm that you {consentTextElement}
+          By placing an order you affirm that you { consentTextElement }
         </Typography>
       </>
-      )}
+      ) }
 
-      {showConsent && consentType === "circle" && (
+      { showConsent && consentType === "circle" && (
         <>
           <Divider sx={{ my: 5, width: "100%" }} />
           <Box display="flex">
@@ -233,11 +233,11 @@ export const CheckoutModalFooter: React.FC<CheckoutModalFooterProps> = ({
               Payments powered by
             </Typography>
             <Link href="https://www.circle.com/en/" target="_blank" rel="noopener noreferrer">
-              <Img src={CIRCLE_LOGO_IMAGE_SRC} height={20} />
+              <Img src={ CIRCLE_LOGO_IMAGE_SRC } height={ 20 } />
             </Link>
           </Box>
         </>
-      )}
+      ) }
     </Box>
   );
 }

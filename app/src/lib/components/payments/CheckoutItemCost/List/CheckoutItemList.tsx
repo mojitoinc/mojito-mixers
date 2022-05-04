@@ -18,17 +18,17 @@ export const CheckoutItemList: React.FC<CheckoutItemListProps> = ({
   showPrices = false,
 }) => (
   <Stack
-    sx={sx}
-    divider={(
+    sx={ sx }
+    divider={ (
       <Box sx={{ py: 1.25 }}>
-        {withSeparators && <Divider sx={{ my: 2.5 }} />}
+        { withSeparators && <Divider sx={{ my: 2.5 }} /> }
       </Box>
-    )}
+    ) }
   >
-    {checkoutItems.map(
+    { checkoutItems.map(
       ({ lotID, name, imageSrc, imageBackground, totalSupply, remainingSupply, units, unitPrice }) => (
         <Grid
-          key={lotID}
+          key={ lotID }
           container
           item
           direction="column"
@@ -38,8 +38,8 @@ export const CheckoutItemList: React.FC<CheckoutItemListProps> = ({
         >
           <Box sx={{ flex: 1, display: "flex" }}>
             <Avatar
-              alt={name}
-              src={imageSrc}
+              alt={ name }
+              src={ imageSrc }
               variant="square"
               sx={{
                 background: theme => imageBackground || theme.palette.grey["300"],
@@ -58,17 +58,17 @@ export const CheckoutItemList: React.FC<CheckoutItemListProps> = ({
                 flex: 1,
               }}
             >
-              <Typography sx={{ fontWeight: "500", pb: 0.5 }}>{name}</Typography>
+              <Typography sx={{ fontWeight: "500", pb: 0.5 }}>{ name }</Typography>
 
               { totalSupply && remainingSupply && (
                 <Typography sx={{ pb: 0.5 }}>
                   # { units === 1 ? (
-                    <Number>{totalSupply - remainingSupply + 1}</Number>
+                    <Number>{ totalSupply - remainingSupply + 1 }</Number>
                 ) : (
                   <>
-                    <Number>{totalSupply - remainingSupply + 1}</Number>-<Number>{totalSupply - remainingSupply + units}</Number>
+                    <Number>{ totalSupply - remainingSupply + 1 }</Number>-<Number>{ totalSupply - remainingSupply + units }</Number>
                   </>
-                ) } / <Number>{totalSupply}</Number>
+                ) } / <Number>{ totalSupply }</Number>
                 </Typography>
               ) }
 
@@ -81,13 +81,13 @@ export const CheckoutItemList: React.FC<CheckoutItemListProps> = ({
                   pt: 0.5,
                 }}
               >
-                <Typography>Quantity: <Box component="span" sx={{ fontWeight: 500 }}>{units}</Box></Typography>
-                { showPrices && <Typography><Number suffix=" USD">{unitPrice}</Number></Typography> }
+                <Typography>Quantity: <Box component="span" sx={{ fontWeight: 500 }}>{ units }</Box></Typography>
+                { showPrices && <Typography><Number suffix=" USD">{ unitPrice }</Number></Typography> }
               </Box>
             </Box>
           </Box>
         </Grid>
       )
-    )}
+    ) }
   </Stack>
 );

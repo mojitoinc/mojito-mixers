@@ -80,7 +80,7 @@ export const SavedBillingDetailsSelector: React.FC<SavedBillingDetailsSelectorPr
           }) }
           component={ BillingInfoItem }
           itemKey={ getPaymentMethodAddressId }
-          deps={[selectedPaymentMethodAddressId, showLoader, onDelete, onPick, onEdit]} />
+          deps={ [selectedPaymentMethodAddressId, showLoader, onDelete, onPick, onEdit] } />
 
         <SecondaryButton onClick={ onNew } startIcon={ <AddIcon /> } sx={{ mt: 2.5 }} disabled={ showLoader }>
           Add New Billing Info

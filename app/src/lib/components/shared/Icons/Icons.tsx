@@ -6,7 +6,7 @@ import { standaloneGetCardImageProps } from "../../../domain/payment/payment.uti
 export const CREDIT_CARD_ICON_SX: SxProps<Theme> = { width: "35px", height: "24px" };
 
 export const SelectIcon = (props: SvgIconProps) => (
-  <SvgIcon {...props}>
+  <SvgIcon { ...props }>
     <path
       fillRule="evenodd"
       clipRule="evenodd"
@@ -20,6 +20,6 @@ export const CreditCardIcon: React.FC<SvgIconProps & { network: string }> = ({ n
     <SvgIcon
       { ...standaloneGetCardImageProps(network) }
       { ...props }
-      sx={ { ...CREDIT_CARD_ICON_SX, ...props.sx } } />
+      sx={{ ...CREDIT_CARD_ICON_SX, ...props.sx }} />
   );
 };

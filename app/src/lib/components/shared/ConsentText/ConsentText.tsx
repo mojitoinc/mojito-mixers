@@ -20,7 +20,7 @@ export const ConsentText: React.FC = () => {
   return (
     <>
       have read, understood, and consent to the
-      {" "}
+      { " " }
       { linkElements.map((linkElement, i) => {
         return (
           // eslint-disable-next-line react/no-array-index-key

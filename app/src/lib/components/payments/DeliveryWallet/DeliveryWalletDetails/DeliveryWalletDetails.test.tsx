@@ -20,7 +20,7 @@ describe("DeliveryWalletDetails", () => {
   });
 
   it("render wallet details", async () => {
-    render(<DeliveryWalletDetails {...deliveryWalletDetailsProps} />);
+    render(<DeliveryWalletDetails { ...deliveryWalletDetailsProps } />);
 
     const button = await screen.getByLabelText("Copy Wallet Address");
 

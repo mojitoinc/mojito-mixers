@@ -21,23 +21,23 @@ export const Checkbox: React.FC<CheckboxProps> = ({
 }) => (
   <FormControl sx={ sx } error={ error }>
     <FormControlLabel
-      label={(
+      label={ (
         <>
           { label }
           { helperText && <FormHelperText sx={{ mt: 1 }}>{ helperText }</FormHelperText> }
         </>
-)}
+) }
       sx={{ alignItems: "flex-start", pt: 1 }}
-      control={(
+      control={ (
         <MuiCheckbox
           sx={{ pl: 1.5, pt: 0 }}
-          checked={checked}
-          onChange={onChange}
+          checked={ checked }
+          onChange={ onChange }
           icon={ <CheckboxIconUnchecked error={ error } /> }
           checkedIcon={ <CheckboxIconChecked error={ error } /> }
           disableRipple
           { ...props } />
-      )} />
+      ) } />
 
   </FormControl>
 );
@@ -50,24 +50,24 @@ export const ControlledCheckbox: React.FC<ControlledCheckboxProps> = ({
   label,
 }) => (
   <Controller
-    name={parentName}
-    control={control}
-    render={({ field: { name, onChange, ref, value, ...field }, fieldState }) => {
+    name={ parentName }
+    control={ control }
+    render={ ({ field: { name, onChange, ref, value, ...field }, fieldState }) => {
       const error = fieldState?.error;
 
       return (
         <Checkbox
-          id={name}
-          name={name}
-          label={label}
-          checked={value}
-          onChange={onChange}
-          inputRef={ref}
-          error={!!error}
-          helperText={error?.message}
-          {...field}
+          id={ name }
+          name={ name }
+          label={ label }
+          checked={ value }
+          onChange={ onChange }
+          inputRef={ ref }
+          error={ !!error }
+          helperText={ error?.message }
+          { ...field }
         />
       );
-    }}
+    } }
   />
 );

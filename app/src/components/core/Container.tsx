@@ -18,5 +18,5 @@ export interface ContainerProps {
 }
 
 export const Container: React.FC<ContainerProps> = ({ children }) => {
-  return <Box sx={ containerSx }>{children}</Box>;
+  return <Box sx={ containerSx }>{ children }</Box>;
 };

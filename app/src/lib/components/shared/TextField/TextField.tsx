@@ -17,21 +17,21 @@ export const controlledFieldFrom = (FieldComponent: React.ComponentType<TextFiel
     ...props
   }) => (
     <Controller
-      name={parentName}
-      control={control}
-      render={({ field: { name, ref, ...field }, fieldState: { error } }) => (
+      name={ parentName }
+      control={ control }
+      render={ ({ field: { name, ref, ...field }, fieldState: { error } }) => (
         <FieldComponent
-          id={name}
-          name={name}
-          label={label}
+          id={ name }
+          name={ name }
+          label={ label }
           fullWidth
-          inputRef={ref}
-          error={!!error}
-          helperText={error?.message}
-          {...props}
-          {...field}
+          inputRef={ ref }
+          error={ !!error }
+          helperText={ error?.message }
+          { ...props }
+          { ...field }
         />
-      )}
+      ) }
     />
   );
 
@@ -48,13 +48,11 @@ export const TextField: React.FC<TextFieldProps> = ({
     fullWidth
     variant="filled"
     margin="normal"
-    {...props}
-    InputProps={
-      {
-        ...InputProps,
-        disableUnderline: true
-      } as any
-    }
+    { ...props }
+    InputProps={{
+      ...InputProps,
+      disableUnderline: true
+    } as any}
     InputLabelProps={{
       ...InputLabelProps,
       shrink: true

@@ -99,7 +99,7 @@ export function createComponentsTheme({ typography, palette, spacing, breakpoint
       styleOverrides: {
         root: {
           borderRadius: MD_BORDER_RADIUS,
-          border: `${BORDER_THICKNESS}px solid ${palette.grey[200]}`,
+          border: `${ BORDER_THICKNESS }px solid ${ palette.grey[200] }`,
           background: palette.background.default,
 
           "&:hover": {
@@ -178,7 +178,7 @@ export function createComponentsTheme({ typography, palette, spacing, breakpoint
 
           "&.Mui-disabled": {
             background: palette.grey["50"],
-            border: `${BORDER_THICKNESS}px solid ${palette.grey[100]}`,
+            border: `${ BORDER_THICKNESS }px solid ${ palette.grey[100] }`,
             cursor: "not-allowed",
             pointerEvents: "auto",
 
@@ -275,7 +275,7 @@ export function createComponentsTheme({ typography, palette, spacing, breakpoint
         root: {
           background: palette.paymentUI?.paymentMethodSelectorBorder || palette.primary.main,
           backgroundOrigin: "border-box",
-          border: `${BORDER_THICKNESS}px solid transparent`,
+          border: `${ BORDER_THICKNESS }px solid transparent`,
           borderRadius: MD_BORDER_RADIUS + BORDER_THICKNESS,
         },
       },

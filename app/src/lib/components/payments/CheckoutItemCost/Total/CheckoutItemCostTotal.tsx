@@ -83,7 +83,7 @@ export const CheckoutItemCostTotal: React.FC<CheckoutItemCostTotalProps> = ({
 
     taxRowElement = (
       <Box sx={ ROW_SX }>
-        <Typography sx={theme => ({ color: theme.palette.grey["500"] })}>Taxes { taxRateElement }</Typography>
+        <Typography sx={ theme => ({ color: theme.palette.grey["500"] }) }>Taxes { taxRateElement }</Typography>
         <Typography>{ taxAmountElement }</Typography>
       </Box>
     );
@@ -100,8 +100,8 @@ export const CheckoutItemCostTotal: React.FC<CheckoutItemCostTotalProps> = ({
 
           { fees === null ? null : (
             <Box sx={ ROW_SX }>
-              <Typography sx={theme => ({ color: theme.palette.grey["500"] })}>Fees</Typography>
-              <Typography><Number suffix=" USD">{fees}</Number></Typography>
+              <Typography sx={ theme => ({ color: theme.palette.grey["500"] }) }>Fees</Typography>
+              <Typography><Number suffix=" USD">{ fees }</Number></Typography>
             </Box>
           ) }
 
@@ -119,7 +119,7 @@ export const CheckoutItemCostTotal: React.FC<CheckoutItemCostTotalProps> = ({
         }}>
 
         <Typography sx={{ fontWeight: "500" }}>
-          {withDetails ? "Total Amount (USD)" : "Total Amount Paid (USD)"}
+          { withDetails ? "Total Amount (USD)" : "Total Amount Paid (USD)" }
         </Typography>
 
         <Typography

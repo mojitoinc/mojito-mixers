@@ -78,7 +78,7 @@ export const FullScreenOverlay: React.FC<FullScreenOverlayProps> = ({
       aria-labelledby="checkout-modal-header-title"
       scroll="body"
       ref={ dialogRootRef }
-      PaperProps={ { sx: shakeSx, ref: paperRef }}
+      PaperProps={{ sx: shakeSx, ref: paperRef }}
       TransitionComponent={ NoTransition }
       // Dialog only:
       // fullWidth
