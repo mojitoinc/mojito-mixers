@@ -8,18 +8,18 @@ import { mdiEthereum } from '@mdi/js';
 import { useTheme } from "@mui/material/styles";
 import { PaymentType } from "../../../domain/payment/payment.interfaces";
 
-type PaymentMethodSelectorProps = {
+interface PaymentMethodSelectorProps {
   paymentMethods: PaymentType[];
   selectedPaymentMethod: PaymentType;
   onPaymentMethodChange: (paymentMethod: PaymentType) => void;
-};
+}
 
-type PaymentMethodOptionProps = {
+interface PaymentMethodOptionProps {
   label: string;
   icon: JSX.Element;
-};
+}
 
-const PAYMENT_METHOD_OPTION_PROPS: Record<
+export const PAYMENT_METHOD_OPTION_PROPS: Record<
   PaymentType,
   PaymentMethodOptionProps
 > = {

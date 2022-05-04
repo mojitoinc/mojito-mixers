@@ -70,7 +70,6 @@ export interface PUICheckoutOverlayProps {
   acceptedPaymentTypes?: PaymentType[];
   acceptedCreditCardNetworks?: CreditCardNetwork[];
   network?: Network;
-  // paymentLimits?: Partial<Record<PaymentType, number>>;
   dictionary?: Partial<PUIDictionary>;
 
   // Legal:
@@ -125,10 +124,9 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   successImageSrc,
   errorImageSrc,
   userFormat,
-  acceptedPaymentTypes,
+  acceptedPaymentTypes = ["CreditCard"],
   acceptedCreditCardNetworks,
   network,
-  // paymentLimits, // Not implemented yet. Used to show payment limits for some payment types.
   dictionary: parentDictionary,
 
   // Legal:
