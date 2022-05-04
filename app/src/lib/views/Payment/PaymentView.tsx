@@ -44,7 +44,7 @@ export interface PaymentViewProps {
   onNext: () => void;
   onPrev: () => void;
   onClose: () => void;
-  acceptedPaymentTypes?: PaymentType[];
+  acceptedPaymentTypes: PaymentType[];
   acceptedCreditCardNetworks?: CreditCardNetwork[];
   consentType?: ConsentType;
   debug?: boolean;
@@ -68,7 +68,7 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
   onNext,
   onPrev,
   onClose,
-  acceptedPaymentTypes = ["CreditCard"],
+  acceptedPaymentTypes,
   acceptedCreditCardNetworks,
   consentType,
   debug,
@@ -168,6 +168,7 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
 
         {showSaved ? (
           <SavedPaymentDetailsSelector
+            acceptedPaymentTypes={acceptedPaymentTypes}
             showLoader={isDeleting}
             acceptedCreditCardNetworks={acceptedCreditCardNetworks}
             savedPaymentMethods={savedPaymentMethods}
@@ -179,7 +180,9 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
             onNext={onNext}
             onClose={onClose}
             onAttemptSubmit={handleFormAttemptSubmit}
-            consentType={consentType} />
+            consentType={consentType}
+            checkoutItems={checkoutItems}
+            debug={debug} />
         ) : (
           <PaymentMethodForm
             acceptedPaymentTypes={acceptedPaymentTypes}
@@ -195,6 +198,7 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
             onSubmit={handleSubmit}
             onAttemptSubmit={handleFormAttemptSubmit}
             consentType={consentType}
+            checkoutItems={checkoutItems}
             debug={debug} />
         )}
       </Stack>

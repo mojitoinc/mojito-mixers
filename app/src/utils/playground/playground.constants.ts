@@ -16,6 +16,7 @@ export const PLAYGROUND_USER_FORMAT: UserFormat = "email";
 
 export const PLAYGROUND_MOCKED_BUY_NOW_LOT: CheckoutItemInfo = {
   lotID: "",
+  collectionItemId: "",
   lotType: "buyNow",
   name: "Your Buy Now Lot",
   description: `${PLAYGROUND_LOREM_IPSUM.slice(0, 128)}...`,
@@ -29,6 +30,7 @@ export const PLAYGROUND_MOCKED_BUY_NOW_LOT: CheckoutItemInfo = {
 
 export const PLAYGROUND_MOCKED_AUCTION_LOT: CheckoutItemInfo = {
   lotID: "",
+  collectionItemId: "",
   lotType: "auction",
   name: "Your Auction Lot",
   description: `${PLAYGROUND_LOREM_IPSUM.slice(0, 128)}...`,
