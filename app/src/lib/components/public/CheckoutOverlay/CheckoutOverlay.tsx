@@ -39,6 +39,7 @@ import { PUIStaticErrorOverlay } from "../ErrorOverlay/StaticErrorOverlay";
 import { useCountdown } from "../../../hooks/useContdown";
 import { PUIRouterOptions } from "../../../domain/router/router.types";
 import { getPathnameWithParams } from "../../../domain/url/url.utils";
+import { IS_BROWSER } from "../../../domain/build/build.constants";
 
 export type LoaderMode = "default" | "success" | "error";
 
@@ -98,7 +99,7 @@ export type PUICheckoutComponentProps = Partial<PUICheckoutProps> & Pick<
   "open" | "loaderMode" | "paymentErrorParam"
 >;
 
-const DEV_DEBUG_ENABLED = process.browser && localStorage.getItem(DEV_DEBUG_ENABLED_KEY) === "true";
+const DEV_DEBUG_ENABLED = IS_BROWSER && localStorage.getItem(DEV_DEBUG_ENABLED_KEY) === "true";
 
 export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   // Modal:

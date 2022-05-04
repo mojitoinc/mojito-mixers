@@ -1,5 +1,7 @@
+import { IS_SERVER } from "../build/build.constants";
+
 export function getUrlWithoutParams(): string {
-  if (!process.browser) return "/";
+  if (IS_SERVER) return "/";
 
   const { href, search } = window.location;
 
@@ -7,7 +9,7 @@ export function getUrlWithoutParams(): string {
 }
 
 export function urlToPathnameWhenPossible(url: string): string {
-  if (!process.browser) return "/";
+  if (IS_SERVER) return "/";
 
   const { origin } = window.location;
 
@@ -23,19 +25,19 @@ export function isUrlPathname(url: string): boolean {
 }
 
 export function getUrlWithSearchParams(url: string): string {
-  if (!process.browser) return url;
+  if (IS_SERVER) return url;
 
   return `${ url }${ window.location.search }`;
 }
 
 export function isLocalhost() {
-  if (!process.browser) return false;
+  if (IS_SERVER) return false;
 
   return window.location.hostname === "localhost";
 }
 
 export function isLocalhostOrStaging() {
-  if (!process.browser) return false;
+  if (IS_SERVER) return false;
 
   return isLocalhost() || /\.staging\./.test(window.location.origin.replace(/[/\-.]/g, "."));
 }

@@ -1,4 +1,5 @@
 import { THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY, CHECKOUT_MODAL_INFO_REDIRECT_URI_KEY, CHECKOUT_MODAL_INFO_USED_KEY, CHECKOUT_MODAL_INFO_KEY, PLAID_OAUTH_FLOW_URL_SEARCH, CHECKOUT_MODAL_INFO_KEY_PLAID_SUFFIX, PLAID_STORAGE_EXPIRATION_MS, THREEDS_STORAGE_EXPIRATION_MS, CHECKOUT_MODAL_INFO_KEY_REGEXP, THREEDS_ERROR_URL_REG_EXP, THREEDS_SUCCESS_URL_REG_EXP } from "../../../config/config";
+import { IS_SERVER } from "../../../domain/build/build.constants";
 import { getUrlWithoutParams, isLocalhost, isLocalhostOrStaging, urlToPathnameWhenPossible } from "../../../domain/url/url.utils";
 import { cookieStorage } from "../../../utils/storageUtils";
 import { FALLBACK_MODAL_STATE_COMMON } from "./CheckoutOverlay.constants";
@@ -15,7 +16,7 @@ export function isCheckoutModalInfoPlaid(checkoutModalInfo: Partial<CheckoutModa
 }
 
 export function persistCheckoutModalInfo(info: CheckoutModalInfo) {
-  if (!process.browser) return;
+  if (IS_SERVER) return;
 
   try {
     const url = info.url || getUrlWithoutParams();
@@ -42,14 +43,14 @@ export function persistCheckoutModalInfoUsed(used = true) {
 }
 
 export function clearPersistedInfo() {
+  if (IS_SERVER) return;
+
   if (debug) console.log(`💾 Clearing state...`);
 
-  if (process.browser) {
-    cookieStorage.removeItem(CHECKOUT_MODAL_INFO_KEY_REGEXP); // 3DS
-    cookieStorage.removeItem(CHECKOUT_MODAL_INFO_KEY(CHECKOUT_MODAL_INFO_KEY_PLAID_SUFFIX)); // Plaid
-    cookieStorage.removeItem(CHECKOUT_MODAL_INFO_REDIRECT_URI_KEY);
-    cookieStorage.removeItem(CHECKOUT_MODAL_INFO_USED_KEY);
-  }
+  cookieStorage.removeItem(CHECKOUT_MODAL_INFO_KEY_REGEXP); // 3DS
+  cookieStorage.removeItem(CHECKOUT_MODAL_INFO_KEY(CHECKOUT_MODAL_INFO_KEY_PLAID_SUFFIX)); // Plaid
+  cookieStorage.removeItem(CHECKOUT_MODAL_INFO_REDIRECT_URI_KEY);
+  cookieStorage.removeItem(CHECKOUT_MODAL_INFO_USED_KEY);
 }
 
 export interface GetCheckoutModalStateOptions {
@@ -64,7 +65,7 @@ export function getCheckoutModalState({
 }: GetCheckoutModalStateOptions): CheckoutModalStateCombined {
   let modalState = FALLBACK_MODAL_STATE_COMMON;
 
-  if (!process.browser) return modalState;
+  if (IS_SERVER) return modalState;
 
   let hasSavedModalInfo = false;
   let savedModalInfo: Partial<CheckoutModalInfo> = {};

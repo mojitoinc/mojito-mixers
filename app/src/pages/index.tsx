@@ -5,6 +5,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { CheckoutComponent } from "../components/checkout-component/CheckoutComponent";
 import { PaymentType, PUICheckoutComponentProps, THREEDS_FLOW_SEARCH_PARAM_ERROR_KEY, THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY } from "../lib";
 import { useOpenCloseCheckoutModal } from "../lib/components/public/useOpenCloseCheckoutModal/useOpenCloseCheckoutModal";
+import { IS_BROWSER } from "../lib/domain/build/build.constants";
 import { useMeQuery } from "../services/graphql/generated";
 import { PLAYGROUND_PARAGRAPHS_ARRAY, PLAYGROUND_MOCKED_AUCTION_LOT, PLAYGROUND_MOCKED_BUY_NOW_LOT } from "../utils/playground/playground.constants";
 import { PlaygroundFormData } from "../utils/playground/playground.interfaces";
@@ -33,7 +34,7 @@ const FORM_VALUES_KEY = "FORM_VALUES_KEY";
 
 let INITIAL_FORM_VALUES: Partial<PlaygroundFormData> = {};
 
-if (process.browser) {
+if (IS_BROWSER) {
   try {
     INITIAL_FORM_VALUES = JSON.parse(localStorage.getItem(FORM_VALUES_KEY) || "{}") as Partial<PlaygroundFormData>;
   } catch (err) {

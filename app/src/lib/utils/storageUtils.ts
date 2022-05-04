@@ -2,6 +2,7 @@
 
 // import { WebStorage } from "proxy-storage";
 
+import { IS_BROWSER } from "../domain/build/build.constants";
 import { isLocalhost } from "../domain/url/url.utils";
 
 // TODO: Replace all this with a good storage library.
@@ -39,7 +40,7 @@ function getCookieSecurityParams(params: CookieParams = {}) {
   }
 
   if (crossDomain) {
-    const domainParam = domain || (process.browser ? window.location.host : "");
+    const domainParam = domain || (IS_BROWSER ? window.location.host : "");
 
     if (domainParam) securityParams.push(`domain=${ domainParam }`);
   }

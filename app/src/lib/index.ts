@@ -1,3 +1,5 @@
+import { IS_BROWSER } from "./domain/build/build.constants";
+
 export { PUICheckout } from "./components/public/CheckoutOverlay/CheckoutOverlay";
 export { PUISuccess } from "./components/public/SuccessOverlay/SuccessOverlay";
 export { PUIError } from "./components/public/ErrorOverlay/ErrorOverlay";
@@ -21,7 +23,7 @@ export type { CheckoutEventType, CheckoutEventData } from "./domain/events/event
 export type { PalettePaymentUI } from "./domain/mui/mui.interfaces";
 export type { PUIRouterOptions } from "./domain/router/router.types";
 
-if (process.env.NODE_ENV === "development" && process.browser) {
+if (process.env.NODE_ENV === "development" && IS_BROWSER) {
   console.log("\n👨‍💻 PUI development mode.\n\n");
 
   // (window as any)._React = React;
