@@ -52,7 +52,7 @@ export const ConfirmationView: React.FC<ConfirmationViewProps> = ({
       return {
         selectedPaymentMethodBillingInfo: paymentMethod,
         selectedPaymentMethodPaymentInfo: paymentMethod,
-      }
+      };
     }
 
     return {
@@ -67,8 +67,8 @@ export const ConfirmationView: React.FC<ConfirmationViewProps> = ({
 
   return (
     <Stack
-      direction={{ xs: "column",  md: "row" }}
-      spacing={{ xs: 3,  md: 3.75 }}>
+      direction={{ xs: "column", md: "row" }}
+      spacing={{ xs: 3, md: 3.75 }}>
 
       <PurchaseConfirmationBillingDetails
         checkoutItems={ checkoutItems }
@@ -81,16 +81,16 @@ export const ConfirmationView: React.FC<ConfirmationViewProps> = ({
         <Divider sx={{ display: { xs: "block", md: "none" } }} />
 
         <PurchaseConfirmationItemDetails
-          checkoutItems={checkoutItems}/>
+          checkoutItems={ checkoutItems } />
 
         <CheckoutModalFooter
           variant="toMarketplace"
-          onSubmitClicked={onNext}
-          submitHref={goToMarketplaceHref}
-          submitLabel={goToMarketplaceLabel}
-          goToHref={goToHref}
-          goToLabel={goToLabel}
-          onGoTo={onGoTo} />
+          onSubmitClicked={ onNext }
+          submitHref={ goToMarketplaceHref }
+          submitLabel={ goToMarketplaceLabel }
+          goToHref={ goToHref }
+          goToLabel={ goToLabel }
+          onGoTo={ onGoTo } />
       </Stack>
 
     </Stack>

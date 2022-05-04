@@ -1,9 +1,8 @@
-import { useEffect, useRef, useState } from "react";
-import { SavedPaymentMethod } from "../../domain/circle/circle.interfaces";
-import { useFullPayment } from "../../hooks/useFullPayment";
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Box, Typography } from "@mui/material";
 import { useTimeout, useInterval } from "@swyg/corre";
+import { SavedPaymentMethod } from "../../domain/circle/circle.interfaces";
+import { useFullPayment } from "../../hooks/useFullPayment";
 import { CheckoutModalError, SelectedPaymentMethod } from "../../components/public/CheckoutOverlay/CheckoutOverlay.hooks";
 import { ERROR_PURCHASE_TIMEOUT } from "../../domain/errors/errors.constants";
 import { XS_MOBILE_MAX_WIDTH } from "../../config/theme/themeConstants";
@@ -88,19 +87,19 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
     pollInterval: PAYMENT_NOTIFICATION_INTERVAL_MS,
   });
 
-  const nextRedirectURL = paymentNotificationResult.data?.getPaymentNotification?.message?.redirectURL || "";
+  const receivedRedirectURL = paymentNotificationResult.data?.getPaymentNotification?.message?.redirectURL || "";
 
   useEffect(() => {
     if (skipPaymentNotificationRedirect) return;
 
     setRedirectURL((prevRedirectURL) => {
-      const redirectURL = prevRedirectURL || nextRedirectURL;
+      const nextRedirectURL = prevRedirectURL || receivedRedirectURL;
 
-      if (debug) console.log(`  👀 getPaymentNotificationQuery`, { redirectURL });
+      if (debug) console.log("  👀 getPaymentNotificationQuery", { redirectURL: nextRedirectURL });
 
-      return redirectURL;
+      return nextRedirectURL;
     });
-  }, [skipPaymentNotificationRedirect, nextRedirectURL, debug]);
+  }, [skipPaymentNotificationRedirect, receivedRedirectURL, debug]);
 
 
   // Triggers for payment mutation and onPurchaseSuccess/onPurchaseError callbacks:
@@ -125,7 +124,7 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
   }, [fullPayment]);
 
   useEffect(() => {
-    const { paymentStatus, processorPaymentID, paymentID, paymentError } = fullPaymentState;
+    const { paymentStatus, processorPaymentID, paymentID, paymentError, } = fullPaymentState;
 
     if (paymentStatus === "processing") {
       onDialogBlocked(true);
@@ -188,7 +187,7 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
   let purchasingMessages = customPurchasingMessages;
 
   if (purchasingMessages === false) {
-    purchasingMessages = []
+    purchasingMessages = [];
   } else if (purchasingMessages === undefined || purchasingMessages.length === 0) {
     purchasingMessages = PURCHASING_MESSAGES_DEFAULT;
   }
@@ -200,10 +199,10 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
 
       <StatusIcon
         variant="loading"
-        imgSrc={purchasingImageSrc}
+        imgSrc={ purchasingImageSrc }
         sx={{ mt: 5 }} />
 
-      {purchasingMessage ? <Typography variant="body2" sx={{ textAlign: "center", mt: 1.5 }}>{purchasingMessage}</Typography> : null}
+      { purchasingMessage ? <Typography variant="body2" sx={{ textAlign: "center", mt: 1.5 }}>{ purchasingMessage }</Typography> : null }
 
       <Box sx={{ maxWidth: XS_MOBILE_MAX_WIDTH, mx: "auto", my: 5 }}>
         <Typography variant="body2" sx={{ textAlign: "center", mb: 1.5 }}>Hang tight! We are currently processing your payment.</Typography>

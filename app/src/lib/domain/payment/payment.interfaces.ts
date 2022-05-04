@@ -33,5 +33,3 @@ export interface PaymentDetails {
   cardNumber: string;
   referenceNumber: string;
 }
-
-

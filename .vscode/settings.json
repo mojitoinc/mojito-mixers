@@ -2,5 +2,9 @@
   "search.exclude": {
     "**/dist": true,
     "**/node_modules": true
-  }
+  },
+  "eslint.workingDirectories": [
+    "./app",
+  ],
+  "editor.rulers": [80, 120, 160]
 }

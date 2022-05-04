@@ -6,12 +6,12 @@ import { SelectOption } from "../components/shared/Select/Select";
 interface RawCountry {
   countryName: string;
   countryShortCode: string;
-};
+}
 
 interface RawRegion {
   name: string;
   shortCode: string;
-};
+}
 
 const mapCountryToSelectOption = (country: RawCountry): SelectOption => ({
   label: country.countryName,
@@ -24,17 +24,22 @@ const mapRegionToSelectOption = (region: RawRegion): SelectOption => ({
 });
 
 const reduceSelectOptionsToMap = (
-  optionsMap: Record<string, SelectOption>,
+  optionsMapAcc: Record<string, SelectOption>,
   selectOption: SelectOption,
 ) => {
-  optionsMap[selectOption.value] = selectOption;
-  return optionsMap;
+  optionsMapAcc[selectOption.value] = selectOption;
+
+  return optionsMapAcc;
 };
 
-const UNAVAILABLE_COUNTRIES = ["AF", "AL", "BB", "BS", "BW", "BY", "CF", "CU", "GH", "GW", "IQ", "IR", "JM", "KH", "KP", "KS", "LY", "ML", "MM", "MN", "MU", "NI", "PA", "PK", "RU", "SD", "SO", "SS", "SY", "TT", "UA", "UG", "VE", "VI", "VU", "YE", "ZW"];
+const UNAVAILABLE_COUNTRIES = [
+  // eslint-disable-next-line array-element-newline
+  "AF", "AL", "BB", "BS", "BW", "BY", "CF", "CU", "GH", "GW", "IQ", "IR", "JM", "KH", "KP",
+  // eslint-disable-next-line array-element-newline
+  "KS", "LY", "ML", "MM", "MN", "MU", "NI", "PA", "PK", "RU", "SD", "SO", "SS", "SY", "TT", "UA", "UG", "VE", "VI", "VU", "YE", "ZW",
+];
 
-const countryIsAvailable = (country: RawCountry) =>
-  !UNAVAILABLE_COUNTRIES.includes(country.countryShortCode);
+const countryIsAvailable = (country: RawCountry) => !UNAVAILABLE_COUNTRIES.includes(country.countryShortCode);
 
 export function useCountryOptions(countryCode?: string | number) {
   const { result: country, getCountryList } = useCountryRegion(countryCode);
@@ -50,8 +55,8 @@ export function useCountryOptions(countryCode?: string | number) {
     const options: SelectOption[] = country
       ? country.regions.map(mapRegionToSelectOption)
       : getCountryList()
-          .filter(countryIsAvailable)
-          .map(mapCountryToSelectOption);
+        .filter(countryIsAvailable)
+        .map(mapCountryToSelectOption);
 
     const optionsMap: Record<string, SelectOption> = options.reduce(reduceSelectOptionsToMap, {});
 

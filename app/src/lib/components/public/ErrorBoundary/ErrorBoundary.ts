@@ -10,7 +10,6 @@ interface ErrorBoundaryState {
 }
 
 export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
-
   state = { hasError: false };
 
   static getDerivedStateFromError() {
@@ -25,6 +24,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
     const useConfirmModal = !onCatch || onCatch(error, errorInfo) === true;
 
     if (useConfirmModal) {
+      // eslint-disable-next-line no-alert
       const retry = window.confirm("Sorry, there was an unexpected error. Do you want to re-open the payment modal?");
 
       if (retry) this.setState({ hasError: false });
@@ -32,6 +32,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
   }
 
   render() {
+    // eslint-disable-next-line react/destructuring-assignment
     return this.state.hasError ? null : this.props.children;
   }
 }

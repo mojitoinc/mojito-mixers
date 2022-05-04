@@ -1,24 +1,36 @@
 import { Select as MuiSelect, SelectProps as MuiSelectProps, InputLabel, MenuItem, FormControl, FormHelperText, useMediaQuery } from "@mui/material";
-import { SelectIcon } from "../Icons/Icons";
 import React from "react";
 import { useTheme } from "@mui/material/styles";
+import { SelectIcon } from "../Icons/Icons";
 
 export interface SelectOption<V = string | number> {
   value: V;
   label: string;
-};
+}
 
 export interface SelectProps extends Omit<MuiSelectProps<string | number>, "margin"> {
   label: React.ReactNode;
   options: SelectOption[];
   helperText?: string;
   margin?: "none" | "dense" | "normal";
-};
+}
 
 export const EMPTY_OPTION: SelectOption = {
   label: "",
   value: "",
 };
+
+const mapOptionMobile = ({ value, label }: SelectOption) => (
+  <option key={ label } value={ value }>
+    { label }
+  </option>
+);
+
+const mapOptionDesktop = ({ value, label }: SelectOption) => (
+  <MenuItem key={ label } value={ value }>
+    { label }
+  </MenuItem>
+);
 
 export const Select: React.FC<SelectProps> = ({
   id,
@@ -31,21 +43,10 @@ export const Select: React.FC<SelectProps> = ({
   margin = "normal",
   ...props
 }) => {
-
   const theme = useTheme();
   const matches = useMediaQuery(theme.breakpoints.down('sm'));
-
+  const mapOption = matches ? mapOptionMobile : mapOptionDesktop;
   const selectOptions = matches ? [EMPTY_OPTION, ...options] : options;
-
-  const mapOption = ({ value, label }: SelectOption) => matches ? (
-    <option key={ label } value={ value }>
-      { label }
-    </option>
-  ) : (
-    <MenuItem key={ label } value={ value }>
-      { label }
-    </MenuItem>
-  );
 
   return (
     <FormControl fullWidth margin={ margin } variant="filled" disabled={disabled} error={error}>

@@ -42,7 +42,6 @@ export function useCountdown({
     }
 
     if (countdownElement) countdownElement.textContent = formattedTimeLeft;
-
   }, countdownStartRef.current === null || invoiceCountdownStart === null ? null : RESERVATION_COUNTDOWN_REFRESH_RATE_MS);
 
   return { countdownElementRef };

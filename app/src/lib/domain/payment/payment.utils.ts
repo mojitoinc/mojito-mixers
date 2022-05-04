@@ -3,7 +3,7 @@ import { getExpiryDateError } from "react-payment-inputs";
 import { CreditCardNetwork, CREDIT_CARD_NETWORKS, getCardTypeByValue } from "../react-payment-inputs/react-payment-inputs.utils";
 import { ValidatePaymentLimitOutput } from "../../queries/graphqlGenerated";
 
-export function getCreditCardNetworkFromNumber(cardNumber: string): "" | CreditCardNetwork  {
+export function getCreditCardNetworkFromNumber(cardNumber: string): "" | CreditCardNetwork {
   return getCardTypeByValue(cardNumber)?.type || "";
 }
 
@@ -35,7 +35,7 @@ export function standaloneGetCardImageProps(network = "") {
 
 export const getExpiryDateIsValid = (expiryDate?: string) => !getExpiryDateError(expiryDate);
 
-export function getCvvIsValid (cvv = "", network: "" | CreditCardNetwork = "", networks: CreditCardNetwork[] = [], required = true) {
+export function getCvvIsValid(cvv = "", network: "" | CreditCardNetwork = "", networks: CreditCardNetwork[] = [], required = true) {
   // if (required && !cvv) return false;
   // if (!required && !cvv) return true;
 
@@ -75,4 +75,4 @@ export function transformRawRemainingItemLimit(rawRemainingItemLimit?: ValidateP
     // TODO: Update once crypto is added to ValidatePaymentLimitOutput:
     Crypto: ((rawRemainingItemLimit as any)?.crypto?.remainingTransaction ?? Infinity) + itemsCount,
   };
-};
+}

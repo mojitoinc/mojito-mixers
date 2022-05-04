@@ -1,7 +1,7 @@
 import { Box, Dialog, DialogContent } from "@mui/material";
 import React, { useEffect, useRef } from "react";
-import { useShakeAnimation } from "../../../utils/animationUtils";
 import { SxProps, Theme } from "@mui/material/styles";
+import { useShakeAnimation } from "../../../utils/animationUtils";
 import { NoTransition } from "../NoTransition/NoTransition";
 
 const centeredSx: SxProps<Theme> = {
@@ -59,6 +59,17 @@ export const FullScreenOverlay: React.FC<FullScreenOverlayProps> = ({
 
   const [shakeSx, shake] = useShakeAnimation(paperRef.current);
 
+  const dialogContentSx: SxProps<Theme> = {
+    overflowX: 'hidden',
+    px: {
+      xs: 1.5,
+      sm: 2.5,
+    },
+    py: 2.5,
+    maxWidth: theme => theme.breakpoints.values.lg,
+    mx: "auto",
+  };
+
   return (
     <Dialog
       open={ isDialogBlocked ? true : open }
@@ -74,31 +85,22 @@ export const FullScreenOverlay: React.FC<FullScreenOverlayProps> = ({
       // maxWidth="sm"
       fullScreen>
 
-    <DialogContent
-      sx={{
-        overflowX: 'hidden',
-        px: {
-          xs: 1.5,
-          sm: 2.5,
-        },
-        py: 2.5,
-        maxWidth: theme => theme.breakpoints.values.lg,
-        mx: "auto",
-      }}><>
+      <DialogContent sx={ dialogContentSx }>
+        <>
+          { header }
 
-      { header }
+          { children ? (
+            <Box sx={ "centered" in variantProps && variantProps.centered ? centeredSx : undefined }>
+              { children }
+            </Box>
+          ) : (
+            ("leftColumn" in variantProps || "rightColumn" in variantProps) && {
+              /* Implement 2-column layout using leftColumn and rightColumn */
+            }
+          ) }
 
-      { children ? (
-        <Box sx={ "centered" in variantProps && variantProps.centered ? centeredSx : undefined }>
-          { children }
-        </Box>
-      ) : (
-        ("leftColumn" in variantProps || "rightColumn" in variantProps) && {
-          /* Implement 2-column layout using leftColumn and rightColumn */
-        }
-      ) }
-
-    </></DialogContent>
-  </Dialog>
+        </>
+      </DialogContent>
+    </Dialog>
   );
 }

@@ -3,18 +3,26 @@ import React from "react";
 import { usePaymentInputs } from "react-payment-inputs";
 import images from "react-payment-inputs/images";
 import { useMergeRefs } from "use-callback-ref";
+import { ReactRef } from "use-callback-ref/dist/es5/types";
 import { CreditCardIcon } from "../Icons/Icons";
 import { TextField, TextFieldProps, controlledFieldFrom } from "../TextField/TextField";
-import { ReactRef } from "use-callback-ref/dist/es5/types";
 
-export const CardNumberField: React.FC<TextFieldProps> = (props) => {
+export const CardNumberField: React.FC<TextFieldProps> = ({
+  placeholder,
+  onChange,
+  onBlur,
+  inputRef: parentInputRef,
+  ...props
+}) => {
   const { getCardImageProps, getCardNumberProps } = usePaymentInputs();
+
   const { ref, ...paymentInputProps } = getCardNumberProps({
-    placeholder: props.placeholder,
-    onChange: props.onChange,
-    onBlur: props.onBlur,
+    placeholder,
+    onChange,
+    onBlur,
   });
-  const inputRef = useMergeRefs([props.inputRef, ref].filter(Boolean) as ReactRef<any>[]);
+
+  const inputRef = useMergeRefs([parentInputRef, ref].filter(Boolean) as ReactRef<any>[]);
 
   return (
     <TextField

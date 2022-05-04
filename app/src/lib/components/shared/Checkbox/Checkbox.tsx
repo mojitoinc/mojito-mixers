@@ -21,12 +21,14 @@ export const Checkbox: React.FC<CheckboxProps> = ({
 }) => (
   <FormControl sx={ sx } error={ error }>
     <FormControlLabel
-      label={<>
-        { label }
-        { helperText && <FormHelperText sx={{ mt: 1 }}>{ helperText }</FormHelperText> }
-      </>}
+      label={(
+        <>
+          { label }
+          { helperText && <FormHelperText sx={{ mt: 1 }}>{ helperText }</FormHelperText> }
+        </>
+)}
       sx={{ alignItems: "flex-start", pt: 1 }}
-      control={
+      control={(
         <MuiCheckbox
           sx={{ pl: 1.5, pt: 0 }}
           checked={checked}
@@ -35,7 +37,7 @@ export const Checkbox: React.FC<CheckboxProps> = ({
           checkedIcon={ <CheckboxIconChecked error={ error } /> }
           disableRipple
           { ...props } />
-      } />
+      )} />
 
   </FormControl>
 );
@@ -43,12 +45,12 @@ export const Checkbox: React.FC<CheckboxProps> = ({
 export type ControlledCheckboxProps = CheckboxProps & { name: string; control: Control<any>; };
 
 export const ControlledCheckbox: React.FC<ControlledCheckboxProps> = ({
-  name,
+  name: parentName,
   control,
   label,
 }) => (
   <Controller
-    name={name}
+    name={parentName}
     control={control}
     render={({ field: { name, onChange, ref, value, ...field }, fieldState }) => {
       const error = fieldState?.error;

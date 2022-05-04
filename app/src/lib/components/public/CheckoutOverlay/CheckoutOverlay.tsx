@@ -1,5 +1,7 @@
 import { Backdrop, CircularProgress } from "@mui/material";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Theme, SxProps } from "@mui/material/styles";
+import { ApolloError } from "@apollo/client";
 import { getSavedPaymentMethodAddressIdFromBillingInfo, savedPaymentMethodToBillingInfo, transformRawSavedPaymentMethods } from "../../../domain/circle/circle.utils";
 import { UserFormat } from "../../../domain/auth/authentication.interfaces";
 import { PaymentMethod, PaymentType } from "../../../domain/payment/payment.interfaces";
@@ -15,7 +17,6 @@ import { CheckoutModalHeader, CheckoutModalHeaderVariant } from "../../payments/
 import { PurchasingView } from "../../../views/Purchasing/PurchasingView";
 import { ErrorView } from "../../../views/Error/ErrorView";
 import { RawSavedPaymentMethod, SavedPaymentMethod } from "../../../domain/circle/circle.interfaces";
-import { Theme, SxProps } from "@mui/material/styles";
 import { continuePlaidOAuthFlow, PlaidFlow } from "../../../hooks/usePlaid";
 import { ConsentType } from "../../shared/ConsentText/ConsentText";
 import { CheckoutModalError, CheckoutModalStepIndex, useCheckoutModalState } from "./CheckoutOverlay.hooks";
@@ -26,7 +27,6 @@ import { transformCheckoutItemsFromInvoice } from "../../../domain/product/produ
 import { useCreateInvoiceAndReservation } from "../../../hooks/useCreateInvoiceAndReservation";
 import { useCheckoutItemsCostTotal } from "../../../hooks/useCheckoutItemCostTotal";
 import { PUIDictionary } from "../../../domain/dictionary/dictionary.interfaces";
-import { ApolloError } from "@apollo/client";
 import { DictionaryProvider } from "../../../providers/DictionaryProvider";
 import { Wallet } from "../../../domain/wallet/wallet.interfaces";
 import { DEV_DEBUG_ENABLED_KEY, THREEDS_FLOW_SEARCH_PARAM_ERROR_KEY, THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY, THREEDS_REDIRECT_DELAY_MS } from "../../../config/config";
@@ -39,6 +39,7 @@ import { PUIStaticErrorOverlay } from "../ErrorOverlay/StaticErrorOverlay";
 import { useCountdown } from "../../../hooks/useContdown";
 import { PUIRouterOptions } from "../../../domain/router/router.types";
 import { getPathnameWithParams } from "../../../domain/url/url.utils";
+import { IS_BROWSER } from "../../../domain/build/build.constants";
 
 export type LoaderMode = "default" | "success" | "error";
 
@@ -97,7 +98,7 @@ export type PUICheckoutComponentProps = Partial<PUICheckoutProps> & Pick<
   "open" | "loaderMode" | "paymentErrorParam"
 >;
 
-const DEV_DEBUG_ENABLED = process.browser && localStorage.getItem(DEV_DEBUG_ENABLED_KEY) === "true";
+const DEV_DEBUG_ENABLED = IS_BROWSER && localStorage.getItem(DEV_DEBUG_ENABLED_KEY) === "true";
 
 export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   // Modal:
@@ -286,9 +287,9 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   useEffect(() => {
     if (!destinationAddress) return;
 
-    const wallet = (wallets || []).find(({ address }) => address === destinationAddress);
+    const nextWallet = (wallets || []).find(({ address }) => address === destinationAddress);
 
-    setWalletAddress(wallet || destinationAddress);
+    setWalletAddress(nextWallet || destinationAddress);
   }, [wallets, destinationAddress, setWalletAddress]);
 
   // TODO: These should probably be combined.
@@ -320,7 +321,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   }, [loaderMode, isDialogInitializing, open]);
 
   useEffect(() => {
-    const params = new URLSearchParams(location.search);
+    const params = new URLSearchParams(window.location.search);
 
     params.delete(THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY);
     params.delete(THREEDS_FLOW_SEARCH_PARAM_ERROR_KEY);
@@ -331,7 +332,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     if (cleanPathname && cleanPathname !== getPathnameWithParams()) {
       // As soon as we find these params, we remove them from the URL (they are stored in a Ref to avoid losing them
       // before we get a change to use them):
-      onGoTo(cleanPathname, { replace: true, shallow: true, reason: "Clean URL."});
+      onGoTo(cleanPathname, { replace: true, shallow: true, reason: "Clean URL." });
     }
   }, [onGoTo]);
 
@@ -355,7 +356,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   }, [isDialogLoading, invoiceID, createInvoiceAndReservation]);
 
   useEffect(() => {
-    const { invoiceID, invoiceCountdownStart, error } = invoiceAndReservationState;
+    const { invoiceID: nextInvoiceID, invoiceCountdownStart: nextInvoiceCountdownStart, error } = invoiceAndReservationState;
 
     if (error) {
       // TODO: It would be great if we can keep track of the reservation expiration without changing the displayed error
@@ -366,7 +367,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
       return;
     }
 
-    if (invoiceID && invoiceCountdownStart) setInvoiceID(invoiceID, invoiceCountdownStart);
+    if (nextInvoiceID && nextInvoiceCountdownStart) setInvoiceID(nextInvoiceID, nextInvoiceCountdownStart);
   }, [invoiceAndReservationState, setError, setInvoiceID]);
 
 
@@ -428,9 +429,9 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   triggerAnalyticsEventRef.current = (eventType: CheckoutEventType) => {
     if (!onEvent || !open) return;
 
-    const paymentInfo = selectedPaymentMethod.paymentInfo;
+    const { paymentInfo } = selectedPaymentMethod;
 
-    let paymentType: PaymentType | undefined = undefined;
+    let paymentType: PaymentType | undefined;
 
     if (typeof paymentInfo === "string") {
       const payment = savedPaymentMethods.find(({ id }) => id === paymentInfo);
@@ -476,7 +477,6 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
 
     // Possible fix (might this cause some other issues such as missing data):
     // if (!isDialogInitializing) triggerAnalyticsEventRef.current(`navigate:${ checkoutStep }`);
-
   }, [isDialogInitializing, checkoutStep]);
 
 
@@ -498,7 +498,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
 
       // TODO: This logic can probably be simplified. Just get the last saved payment method...
 
-      let matchingPaymentMethod: SavedPaymentMethod | undefined = undefined;
+      let matchingPaymentMethod: SavedPaymentMethod | undefined;
 
       if (typeof billingInfo === "object") {
         const addressId = getSavedPaymentMethodAddressIdFromBillingInfo(billingInfo);
@@ -602,7 +602,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
       setTimeout(() => {
         if (debug) console.log(`Redirecting to 3DS = ${ redirectURL }`);
 
-        location.href = redirectURL;
+        window.location.href = redirectURL;
       }, THREEDS_REDIRECT_DELAY_MS);
 
       return;
@@ -664,7 +664,8 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
       // e.returnValue = '';
 
       // The absence of a returnValue property on the event will guarantee the browser unload happens:
-      delete e['returnValue'];
+      // eslint-disable-next-line no-param-reassign
+      delete e.returnValue;
     }
   }, [paymentID, processorPaymentID, parentInvoiceID, orgID, invoiceID, debug, releaseReservationBuyNowLot]);
 
@@ -739,7 +740,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
 
       if (at !== "purchasing") {
         // If we are redirecting users to the PurchasingView again, we keep the CVV to be able to re-try the purchase:
-        setSelectedPaymentMethod((prevSelectedPaymentMethod) => ({ ...prevSelectedPaymentMethod, cvv: "" }));
+        setSelectedPaymentMethod(prevSelectedPaymentMethod => ({ ...prevSelectedPaymentMethod, cvv: "" }));
       }
 
       goTo(at || DEFAULT_ERROR_AT, checkoutError);
@@ -791,22 +792,24 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   }
 
   if ((isDialogInitializing || isPlaidFlowLoading) && (checkoutStep !== "error")) {
-    return (<>
-      { isPlaidFlowLoading && <PlaidFlow onSubmit={ handlePlaidFlowCompleted } /> }
+    return (
+      <>
+        { isPlaidFlowLoading && <PlaidFlow onSubmit={ handlePlaidFlowCompleted } /> }
 
-      <Backdrop
-        open={ open }
-        onClick={ handleClose }>
-        { loaderImageSrc ? (
-          <StatusIcon
-            variant="loading"
-            imgSrc={ loaderImageSrc }
-            sx={{ mt: 5 }} />
-        ) : (
-          <CircularProgress color="primary" />
-        ) }
-      </Backdrop>
-    </>);
+        <Backdrop
+          open={ open }
+          onClick={ handleClose }>
+          { loaderImageSrc ? (
+            <StatusIcon
+              variant="loading"
+              imgSrc={ loaderImageSrc }
+              sx={{ mt: 5 }} />
+          ) : (
+            <CircularProgress color="primary" />
+          ) }
+        </Backdrop>
+      </>
+    );
   }
 
 
@@ -947,8 +950,9 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
         onClose={ handleClose }
         isDialogBlocked={ isDialogBlocked }
         contentKey={ checkoutStep }
-        header={ headerElement }
-        children={ checkoutStepElement } />
+        header={ headerElement }>
+        { checkoutStepElement }
+      </FullScreenOverlay>
     </DictionaryProvider>
   );
 };

@@ -13,7 +13,7 @@ export const FormErrorsBox: React.FC<FormErrorsBoxProps> = ({
 }) => {
   return (
     <Box { ...props } sx={{ color: theme => theme.palette.warning.dark, ...sx }}>
-      <Typography variant="caption" component="p"  sx={{ fontWeight: 600 }}>
+      <Typography variant="caption" component="p" sx={{ fontWeight: 600 }}>
         Last purchase attempt errors:
       </Typography>
 

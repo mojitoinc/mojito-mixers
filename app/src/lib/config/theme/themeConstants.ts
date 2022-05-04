@@ -1,4 +1,3 @@
-
 // Used to limit text width in PaymentView's disclaimer text and PurchasingView's loading text:
 export const XS_MOBILE_MAX_WIDTH = 320;
 export const SM_MOBILE_MAX_WIDTH = 400;

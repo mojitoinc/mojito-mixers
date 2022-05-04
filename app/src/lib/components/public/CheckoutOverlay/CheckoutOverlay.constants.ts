@@ -30,4 +30,3 @@ export const FALLBACK_MODAL_STATE_COMMON: CheckoutModalStateCombined = {
   // CheckoutModalInfoPlaid:
   linkToken: "",
 };
-

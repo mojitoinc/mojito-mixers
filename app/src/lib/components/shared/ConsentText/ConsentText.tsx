@@ -17,12 +17,21 @@ export const ConsentText: React.FC = () => {
 
   const lastLinkElementsIndex = linkElements.length - 1;
 
-  return (<>
-    have read, understood, and consent to the{" "}
-    { linkElements.map((linkElement, i) => {
-      return <Fragment key={ i }>{ i > 0 && i === lastLinkElementsIndex ? "and " : "" }{ linkElement }{ " " }</Fragment>
-    }) }
-    of the sale.
-  </>);
+  return (
+    <>
+      have read, understood, and consent to the
+      {" "}
+      { linkElements.map((linkElement, i) => {
+        return (
+          // eslint-disable-next-line react/no-array-index-key
+          <Fragment key={ i }>
+            { i > 0 && i === lastLinkElementsIndex ? "and " : "" }
+            { linkElement }
+            { " " }
+          </Fragment>
+        )
+      }) }
+      of the sale.
+    </>
+  );
 };
-

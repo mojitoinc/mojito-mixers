@@ -1,4 +1,4 @@
-export type ThemeColors = 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning';
+export type ThemeColors = "default" | "primary" | "secondary" | "error" | "info" | "success" | "warning";
 
 export interface PalettePaymentUI {
   progressBar?: string;

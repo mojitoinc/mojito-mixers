@@ -1,16 +1,19 @@
 import { useAuth0 } from "@auth0/auth0-react";
-import { GlobalLoader } from "../../components/core/GlobalLoader";
-import { EPages } from "../../utils/pages/pages.enum";
 import { Typography } from "@mui/material";
-import { PropsWithChildren } from "react";
+import React from "react";
+import { EPages } from "../../utils/pages/pages.enum";
+import { GlobalLoader } from "../core/GlobalLoader";
 
-export function ProtectedPageContainer({
-  revertDirection = false,
-  children,
-}: PropsWithChildren<{
+interface ProtectedPageContainer {
   redirectUrl?: EPages;
   revertDirection?: boolean;
-}>) {
+  children?: React.ReactNode;
+}
+
+export const ProtectedPageContainer: React.FC<ProtectedPageContainer> = ({
+  revertDirection = false,
+  children,
+}) => {
   const { isAuthenticated, isLoading } = useAuth0();
 
   if (isLoading) return <GlobalLoader />;

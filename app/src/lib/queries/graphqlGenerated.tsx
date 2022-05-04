@@ -778,6 +778,8 @@ export type Mutation = {
   cancelMarketplaceAuctionBid: Scalars['Boolean'];
   /** Cancels payment by ID, can be called by org admin */
   cancelPayment: Scalars['Boolean'];
+  /** Check Token Owner mutation takes the input arguments address, rangeStart, rangeEnd and then we check if the address is the owner of any of the tokens, between input range. */
+  checkTokenOwners: Scalars['Boolean'];
   /** Creates new Applicant based on input data. */
   createApplicant: ApplicantResponse;
   /** Creates invoice for given Lot, can be called by org admin */
@@ -855,6 +857,8 @@ export type Mutation = {
   uploadArweaveMetadata: Scalars['String'];
   uploadAsset: Scalars['String'];
   uploadAssets: Scalars['Int'];
+  /** Verify Signature mutation takes the input arguments signature, message, address and then we need to check if signature+message indeed was signed by the address.  */
+  verifySignature: Scalars['Boolean'];
 };
 
 
@@ -890,6 +894,14 @@ export type MutationCancelMarketplaceAuctionBidArgs = {
 export type MutationCancelPaymentArgs = {
   orgID: Scalars['UUID1'];
   paymentID: Scalars['UUID1'];
+};
+
+
+export type MutationCheckTokenOwnersArgs = {
+  contractId: Scalars['UUID1'];
+  rangeEnd: Scalars['Int'];
+  rangeStart: Scalars['Int'];
+  walletAddress: Scalars['String'];
 };
 
 
@@ -1212,6 +1224,13 @@ export type MutationUploadAssetsArgs = {
   orgId: Scalars['UUID1'];
 };
 
+
+export type MutationVerifySignatureArgs = {
+  address: Scalars['String'];
+  message: Scalars['String'];
+  signature: Scalars['String'];
+};
+
 export type NftContract = {
   __typename?: 'NFTContract';
   activationTxHash: Scalars['String'];
@@ -1488,7 +1507,7 @@ export type QueryGetPaymentMethodArgs = {
 
 
 export type QueryGetPaymentMethodListArgs = {
-  orgID: Scalars['UUID1'];
+  orgID?: InputMaybe<Scalars['UUID1']>;
 };
 
 

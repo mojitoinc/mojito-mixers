@@ -80,13 +80,13 @@ export const CheckoutModalFooter: React.FC<CheckoutModalFooterProps> = ({
   }, setConsentState] = useState<CheckoutModalFooterConsentState>({
     isFormSubmitted: false,
     isFormLoading: false,
-    isConsentChecked: showConsent && consentType === "checkbox" ? false : true,
+    isConsentChecked: !(showConsent && consentType === "checkbox"),
   });
 
   const showConsentError = isFormSubmitted && !isConsentChecked;
 
   const handleConsentClicked = useCallback((_: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
-    setConsentState((prevConsentState) => ({
+    setConsentState(prevConsentState => ({
       isFormSubmitted: prevConsentState.isFormSubmitted,
       isFormLoading: prevConsentState.isFormLoading,
       isConsentChecked: checked,
@@ -194,7 +194,7 @@ export const CheckoutModalFooter: React.FC<CheckoutModalFooterProps> = ({
 
       {primaryButtonVisible && (
         <PrimaryButton
-          onClickCapture={ handleSubmitClicked }
+          onClickCapture={ onSubmitClicked ? handleSubmitClicked : undefined }
           disabled={ isPrimaryButtonDisabled }
           href={ submitHref || undefined }
           type={ onSubmitClicked ? "button" : "submit" }
@@ -215,13 +215,15 @@ export const CheckoutModalFooter: React.FC<CheckoutModalFooterProps> = ({
         </Typography>
       )}
 
-      {showConsent && consentType === "disclaimer" && (<>
+      {showConsent && consentType === "disclaimer" && (
+      <>
         <Divider sx={{ my: 5, width: "100%" }} />
 
         <Typography sx={{ maxWidth: SM_MOBILE_MAX_WIDTH }} align="center">
           By placing an order you affirm that you {consentTextElement}
         </Typography>
-      </>)}
+      </>
+      )}
 
       {showConsent && consentType === "circle" && (
         <>

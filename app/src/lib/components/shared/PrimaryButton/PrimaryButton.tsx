@@ -1,4 +1,3 @@
-
 import { Button, ButtonProps } from "@mui/material";
 import React from "react";
 import { containsOnlyIcon } from "../../../utils/reactUtils";

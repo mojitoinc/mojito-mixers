@@ -21,7 +21,6 @@ interface UseShakeAnimationState {
 }
 
 export function useShakeAnimation(element: HTMLElement | null): [SxProps, () => void] {
-
   const [{ shakeCount, blip }, setShakeSate] = useState<UseShakeAnimationState>({
     shakeCount: 0,
     blip: false,
@@ -30,7 +29,7 @@ export function useShakeAnimation(element: HTMLElement | null): [SxProps, () => 
   const isShaking = shakeCount > 0;
 
   const incrementCount = useCallback(() => {
-    setShakeSate((prevShakeSate) => ({ shakeCount: prevShakeSate.shakeCount + 1, blip: false }));
+    setShakeSate(prevShakeSate => ({ shakeCount: prevShakeSate.shakeCount + 1, blip: false }));
   }, []);
 
   const resetCount = useCallback(() => {
@@ -51,7 +50,7 @@ export function useShakeAnimation(element: HTMLElement | null): [SxProps, () => 
     if (!element) return;
 
     if (isShaking) {
-      setShakeSate((prevShakeSate) => ({ shakeCount: prevShakeSate.shakeCount, blip: true }));
+      setShakeSate(prevShakeSate => ({ shakeCount: prevShakeSate.shakeCount, blip: true }));
 
       setTimeout(incrementCount);
 
@@ -61,7 +60,7 @@ export function useShakeAnimation(element: HTMLElement | null): [SxProps, () => 
     incrementCount();
   }, [element, incrementCount, isShaking]);
 
-  const multiplier = Math.min(1 + 2 * (shakeCount - 1) / 10, 3);
+  const multiplier = Math.min(1 + (2 * (shakeCount - 1) / 10), 3);
 
   return [isShaking && !blip ? {
     "--multiplier": multiplier,

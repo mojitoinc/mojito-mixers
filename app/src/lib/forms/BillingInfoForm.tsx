@@ -3,14 +3,14 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { object, string } from "yup";
 
 import React, { useCallback, useEffect } from "react";
+import { Box, InputAdornment, Typography, Grid } from "@mui/material";
+import BookIcon from "@mui/icons-material/Book";
 import { ControlledCountrySelector } from "../components/shared/Select/CountrySelector/CountrySelector";
 import { ControlledStateSelector } from "../components/shared/Select/StateSelector/StateSelector";
 import { CheckoutModalFooter } from "../components/payments/CheckoutModalFooter/CheckoutModalFooter";
 import { InputGroupLabel } from "../components/shared/InputGroupLabel/InputGroupLabel";
 import { ControlledTextField } from "../components/shared/TextField/TextField";
 import { SecondaryButton } from "../components/shared/SecondaryButton/SecondaryButton";
-import { Box, InputAdornment, Typography, Grid } from "@mui/material";
-import BookIcon from "@mui/icons-material/Book";
 import { EMPTY_OPTION, SelectOption } from "../components/shared/Select/Select";
 import { withFullNameCharsetErrorMessage, withFullNameErrorMessage, withPhoneErrorMessage, withRequiredErrorMessage } from "../utils/validationUtils";
 import { DebugBox } from "../components/payments/DebugBox/DebugBox";
@@ -195,6 +195,7 @@ export const BillingInfoForm: React.FC<BillingInfoFormProps> = ({
 
   const handleFormSubmit = useCallback(async (e: React.FormEvent) => {
     onAttemptSubmit();
+
     submitForm(e);
   }, [onAttemptSubmit, submitForm]);
 

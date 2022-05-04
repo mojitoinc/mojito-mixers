@@ -1,4 +1,3 @@
-
 import { ApolloError } from "@apollo/client";
 import { Dispatch, SetStateAction, useState, useCallback } from "react";
 import { CircleFieldErrors, parseCircleError } from "../../../domain/circle/circle.utils";
@@ -178,7 +177,7 @@ export function useCheckoutModalState({
     });
 
     setPurchaseState({
-      invoiceID: parentInvoiceID ? parentInvoiceID : (checkoutModalState.invoiceID || ""),
+      invoiceID: parentInvoiceID || (checkoutModalState.invoiceID || ""),
       invoiceCountdownStart: parentInvoiceID ? Date.now() : (checkoutModalState.invoiceCountdownStart || null),
       taxes: vertexEnabled ? { status: "incomplete" } : null,
       wallet: null, // Wallet is added from invoice: `setWalletAddress(wallet || destinationAddress)`
@@ -190,9 +189,9 @@ export function useCheckoutModalState({
   }, [debug, startAt, parentInvoiceID, paymentIdParam, vertexEnabled]);
 
   const goBack = useCallback(() => {
-    setCheckoutModalState(({ checkoutStep, checkoutError }) => ({
-      checkoutStep: CHECKOUT_STEPS[Math.max(CHECKOUT_STEPS.indexOf(checkoutStep) - 1, 0)],
-      checkoutError,
+    setCheckoutModalState(({ checkoutStep: prevCheckoutStep, checkoutError: prevCheckoutError }) => ({
+      checkoutStep: CHECKOUT_STEPS[Math.max(CHECKOUT_STEPS.indexOf(prevCheckoutStep) - 1, 0)],
+      checkoutError: prevCheckoutError,
       isDialogBlocked: false,
     }));
   }, []);
@@ -200,18 +199,18 @@ export function useCheckoutModalState({
   const goNext = useCallback(() => {
     if (!isValidWalletAddress(wallet) && WALLET_ADDRESS_FIELD_STEPS.includes(checkoutStep)) return;
 
-    setCheckoutModalState(({ checkoutStep, checkoutError }) => ({
-      checkoutStep: CHECKOUT_STEPS[Math.min(CHECKOUT_STEPS.indexOf(checkoutStep) + 1, CHECKOUT_STEPS.length - 1)],
-      checkoutError,
+    setCheckoutModalState(({ checkoutStep: prevCheckoutStep, checkoutError: prevCheckoutError }) => ({
+      checkoutStep: CHECKOUT_STEPS[Math.min(CHECKOUT_STEPS.indexOf(prevCheckoutStep) + 1, CHECKOUT_STEPS.length - 1)],
+      checkoutError: prevCheckoutError,
       isDialogBlocked: false,
     }));
   }, [checkoutStep, wallet]);
 
-  const goTo = useCallback((checkoutStep: CheckoutModalStep = startAt, checkoutError?: CheckoutModalError) => {
+  const goTo = useCallback((nextCheckoutStep: CheckoutModalStep = startAt, nextCheckoutError?: CheckoutModalError) => {
     setCheckoutModalState((prevCheckoutModalState) => {
-      return checkoutError
-        ? { checkoutStep, checkoutError, isDialogBlocked: false }
-        : { checkoutStep, checkoutError: prevCheckoutModalState.checkoutError, isDialogBlocked: false };
+      return nextCheckoutError
+        ? { checkoutStep: nextCheckoutStep, checkoutError: nextCheckoutError, isDialogBlocked: false }
+        : { checkoutStep: nextCheckoutStep, checkoutError: prevCheckoutModalState.checkoutError, isDialogBlocked: false };
     });
   }, [startAt]);
 
@@ -232,15 +231,12 @@ export function useCheckoutModalState({
         // If only 2 keys are present, those are firstAt and summary, so we need to try to map the generic error to a
         // more specific one:
 
-        let mappedErrorObject: MappedError | undefined;
-
         const errorMessageParts = circleFieldErrors.summary.split(": ").reverse();
 
-        for (const errorMessagePart of errorMessageParts) {
-          mappedErrorObject = MAPPED_ERRORS[fullTrim(errorMessagePart)];
-
-          if (mappedErrorObject) break;
-        }
+        const mappedErrorObject: MappedError | undefined = Object
+          .values(errorMessageParts)
+          .map(errorMessagePart => MAPPED_ERRORS[fullTrim(errorMessagePart)])
+          .find(mappedError => !!mappedError);
 
         if (mappedErrorObject) {
           const { errorLocation, fieldName } = mappedErrorObject;
@@ -272,28 +268,30 @@ export function useCheckoutModalState({
     });
   }, [onError]);
 
-  const setIsDialogBlocked = useCallback((isDialogBlocked: boolean) => {
-    setCheckoutModalState(({ checkoutStep, checkoutError }) => ({
-      checkoutStep,
-      checkoutError,
-      isDialogBlocked,
+  const setIsDialogBlocked = useCallback((nextIsDialogBlocked: boolean) => {
+    setCheckoutModalState(prevCheckoutModalState => ({ ...prevCheckoutModalState, isDialogBlocked: nextIsDialogBlocked }));
+  }, []);
+
+  const setInvoiceID = useCallback((nextInvoiceID: string | null, nextInvoiceCountdownStart: number | null) => {
+    setPurchaseState(prevPurchaseState => ({
+      ...prevPurchaseState,
+      invoiceID: nextInvoiceID,
+      invoiceCountdownStart: nextInvoiceCountdownStart,
+      processorPaymentID: "",
+      paymentID: "",
     }));
   }, []);
 
-  const setInvoiceID = useCallback((invoiceID: string | null, invoiceCountdownStart: number | null) => {
-    setPurchaseState((prevPurchaseState) => ({ ...prevPurchaseState, invoiceID, invoiceCountdownStart, processorPaymentID: "", paymentID: "" }));
+  const setTaxes = useCallback((nextTaxes: TaxesState) => {
+    setPurchaseState(prevPurchaseState => ({ ...prevPurchaseState, taxes: nextTaxes }));
   }, []);
 
-  const setTaxes = useCallback((taxes: TaxesState) => {
-    setPurchaseState((prevPurchaseState) => ({ ...prevPurchaseState, taxes }));
+  const setWalletAddress = useCallback((nextWallet: null | string | Wallet) => {
+    setPurchaseState(prevPurchaseState => ({ ...prevPurchaseState, wallet: nextWallet }));
   }, []);
 
-  const setWalletAddress = useCallback((wallet: null | string | Wallet) => {
-    setPurchaseState((prevPurchaseState) => ({ ...prevPurchaseState, wallet }));
-  }, []);
-
-  const setPayments = useCallback((processorPaymentID: string, paymentID: string) => {
-    setPurchaseState((prevPurchaseState) => ({ ...prevPurchaseState, processorPaymentID, paymentID }));
+  const setPayments = useCallback((nextProcessorPaymentID: string, nextPaymentID: string) => {
+    setPurchaseState(prevPurchaseState => ({ ...prevPurchaseState, processorPaymentID: nextProcessorPaymentID, paymentID: nextPaymentID }));
   }, []);
 
   return {

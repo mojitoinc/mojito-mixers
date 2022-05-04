@@ -1,10 +1,10 @@
 import { TextFieldProps, styled } from "@mui/material";
+import React from "react";
 import { CardNumberField } from "../CardNumberField/CardNumberField";
 import { TextField } from "../TextField/TextField";
-import React from "react";
 import { SM_BORDER_RADIUS } from "../../../config/theme/themeConstants";
 
-export const ReadOnlyField: React.FC<TextFieldProps> = styled((props) => (
+export const ReadOnlyField: React.FC<TextFieldProps> = styled(props => (
   <TextField variant="standard" disabled { ...props } />
 ))(({ theme: { palette, typography } }) => ({
   "& .MuiInputLabel-root": {
@@ -36,7 +36,7 @@ export const ReadOnlyField: React.FC<TextFieldProps> = styled((props) => (
 }));
 
 
-export const ReadOnlyCardField: React.FC<TextFieldProps> = styled((props) => (
+export const ReadOnlyCardField: React.FC<TextFieldProps> = styled(props => (
   <CardNumberField variant="standard" disabled { ...props } />
 ))(({ theme: { palette, typography } }) => ({
   "& .MuiInputLabel-root": {
@@ -67,7 +67,7 @@ export const ReadOnlyCardField: React.FC<TextFieldProps> = styled((props) => (
   },
 }));
 
-export const ReadOnlyWalletAddress: React.FC<TextFieldProps> = styled((props) => (
+export const ReadOnlyWalletAddress: React.FC<TextFieldProps> = styled(props => (
   <TextField variant="standard" disabled { ...props } />
 ))(({ theme: { palette, typography } }) => ({
   "& .MuiInputLabel-root": {

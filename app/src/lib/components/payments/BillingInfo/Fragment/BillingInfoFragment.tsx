@@ -1,10 +1,10 @@
-import { SavedPaymentMethod, SavedPaymentMethodBillingInfo } from "../../../../domain/circle/circle.interfaces";
 import React from "react";
 import { Box, Typography } from "@mui/material";
+import { SavedPaymentMethod, SavedPaymentMethodBillingInfo } from "../../../../domain/circle/circle.interfaces";
 
 export interface BillingInfoFragmentProps {
   savedPaymentMethod: SavedPaymentMethod | SavedPaymentMethodBillingInfo;
-};
+}
 
 export const BillingInfoFragment: React.FC<BillingInfoFragmentProps> = ({
   savedPaymentMethod: {
@@ -23,7 +23,7 @@ export const BillingInfoFragment: React.FC<BillingInfoFragmentProps> = ({
     },
   },
 }) => (
-  <Box sx={{ display:"flex", flexDirection: 'column' }}>
+  <Box sx={{ display: "flex", flexDirection: 'column' }}>
     <Typography variant="caption">{ name }</Typography>
     { address1 && <Typography variant="caption">{ address1 }</Typography> }
     { address2 && <Typography variant="caption">{ address2 }</Typography> }

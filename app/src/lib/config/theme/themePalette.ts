@@ -57,31 +57,31 @@ const MOJITO_LIGHT_PALETTE: PaletteOptions = {
 
   grey: {
     // Address box, read only input and payment method toggle (selected) background:
-    "50": "#F8F8F8",
+    50: "#F8F8F8",
 
     // Payment method toggle (not selected) background, separators, secondary button background and address box border:
-    "100": "#DDDDDD",
+    100: "#DDDDDD",
 
     // Input borders:
-    "200": "#D9D9D9",
+    200: "#D9D9D9",
 
     // Image placeholder background:
-    "300": "#C4C4C4",
+    300: "#C4C4C4",
 
     // Payment method toggle (not selected) text:
-    "400": "#727272",
+    400: "#727272",
 
     // Input labels and icons:
-    "500": "#6B6B6B",
+    500: "#6B6B6B",
 
     // Secondary button text:
-    "600": "#686868",
+    600: "#686868",
 
     // Form input group labels:
-    "700": "#333333",
+    700: "#333333",
 
     // Address box text and primary button text:
-    "800": "#292929",
+    800: "#292929",
   },
 
 };

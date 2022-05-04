@@ -1,13 +1,13 @@
-import { InputGroupLabel } from "../InputGroupLabel/InputGroupLabel";
 import AddIcon from '@mui/icons-material/Add';
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { alpha, Box, CircularProgress, Typography } from "@mui/material";
+import { InputGroupLabel } from "../InputGroupLabel/InputGroupLabel";
 import { StackList } from "../StackList/StackList";
 import { SecondaryButton } from "../SecondaryButton/SecondaryButton";
 import { PaymentDetailsItem } from "../../payments/PaymentDetailsItem/Item/PaymentDetailsItem";
 import { CheckoutModalFooter } from "../../payments/CheckoutModalFooter/CheckoutModalFooter";
 import { DisplayBox } from "../../payments/DisplayBox/DisplayBox";
 import { SavedPaymentMethod } from "../../../domain/circle/circle.interfaces";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { alpha, Box, CircularProgress, Typography } from "@mui/material";
 import { ConsentType } from "../ConsentText/ConsentText";
 import { OVERLAY_OPACITY } from "../../../config/theme/themeConstants";
 import { getCreditCardNetworkFromLabel, getCvvIsValid } from "../../../domain/payment/payment.utils";
@@ -18,6 +18,7 @@ import { CheckoutItem } from "../../../domain/product/product.interfaces";
 import { useLimits } from "../../../hooks/useLimits";
 import { FormErrorsCaption } from "../FormErrorCaption/FormErrorCaption";
 import { DebugBox } from "../../payments/DebugBox/DebugBox";
+
 interface SavedPaymentDetailsSelectorState {
   isFormSubmitted: boolean;
   cvv: string;
@@ -94,12 +95,11 @@ export const SavedPaymentDetailsSelector: React.FC<SavedPaymentDetailsSelectorPr
       };
     }
 
-    const creditCardNetwork = getCreditCardNetworkFromLabel(selectedPaymentMethod.network);
-    const cvvLabel = getCardTypeByType(creditCardNetwork).code.name;
+    const network = getCreditCardNetworkFromLabel(selectedPaymentMethod.network);
 
     return {
-      creditCardNetwork,
-      cvvLabel,
+      creditCardNetwork: network,
+      cvvLabel: getCardTypeByType(network).code.name,
       isCvvRequired: true,
     };
   }, [selectedPaymentMethod]);
@@ -114,7 +114,7 @@ export const SavedPaymentDetailsSelector: React.FC<SavedPaymentDetailsSelectorPr
 
   useEffect(() => {
     // Reset CVV if user selects a different payment method:
-    setSelectorState(({ isFormSubmitted }) => ({ isFormSubmitted, cvv: "" }));
+    setSelectorState(prevSelectorState => ({ ...prevSelectorState, cvv: "" }));
   }, [selectedPaymentMethodId]);
 
   const { cvvExpectedLength, isCvvValid } = getCvvIsValid(cvv, creditCardNetwork, acceptedCreditCardNetworks, isCvvRequired);
@@ -130,95 +130,97 @@ export const SavedPaymentDetailsSelector: React.FC<SavedPaymentDetailsSelectorPr
       return;
     }
 
-    setSelectorState(({ cvv }) => ({ isFormSubmitted: true, cvv }));
+    setSelectorState(prevSelectorState => ({ ...prevSelectorState, isFormSubmitted: true }));
   }, [onAttemptSubmit, selectedPaymentMethodId, cvv, isCvvValid, onCvvSelected, onNext]);
 
   const handleCvvChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const cvv = e.currentTarget.value || "";
+    const nextCvv = e.currentTarget.value || "";
 
-    setSelectorState(({ isFormSubmitted }) => ({ isFormSubmitted, cvv }));
+    setSelectorState(prevSelectorState => ({ ...prevSelectorState, cvv: nextCvv }));
   }, []);
 
   const getPaymentMethodId = useCallback((savedPaymentMethod: SavedPaymentMethod) => savedPaymentMethod.id, []);
 
-  return (<>
-    <Box sx={{ position: "relative", mb: consentType === "checkbox" ? 5 : 0 }}>
+  return (
+    <>
+      <Box sx={{ position: "relative", mb: consentType === "checkbox" ? 5 : 0 }}>
 
-      { showLoader ? (
-        <Box sx={{
-          position: "absolute",
-          width: "100%",
-          height: "100%",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          background: theme => alpha(theme.palette.background.default, OVERLAY_OPACITY),
-          zIndex: 100,
-        }}>
-          <CircularProgress color="secondary" />
-        </Box>
-      ) : null }
+        { showLoader ? (
+          <Box sx={{
+            position: "absolute",
+            width: "100%",
+            height: "100%",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            background: theme => alpha(theme.palette.background.default, OVERLAY_OPACITY),
+            zIndex: 100,
+          }}>
+            <CircularProgress color="secondary" />
+          </Box>
+        ) : null }
 
-      <InputGroupLabel sx={{ mt: 2.5, mb: 1.5 }}>Saved Payment Methods</InputGroupLabel>
+        <InputGroupLabel sx={{ mt: 2.5, mb: 1.5 }}>Saved Payment Methods</InputGroupLabel>
 
-      { limitExceededMessage ? (
-        <DisplayBox sx={{ mb: 2 }}>
-          <Typography sx={{ fontWeight: "500" }}>
-            {limitExceededMessage}
-          </Typography>
-        </DisplayBox>
-      ) : null }
+        { limitExceededMessage ? (
+          <DisplayBox sx={{ mb: 2 }}>
+            <Typography sx={{ fontWeight: "500" }}>
+              {limitExceededMessage}
+            </Typography>
+          </DisplayBox>
+        ) : null }
 
-      <StackList
-        data={ savedPaymentMethods }
-        additionalProps={ (savedPaymentMethod) => ({
-          active: savedPaymentMethod.id === selectedPaymentMethodId,
-          disabled: showLoader,
-          onDelete,
-          onPick: handlePick,
-          cvvLabel,
-          cvvError,
-          onCvvChange: handleCvvChange,
-        }) }
-        component={ PaymentDetailsItem }
-        itemKey={ getPaymentMethodId }
-        deps={[ selectedPaymentMethodId, showLoader, onDelete, handlePick, cvvLabel, cvvError, handleCvvChange]} />
+        <StackList
+          data={ savedPaymentMethods }
+          additionalProps={ savedPaymentMethod => ({
+            active: savedPaymentMethod.id === selectedPaymentMethodId,
+            disabled: showLoader,
+            onDelete,
+            onPick: handlePick,
+            cvvLabel,
+            cvvError,
+            onCvvChange: handleCvvChange,
+          }) }
+          component={ PaymentDetailsItem }
+          itemKey={ getPaymentMethodId }
+          deps={[selectedPaymentMethodId, showLoader, onDelete, onPick, cvvLabel, cvvError, handleCvvChange]} />
 
-      { cvvError && (
+        { cvvError && (
         <FormErrorsCaption sx={{ mt: 2 }}>
           { withInvalidCVV({ cvvLabel, cvvExpectedLength }) }
         </FormErrorsCaption>
-      ) }
+        ) }
 
-      <SecondaryButton
-        onClick={ onNew }
-        startIcon={ <AddIcon /> }
-        sx={{ mt: 2.5 }}
-        disabled={ showLoader }>
-        Add New Payment Method
-      </SecondaryButton>
+        <SecondaryButton
+          onClick={ onNew }
+          startIcon={ <AddIcon /> }
+          sx={{ mt: 2.5 }}
+          disabled={ showLoader }>
+          Add New Payment Method
+        </SecondaryButton>
 
-      { isFormSubmitted && !selectedPaymentMethodId && (
+        { isFormSubmitted && !selectedPaymentMethodId && (
         <FormErrorsCaption sx={{ mt: 2 }}>
-         { SELECTION_ERROR_MESSAGE }
+          { SELECTION_ERROR_MESSAGE }
         </FormErrorsCaption>
-      ) }
+        ) }
 
-      { debug ? (
-        <DebugBox sx={{ mt: 2.5 }}>
-          { JSON.stringify(limits, null, 2)}
-        </DebugBox>
-      ) : null }
+        { debug ? (
+          <DebugBox sx={{ mt: 2.5 }}>
+            { JSON.stringify(limits, null, 2)}
+          </DebugBox>
+        ) : null }
 
-    </Box>
+      </Box>
 
-    <CheckoutModalFooter
-      variant="toConfirmation"
-      consentType={ consentType }
-      submitLabel={ loadingItemLimits ? "Verifying purchase..." : undefined }
-      submitDisabled={ loadingItemLimits || !!limitExceededMessage }
-      submitLoading={ loadingItemLimits }
-      onSubmitClicked={ handleNextClicked }
-      onCloseClicked={ onClose } />
-  </>);
+      <CheckoutModalFooter
+        variant="toConfirmation"
+        consentType={ consentType }
+        submitLabel={ loadingItemLimits ? "Verifying purchase..." : undefined }
+        submitDisabled={ loadingItemLimits || !!limitExceededMessage }
+        submitLoading={ loadingItemLimits }
+        onSubmitClicked={ handleNextClicked }
+        onCloseClicked={ onClose } />
+    </>
+  );
 }

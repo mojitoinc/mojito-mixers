@@ -45,7 +45,6 @@ export const ProviderInjector: React.FC<ProvidersInjectorProps> = ({
     if (!apolloClient && !uri) {
       throw new Error(EXCEPTIONS.DEV.APOLLO_PROVIDER_MISSING);
     }
-
   }, [apolloClient, uri]);
 
   return (
@@ -73,7 +72,6 @@ export function withThemeProvider<P extends object>(Component: React.ComponentTy
 
   return WithThemeProvider;
 }
-
 
 
 export function withProviders<P extends object>(Component: React.ComponentType<P>) {

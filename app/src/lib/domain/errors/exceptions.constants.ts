@@ -1,4 +1,4 @@
-export const DEV_EXCEPTION_PREFIX = "(DEV)"
+export const DEV_EXCEPTION_PREFIX = "(DEV)";
 
 export const EXCEPTIONS = {
   DEV: {
@@ -17,4 +17,4 @@ export const EXCEPTIONS = {
     VALIDATION_FAILED: "Payment method could not be validated.",
     VALIDATION_TIMEOUT: "Payment method validation took too long.",
   },
-}
+};

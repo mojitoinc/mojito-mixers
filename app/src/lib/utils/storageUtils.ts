@@ -1,5 +1,8 @@
+/* eslint-disable class-methods-use-this */
+
 // import { WebStorage } from "proxy-storage";
 
+import { IS_BROWSER } from "../domain/build/build.constants";
 import { isLocalhost } from "../domain/url/url.utils";
 
 // TODO: Replace all this with a good storage library.
@@ -37,7 +40,7 @@ function getCookieSecurityParams(params: CookieParams = {}) {
   }
 
   if (crossDomain) {
-    const domainParam = domain || (process.browser ? location.host : "");
+    const domainParam = domain || (IS_BROWSER ? window.location.host : "");
 
     if (domainParam) securityParams.push(`domain=${ domainParam }`);
   }
@@ -59,7 +62,10 @@ function setCookie(
   if (typeof document === "undefined") return;
 
   const serializedValue = params.noParse ? value : encodeURIComponent(JSON.stringify(value));
-  const expirationDate =  params.expirationDate || (params.expirationDate === false ? undefined : new Date(Date.now() + 30 * 24 * 3600000)); // 30 days default expiration
+
+  const expirationDate = params.expirationDate ||
+    (params.expirationDate === false ? undefined : new Date(Date.now() + (30 * 24 * 3600000))); // 30 days default expiration
+
   const cookieParams = [
     expirationDate ? `expires=${ expirationDate.toUTCString() }` : undefined,
     `path=${ params.path || "/" }`,
@@ -90,7 +96,7 @@ function getCookies(): Record<string, string> {
 function getCookie<T = any>(name: string | RegExp, options: CookieOptions = {}): T | string | undefined {
   const cookies = getCookies();
 
-  let rawCookie: string | undefined = undefined;
+  let rawCookie: string | undefined;
 
   if (typeof name === "string") {
     rawCookie = cookies[name];
@@ -143,7 +149,7 @@ export type ProxyStorageType = "localStorage" | "cookieStorage" | "sessionStorag
 export class ProxyStorage {
   type: ProxyStorageType;
 
-  constructor (type: ProxyStorageType) {
+  constructor(type: ProxyStorageType) {
     this.type = type;
   }
 
@@ -184,7 +190,6 @@ export class ProxyStorage {
   get length(): number {
     return Object.keys(getCookies()).length;
   }
-};
+}
 
 export const cookieStorage = new ProxyStorage("cookieStorage");
-

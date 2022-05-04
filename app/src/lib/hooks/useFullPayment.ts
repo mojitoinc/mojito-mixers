@@ -76,9 +76,10 @@ export function useFullPayment({
     }
 
     if (debug) {
-      console.log(invoiceID
-        ? `\n💵 Making payment for invoice ${invoiceID} (orgID = ${orgID})...\n`
-        : `\n💵 Aborting payment for unknown invoice (orgID = ${orgID})...\n`
+      console.log(
+        invoiceID
+          ? `\n💵 Making payment for invoice ${invoiceID} (orgID = ${orgID})...\n`
+          : `\n💵 Aborting payment for unknown invoice (orgID = ${orgID})...\n`
       );
     }
 
@@ -97,7 +98,7 @@ export function useFullPayment({
     let paymentMethodID = "";
     let processorPaymentID = "";
     let paymentID = "";
-    let mutationError: ApolloError | Error | undefined = undefined;
+    let mutationError: ApolloError | Error | undefined;
 
     if (typeof selectedPaymentInfo === "string") {
       // If selectedPaymentInfo is a payment method ID, that's all we need, no need to create a new payment method:
@@ -106,18 +107,17 @@ export function useFullPayment({
       let selectedBillingInfoData: BillingInfo;
 
       if (typeof selectedBillingInfo === "string") {
-
         // If selectedPaymentInfo is an object and selectedBillingInfo is an addressID, we need to find the matching
         // data in savedPaymentMethods:
-        const selectedPaymentMethod = savedPaymentMethods.find(({ addressId }) => addressId === selectedBillingInfo);
+        const matchingPaymentMethod = savedPaymentMethods.find(({ addressId }) => addressId === selectedBillingInfo);
 
-        if (!selectedPaymentMethod) {
+        if (!matchingPaymentMethod) {
           setError(ERROR_PURCHASE_SELECTED_PAYMENT_METHOD());
 
           return;
         }
 
-        selectedBillingInfoData = savedPaymentMethodToBillingInfo(selectedPaymentMethod);
+        selectedBillingInfoData = savedPaymentMethodToBillingInfo(matchingPaymentMethod);
       } else {
         // If both selectedPaymentInfo and selectedBillingInfo are objects, we just create a new payment method with them:
         selectedBillingInfoData = selectedBillingInfo;

@@ -1,15 +1,8 @@
 import React, { useCallback, useMemo } from "react";
-import {
-  ApolloClient,
-  ApolloProvider,
-  InMemoryCache,
-  createHttpLink,
-  NormalizedCacheObject,
-  Context,
-} from "@apollo/client";
-import { isLocalhost } from "../../../domain/url/url.utils";
+import { ApolloClient, ApolloProvider, InMemoryCache, createHttpLink, NormalizedCacheObject, Context } from "@apollo/client";
 import { useAuth0 } from "@auth0/auth0-react";
 import { setContext } from "@apollo/link-context";
+import { isLocalhost } from "../../../domain/url/url.utils";
 
 const cache = new InMemoryCache();
 
@@ -31,6 +24,7 @@ export const AuthorizedApolloProvider: React.FC<AuthorizedApolloProviderProps> =
   const defaultGetAuthenticationToken = useCallback(async () => {
     const token = await getIdTokenClaims();
 
+    // eslint-disable-next-line no-underscore-dangle
     return token?.__raw;
   }, [getIdTokenClaims]);
 
