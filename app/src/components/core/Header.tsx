@@ -23,6 +23,7 @@ export const Header: React.FC = () => (
 
     <Link href="/">
       <a style={{ display: "block" }}>
+        { /* eslint-disable-next-line @next/next/no-img-element */ }
         <img src="/img/logos/mojito-light-logo.svg" alt="Mojito Logo" style={{ display: "block", height: "32px" }} />
       </a>
     </Link>

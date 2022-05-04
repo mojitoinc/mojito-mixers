@@ -47,7 +47,7 @@ const HomePage: React.FC = () => {
   const paymentErrorParam = router.query[THREEDS_FLOW_SEARCH_PARAM_ERROR_KEY]?.toString();
 
   const { isAuthenticated, isLoading: isAuthenticatedLoading } = useAuth0();
-  const { data: meData, loading: meLoading, error: meError } = useMeQuery({ skip: !isAuthenticated });
+  const { data: meData, loading: meLoading /* , error: meError */ } = useMeQuery({ skip: !isAuthenticated });
   const isLoading = isAuthenticatedLoading || meLoading;
   const organizations = isLoading ? [] : (meData?.me?.userOrgs || []).map(userOrg => userOrg.organization);
   const hasOrganizations = organizations.length > 0;
