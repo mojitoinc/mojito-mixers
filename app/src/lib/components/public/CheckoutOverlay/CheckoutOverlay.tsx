@@ -35,22 +35,23 @@ import { NEW_WALLET_OPTION } from "../../../domain/wallet/wallet.constants";
 import { StatusIcon } from "../../shared/StatusIcon/StatusIcon";
 import { CreditCardNetwork } from "../../../domain/react-payment-inputs/react-payment-inputs.utils";
 import { PUIStaticSuccessOverlay } from "../SuccessOverlay/StaticSuccessOverlay";
-import { LoaderMode } from "../useOpenCloseCheckoutModal/useOpenCloseCheckoutModal";
 import { PUIStaticErrorOverlay } from "../ErrorOverlay/StaticErrorOverlay";
 import { useCountdown } from "../../../hooks/useContdown";
+import { PUIRouterOptions } from "../../../domain/router/router.types";
+import { getPathnameWithParams } from "../../../domain/url/url.utils";
+
+export type LoaderMode = "default" | "success" | "error";
 
 export interface PUICheckoutOverlayProps {
   // Modal:
   open: boolean;
-  onClose: () => void;
-  onGoTo?: () => void;
-  goToHref?: string;
-  goToLabel?: string;
+  onClose?: () => void;
+  onGoTo: (pathnameOrUrl: string, options?: PUIRouterOptions) => void;
 
   // Flow:
   loaderMode?: LoaderMode;
+  paymentIdParam?: string;
   paymentErrorParam?: string;
-  onRemoveUrlParams: (cleanURL: string) => void;
   guestCheckoutEnabled?: boolean;
   productConfirmationEnabled?: boolean;
   vertexEnabled?: boolean;
@@ -91,6 +92,11 @@ export interface PUICheckoutOverlayProps {
 
 export type PUICheckoutProps = PUICheckoutOverlayProps & ProvidersInjectorProps;
 
+export type PUICheckoutComponentProps = Partial<PUICheckoutProps> & Pick<
+  PUICheckoutProps,
+  "open" | "loaderMode" | "paymentErrorParam"
+>;
+
 const DEV_DEBUG_ENABLED = process.browser && localStorage.getItem(DEV_DEBUG_ENABLED_KEY) === "true";
 
 export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
@@ -98,14 +104,11 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   open,
   onClose,
   onGoTo,
-  // TODO: Move to dictionary:
-  goToHref,
-  goToLabel,
 
   // Flow:
   loaderMode: initialLoaderMode = "default",
+  paymentIdParam,
   paymentErrorParam,
-  onRemoveUrlParams,
   guestCheckoutEnabled,
   productConfirmationEnabled,
   vertexEnabled = true,
@@ -123,14 +126,14 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   acceptedPaymentTypes = ["CreditCard"],
   acceptedCreditCardNetworks,
   network,
-  dictionary,
+  dictionary: parentDictionary,
 
   // Legal:
   consentType,
 
   // Data:
-  orgID,
-  invoiceID: initialInvoiceID,
+  orgID: parentOrgID,
+  invoiceID: parentInvoiceID,
   checkoutItems: parentCheckoutItems,
 
   // Authentication:
@@ -146,6 +149,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   const [debug, setDebug] = useState(!!parentDebug);
 
   // Initialization, just to prevent issues with Next.js' SSR:
+
   useEffect(() => {
     setDebug((prevDebug) => {
       const nextDebug = prevDebug || DEV_DEBUG_ENABLED;
@@ -173,7 +177,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     });
   }, []);
 
-  // First, get user data and saved payment methods:
+  // First, get user data:
 
   const {
     data: meData,
@@ -192,17 +196,11 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
       : userWallets;
   }, [meLoading, meData, network]);
 
-  const {
-    data: paymentMethodsData,
-    loading: paymentMethodsLoading,
-    error: paymentMethodsError,
-    refetch: refetchPaymentMethods,
-  } = useGetPaymentMethodListQuery({
-    skip: !isAuthenticated || !orgID || !open,
-    variables: { orgID },
-  });
 
   // Get everything related to Payment UI routing, error and state handling, including resuming Plaid / 3DS flows:
+
+  const paymentIdParamRef = useRef(paymentIdParam);
+  const paymentErrorParamRef = useRef(paymentErrorParam);
 
   const {
     // CheckoutModalState:
@@ -216,6 +214,11 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     goNext,
     goTo,
     setError,
+
+    // Data that can be persisted:
+    orgID,
+    checkoutItems: initialCheckoutItems,
+    goToMarketplaceHref,
 
     // SelectedPaymentMethod:
     selectedPaymentMethod,
@@ -233,12 +236,29 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     processorPaymentID,
     setPayments,
   } = useCheckoutModalState({
-    invoiceID: initialInvoiceID,
+    orgID: parentOrgID,
+    invoiceID: parentInvoiceID,
+    paymentIdParam: paymentIdParamRef.current,
     productConfirmationEnabled,
     vertexEnabled,
     isAuthenticated,
     onError,
     debug,
+  });
+
+  const dictionary = useMemo(() => ({ ...parentDictionary, goToMarketplaceHref }), [parentDictionary, goToMarketplaceHref]);
+
+
+  // Get saved payment methods:
+
+  const {
+    data: paymentMethodsData,
+    loading: paymentMethodsLoading,
+    error: paymentMethodsError,
+    refetch: refetchPaymentMethods,
+  } = useGetPaymentMethodListQuery({
+    skip: !isAuthenticated || !orgID || !open,
+    variables: { orgID },
   });
 
 
@@ -255,61 +275,12 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   });
 
 
-  // Modal loading state:
-
-  const isDialogLoading = !orgID || parentCheckoutItems.length === 0 || isAuthenticatedLoading || meLoading || paymentMethodsLoading;
-  const isDialogInitializing = isDialogLoading || invoiceDetailsLoading || !invoiceID || !invoiceCountdownStart;
-  const isPlaidFlowLoading = continuePlaidOAuthFlow();
-  const [loaderMode, setLoaderMode] = useState(initialLoaderMode);
-  const isInvalidMode = loaderMode !== "default" && !open;
-  const showEspecialLoaders = open && isDialogInitializing && loaderMode !== "default" && checkoutStep !== "error";
-
-  useEffect(() => {
-    if (!isDialogInitializing || isInvalidMode) {
-      // Once we have finished loading data OR if `loaderMode` is not default but the modal is not opened (probably
-      // because the data in `localStorage` expired), we reset the loader mode:
-      setLoaderMode("default");
-    }
-  }, [isDialogInitializing, isInvalidMode]);
-
-  useEffect(() => {
-    if (showEspecialLoaders) return;
-
-    const params = new URLSearchParams(location.search);
-
-    params.delete(THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY);
-    params.delete(THREEDS_FLOW_SEARCH_PARAM_ERROR_KEY);
-
-    const cleanParams = params.toString();
-    const cleanURL = location.href.replace(location.search, cleanParams ? `?${ cleanParams }` : "");
-
-    if (cleanURL && cleanURL !== location.href) onRemoveUrlParams(cleanURL);
-  }, [showEspecialLoaders, onRemoveUrlParams]);
-
-  useEffect(() => {
-    let emoji = "🔄";
-
-    if (isInvalidMode) {
-      emoji = "⚠️";
-    } else if (loaderMode === "default") {
-      emoji = open ? "📬" : "📭";
-    } else {
-      emoji = loaderMode === "success" ? "✔️" : "❌";
-    }
-
-    if (debug) console.log(`${ emoji } loaderMode = ${ loaderMode } / isOpen = ${ open }`);
-  }, [debug, isInvalidMode, loaderMode, open, onRemoveUrlParams]);
-
-
   // Payment methods and checkout items / invoice items transforms:
 
   const rawSavedPaymentMethods = paymentMethodsData?.getPaymentMethodList;
   const savedPaymentMethods = useMemo(() => transformRawSavedPaymentMethods(rawSavedPaymentMethods as RawSavedPaymentMethod[]), [rawSavedPaymentMethods]);
 
-  // TODO: These should probably be combined.
   const invoiceItems = invoiceDetailsData?.getInvoiceDetails.items;
-  const checkoutItems = useMemo(() => transformCheckoutItemsFromInvoice(parentCheckoutItems, invoiceItems), [parentCheckoutItems, invoiceItems]);
-  const { total: subtotal, fees, taxAmount } = useCheckoutItemsCostTotal(checkoutItems);
   const destinationAddress = (invoiceItems || [])?.[0]?.destinationAddress || NEW_WALLET_OPTION.value;
 
   useEffect(() => {
@@ -319,6 +290,50 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
 
     setWalletAddress(wallet || destinationAddress);
   }, [wallets, destinationAddress, setWalletAddress]);
+
+  // TODO: These should probably be combined.
+
+  const checkoutItems = useMemo(() => {
+    return transformCheckoutItemsFromInvoice(parentCheckoutItems, initialCheckoutItems, invoiceItems);
+  }, [parentCheckoutItems, initialCheckoutItems, invoiceItems]);
+
+  const { total: subtotal, fees, taxAmount } = useCheckoutItemsCostTotal(checkoutItems);
+
+
+  // Modal loading state:
+
+  const isAuthLoading = isAuthenticatedLoading || meLoading;
+  const isDialogLoading = isAuthLoading || paymentMethodsLoading || !orgID || checkoutItems.length === 0;
+  const isDialogInitializing = isDialogLoading || paymentMethodsLoading || invoiceDetailsLoading || !invoiceID || !invoiceCountdownStart;
+  const isPlaidFlowLoading = continuePlaidOAuthFlow();
+  const [loaderMode, setLoaderMode] = useState(initialLoaderMode);
+  const showEspecialLoaders = open && isDialogInitializing && loaderMode !== "default" && checkoutStep !== "error";
+
+  useEffect(() => {
+    if (loaderMode === "default") return;
+
+    if (!isDialogInitializing || !open) {
+      // Once we have finished loading data OR if the modal is not opened (probably
+      // because the stored data expired) or is closed, we reset the loader mode:
+      setLoaderMode("default");
+    }
+  }, [loaderMode, isDialogInitializing, open]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+
+    params.delete(THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY);
+    params.delete(THREEDS_FLOW_SEARCH_PARAM_ERROR_KEY);
+
+    const cleanParams = params.toString();
+    const cleanPathname = `${ window.location.pathname }${ cleanParams ? `?${ cleanParams }` : "" }`;
+
+    if (cleanPathname && cleanPathname !== getPathnameWithParams()) {
+      // As soon as we find these params, we remove them from the URL (they are stored in a Ref to avoid losing them
+      // before we get a change to use them):
+      onGoTo(cleanPathname, { replace: true, shallow: true, reason: "Clean URL."});
+    }
+  }, [onGoTo]);
 
 
   // Invoice creation & buy now lot reservation:
@@ -365,9 +380,25 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
 
   // Init modal state once everything has been loaded:
 
+  const hasBeenInitRef = useRef(false);
+
   useEffect(() => {
-    if (!isDialogLoading && open) initModalState();
-  }, [isDialogLoading, open, initModalState]);
+    if (hasBeenInitRef.current && (!open || isAuthLoading)) hasBeenInitRef.current = false;
+  }, [open, isAuthLoading, debug]);
+
+  useEffect(() => {
+    if (!open || isAuthLoading || hasBeenInitRef.current) return;
+
+    if ((loaderMode === "default" && !isDialogLoading) || (loaderMode !== "default" && isDialogLoading)) {
+      hasBeenInitRef.current = true;
+
+      const { flowType, url } = initModalState();
+
+      if (flowType === "" && loaderMode !== "default") {
+        onGoTo(url || "/", { replace: true, reason: "Invalid modal state." });
+      }
+    }
+  }, [open, isAuthLoading, loaderMode, isDialogLoading, initModalState, onGoTo]);
 
 
   // Data loading error handling:
@@ -381,12 +412,12 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
 
     if (paymentMethodsError) {
       if (ignorePaymentMethodsError) {
-        console.log("\n❌ (IGNORED) Error loading saved payment methods:\n\n", paymentMethodsError);
+        if (debug) console.log("\n❌ (IGNORED) Error loading saved payment methods:\n\n", paymentMethodsError);
       } else {
         setError(ERROR_LOADING_PAYMENT_METHODS(paymentMethodsError));
       }
     }
-  }, [meError, paymentMethodsError, invoiceDetailsError, setError]);
+  }, [meError, invoiceDetailsError, paymentMethodsError, debug, setError]);
 
 
   // Analytics:
@@ -593,12 +624,6 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     setError(error);
   }, [refetchPaymentMethods, setError]);
 
-  const handleGoTo = useCallback(() => {
-    if (onGoTo) onGoTo();
-
-    onClose();
-  }, [onGoTo, onClose]);
-
 
   // Release reservation:
 
@@ -615,7 +640,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   });
 
   const handleBeforeUnload = handleBeforeUnloadRef.current = useCallback((e?: BeforeUnloadEvent) => {
-    if (paymentID || processorPaymentID || initialInvoiceID) return;
+    if (paymentID || processorPaymentID || parentInvoiceID) return;
 
     if (orgID && invoiceID && invoiceID !== lastReleasedReservationID.current) {
       if (debug) console.log(`\n♻️ Releasing reservation invoice ${ invoiceID } (orgID = ${ orgID })...\n`);
@@ -641,7 +666,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
       // The absence of a returnValue property on the event will guarantee the browser unload happens:
       delete e['returnValue'];
     }
-  }, [paymentID, processorPaymentID, initialInvoiceID, orgID, invoiceID, debug, releaseReservationBuyNowLot]);
+  }, [paymentID, processorPaymentID, parentInvoiceID, orgID, invoiceID, debug, releaseReservationBuyNowLot]);
 
   useEffect(() => {
     if (checkoutError?.at === "reset") handleBeforeUnloadRef.current();
@@ -656,6 +681,8 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   }, [handleBeforeUnload]);
 
   const handleClose = useCallback(() => {
+    if (!onClose) return;
+
     window.removeEventListener('beforeunload', handleBeforeUnload);
 
     handleBeforeUnload();
@@ -666,6 +693,24 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
 
     onClose();
   }, [handleBeforeUnload, setInvoiceID, onClose]);
+
+  const handleGoTo = useCallback((pathnameOrUrl: string) => {
+    if (pathnameOrUrl === window.location.href || pathnameOrUrl === window.location.pathname) {
+      handleClose();
+
+      return;
+    }
+
+    window.removeEventListener('beforeunload', handleBeforeUnload);
+
+    handleBeforeUnload();
+
+    onGoTo(pathnameOrUrl || "/", { replace: true });
+  }, [handleClose, handleBeforeUnload, onGoTo]);
+
+  const handlePurchaseCompleted = useCallback(() => {
+    handleGoTo(goToMarketplaceHref)
+  }, [handleGoTo, goToMarketplaceHref]);
 
 
   // Error handling:
@@ -724,7 +769,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
 
   // Loading UI:
 
-  if (open && isDialogInitializing && loaderMode === "success" && checkoutStep !== "error") {
+  if (showEspecialLoaders && loaderMode === "success") {
     return (
       <PUIStaticSuccessOverlay
         // TODO: Add to dictionary:
@@ -734,10 +779,10 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     );
   }
 
-  if (open && isDialogInitializing && loaderMode === "error" && checkoutStep !== "error") {
+  if (showEspecialLoaders && loaderMode === "error") {
     return (
       <PUIStaticErrorOverlay
-        checkoutError={{ errorMessage: paymentErrorParam || "" }}
+        checkoutError={{ errorMessage: paymentErrorParamRef.current || "" }}
         // TODO: Add to dictionary:
         errorImageSrc={ errorImageSrc }
         logoSrc={ logoSrc }
@@ -867,9 +912,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
         selectedPaymentMethod={ selectedPaymentMethod }
         processorPaymentID={ processorPaymentID }
         wallet={ wallet }
-        onNext={ handleClose }
-        goToHref={ goToHref }
-        goToLabel={ goToLabel }
+        onNext={ handlePurchaseCompleted }
         onGoTo={ handleGoTo } />
     );
   } else {

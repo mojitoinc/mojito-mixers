@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { isInitiallyOpen } from "../CheckoutOverlay/CheckoutOverlay.utils";
 
 export type LoaderMode = "default" | "success" | "error";
@@ -32,8 +32,10 @@ export function useOpenCloseCheckoutModal({
     isOpen: initialLoaderMode !== "default",
   });
 
+  const paymentIdParamRef = useRef(paymentIdParam);
+
   useEffect(() => {
-    setState(({ loaderMode }) => ({ loaderMode, isOpen: isInitiallyOpen() }));
+    setState(({ loaderMode }) => ({ loaderMode, isOpen: isInitiallyOpen(paymentIdParamRef.current) }));
   }, []);
 
   useEffect(() => {

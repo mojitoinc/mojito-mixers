@@ -5,6 +5,7 @@ export const FALLBACK_MODAL_STATE_COMMON: CheckoutModalStateCombined = {
   // CheckoutModalInfoCommon:
   url: "",
   fromLocalhost: false,
+  orgID: "",
   invoiceID: "",
   invoiceCountdownStart: 0,
   billingInfo: "",

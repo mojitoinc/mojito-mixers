@@ -1,4 +1,8 @@
+import { GetInvoiceDetailsQuery } from "../../queries/graphqlGenerated";
+
 export type LotType = "auction" | "buyNow";
+
+export type RawCheckoutItemInfo = GetInvoiceDetailsQuery["getInvoiceDetails"]["items"][0];
 
 export interface CheckoutItemInfo {
   // Common:

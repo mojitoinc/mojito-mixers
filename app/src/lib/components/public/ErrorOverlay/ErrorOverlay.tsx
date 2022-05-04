@@ -1,7 +1,8 @@
 import { useTimeout } from "@swyg/corre";
 import React, { useCallback, useLayoutEffect, useState, useEffect } from "react";
-import { PAYMENT_NOTIFICATION_ERROR_MAX_WAIT_MS, PAYMENT_NOTIFICATION_INTERVAL_MS, THREEDS_FLOW_SEARCH_PARAM_ERROR } from "../../../config/config";
+import { PAYMENT_NOTIFICATION_ERROR_MAX_WAIT_MS, PAYMENT_NOTIFICATION_INTERVAL_MS, THREEDS_FLOW_SEARCH_PARAM_ERROR_KEY } from "../../../config/config";
 import { ERROR_PURCHASE } from "../../../domain/errors/errors.constants";
+import { PUIRouterOptions } from "../../../domain/router/router.types";
 import { isUrlPathname } from "../../../domain/url/url.utils";
 import { useGetPaymentNotificationQuery } from "../../../queries/graphqlGenerated";
 import { withProviders, ProvidersInjectorProps } from "../../shared/ProvidersInjector/ProvidersInjector";
@@ -9,13 +10,13 @@ import { clearPersistedInfo, getCheckoutModalState, persistCheckoutModalInfoRedi
 import { PUIStaticErrorOverlay, PUIStaticErrorOverlayProps } from "./StaticErrorOverlay";
 
 export interface PUIErrorOverlayProps extends PUIStaticErrorOverlayProps {
-  onRedirect: (pathnameOrUrl: string) => void;
+  onGoTo: (pathnameOrUrl: string, options?: PUIRouterOptions) => void;
 }
 
 export type PUIErrorProps = PUIErrorOverlayProps & ProvidersInjectorProps;
 
 export const PUIErrorOverlay: React.FC<PUIErrorOverlayProps> = ({
-  onRedirect,
+  onGoTo,
   ...staticErrorOverlayProps
 }) => {
   const [errorMessage, setErrorMessage] = useState("");
@@ -35,25 +36,28 @@ export const PUIErrorOverlay: React.FC<PUIErrorOverlayProps> = ({
     setErrorMessage(prevErrorMessage => prevErrorMessage || ERROR_PURCHASE.errorMessage);
   }, PAYMENT_NOTIFICATION_ERROR_MAX_WAIT_MS);
 
-  const { purchaseError, url = "" } = getCheckoutModalState(true);
+  // TODO: Remove this from render body:
+  const { purchaseError, url = "" } = getCheckoutModalState({ noClear: true });
 
   useLayoutEffect(() => {
     // Users should only see this page if they completed a credit card payment and 3DS' verification went wrong.
     // Otherwise, they are immediately redirected to homepage:
-    if (!purchaseError) onRedirect("/");
-  }, [purchaseError, onRedirect]);
+    if (!purchaseError) onGoTo("/", { replace: true, reason: "No purchase error." });
+  }, [purchaseError, onGoTo]);
 
-  const reviewData = useCallback(async (errorMessage: string): Promise<false> => {
-    const isPathname = isUrlPathname(url);
+  const reviewHref = `${ url || "/" }?${ THREEDS_FLOW_SEARCH_PARAM_ERROR_KEY }=${ encodeURIComponent(errorMessage) }`;
+
+  const reviewData = useCallback(async (): Promise<false> => {
+    const isPathname = isUrlPathname(reviewHref);
 
     if (isPathname) persistCheckoutModalInfoRedirectURI(window.location.href);
 
     // If there was an error, users can click the review button and go back to the Payment UI to review the data...:
 
-    onRedirect(`${ url }${ THREEDS_FLOW_SEARCH_PARAM_ERROR }${ encodeURIComponent(errorMessage) }`);
+    onGoTo(reviewHref, { replace: true });
 
     return false;
-  }, [onRedirect, url]);
+  }, [onGoTo, reviewHref]);
 
   const toMarketplace = useCallback(() => {
     if (!purchaseError) return;
@@ -61,13 +65,14 @@ export const PUIErrorOverlay: React.FC<PUIErrorOverlayProps> = ({
     clearPersistedInfo();
 
     // ...or they can just go back to the marketplace homepage:
-    onRedirect("/");
-  }, [purchaseError, onRedirect]);
+    onGoTo("/", { replace: true });
+  }, [purchaseError, onGoTo]);
 
   return (
     <PUIStaticErrorOverlay
       { ...staticErrorOverlayProps }
       checkoutError={ { errorMessage } }
+      reviewHref={ reviewHref }
       onFixError={ reviewData }
       onClose={ toMarketplace } />
   );

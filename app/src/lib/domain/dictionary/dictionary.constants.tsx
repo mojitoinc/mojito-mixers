@@ -41,4 +41,10 @@ export const DEFAULT_DICTIONARY: PUIDictionary = {
   purchaseInstructions: [
     "After the sale is closed, you’ll receive your NFTs to your chosen wallet.",
   ],
+
+  goToMarketplaceHref: "",
+  goToMarketplaceLabel: "",
+
+  goToHref: "/profile/invoices",
+  goToLabel: "View Invoices",
 };

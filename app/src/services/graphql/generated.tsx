@@ -233,9 +233,11 @@ export type CreatePaymentCreditCardMetadataInput = {
 
 export type CreatePaymentCryptoMetadataInput = {
   billingDetails?: InputMaybe<CryptoBillingDetails>;
+  cancelURL?: InputMaybe<Scalars['String']>;
   description?: InputMaybe<Scalars['String']>;
   localPrice: LocalPrice;
   name?: InputMaybe<Scalars['String']>;
+  redirectURL?: InputMaybe<Scalars['String']>;
 };
 
 export type CreatePaymentMetadataInput = {
@@ -342,7 +344,7 @@ export type CurrentUserUserOrgsArgs = {
 
 
 export type CurrentUserWonBidsArgs = {
-  orgId: Scalars['UUID'];
+  orgId?: InputMaybe<Scalars['UUID']>;
 };
 
 export enum DeliveryMethod {
@@ -417,6 +419,7 @@ export type InvoiceDetailsBillingAddress = {
 };
 
 export enum InvoiceStatus {
+  AwaitingUserPayment = 'AwaitingUserPayment',
   Canceled = 'Canceled',
   Delivered = 'Delivered',
   Draft = 'Draft',
@@ -569,6 +572,7 @@ export type MarketplaceAuctionLotUpdateInput = {
   delivery?: InputMaybe<MarketplaceItemDeliveryInput>;
   endDate?: InputMaybe<Scalars['Time']>;
   lotNumber?: InputMaybe<Scalars['Int']>;
+  maxEndDate?: InputMaybe<Scalars['Time']>;
   reservePrice?: InputMaybe<Scalars['Float']>;
   startDate?: InputMaybe<Scalars['Time']>;
   startingBid?: InputMaybe<Scalars['Float']>;
@@ -809,7 +813,7 @@ export type Mutation = {
   /** Deploy existing multisig wallet to a new network */
   deployWalletToNetwork: Scalars['String'];
   /** Generates promo codes for a marketplace item */
-  generateCodes: Array<Maybe<Scalars['String']>>;
+  generatePromoCodes: Array<Maybe<Scalars['String']>>;
   importExternalTokenToCollection: Scalars['String'];
   loginWithSignature: Organization;
   marketplaceUpdateTheme: Marketplace;
@@ -830,6 +834,7 @@ export type Mutation = {
   /** Release reservations held by invoice ID */
   releaseReservation: Scalars['Boolean'];
   reserveMarketplaceBuyNowLot: MarketplaceBuyNowOutput;
+  sendUserInvitation: Scalars['Boolean'];
   setJwtIssuerDomain: Organization;
   startInvoiceDelivery: Scalars['Boolean'];
   /** Transfers a token in the provided wallet to the `transferTo` address */
@@ -849,6 +854,7 @@ export type Mutation = {
   uploadArweaveAsset: Scalars['String'];
   uploadArweaveMetadata: Scalars['String'];
   uploadAsset: Scalars['String'];
+  uploadAssets: Scalars['Int'];
 };
 
 
@@ -994,7 +1000,7 @@ export type MutationDeployWalletToNetworkArgs = {
 };
 
 
-export type MutationGenerateCodesArgs = {
+export type MutationGeneratePromoCodesArgs = {
   marketplaceCollectionItemId: Scalars['UUID1'];
   num: Scalars['Int'];
 };
@@ -1105,6 +1111,12 @@ export type MutationReserveMarketplaceBuyNowLotArgs = {
 };
 
 
+export type MutationSendUserInvitationArgs = {
+  email: Scalars['String'];
+  orgId: Scalars['UUID1'];
+};
+
+
 export type MutationSetJwtIssuerDomainArgs = {
   domain: Scalars['String'];
   orgId: Scalars['UUID'];
@@ -1191,6 +1203,12 @@ export type MutationUploadArweaveMetadataArgs = {
 export type MutationUploadAssetArgs = {
   file: Scalars['Upload'];
   name: Scalars['String'];
+  orgId: Scalars['UUID1'];
+};
+
+
+export type MutationUploadAssetsArgs = {
+  files: Array<InputMaybe<Scalars['Upload']>>;
   orgId: Scalars['UUID1'];
 };
 
@@ -1287,9 +1305,11 @@ export type OrganizationMember = {
   __typename?: 'OrganizationMember';
   email?: Maybe<Scalars['String']>;
   externalId: Scalars['String'];
-  id: Scalars['UUID'];
+  id: Scalars['UUID1'];
   name?: Maybe<Scalars['String']>;
+  organizationId: Scalars['UUID1'];
   role?: Maybe<Scalars['String']>;
+  userId: Scalars['UUID1'];
   username?: Maybe<Scalars['String']>;
 };
 
@@ -1401,6 +1421,7 @@ export type Query = {
   getSDKToken: SdkTokenResponse;
   /** Get Tax Quote */
   getTaxQuote: TaxQuoteOutput;
+  internalUsers: Array<UserOrganization>;
   /** create invoice/lot report by collectionID and mails  to provided email */
   mailInvoiceLotDetailReportMailByCollectionID: Scalars['Boolean'];
   /** create salesreport by collectionID and mails to provided email */
@@ -1467,7 +1488,7 @@ export type QueryGetPaymentMethodArgs = {
 
 
 export type QueryGetPaymentMethodListArgs = {
-  orgID?: InputMaybe<Scalars['UUID1']>;
+  orgID: Scalars['UUID1'];
 };
 
 
@@ -1490,6 +1511,11 @@ export type QueryGetSdkTokenArgs = {
 
 export type QueryGetTaxQuoteArgs = {
   input: TaxQuoteInput;
+};
+
+
+export type QueryInternalUsersArgs = {
+  organizationID: Scalars['UUID1'];
 };
 
 
@@ -1538,7 +1564,7 @@ export type QueryOrganizationArgs = {
 
 
 export type QueryOrganizationByIdArgs = {
-  id: Scalars['UUID1'];
+  id?: InputMaybe<Scalars['UUID1']>;
 };
 
 
@@ -1698,7 +1724,7 @@ export type UserApiKeyResponse = {
 };
 
 export type UserOrgFilter = {
-  orgId: Scalars['UUID'];
+  orgId?: InputMaybe<Scalars['UUID']>;
 };
 
 export type UserOrganization = {
@@ -1866,6 +1892,7 @@ export type GetPaymentNotificationQuery = { __typename?: 'Query', getPaymentNoti
 export type CreatePaymentMutationVariables = Exact<{
   paymentMethodID: Scalars['UUID1'];
   invoiceID: Scalars['UUID1'];
+  metadata?: InputMaybe<CreatePaymentMetadataInput>;
 }>;
 
 
@@ -2018,8 +2045,12 @@ export type GetPaymentNotificationQueryHookResult = ReturnType<typeof useGetPaym
 export type GetPaymentNotificationLazyQueryHookResult = ReturnType<typeof useGetPaymentNotificationLazyQuery>;
 export type GetPaymentNotificationQueryResult = Apollo.QueryResult<GetPaymentNotificationQuery, GetPaymentNotificationQueryVariables>;
 export const CreatePaymentDocument = gql`
-    mutation CreatePayment($paymentMethodID: UUID1!, $invoiceID: UUID1!) {
-  createPayment(paymentMethodID: $paymentMethodID, invoiceID: $invoiceID) {
+    mutation CreatePayment($paymentMethodID: UUID1!, $invoiceID: UUID1!, $metadata: CreatePaymentMetadataInput) {
+  createPayment(
+    paymentMethodID: $paymentMethodID
+    invoiceID: $invoiceID
+    metadata: $metadata
+  ) {
     id
     invoiceID
     processorPaymentID
@@ -2045,6 +2076,7 @@ export type CreatePaymentMutationFn = Apollo.MutationFunction<CreatePaymentMutat
  *   variables: {
  *      paymentMethodID: // value for 'paymentMethodID'
  *      invoiceID: // value for 'invoiceID'
+ *      metadata: // value for 'metadata'
  *   },
  * });
  */

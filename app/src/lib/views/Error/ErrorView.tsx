@@ -21,6 +21,7 @@ const ERROR_ACTION_LABELS: Record<CheckoutModalErrorAt, string> = {
 
 export interface ErrorViewProps {
   checkoutError?: CheckoutModalError;
+  reviewHref?: string;
   errorImageSrc?: string;
   onFixError?: (errorMessage: string) => Promise<false>;
   onClose?: () => void;
@@ -34,6 +35,7 @@ export const ErrorView: React.FC<ErrorViewProps> = ({
     circleFieldErrors,
     errorMessage = "",
   } = { },
+  reviewHref,
   errorImageSrc,
   onFixError,
   onClose,
@@ -89,10 +91,12 @@ export const ErrorView: React.FC<ErrorViewProps> = ({
 
     <CheckoutModalFooter
       variant="toReview"
+      submitHref={ reviewHref }
       submitLabel={ ERROR_ACTION_LABELS[at] }
       submitDisabled={ !displayMessage || !onFixError }
       submitLoading={ !displayMessage || !onFixError }
       onSubmitClicked={ handleSubmitClicked }
+      closeHref="/"
       closeDisabled={ !displayMessage || !onClose }
       onCloseClicked={ onClose } />
 
