@@ -49,21 +49,21 @@ export const Select: React.FC<SelectProps> = ({
   const selectOptions = matches ? [EMPTY_OPTION, ...options] : options;
 
   return (
-    <FormControl fullWidth margin={ margin } variant="filled" disabled={disabled} error={error}>
-      <InputLabel required={required} htmlFor={id} disabled={disabled} shrink>
-        {label}
+    <FormControl fullWidth margin={ margin } variant="filled" disabled={ disabled } error={ error }>
+      <InputLabel required={ required } htmlFor={ id } disabled={ disabled } shrink>
+        { label }
       </InputLabel>
       <MuiSelect
-        {...props}
-        id={id}
-        disabled={disabled}
-        native={matches}
-        IconComponent={SelectIcon}
+        { ...props }
+        id={ id }
+        disabled={ disabled }
+        native={ matches }
+        IconComponent={ SelectIcon }
         disableUnderline
-        autoComplete={props.autoComplete || props.name}>
-        {selectOptions.map(mapOption)}
+        autoComplete={ props.autoComplete || props.name }>
+        { selectOptions.map(mapOption) }
       </MuiSelect>
-      {helperText && <FormHelperText>{helperText}</FormHelperText>}
+      { helperText && <FormHelperText>{ helperText }</FormHelperText> }
     </FormControl>
   );
 }

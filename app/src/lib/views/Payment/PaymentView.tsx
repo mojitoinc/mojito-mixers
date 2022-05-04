@@ -167,7 +167,7 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
         { showSaved ? (
           <SavedPaymentDetailsSelector
             showLoader={ isDeleting }
-            acceptedPaymentTypes={acceptedPaymentTypes}
+            acceptedPaymentTypes={ acceptedPaymentTypes }
             acceptedCreditCardNetworks={ acceptedCreditCardNetworks }
             savedPaymentMethods={ savedPaymentMethods }
             selectedPaymentMethodId={ typeof selectedPaymentInfo === "string" ? selectedPaymentInfo : undefined }
@@ -179,8 +179,8 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
             onClose={ onClose }
             onAttemptSubmit={ handleFormAttemptSubmit }
             consentType={ consentType }
-            checkoutItems={checkoutItems}
-            debug={debug} />
+            checkoutItems={ checkoutItems }
+            debug={ debug } />
         ) : (
           <PaymentMethodForm
             acceptedPaymentTypes={ acceptedPaymentTypes }
@@ -196,7 +196,7 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
             onSubmit={ handleSubmit }
             onAttemptSubmit={ handleFormAttemptSubmit }
             consentType={ consentType }
-            checkoutItems={checkoutItems}
+            checkoutItems={ checkoutItems }
             debug={ debug } />
         ) }
       </Stack>

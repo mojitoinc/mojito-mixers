@@ -78,8 +78,8 @@ export function useFullPayment({
     if (debug) {
       console.log(
         invoiceID
-          ? `\n💵 Making payment for invoice ${invoiceID} (orgID = ${orgID})...\n`
-          : `\n💵 Aborting payment for unknown invoice (orgID = ${orgID})...\n`
+          ? `\n💵 Making payment for invoice ${ invoiceID } (orgID = ${ orgID })...\n`
+          : `\n💵 Aborting payment for unknown invoice (orgID = ${ orgID })...\n`
       );
     }
 

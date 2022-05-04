@@ -72,7 +72,7 @@ export const StateSelector: React.FC<StateSelectorProps> = ({
       label={ label }
       options={ options }
       onChange={ handleChange }
-      value={ optionsMap[selectedValue] ? selectedValue : ""}
+      value={ optionsMap[selectedValue] ? selectedValue : "" }
       disabled={ isDisabled } />
   );
 };
@@ -86,26 +86,26 @@ export const ControlledStateSelector: React.FC<ControlledStateSelectorProps> = (
   countryCode,
 }) => (
   <Controller
-    name={parentName}
-    control={control}
-    render={({ field: { name, onChange, ref, ...field }, fieldState }) => {
+    name={ parentName }
+    control={ control }
+    render={ ({ field: { name, onChange, ref, ...field }, fieldState }) => {
       const error = fieldState?.error;
       const fieldError = error ? (error.hasOwnProperty("message") ? error.message : (error as unknown as { value: FieldError }).value?.message) || "" : "";
 
       return (
         <StateSelector
-          id={name}
-          name={name}
-          label={label}
-          onSelectState={onChange}
+          id={ name }
+          name={ name }
+          label={ label }
+          onSelectState={ onChange }
           fullWidth
-          countryCode={countryCode}
-          inputRef={ref}
-          error={!!fieldError}
-          helperText={fieldError}
-          {...field}
+          countryCode={ countryCode }
+          inputRef={ ref }
+          error={ !!fieldError }
+          helperText={ fieldError }
+          { ...field }
         />
       );
-    }}
+    } }
   />
 );

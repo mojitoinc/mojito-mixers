@@ -89,7 +89,7 @@ const HomePage: React.FC = () => {
       ...(lotType === "buyNow" ? PLAYGROUND_MOCKED_BUY_NOW_LOT : PLAYGROUND_MOCKED_AUCTION_LOT),
       lotID: formValues.lotID || DEFAULT_FORM_VALUES.lotID,
       lotType,
-      units: lotType === "auction" ? 1 : (parseInt(`${formValues.lotUnits || DEFAULT_FORM_VALUES.lotUnits}`, 10) || 1),
+      units: lotType === "auction" ? 1 : (parseInt(`${ formValues.lotUnits || DEFAULT_FORM_VALUES.lotUnits }`, 10) || 1),
     }],
   };
 
@@ -157,8 +157,8 @@ const HomePage: React.FC = () => {
   return (
     <>
       <Box sx={{ my: 4 }}>
-        <Stack spacing={2} direction="row">
-          <Button variant="contained" onClick={onOpen} disabled={isLoading}>Open Checkout Modal</Button>
+        <Stack spacing={ 2 } direction="row">
+          <Button variant="contained" onClick={ onOpen } disabled={ isLoading }>Open Checkout Modal</Button>
         </Stack>
       </Box>
 
@@ -168,30 +168,30 @@ const HomePage: React.FC = () => {
 
           <RadioGroup
             name="orgID"
-            value={formValues.orgID}
-            onChange={handleChange}>
+            value={ formValues.orgID }
+            onChange={ handleChange }>
 
-            {organizations.map(organization => (
+            { organizations.map(organization => (
               <FormControlLabel
-                key={organization.id}
-                value={organization.id}
-                control={<Radio />}
-                label={organization.name} />
-            ))}
+                key={ organization.id }
+                value={ organization.id }
+                control={ <Radio /> }
+                label={ organization.name } />
+            )) }
 
             <FormControlLabel
               value="custom"
-              control={<Radio />}
+              control={ <Radio /> }
               sx={{ mt: 1 }}
-              label={(
+              label={ (
                 <TextField
                   name="customOrgID"
                   label="Custom Org ID"
                   size="small"
-                  value={formValues.customOrgID}
-                  onChange={handleChange}
-                  disabled={formValues.orgID !== "custom"} />
-            )} />
+                  value={ formValues.customOrgID }
+                  onChange={ handleChange }
+                  disabled={ formValues.orgID !== "custom" } />
+            ) } />
 
           </RadioGroup>
         </FormControl>
@@ -204,13 +204,13 @@ const HomePage: React.FC = () => {
         <FormControl component="fieldset">
           <FormLabel component="legend" sx={{ mb: 2 }}>Lot Data</FormLabel>
 
-          <Stack spacing={2}>
+          <Stack spacing={ 2 }>
             <TextField
               name="lotID"
               label="Lot ID"
               size="small"
-              value={formValues.lotID}
-              onChange={handleChange} />
+              value={ formValues.lotID }
+              onChange={ handleChange } />
 
             <FormControl fullWidth>
               <InputLabel id="lotTypeLabel">Lot Type</InputLabel>
@@ -220,30 +220,30 @@ const HomePage: React.FC = () => {
                 name="lotType"
                 label="Lot Type"
                 size="small"
-                value={formValues.lotType}
-                onChange={handleChange as (e: SelectChangeEvent<"buyNow" | "auction">) => void}>
+                value={ formValues.lotType }
+                onChange={ handleChange as (e: SelectChangeEvent<"buyNow" | "auction">) => void }>
                 <MenuItem value="buyNow">Buy Now</MenuItem>
                 <MenuItem value="auction">Auction</MenuItem>
               </Select>
             </FormControl>
 
-            {formValues.lotType === "buyNow" ? (
+            { formValues.lotType === "buyNow" ? (
               <TextField
                 type="number"
                 name="lotUnits"
                 label="Lot Units"
                 size="small"
-                value={formValues.lotUnits}
-                onChange={handleChange} />
+                value={ formValues.lotUnits }
+                onChange={ handleChange } />
             ) : (
               <TextField
                 name="invoiceID"
                 label="Invoice ID"
                 size="small"
-                value={formValues.invoiceID}
-                onChange={handleChange}
+                value={ formValues.invoiceID }
+                onChange={ handleChange }
                 required />
-            )}
+            ) }
 
           </Stack>
         </FormControl>
@@ -257,18 +257,18 @@ const HomePage: React.FC = () => {
         <FormControl component="fieldset">
           <FormLabel component="legend">Payment Methods</FormLabel>
           <FormGroup>
-            <FormControlLabel control={<Checkbox checked={formValues.paymentCC} value="" onChange={handleChange} name="paymentCC" />} label="Credit Card" />
-            <FormControlLabel control={<Checkbox checked={formValues.paymentACH} value="" onChange={handleChange} name="paymentACH" />} label="ACH" />
-            <FormControlLabel control={<Checkbox checked={formValues.paymentWire} value="" onChange={handleChange} name="paymentWire" />} label="Wire" />
-            <FormControlLabel control={<Checkbox checked={formValues.paymentCrypto} value="" onChange={handleChange} name="paymentCrypto" />} label="Crypto" />
+            <FormControlLabel control={ <Checkbox checked={ formValues.paymentCC } value="" onChange={ handleChange } name="paymentCC" /> } label="Credit Card" />
+            <FormControlLabel control={ <Checkbox checked={ formValues.paymentACH } value="" onChange={ handleChange } name="paymentACH" /> } label="ACH" />
+            <FormControlLabel control={ <Checkbox checked={ formValues.paymentWire } value="" onChange={ handleChange } name="paymentWire" /> } label="Wire" />
+            <FormControlLabel control={ <Checkbox checked={ formValues.paymentCrypto } value="" onChange={ handleChange } name="paymentCrypto" /> } label="Crypto" />
           </FormGroup>
         </FormControl>
       </Box>
 
 
       <Box sx={{ my: 4 }}>
-        <Stack spacing={2} direction="row">
-          <Button variant="contained" onClick={onOpen} disabled={isLoading}>Open Checkout Modal</Button>
+        <Stack spacing={ 2 } direction="row">
+          <Button variant="contained" onClick={ onOpen } disabled={ isLoading }>Open Checkout Modal</Button>
         </Stack>
       </Box>
 
@@ -290,15 +290,15 @@ const HomePage: React.FC = () => {
     */ }
 
       <Box sx={{ my: 2 }}>
-        {PLAYGROUND_PARAGRAPHS_ARRAY.map((paragraph, i) => (
+        { PLAYGROUND_PARAGRAPHS_ARRAY.map((paragraph, i) => (
           // eslint-disable-next-line react/no-array-index-key
-          <Typography key={i} variant="body2" sx={{ my: 2 }}>{paragraph}</Typography>
-        ))}
+          <Typography key={ i } variant="body2" sx={{ my: 2 }}>{ paragraph }</Typography>
+        )) }
       </Box>
 
       <Box sx={{ my: 4 }}>
-        <Stack spacing={2} direction="row">
-          <Button variant="contained" onClick={onOpen} disabled={isLoading}>Open Checkout Modal</Button>
+        <Stack spacing={ 2 } direction="row">
+          <Button variant="contained" onClick={ onOpen } disabled={ isLoading }>Open Checkout Modal</Button>
         </Stack>
       </Box>
 

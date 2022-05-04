@@ -206,40 +206,40 @@ export const BillingInfoForm: React.FC<BillingInfoFormProps> = ({
   }, [setValue]);
 
   return (
-    <form onSubmit={handleFormSubmit}>
-      {onSaved && (
+    <form onSubmit={ handleFormSubmit }>
+      { onSaved && (
         <Box sx={{ my: 2.5 }}>
-          <SecondaryButton onClick={onSaved} startIcon={<BookIcon />}>
+          <SecondaryButton onClick={ onSaved } startIcon={ <BookIcon /> }>
             Use Saved Billing Info
           </SecondaryButton>
         </Box>
-      )}
+      ) }
 
       <InputGroupLabel sx={{ m: 0, pt: 2 }}>Information</InputGroupLabel>
 
       <ControlledTextField
-        name={FULL_NAME_FIELD}
-        control={control}
-        label={FIELD_LABELS[FULL_NAME_FIELD]}
+        name={ FULL_NAME_FIELD }
+        control={ control }
+        label={ FIELD_LABELS[FULL_NAME_FIELD] }
       />
 
       <ControlledTextField
-        name={EMAIL_FIELD}
-        control={control}
-        label={FIELD_LABELS[EMAIL_FIELD]}
+        name={ EMAIL_FIELD }
+        control={ control }
+        label={ FIELD_LABELS[EMAIL_FIELD] }
       />
 
       <ControlledTextField
-        name={PHONE_FIELD}
-        control={control}
-        label={FIELD_LABELS[PHONE_FIELD]}
+        name={ PHONE_FIELD }
+        control={ control }
+        label={ FIELD_LABELS[PHONE_FIELD] }
         InputProps={ selectedCountryCode && !phoneHasPrefix(phone) ? {
           startAdornment: (
             <InputAdornment position="start">
               <Typography variant="subtitle1" component="span" sx={{ pointerEvents: "none" }}>{ getPhonePrefix(`${ selectedCountryCode }`) }</Typography>
             </InputAdornment>
           ),
-        } : undefined}
+        } : undefined }
       />
 
       { debug && phone && (
@@ -249,58 +249,58 @@ export const BillingInfoForm: React.FC<BillingInfoFormProps> = ({
       <InputGroupLabel sx={{ m: 0, pt: 2 }}>Address</InputGroupLabel>
 
       <ControlledTextField
-        name={STREET_FIELD}
-        control={control}
-        label={FIELD_LABELS[STREET_FIELD]}
+        name={ STREET_FIELD }
+        control={ control }
+        label={ FIELD_LABELS[STREET_FIELD] }
       />
 
       <ControlledTextField
-        name={APARTMENT_FIELD}
-        control={control}
-        label={FIELD_LABELS[APARTMENT_FIELD]}
+        name={ APARTMENT_FIELD }
+        control={ control }
+        label={ FIELD_LABELS[APARTMENT_FIELD] }
       />
 
       <Grid
         container
-        columnSpacing={2}
+        columnSpacing={ 2 }
         direction={{
           xs: "column",
           sm: "row"
         }}>
-        <Grid item sm={6} zeroMinWidth>
+        <Grid item sm={ 6 } zeroMinWidth>
           <ControlledTextField
-            name={CITY_FIELD}
-            control={control}
-            label={FIELD_LABELS[CITY_FIELD]} />
+            name={ CITY_FIELD }
+            control={ control }
+            label={ FIELD_LABELS[CITY_FIELD] } />
         </Grid>
 
-        <Grid item sm={6}>
+        <Grid item sm={ 6 }>
           <ControlledCountrySelector
-            name={COUNTRY_FIELD}
-            control={control}
-            label={FIELD_LABELS[COUNTRY_FIELD]} />
+            name={ COUNTRY_FIELD }
+            control={ control }
+            label={ FIELD_LABELS[COUNTRY_FIELD] } />
         </Grid>
       </Grid>
 
       <Grid
         container
-        columnSpacing={2}
+        columnSpacing={ 2 }
         direction={{
           xs: "column",
           sm: "row"
         }}>
-        <Grid item sm={6} zeroMinWidth sx={{ maxWidth: "100%" }}>
+        <Grid item sm={ 6 } zeroMinWidth sx={{ maxWidth: "100%" }}>
           <ControlledStateSelector
-            name={STATE_FIELD}
-            control={control}
-            label={FIELD_LABELS[STATE_FIELD]}
-            countryCode={selectedCountryCode} />
+            name={ STATE_FIELD }
+            control={ control }
+            label={ FIELD_LABELS[STATE_FIELD] }
+            countryCode={ selectedCountryCode } />
         </Grid>
-        <Grid item sm={6}>
+        <Grid item sm={ 6 }>
           <ControlledTextField
-            name={ZIP_CODE_FIELD}
-            control={control}
-            label={FIELD_LABELS[ZIP_CODE_FIELD]} />
+            name={ ZIP_CODE_FIELD }
+            control={ control }
+            label={ FIELD_LABELS[ZIP_CODE_FIELD] } />
         </Grid>
       </Grid>
 
@@ -321,14 +321,14 @@ export const BillingInfoForm: React.FC<BillingInfoFormProps> = ({
         </DebugBox>
       ) }
 
-      {/* variant === "loggedIn" && <Checkbox label="Save this billing information" /> */}
+      { /* variant === "loggedIn" && <Checkbox label="Save this billing information" /> */ }
 
       <CheckoutModalFooter
         variant="toPayment"
         consentType={ consentType }
         submitLabel={ taxes?.status === "loading" ? "Calculating taxes..." : undefined }
         submitDisabled={ !!taxes && taxes.status === "loading" }
-        onCloseClicked={onClose} />
+        onCloseClicked={ onClose } />
     </form>
   );
 };

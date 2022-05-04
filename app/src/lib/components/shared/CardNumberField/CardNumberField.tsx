@@ -33,7 +33,7 @@ export const CardNumberField: React.FC<TextFieldProps> = ({
         ...props.InputProps,
         endAdornment: (
           <InputAdornment position="end">
-            <CreditCardIcon {...getCardImageProps({ images })} />
+            <CreditCardIcon { ...getCardImageProps({ images }) } />
           </InputAdornment>
         ),
       }} />

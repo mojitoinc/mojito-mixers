@@ -41,7 +41,7 @@ export const PurchaseConfirmationBillingDetails: React.FC<PurchaseConfirmationBi
     <Box sx={{ display: 'flex', flexDirection: 'column', flex: 1, position: "relative" }}>
       <Stack
         spacing={ 2 }
-        direction={ { xs: "column", sm: "row" } }
+        direction={{ xs: "column", sm: "row" }}
         sx={{
           justifyContent: "space-between",
           alignItems: { xs: "flex-start", sm: "center" },
@@ -65,7 +65,7 @@ export const PurchaseConfirmationBillingDetails: React.FC<PurchaseConfirmationBi
 
       <Stack
         spacing={ 2 }
-        direction={ { xs: "column", sm: "row" } }
+        direction={{ xs: "column", sm: "row" }}
         sx={{
           justifyContent: "space-between",
           alignItems: { xs: "flex-start", sm: "center" },

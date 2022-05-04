@@ -180,40 +180,40 @@ const PAYMENT_TYPE_FORM_DATA: Record<PaymentType, PaymentTypeFormData> = {
       <>
         <ControlledCardNumberField
           name="cardNumber"
-          control={control}
-          label={FIELD_LABELS.cardNumber} />
+          control={ control }
+          label={ FIELD_LABELS.cardNumber } />
 
         <Grid
           container
-          columnSpacing={2}
+          columnSpacing={ 2 }
           direction={{
             xs: "column",
             sm: "row"
           }}>
-          <Grid item sm={6} zeroMinWidth>
+          <Grid item sm={ 6 } zeroMinWidth>
             <ControlledCardExpiryDateField
               name="expiryDate"
-              control={control}
-              label={FIELD_LABELS.expiryDate} />
+              control={ control }
+              label={ FIELD_LABELS.expiryDate } />
           </Grid>
-          <Grid item sm={6}>
+          <Grid item sm={ 6 }>
             <ControlledCardSecureCodeField
               name="secureCode"
-              control={control}
-              label={cvvLabel} />
+              control={ control }
+              label={ cvvLabel } />
           </Grid>
         </Grid>
 
         <ControlledTextField
           name="nameOnCard"
-          control={control}
-          label={FIELD_LABELS.nameOnCard}
+          control={ control }
+          label={ FIELD_LABELS.nameOnCard }
         />
 
         { consentType === "checkbox" && (
           <ControlledCheckbox
             name="consent"
-            control={control}
+            control={ control }
             label={ <>I <ConsentText /></> } />
         ) }
       </>
@@ -238,7 +238,7 @@ const PAYMENT_TYPE_FORM_DATA: Record<PaymentType, PaymentTypeFormData> = {
         { consentType === "checkbox" && (
           <ControlledCheckbox
             name="consent"
-            control={control}
+            control={ control }
             label={ <>I <ConsentText /></> } />
         ) }
       </>
@@ -263,18 +263,18 @@ const PAYMENT_TYPE_FORM_DATA: Record<PaymentType, PaymentTypeFormData> = {
       <>
         <ControlledTextField
           name="accountNumber"
-          control={control}
-          label={FIELD_LABELS.accountNumber} />
+          control={ control }
+          label={ FIELD_LABELS.accountNumber } />
 
         <ControlledTextField
           name="routingNumber"
-          control={control}
-          label={FIELD_LABELS.routingNumber} />
+          control={ control }
+          label={ FIELD_LABELS.routingNumber } />
 
         { consentType === "checkbox" && (
           <ControlledCheckbox
             name="consent"
-            control={control}
+            control={ control }
             label={ <>I <ConsentText /></> } />
         ) }
 
@@ -304,7 +304,7 @@ const PAYMENT_TYPE_FORM_DATA: Record<PaymentType, PaymentTypeFormData> = {
         { consentType === "checkbox" && (
           <ControlledCheckbox
             name="consent"
-            control={control}
+            control={ control }
             label={ <>I <ConsentText /></> } />
         ) }
       </>
@@ -432,22 +432,22 @@ export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
 
   return (
     <form onSubmit={ handleFormSubmit }>
-      {onSaved && (
+      { onSaved && (
         <Box sx={{ my: 2.5 }}>
-          <SecondaryButton onClick={onSaved} startIcon={<BookIcon />}>
+          <SecondaryButton onClick={ onSaved } startIcon={ <BookIcon /> }>
             Use Saved Payment Method
           </SecondaryButton>
         </Box>
-      )}
+      ) }
 
       { acceptsManyPaymentMethods && (
         <>
           <InputGroupLabel sx={{ m: 0, pt: 2, pb: 1.5 }}>Payment Method</InputGroupLabel>
 
           <PaymentMethodSelector
-            selectedPaymentMethod={selectedPaymentMethod}
-            onPaymentMethodChange={handleSelectedPaymentMethodChange}
-            paymentMethods={acceptedPaymentTypes}
+            selectedPaymentMethod={ selectedPaymentMethod }
+            onPaymentMethodChange={ handleSelectedPaymentMethodChange }
+            paymentMethods={ acceptedPaymentTypes }
           />
         </>
       ) }
@@ -459,7 +459,7 @@ export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
       { limitExceededMessage ? (
         <DisplayBox sx={{ mt: addSpacing ? 1 : 0, mb: 2.5 }}>
           <Typography sx={{ fontWeight: "500" }}>
-            {limitExceededMessage}
+            { limitExceededMessage }
           </Typography>
         </DisplayBox>
       ) : null }

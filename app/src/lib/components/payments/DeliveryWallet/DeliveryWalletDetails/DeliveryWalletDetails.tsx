@@ -18,7 +18,7 @@ export const DeliveryWalletDetails: React.FC<DeliveryWalletDetailsProps> = ({
   const isMultiSig = typeof wallet === "object" || !walletAddress;
 
   return (
-    <Box pt={2}>
+    <Box pt={ 2 }>
       <Typography variant="body1">Once minted, items will be delivered to:</Typography>
 
       <Box sx={{ display: "flex", justifyContent: "space-between", mt: 1, mb: walletAddress ? 1 : 0, alignItems: "center" }}>

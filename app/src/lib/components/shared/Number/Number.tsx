@@ -19,6 +19,6 @@ export const Number: React.FC<NumberProps> = ({
   });
 
   return (
-    <Wrapper>{`${prefix}${numberFormat.format(children).replace(/[.,']00$/, "")}${suffix}`}</Wrapper>
+    <Wrapper>{ `${ prefix }${ numberFormat.format(children).replace(/[.,']00$/, "") }${ suffix }` }</Wrapper>
   );
 };

@@ -71,7 +71,7 @@ export const PUIErrorOverlay: React.FC<PUIErrorOverlayProps> = ({
   return (
     <PUIStaticErrorOverlay
       { ...staticErrorOverlayProps }
-      checkoutError={ { errorMessage } }
+      checkoutError={{ errorMessage }}
       reviewHref={ reviewHref }
       onFixError={ reviewData }
       onClose={ toMarketplace } />

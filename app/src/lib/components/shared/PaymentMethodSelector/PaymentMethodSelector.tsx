@@ -55,9 +55,9 @@ export const PaymentMethodSelector: React.FC<PaymentMethodSelectorProps> = ({
 
   return (
     <ToggleButtonGroup
-      value={selectedPaymentMethod}
+      value={ selectedPaymentMethod }
       exclusive
-      onChange={handleChange}
+      onChange={ handleChange }
       aria-label="payment method"
       sx={{ mb: 3.5 }}>
 
@@ -66,12 +66,12 @@ export const PaymentMethodSelector: React.FC<PaymentMethodSelectorProps> = ({
 
         return (
           <ToggleButton
-            key={paymentMethod}
-            value={paymentMethod}
-            aria-label={paymentMethod}>
+            key={ paymentMethod }
+            value={ paymentMethod }
+            aria-label={ paymentMethod }>
             { wideViewport ? (
               <Stack
-                spacing={1}
+                spacing={ 1 }
                 direction="row"
                 sx={{
                   alignItems: "center"

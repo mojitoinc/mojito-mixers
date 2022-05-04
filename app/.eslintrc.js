@@ -57,7 +57,7 @@ module.exports = {
     "max-len": [2, { code: 160, ignorePattern: "^(import|export) .*", ignoreRegExpLiterals: true, ignoreStrings: true }],
     "no-multiple-empty-lines": [2, { max: 2, maxBOF: 0, maxEOF: 0 }],
     "arrow-parens": [2, "as-needed", { requireForBlockBody: true }],
-    "template-curly-spacing": [TEMPORARILY_DISABLED, "always"],
+    "template-curly-spacing": [2, "always"],
     "no-bitwise": ["error", { int32Hint: true }],
     "comma-dangle": TEMPORARILY_DISABLED,
     "semi": TEMPORARILY_DISABLED,
@@ -105,7 +105,7 @@ module.exports = {
       extensions: [".tsx"],
     }],
 
-    "react/jsx-curly-spacing": [TEMPORARILY_DISABLED, {
+    "react/jsx-curly-spacing": [2, {
       when: "always",
       attributes: { allowMultiline: false },
       children: true,

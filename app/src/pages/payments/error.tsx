@@ -20,17 +20,17 @@ const ErrorPage: NextPage = () => {
   const onGoTo = useCallback((pathnameOrUrl: string, { replace, reason, ...options }: PUIRouterOptions = {}) => {
     if (pathnameOrUrl.startsWith("http")) {
       if (replace) {
-        console.log(`Replace URL with ${pathnameOrUrl}`, reason);
+        console.log(`Replace URL with ${ pathnameOrUrl }`, reason);
         window.location.replace(pathnameOrUrl);
       } else {
-        console.log(`Push URL ${pathnameOrUrl}`, reason);
+        console.log(`Push URL ${ pathnameOrUrl }`, reason);
         window.location.href = pathnameOrUrl;
       }
     } else if (replace) {
-      console.log(`Replace route with ${pathnameOrUrl}`, reason);
+      console.log(`Replace route with ${ pathnameOrUrl }`, reason);
       router.replace(pathnameOrUrl || "/", undefined, options);
     } else {
-      console.log(`Push route ${pathnameOrUrl}`, reason);
+      console.log(`Push route ${ pathnameOrUrl }`, reason);
       router.push(pathnameOrUrl || "/", undefined, options);
     }
   }, [router]);
@@ -39,10 +39,10 @@ const ErrorPage: NextPage = () => {
     <PUIError
       uri={ `${ config.API_HOSTNAME }/query` }
       getAuthenticationToken={ getAuthenticationToken }
-      theme={MOJITO_LIGHT_THEME}
-      logoSrc={PLAYGROUND_MOJITO_LOGO}
+      theme={ MOJITO_LIGHT_THEME }
+      logoSrc={ PLAYGROUND_MOJITO_LOGO }
       errorImageSrc=""
-      onGoTo={onGoTo} />
+      onGoTo={ onGoTo } />
   );
 }
 

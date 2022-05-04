@@ -22,11 +22,11 @@ export const PaymentMethodListItem: React.FC<PaymentMethodListItem> = ({
 }) => {
   return (
     <Box sx={ paymentMethodListItemSx }>
-      <p>#{index}</p>
-      <p>ID: {card.id}</p>
-      <p>Last 4: {card.last4Digit}</p>
-      <p>Network: {card.network}</p>
-      <p>Type: {card.type}</p>
+      <p>#{ index }</p>
+      <p>ID: { card.id }</p>
+      <p>Last 4: { card.last4Digit }</p>
+      <p>Network: { card.network }</p>
+      <p>Type: { card.type }</p>
     </Box>
   );
 };

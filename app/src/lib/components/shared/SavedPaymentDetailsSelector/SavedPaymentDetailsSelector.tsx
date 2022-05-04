@@ -165,7 +165,7 @@ export const SavedPaymentDetailsSelector: React.FC<SavedPaymentDetailsSelectorPr
         { limitExceededMessage ? (
           <DisplayBox sx={{ mb: 2 }}>
             <Typography sx={{ fontWeight: "500" }}>
-              {limitExceededMessage}
+              { limitExceededMessage }
             </Typography>
           </DisplayBox>
         ) : null }
@@ -183,7 +183,7 @@ export const SavedPaymentDetailsSelector: React.FC<SavedPaymentDetailsSelectorPr
           }) }
           component={ PaymentDetailsItem }
           itemKey={ getPaymentMethodId }
-          deps={[selectedPaymentMethodId, showLoader, onDelete, onPick, cvvLabel, cvvError, handleCvvChange]} />
+          deps={ [selectedPaymentMethodId, showLoader, onDelete, onPick, cvvLabel, cvvError, handleCvvChange] } />
 
         { cvvError && (
         <FormErrorsCaption sx={{ mt: 2 }}>
@@ -207,7 +207,7 @@ export const SavedPaymentDetailsSelector: React.FC<SavedPaymentDetailsSelectorPr
 
         { debug ? (
           <DebugBox sx={{ mt: 2.5 }}>
-            { JSON.stringify(limits, null, 2)}
+            { JSON.stringify(limits, null, 2) }
           </DebugBox>
         ) : null }
 
