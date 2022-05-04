@@ -195,6 +195,7 @@ export const BillingInfoForm: React.FC<BillingInfoFormProps> = ({
 
   const handleFormSubmit = useCallback(async (e: React.FormEvent) => {
     onAttemptSubmit();
+
     submitForm(e);
   }, [onAttemptSubmit, submitForm]);
 

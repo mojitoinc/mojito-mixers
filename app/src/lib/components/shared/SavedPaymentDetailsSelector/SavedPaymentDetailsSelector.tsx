@@ -95,9 +95,11 @@ export const SavedPaymentDetailsSelector: React.FC<SavedPaymentDetailsSelectorPr
       };
     }
 
+    const network = getCreditCardNetworkFromLabel(selectedPaymentMethod.network);
+
     return {
-      creditCardNetwork: getCreditCardNetworkFromLabel(selectedPaymentMethod.network),
-      cvvLabel: getCardTypeByType(creditCardNetwork).code.name,
+      creditCardNetwork: network,
+      cvvLabel: getCardTypeByType(network).code.name,
       isCvvRequired: true,
     };
   }, [selectedPaymentMethod]);
@@ -132,7 +134,9 @@ export const SavedPaymentDetailsSelector: React.FC<SavedPaymentDetailsSelectorPr
   }, [onAttemptSubmit, selectedPaymentMethodId, cvv, isCvvValid, onCvvSelected, onNext]);
 
   const handleCvvChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setSelectorState(prevSelectorState => ({ ...prevSelectorState, cvv: e.currentTarget.value || "" }));
+    const nextCvv = e.currentTarget.value || "";
+
+    setSelectorState(prevSelectorState => ({ ...prevSelectorState, cvv: nextCvv }));
   }, []);
 
   const getPaymentMethodId = useCallback((savedPaymentMethod: SavedPaymentMethod) => savedPaymentMethod.id, []);

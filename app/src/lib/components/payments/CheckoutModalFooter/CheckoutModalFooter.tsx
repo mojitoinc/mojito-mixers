@@ -194,7 +194,7 @@ export const CheckoutModalFooter: React.FC<CheckoutModalFooterProps> = ({
 
       {primaryButtonVisible && (
         <PrimaryButton
-          onClickCapture={ handleSubmitClicked }
+          onClickCapture={ onSubmitClicked ? handleSubmitClicked : undefined }
           disabled={ isPrimaryButtonDisabled }
           href={ submitHref || undefined }
           type={ onSubmitClicked ? "button" : "submit" }
