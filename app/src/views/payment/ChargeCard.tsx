@@ -1,14 +1,10 @@
-import {
-  useCreatePaymentMutation,
-} from "../../services/graphql/generated";
-import { useCallback, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { Box, Button, Typography } from "@mui/material";
+import { useCreatePaymentMutation } from "../../services/graphql/generated";
 import { fieldsetLabelSx, inputStyle, buttonSx } from "../../components/legacy/legacy-styles.constants";
 
 export const ChargeCard: React.FC = () => {
-  const [createPaymentMutation, { data, loading, error }] =
-    useCreatePaymentMutation();
-
+  const [createPaymentMutation] = useCreatePaymentMutation();
   const [paymentMethodId, setPaymentMethodId] = useState("");
   const [invoiceId, setInvoiceId] = useState("");
 
@@ -40,22 +36,22 @@ export const ChargeCard: React.FC = () => {
       <input
         style={ inputStyle }
         type="text"
-        value={paymentMethodId}
+        value={ paymentMethodId }
         placeholder="Payment Method ID"
         name="paymentMethodID"
-        onChange={(e) => setPaymentMethodId(e.target.value)} />
+        onChange={ e => setPaymentMethodId(e.target.value) } />
 
       <Typography variant="h6" sx={ fieldsetLabelSx }>Invoice ID</Typography>
 
       <input
         style={ inputStyle }
         type="text"
-        value={invoiceId}
+        value={ invoiceId }
         placeholder="Invoice ID"
         name="invoiceID"
-        onChange={(e) => setInvoiceId(e.target.value)} />
+        onChange={ e => setInvoiceId(e.target.value) } />
 
-      <Button onClick={chargeCard} sx={ buttonSx } variant="contained">Charge Card</Button>
+      <Button onClick={ chargeCard } sx={ buttonSx } variant="contained">Charge Card</Button>
 
     </Box>
   );

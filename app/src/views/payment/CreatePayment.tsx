@@ -1,13 +1,9 @@
-import { useState, useCallback } from "react";
-import {
-  usePaymentKeyQuery,
-  useCreatePaymentMethodMutation,
-  useGetPaymentMethodListQuery,
-} from "../../services/graphql/generated";
+import React, { useState, useCallback } from "react";
 import { createMessage, encrypt, readKeys } from "openpgp";
 import { Box, Button, Typography } from "@mui/material";
 import atob from "atob";
 import btoa from "btoa";
+import { usePaymentKeyQuery, useCreatePaymentMethodMutation, useGetPaymentMethodListQuery } from "../../services/graphql/generated";
 import { fieldsetLabelSx, inputStyle, inputGroupStyle, buttonSx } from "../../components/legacy/legacy-styles.constants";
 import { PaymentMethodListItem } from "../../components/payment/PaymentMethodListItem";
 
@@ -60,22 +56,17 @@ const emptyValues: PaymentDetails = {
 };
 
 export const CreatePayment: React.FC = () => {
-
   const [orgId, setOrgId] = useState("");
   const [paymentDetails, setPaymentDetails] = useState<PaymentDetails>(emptyValues);
 
-  const { data, loading, error } = usePaymentKeyQuery({
+  const { data, error } = usePaymentKeyQuery({
     skip: !orgId,
     variables: {
       orgID: orgId,
     },
   });
 
-  const [createPaymentMethod, {
-    data: mutationData,
-    loading: mutationLoading,
-    error: mutationError
-  }] = useCreatePaymentMethodMutation();
+  const [createPaymentMethod] = useCreatePaymentMethodMutation();
 
   const prefillValues = () => setPaymentDetails(defaultValues);
   const clearValues = () => setPaymentDetails(emptyValues);
@@ -83,7 +74,6 @@ export const CreatePayment: React.FC = () => {
   const {
     data: paymentMethodList,
     loading: methodListLoading,
-    error: paymentMethodListError,
   } = useGetPaymentMethodListQuery({
     skip: !orgId,
     variables: {
@@ -95,16 +85,16 @@ export const CreatePayment: React.FC = () => {
 
   const monthList = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((m) => {
     return (
-      <option key={m} value={m}>
-        {m}
+      <option key={ m } value={ m }>
+        { m }
       </option>
     );
   });
 
   const yearList = [2022, 2023, 2024, 2025, 2026, 2027, 2028, 2029, 2030].map((y) => {
     return (
-      <option key={y} value={y}>
-        {y}
+      <option key={ y } value={ y }>
+        { y }
       </option>
     );
   });
@@ -121,7 +111,7 @@ export const CreatePayment: React.FC = () => {
     key: string,
     keyId: string,
     cardNumber: string,
-    cvv: string
+    cvv: string,
   ) => {
     const dataToEncrypt = {
       number: cardNumber,
@@ -142,7 +132,7 @@ export const CreatePayment: React.FC = () => {
 
     return {
       encryptedData: btoa(ciphertext),
-      keyId: keyId,
+      keyId,
     };
   };
 
@@ -159,11 +149,11 @@ export const CreatePayment: React.FC = () => {
       return;
     }
     try {
-      const encrypt = await encryptCard(
+      const encryptedCard = await encryptCard(
         data.getPaymentPublicKey.publicKey,
         data.getPaymentPublicKey.keyID,
         paymentDetails.cardNumber,
-        paymentDetails.cvv
+        paymentDetails.cvv,
       );
 
       enum PaymentType {
@@ -176,8 +166,8 @@ export const CreatePayment: React.FC = () => {
           input: {
             paymentType: PaymentType.CreditCard,
             creditCardData: {
-              keyID: encrypt.keyId,
-              encryptedData: encrypt.encryptedData,
+              keyID: encryptedCard.keyId,
+              encryptedData: encryptedCard.encryptedData,
               billingDetails: {
                 name: paymentDetails.name,
                 city: paymentDetails.city,
@@ -204,160 +194,163 @@ export const CreatePayment: React.FC = () => {
     }
   }, [createPaymentMethod, data, error, orgId, paymentDetails]);
 
-  return (<>
-    <Box sx={{ display: "block", position: "relative", margin: "2em auto" }}>
-      <Typography variant="h5">1. Create Payment Method</Typography>
+  return (
+    <>
+      <Box sx={{ display: "block", position: "relative", margin: "2em auto" }}>
+        <Typography variant="h5">1. Create Payment Method</Typography>
 
-      <form onSubmit={createCard}>
-        <Typography variant="h6" sx={ fieldsetLabelSx }>Organization ID</Typography>
+        <form onSubmit={ createCard }>
+          <Typography variant="h6" sx={ fieldsetLabelSx }>Organization ID</Typography>
 
-        { /* TODO: Make a dropdown list of organizations */ }
-        <input
-          style={ inputStyle }
-          type="text"
-          value={orgId}
-          placeholder="Organization ID"
-          name="orgID"
-          onChange={(e) => setOrgId(e.target.value)} />
-
-        <Typography variant="h6" sx={ fieldsetLabelSx }>Billing Information</Typography>
-
-        <input
-          style={ inputStyle }
-          type="text"
-          value={paymentDetails.name}
-          placeholder="Name"
-          name="name"
-          onChange={onChange} />
-
-        <input
-          style={ inputStyle }
-          type="email"
-          placeholder="Email"
-          name="email"
-          value={paymentDetails.email}
-          onChange={onChange} />
-
-        <input
-          style={ inputStyle }
-          type="phone"
-          placeholder="Phone Number"
-          name="phoneNumber"
-          value={paymentDetails.phoneNumber}
-          onChange={onChange} />
-
-        <input
-          style={ inputStyle }
-          type="text"
-          placeholder="Line 1"
-          name="line1"
-          value={paymentDetails.line1}
-          onChange={onChange} />
-
-        <input
-          style={ inputStyle }
-          type="text"
-          placeholder="Line 2"
-          name="line2"
-          value={paymentDetails.line2}
-          onChange={onChange} />
-
-        <input
-          style={ inputStyle }
-          type="text"
-          placeholder="City"
-          name="city"
-          value={paymentDetails.city}
-          onChange={onChange} />
-
-        <input
-          style={ inputStyle }
-          type="text"
-          placeholder="Country"
-          name="country"
-          value={paymentDetails.country}
-          onChange={onChange} />
-
-        <input
-          style={ inputStyle }
-          type="text"
-          placeholder="State"
-          name="district"
-          value={paymentDetails.district}
-          onChange={onChange} />
-
-        <input
-          style={ inputStyle }
-          type="text"
-          placeholder="Postal Code"
-          name="postalCode"
-          value={paymentDetails.postalCode}
-          onChange={onChange} />
-
-        <Typography variant="h6" sx={ fieldsetLabelSx }>Credit Card Information</Typography>
-
-        <Box sx={ inputGroupStyle }>
+          { /* TODO: Make a dropdown list of organizations */ }
           <input
             style={ inputStyle }
             type="text"
-            placeholder="Card number"
-            name="cardNumber"
-            value={paymentDetails.cardNumber}
-            onChange={onChange} />
+            value={ orgId }
+            placeholder="Organization ID"
+            name="orgID"
+            onChange={ e => setOrgId(e.target.value) } />
+
+          <Typography variant="h6" sx={ fieldsetLabelSx }>Billing Information</Typography>
 
           <input
             style={ inputStyle }
             type="text"
-            placeholder="CVV"
-            value={paymentDetails.cvv}
-            name="cvv"
-            onChange={onChange} />
-        </Box>
+            value={ paymentDetails.name }
+            placeholder="Name"
+            name="name"
+            onChange={ onChange } />
 
-        <Box sx={ inputGroupStyle }>
-          <select
+          <input
             style={ inputStyle }
-            placeholder="Exp. Month"
-            name="expMonth"
-            value={paymentDetails.expMonth}
-            onChange={onChange}>
-            {monthList}
-          </select>
+            type="email"
+            placeholder="Email"
+            name="email"
+            value={ paymentDetails.email }
+            onChange={ onChange } />
 
-          <select
+          <input
             style={ inputStyle }
-            placeholder="Exp. Year"
-            name="expYear"
-            value={paymentDetails.expYear}
-            onChange={onChange}>
-            {yearList}
-          </select>
-        </Box>
+            type="phone"
+            placeholder="Phone Number"
+            name="phoneNumber"
+            value={ paymentDetails.phoneNumber }
+            onChange={ onChange } />
 
-        <Button type="submit" sx={ buttonSx } variant="contained">Create Payment Method</Button>
+          <input
+            style={ inputStyle }
+            type="text"
+            placeholder="Line 1"
+            name="line1"
+            value={ paymentDetails.line1 }
+            onChange={ onChange } />
 
-        <Box sx={ inputGroupStyle }>
-          <Button onClick={ prefillValues } sx={ buttonSx } variant="contained" color="secondary">Fill Form</Button>
-          <Button onClick={ clearValues } sx={ buttonSx } variant="contained" color="secondary">Clear Form</Button>
-        </Box>
+          <input
+            style={ inputStyle }
+            type="text"
+            placeholder="Line 2"
+            name="line2"
+            value={ paymentDetails.line2 }
+            onChange={ onChange } />
 
-      </form>
-    </Box>
+          <input
+            style={ inputStyle }
+            type="text"
+            placeholder="City"
+            name="city"
+            value={ paymentDetails.city }
+            onChange={ onChange } />
 
-    <div>
-      {methodListLoading && <p>Fetching payment method list...</p>}
-      {methodListLoading && <p>Error fetching payment method list!</p>}
-      {paymentList.length > 0 && (
+          <input
+            style={ inputStyle }
+            type="text"
+            placeholder="Country"
+            name="country"
+            value={ paymentDetails.country }
+            onChange={ onChange } />
+
+          <input
+            style={ inputStyle }
+            type="text"
+            placeholder="State"
+            name="district"
+            value={ paymentDetails.district }
+            onChange={ onChange } />
+
+          <input
+            style={ inputStyle }
+            type="text"
+            placeholder="Postal Code"
+            name="postalCode"
+            value={ paymentDetails.postalCode }
+            onChange={ onChange } />
+
+          <Typography variant="h6" sx={ fieldsetLabelSx }>Credit Card Information</Typography>
+
+          <Box sx={ inputGroupStyle }>
+            <input
+              style={ inputStyle }
+              type="text"
+              placeholder="Card number"
+              name="cardNumber"
+              value={ paymentDetails.cardNumber }
+              onChange={ onChange } />
+
+            <input
+              style={ inputStyle }
+              type="text"
+              placeholder="CVV"
+              value={ paymentDetails.cvv }
+              name="cvv"
+              onChange={ onChange } />
+          </Box>
+
+          <Box sx={ inputGroupStyle }>
+            <select
+              style={ inputStyle }
+              placeholder="Exp. Month"
+              name="expMonth"
+              value={ paymentDetails.expMonth }
+              onChange={ onChange }>
+              { monthList }
+            </select>
+
+            <select
+              style={ inputStyle }
+              placeholder="Exp. Year"
+              name="expYear"
+              value={ paymentDetails.expYear }
+              onChange={ onChange }>
+              { yearList }
+            </select>
+          </Box>
+
+          <Button type="submit" sx={ buttonSx } variant="contained">Create Payment Method</Button>
+
+          <Box sx={ inputGroupStyle }>
+            <Button onClick={ prefillValues } sx={ buttonSx } variant="contained" color="secondary">Fill Form</Button>
+            <Button onClick={ clearValues } sx={ buttonSx } variant="contained" color="secondary">Clear Form</Button>
+          </Box>
+
+        </form>
+      </Box>
+
+      <div>
+        { methodListLoading && <p>Fetching payment method list...</p> }
+        { methodListLoading && <p>Error fetching payment method list!</p> }
+        { paymentList.length > 0 && (
         <div>
           <h4>Cards in Organization</h4>
-          {paymentList.map((card, i) => {
+          { paymentList.map((card, i) => {
             return (
-              <PaymentMethodListItem key={ i } index={ i  + 1} card={card} />
+              // eslint-disable-next-line react/no-array-index-key
+              <PaymentMethodListItem key={ i } index={ i + 1 } card={ card } />
             );
-          })}
+          }) }
         </div>
-      )}
-    </div>
+        ) }
+      </div>
 
-  </>);
+    </>
+  );
 };

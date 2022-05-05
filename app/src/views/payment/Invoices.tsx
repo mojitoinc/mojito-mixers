@@ -1,9 +1,7 @@
-import {
-  useCreateAuctionInvoiceMutation,
-} from "../../services/graphql/generated";
-import { useCallback, useState } from "react";
-import { buttonSx, fieldsetLabelSx, inputStyle } from "../../components/legacy/legacy-styles.constants";
+import React, { useCallback, useState } from "react";
 import { Box, Button, Typography } from "@mui/material";
+import { useCreateAuctionInvoiceMutation } from "../../services/graphql/generated";
+import { buttonSx, fieldsetLabelSx, inputStyle } from "../../components/legacy/legacy-styles.constants";
 
 export const Invoices: React.FC = () => {
   const [createAuctionInvoiceMutation] = useCreateAuctionInvoiceMutation();
@@ -40,22 +38,22 @@ export const Invoices: React.FC = () => {
       <input
         style={ inputStyle }
         type="text"
-        value={orgId}
+        value={ orgId }
         placeholder="Organization ID"
         name="orgID"
-        onChange={(e) => setOrgId(e.target.value)} />
+        onChange={ e => setOrgId(e.target.value) } />
 
       <Typography variant="h6" sx={ fieldsetLabelSx }>Lot ID</Typography>
 
       <input
         style={ inputStyle }
         type="text"
-        value={lotId}
+        value={ lotId }
         placeholder="Lot ID"
         name="lotID"
-        onChange={(e) => setLotId(e.target.value)} />
+        onChange={ e => setLotId(e.target.value) } />
 
-      <Button onClick={createInvoice} sx={ buttonSx } variant="contained">Create Invoice</Button>
+      <Button onClick={ createInvoice } sx={ buttonSx } variant="contained">Create Invoice</Button>
     </Box>
   );
 };
