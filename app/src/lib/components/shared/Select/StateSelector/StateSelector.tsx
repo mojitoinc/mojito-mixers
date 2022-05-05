@@ -103,9 +103,7 @@ export const ControlledStateSelector: React.FC<ControlledStateSelectorProps> = (
           inputRef={ ref }
           error={ !!fieldError }
           helperText={ fieldError }
-          { ...field }
-        />
+          { ...field } />
       );
-    } }
-  />
+    } } />
 );

@@ -29,10 +29,8 @@ export const controlledFieldFrom = (FieldComponent: React.ComponentType<TextFiel
           error={ !!error }
           helperText={ error?.message }
           { ...props }
-          { ...field }
-        />
-      ) }
-    />
+          { ...field } />
+      ) } />
   );
 
   return ControlledField;
@@ -56,8 +54,7 @@ export const TextField: React.FC<TextFieldProps> = ({
     InputLabelProps={{
       ...InputLabelProps,
       shrink: true
-    }}
-  />
+    }} />
 );
 
 export const ControlledTextField = controlledFieldFrom(TextField);

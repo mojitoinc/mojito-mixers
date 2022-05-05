@@ -23,8 +23,7 @@ export const CheckoutItemList: React.FC<CheckoutItemListProps> = ({
       <Box sx={{ py: 1.25 }}>
         { withSeparators && <Divider sx={{ my: 2.5 }} /> }
       </Box>
-    ) }
-  >
+    ) }>
     { checkoutItems.map(
       ({ lotID, name, imageSrc, imageBackground, totalSupply, remainingSupply, units, unitPrice }) => (
         <Grid
@@ -34,8 +33,7 @@ export const CheckoutItemList: React.FC<CheckoutItemListProps> = ({
           direction="column"
           sx={{
             display: "flex",
-          }}
-        >
+          }}>
           <Box sx={{ flex: 1, display: "flex" }}>
             <Avatar
               alt={ name }
@@ -46,8 +44,7 @@ export const CheckoutItemList: React.FC<CheckoutItemListProps> = ({
                 width: 80,
                 height: 80,
                 flex: "0 0 auto",
-              }}
-            />
+              }} />
 
             <Box
               sx={{
@@ -56,8 +53,7 @@ export const CheckoutItemList: React.FC<CheckoutItemListProps> = ({
                 display: "flex",
                 flexDirection: "column",
                 flex: 1,
-              }}
-            >
+              }}>
               <Typography sx={{ fontWeight: "500", pb: 0.5 }}>{ name }</Typography>
 
               { totalSupply && remainingSupply && (
@@ -79,8 +75,7 @@ export const CheckoutItemList: React.FC<CheckoutItemListProps> = ({
                   justifyContent: "space-between",
                   mt: "auto",
                   pt: 0.5,
-                }}
-              >
+                }}>
                 <Typography>Quantity: <Box component="span" sx={{ fontWeight: 500 }}>{ units }</Box></Typography>
                 { showPrices && <Typography><Number suffix=" USD">{ unitPrice }</Number></Typography> }
               </Box>

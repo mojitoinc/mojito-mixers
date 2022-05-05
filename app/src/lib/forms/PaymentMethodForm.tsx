@@ -207,8 +207,7 @@ const PAYMENT_TYPE_FORM_DATA: Record<PaymentType, PaymentTypeFormData> = {
         <ControlledTextField
           name="nameOnCard"
           control={ control }
-          label={ FIELD_LABELS.nameOnCard }
-        />
+          label={ FIELD_LABELS.nameOnCard } />
 
         { consentType === "checkbox" && (
           <ControlledCheckbox
@@ -447,8 +446,7 @@ export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
           <PaymentMethodSelector
             selectedPaymentMethod={ selectedPaymentMethod }
             onPaymentMethodChange={ handleSelectedPaymentMethodChange }
-            paymentMethods={ acceptedPaymentTypes }
-          />
+            paymentMethods={ acceptedPaymentTypes } />
         </>
       ) }
 

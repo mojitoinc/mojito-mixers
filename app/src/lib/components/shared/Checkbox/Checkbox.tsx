@@ -65,9 +65,7 @@ export const ControlledCheckbox: React.FC<ControlledCheckboxProps> = ({
           inputRef={ ref }
           error={ !!error }
           helperText={ error?.message }
-          { ...field }
-        />
+          { ...field } />
       );
-    } }
-  />
+    } } />
 );

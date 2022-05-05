@@ -86,9 +86,7 @@ export const ControlledCountrySelector: React.FC<ControlledCountrySelectorProps>
           inputRef={ ref }
           error={ !!fieldError }
           helperText={ fieldError }
-          { ...field }
-        />
+          { ...field } />
       );
-    } }
-  />
+    } } />
 );

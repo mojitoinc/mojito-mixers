@@ -19,6 +19,5 @@ export const InputGroupLabel: React.FC<TypographyProps> = ({
         | SystemStyleObject<Theme>
         | ((theme: Theme) => SystemStyleObject<Theme>)
     ] }
-    { ...props }
-  />
+    { ...props } />
 );

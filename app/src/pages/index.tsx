@@ -248,7 +248,7 @@ const HomePage: React.FC = () => {
           </Stack>
         </FormControl>
 
-        <Typography variant="body2" sx={{ mt: 2 }}>The Lot ID field can be left empty, but you won't be able to complete the purchase.</Typography>
+        <Typography variant="body2" sx={{ mt: 2 }}>The Lot ID field can be left empty, but you won’t be able to complete the purchase.</Typography>
         <Typography variant="body2" sx={{ mt: 1 }}>If you want to complete the purchase, make sure the lot also belongs to the organization referenced by the Org ID above.</Typography>
         <Typography variant="body2" sx={{ mt: 1 }}>The Payment UI handles invoice creation for both auction and buy now lots in this playground app, but will only do it for buy now lots in production.</Typography>
       </Box>

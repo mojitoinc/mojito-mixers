@@ -59,8 +59,7 @@ export const TaxesMessagesBox: React.FC<TaxesMessagesBoxProps> = ({
       { Object.entries(vertexSuggestions).map(([fieldKey, suggestionValue], i) => {
         return (
           <Typography variant="caption" component="p" sx={{ mt: i === 0 ? 0 : 1 }}>
-            Did you mean
-            { " " }
+            Did you mean{ " " }
             <Tooltip title={ `Click to accept suggestion (${ suggestionValue })` }>
               <Link href="" onClickCapture={ handleSuggestionAccepted } data-field={ fieldKey }>{ suggestionValue }</Link>
             </Tooltip>

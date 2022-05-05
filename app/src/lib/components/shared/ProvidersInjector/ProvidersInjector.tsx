@@ -6,6 +6,7 @@ import { ErrorBoundary } from "../../public/ErrorBoundary/ErrorBoundary";
 import { EXCEPTIONS } from "../../../domain/errors/exceptions.constants";
 
 export interface CommonProviderProps {
+  // eslint-disable-next-line react/no-unused-prop-types
   onCatch?: (error: Error, errorInfo?: ErrorInfo) => void | true;
 }
 
