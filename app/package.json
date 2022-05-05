@@ -32,8 +32,8 @@
     "test:ci": "jest --ci",
     "clean": "rm -rf build",
     "uninstall": "rm -rf node_modules",
-    "lint": "eslint . --ext .ts,.tsx",
-    "lint:fix": "eslint . --ext .ts,.tsx --fix",
+    "lint": "./node_modules/.bin/eslint . --ext .ts,.tsx",
+    "lint:fix": "./node_modules/.bin/eslint . --ext .ts,.tsx --fix",
     "start-prod": "cp /app/.container/.env.production /app/ && next start",
     "firebase:deploy:indexes": "npx firebase deploy --only firestore:indexes",
     "emulators": "npx firebase emulators:start"
