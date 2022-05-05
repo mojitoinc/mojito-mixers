@@ -20,7 +20,7 @@ export function transformCheckoutItemsFromInvoice(
       unitPrice: invoiceItem?.unitPrice || 0,
       taxes: invoiceItem?.taxes || 0,
       totalPrice: invoiceItem?.totalPrice || 0,
-      collectionItemId: invoiceItem?.collectionItemID || ""
+      collectionItemId: invoiceItem?.collectionItemID || "",
       // TODO: Include fees and fees calculation logic here for auctions (from invoice)
       // TODO: Include taxes too (if present in invoice).
     };

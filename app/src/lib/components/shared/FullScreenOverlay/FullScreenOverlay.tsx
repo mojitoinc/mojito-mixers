@@ -60,7 +60,7 @@ export const FullScreenOverlay: React.FC<FullScreenOverlayProps> = ({
   const [shakeSx, shake] = useShakeAnimation(paperRef.current);
 
   const dialogContentSx: SxProps<Theme> = {
-    overflowX: 'hidden',
+    overflowX: "hidden",
     px: {
       xs: 1.5,
       sm: 2.5,
@@ -103,4 +103,4 @@ export const FullScreenOverlay: React.FC<FullScreenOverlayProps> = ({
       </DialogContent>
     </Dialog>
   );
-}
+};

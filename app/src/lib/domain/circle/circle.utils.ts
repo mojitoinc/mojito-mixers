@@ -6,7 +6,7 @@ import { BillingInfo } from "../../forms/BillingInfoForm";
 import { formatSentence, fullTrim } from "../../utils/formatUtils";
 import { BUILT_IN_ERRORS } from "../errors/errors.constants";
 
-const countryPrefixes = customList('countryCode', '{countryCallingCode}');
+const countryPrefixes = customList("countryCode", "{countryCallingCode}");
 
 export function getPhonePrefix(countryCode: string, withPlus = true) {
   const prefix = countryPrefixes[countryCode];
@@ -15,7 +15,7 @@ export function getPhonePrefix(countryCode: string, withPlus = true) {
 }
 
 export function phoneHasPrefix(phone: string) {
-  return phone.startsWith("+") || phone.startsWith("00")
+  return phone.startsWith("+") || phone.startsWith("00");
 }
 
 export function formatPhoneAsE123(phoneNumber: string, countryCode: string) {
@@ -190,7 +190,7 @@ export function parseCircleError(error: ApolloError | Error): CircleFieldErrors 
 
   if (message.includes("with body: ")) {
     try {
-      const parsedCircleError: CircleError = JSON.parse(String.raw`${ message }`.replace(/^.+with body: /, ''));
+      const parsedCircleError: CircleError = JSON.parse(String.raw`${ message }`.replace(/^.+with body: /, ""));
       const parsedCircleErrors = parsedCircleError.errors;
       const circleFieldErrors: CircleFieldErrors = {
         summary: parsedCircleError.message.replace("Invalid entity.\n", ""),

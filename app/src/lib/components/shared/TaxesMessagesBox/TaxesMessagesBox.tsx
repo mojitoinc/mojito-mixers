@@ -69,4 +69,4 @@ export const TaxesMessagesBox: React.FC<TaxesMessagesBoxProps> = ({
       }) }
     </Box>
   );
-}
+};

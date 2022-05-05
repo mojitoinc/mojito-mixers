@@ -58,4 +58,4 @@ export const AuthorizedApolloProvider: React.FC<AuthorizedApolloProviderProps> =
   }, [parentApolloClient, uri, getAuthenticationToken]);
 
   return apolloClient ? <ApolloProvider client={ apolloClient }>{ children }</ApolloProvider> : <>{ children }</>;
-}
+};

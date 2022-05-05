@@ -29,7 +29,7 @@ export const ConsentText: React.FC = () => {
             { linkElement }
             { " " }
           </Fragment>
-        )
+        );
       }) }
       of the sale.
     </>

@@ -11,14 +11,14 @@ export const extendDefaultTheme = (themeOptions?: ThemeOptions): Theme => {
     typography: createTypographyTheme(
       typeof themeOptions?.typography === "function"
         ? themeOptions.typography(createTheme({ palette: themeOptions?.palette }).palette)
-        : themeOptions?.typography
+        : themeOptions?.typography,
     ),
   });
 
   return createTheme({
     components: createComponentsTheme(baseTheme),
-  }, baseTheme)
-}
+  }, baseTheme);
+};
 
 // Default Mojito themes:
 export const MOJITO_LIGHT_THEME = extendDefaultTheme();

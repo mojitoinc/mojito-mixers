@@ -1,4 +1,4 @@
-import AddIcon from '@mui/icons-material/Add';
+import AddIcon from "@mui/icons-material/Add";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { alpha, Box, CircularProgress, Typography } from "@mui/material";
 import { InputGroupLabel } from "../InputGroupLabel/InputGroupLabel";
@@ -63,7 +63,7 @@ export const SavedPaymentDetailsSelector: React.FC<SavedPaymentDetailsSelectorPr
   onAttemptSubmit,
   consentType,
   checkoutItems,
-  debug = false
+  debug = false,
 }) => {
   const firstCheckoutItem = checkoutItems[0];
 
@@ -223,4 +223,4 @@ export const SavedPaymentDetailsSelector: React.FC<SavedPaymentDetailsSelectorPr
         onCloseClicked={ onClose } />
     </>
   );
-}
+};

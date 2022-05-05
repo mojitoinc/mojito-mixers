@@ -44,7 +44,7 @@ export const Select: React.FC<SelectProps> = ({
   ...props
 }) => {
   const theme = useTheme();
-  const matches = useMediaQuery(theme.breakpoints.down('sm'));
+  const matches = useMediaQuery(theme.breakpoints.down("sm"));
   const mapOption = matches ? mapOptionMobile : mapOptionDesktop;
   const selectOptions = matches ? [EMPTY_OPTION, ...options] : options;
 
@@ -66,4 +66,4 @@ export const Select: React.FC<SelectProps> = ({
       { helperText && <FormHelperText>{ helperText }</FormHelperText> }
     </FormControl>
   );
-}
+};

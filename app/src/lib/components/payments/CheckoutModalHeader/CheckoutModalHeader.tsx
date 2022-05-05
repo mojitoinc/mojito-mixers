@@ -1,7 +1,7 @@
 import { Box, Typography, Divider, Stack } from "@mui/material";
 import { Theme, SxProps } from "@mui/material/styles";
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import CloseIcon from '@mui/icons-material/Close';
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import CloseIcon from "@mui/icons-material/Close";
 import React, { useRef, useCallback } from "react";
 import { PrimaryButton } from "../../shared/PrimaryButton/PrimaryButton";
 import { OutlinedSecondaryButton } from "../../shared/OutlinedSecondaryButton/OutlinedSecondaryButton";
@@ -111,7 +111,7 @@ export const CheckoutModalHeader: React.FC<CheckoutModalHeaderProps> = ({
             sx={{
               maxHeight: "32px",
               maxWidth: { xs: "180px", sm: "240px" },
-              ...logoSx
+              ...logoSx,
             }} />
         ) }
       </Stack>
@@ -151,4 +151,4 @@ export const CheckoutModalHeader: React.FC<CheckoutModalHeaderProps> = ({
       ) : null }
     </Box>
   );
-}
+};

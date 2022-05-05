@@ -155,7 +155,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     setDebug((prevDebug) => {
       const nextDebug = prevDebug || DEV_DEBUG_ENABLED;
 
-      if (nextDebug) console.log(`\n🐞 DEBUG MODE ENABLED!\n\n`);
+      if (nextDebug) console.log("\n🐞 DEBUG MODE ENABLED!\n\n");
 
       return nextDebug;
     });
@@ -674,17 +674,17 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   }, [checkoutError]);
 
   useEffect(() => {
-    window.addEventListener('beforeunload', handleBeforeUnload);
+    window.addEventListener("beforeunload", handleBeforeUnload);
 
     return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
+      window.removeEventListener("beforeunload", handleBeforeUnload);
     };
   }, [handleBeforeUnload]);
 
   const handleClose = useCallback(() => {
     if (!onClose) return;
 
-    window.removeEventListener('beforeunload', handleBeforeUnload);
+    window.removeEventListener("beforeunload", handleBeforeUnload);
 
     handleBeforeUnload();
 
@@ -702,7 +702,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
       return;
     }
 
-    window.removeEventListener('beforeunload', handleBeforeUnload);
+    window.removeEventListener("beforeunload", handleBeforeUnload);
 
     handleBeforeUnload();
 
@@ -710,7 +710,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   }, [handleClose, handleBeforeUnload, onGoTo]);
 
   const handlePurchaseCompleted = useCallback(() => {
-    handleGoTo(goToMarketplaceHref)
+    handleGoTo(goToMarketplaceHref);
   }, [handleGoTo, goToMarketplaceHref]);
 
 
@@ -815,7 +815,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
 
   // Normal UI (steps / views):
 
-  let headerVariant: CheckoutModalHeaderVariant = isAuthenticated ? 'loggedIn' : 'guest';
+  let headerVariant: CheckoutModalHeaderVariant = isAuthenticated ? "loggedIn" : "guest";
   let checkoutStepElement = null;
 
   if (checkoutStep === "error" && checkoutError) {
@@ -830,7 +830,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
         debug={ debug } />
     );
   } else if (checkoutStep === "authentication") {
-    if (!isAuthenticated) headerVariant = 'anonymous';
+    if (!isAuthenticated) headerVariant = "anonymous";
 
     checkoutStepElement = (
       <AuthenticationView

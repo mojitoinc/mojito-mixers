@@ -22,6 +22,6 @@ export const PUIPlaidOverlay: React.FC<PUIPlaidOverlayProps> = ({
   }, [continueFlow, onRedirect, url]);
 
   return null;
-}
+};
 
 export const PUIPlaid: React.FC<PUISuccessProps> = withThemeProvider(PUIPlaidOverlay);

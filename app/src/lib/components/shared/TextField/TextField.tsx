@@ -1,6 +1,6 @@
 import {
   TextField as MUITextField,
-  TextFieldProps as MUITextFieldProps
+  TextFieldProps as MUITextFieldProps,
 } from "@mui/material";
 import { Control, Controller } from "react-hook-form";
 import React from "react";
@@ -34,7 +34,7 @@ export const controlledFieldFrom = (FieldComponent: React.ComponentType<TextFiel
   );
 
   return ControlledField;
-}
+};
 
 
 export const TextField: React.FC<TextFieldProps> = ({
@@ -49,11 +49,11 @@ export const TextField: React.FC<TextFieldProps> = ({
     { ...props }
     InputProps={{
       ...InputProps,
-      disableUnderline: true
+      disableUnderline: true,
     } as any}
     InputLabelProps={{
       ...InputLabelProps,
-      shrink: true
+      shrink: true,
     }} />
 );
 

@@ -19,7 +19,7 @@ describe("DeliveryWalletSelector", () => {
     deliveryWalletSelectorProps = {
       wallet: "",
       onWalletChange: () => { /* Do nothing */ },
-      validatePersonalAddress: false
+      validatePersonalAddress: false,
     };
   });
 

@@ -26,4 +26,4 @@ export const PUIStaticErrorOverlay: React.FC<PUIStaticErrorOverlayProps> = ({
       <ErrorView { ...errorViewProps } />
     </FullScreenOverlay>
   );
-}
+};

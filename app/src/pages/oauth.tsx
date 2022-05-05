@@ -21,6 +21,6 @@ const PlaidOAuthPage: NextPage = () => {
       theme={ MOJITO_LIGHT_THEME }
       onRedirect={ handleRedirect } />
   );
-}
+};
 
 export default PlaidOAuthPage;

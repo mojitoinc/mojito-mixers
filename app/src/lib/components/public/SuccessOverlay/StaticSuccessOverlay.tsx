@@ -26,4 +26,4 @@ export const PUIStaticSuccessOverlay: React.FC<PUIStaticSuccessOverlayProps> = (
       <SuccessView { ...successViewProps } />
     </FullScreenOverlay>
   );
-}
+};

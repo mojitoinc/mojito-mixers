@@ -19,11 +19,11 @@ export const BillingInfoFragment: React.FC<BillingInfoFragmentProps> = ({
     },
     metadata: {
       email,
-      phoneNumber
+      phoneNumber,
     },
   },
 }) => (
-  <Box sx={{ display: "flex", flexDirection: 'column' }}>
+  <Box sx={{ display: "flex", flexDirection: "column" }}>
     <Typography variant="caption">{ name }</Typography>
     { address1 && <Typography variant="caption">{ address1 }</Typography> }
     { address2 && <Typography variant="caption">{ address2 }</Typography> }

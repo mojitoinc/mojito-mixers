@@ -53,7 +53,7 @@ export const ProviderInjector: React.FC<ProvidersInjectorProps> = ({
       { theme ? <ThemeProvider theme={ theme }>{ children }</ThemeProvider> : children }
     </AuthorizedApolloProvider>
   );
-}
+};
 
 export function withThemeProvider<P extends object>(Component: React.ComponentType<P>) {
   const WithThemeProvider: React.FC<P & ThemeProviderProps> = ({

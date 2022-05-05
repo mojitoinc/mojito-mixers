@@ -123,12 +123,12 @@ const schema = object()
     [STATE_FIELD]: object().shape({
       value: string()
         .label(FIELD_LABELS[STATE_FIELD])
-        .required(withRequiredErrorMessage)
+        .required(withRequiredErrorMessage),
     }),
     [COUNTRY_FIELD]: object().shape({
       value: string()
         .label(FIELD_LABELS[COUNTRY_FIELD])
-        .required(withRequiredErrorMessage)
+        .required(withRequiredErrorMessage),
     }),
   }).required();
 
@@ -171,7 +171,7 @@ export const BillingInfoForm: React.FC<BillingInfoFormProps> = ({
   } = useForm<BillingInfo>({
     defaultValues: {
       ...EMPTY_FORM_VALUES,
-      ...defaultValues
+      ...defaultValues,
     },
     reValidateMode: "onChange",
     resolver: yupResolver(schema),
@@ -260,7 +260,7 @@ export const BillingInfoForm: React.FC<BillingInfoFormProps> = ({
         columnSpacing={ 2 }
         direction={{
           xs: "column",
-          sm: "row"
+          sm: "row",
         }}>
         <Grid item sm={ 6 } zeroMinWidth>
           <ControlledTextField
@@ -282,7 +282,7 @@ export const BillingInfoForm: React.FC<BillingInfoFormProps> = ({
         columnSpacing={ 2 }
         direction={{
           xs: "column",
-          sm: "row"
+          sm: "row",
         }}>
         <Grid item sm={ 6 } zeroMinWidth sx={{ maxWidth: "100%" }}>
           <ControlledStateSelector

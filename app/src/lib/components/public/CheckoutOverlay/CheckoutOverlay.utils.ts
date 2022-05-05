@@ -27,7 +27,7 @@ export function persistCheckoutModalInfo(info: CheckoutModalInfo) {
       url,
       fromLocalhost: info.fromLocalhost ?? isLocalhost(),
     }, {
-      expirationDate: new Date(Date.now() + (isCheckoutModalInfo3DS(info) ? THREEDS_STORAGE_EXPIRATION_MS : PLAID_STORAGE_EXPIRATION_MS))
+      expirationDate: new Date(Date.now() + (isCheckoutModalInfo3DS(info) ? THREEDS_STORAGE_EXPIRATION_MS : PLAID_STORAGE_EXPIRATION_MS)),
     });
   } catch (err) {
     if (debug) console.log(err);
@@ -45,7 +45,7 @@ export function persistCheckoutModalInfoUsed(used = true) {
 export function clearPersistedInfo() {
   if (IS_SERVER) return;
 
-  if (debug) console.log(`💾 Clearing state...`);
+  if (debug) console.log("💾 Clearing state...");
 
   cookieStorage.removeItem(CHECKOUT_MODAL_INFO_KEY_REGEXP); // 3DS
   cookieStorage.removeItem(CHECKOUT_MODAL_INFO_KEY(CHECKOUT_MODAL_INFO_KEY_PLAID_SUFFIX)); // Plaid
@@ -80,7 +80,7 @@ export function getCheckoutModalState({
       cookieStorage.getItem(CHECKOUT_MODAL_INFO_KEY_REGEXP);
 
     hasSavedModalInfo = !!rawSavedModalInfo;
-    savedModalInfo = rawSavedModalInfo || {}
+    savedModalInfo = rawSavedModalInfo || {};
     savedReceivedRedirectUri = cookieStorage.getItem(CHECKOUT_MODAL_INFO_REDIRECT_URI_KEY) || "";
     savedInfoUsed = cookieStorage.getItem(CHECKOUT_MODAL_INFO_USED_KEY) || false;
   } catch (err) {
@@ -180,7 +180,7 @@ export function getCheckoutModalState({
 
     if (isCheckoutModalInfoPlaid(savedModalInfo)) {
       const {
-        linkToken
+        linkToken,
       } = savedModalInfo;
 
       isValid &&=

@@ -93,7 +93,7 @@ export function usePlaid(options: UsePlaidOptions): UsePlaidReturn {
     } else if (preparePaymentMethodError) {
       console.log("🏚️ Plaid Link Error: ", preparePaymentMethodError);
     }
-  }, [isPreparePaymentMethodLoading, preparePaymentMethodError])
+  }, [isPreparePaymentMethodLoading, preparePaymentMethodError]);
 
   const linkToken = (continueFlow ? savedLinkToken : preparePaymentMethodData?.preparePaymentMethod?.linkToken) || "";
 
@@ -207,4 +207,4 @@ export const PlaidFlow: React.FC<UsePlaidOptionsContinueFlow> = ({
   usePlaid({ onSubmit });
 
   return null;
-}
+};

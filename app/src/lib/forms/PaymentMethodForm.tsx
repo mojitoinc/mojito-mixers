@@ -17,7 +17,7 @@ import { SecondaryButton } from "../components/shared/SecondaryButton/SecondaryB
 import { PaymentMethodSelector } from "../components/shared/PaymentMethodSelector/PaymentMethodSelector";
 import {
   PaymentMethod,
-  PaymentType
+  PaymentType,
 } from "../domain/payment/payment.interfaces";
 import {
   CONSENT_ERROR_MESSAGE,
@@ -27,7 +27,7 @@ import {
   withInvalidCreditCardNetwork,
   withInvalidCVV,
   withInvalidErrorMessage,
-  withRequiredErrorMessage
+  withRequiredErrorMessage,
 } from "../utils/validationUtils";
 import {
   getExpiryDateIsValid,
@@ -129,9 +129,9 @@ const PAYMENT_TYPE_FORM_DATA: Record<PaymentType, PaymentTypeFormData> = {
             return schema.required(withRequiredErrorMessage).test({
               name: "is-valid-expiry-date",
               test: getExpiryDateIsValid,
-              message: withInvalidErrorMessage
+              message: withInvalidErrorMessage,
             });
-          }
+          },
         }),
       secureCode: string()
         // .label(FIELD_LABELS.secureCode)
@@ -170,7 +170,7 @@ const PAYMENT_TYPE_FORM_DATA: Record<PaymentType, PaymentTypeFormData> = {
                 return true;
               },
             });
-          }
+          },
         }),
       nameOnCard: string()
         .label(FIELD_LABELS.nameOnCard)
@@ -188,7 +188,7 @@ const PAYMENT_TYPE_FORM_DATA: Record<PaymentType, PaymentTypeFormData> = {
           columnSpacing={ 2 }
           direction={{
             xs: "column",
-            sm: "row"
+            sm: "row",
           }}>
           <Grid item sm={ 6 } zeroMinWidth>
             <ControlledCardExpiryDateField
@@ -344,7 +344,7 @@ export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
   onAttemptSubmit,
   consentType,
   checkoutItems,
-  debug = false
+  debug = false,
 }) => {
   const defaultPaymentType = acceptedPaymentTypes[0] || "CreditCard";
   const defaultPaymentTypeFormData = PAYMENT_TYPE_FORM_DATA[defaultPaymentType];

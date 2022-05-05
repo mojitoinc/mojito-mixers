@@ -42,7 +42,7 @@ export interface CheckoutModalFooterProps {
   onGoTo?: (pathnameOrUrl: string) => void;
 }
 
-const VARIANTS_WITH_DISCLAIMER: CheckoutModalFooterVariant[] = ["toPayment", "toPlaid", "toConfirmation"]
+const VARIANTS_WITH_DISCLAIMER: CheckoutModalFooterVariant[] = ["toPayment", "toPlaid", "toConfirmation"];
 
 export const CheckoutModalFooter: React.FC<CheckoutModalFooterProps> = ({
   // Configuration:
@@ -240,4 +240,4 @@ export const CheckoutModalFooter: React.FC<CheckoutModalFooterProps> = ({
       ) }
     </Box>
   );
-}
+};

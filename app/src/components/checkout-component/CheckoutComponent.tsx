@@ -152,4 +152,4 @@ export const CheckoutComponent: React.FC<PUICheckoutComponentProps> = ({
   };
 
   return <PUICheckout { ...checkoutProps } />;
-}
+};

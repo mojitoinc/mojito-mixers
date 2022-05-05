@@ -38,14 +38,14 @@ export const PurchaseConfirmationBillingDetails: React.FC<PurchaseConfirmationBi
   const icon: React.ReactNode = network ? <CreditCardIcon network={ network } /> : null;
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', flex: 1, position: "relative" }}>
+    <Box sx={{ display: "flex", flexDirection: "column", flex: 1, position: "relative" }}>
       <Stack
         spacing={ 2 }
         direction={{ xs: "column", sm: "row" }}
         sx={{
           justifyContent: "space-between",
           alignItems: { xs: "flex-start", sm: "center" },
-          pt: 2
+          pt: 2,
         }}>
 
         <Typography variant="h5">
@@ -70,7 +70,7 @@ export const PurchaseConfirmationBillingDetails: React.FC<PurchaseConfirmationBi
           justifyContent: "space-between",
           alignItems: { xs: "flex-start", sm: "center" },
           pt: 1.5,
-          pb: { xs: 2.5, sm: 1.5 }
+          pb: { xs: 2.5, sm: 1.5 },
         }}>
 
         { isMasked ? (
@@ -110,4 +110,4 @@ export const PurchaseConfirmationBillingDetails: React.FC<PurchaseConfirmationBi
       <DeliveryWalletDetails wallet={ wallet } />
     </Box>
   );
-}
+};
