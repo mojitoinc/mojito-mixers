@@ -220,14 +220,12 @@ export const BillingInfoForm: React.FC<BillingInfoFormProps> = ({
       <ControlledTextField
         name={ FULL_NAME_FIELD }
         control={ control }
-        label={ FIELD_LABELS[FULL_NAME_FIELD] }
-      />
+        label={ FIELD_LABELS[FULL_NAME_FIELD] } />
 
       <ControlledTextField
         name={ EMAIL_FIELD }
         control={ control }
-        label={ FIELD_LABELS[EMAIL_FIELD] }
-      />
+        label={ FIELD_LABELS[EMAIL_FIELD] } />
 
       <ControlledTextField
         name={ PHONE_FIELD }
@@ -239,8 +237,7 @@ export const BillingInfoForm: React.FC<BillingInfoFormProps> = ({
               <Typography variant="subtitle1" component="span" sx={{ pointerEvents: "none" }}>{ getPhonePrefix(`${ selectedCountryCode }`) }</Typography>
             </InputAdornment>
           ),
-        } : undefined }
-      />
+        } : undefined } />
 
       { debug && phone && (
         <DebugBox compact sx={{ mt: 1 }}>{ formatPhoneAsE123(phone || "", `${ selectedCountryCode }`) }</DebugBox>
@@ -251,14 +248,12 @@ export const BillingInfoForm: React.FC<BillingInfoFormProps> = ({
       <ControlledTextField
         name={ STREET_FIELD }
         control={ control }
-        label={ FIELD_LABELS[STREET_FIELD] }
-      />
+        label={ FIELD_LABELS[STREET_FIELD] } />
 
       <ControlledTextField
         name={ APARTMENT_FIELD }
         control={ control }
-        label={ FIELD_LABELS[APARTMENT_FIELD] }
-      />
+        label={ FIELD_LABELS[APARTMENT_FIELD] } />
 
       <Grid
         container

@@ -96,7 +96,6 @@ export const WalletAddressSelector: React.FC<WalletAddressSelectorProps> = ({
       disabled={ disabled }
       error={ showError ? error : undefined }
       helperText={ showError ? helperText : undefined }
-      displayEmpty
-    />
+      displayEmpty />
   );
 };

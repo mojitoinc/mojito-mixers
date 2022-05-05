@@ -52,64 +52,62 @@ module.exports = {
   rules: {
     // eslint:
 
-    "quotes": [TEMPORARILY_DISABLED, "double"],
-    "quote-props": [2, "as-needed"],
-    "max-len": [2, { code: 160, ignorePattern: "^(import|export) .*", ignoreRegExpLiterals: true, ignoreStrings: true }],
-    "no-multiple-empty-lines": [2, { max: 2, maxBOF: 0, maxEOF: 0 }],
-    "arrow-parens": [2, "as-needed", { requireForBlockBody: true }],
-    "template-curly-spacing": [2, "always"],
-    "no-bitwise": ["error", { int32Hint: true }],
-    "comma-dangle": TEMPORARILY_DISABLED,
-    "semi": TEMPORARILY_DISABLED,
-    "no-console": TEMPORARILY_DISABLED,
-    "object-curly-newline": [2, { multiline: true, consistent: true }],
     "array-element-newline": [2, "consistent"],
     "arrow-body-style": 0,
-    "no-prototype-builtins": 0,
+    "arrow-parens": [2, "as-needed", { requireForBlockBody: true }],
+    "comma-dangle": TEMPORARILY_DISABLED,
     "default-param-last": 0,
-    "no-multi-assign": 0,
-    "no-nested-ternary": TEMPORARILY_DISABLED,
-    "no-mixed-operators": [2, { allowSamePrecedence: true }],
     "function-paren-newline": [2, "consistent"],
+    "max-len": [2, { code: 160, ignorePattern: "^(import|export) .*", ignoreRegExpLiterals: true, ignoreStrings: true }],
+    "no-bitwise": ["error", { int32Hint: true }],
+    "no-console": TEMPORARILY_DISABLED,
+    "no-mixed-operators": [2, { allowSamePrecedence: true }],
+    "no-multi-assign": 0,
+    "no-multiple-empty-lines": [2, { max: 2, maxBOF: 0, maxEOF: 0 }],
+    "no-nested-ternary": TEMPORARILY_DISABLED,
     "no-param-reassign": [2, { props: true, ignorePropertyModificationsForRegex: ["Acc$"] }],
-    "operator-linebreak": [2, "after", { overrides: { "?": "before", ":": "before" } }],
+    "no-prototype-builtins": 0,
     "no-shadow": 0,
+    "object-curly-newline": [2, { multiline: true, consistent: true }],
+    "operator-linebreak": [2, "after", { overrides: { "?": "before", ":": "before" } }],
+    "quote-props": [2, "as-needed"],
+    "quotes": [TEMPORARILY_DISABLED, "double"],
+    "semi": TEMPORARILY_DISABLED,
+    "template-curly-spacing": [2, "always"],
 
 
     // eslint-plugin-import:
 
     "import/extensions": 0,
-    "import/no-unresolved": 2,
-    "import/prefer-default-export": 0,
     "import/no-cycle": TEMPORARILY_DISABLED,
     "import/no-extraneous-dependencies": ["error", { devDependencies: ["**/*.test.ts", "**/*.test.tsx"] }],
+    "import/no-unresolved": 2,
+    "import/prefer-default-export": 0,
 
     // eslint-plugin-react:
 
-    "react/jsx-props-no-spreading": TEMPORARILY_DISABLED,
-    "react/prop-types": TEMPORARILY_DISABLED,
-    "react/no-unused-prop-types": TEMPORARILY_DISABLED,
-
-    "react/state-in-constructor": 0,
-    "react/no-unescaped-entities": 0, // TODO: Use ’
-    "react/require-default-props": 0,
     "react/jsx-one-expression-per-line": 0,
-
-    "react/jsx-closing-bracket-location": [TEMPORARILY_DISABLED, "after-props"],
+    "react/jsx-props-no-spreading": 0,
+    "react/no-unescaped-entities": 2, // For ' use ’
+    "react/require-default-props": 0,
+    "react/state-in-constructor": 0,
 
     "react/function-component-definition": [2, { namedComponents: "arrow-function" }],
+    "react/jsx-closing-bracket-location": [2, "after-props"],
     "react/jsx-no-useless-fragment": [2, { allowExpressions: true }],
-
-    "react/jsx-filename-extension": [1, {
-      allow: "as-needed",
-      extensions: [".tsx"],
-    }],
+    "react/no-unused-prop-types": 2,
+    "react/prop-types": 2,
 
     "react/jsx-curly-spacing": [2, {
       when: "always",
       attributes: { allowMultiline: false },
       children: true,
       spacing: { objectLiterals: "never" },
+    }],
+
+    "react/jsx-filename-extension": [2, {
+      allow: "as-needed",
+      extensions: [".tsx"],
     }],
 
 
@@ -119,11 +117,13 @@ module.exports = {
 
 
     // eslint-plugin-jsx-a11y:
-    "jsx-a11y/anchor-is-valid": TEMPORARILY_DISABLED,
+
+    "jsx-a11y/anchor-is-valid": 0,
 
 
     // typescript-eslint:
 
+    "@typescript-eslint/explicit-module-boundary-types": TEMPORARILY_DISABLED,
     "@typescript-eslint/no-explicit-any": TEMPORARILY_DISABLED,
     "@typescript-eslint/no-shadow": 2,
 
@@ -133,14 +133,6 @@ module.exports = {
     // unused-imports:
 
     "unused-imports/no-unused-imports": "warn",
-
-
-    // OLD:
-    // "func-style": ["off", "declaration"],
-    // "no-prototype-builtins": "off",
-    // @TODO/temp Non-critical stuff we should clean up, but hiding for now to clear clutter in order to see more
-    // important issues:
-    // "@typescript-eslint/explicit-module-boundary-types": "off",
   },
 
   ignorePatterns: [

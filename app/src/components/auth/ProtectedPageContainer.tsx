@@ -1,11 +1,9 @@
 import { useAuth0 } from "@auth0/auth0-react";
 import { Typography } from "@mui/material";
 import React from "react";
-import { EPages } from "../../utils/pages/pages.enum";
 import { GlobalLoader } from "../core/GlobalLoader";
 
 interface ProtectedPageContainer {
-  redirectUrl?: EPages;
   revertDirection?: boolean;
   children?: React.ReactNode;
 }

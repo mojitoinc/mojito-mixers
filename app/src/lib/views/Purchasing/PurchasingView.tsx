@@ -206,7 +206,7 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
 
       <Box sx={{ maxWidth: XS_MOBILE_MAX_WIDTH, mx: "auto", my: 5 }}>
         <Typography variant="body2" sx={{ textAlign: "center", mb: 1.5 }}>Hang tight! We are currently processing your payment.</Typography>
-        <Typography variant="body2" sx={{ textAlign: "center" }}>Please, don't close or reload the page...</Typography>
+        <Typography variant="body2" sx={{ textAlign: "center" }}>Please, don’t close or reload the page...</Typography>
       </Box>
 
     </Box>
