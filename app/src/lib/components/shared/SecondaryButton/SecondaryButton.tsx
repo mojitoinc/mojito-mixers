@@ -23,6 +23,8 @@ export const SecondaryButton = React.forwardRef<HTMLButtonElement, SecondaryButt
       ref={ ref }
       disableElevation
       sx={ isIcon ? { ...sx, p: 0 } : sx }
-      { ...props } />
+      { ...props }>
+      { children }
+    </Button>
   );
 });
