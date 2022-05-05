@@ -82,7 +82,7 @@ export const CheckoutItemList: React.FC<CheckoutItemListProps> = ({
             </Box>
           </Box>
         </Grid>
-      )
+      ),
     ) }
   </Stack>
 );

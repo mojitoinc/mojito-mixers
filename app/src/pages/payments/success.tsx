@@ -25,7 +25,7 @@ const SuccessPage: NextPage = () => {
       open
       paymentIdParam={ paymentId } />
   ) : null;
-}
+};
 
 export default SuccessPage;
 

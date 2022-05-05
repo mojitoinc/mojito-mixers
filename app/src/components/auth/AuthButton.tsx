@@ -47,4 +47,4 @@ export const AuthButton: React.FC = () => {
       Log In
     </Button>
   );
-}
+};

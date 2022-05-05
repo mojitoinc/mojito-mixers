@@ -1,5 +1,5 @@
 import { Typography } from "@mui/material";
-import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
+import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
 import React from "react";
 import { SavedPaymentMethod } from "../../../../domain/circle/circle.interfaces";
 import { CreditCardIcon } from "../../../shared/Icons/Icons";

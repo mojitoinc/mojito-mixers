@@ -1,5 +1,5 @@
 import { Box, Chip, Tooltip, Typography } from "@mui/material";
-import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import React from "react";
 import { CopyButton } from "../../../shared/CopyButton/CopyButton";
 import { ReadOnlyWalletAddress } from "../../../shared/ReadOnlyField/ReadOnlyField";
@@ -54,4 +54,4 @@ export const DeliveryWalletDetails: React.FC<DeliveryWalletDetailsProps> = ({
       ) }
     </Box>
   );
-}
+};

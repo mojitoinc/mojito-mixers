@@ -4,7 +4,7 @@ import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
 import CreditCardIcon from "@mui/icons-material/CreditCard";
 import LanguageIcon from "@mui/icons-material/Language";
 import Icon from "@mdi/react";
-import { mdiEthereum } from '@mdi/js';
+import { mdiEthereum } from "@mdi/js";
 import { useTheme } from "@mui/material/styles";
 import { PaymentType } from "../../../domain/payment/payment.interfaces";
 
@@ -25,26 +25,26 @@ export const PAYMENT_METHOD_OPTION_PROPS: Record<
 > = {
   CreditCard: {
     label: "Credit Card",
-    icon: <CreditCardIcon />
+    icon: <CreditCardIcon />,
   },
   ACH: {
     label: "ACH",
-    icon: <AccountBalanceIcon sx={{ fontSize: "20px" }} />
+    icon: <AccountBalanceIcon sx={{ fontSize: "20px" }} />,
   },
   Wire: {
     label: "Wire",
-    icon: <LanguageIcon sx={{ fontSize: "20px" }} />
+    icon: <LanguageIcon sx={{ fontSize: "20px" }} />,
   },
   Crypto: {
     label: "Crypto",
-    icon: <Icon path={ mdiEthereum } size="20px" />
-  }
+    icon: <Icon path={ mdiEthereum } size="20px" />,
+  },
 };
 
 export const PaymentMethodSelector: React.FC<PaymentMethodSelectorProps> = ({
   paymentMethods,
   selectedPaymentMethod,
-  onPaymentMethodChange
+  onPaymentMethodChange,
 }) => {
   const theme = useTheme();
   const wideViewport = useMediaQuery(theme.breakpoints.up("sm"));
@@ -74,7 +74,7 @@ export const PaymentMethodSelector: React.FC<PaymentMethodSelectorProps> = ({
                 spacing={ 1 }
                 direction="row"
                 sx={{
-                  alignItems: "center"
+                  alignItems: "center",
                 }}>
                 { icon }
                 <Typography sx={{ fontWeight: 500 }}>{ label }</Typography>

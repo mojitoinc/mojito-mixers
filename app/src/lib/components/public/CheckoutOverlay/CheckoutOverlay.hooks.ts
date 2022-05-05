@@ -143,7 +143,7 @@ export function useCheckoutModalState({
     taxes: vertexEnabled ? { status: "incomplete" } : null,
     wallet: null,
     processorPaymentID: "",
-    paymentID: ""
+    paymentID: "",
   });
 
   const initModalState = useCallback(() => {
@@ -182,7 +182,7 @@ export function useCheckoutModalState({
       taxes: vertexEnabled ? { status: "incomplete" } : null,
       wallet: null, // Wallet is added from invoice: `setWalletAddress(wallet || destinationAddress)`
       processorPaymentID: checkoutModalState.processorPaymentID || "",
-      paymentID: checkoutModalState.paymentID || ""
+      paymentID: checkoutModalState.paymentID || "",
     });
 
     return checkoutModalState;

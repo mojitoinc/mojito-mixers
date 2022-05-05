@@ -39,7 +39,7 @@ export function useFullPayment({
   const [paymentState, setPaymentState] = useState<FullPaymentState>({
     paymentStatus: "processing",
     processorPaymentID: "",
-    paymentID: ""
+    paymentID: "",
   });
 
   const setError = useCallback((paymentError: string | CheckoutModalError) => {
@@ -79,7 +79,7 @@ export function useFullPayment({
       console.log(
         invoiceID
           ? `\n💵 Making payment for invoice ${ invoiceID } (orgID = ${ orgID })...\n`
-          : `\n💵 Aborting payment for unknown invoice (orgID = ${ orgID })...\n`
+          : `\n💵 Aborting payment for unknown invoice (orgID = ${ orgID })...\n`,
       );
     }
 
@@ -225,7 +225,7 @@ export function useFullPayment({
     setPaymentState({
       paymentStatus: "processed",
       processorPaymentID,
-      paymentID
+      paymentID,
     });
   }, [
     orgID,

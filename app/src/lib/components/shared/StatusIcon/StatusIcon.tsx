@@ -1,9 +1,9 @@
 import { Box, BoxProps, SvgIcon } from "@mui/material";
 import { Theme } from "@mui/material/styles";
 import React from "react";
-import WarningAmberIcon from '@mui/icons-material/WarningAmber';
-import CheckIcon from '@mui/icons-material/Check';
-import AutoRenewIcon from '@mui/icons-material/Autorenew';
+import WarningAmberIcon from "@mui/icons-material/WarningAmber";
+import CheckIcon from "@mui/icons-material/Check";
+import AutoRenewIcon from "@mui/icons-material/Autorenew";
 import { DEFAULT_ERROR_IMAGE_SRC, DEFAULT_PURCHASING_IMAGE_SRC, ROUNDED_BORDER_RADIUS } from "../../../config/theme/themeConstants";
 import { Img } from "../Img/Img";
 
@@ -59,7 +59,7 @@ export const StatusIcon: React.FC<StatusIconProps> = ({
         width: 196,
         height: 196,
         mx: "auto",
-        ...sx
+        ...sx,
       }} />
   ) : (
     <Box
@@ -73,7 +73,7 @@ export const StatusIcon: React.FC<StatusIconProps> = ({
         alignItems: "center",
         borderRadius: ROUNDED_BORDER_RADIUS,
         border: (theme: Theme) => `4px solid ${ iconColor(theme) }`,
-        ...sx
+        ...sx,
       }}>
 
       <Icon sx={{ fontSize: 40, color: (theme: Theme) => iconColor(theme) }} />

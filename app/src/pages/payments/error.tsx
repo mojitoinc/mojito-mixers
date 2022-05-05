@@ -44,7 +44,7 @@ const ErrorPage: NextPage = () => {
       errorImageSrc=""
       onGoTo={ onGoTo } />
   );
-}
+};
 
 export default ErrorPage;
 

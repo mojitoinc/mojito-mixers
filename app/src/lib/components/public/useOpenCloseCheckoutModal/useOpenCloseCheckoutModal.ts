@@ -45,7 +45,7 @@ export function useOpenCloseCheckoutModal({
       loaderMode: initialLoaderMode,
       isOpen: true,
     });
-  }, [initialLoaderMode])
+  }, [initialLoaderMode]);
 
   const onOpen = useCallback(() => {
     setState(({ loaderMode }) => ({ loaderMode, isOpen: true }));

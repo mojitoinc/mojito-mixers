@@ -11,7 +11,7 @@ export const Number: React.FC<NumberProps> = ({
   as: Wrapper = "span",
   children,
   prefix = "",
-  suffix = ""
+  suffix = "",
 }) => {
   const numberFormat = new Intl.NumberFormat("en-US", {
     minimumFractionDigits: 2,

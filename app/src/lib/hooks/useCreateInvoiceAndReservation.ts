@@ -53,7 +53,7 @@ export function useCreateInvoiceAndReservation({
       console.log(
         firstCheckoutItem
           ? `\n🎫 Making reservation / creating invoice for ${ units } × ${ lotType } lot${ units > 1 ? "s" : "" } ${ lotID } (orgID = ${ orgID })...\n`
-          : `\n🎫 Aborting reservation / creating invoice for unknown lot (orgID = ${ orgID })...\n`
+          : `\n🎫 Aborting reservation / creating invoice for unknown lot (orgID = ${ orgID })...\n`,
       );
     }
 

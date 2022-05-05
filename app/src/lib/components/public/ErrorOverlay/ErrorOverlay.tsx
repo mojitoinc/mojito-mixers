@@ -76,6 +76,6 @@ export const PUIErrorOverlay: React.FC<PUIErrorOverlayProps> = ({
       onFixError={ reviewData }
       onClose={ toMarketplace } />
   );
-}
+};
 
 export const PUIError: React.FC<PUIErrorProps> = withProviders(PUIErrorOverlay);

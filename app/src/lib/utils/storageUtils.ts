@@ -89,7 +89,7 @@ function getCookies(): Record<string, string> {
   return Object.fromEntries(
     document.cookie.split("; ").map((cookie) => {
       return cookie.split("=");
-    })
+    }),
   );
 }
 
@@ -166,7 +166,7 @@ export class ProxyStorage {
    * If noParse is true then the value retrieved is not parsed with JSON.parse.
    */
   getItem(key: string | RegExp, options: CookieOptions = {}) {
-    return getCookie(key, options)
+    return getCookie(key, options);
   }
 
   /**

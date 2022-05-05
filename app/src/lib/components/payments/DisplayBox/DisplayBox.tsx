@@ -18,4 +18,4 @@ export const DisplayBox: React.FC<BoxProps> = ({
   return (
     <Box { ...props } sx={{ ...DISPLAY_BOX_SX, ...sx }} />
   );
-}
+};

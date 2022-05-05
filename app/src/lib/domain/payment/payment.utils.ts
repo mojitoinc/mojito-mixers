@@ -41,7 +41,7 @@ export function getCvvIsValid(cvv = "", network: "" | CreditCardNetwork = "", ne
 
   const cvvLength = cvv.length;
 
-  let cvvExpectedLength: 3 | 4 | "3 or 4" = "3 or 4"
+  let cvvExpectedLength: 3 | 4 | "3 or 4" = "3 or 4";
 
   if ((!network && networks.length > 0 && !networks.includes("amex")) || network !== "amex") {
     cvvExpectedLength = 3;

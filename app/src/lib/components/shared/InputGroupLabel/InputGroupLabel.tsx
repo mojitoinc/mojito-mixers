@@ -13,11 +13,11 @@ export const InputGroupLabel: React.FC<TypographyProps> = ({
       (theme: Theme) => ({
         fontWeight: "bold",
         color: theme.palette.grey["700"],
-        mt: 1.5
+        mt: 1.5,
       }),
       sx as
         | SystemStyleObject<Theme>
-        | ((theme: Theme) => SystemStyleObject<Theme>)
+        | ((theme: Theme) => SystemStyleObject<Theme>),
     ] }
     { ...props } />
 );

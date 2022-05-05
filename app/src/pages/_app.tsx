@@ -42,7 +42,7 @@ const MyApp: React.FC<AppProps> = ({ Component, pageProps }) => {
       </AuthorizedApolloProvider>
     </Auth0Provider>
   );
-}
+};
 
 /*
 MyApp.getInitialProps = async (appContext: AppContext) => {

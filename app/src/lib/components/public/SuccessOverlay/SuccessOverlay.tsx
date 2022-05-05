@@ -39,6 +39,6 @@ export const PUISuccessOverlay: React.FC<PUISuccessOverlayProps> = ({
   }, THREEDS_SUCCESS_REDIRECT_DELAY_MS);
 
   return <PUIStaticSuccessOverlay { ...staticSuccessOverlayProps } />;
-}
+};
 
 export const PUISuccess: React.FC<PUISuccessProps> = withThemeProvider(PUISuccessOverlay);

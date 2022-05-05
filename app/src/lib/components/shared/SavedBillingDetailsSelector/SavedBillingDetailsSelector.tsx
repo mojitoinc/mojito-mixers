@@ -1,4 +1,4 @@
-import AddIcon from '@mui/icons-material/Add';
+import AddIcon from "@mui/icons-material/Add";
 import React, { useCallback } from "react";
 import { alpha, Box, CircularProgress } from "@mui/material";
 import { InputGroupLabel } from "../InputGroupLabel/InputGroupLabel";
@@ -98,4 +98,4 @@ export const SavedBillingDetailsSelector: React.FC<SavedBillingDetailsSelectorPr
         onCloseClicked={ onClose } />
     </>
   );
-}
+};

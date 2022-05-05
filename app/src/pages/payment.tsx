@@ -12,6 +12,6 @@ const Payment: React.FC = () => {
       <PaymentMemoized />
     </ProtectedPageContainer>
   );
-}
+};
 
 export default Payment;

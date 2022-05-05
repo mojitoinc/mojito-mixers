@@ -31,7 +31,7 @@ module.exports = {
   ],
 
   settings: {
-    "import/parsers": { "@typescript-eslint/parser": [".ts", ".tsx"], },
+    "import/parsers": { "@typescript-eslint/parser": [".ts", ".tsx"] },
 
     "import/resolver": {
       typescript: {
@@ -41,12 +41,10 @@ module.exports = {
     },
   },
 
-  // exhaustive props
-  // rules-of-hook
-  // How to find out if rules enabled.
-
-  // See Nubble to fix individual rules (doesn't seem to work properly right now, thought):
+  // To fix individual rules, see Nubble (doesn't seem to work properly right now, thought):
   // https://github.com/IanVS/eslint-nibble
+
+  // Otherwise, you can do it with this command by writing the rule and params inline:
   // ./node_modules/.bin/eslint --no-eslintrc --fix --rule 'semi: [2]'
 
   rules: {
@@ -55,7 +53,7 @@ module.exports = {
     "array-element-newline": [2, "consistent"],
     "arrow-body-style": 0,
     "arrow-parens": [2, "as-needed", { requireForBlockBody: true }],
-    "comma-dangle": TEMPORARILY_DISABLED,
+    "comma-dangle": 2,
     "default-param-last": 0,
     "function-paren-newline": [2, "consistent"],
     "max-len": [2, { code: 160, ignorePattern: "^(import|export) .*", ignoreRegExpLiterals: true, ignoreStrings: true }],
@@ -71,8 +69,8 @@ module.exports = {
     "object-curly-newline": [2, { multiline: true, consistent: true }],
     "operator-linebreak": [2, "after", { overrides: { "?": "before", ":": "before" } }],
     "quote-props": [2, "as-needed"],
-    "quotes": [TEMPORARILY_DISABLED, "double"],
-    "semi": TEMPORARILY_DISABLED,
+    "quotes": [2, "double"],
+    "semi": 2,
     "template-curly-spacing": [2, "always"],
 
 
@@ -83,6 +81,7 @@ module.exports = {
     "import/no-extraneous-dependencies": ["error", { devDependencies: ["**/*.test.ts", "**/*.test.tsx"] }],
     "import/no-unresolved": 2,
     "import/prefer-default-export": 0,
+
 
     // eslint-plugin-react:
 
@@ -126,6 +125,7 @@ module.exports = {
     "@typescript-eslint/explicit-module-boundary-types": TEMPORARILY_DISABLED,
     "@typescript-eslint/no-explicit-any": TEMPORARILY_DISABLED,
     "@typescript-eslint/no-shadow": 2,
+
 
     // next/recommended:
 

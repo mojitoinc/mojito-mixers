@@ -29,4 +29,4 @@ export const ProtectedPageContainer: React.FC<ProtectedPageContainer> = ({
   }
 
   return <>{ children }</>;
-}
+};

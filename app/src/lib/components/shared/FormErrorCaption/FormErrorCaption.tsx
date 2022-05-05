@@ -12,4 +12,4 @@ export const FormErrorsCaption: React.FC<FormErrorsCaptionProps> = ({
       { children }
     </Typography>
   );
-}
+};

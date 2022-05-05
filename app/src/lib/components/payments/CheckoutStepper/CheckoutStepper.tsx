@@ -52,4 +52,4 @@ export const CheckoutStepper: React.FC<CheckoutStepperProps> = ({
 
     </Box>
   );
-}
+};

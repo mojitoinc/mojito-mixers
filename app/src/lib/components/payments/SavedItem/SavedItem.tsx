@@ -52,7 +52,7 @@ const DISPLAY_BOX_SX: SxProps<Theme> = {
   display: "flex",
   flexDirection: {
     xs: "column",
-    sm: "row"
+    sm: "row",
   },
 };
 

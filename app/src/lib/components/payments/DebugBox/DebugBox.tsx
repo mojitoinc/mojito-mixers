@@ -60,4 +60,4 @@ export const DebugBox: React.FC<DebugBoxProps> = ({
       <Box component="pre" sx={ compact ? DEBUG_BOX_INNER_COMPACT_SX : DEBUG_BOX_INNER_SCROLL_SX }>{ children }</Box>
     </Box>
   );
-}
+};

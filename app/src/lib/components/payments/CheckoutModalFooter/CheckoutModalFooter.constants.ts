@@ -1,6 +1,6 @@
 import { SvgIcon } from "@mui/material";
-import LockIcon from '@mui/icons-material/Lock';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import LockIcon from "@mui/icons-material/Lock";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { CheckoutModalFooterVariant } from "./CheckoutModalFooter";
 
 export const LABELS_BY_VARIANT: Record<CheckoutModalFooterVariant, string> = {

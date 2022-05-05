@@ -24,4 +24,4 @@ export const FormErrorsBox: React.FC<FormErrorsBoxProps> = ({
       </Box>
     </Box>
   );
-}
+};

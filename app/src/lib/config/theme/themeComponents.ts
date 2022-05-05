@@ -35,8 +35,8 @@ export function createComponentsTheme({ typography, palette, spacing, breakpoint
           "&.Mui-error": {
             color: palette.warning.dark,
           },
-        }
-      }
+        },
+      },
     },
 
     // INPUTS:
@@ -193,8 +193,8 @@ export function createComponentsTheme({ typography, palette, spacing, breakpoint
           minWidth: "30px",
 
           "& svg": {
-            fontSize: "18px"
-          }
+            fontSize: "18px",
+          },
         },
         sizeMedium: {
           minHeight: "40px",
@@ -202,8 +202,8 @@ export function createComponentsTheme({ typography, palette, spacing, breakpoint
           minWidth: "40px",
 
           "& svg": {
-            fontSize: "24px"
-          }
+            fontSize: "24px",
+          },
         },
         containedPrimary: {
           background: palette.paymentUI?.mainButtonBackground || palette.primary.main,
@@ -267,7 +267,7 @@ export function createComponentsTheme({ typography, palette, spacing, breakpoint
             background: palette.grey["100"],
           },
         },
-      }
+      },
     },
 
     MuiToggleButtonGroup: {

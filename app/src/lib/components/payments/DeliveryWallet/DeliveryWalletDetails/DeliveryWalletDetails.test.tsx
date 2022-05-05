@@ -28,5 +28,5 @@ describe("DeliveryWalletDetails", () => {
 
     expect(screen.getByDisplayValue(walletAddress)).toBeInTheDocument();
     expect(screen.queryByText("Copied", { exact: false })).toBeInTheDocument();
-  })
-})
+  });
+});
