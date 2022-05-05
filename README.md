@@ -705,15 +705,11 @@ While this project will be installed as a dependency in other apps, it also prov
     
 3. Access the project at [http://localhost:3000](http://localhost:3000).
 
-4.  Before committing, be sure to run:
+4.  Before committing, be sure to fix all linting errors:
 
     ```bash
-    yarn lint
+    yarn lint:fix
     ```
-
-    There is also `yarn lint:fix` which can automatically fix some lint issues.
-
-    Do not run `yarn deprecated:prettier`, that will be either updated or removed from the project later.
 
 <br />
 

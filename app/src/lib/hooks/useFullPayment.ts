@@ -168,7 +168,7 @@ export function useFullPayment({
       destinationAddress = filterSpecialWalletAddressValues(wallet);
     }
 
-    const metadata: Partial<CreatePaymentMetadataInput> = destinationAddress ? { destinationAddress } : { };
+    const metadata: CreatePaymentMetadataInput = destinationAddress ? { destinationAddress } : { };
 
     if (cvv) {
       const encryptCardDataResult = await encryptCardData({
@@ -199,7 +199,7 @@ export function useFullPayment({
       variables: {
         paymentMethodID,
         invoiceID,
-        metadata: Object.keys(metadata).length > 0 ? (metadata as CreatePaymentMetadataInput) : undefined,
+        metadata,
       },
     }).catch((error: ApolloError | Error) => {
       mutationError = error;
