@@ -170,36 +170,25 @@ this example) to customize and open the Payment UI like this:
 
 ```
 
-**Make sure you check the setup steps below for Vertex, 3DS and Plaid.**
+**Make sure you check the setup steps below for Vertex/TaxJar, Circle, 3DS and Plaid.**
 
 <br />
 
+ 
+### Address Validation & Tax Calculation with Vertex or TaxJar
 
-### Supported Countries
-
-We use Circle for payments, so the supported countries depend on which payment method is going to be used, as described here:
-
-https://developers.circle.com/docs/supported-countries
-
-We use the following script to compile the list of excluded countries:
-
-[app/src/lib/hooks/useCountryOptionsBlacklistScript.js](https://github.com/mojitoinc/mojito-mixers/blob/main/app/src/lib/hooks/useCountryOptionsBlacklistScript.js)
-
-<br />
-
-
-### Address Validation & Tax Calculation with Vertex
-
-Id you'd like address to be validated and taxes to be calculated during the checkout process, particularly in the Billing
-Information step, you need a Vertex account.
+If you'd like address to be validated and taxes to be calculated during the checkout process, particularly in the Billing
+Information step, you need a Vertex or TaxJar account. Once you have it, you need to configure it in Mojito Mint.
 
 Alternatively, set the following prop to disable those calls to the backend: `vertexEnabled = false`.
-
+  
 <br />
+  
 
+### Credit Card payments with Circle & 3DS
 
-### Credit Card payments with 3DS
-
+We use Circle to process credit card payments and 3DS on top of that for fraud detection.
+  
 When using 3DS for Credit Card payments you need to add a success and error page into your app. The URL can
 be anything you want as long as you configure that in your 3DS account. In this repo, those pages are:
 
@@ -212,11 +201,11 @@ You can just copy-paste those into your project as a starting point, only minor 
 most of the logic in those pages is already provided by this library in your custom `CheckoutComponent` component or in
 [`PUIError`](https://github.com/mojitoinc/mojito-mixers/blob/main/app/src/lib/components/public/ErrorOverlay/ErrorOverlay.tsx).
 
-If you don't have a 3DS account and just want to disable that step, you can do that passing `threeDSEnabled={ false }` to `PUICheckout`.
+If you don't have a 3DS account and want to disable fraud detection, you can do that passing `threeDSEnabled={ false }` to `PUICheckout`.
 
 <br />
-
-
+  
+  
 ### ACH payments with Plaid: 
 
 Additionally, when using Plaid for ACH payments you need to add an `/oauth` page with the following content:
@@ -225,7 +214,20 @@ Additionally, when using Plaid for ACH payments you need to add an `/oauth` page
 
 <br />
 
+  
+### Supported Countries
 
+We use Circle for payments, so the supported countries depend on which payment method is going to be used, as described here:
+
+- https://developers.circle.com/docs/supported-countries
+
+We use the following script to compile the list of excluded countries:
+
+- [app/src/lib/hooks/useCountryOptionsBlacklistScript.js](https://github.com/mojitoinc/mojito-mixers/blob/main/app/src/lib/hooks/useCountryOptionsBlacklistScript.js)
+
+<br />
+  
+  
 ### Theming 
 
 You can use the `themeOptions` or `theme` props to pass a custom theme or theme options object:
