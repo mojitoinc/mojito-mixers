@@ -62,7 +62,7 @@ module.exports = {
     "no-mixed-operators": [2, { allowSamePrecedence: true }],
     "no-multi-assign": 0,
     "no-multiple-empty-lines": [2, { max: 2, maxBOF: 0, maxEOF: 0 }],
-    "no-nested-ternary": TEMPORARILY_DISABLED,
+    "no-nested-ternary": 0,
     "no-param-reassign": [2, { props: true, ignorePropertyModificationsForRegex: ["Acc$"] }],
     "no-prototype-builtins": 0,
     "no-shadow": 0,
@@ -122,7 +122,7 @@ module.exports = {
 
     // typescript-eslint:
 
-    "@typescript-eslint/explicit-module-boundary-types": TEMPORARILY_DISABLED,
+    "@typescript-eslint/explicit-module-boundary-types": 0,
     "@typescript-eslint/no-explicit-any": TEMPORARILY_DISABLED,
     "@typescript-eslint/no-shadow": 2,
 
