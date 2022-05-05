@@ -1,8 +1,8 @@
-import { useCallback, useState } from "react";
+import React, { useCallback, useState } from "react";
+import { ToggleButton, ToggleButtonGroup } from "@mui/material";
 import { CreatePayment } from "./CreatePayment";
 import { Invoices } from "./Invoices";
 import { ChargeCard } from "./ChargeCard";
-import { ToggleButton, ToggleButtonGroup } from "@mui/material";
 
 interface NavMenuProps {
   activeTab: string;
@@ -18,7 +18,7 @@ const NavMenu: React.FC<NavMenuProps> = ({
   }, [setMenuTab]);
 
   return (
-    <ToggleButtonGroup exclusive value={activeTab} onChange={handleChange}>
+    <ToggleButtonGroup exclusive value={ activeTab } onChange={ handleChange }>
 
       <ToggleButton value="create">
         1. Create Payment Method
@@ -39,8 +39,9 @@ const NavMenu: React.FC<NavMenuProps> = ({
 export const PaymentView: React.FC = () => {
   const [menuTab, setMenuTab] = useState("create");
 
-  return (<>
-      <NavMenu setMenuTab={setMenuTab} activeTab={menuTab} />
+  return (
+    <>
+      <NavMenu setMenuTab={ setMenuTab } activeTab={ menuTab } />
 
       { menuTab === "create" ? (
         <CreatePayment />
@@ -49,5 +50,6 @@ export const PaymentView: React.FC = () => {
       ) : (
         <Invoices />
       ) }
-  </>);
+    </>
+  );
 };

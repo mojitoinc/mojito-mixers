@@ -78,7 +78,7 @@ module.exports = {
 
     "import/extensions": 0,
     "import/no-cycle": TEMPORARILY_DISABLED,
-    "import/no-extraneous-dependencies": ["error", { devDependencies: ["**/*.test.ts", "**/*.test.tsx"] }],
+    "import/no-extraneous-dependencies": ["error", { devDependencies: ["**/*.test.ts", "**/*.test.tsx", "jest.setup.ts"] }],
     "import/no-unresolved": 2,
     "import/prefer-default-export": 0,
 

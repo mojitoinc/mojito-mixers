@@ -180,7 +180,7 @@ export function useCheckoutModalState({
       invoiceID: parentInvoiceID || (checkoutModalState.invoiceID || ""),
       invoiceCountdownStart: parentInvoiceID ? Date.now() : (checkoutModalState.invoiceCountdownStart || null),
       taxes: vertexEnabled ? { status: "incomplete" } : null,
-      wallet: null, // Wallet is added from invoice: `setWalletAddress(wallet || destinationAddress)`
+      wallet: null, // Wallet is added from invoice: `setWalletAddress(nextWallet || destinationAddress)`
       processorPaymentID: checkoutModalState.processorPaymentID || "",
       paymentID: checkoutModalState.paymentID || "",
     });
