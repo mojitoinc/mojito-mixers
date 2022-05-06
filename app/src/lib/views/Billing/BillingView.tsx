@@ -274,7 +274,7 @@ export const BillingView: React.FC<BillingViewProps> = ({
             consentType={ consentType === "checkbox" ? undefined : consentType } />
         ) : (
           <BillingInfoForm
-              // variant="loggedIn"
+            // variant="loggedIn"
             defaultValues={ typeof selectedBillingInfo === "string" ? undefined : selectedBillingInfo }
             checkoutError={ checkoutError }
             taxes={ taxes }

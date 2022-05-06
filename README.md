@@ -755,7 +755,7 @@ This builds the library using the Rollup setup at the root of the project and th
 <br />
 
 
-## GraphQL Codegen
+### GraphQL Codegen
 
 Automatically generated types and hooks from the Mojito GraphQL API:
 
@@ -775,3 +775,84 @@ them. If, for example, the query is called `Organization`, then the auto-generat
 
 <br />
 
+
+## Payment Flows
+
+If you are just using this project as reference to implement your own checkout flow, these are the main flows must implement
+as described here.
+
+Note this is pseud-code, so params and return values might not match. The name of the queries/mutations does match, though.
+
+<br />
+
+
+### Credit Card
+
+- `{ invoiceID } = reserveBuyNowLot({ units, lotID })`
+
+- `{ verifiedAddress, taxes } = getTaxQuote({ address })`
+
+  If Vertex/TaxJar is enabled, verify that the selected address is valid and display appropriate taxes.
+
+- `{ remainingLimits } = validatePaymentLimit({ collectionId, itemsCount })`
+
+  Verify that the selected payment method can be used to buy the selected units.
+
+- `{ paymentMethodID } = createPaymentMethod({ orgID, creditCardData })`
+
+  Needs key from `getPaymentPublicKey` to encrypt part of the credit card data. See [`app/src/lib/utils/encryptionUtils.ts`](app/src/lib/utils/encryptionUtils.ts).
+  
+- `{ paymentID, processorPaymentID } = createPayment({ invoiceID, paymentMethodID })`
+
+  Needs key from `getPaymentPublicKey` to encrypt part of the credit card data. See [`app/src/lib/utils/encryptionUtils.ts`](app/src/lib/utils/encryptionUtils.ts).
+
+- `{ redirectURL } = getPaymentNotificationQuery()`
+
+  If 3DS is enabled, poll until it returns a `redirectURL`.
+  
+  Persist the purchase data with `persistCheckoutModalInfo()` and redirect the user there.
+
+- User sees the 3DS page and might have to enter some additional details there.
+
+- 3DS redirects the user to either `/payments/success` or `/payments/error`.
+
+- In the former (success), the purchase data is loaded using `getCheckoutModalState()` and the `ConfirmationView` is
+  presented to the user (while still in `/payments/success`).
+
+- In the later (error), we try to load the error details using `getPaymentNotification()`. Users can then click a button
+  that takes them back to the product page, which will NOT create a new invoice/reservation. The same process will be 
+  resumed and they'll be able to update the information and try again.
+
+<br />
+
+
+### ACH
+
+- `{ invoiceID } = reserveBuyNowLot({ units, lotID })`
+
+- `{ verifiedAddress, taxes } = getTaxQuote({ address })`
+
+  If Vertex/TaxJar is enabled, verify that the selected address is valid and display appropriate taxes.
+
+- `{ linkToken } = preparePaymentMethod(paymentMethodType: ACH, orgID: $orgID)`
+
+- `{ remainingLimits } = validatePaymentLimit({ collectionId, itemsCount })`
+
+  Verify that the selected payment method can be used to buy the selected units.
+
+- If the limits are fine, the user will be able to click the `Purchase with Plaid` button, which takes them to `linkToken`.
+
+- Once in Plaid's page, users will be able to connect their account, and they'll be redirect to `/oauth`.
+
+- From there, we'll redirect them back to the product page.
+
+- Once in the product page, the purchase data is loaded using `getCheckoutModalState()` and the `PurchasingView` is
+  presented to the user (the payment will happen automatically, no additional interaction needed).
+
+- `{ paymentMethodID } = createPaymentMethod({ orgID, achData })`
+  
+- `{ paymentID, processorPaymentID } = createPayment({ invoiceID, paymentMethodID })`
+
+- Users see the `ConfirmationView`.
+
+<br />
