@@ -20,7 +20,7 @@ import { RawSavedPaymentMethod, SavedPaymentMethod } from "../../../domain/circl
 import { continuePlaidOAuthFlow, PlaidFlow } from "../../../hooks/usePlaid";
 import { ConsentType } from "../../shared/ConsentText/ConsentText";
 import { CheckoutModalError, CheckoutModalStepIndex, useCheckoutModalState } from "./CheckoutOverlay.hooks";
-import { DEFAULT_ERROR_AT, ERROR_LOADING_INVOICE, ERROR_LOADING_PAYMENT_METHODS, ERROR_LOADING_USER } from "../../../domain/errors/errors.constants";
+import { ERROR_LOADING_INVOICE, ERROR_LOADING_PAYMENT_METHODS, ERROR_LOADING_USER } from "../../../domain/errors/errors.constants";
 import { FullScreenOverlay } from "../../shared/FullScreenOverlay/FullScreenOverlay";
 import { ProvidersInjectorProps, withProviders } from "../../shared/ProvidersInjector/ProvidersInjector";
 import { transformCheckoutItemsFromInvoice } from "../../../domain/product/product.utils";
@@ -719,7 +719,9 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   const handleFixError = useCallback(async (): Promise<false> => {
     const at = checkoutError?.at;
 
-    if (at === "reset") {
+    if (at === "close") {
+      handleClose();
+    } else if (at === "reset") {
       await Promise.allSettled([
         meRefetch(),
         refetchPaymentMethods().catch(() => { /* TODO: Handle this error properly. */ }),
@@ -743,14 +745,14 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
         setSelectedPaymentMethod(prevSelectedPaymentMethod => ({ ...prevSelectedPaymentMethod, cvv: "" }));
       }
 
-      goTo(at || DEFAULT_ERROR_AT, checkoutError);
+      goTo(at, checkoutError);
     }
 
     // This function is used as a CheckoutModalFooter's onSubmitClicked, so we want that to show a loader on the submit
     // button when clicked but do not remove it once the Promise is resolved, as we are moving to another view and
     // CheckoutModalFooter will unmount (so doing this prevents a memory leak issue):
     return false;
-  }, [checkoutError, goTo, createInvoiceAndReservation, meRefetch, refetchPaymentMethods, refetchInvoiceDetails, setSelectedPaymentMethod]);
+  }, [checkoutError, handleClose, meRefetch, refetchPaymentMethods, createInvoiceAndReservation, goTo, refetchInvoiceDetails, setSelectedPaymentMethod]);
 
 
   // Plaid integration (resume Plaid flow):

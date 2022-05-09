@@ -23,6 +23,7 @@ export interface UseFullPaymentOptions {
 
 export interface FullPaymentState {
   paymentStatus: PaymentStatus;
+  paymentMethodID: string;
   processorPaymentID: string;
   paymentID: string;
   paymentError?: string | CheckoutModalError;
@@ -38,6 +39,7 @@ export function useFullPayment({
 }: UseFullPaymentOptions): [FullPaymentState, () => Promise<void>] {
   const [paymentState, setPaymentState] = useState<FullPaymentState>({
     paymentStatus: "processing",
+    paymentMethodID: "",
     processorPaymentID: "",
     paymentID: "",
   });
@@ -45,6 +47,7 @@ export function useFullPayment({
   const setError = useCallback((paymentError: string | CheckoutModalError) => {
     setPaymentState({
       paymentStatus: "error",
+      paymentMethodID: "",
       processorPaymentID: "",
       paymentID: "",
       paymentError,
@@ -91,6 +94,7 @@ export function useFullPayment({
 
     setPaymentState({
       paymentStatus: "processing",
+      paymentMethodID: "",
       processorPaymentID: "",
       paymentID: "",
     });
@@ -224,6 +228,7 @@ export function useFullPayment({
 
     setPaymentState({
       paymentStatus: "processed",
+      paymentMethodID,
       processorPaymentID,
       paymentID,
     });

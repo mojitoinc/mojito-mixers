@@ -13,8 +13,7 @@ import { resetStepperProgress } from "../../payments/CheckoutStepper/CheckoutSte
 import { CheckoutModalStateCombined } from "./CheckoutOverlay.types";
 import { getCheckoutModalState } from "./CheckoutOverlay.utils";
 
-// TODO: Add a "close" value here:
-export type CheckoutModalErrorAt = "reset" | "authentication" | "billing" | "payment" | "purchasing";
+export type CheckoutModalErrorAt = "close" | "reset" | "authentication" | "billing" | "payment" | "purchasing";
 
 export interface CheckoutModalError {
   at?: CheckoutModalErrorAt;

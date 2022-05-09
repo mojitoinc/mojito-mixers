@@ -12,11 +12,12 @@ import { DEV_EXCEPTION_PREFIX } from "../../domain/errors/exceptions.constants";
 import { ASYNC_ERROR_MAX_WAIT_MS } from "../../config/config";
 
 const ERROR_ACTION_LABELS: Record<CheckoutModalErrorAt, string> = {
+  close: "Close",
   reset: "Try Again",
   authentication: "Review Information",
   billing: "Review Billing Information",
   payment: "Review Payment Information",
-  purchasing: "Try Again",
+  purchasing: "Retry Payment",
 };
 
 export interface ErrorViewProps {

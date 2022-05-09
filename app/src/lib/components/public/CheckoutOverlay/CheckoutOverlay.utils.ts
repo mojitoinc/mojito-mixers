@@ -21,6 +21,8 @@ export function persistCheckoutModalInfo(info: CheckoutModalInfo) {
   try {
     const url = info.url || getUrlWithoutParams();
 
+    console.log("isCheckoutModalInfo3DS(info) =", isCheckoutModalInfo3DS(info));
+
     // Multiple cookies for different 3DS payments can co-exist for a brief time. Plaid ones can't, as they share the same key:
     cookieStorage.setItem(CHECKOUT_MODAL_INFO_KEY(isCheckoutModalInfo3DS(info) ? info.processorPaymentID : CHECKOUT_MODAL_INFO_KEY_PLAID_SUFFIX), {
       ...info,

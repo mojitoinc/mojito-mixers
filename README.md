@@ -284,6 +284,7 @@ Error, exception and validation messages in the Payment UI are displayed in the 
 and have a configurable button text and action (what the button does or where it takes users when clicking it). Particularly,
 those actions are:
 
+- `close`: Closes the payment modal.
 - `reset`: Re-creates the reservation/invoice.
 - `authentication`: Takes users to the authentication view (currently not used).
 - `billing`: Takes users to the billing view/form.
@@ -299,47 +300,51 @@ Defined in [`app/src/lib/domain/errors/errors.constants.ts`](https://github.com/
 
 - `ERROR_GENERIC = ` An unexpected error happened.
 
-  `action = payment`
+  `action = close`
 
 - `ERROR_LOADING = ` Loading error details...
 
-  `action = none`
+  `action = close`
+
+- `ERROR_LOADING_TIMEOUT = ` The purchase could not be completed.
+
+  `action = payment`
 
 - `ERROR_LOADING_USER = ` User could not be loaded.
 
-  `action = billing`
+  `action = reset`
 
 - `ERROR_LOADING_PAYMENT_METHODS = ` Payment methods could not be loaded.
 
-  `action = billing`
+  `action = reset`
 
 - `ERROR_LOADING_INVOICE = ` Invoice could not be loaded.
 
-  `action = billing`
+  `action = reset`
 
-- `ERROR_PURCHASE = ` The purchase could not be completed.
+- `ERROR_INVOICE_TIMEOUT = ` Your product reservation expired. Please, try to complete the purchase again in time.
 
-  `action = payment`
+  `action = reset`
 
 - `ERROR_PURCHASE_TIMEOUT = ` The purchase could not be completed in time.
 
-  `action = payment`
+  `action = purchasing`
 
 - `ERROR_PURCHASE_NO_ITEMS = ` No items to purchase.
 
-  `action = payment`
+  `action = close`
 
 - `ERROR_PURCHASE_NO_UNITS = ` No units to purchase.
 
-  `action = payment`
+  `action = close`
 
 - `ERROR_PURCHASE_LOADING_ITEMS = ` Purchase items could not be loaded.
 
-  `action = payment`
+  `action = close`
 
 - `ERROR_PURCHASE_SELECTED_PAYMENT_METHOD = ` Could not find the selected payment method.
 
-  `action = payment`
+  `action = reset`
 
 - `ERROR_PURCHASE_CREATING_PAYMENT_METHOD = ` Payment method could not be saved.
 
@@ -355,15 +360,7 @@ Defined in [`app/src/lib/domain/errors/errors.constants.ts`](https://github.com/
 
 - `ERROR_PURCHASE_PAYING = ` Payment failed.
 
-  `action = payment`
-
-- `ERROR_PURCHASE_3DS = ` Payment method could not be verified.
-
-  `action = payment`
-
-- `ERROR_INVOICE_TIMEOUT = ` Your product reservation expired. Please, try to complete the purchase again in time.
-
-  `action = reset`
+  `action = purchasing`
 
 <br />
 
@@ -371,11 +368,11 @@ Additionally, there are some backend errors that are mapped to frontend ones:
 
 - `lot auction not started = ` The auction has not started yet.
 
-  `action = reset`
+  `action = close`
 
 - `payment limit exceeded = ` You have already bought the maximum number of NFTs allowed for this sale.
 
-  `action = reset`
+  `action = close`
 
 - `name should contains first and last name = ` Full Name must have at least first and last name.
 
