@@ -124,7 +124,7 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
   }, [fullPayment]);
 
   useEffect(() => {
-    const { paymentStatus, processorPaymentID, paymentID, paymentError } = fullPaymentState;
+    const { paymentStatus, paymentMethodID, processorPaymentID, paymentID, paymentError } = fullPaymentState;
 
     if (paymentStatus === "processing") {
       onDialogBlocked(true);
@@ -152,7 +152,7 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
         processorPaymentID,
         paymentID,
         billingInfo,
-        paymentInfo: typeof paymentInfo === "string" ? paymentInfo : null,
+        paymentInfo: typeof paymentInfo === "string" ? paymentInfo : paymentMethodID,
         checkoutItems,
       });
     }

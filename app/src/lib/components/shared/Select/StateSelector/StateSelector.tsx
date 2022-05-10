@@ -18,36 +18,30 @@ export const StateSelector: React.FC<StateSelectorProps> = ({
   countryCode,
   ...props
 }) => {
-  const initRef = useRef(false);
+  const optionFromCountryRef = useRef<string | number>(countryCode);
 
   const { options, optionsMap } = useCountryOptions(countryCode);
 
   const handleChange = useCallback((e: SelectChangeEvent<string | number>) => {
+    optionFromCountryRef.current = countryCode;
+
     onSelectState(optionsMap[e.target.value]);
-  }, [optionsMap, onSelectState]);
+  }, [countryCode, optionsMap, onSelectState]);
 
   const isDisabled = disabled || !countryCode || options.length === 0;
 
-  // If the selected country code changes, we reset the field. Note the useEffect below might not do that, as two
-  // different countries might have states with the same code (eg. Andorra and Anguilla):
-  useEffect(() => {
-    if (!initRef.current) {
-      initRef.current = true;
-
-      return;
-    }
-
-    onSelectState(EMPTY_OPTION);
-  }, [countryCode, onSelectState]);
-
-  // If the selected option can't be found among the available ones, we reset the field:
+  // If the selected option can't be found among the available ones, or if the selected country code changes, we reset
+  // the field (note the optionFromCountryRef takes care of handling states of different countries that have the same
+  // code, such as Andorra and Anguilla):
   useEffect(() => {
     const stateCode = value.value;
 
     if (isDisabled || !stateCode) return;
 
-    if (!optionsMap[stateCode]) onSelectState(EMPTY_OPTION);
-  }, [value, isDisabled, optionsMap, onSelectState]);
+    const optionFromCountry = optionFromCountryRef.current;
+
+    if (!optionsMap[stateCode] || (optionFromCountry && optionFromCountry !== countryCode)) onSelectState(EMPTY_OPTION);
+  }, [value, isDisabled, optionsMap, onSelectState, countryCode]);
 
   // If the selected option only has one property set, we try to find a match:
   useEffect(() => {
@@ -55,11 +49,13 @@ export const StateSelector: React.FC<StateSelectorProps> = ({
 
     if ((selectedValue && selectedLabel) || (!selectedValue && !selectedLabel) || options.length === 0) return;
 
-    const option = selectedValue
-      ? optionsMap[selectedValue]
-      : options.find(opt => opt.label === selectedLabel);
+    const option = (
+      selectedValue
+        ? optionsMap[selectedValue]
+        : options.find(opt => opt.label === selectedLabel)
+    ) || EMPTY_OPTION;
 
-    setTimeout(() => onSelectState(option || EMPTY_OPTION));
+    onSelectState(optionFromCountryRef.current === countryCode ? option : EMPTY_OPTION);
   }, [value, optionsMap, options, onSelectState, countryCode]);
 
   const selectedValue = value.value;
@@ -68,7 +64,7 @@ export const StateSelector: React.FC<StateSelectorProps> = ({
     <Select
       { ...props }
       // See https://developers.google.com/web/updates/2015/06/checkout-faster-with-autofill:
-      autoComplete={ props.autoComplete || "state" }
+      autoComplete={ props.autoComplete || "region" }
       label={ label }
       options={ options }
       onChange={ handleChange }

@@ -51,7 +51,7 @@ export const CountrySelector: React.FC<CountrySelectorProps> = ({
   return (
     <Select
       { ...props }
-      // See https://developers.google.com/web/updates/2015/06/checkout-faster-with-autofill:
+      // See https://developers.google.com/web/updates/2015/06/checkout-faster-with-autofill
       autoComplete={ props.autoComplete || "country" }
       label={ label }
       options={ options }

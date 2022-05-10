@@ -1,7 +1,7 @@
 import { useTimeout } from "@swyg/corre";
 import React, { useCallback, useLayoutEffect, useState, useEffect } from "react";
 import { PAYMENT_NOTIFICATION_ERROR_MAX_WAIT_MS, PAYMENT_NOTIFICATION_INTERVAL_MS, THREEDS_FLOW_SEARCH_PARAM_ERROR_KEY } from "../../../config/config";
-import { ERROR_PURCHASE } from "../../../domain/errors/errors.constants";
+import { ERROR_LOADING_TIMEOUT } from "../../../domain/errors/errors.constants";
 import { PUIRouterOptions } from "../../../domain/router/router.types";
 import { isUrlPathname } from "../../../domain/url/url.utils";
 import { useGetPaymentNotificationQuery } from "../../../queries/graphqlGenerated";
@@ -33,7 +33,7 @@ export const PUIErrorOverlay: React.FC<PUIErrorOverlayProps> = ({
   }, [error]);
 
   useTimeout(() => {
-    setErrorMessage(prevErrorMessage => prevErrorMessage || ERROR_PURCHASE.errorMessage);
+    setErrorMessage(prevErrorMessage => prevErrorMessage || ERROR_LOADING_TIMEOUT.errorMessage);
   }, PAYMENT_NOTIFICATION_ERROR_MAX_WAIT_MS);
 
   // TODO: Remove this from render body:
