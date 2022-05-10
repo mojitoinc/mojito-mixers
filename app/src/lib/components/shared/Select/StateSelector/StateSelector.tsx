@@ -55,11 +55,7 @@ export const StateSelector: React.FC<StateSelectorProps> = ({
         : options.find(opt => opt.label === selectedLabel)
     ) || EMPTY_OPTION;
 
-    console.log(optionFromCountryRef.current === countryCode ? "NOOP 2" : "RESET 2");
-
     onSelectState(optionFromCountryRef.current === countryCode ? option : EMPTY_OPTION);
-
-    // setTimeout(() => onSelectState(option || EMPTY_OPTION));
   }, [value, optionsMap, options, onSelectState, countryCode]);
 
   const selectedValue = value.value;
