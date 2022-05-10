@@ -1,9 +1,8 @@
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { object, string } from "yup";
-
 import React, { useCallback, useEffect } from "react";
-import { Box, InputAdornment, Typography, Grid } from "@mui/material";
+import { alpha, Box, InputAdornment, Typography, Grid, Divider, CircularProgress } from "@mui/material";
 import BookIcon from "@mui/icons-material/Book";
 import { ControlledCountrySelector } from "../components/shared/Select/CountrySelector/CountrySelector";
 import { ControlledStateSelector } from "../components/shared/Select/StateSelector/StateSelector";
@@ -21,6 +20,9 @@ import { TaxesState } from "../views/Billing/BillingView";
 import { FormErrorsBox } from "../components/shared/FormErrorsBox/FormErrorsBox";
 import { formatPhoneAsE123, getPhonePrefix, phoneHasPrefix } from "../domain/circle/circle.utils";
 import { ConsentType } from "../components/shared/ConsentText/ConsentText";
+import { ERROR_LOADING_PAYMENT_METHODS } from "../domain/errors/errors.constants";
+import { DisplayBox } from "../components/payments/DisplayBox/DisplayBox";
+import { OVERLAY_OPACITY } from "../config/theme/themeConstants";
 
 const FULL_NAME_FIELD = "fullName";
 const EMAIL_FIELD = "email";
@@ -136,10 +138,12 @@ const schema = object()
 
 export interface BillingInfoFormProps {
   // variant: BillingInfoFormVariant;
+  showLoader: boolean;
   defaultValues?: BillingInfo;
   checkoutError?: CheckoutModalError;
   taxes: null | TaxesState;
   onTaxInfoChange: (taxInfo: Partial<TaxInfo>) => void;
+  onReload: () => Promise<void>;
   onSaved?: () => void;
   onClose: () => void;
   onSubmit: (data: BillingInfo) => void;
@@ -150,10 +154,12 @@ export interface BillingInfoFormProps {
 
 export const BillingInfoForm: React.FC<BillingInfoFormProps> = ({
   // variant,
+  showLoader,
   defaultValues,
   checkoutError,
   taxes,
   onTaxInfoChange,
+  onReload,
   onSaved,
   onClose,
   onSubmit,
@@ -206,13 +212,49 @@ export const BillingInfoForm: React.FC<BillingInfoFormProps> = ({
   }, [setValue]);
 
   return (
-    <form onSubmit={ handleFormSubmit }>
-      { onSaved && (
+    <Box component="form" onSubmit={ handleFormSubmit } sx={{ position: "relative" }}>
+
+      { showLoader ? (
+        <Box sx={{
+          position: "absolute",
+          width: "100%",
+          height: "100%",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          background: theme => alpha(theme.palette.background.default, OVERLAY_OPACITY),
+          zIndex: 100,
+        }}>
+          <CircularProgress color="secondary" />
+        </Box>
+      ) : null }
+
+      { onSaved ? (
         <Box sx={{ my: 2.5 }}>
           <SecondaryButton onClick={ onSaved } startIcon={ <BookIcon /> }>
             Use Saved Billing Info
           </SecondaryButton>
         </Box>
+      ) : (
+        checkoutError?.errorMessage === ERROR_LOADING_PAYMENT_METHODS.errorMessage ? (
+          <>
+            <DisplayBox sx={{ my: 2.5 }}>
+              <Typography sx={{ fontWeight: "500" }}>
+                { ERROR_LOADING_PAYMENT_METHODS.errorMessage }
+              </Typography>
+
+              <Typography sx={{ fontWeight: "500", mt: 0.5 }}>
+                Please, try reloading them or create a new one instead.
+              </Typography>
+
+              <SecondaryButton sx={{ mt: 1.5 }} onClick={ onReload } disabled={ showLoader }>
+                Reload Payment Methods
+              </SecondaryButton>
+            </DisplayBox>
+
+            <Divider />
+          </>
+        ) : null
       ) }
 
       <InputGroupLabel sx={{ m: 0, pt: 2 }}>Information</InputGroupLabel>
@@ -322,8 +364,8 @@ export const BillingInfoForm: React.FC<BillingInfoFormProps> = ({
         variant="toPayment"
         consentType={ consentType }
         submitLabel={ taxes?.status === "loading" ? "Calculating taxes..." : undefined }
-        submitDisabled={ !!taxes && taxes.status === "loading" }
+        submitDisabled={ showLoader || (!!taxes && taxes.status === "loading") }
         onCloseClicked={ onClose } />
-    </form>
+    </Box>
   );
 };

@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Divider, Stack } from "@mui/material";
-
 import { useThrottledCallback } from "@swyg/corre";
 import { CheckoutDeliveryAndItemCostBreakdown } from "../../components/payments/CheckoutDeliveryAndItemCostBreakdown/CheckoutDeliveryAndItemCostBreakdown";
 import { CheckoutStepper } from "../../components/payments/CheckoutStepper/CheckoutStepper";
@@ -34,6 +33,7 @@ export interface TaxesState {
 }
 
 interface BillingViewState {
+  isReloading: boolean;
   isDeleting: boolean;
   showSaved: boolean;
   taxes: null | TaxesState;
@@ -49,6 +49,7 @@ export interface BillingViewProps {
   checkoutError?: CheckoutModalError;
   onBillingInfoSelected: (data: string | BillingInfo) => void;
   onTaxesChange: (taxes: TaxesState) => void;
+  onReloadSavedPaymentMethods: () => Promise<void>;
   onSavedPaymentMethodDeleted: (savedPaymentMethodId: string) => Promise<void>;
   onWalletChange: (wallet: null | string | Wallet) => void;
   onNext: () => void;
@@ -67,6 +68,7 @@ export const BillingView: React.FC<BillingViewProps> = ({
   checkoutError,
   onBillingInfoSelected,
   onTaxesChange,
+  onReloadSavedPaymentMethods,
   onSavedPaymentMethodDeleted,
   onWalletChange,
   onNext,
@@ -78,7 +80,8 @@ export const BillingView: React.FC<BillingViewProps> = ({
   const savedPaymentMethods = useMemo(() => distinctBy(rawSavedPaymentMethods, "addressId"), [rawSavedPaymentMethods]);
   const { total: subtotal, fees } = useCheckoutItemsCostTotal(checkoutItems);
   const total = subtotal + fees;
-  const [{ isDeleting, showSaved, taxes }, setViewState] = useState<BillingViewState>({
+  const [{ isReloading, isDeleting, showSaved, taxes }, setViewState] = useState<BillingViewState>({
+    isReloading: false,
     isDeleting: false,
     showSaved: savedPaymentMethods.length > 0 && typeof selectedBillingInfo === "string" && !checkNeedsGenericErrorMessage("billing", checkoutError),
     taxes: vertexEnabled ? { status: "incomplete" } : null,
@@ -209,7 +212,7 @@ export const BillingView: React.FC<BillingViewProps> = ({
       onBillingInfoSelected("");
     }
 
-    setViewState({ isDeleting: false, showSaved: false, taxes: vertexEnabled ? { status: "loading" } : null });
+    setViewState({ isReloading: false, isDeleting: false, showSaved: false, taxes: vertexEnabled ? { status: "loading" } : null });
   }, [onBillingInfoSelected, savedPaymentMethods, vertexEnabled]);
 
   const handleShowSaved = useCallback(() => {
@@ -217,7 +220,7 @@ export const BillingView: React.FC<BillingViewProps> = ({
 
     if (savedPaymentMethodAddressId) onBillingInfoSelected(savedPaymentMethodAddressId);
 
-    setViewState({ isDeleting: false, showSaved: true, taxes: vertexEnabled ? { status: "loading" } : null });
+    setViewState({ isReloading: false, isDeleting: false, showSaved: true, taxes: vertexEnabled ? { status: "loading" } : null });
   }, [onBillingInfoSelected, vertexEnabled]);
 
   const handleSubmit = useCallback((data: BillingInfo) => {
@@ -229,6 +232,14 @@ export const BillingView: React.FC<BillingViewProps> = ({
     onBillingInfoSelected(savedPaymentMethodData ? savedPaymentMethodAddressId : data);
     onNext();
   }, [savedPaymentMethods, onBillingInfoSelected, onNext, taxes]);
+
+  const handleSavedPaymentMethodsReloaded = useCallback(async () => {
+    setViewState(prevViewState => ({ ...prevViewState, isReloading: true }));
+
+    await onReloadSavedPaymentMethods();
+
+    setViewState(prevViewState => ({ ...prevViewState, isReloading: false }));
+  }, [onReloadSavedPaymentMethods]);
 
   const handleSavedPaymentMethodDeleted = useCallback(async (savedPaymentMethodId: string) => {
     setViewState(prevViewState => ({ ...prevViewState, isDeleting: true, showSaved: true }));
@@ -275,10 +286,12 @@ export const BillingView: React.FC<BillingViewProps> = ({
         ) : (
           <BillingInfoForm
             // variant="loggedIn"
+            showLoader={ isReloading }
             defaultValues={ typeof selectedBillingInfo === "string" ? undefined : selectedBillingInfo }
             checkoutError={ checkoutError }
             taxes={ taxes }
             onTaxInfoChange={ handleTaxInfoChange }
+            onReload={ handleSavedPaymentMethodsReloaded }
             onSaved={ savedPaymentMethods.length > 0 ? handleShowSaved : undefined }
             onClose={ onClose }
             onSubmit={ handleSubmit }
