@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen } from "@testing-library/react";
+import { act, render, screen } from "@testing-library/react";
 import { DeliveryWalletDetails, DeliveryWalletDetailsProps } from "./DeliveryWalletDetails";
 
 describe("DeliveryWalletDetails", () => {
@@ -9,6 +9,7 @@ describe("DeliveryWalletDetails", () => {
     },
 
   });
+
   const walletAddress = "0xb794f5ea0ba39494ce839613fffba74279579268";
 
   let deliveryWalletDetailsProps: DeliveryWalletDetailsProps;
@@ -24,7 +25,9 @@ describe("DeliveryWalletDetails", () => {
 
     const button = await screen.getByLabelText("Copy Wallet Address");
 
-    button.click();
+    act(() => {
+      button.click();
+    });
 
     expect(screen.getByDisplayValue(walletAddress)).toBeInTheDocument();
     expect(screen.queryByText("Copied", { exact: false })).toBeInTheDocument();
