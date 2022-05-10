@@ -61,18 +61,42 @@ export function getCvvIsValid(cvv = "", network: "" | CreditCardNetwork = "", ne
 }
 
 export interface PaymentLimits {
-  CreditCard: number;
-  ACH: number;
-  Wire: number;
-  Crypto: number;
+  CreditCard: {
+    purchase: number;
+    total: number;
+  },
+  ACH: {
+    purchase: number;
+    total: number;
+  };
+  Wire: {
+    purchase: number;
+    total: number;
+  };
+  Crypto: {
+    purchase: number;
+    total: number;
+  };
 }
 
 export function transformRawRemainingItemLimit(rawRemainingItemLimit?: ValidatePaymentLimitOutput, itemsCount = 0): PaymentLimits {
   return {
-    CreditCard: (rawRemainingItemLimit?.creditCard?.remainingTransaction ?? Infinity) + itemsCount,
-    ACH: (rawRemainingItemLimit?.ach?.remainingTransaction ?? Infinity) + itemsCount,
-    Wire: (rawRemainingItemLimit?.wire?.remainingTransaction ?? Infinity) + itemsCount,
+    CreditCard: {
+      purchase: (rawRemainingItemLimit?.creditCard?.remainingTransaction ?? Infinity) + itemsCount,
+      total: (rawRemainingItemLimit?.creditCard?.remainingTotal ?? Infinity) + itemsCount,
+    },
+    ACH: {
+      purchase: (rawRemainingItemLimit?.ach?.remainingTransaction ?? Infinity) + itemsCount,
+      total: (rawRemainingItemLimit?.ach?.remainingTotal ?? Infinity) + itemsCount,
+    },
+    Wire: {
+      purchase: (rawRemainingItemLimit?.wire?.remainingTransaction ?? Infinity) + itemsCount,
+      total: (rawRemainingItemLimit?.wire?.remainingTotal ?? Infinity) + itemsCount,
+    },
     // TODO: Update once crypto is added to ValidatePaymentLimitOutput:
-    Crypto: ((rawRemainingItemLimit as any)?.crypto?.remainingTransaction ?? Infinity) + itemsCount,
+    Crypto: {
+      purchase: ((rawRemainingItemLimit as any)?.crypto?.remainingTransaction ?? Infinity) + itemsCount,
+      total: ((rawRemainingItemLimit as any)?.crypto?.remainingTotal ?? Infinity) + itemsCount,
+    },
   };
 }

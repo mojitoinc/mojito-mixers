@@ -4,3 +4,9 @@ export function distinctBy<V extends Record<string, any> = Record<string, any>>(
 
   return Array.from(map.values());
 }
+
+export function join(array: string[], separator = ", ", lastSeparator = ",") {
+  const [lastElement, ...otherElements] = array.slice(0).reverse();
+
+  return `${ otherElements.join(separator) }${ otherElements.length ? lastSeparator : "" }${ lastElement }`;
+}
