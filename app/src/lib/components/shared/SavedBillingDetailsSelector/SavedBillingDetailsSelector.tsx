@@ -93,7 +93,7 @@ export const SavedBillingDetailsSelector: React.FC<SavedBillingDetailsSelectorPr
         variant="toPayment"
         consentType={ consentType }
         submitLabel={ taxes?.status === "loading" ? "Calculating taxes..." : undefined }
-        submitDisabled={ !!taxes && taxes.status === "loading" }
+        submitDisabled={ showLoader || (!!taxes && taxes.status === "loading") }
         onSubmitClicked={ handleNextClicked }
         onCloseClicked={ onClose } />
     </>

@@ -17,9 +17,9 @@ export interface CheckoutModalInfoCommon {
 }
 
 export interface CheckoutModalInfo3DS extends CheckoutModalInfoCommon {
-  processorPaymentID: string; // TODO: This might be needed to match confirmation screens (use it in the localStorage key).
+  processorPaymentID: string;
   paymentID: string;
-  paymentInfo: string | null;
+  paymentInfo: string;
   checkoutItems: CheckoutItemInfo[];
 }
 

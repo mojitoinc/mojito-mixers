@@ -20,7 +20,7 @@ import { RawSavedPaymentMethod, SavedPaymentMethod } from "../../../domain/circl
 import { continuePlaidOAuthFlow, PlaidFlow } from "../../../hooks/usePlaid";
 import { ConsentType } from "../../shared/ConsentText/ConsentText";
 import { CheckoutModalError, CheckoutModalStepIndex, useCheckoutModalState } from "./CheckoutOverlay.hooks";
-import { DEFAULT_ERROR_AT, ERROR_LOADING_INVOICE, ERROR_LOADING_PAYMENT_METHODS, ERROR_LOADING_USER } from "../../../domain/errors/errors.constants";
+import { ERROR_LOADING_INVOICE, ERROR_LOADING_PAYMENT_METHODS, ERROR_LOADING_USER } from "../../../domain/errors/errors.constants";
 import { FullScreenOverlay } from "../../shared/FullScreenOverlay/FullScreenOverlay";
 import { ProvidersInjectorProps, withProviders } from "../../shared/ProvidersInjector/ProvidersInjector";
 import { transformCheckoutItemsFromInvoice } from "../../../domain/product/product.utils";
@@ -259,8 +259,12 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     refetch: refetchPaymentMethods,
   } = useGetPaymentMethodListQuery({
     skip: !isAuthenticated || !orgID || !open,
-    variables: { orgID },
+    variables: { orgID: "" },
   });
+
+  const handleSavedPaymentMethodsReloaded = useCallback(async () => {
+    await refetchPaymentMethods({ orgID }).catch(() => { /* paymentMethodsError above will get a value and show in BillingInfoForm */ });
+  }, [refetchPaymentMethods, orgID]);
 
 
   // Once we have an invoiceID, load the invoice:
@@ -408,17 +412,9 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     if (meError) setError(ERROR_LOADING_USER(meError));
     if (invoiceDetailsError) setError(ERROR_LOADING_INVOICE(invoiceDetailsError));
 
-    // TODO: We could add an option to configure if we want to ignore this error:
-    const ignorePaymentMethodsError = true;
-
-    if (paymentMethodsError) {
-      if (ignorePaymentMethodsError) {
-        if (debug) console.log("\n❌ (IGNORED) Error loading saved payment methods:\n\n", paymentMethodsError);
-      } else {
-        setError(ERROR_LOADING_PAYMENT_METHODS(paymentMethodsError));
-      }
-    }
-  }, [meError, invoiceDetailsError, paymentMethodsError, debug, setError]);
+    // This one doesn't show the ErrorView. Instead, it's displayed inline in the BillingView > BillingInfoForm:
+    if (paymentMethodsError) goTo(undefined, ERROR_LOADING_PAYMENT_METHODS(paymentMethodsError));
+  }, [meError, invoiceDetailsError, paymentMethodsError, debug, goTo, setError]);
 
 
   // Analytics:
@@ -587,8 +583,8 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
 
     await Promise.allSettled(promises);
 
-    await refetchPaymentMethods().catch(() => { /* TODO: Handle this error properly. */ });
-  }, [checkoutStep, deletePaymentMethod, orgID, refetchPaymentMethods, savedPaymentMethods, setSelectedPaymentMethod]);
+    await handleSavedPaymentMethodsReloaded();
+  }, [checkoutStep, deletePaymentMethod, orgID, savedPaymentMethods, setSelectedPaymentMethod, handleSavedPaymentMethodsReloaded]);
 
 
   // Purchase:
@@ -609,20 +605,20 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     }
 
     // After a successful purchase, a new payment method might have been created, so we reload them:
-    await refetchPaymentMethods().catch(() => { /* TODO: Handle this error properly. */ });
+    await handleSavedPaymentMethodsReloaded();
 
     goNext();
-  }, [setPayments, debug, refetchPaymentMethods, goNext]);
+  }, [setPayments, debug, handleSavedPaymentMethodsReloaded, goNext]);
 
   const handlePurchaseError = useCallback(async (error?: string | CheckoutModalError) => {
     setTimeout(() => triggerAnalyticsEventRef.current("event:paymentError"));
 
     // After a failed purchase, a new payment method might have been created anyway, so we reload them (createPaymentMethod
     // works but createPayment fails):
-    await refetchPaymentMethods().catch(() => { /* TODO: Handle this error properly. */ });
+    await handleSavedPaymentMethodsReloaded();
 
     setError(error);
-  }, [refetchPaymentMethods, setError]);
+  }, [handleSavedPaymentMethodsReloaded, setError]);
 
 
   // Release reservation:
@@ -719,10 +715,12 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   const handleFixError = useCallback(async (): Promise<false> => {
     const at = checkoutError?.at;
 
-    if (at === "reset") {
+    if (at === "close") {
+      handleClose();
+    } else if (at === "reset") {
       await Promise.allSettled([
         meRefetch(),
-        refetchPaymentMethods().catch(() => { /* TODO: Handle this error properly. */ }),
+        handleSavedPaymentMethodsReloaded(),
         createInvoiceAndReservation(),
       ]);
 
@@ -734,7 +732,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
       // method has been created despite the error:
       await Promise.allSettled([
         meRefetch(),
-        refetchPaymentMethods().catch(() => { /* TODO: Handle this error properly. */ }),
+        handleSavedPaymentMethodsReloaded(),
         refetchInvoiceDetails(),
       ]);
 
@@ -743,14 +741,23 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
         setSelectedPaymentMethod(prevSelectedPaymentMethod => ({ ...prevSelectedPaymentMethod, cvv: "" }));
       }
 
-      goTo(at || DEFAULT_ERROR_AT, checkoutError);
+      goTo(at, checkoutError);
     }
 
     // This function is used as a CheckoutModalFooter's onSubmitClicked, so we want that to show a loader on the submit
     // button when clicked but do not remove it once the Promise is resolved, as we are moving to another view and
     // CheckoutModalFooter will unmount (so doing this prevents a memory leak issue):
     return false;
-  }, [checkoutError, goTo, createInvoiceAndReservation, meRefetch, refetchPaymentMethods, refetchInvoiceDetails, setSelectedPaymentMethod]);
+  }, [
+    checkoutError,
+    handleClose,
+    meRefetch,
+    handleSavedPaymentMethodsReloaded,
+    createInvoiceAndReservation,
+    goTo,
+    refetchInvoiceDetails,
+    setSelectedPaymentMethod,
+  ]);
 
 
   // Plaid integration (resume Plaid flow):
@@ -853,6 +860,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
         checkoutError={ checkoutError }
         onBillingInfoSelected={ handleBillingInfoSelected }
         onTaxesChange={ setTaxes }
+        onReloadSavedPaymentMethods={ handleSavedPaymentMethodsReloaded }
         onSavedPaymentMethodDeleted={ handleSavedPaymentMethodDeleted }
         onWalletChange={ setWalletAddress }
         onNext={ goNext }
