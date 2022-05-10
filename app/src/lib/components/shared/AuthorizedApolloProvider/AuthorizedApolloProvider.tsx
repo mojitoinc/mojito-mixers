@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo } from "react";
 import { ApolloClient, ApolloProvider, InMemoryCache, createHttpLink, NormalizedCacheObject, Context } from "@apollo/client";
 import { useAuth0 } from "@auth0/auth0-react";
-import { setContext } from "@apollo/link-context";
+import { setContext } from "@apollo/client/link/context";
 import { isLocalhost } from "../../../domain/url/url.utils";
 
 const cache = new InMemoryCache();

@@ -259,7 +259,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     refetch: refetchPaymentMethods,
   } = useGetPaymentMethodListQuery({
     skip: !isAuthenticated || !orgID || !open,
-    variables: { orgID: "" },
+    variables: { orgID },
   });
 
   const handleSavedPaymentMethodsReloaded = useCallback(async () => {
