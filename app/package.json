@@ -97,11 +97,12 @@
     "eslint-plugin-react-hooks": "^4.3.0",
     "eslint-plugin-unused-imports": "^2.0.0",
     "fork-ts-checker-webpack-plugin": "^7.2.11",
-    "jest": "^27.5.1",
+    "jest": "^28.1.0",
     "jest-chain": "^1.1.5",
+    "jest-environment-jsdom": "^28.1.0",
     "jest-extended": "^2.0.0",
     "jest-fetch-mock": "^3.0.3",
-    "ts-jest": "^27.1.4",
+    "ts-jest": "^28.0.2",
     "typescript": "^4.6.4"
   },
   "resolutions": {
