@@ -48,8 +48,8 @@ export function useLimits(
   });
 
   useEffect(() => {
-    refetch();
-  }, [refetch, paymentType]);
+    if (collectionId) refetch();
+  }, [collectionId, refetch, paymentType]);
 
   const rawRemainingItemLimit = paymentLimitData?.validatePaymentLimit;
 

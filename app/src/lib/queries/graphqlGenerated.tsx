@@ -353,7 +353,7 @@ export type CurrentUserUserOrgsArgs = {
 
 
 export type CurrentUserWonBidsArgs = {
-  orgId: Scalars['UUID'];
+  orgId?: InputMaybe<Scalars['UUID']>;
 };
 
 export enum DeliveryMethod {
@@ -1633,7 +1633,7 @@ export type QueryOrganizationArgs = {
 
 
 export type QueryOrganizationByIdArgs = {
-  id?: InputMaybe<Scalars['UUID1']>;
+  id: Scalars['UUID1'];
 };
 
 
@@ -1804,7 +1804,7 @@ export type UserApiKeyResponse = {
 };
 
 export type UserOrgFilter = {
-  orgId: Scalars['UUID'];
+  orgId?: InputMaybe<Scalars['UUID']>;
 };
 
 export type UserOrganization = {

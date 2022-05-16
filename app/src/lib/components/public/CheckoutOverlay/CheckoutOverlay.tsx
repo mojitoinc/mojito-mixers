@@ -851,6 +851,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   } else if (checkoutStep === "billing") {
     checkoutStepElement = (
       <BillingView
+        orgID={ orgID }
         vertexEnabled={ vertexEnabled }
         checkoutItems={ checkoutItems }
         savedPaymentMethods={ savedPaymentMethods }
