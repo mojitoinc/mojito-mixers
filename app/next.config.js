@@ -1,7 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const withImages = require("next-images");
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
+const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
 
 module.exports = withImages({
   inlineImageLimit: false,
@@ -28,7 +28,7 @@ module.exports = withImages({
   //   externalDir: true,
   // },
 
-  webpack (config, options) {
+  webpack(config, options) {
     const { dev, isServer } = options;
 
     if (dev && isServer) {
@@ -43,10 +43,10 @@ module.exports = withImages({
       // See https://github.com/vercel/next.js/pull/13428
 
       config.plugins.push(
-        new ForkTsCheckerWebpackPlugin()
+        new ForkTsCheckerWebpackPlugin(),
       );
     }
 
-    return config
+    return config;
   },
 });
