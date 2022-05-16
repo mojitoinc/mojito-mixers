@@ -198,6 +198,15 @@ export type BidFilterInput = {
   userId?: InputMaybe<Scalars['UUID']>;
 };
 
+export type BuyerDetailOutput = {
+  __typename?: 'BuyerDetailOutput';
+  timestamp: Scalars['Time'];
+  totalPrice: Scalars['Float'];
+  units: Scalars['Int'];
+  user?: Maybe<User>;
+  userId: Scalars['UUID1'];
+};
+
 export type CheckResponse = {
   __typename?: 'CheckResponse';
   id: Scalars['String'];
@@ -711,6 +720,7 @@ export type MarketplaceItemDeliveryErc1155Transfer = {
 };
 
 export type MarketplaceItemDeliveryErc1155TransferInput = {
+  amount: Scalars['Int'];
   contractAddress: Scalars['String'];
   onChainTokenId: Scalars['Int'];
   ownerWalletId: Scalars['UUID1'];
@@ -742,6 +752,7 @@ export enum MarketplaceSaleType {
 export type MarketplaceToken = {
   __typename?: 'MarketplaceToken';
   id: Scalars['UUID'];
+  isTransferDisabled: Scalars['Boolean'];
   marketplaceID: Scalars['UUID'];
   name?: Maybe<Scalars['String']>;
   nftContractAddress: Scalars['String'];
@@ -831,6 +842,8 @@ export type Mutation = {
   nftDeployContract: NftContract;
   orgCreateMarketplace: Marketplace;
   ping: Scalars['String'];
+  /** Redeem a claimable */
+  redeemClaimable: Scalars['Boolean'];
   /** Redeem a promo code */
   redeemPromoCode: Scalars['Boolean'];
   /** Release reservations held by invoice ID */
@@ -838,6 +851,7 @@ export type Mutation = {
   reserveMarketplaceBuyNowLot: MarketplaceBuyNowOutput;
   sendUserInvitation: Scalars['Boolean'];
   setJwtIssuerDomain: Organization;
+  setRoyaltiesExtension: Scalars['String'];
   startInvoiceDelivery: Scalars['Boolean'];
   /** Transfers a token in the provided wallet to the `transferTo` address */
   transferToken: Scalars['String'];
@@ -1106,6 +1120,12 @@ export type MutationOrgCreateMarketplaceArgs = {
 };
 
 
+export type MutationRedeemClaimableArgs = {
+  claimableId: Scalars['String'];
+  destAddr?: InputMaybe<Scalars['String']>;
+};
+
+
 export type MutationRedeemPromoCodeArgs = {
   code: Scalars['String'];
   destAddr?: InputMaybe<Scalars['String']>;
@@ -1135,14 +1155,24 @@ export type MutationSetJwtIssuerDomainArgs = {
 };
 
 
+export type MutationSetRoyaltiesExtensionArgs = {
+  extensionAddress: Scalars['String'];
+  nftContractId: Scalars['UUID1'];
+  percentages: Array<Scalars['Int']>;
+  receivers: Array<Scalars['String']>;
+};
+
+
 export type MutationStartInvoiceDeliveryArgs = {
   invoiceID: Scalars['UUID1'];
 };
 
 
 export type MutationTransferTokenArgs = {
+  amount?: InputMaybe<Scalars['Int']>;
   contractAddress: Scalars['String'];
   tokenOnChainId: Scalars['Int'];
+  tokenType: TokenType;
   transferTo: Scalars['String'];
   walletId: Scalars['UUID1'];
 };
@@ -1412,11 +1442,16 @@ export enum PaymentType {
 
 export type Query = {
   __typename?: 'Query';
+  /** Check if user can redeem claimable */
+  canRedeemClaimable: Scalars['Boolean'];
   collection?: Maybe<MarketplaceCollection>;
   collectionBySlug?: Maybe<MarketplaceCollection>;
   collectionItemById?: Maybe<MarketplaceCollectionItem>;
   /** Retrieves applicant details by organizationID */
   getApplicant: ApplicantResponse;
+  /** Get Available Claimables */
+  getAvailableClaimables: Scalars['Int'];
+  getBuyNowBuyerInfo?: Maybe<Array<BuyerDetailOutput>>;
   /** Retrieves invoice details by ID */
   getInvoiceDetails: InvoiceDetails;
   /** Retrieves invoice list for given user, can be called by org admin */
@@ -1464,6 +1499,11 @@ export type Query = {
 };
 
 
+export type QueryCanRedeemClaimableArgs = {
+  claimableID: Scalars['String'];
+};
+
+
 export type QueryCollectionArgs = {
   id: Scalars['String'];
 };
@@ -1482,6 +1522,16 @@ export type QueryCollectionItemByIdArgs = {
 
 export type QueryGetApplicantArgs = {
   organizationID: Scalars['UUID1'];
+};
+
+
+export type QueryGetAvailableClaimablesArgs = {
+  claimableId: Scalars['String'];
+};
+
+
+export type QueryGetBuyNowBuyerInfoArgs = {
+  itemId: Scalars['UUID1'];
 };
 
 
@@ -1507,7 +1557,7 @@ export type QueryGetPaymentMethodArgs = {
 
 
 export type QueryGetPaymentMethodListArgs = {
-  orgID?: InputMaybe<Scalars['UUID1']>;
+  orgID: Scalars['UUID1'];
 };
 
 
@@ -1583,7 +1633,7 @@ export type QueryOrganizationArgs = {
 
 
 export type QueryOrganizationByIdArgs = {
-  id?: InputMaybe<Scalars['UUID1']>;
+  id: Scalars['UUID1'];
 };
 
 
@@ -1674,6 +1724,11 @@ export type SubscriptionMarketplaceCollectionLotsUpdatesArgs = {
   collectionId: Scalars['UUID1'];
 };
 
+export enum TaxProvider {
+  TaxJar = 'TaxJar',
+  Vertex = 'Vertex'
+}
+
 export type TaxQuoteBillingAddressInput = {
   city: Scalars['String'];
   country: Scalars['String'];
@@ -1693,6 +1748,7 @@ export type TaxQuoteBillingAddressOutput = {
 
 export type TaxQuoteInput = {
   address: TaxQuoteBillingAddressInput;
+  orgID: Scalars['UUID1'];
   taxablePrice: Scalars['Float'];
 };
 
@@ -1714,6 +1770,11 @@ export type TokenDraft = {
   royaltyBasisPoints?: InputMaybe<Scalars['Int']>;
   tokenId?: InputMaybe<Scalars['UUID1']>;
 };
+
+export enum TokenType {
+  Erc721 = 'ERC721',
+  Erc1155 = 'ERC1155'
+}
 
 export enum TransactionStatus {
   Completed = 'Completed',
@@ -1803,6 +1864,7 @@ export enum WalletParentType {
 
 export type WalletToken = {
   __typename?: 'WalletToken';
+  balance?: Maybe<Scalars['String']>;
   contractAddress: Scalars['String'];
   description?: Maybe<Scalars['String']>;
   /** Token ID in smart contract */

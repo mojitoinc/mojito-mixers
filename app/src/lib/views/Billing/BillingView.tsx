@@ -40,6 +40,7 @@ interface BillingViewState {
 }
 
 export interface BillingViewProps {
+  orgID: string;
   vertexEnabled?: boolean;
   checkoutItems: CheckoutItem[];
   savedPaymentMethods: SavedPaymentMethod[];
@@ -59,6 +60,7 @@ export interface BillingViewProps {
 }
 
 export const BillingView: React.FC<BillingViewProps> = ({
+  orgID,
   vertexEnabled,
   checkoutItems,
   savedPaymentMethods: rawSavedPaymentMethods,
@@ -106,6 +108,7 @@ export const BillingView: React.FC<BillingViewProps> = ({
     const result = await getTaxQuote({
       variables: {
         input: {
+          orgID,
           taxablePrice: total,
           address: {
             street1: taxInfo.street,
@@ -150,7 +153,7 @@ export const BillingView: React.FC<BillingViewProps> = ({
         invalidZipCode,
       },
     }));
-  }, [getTaxQuote, total, showSaved]);
+  }, [getTaxQuote, orgID, total, showSaved]);
 
   const handleThrottledTaxInfoChange = useThrottledCallback((taxInfo: Partial<TaxInfo>) => {
     if (!vertexEnabled) return;
