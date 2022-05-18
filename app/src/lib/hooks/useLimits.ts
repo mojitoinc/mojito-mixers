@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef } from "react";
 
-import { join } from "@lib/utils/arrayUtils";
 import { PaymentLimits, transformRawRemainingItemLimit } from "../domain/payment/payment.utils";
 import { CheckoutItem } from "../domain/product/product.interfaces";
 import { PaymentType } from "../domain/payment/payment.interfaces";
 import { PAYMENT_METHOD_OPTION_PROPS } from "../components/shared/PaymentMethodSelector/PaymentMethodSelector";
 import { useCollectionItemByIdQuery, useValidatePaymentLimitQuery } from "../queries/graphqlGenerated";
+import { join } from "../utils/arrayUtils";
 
 export interface UseLimitsReturn {
   limits?: PaymentLimits;
