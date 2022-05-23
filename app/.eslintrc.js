@@ -1,4 +1,3 @@
-/* eslint react/prop-types: 0 */
 /* eslint quote-props: [2, "consistent-as-needed"] */
 
 const TEMPORARILY_DISABLED = 0;

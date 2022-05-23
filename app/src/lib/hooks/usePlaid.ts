@@ -203,7 +203,7 @@ export function usePlaid(options: UsePlaidOptions): UsePlaidReturn {
 
 export const PlaidFlow: React.FC<UsePlaidOptionsContinueFlow> = ({
   onSubmit,
-}) => {
+}: UsePlaidOptionsContinueFlow) => {
   usePlaid({ onSubmit });
 
   return null;
