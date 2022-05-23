@@ -1,5 +1,5 @@
 import "@testing-library/jest-dom";
-import "jest-chain";
+// import "jest-chain";
 import "jest-extended";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
