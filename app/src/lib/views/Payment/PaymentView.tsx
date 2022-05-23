@@ -16,6 +16,7 @@ import { checkNeedsGenericErrorMessage } from "../../hooks/useFormCheckoutError"
 import { TaxesState } from "../Billing/BillingView";
 import { Wallet } from "../../domain/wallet/wallet.interfaces";
 import { CreditCardNetwork } from "../../domain/react-payment-inputs/react-payment-inputs.utils";
+import { IDiscount } from "../../hooks/usePromoCode";
 
 const billingInfoItemBoxProps: BoxProps = { sx: { mt: 2.5 } };
 
@@ -46,6 +47,7 @@ export interface PaymentViewProps {
   acceptedCreditCardNetworks?: CreditCardNetwork[];
   consentType?: ConsentType;
   debug?: boolean;
+  discount: IDiscount;
 }
 
 export const PaymentView: React.FC<PaymentViewProps> = ({
@@ -70,6 +72,7 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
   acceptedCreditCardNetworks,
   consentType,
   debug,
+  discount,
 }) => {
   const {
     billingInfo: selectedBillingInfo,
@@ -204,6 +207,7 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
       <Divider sx={{ display: { xs: "block", md: "none" } }} />
 
       <CheckoutDeliveryAndItemCostBreakdown
+        discount={discount}
         checkoutItems={ checkoutItems }
         taxes={ taxes }
         validatePersonalDeliveryAddress={ formSubmitAttempted }

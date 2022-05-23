@@ -1,9 +1,12 @@
-import { Box, Tooltip, Typography } from "@mui/material";
-import React from "react";
+import { Box, Button, Tooltip, Typography } from "@mui/material";
+import React, { useCallback, useEffect, useState } from "react";
 import { SxProps, Theme } from "@mui/material/styles";
 import { formatTaxRate } from "../../../../utils/formatUtils";
 import { TaxesState } from "../../../../views/Billing/BillingView";
 import { Number } from "../../../shared/Number/Number";
+import { IDiscount } from "../../../../hooks/usePromoCode";
+import { TextField } from "../../../shared/TextField/TextField";
+import { usePromoCode } from "@lib/utils/promoCodeUtils";
 
 const TAX_RATE_PLACEHOLDER_SX: SxProps<Theme> = {
   background: theme => theme.palette.grey[100],
@@ -41,6 +44,7 @@ export interface CheckoutItemCostTotalProps {
   fees: number | null;
   taxes: null | TaxesState;
   withDetails?: boolean;
+  invoiceID?: string;
 }
 
 export const CheckoutItemCostTotal: React.FC<CheckoutItemCostTotalProps> = ({
@@ -48,7 +52,16 @@ export const CheckoutItemCostTotal: React.FC<CheckoutItemCostTotalProps> = ({
   fees,
   taxes,
   withDetails = false,
+  invoiceID,
 }) => {
+  const { promoCode, onChangePromoCode, onApply, editable, setEditable, } = usePromoCode();
+  const [discountTotal, setDiscountTotal] = useState(total);
+
+  useEffect(() => {
+    if (promoCode.total) {
+      setDiscountTotal(total - promoCode.total);
+    }
+  }, [promoCode])
   const feesValue = fees || 0;
 
   let taxRowElement: React.ReactNode = null;
@@ -69,16 +82,16 @@ export const CheckoutItemCostTotal: React.FC<CheckoutItemCostTotalProps> = ({
 
     if (status === "loading") {
       taxRateElement = <Tooltip title="Calculating taxes..."><span>(<Box component="span" sx={ TAX_RATE_PLACEHOLDER_SX }>00.00</Box> %)</span></Tooltip>;
-      taxAmountElement = <Tooltip title="Calculating taxes..."><span><Box component="span" sx={ TAX_AMOUNT_PLACEHOLDER_SX }>{ `${ (total + feesValue) * 0.10 | 0 }`.replace(/./, "0") }.00</Box> USD</span></Tooltip>;
-      totalElement = <Tooltip title="Calculating total..."><span><Box component="span" sx={ TOTAL_PLACEHOLDER_SX }>{ `${ (total + feesValue) * 1.10 | 0 }`.replace(/./, "0") }.00</Box> USD</span></Tooltip>;
+      taxAmountElement = <Tooltip title="Calculating taxes..."><span><Box component="span" sx={ TAX_AMOUNT_PLACEHOLDER_SX }>{ `${ (discountTotal + feesValue) * 0.10 | 0 }`.replace(/./, "0") }.00</Box> USD</span></Tooltip>;
+      totalElement = <Tooltip title="Calculating total..."><span><Box component="span" sx={ TOTAL_PLACEHOLDER_SX }>{ `${ (discountTotal + feesValue) * 1.10 | 0 }`.replace(/./, "0") }.00</Box> USD</span></Tooltip>;
     } else if (status === "complete" && taxAmount !== undefined) {
       taxRateElement = `(${ formatTaxRate(taxRate) })`;
       taxAmountElement = <Number suffix=" USD">{ taxAmount }</Number>;
-      totalElement = <Number suffix=" USD">{ total + feesValue + taxAmount }</Number>;
+      totalElement = <Number suffix=" USD">{ discountTotal + feesValue + taxAmount }</Number>;
     } else {
       taxRateElement = null;
       taxAmountElement = <Tooltip title="Enter a valid address to calculate the taxes"><span><Number suffix=" USD">{ 0 }</Number></span></Tooltip>;
-      totalElement = <Tooltip title="Enter a valid address to calculate the total"><span><Number suffix=" USD">{ total + feesValue }</Number></span></Tooltip>;
+      totalElement = <Tooltip title="Enter a valid address to calculate the total"><span><Number suffix=" USD">{ discountTotal + feesValue }</Number></span></Tooltip>;
     }
 
     taxRowElement = (
@@ -89,10 +102,28 @@ export const CheckoutItemCostTotal: React.FC<CheckoutItemCostTotalProps> = ({
     );
   }
 
+  const handlePromoCodeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    onChangePromoCode(event.target.value);
+  }
+
+  const handleApplyPromoCode = useCallback(() => {
+    // call api
+    // set id and percent
+    invoiceID && editable && onApply(invoiceID);
+  }, [invoiceID, editable]);
+
   return (
     <Box sx={{ display: "flex", flexDirection: "column", mt: { xs: 3, sm: 0.5 } }}>
       { withDetails && (
         <>
+          <Box sx={ ROW_SX }>
+            <Typography>Promo code</Typography>
+            <Typography>
+              <TextField value={promoCode} onChange={ handlePromoCodeChange } InputProps={{ readOnly: !(editable && invoiceID) }} />
+              <Button onClick={handleApplyPromoCode} disabled={!(editable && invoiceID)}>Apply</Button>
+            </Typography>
+          </Box>
+
           <Box sx={ ROW_SX }>
             <Typography>Subtotal</Typography>
             <Typography><Number suffix=" USD">{ total }</Number></Typography>

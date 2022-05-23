@@ -12,6 +12,7 @@ import { getFormattedPaymentMethod } from "./PurchaseConfirmationBillingDetails.
 import { DeliveryWalletDetails } from "../DeliveryWallet/DeliveryWalletDetails/DeliveryWalletDetails";
 import { CopyButton } from "../../shared/CopyButton/CopyButton";
 import { Wallet } from "../../../domain/wallet/wallet.interfaces";
+import { IDiscount } from "../../../hooks/usePromoCode";
 
 export interface PurchaseConfirmationBillingDetailsProps {
   checkoutItems: CheckoutItem[];
@@ -19,6 +20,7 @@ export interface PurchaseConfirmationBillingDetailsProps {
   wallet: null | string | Wallet;
   selectedPaymentMethodBillingInfo: SavedPaymentMethodBillingInfo;
   selectedPaymentMethodPaymentInfo: PaymentMethod | SavedPaymentMethod | null;
+  discount: IDiscount;
 }
 
 export const PurchaseConfirmationBillingDetails: React.FC<PurchaseConfirmationBillingDetailsProps> = ({
@@ -27,6 +29,7 @@ export const PurchaseConfirmationBillingDetails: React.FC<PurchaseConfirmationBi
   wallet,
   selectedPaymentMethodBillingInfo,
   selectedPaymentMethodPaymentInfo,
+  discount,
 }) => {
   const {
     isMasked,
@@ -105,6 +108,7 @@ export const PurchaseConfirmationBillingDetails: React.FC<PurchaseConfirmationBi
 
       <CheckoutItemCostPurchase
         checkoutItems={ checkoutItems }
+        discount={discount}
         selectedPaymentMethodBillingInfo={ selectedPaymentMethodBillingInfo } />
 
       <DeliveryWalletDetails wallet={ wallet } />
