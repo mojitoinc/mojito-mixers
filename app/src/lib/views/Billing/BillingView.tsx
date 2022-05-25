@@ -15,7 +15,7 @@ import { TaxQuoteOutput, useGetTaxQuoteLazyQuery } from "../../queries/graphqlGe
 import { useCheckoutItemsCostTotal } from "../../hooks/useCheckoutItemCostTotal";
 import { Wallet } from "../../domain/wallet/wallet.interfaces";
 import { ConsentType } from "../../components/shared/ConsentText/ConsentText";
-import { IDiscount } from "../../hooks/usePromoCode";
+import { usePromoCode } from "@lib/utils/promoCodeUtils";
 
 export type TaxStatus = "incomplete" | "loading" | "complete" | "error";
 
@@ -58,7 +58,6 @@ export interface BillingViewProps {
   onClose: () => void;
   consentType?: ConsentType;
   debug?: boolean;
-  discount: IDiscount
 }
 
 export const BillingView: React.FC<BillingViewProps> = ({
@@ -79,11 +78,11 @@ export const BillingView: React.FC<BillingViewProps> = ({
   onClose,
   consentType,
   debug,
-  discount,
 }) => {
+  const { setEditable } = usePromoCode();
   const savedPaymentMethodAddressIdRef = useRef<string>("");
   const savedPaymentMethods = useMemo(() => distinctBy(rawSavedPaymentMethods, "addressId"), [rawSavedPaymentMethods]);
-  const { subtotal } = useCheckoutItemsCostTotal(checkoutItems, discount);
+  const { total } = useCheckoutItemsCostTotal(checkoutItems);
   const [{ isReloading, isDeleting, showSaved, taxes }, setViewState] = useState<BillingViewState>({
     isReloading: false,
     isDeleting: false,
@@ -102,6 +101,10 @@ export const BillingView: React.FC<BillingViewProps> = ({
     getTaxQuoteTimestampRef.current = 0;
   }, []);
 
+  useEffect(() => {
+    setEditable(true);
+  }, []);
+
   const calculateTaxes = useCallback(async (taxInfo: TaxInfo | BillingInfo) => {
     const calledAt = getTaxQuoteTimestampRef.current;
 
@@ -111,7 +114,7 @@ export const BillingView: React.FC<BillingViewProps> = ({
       variables: {
         input: {
           orgID,
-          taxablePrice: subtotal,
+          taxablePrice: total,
           address: {
             street1: taxInfo.street,
             city: taxInfo.city,
@@ -155,7 +158,7 @@ export const BillingView: React.FC<BillingViewProps> = ({
         invalidZipCode,
       },
     }));
-  }, [getTaxQuote, orgID, subtotal, showSaved]);
+  }, [getTaxQuote, orgID, total, showSaved]);
 
   const handleThrottledTaxInfoChange = useThrottledCallback((taxInfo: Partial<TaxInfo>) => {
     if (!vertexEnabled) return;
@@ -309,7 +312,6 @@ export const BillingView: React.FC<BillingViewProps> = ({
       <Divider sx={{ display: { xs: "block", md: "none" } }} />
 
       <CheckoutDeliveryAndItemCostBreakdown
-        discount={discount}
         checkoutItems={ checkoutItems }
         taxes={ vertexEnabled ? taxes : null }
         validatePersonalDeliveryAddress={ formSubmitAttempted }

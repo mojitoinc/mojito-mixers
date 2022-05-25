@@ -42,7 +42,6 @@ import { getPathnameWithParams } from "../../../domain/url/url.utils";
 import { IS_BROWSER } from "../../../domain/build/build.constants";
 
 export type LoaderMode = "default" | "success" | "error";
-import { IDiscount, applyDiscount } from "@lib/hooks/usePromoCode";
 import { PromoCodeProvider } from "@lib/utils/promoCodeUtils";
 
 export interface PUICheckoutOverlayProps {
@@ -297,25 +296,6 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
 
     setWalletAddress(nextWallet || destinationAddress);
   }, [wallets, destinationAddress, setWalletAddress]);
-
-  const [promoCode, setPromoCode] = useState('');
-  const [discount, setDiscount] = useState<IDiscount>();
-
-  const applyPromoCode = useCallback(async () => {
-    if (!invoiceID) {
-      setDiscount({
-        subtotal: 0,
-        error: 'No invoice ID',
-      });
-    } else if (!promoCode) {
-      setDiscount({
-        subtotal: 0,
-        error: 'No promo code',
-      });
-    } else {
-      setDiscount(applyDiscount(promoCode, invoiceID));
-    }
-  }, [promoCode, invoiceID]);
 
   // TODO: These should probably be combined.
 

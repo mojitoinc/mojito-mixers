@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import { Divider, Stack } from "@mui/material";
 
 import { CheckoutModalFooter } from "../../components/payments/CheckoutModalFooter/CheckoutModalFooter";
@@ -10,7 +10,7 @@ import { CheckoutItem } from "../../domain/product/product.interfaces";
 import { SelectedPaymentMethod } from "../../components/public/CheckoutOverlay/CheckoutOverlay.hooks";
 import { Wallet } from "../../domain/wallet/wallet.interfaces";
 import { useDictionary } from "../../hooks/useDictionary";
-import { IDiscount } from "../../hooks/usePromoCode";
+import { usePromoCode } from "@lib/utils/promoCodeUtils";
 
 export interface ConfirmationViewProps {
   checkoutItems: CheckoutItem[];
@@ -20,7 +20,6 @@ export interface ConfirmationViewProps {
   wallet: null | string | Wallet;
   onNext: () => void;
   onGoTo?: (pathnameOrUrl: string) => void;
-  discount: IDiscount;
 }
 
 export const ConfirmationView: React.FC<ConfirmationViewProps> = ({
@@ -31,14 +30,18 @@ export const ConfirmationView: React.FC<ConfirmationViewProps> = ({
   wallet,
   onNext,
   onGoTo,
-  discount,
 }) => {
+  const { setEditable } = usePromoCode();
   const {
     goToMarketplaceHref,
     goToMarketplaceLabel,
     goToHref,
     goToLabel,
   } = useDictionary();
+
+  useEffect(() => {
+    setEditable(false);
+  }, []);
 
   const {
     billingInfo: selectedBillingInfo,
@@ -74,7 +77,6 @@ export const ConfirmationView: React.FC<ConfirmationViewProps> = ({
       spacing={{ xs: 3, md: 3.75 }}>
 
       <PurchaseConfirmationBillingDetails
-        discount={discount}
         checkoutItems={ checkoutItems }
         processorPaymentID={ processorPaymentID }
         wallet={ wallet }

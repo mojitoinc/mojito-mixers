@@ -4,7 +4,6 @@ import { SxProps, Theme } from "@mui/material/styles";
 import { formatTaxRate } from "../../../../utils/formatUtils";
 import { TaxesState } from "../../../../views/Billing/BillingView";
 import { Number } from "../../../shared/Number/Number";
-import { IDiscount } from "../../../../hooks/usePromoCode";
 import { TextField } from "../../../shared/TextField/TextField";
 import { usePromoCode } from "@lib/utils/promoCodeUtils";
 
@@ -54,7 +53,7 @@ export const CheckoutItemCostTotal: React.FC<CheckoutItemCostTotalProps> = ({
   withDetails = false,
   invoiceID,
 }) => {
-  const { promoCode, onChangePromoCode, onApply, editable, setEditable, } = usePromoCode();
+  const { promoCode, onChangePromoCode, onApply, editable } = usePromoCode();
   const [discountTotal, setDiscountTotal] = useState(total);
 
   useEffect(() => {

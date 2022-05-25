@@ -6,6 +6,7 @@ import { CheckoutModalFooter } from "../../components/payments/CheckoutModalFoot
 import { CheckoutItem } from "../../domain/product/product.interfaces";
 import { resetStepperProgress } from "../../components/payments/CheckoutStepper/CheckoutStepper";
 import { TaxesState } from "../Billing/BillingView";
+import { usePromoCode } from "@lib/utils/promoCodeUtils";
 
 export interface AuthenticationViewProps {
   checkoutItems: CheckoutItem[];
@@ -24,6 +25,12 @@ export const AuthenticationView: React.FC<AuthenticationViewProps> = ({
   onGuestClicked,
   onCloseClicked,
 }) => {
+  const { setEditable } = usePromoCode();
+
+  useEffect(() => {
+    setEditable(true);
+  }, []);
+
   useEffect(() => {
     // Make sure the progress tracker in BillingView and PaymentView is properly animated:
     resetStepperProgress();
