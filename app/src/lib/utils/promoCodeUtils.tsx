@@ -14,6 +14,8 @@ interface IPromoCodeContext {
   setPromoCode: Dispatch<SetStateAction<IPromoCode>>;
   editable: boolean;
   setEditable: Dispatch<SetStateAction<boolean>>;
+  error: string | null;
+  setError: Dispatch<SetStateAction<string | null>>;
 }
 
 const PromoCodeContext = React.createContext<IPromoCodeContext>({
@@ -21,6 +23,8 @@ const PromoCodeContext = React.createContext<IPromoCodeContext>({
   setPromoCode: () => undefined,
   editable: false,
   setEditable: () => false,
+  error: null,
+  setError: () => undefined,
 });
 
 interface PromoCodeProviderProps {
@@ -31,10 +35,11 @@ const PromoCodeProvider: React.FC<PromoCodeProviderProps> = ({ children }) => {
   const [promoCode, setPromoCode] =
     React.useState<IPromoCode>(defaultPromoCode);
   const [editable, setEditable] = React.useState<boolean>(false);
+  const [error, setError] = React.useState<string | null>(null);
 
   const PromoCodeProviderValue = useMemo(
-    () => ({ promoCode, setPromoCode, editable, setEditable }),
-    [promoCode, setPromoCode, editable, setEditable],
+    () => ({ promoCode, setPromoCode, editable, setEditable, error, setError }),
+    [promoCode, setPromoCode, editable, setEditable, error, setError],
   );
 
   return (
@@ -46,7 +51,7 @@ const PromoCodeProvider: React.FC<PromoCodeProviderProps> = ({ children }) => {
 
 const usePromoCode = () => {
   const [applyDiscountCode] = useApplyDiscountCodeLazyQuery();
-  const { promoCode, setPromoCode, editable, setEditable } =
+  const { promoCode, setPromoCode, editable, setEditable, error, setError } =
     React.useContext(PromoCodeContext);
 
   const onChangePromoCode = (value: string) => {
@@ -54,6 +59,7 @@ const usePromoCode = () => {
       ...code,
       code: value,
     }));
+    setError(null);
   };
 
   const onApply = async (invoiceId: string) => {
@@ -74,14 +80,14 @@ const usePromoCode = () => {
           total,
         }));
       } else {
-        console.log("wrong discount code");
+        setError("Code invalid");
       }
     } catch (e) {
       console.log(e);
     }
   };
 
-  return { promoCode, onChangePromoCode, onApply, editable, setEditable };
+  return { promoCode, onChangePromoCode, onApply, editable, setEditable, error };
 };
 
 export { PromoCodeProvider, usePromoCode };

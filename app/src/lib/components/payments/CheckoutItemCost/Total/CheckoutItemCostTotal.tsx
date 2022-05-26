@@ -53,12 +53,12 @@ export const CheckoutItemCostTotal: React.FC<CheckoutItemCostTotalProps> = ({
   withDetails = false,
   invoiceID,
 }) => {
-  const { promoCode, onChangePromoCode, onApply, editable } = usePromoCode();
+  const { promoCode, onChangePromoCode, onApply, editable, error } = usePromoCode();
   const [discountTotal, setDiscountTotal] = useState(total);
 
   useEffect(() => {
     if (promoCode.total) {
-      setDiscountTotal(total - promoCode.total);
+      setDiscountTotal(promoCode.total);
     }
   }, [promoCode, total]);
 
@@ -119,6 +119,8 @@ export const CheckoutItemCostTotal: React.FC<CheckoutItemCostTotalProps> = ({
               label="Discount code"
               value={ promoCode.code }
               onChange={ handlePromoCodeChange }
+              error={ !!error }
+              helperText={ error }
               InputProps={{
                 readOnly: !(editable && invoiceID),
                 endAdornment: (
