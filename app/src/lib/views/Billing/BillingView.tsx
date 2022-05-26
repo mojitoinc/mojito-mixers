@@ -103,7 +103,7 @@ export const BillingView: React.FC<BillingViewProps> = ({
 
   useEffect(() => {
     setEditable(true);
-  }, []);
+  }, [setEditable]);
 
   const calculateTaxes = useCallback(async (taxInfo: TaxInfo | BillingInfo) => {
     const calledAt = getTaxQuoteTimestampRef.current;

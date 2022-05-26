@@ -124,7 +124,7 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
 
   useEffect(() => {
     setEditable(true);
-  }, []);
+  }, [setEditable]);
 
   useEffect(() => {
     if (!selectedPaymentMethodBillingInfo) onPrev();

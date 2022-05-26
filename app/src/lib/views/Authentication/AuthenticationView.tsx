@@ -29,7 +29,7 @@ export const AuthenticationView: React.FC<AuthenticationViewProps> = ({
 
   useEffect(() => {
     setEditable(true);
-  }, []);
+  }, [setEditable]);
 
   useEffect(() => {
     // Make sure the progress tracker in BillingView and PaymentView is properly animated:

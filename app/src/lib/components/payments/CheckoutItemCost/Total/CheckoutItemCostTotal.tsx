@@ -60,7 +60,7 @@ export const CheckoutItemCostTotal: React.FC<CheckoutItemCostTotalProps> = ({
     if (promoCode.total) {
       setDiscountTotal(total - promoCode.total);
     }
-  }, [promoCode]);
+  }, [promoCode, total]);
 
   const feesValue = fees || 0;
 
@@ -104,13 +104,11 @@ export const CheckoutItemCostTotal: React.FC<CheckoutItemCostTotalProps> = ({
 
   const handlePromoCodeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     onChangePromoCode(event.target.value);
-  }
+  };
 
   const handleApplyPromoCode = useCallback(() => {
-    // call api
-    // set id and percent
-    invoiceID && editable && onApply(invoiceID);
-  }, [invoiceID, editable]);
+    if (invoiceID && editable) onApply(invoiceID);
+  }, [invoiceID, editable, onApply]);
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", mt: { xs: 3, sm: 0.5 } }}>
@@ -119,8 +117,8 @@ export const CheckoutItemCostTotal: React.FC<CheckoutItemCostTotalProps> = ({
           <Box sx={ ROW_SX }>
             <Typography>Promo code</Typography>
             <Typography>
-              <TextField value={promoCode} onChange={ handlePromoCodeChange } InputProps={{ readOnly: !(editable && invoiceID) }} />
-              <Button onClick={handleApplyPromoCode} disabled={!(editable && invoiceID)}>Apply</Button>
+              <TextField value={ promoCode } onChange={ handlePromoCodeChange } InputProps={{ readOnly: !(editable && invoiceID) }} />
+              <Button onClick={ handleApplyPromoCode } disabled={ !(editable && invoiceID) }>Apply</Button>
             </Typography>
           </Box>
 

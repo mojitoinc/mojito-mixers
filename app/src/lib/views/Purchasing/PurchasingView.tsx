@@ -59,7 +59,7 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
 
   useEffect(() => {
     setEditable(false);
-  }, []);
+  }, [setEditable]);
 
   useTimeout(() => {
     setHasWaited(true);

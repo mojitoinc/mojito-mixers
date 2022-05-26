@@ -41,7 +41,7 @@ export const ConfirmationView: React.FC<ConfirmationViewProps> = ({
 
   useEffect(() => {
     setEditable(false);
-  }, []);
+  }, [setEditable]);
 
   const {
     billingInfo: selectedBillingInfo,
