@@ -35,6 +35,7 @@ jobs:
       - run: yarn dist:build
       - run: test -e ./dist/cjs/index.js
       - run: test -e ./dist/esm/index.js
+      - run: test -e ./dist/test/index.js
 
   # test:
   #   name: Test
