@@ -16,7 +16,7 @@ import { checkNeedsGenericErrorMessage } from "../../hooks/useFormCheckoutError"
 import { TaxesState } from "../Billing/BillingView";
 import { Wallet } from "../../domain/wallet/wallet.interfaces";
 import { CreditCardNetwork } from "../../domain/react-payment-inputs/react-payment-inputs.utils";
-import { usePromoCode } from "@lib/utils/promoCodeUtils";
+import { usePromoCode } from "../../utils/promoCodeUtils";
 
 const billingInfoItemBoxProps: BoxProps = { sx: { mt: 2.5 } };
 

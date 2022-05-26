@@ -5,7 +5,7 @@ import { formatTaxRate } from "../../../../utils/formatUtils";
 import { TaxesState } from "../../../../views/Billing/BillingView";
 import { Number } from "../../../shared/Number/Number";
 import { TextField } from "../../../shared/TextField/TextField";
-import { usePromoCode } from "@lib/utils/promoCodeUtils";
+import { usePromoCode } from "../../../../utils/promoCodeUtils";
 
 const TAX_RATE_PLACEHOLDER_SX: SxProps<Theme> = {
   background: theme => theme.palette.grey[100],
@@ -60,7 +60,8 @@ export const CheckoutItemCostTotal: React.FC<CheckoutItemCostTotalProps> = ({
     if (promoCode.total) {
       setDiscountTotal(total - promoCode.total);
     }
-  }, [promoCode])
+  }, [promoCode]);
+
   const feesValue = fees || 0;
 
   let taxRowElement: React.ReactNode = null;

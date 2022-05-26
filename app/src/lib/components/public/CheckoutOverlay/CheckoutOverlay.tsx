@@ -40,9 +40,9 @@ import { useCountdown } from "../../../hooks/useContdown";
 import { PUIRouterOptions } from "../../../domain/router/router.types";
 import { getPathnameWithParams } from "../../../domain/url/url.utils";
 import { IS_BROWSER } from "../../../domain/build/build.constants";
+import { PromoCodeProvider } from "../../../utils/promoCodeUtils";
 
 export type LoaderMode = "default" | "success" | "error";
-import { PromoCodeProvider } from "@lib/utils/promoCodeUtils";
 
 export interface PUICheckoutOverlayProps {
   // Modal:

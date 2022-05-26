@@ -15,7 +15,7 @@ import { TaxQuoteOutput, useGetTaxQuoteLazyQuery } from "../../queries/graphqlGe
 import { useCheckoutItemsCostTotal } from "../../hooks/useCheckoutItemCostTotal";
 import { Wallet } from "../../domain/wallet/wallet.interfaces";
 import { ConsentType } from "../../components/shared/ConsentText/ConsentText";
-import { usePromoCode } from "@lib/utils/promoCodeUtils";
+import { usePromoCode } from "../../utils/promoCodeUtils";
 
 export type TaxStatus = "incomplete" | "loading" | "complete" | "error";
 

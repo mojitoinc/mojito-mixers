@@ -13,7 +13,7 @@ import { PAYMENT_NOTIFICATION_INTERVAL_MS, PURCHASING_MESSAGES_DEFAULT, PURCHASI
 import { isLocalhost } from "../../domain/url/url.utils";
 import { Wallet } from "../../domain/wallet/wallet.interfaces";
 import { CheckoutItemInfo } from "../../domain/product/product.interfaces";
-import { usePromoCode } from "@lib/utils/promoCodeUtils";
+import { usePromoCode } from "../../utils/promoCodeUtils";
 
 export interface PurchasingViewProps {
   threeDSEnabled?: boolean;

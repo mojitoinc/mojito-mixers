@@ -10,7 +10,7 @@ import { CheckoutItem } from "../../domain/product/product.interfaces";
 import { SelectedPaymentMethod } from "../../components/public/CheckoutOverlay/CheckoutOverlay.hooks";
 import { Wallet } from "../../domain/wallet/wallet.interfaces";
 import { useDictionary } from "../../hooks/useDictionary";
-import { usePromoCode } from "@lib/utils/promoCodeUtils";
+import { usePromoCode } from "../../utils/promoCodeUtils";
 
 export interface ConfirmationViewProps {
   checkoutItems: CheckoutItem[];

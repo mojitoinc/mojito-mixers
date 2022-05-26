@@ -6,7 +6,7 @@ import { CheckoutModalFooter } from "../../components/payments/CheckoutModalFoot
 import { CheckoutItem } from "../../domain/product/product.interfaces";
 import { resetStepperProgress } from "../../components/payments/CheckoutStepper/CheckoutStepper";
 import { TaxesState } from "../Billing/BillingView";
-import { usePromoCode } from "@lib/utils/promoCodeUtils";
+import { usePromoCode } from "../../utils/promoCodeUtils";
 
 export interface AuthenticationViewProps {
   checkoutItems: CheckoutItem[];
