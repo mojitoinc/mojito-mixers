@@ -47,7 +47,7 @@
     "codegen": "graphql-codegen --config codegen.yml"
   },
   "dependencies": {
-    "@apollo/client": "3.6.4",
+    "@apollo/client": "3.6.5",
     "@auth0/auth0-react": "^1.10.1",
     "@emotion/react": "^11.9.0",
     "@emotion/styled": "^11.8.1",
@@ -87,7 +87,7 @@
     "@graphql-codegen/typescript": "^2.4.11",
     "@graphql-codegen/typescript-operations": "^2.4.0",
     "@graphql-codegen/typescript-react-apollo": "^3.2.14",
-    "@rollup/plugin-commonjs": "21.1.0",
+    "@rollup/plugin-commonjs": "^22.0.0",
     "@rollup/plugin-node-resolve": "^13.3.0",
     "@rollup/plugin-typescript": "^8.3.2",
     "@types/atob": "^2.1.2",

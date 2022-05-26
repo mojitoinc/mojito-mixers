@@ -33,6 +33,9 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
       - run: yarn install --frozen-lockfile
       - run: yarn dist:build
+      - run: test -e ./dist/cjs/index.js
+      - run: test -e ./dist/esm/index.js
+
   # test:
   #   name: Test
   #   runs-on: ubuntu-latest

@@ -25,6 +25,7 @@ const EXTERNAL = [
   "react-payment-inputs/images",
   "@mui/material/styles",
   "country-region-data/dist/data-umd",
+  "@apollo/client/link/context",
   /@mui\/icons\-material\/.*/,
 ];
 

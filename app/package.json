@@ -39,7 +39,7 @@
     "emulators": "npx firebase emulators:start"
   },
   "dependencies": {
-    "@apollo/client": "3.6.4",
+    "@apollo/client": "3.6.5",
     "@auth0/auth0-react": "^1.10.0",
     "@emotion/react": "^11.9.0",
     "@emotion/styled": "^11.8.1",
@@ -47,8 +47,8 @@
     "@mdi/js": "^6.7.96",
     "@mdi/react": "^1.6.0",
     "@mui/icons-material": "^5.8.0",
-    "@mui/material": "^5.8.0",
-    "@mui/system": "^5.8.0",
+    "@mui/material": "^5.8.1",
+    "@mui/system": "^5.8.1",
     "@swyg/corre": "^1.0.4",
     "atob": "^2.1.2",
     "btoa": "^1.2.1",
@@ -84,9 +84,9 @@
     "@types/btoa": "^1.2.3",
     "@types/jest": "^27.5.1",
     "@types/react": "^18.0.9",
-    "@types/react-dom": "^18.0.4",
-    "@typescript-eslint/eslint-plugin": "^5.25.0",
-    "@typescript-eslint/parser": "^5.25.0",
+    "@types/react-dom": "^18.0.5",
+    "@typescript-eslint/eslint-plugin": "^5.26.0",
+    "@typescript-eslint/parser": "^5.26.0",
     "eslint": "^8.16.0",
     "eslint-config-airbnb": "19.0.4",
     "eslint-config-next": "^12.1.6",
@@ -101,8 +101,8 @@
     "jest-environment-jsdom": "^28.1.0",
     "jest-extended": "^2.0.0",
     "jest-fetch-mock": "^3.0.3",
-    "ts-jest": "^28.0.2",
-    "typescript": "^4.6.4"
+    "ts-jest": "^28.0.3",
+    "typescript": "^4.7.2"
   },
   "resolutions": {
     "ansi-regex": "^5.0.1",
