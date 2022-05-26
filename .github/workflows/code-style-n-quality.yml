@@ -1,4 +1,4 @@
-name: "Lint & Test"
+name: "Code Style & Quality"
 
 on:
   push:
@@ -21,6 +21,18 @@ jobs:
         working-directory: ./app
       - run: yarn lint
         working-directory: ./app
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    if: "!startsWith(github.event.head_commit.message, '[RELEASE]')"
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '14.x'
+          registry-url: 'https://registry.npmjs.org'
+      - run: yarn install --frozen-lockfile
+      - run: yarn dist:build
   # test:
   #   name: Test
   #   runs-on: ubuntu-latest
