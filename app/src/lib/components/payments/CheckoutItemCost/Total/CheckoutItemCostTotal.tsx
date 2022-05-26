@@ -115,11 +115,21 @@ export const CheckoutItemCostTotal: React.FC<CheckoutItemCostTotalProps> = ({
       { withDetails && (
         <>
           <Box sx={ ROW_SX }>
-            <Typography>Promo code</Typography>
-            <Typography>
-              <TextField value={ promoCode } onChange={ handlePromoCodeChange } InputProps={{ readOnly: !(editable && invoiceID) }} />
-              <Button onClick={ handleApplyPromoCode } disabled={ !(editable && invoiceID) }>Apply</Button>
-            </Typography>
+            <TextField
+              label="Discount code"
+              value={ promoCode.code }
+              onChange={ handlePromoCodeChange }
+              InputProps={{
+                readOnly: !(editable && invoiceID),
+                endAdornment: (
+                  <Button
+                    sx={{ color: "text.primary" }}
+                    onClick={ handleApplyPromoCode }
+                    disabled={ !(editable && invoiceID) }>
+                    Apply
+                  </Button>
+                ),
+              }} />
           </Box>
 
           <Box sx={ ROW_SX }>
