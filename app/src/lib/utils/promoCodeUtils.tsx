@@ -73,6 +73,8 @@ const usePromoCode = () => {
           id,
           total,
         }));
+      } else {
+        console.log("wrong discount code");
       }
     } catch (e) {
       console.log(e);
