@@ -93,7 +93,7 @@ Next, add this component to any page where you'd like to show the payment UI, pa
 
   useEffect(() => {
     onOpen();
-  }, [onOpen])
+  }, [onOpen]);
 
   return (
     <CheckoutComponent

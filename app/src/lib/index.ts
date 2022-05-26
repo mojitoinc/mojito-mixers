@@ -4,6 +4,7 @@ export { PUICheckout } from "./components/public/CheckoutOverlay/CheckoutOverlay
 export { PUISuccess } from "./components/public/SuccessOverlay/SuccessOverlay";
 export { PUIError } from "./components/public/ErrorOverlay/ErrorOverlay";
 export { PUIPlaid } from "./components/public/PlaidOverlay/PlaidOverlay";
+export { useOpenCloseCheckoutModal } from "./components/public/useOpenCloseCheckoutModal/useOpenCloseCheckoutModal";
 export { continuePlaidOAuthFlow } from "./hooks/usePlaid";
 export { getCheckoutModalState, persistCheckoutModalInfoRedirectURI, persistCheckoutModalInfoUsed } from "./components/public/CheckoutOverlay/CheckoutOverlay.utils";
 export { extendDefaultTheme, MOJITO_LIGHT_THEME, MOJITO_DARK_THEME } from "./config/theme/theme";
