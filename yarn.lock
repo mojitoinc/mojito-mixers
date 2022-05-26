@@ -10,10 +10,10 @@
     "@jridgewell/gen-mapping" "^0.1.0"
     "@jridgewell/trace-mapping" "^0.3.9"
 
-"@apollo/client@3.6.4":
-  version "3.6.4"
-  resolved "https://registry.yarnpkg.com/@apollo/client/-/client-3.6.4.tgz#08b726d72bb207f27ed1aeb0025bc4d32d776a9e"
-  integrity sha512-2z0dzQpx2HhGK5Pip/rbMM5kkbE4BLZGK2ItSmy2lMPy9/SZGFnw+zWBXSoIook0JT2bDscm+FsdmtV+1AhdJw==
+"@apollo/client@3.6.5":
+  version "3.6.5"
+  resolved "https://registry.yarnpkg.com/@apollo/client/-/client-3.6.5.tgz#6a7baaf05852187b0eac1c6064e721d47326d70c"
+  integrity sha512-xGAZzv1f5abyH45MSU5eOLyGQuP4Ps0OhP36pSCtt6pCICI3n4yDkdftFCPvqDVqVTuciX1kkyeJPfGodz5kwg==
   dependencies:
     "@graphql-typed-document-node/core" "^3.1.1"
     "@wry/context" "^0.6.0"
@@ -1138,10 +1138,10 @@
   resolved "https://registry.yarnpkg.com/@popperjs/core/-/core-2.11.5.tgz#db5a11bf66bdab39569719555b0f76e138d7bd64"
   integrity sha512-9X2obfABZuDVLCgPK9aX0a/x4jaOEweTTWE2+9sr0Qqqevj2Uv5XorvusThmc9XGYpS9yI+fhh8RTafBtGposw==
 
-"@rollup/plugin-commonjs@21.1.0":
-  version "21.1.0"
-  resolved "https://registry.yarnpkg.com/@rollup/plugin-commonjs/-/plugin-commonjs-21.1.0.tgz#45576d7b47609af2db87f55a6d4b46e44fc3a553"
-  integrity sha512-6ZtHx3VHIp2ReNNDxHjuUml6ur+WcQ28N1yHgCQwsbNkQg2suhxGMDQGJOn/KuDxKtd1xuZP5xSTwBA4GQ8hbA==
+"@rollup/plugin-commonjs@22.0.0":
+  version "22.0.0"
+  resolved "https://registry.yarnpkg.com/@rollup/plugin-commonjs/-/plugin-commonjs-22.0.0.tgz#f4d87016e2fbf187a593ab9f46626fe05b59e8bd"
+  integrity sha512-Ktvf2j+bAO+30awhbYoCaXpBcyPmJbaEUYClQns/+6SNCYFURbvBiNbWgHITEsIgDDWCDUclWRKEuf8cwZCFoQ==
   dependencies:
     "@rollup/pluginutils" "^3.1.0"
     commondir "^1.0.1"
