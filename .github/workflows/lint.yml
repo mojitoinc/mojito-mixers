@@ -21,6 +21,7 @@ jobs:
         working-directory: ./app
       - run: yarn lint
         working-directory: ./app
+      - run: yarn install --frozen-lockfile
       - run: yarn dist:build
   # test:
   #   name: Test
