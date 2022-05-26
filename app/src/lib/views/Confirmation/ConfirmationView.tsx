@@ -20,6 +20,7 @@ export interface ConfirmationViewProps {
   wallet: null | string | Wallet;
   onNext: () => void;
   onGoTo?: (pathnameOrUrl: string) => void;
+  invoiceID: string | null;
 }
 
 export const ConfirmationView: React.FC<ConfirmationViewProps> = ({
@@ -30,6 +31,7 @@ export const ConfirmationView: React.FC<ConfirmationViewProps> = ({
   wallet,
   onNext,
   onGoTo,
+  invoiceID,
 }) => {
   const { setEditable } = usePromoCode();
   const {
@@ -77,6 +79,7 @@ export const ConfirmationView: React.FC<ConfirmationViewProps> = ({
       spacing={{ xs: 3, md: 3.75 }}>
 
       <PurchaseConfirmationBillingDetails
+        invoiceID={ invoiceID }
         checkoutItems={ checkoutItems }
         processorPaymentID={ processorPaymentID }
         wallet={ wallet }

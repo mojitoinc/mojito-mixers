@@ -43,7 +43,7 @@ export interface CheckoutItemCostTotalProps {
   fees: number | null;
   taxes: null | TaxesState;
   withDetails?: boolean;
-  invoiceID?: string;
+  invoiceID: string | null;
 }
 
 export const CheckoutItemCostTotal: React.FC<CheckoutItemCostTotalProps> = ({

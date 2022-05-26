@@ -58,6 +58,7 @@ export interface BillingViewProps {
   onClose: () => void;
   consentType?: ConsentType;
   debug?: boolean;
+  invoiceID: string | null;
 }
 
 export const BillingView: React.FC<BillingViewProps> = ({
@@ -78,6 +79,7 @@ export const BillingView: React.FC<BillingViewProps> = ({
   onClose,
   consentType,
   debug,
+  invoiceID,
 }) => {
   const { setEditable } = usePromoCode();
   const savedPaymentMethodAddressIdRef = useRef<string>("");
@@ -312,6 +314,7 @@ export const BillingView: React.FC<BillingViewProps> = ({
       <Divider sx={{ display: { xs: "block", md: "none" } }} />
 
       <CheckoutDeliveryAndItemCostBreakdown
+        invoiceID={ invoiceID }
         checkoutItems={ checkoutItems }
         taxes={ vertexEnabled ? taxes : null }
         validatePersonalDeliveryAddress={ formSubmitAttempted }

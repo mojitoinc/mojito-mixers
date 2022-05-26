@@ -9,11 +9,13 @@ import { useCheckoutItemsCostTotal } from "../../../../hooks/useCheckoutItemCost
 export interface CheckoutItemCostPurchaseProps {
   checkoutItems: CheckoutItem[];
   selectedPaymentMethodBillingInfo: SavedPaymentMethod | SavedPaymentMethodBillingInfo;
+  invoiceID: string | null;
 }
 
 export const CheckoutItemCostPurchase: React.FC<CheckoutItemCostPurchaseProps> = ({
   checkoutItems,
   selectedPaymentMethodBillingInfo,
+  invoiceID,
 }) => {
   const firstCheckoutItem = checkoutItems[0];
   const { total, fees, taxRate, taxAmount } = useCheckoutItemsCostTotal(checkoutItems);
@@ -29,6 +31,7 @@ export const CheckoutItemCostPurchase: React.FC<CheckoutItemCostPurchaseProps> =
         <BillingInfoFragment savedPaymentMethod={ selectedPaymentMethodBillingInfo } />
 
         <CheckoutItemCostTotal
+          invoiceID={ invoiceID }
           total={ total }
           fees={ fees === 0 && firstCheckoutItem.lotType === "buyNow" ? null : fees }
           taxes={{ status: "complete", taxRate, taxAmount }} />

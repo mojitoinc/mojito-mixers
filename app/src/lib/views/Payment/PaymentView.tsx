@@ -210,6 +210,7 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
       <Divider sx={{ display: { xs: "block", md: "none" } }} />
 
       <CheckoutDeliveryAndItemCostBreakdown
+        invoiceID={ invoiceID }
         checkoutItems={ checkoutItems }
         taxes={ taxes }
         validatePersonalDeliveryAddress={ formSubmitAttempted }

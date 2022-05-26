@@ -842,6 +842,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
 
     checkoutStepElement = (
       <AuthenticationView
+        invoiceID={ invoiceID }
         checkoutItems={ checkoutItems }
         taxes={ taxes }
         isAuthenticated={ isAuthenticated }
@@ -852,6 +853,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   } else if (checkoutStep === "billing") {
     checkoutStepElement = (
       <BillingView
+        invoiceID={ invoiceID }
         orgID={ orgID }
         vertexEnabled={ vertexEnabled }
         checkoutItems={ checkoutItems }
@@ -920,6 +922,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
 
     checkoutStepElement = (
       <ConfirmationView
+        invoiceID={ invoiceID }
         checkoutItems={ checkoutItems }
         savedPaymentMethods={ savedPaymentMethods }
         selectedPaymentMethod={ selectedPaymentMethod }

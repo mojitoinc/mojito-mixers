@@ -14,6 +14,7 @@ interface CheckoutDeliveryAndItemCostBreakdownProps {
   wallets?: Wallet[];
   wallet: null | string | Wallet;
   onWalletChange: (wallet: null | string | Wallet) => void;
+  invoiceID: string | null;
 }
 
 export const CheckoutDeliveryAndItemCostBreakdown: React.FC<CheckoutDeliveryAndItemCostBreakdownProps> = ({
@@ -23,6 +24,7 @@ export const CheckoutDeliveryAndItemCostBreakdown: React.FC<CheckoutDeliveryAndI
   wallets,
   wallet,
   onWalletChange,
+  invoiceID,
 }) => (
   <Stack sx={{ display: "flex", width: theme => ({ xs: "100%", md: `calc(50% - ${ theme.spacing(3.75 / 2) })` }) }}>
     <DeliveryWalletSelector
@@ -33,6 +35,6 @@ export const CheckoutDeliveryAndItemCostBreakdown: React.FC<CheckoutDeliveryAndI
 
     <Divider sx={{ my: 3.75 }} />
 
-    <CheckoutItemCostBreakdown checkoutItems={ checkoutItems } taxes={ taxes } />
+    <CheckoutItemCostBreakdown checkoutItems={ checkoutItems } taxes={ taxes } invoiceID={ invoiceID } />
   </Stack>
 );
