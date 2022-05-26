@@ -1660,12 +1660,12 @@ export type QueryGetPaymentMethodArgs = {
 
 
 export type QueryGetPaymentMethodListArgs = {
-  orgID: Scalars['UUID1'];
+  orgID?: InputMaybe<Scalars['UUID1']>;
 };
 
 
 export type QueryGetPaymentPublicKeyArgs = {
-  orgID: Scalars['UUID1'];
+  orgID?: InputMaybe<Scalars['UUID1']>;
 };
 
 
@@ -1747,7 +1747,7 @@ export type QueryOrganizationArgs = {
 
 
 export type QueryOrganizationByIdArgs = {
-  id: Scalars['UUID1'];
+  id?: InputMaybe<Scalars['UUID1']>;
 };
 
 
@@ -2146,6 +2146,14 @@ export type GetInvoiceDetailsQueryVariables = Exact<{
 
 export type GetInvoiceDetailsQuery = { __typename?: 'Query', getInvoiceDetails: { __typename?: 'InvoiceDetails', items: Array<{ __typename?: 'ItemInvoiceDetail', collectionItemID: any, destinationAddress: string, units: number, unitPrice: number, taxes: number, totalPrice: number } | null> } };
 
+export type ApplyDiscountCodeQueryVariables = Exact<{
+  discountCode: Scalars['String'];
+  invoiceItemID: Scalars['UUID1'];
+}>;
+
+
+export type ApplyDiscountCodeQuery = { __typename?: 'Query', applyDiscountCode: { __typename?: 'DiscountedInvoiceItem', discountedAmount: number, totalPrice: number, totalPriceAfterDiscount: number, invoiceItemID: any, discountCode: { __typename?: 'DiscountCode', id: any, discountCode: string, discountType: string, description?: string | null, value: number, organizationID: any } } };
+
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -2491,6 +2499,53 @@ export function useGetInvoiceDetailsLazyQuery(baseOptions?: Apollo.LazyQueryHook
 export type GetInvoiceDetailsQueryHookResult = ReturnType<typeof useGetInvoiceDetailsQuery>;
 export type GetInvoiceDetailsLazyQueryHookResult = ReturnType<typeof useGetInvoiceDetailsLazyQuery>;
 export type GetInvoiceDetailsQueryResult = Apollo.QueryResult<GetInvoiceDetailsQuery, GetInvoiceDetailsQueryVariables>;
+export const ApplyDiscountCodeDocument = gql`
+    query ApplyDiscountCode($discountCode: String!, $invoiceItemID: UUID1!) {
+  applyDiscountCode(discountCode: $discountCode, invoiceItemID: $invoiceItemID) {
+    discountedAmount
+    totalPrice
+    totalPriceAfterDiscount
+    invoiceItemID
+    discountCode {
+      id
+      discountCode
+      discountType
+      description
+      value
+      organizationID
+    }
+  }
+}
+    `;
+
+/**
+ * __useApplyDiscountCodeQuery__
+ *
+ * To run a query within a React component, call `useApplyDiscountCodeQuery` and pass it any options that fit your needs.
+ * When your component renders, `useApplyDiscountCodeQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useApplyDiscountCodeQuery({
+ *   variables: {
+ *      discountCode: // value for 'discountCode'
+ *      invoiceItemID: // value for 'invoiceItemID'
+ *   },
+ * });
+ */
+export function useApplyDiscountCodeQuery(baseOptions: Apollo.QueryHookOptions<ApplyDiscountCodeQuery, ApplyDiscountCodeQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<ApplyDiscountCodeQuery, ApplyDiscountCodeQueryVariables>(ApplyDiscountCodeDocument, options);
+      }
+export function useApplyDiscountCodeLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ApplyDiscountCodeQuery, ApplyDiscountCodeQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<ApplyDiscountCodeQuery, ApplyDiscountCodeQueryVariables>(ApplyDiscountCodeDocument, options);
+        }
+export type ApplyDiscountCodeQueryHookResult = ReturnType<typeof useApplyDiscountCodeQuery>;
+export type ApplyDiscountCodeLazyQueryHookResult = ReturnType<typeof useApplyDiscountCodeLazyQuery>;
+export type ApplyDiscountCodeQueryResult = Apollo.QueryResult<ApplyDiscountCodeQuery, ApplyDiscountCodeQueryVariables>;
 export const MeDocument = gql`
     query Me {
   me {

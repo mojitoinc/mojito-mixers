@@ -1,3 +1,4 @@
+import { useApplyDiscountCodeLazyQuery } from "@lib/queries/graphqlGenerated";
 import React, { Dispatch, SetStateAction, useMemo } from "react";
 
 interface IPromoCode {
@@ -44,6 +45,7 @@ const PromoCodeProvider: React.FC<PromoCodeProviderProps> = ({ children }) => {
 };
 
 const usePromoCode = () => {
+  const [applyDiscountCode] = useApplyDiscountCodeLazyQuery();
   const { promoCode, setPromoCode, editable, setEditable } =
     React.useContext(PromoCodeContext);
 
@@ -54,15 +56,27 @@ const usePromoCode = () => {
     }));
   };
 
-  const onApply = (invoiceId: string) => {
-    // call mutation api
-    console.log(invoiceId);
-    // update total
-    setPromoCode(code => ({
-      ...code,
-      id: "123",
-      total: 100,
-    }));
+  const onApply = async (invoiceId: string) => {
+    try {
+      const discountResult = await applyDiscountCode({
+        variables: {
+          discountCode: promoCode.code,
+          invoiceItemID: invoiceId,
+        },
+      });
+      const id = discountResult.data?.applyDiscountCode?.discountCode?.id;
+      const total = discountResult.data?.applyDiscountCode?.totalPriceAfterDiscount;
+      if (id) {
+        // update total
+        setPromoCode(code => ({
+          ...code,
+          id,
+          total,
+        }));
+      }
+    } catch (e) {
+      console.log(e);
+    }
   };
 
   return { promoCode, onChangePromoCode, onApply, editable, setEditable };

@@ -44,3 +44,20 @@ query GetInvoiceDetails($invoiceID: UUID1!) {
     }
   }
 }
+
+query ApplyDiscountCode($discountCode: String!, $invoiceItemID: UUID1!) {
+  applyDiscountCode(discountCode: $discountCode, invoiceItemID: $invoiceItemID) {
+    discountedAmount
+    totalPrice
+    totalPriceAfterDiscount
+    invoiceItemID
+    discountCode {
+      id
+      discountCode
+      discountType
+      description
+      value
+      organizationID
+    }
+  }
+}
