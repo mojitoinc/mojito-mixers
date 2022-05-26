@@ -1,5 +1,5 @@
-import { useApplyDiscountCodeLazyQuery } from "@lib/queries/graphqlGenerated";
 import React, { Dispatch, SetStateAction, useMemo } from "react";
+import { useApplyDiscountCodeLazyQuery } from "../queries/graphqlGenerated";
 
 interface IPromoCode {
   code: string;
