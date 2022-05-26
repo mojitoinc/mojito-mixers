@@ -683,7 +683,7 @@ Make sure:
 
 - You have a 3DS account configured on the backend for the environment you are using (contact support).
 
-- If you are using a GraphQL playground to play around with the API, make sure you use `https://api.dev.mojito.xyz/`.
+- If you are using a GraphQL playground to play around with the API, make sure you use `https://api-dev.mojito.xyz/`.
 
 - If you are triggering the mutation from your app in localhost, make sure you add the header `"origin-overwrite": "https://yourdomain.com"`.
 
@@ -730,7 +730,7 @@ When testing the purchase flow, you need to make sure to:
 
     - **Mojito Mint** - [`https://mint.dev.mojito.xyz/`](https://mint.dev.mojito.xyz/).
 
-    - **Mojito API GraphQL Playground** - [`https://api.dev.mojito.xyz/query`](https://api.dev.mojito.xyz/query)
+    - **Mojito API GraphQL Playground** - [`https://api-dev.mojito.xyz/query`](https://api-dev.mojito.xyz/query)
 
 - When paying with credit card, use [Circle's](https://developers.circle.com/docs/introducing-circle-apis) [Test card numbers](https://developers.circle.com/docs/test-card-numbers). As you can see, only Visa and MasterCard are supported.
 
