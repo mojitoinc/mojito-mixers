@@ -104,10 +104,19 @@ Next, add this component to any page where you'd like to show the payment UI, pa
   );
 ```
 
-While you might feel tempted to wrap this logic in a provider and call it using context and a custom hook, note that's
-usually a bad idea, as you'll have to add the provider in your App's entry point (`_app.tsx` in Next.js), which will
-make all your pages heavier, even if the Payment UI is not used. You should only do this if you App is a SPA, in which
-case it will look something like this: 
+**Next, make sure you check the sections below for Vertex/TaxJar, Circle, 3DS and Plaid.**
+
+<br />
+
+
+### Usage with Provider
+
+**Please, do not use this approach, stick to the one above. This is here for reference only. Just skip this section.**
+
+While you might feel tempted to wrap this logic in a custom provider (`CheckoutOverlayProvider` in this example) and
+call it using context and a custom hook, note that's usually a bad idea, as you'll have to add the provider in your
+App's entry point (`_app.tsx` in Next.js), which will make all your pages heavier, even if the Payment UI is not used.
+You should only do this if you App is a SPA, in which case it will look something like this: 
 
 ```TSX
   const router = useRouter();
@@ -134,7 +143,7 @@ this example) to customize and open the Payment UI like this:
 ```TSX
   const { open, setCheckoutComponentProps } = useCheckoutOverlay();
 
-  const getComponentPropsRef = useRef<() => CheckoutComponentProps>(() => ({}));
+  const getComponentPropsRef = useRef<() => PUICheckoutComponentProps>(() => ({}));
 
   getComponentPropsRef.current = () => {
     return {
@@ -169,8 +178,6 @@ this example) to customize and open the Payment UI like this:
   }, [setCheckoutComponentProps]);
 
 ```
-
-**Make sure you check the setup steps below for Vertex/TaxJar, Circle, 3DS and Plaid.**
 
 <br />
 
