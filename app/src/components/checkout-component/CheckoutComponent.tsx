@@ -78,8 +78,6 @@ export const CheckoutComponent: React.FC<PUICheckoutComponentProps> = ({
     // open,
     // onClose,
     onGoTo,
-    // goToHref,
-    // goToLabel,
 
     // Flow:
     // loaderMode,
