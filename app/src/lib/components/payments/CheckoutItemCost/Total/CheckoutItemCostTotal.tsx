@@ -58,14 +58,14 @@ export const CheckoutItemCostTotal: React.FC<CheckoutItemCostTotalProps> = ({
     if (promoCode.total) {
       setDiscountTotal(promoCode.total);
     }
-  }, [promoCode, total]);
+  }, [promoCode, setDiscountTotal]);
 
   const feesValue = fees || 0;
 
   let taxRowElement: React.ReactNode = null;
 
   let totalElement: React.ReactNode = (
-    <Tooltip title="Enter a valid address to calculate the total"><span><Number suffix=" USD">{ total + feesValue }</Number></span></Tooltip>
+    <Tooltip title="Enter a valid address to calculate the total"><span><Number suffix=" USD">{ discountTotal + feesValue }</Number></span></Tooltip>
   );
 
   if (taxes) {
