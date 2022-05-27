@@ -47,6 +47,7 @@ export interface PaymentViewProps {
   acceptedCreditCardNetworks?: CreditCardNetwork[];
   consentType?: ConsentType;
   debug?: boolean;
+  invoiceItemIDs: string[];
 }
 
 export const PaymentView: React.FC<PaymentViewProps> = ({
@@ -71,8 +72,20 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
   acceptedCreditCardNetworks,
   consentType,
   debug,
+  invoiceItemIDs,
 }) => {
-  const { setEditable } = usePromoCode();
+  const { setEditable, setInvoiceItemIDs } = usePromoCode();
+
+  useEffect(() => {
+    if (invoiceItemIDs.length > 0) {
+      setInvoiceItemIDs(invoiceItemIDs);
+    }
+  }, [invoiceItemIDs, setInvoiceItemIDs]);
+
+  useEffect(() => {
+    setEditable(true);
+  }, [setEditable]);
+
   const {
     billingInfo: selectedBillingInfo,
     paymentInfo: selectedPaymentInfo,
@@ -121,10 +134,6 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
   }, [onSavedPaymentMethodDeleted, savedPaymentMethods.length]);
 
   const handleFormAttemptSubmit = useCallback(() => setFormSubmitAttempted(true), []);
-
-  useEffect(() => {
-    setEditable(true);
-  }, [setEditable]);
 
   useEffect(() => {
     if (!selectedPaymentMethodBillingInfo) onPrev();
@@ -210,7 +219,6 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
       <Divider sx={{ display: { xs: "block", md: "none" } }} />
 
       <CheckoutDeliveryAndItemCostBreakdown
-        invoiceID={ invoiceID }
         checkoutItems={ checkoutItems }
         taxes={ taxes }
         validatePersonalDeliveryAddress={ formSubmitAttempted }

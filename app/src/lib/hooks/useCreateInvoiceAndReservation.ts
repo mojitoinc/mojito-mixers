@@ -1,6 +1,5 @@
 import { useCallback, useState } from "react";
 import { ApolloError } from "@apollo/client";
-import { usePromoCode } from "../utils/promoCodeUtils";
 import { CheckoutModalError } from "../components/public/CheckoutOverlay/CheckoutOverlay.hooks";
 import { ERROR_PURCHASE_CREATING_INVOICE, ERROR_PURCHASE_LOADING_ITEMS, ERROR_PURCHASE_NO_ITEMS, ERROR_PURCHASE_NO_UNITS } from "../domain/errors/errors.constants";
 import { CheckoutItem } from "../domain/product/product.interfaces";
@@ -14,6 +13,7 @@ export interface UseCreateInvoiceAndReservationOptions {
 
 export interface InvoiceAndReservationState {
   invoiceID?: string;
+  invoiceItemIDs: string[];
   invoiceCountdownStart?: number;
   error?: string | CheckoutModalError;
 }
@@ -28,11 +28,11 @@ export function useCreateInvoiceAndReservation({
   checkoutItems,
   debug = false,
 }: UseCreateInvoiceAndReservationOptions): UseCreateInvoiceAndReservationReturn {
-  const [invoiceAndReservationState, setInvoiceAndReservationState] = useState<InvoiceAndReservationState>({ });
-  const { setInvoiceItemID } = usePromoCode();
+  const [invoiceAndReservationState, setInvoiceAndReservationState] = useState<InvoiceAndReservationState>({ invoiceItemIDs: [] });
 
   const setError = useCallback((error: string | CheckoutModalError) => {
     setInvoiceAndReservationState({
+      invoiceItemIDs: [],
       error,
     });
   }, []);
@@ -78,6 +78,7 @@ export function useCreateInvoiceAndReservation({
     }
 
     let invoiceID = "";
+    const invoiceItemIDs: string[] = [];
     let mutationError: ApolloError | Error | undefined;
 
     if (lotType === "buyNow") {
@@ -105,7 +106,11 @@ export function useCreateInvoiceAndReservation({
         if (debug) console.log("    🟢 reserveBuyNowLot result", reserveBuyNowLotResult);
 
         invoiceID = reserveBuyNowLotResult.data?.reserveMarketplaceBuyNowLot?.invoice?.invoiceID;
-        setInvoiceItemID(reserveBuyNowLotResult.data?.reserveMarketplaceBuyNowLot?.invoice?.items[0]?.invoiceItemID);
+        reserveBuyNowLotResult.data?.reserveMarketplaceBuyNowLot?.invoice?.items.forEach((item) => {
+          if (item) {
+            invoiceItemIDs.push(item.invoiceItemID);
+          }
+        });
       }
     } else if (lotType === "auction" && process.env.NODE_ENV === "development") {
       if (debug) {
@@ -139,7 +144,7 @@ export function useCreateInvoiceAndReservation({
       return;
     }
 
-    setInvoiceAndReservationState({ invoiceID, invoiceCountdownStart: Date.now() });
+    setInvoiceAndReservationState({ invoiceID, invoiceCountdownStart: Date.now(), invoiceItemIDs });
 
     // TODO: Error handling and automatic retry:
   }, [
@@ -149,7 +154,6 @@ export function useCreateInvoiceAndReservation({
     debug,
     createAuctionInvoice,
     reserveBuyNowLot,
-    setInvoiceItemID,
   ]);
 
   return {

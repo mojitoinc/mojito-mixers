@@ -15,7 +15,7 @@ export interface AuthenticationViewProps {
   guestCheckoutEnabled?: boolean;
   onGuestClicked: () => void;
   onCloseClicked: () => void;
-  invoiceID: string | null;
+  invoiceItemIDs: string[];
 }
 
 export const AuthenticationView: React.FC<AuthenticationViewProps> = ({
@@ -25,9 +25,15 @@ export const AuthenticationView: React.FC<AuthenticationViewProps> = ({
   guestCheckoutEnabled,
   onGuestClicked,
   onCloseClicked,
-  invoiceID,
+  invoiceItemIDs,
 }) => {
-  const { setEditable } = usePromoCode();
+  const { setEditable, setInvoiceItemIDs } = usePromoCode();
+
+  useEffect(() => {
+    if (invoiceItemIDs.length > 0) {
+      setInvoiceItemIDs(invoiceItemIDs);
+    }
+  }, [invoiceItemIDs, setInvoiceItemIDs]);
 
   useEffect(() => {
     setEditable(true);
@@ -40,7 +46,7 @@ export const AuthenticationView: React.FC<AuthenticationViewProps> = ({
 
   return (
     <Stack sx={{ mt: 5 }}>
-      <CheckoutItemCostBreakdown checkoutItems={ checkoutItems } taxes={ taxes } invoiceID={ invoiceID } />
+      <CheckoutItemCostBreakdown checkoutItems={ checkoutItems } taxes={ taxes } />
 
       <CheckoutModalFooter
         variant={ isAuthenticated ? "toPayment" : "toGuestCheckout" }

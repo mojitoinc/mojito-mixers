@@ -19,7 +19,6 @@ export interface PurchaseConfirmationBillingDetailsProps {
   wallet: null | string | Wallet;
   selectedPaymentMethodBillingInfo: SavedPaymentMethodBillingInfo;
   selectedPaymentMethodPaymentInfo: PaymentMethod | SavedPaymentMethod | null;
-  invoiceID: string | null;
 }
 
 export const PurchaseConfirmationBillingDetails: React.FC<PurchaseConfirmationBillingDetailsProps> = ({
@@ -28,7 +27,6 @@ export const PurchaseConfirmationBillingDetails: React.FC<PurchaseConfirmationBi
   wallet,
   selectedPaymentMethodBillingInfo,
   selectedPaymentMethodPaymentInfo,
-  invoiceID,
 }) => {
   const {
     isMasked,
@@ -106,7 +104,6 @@ export const PurchaseConfirmationBillingDetails: React.FC<PurchaseConfirmationBi
       </Stack>
 
       <CheckoutItemCostPurchase
-        invoiceID={ invoiceID }
         checkoutItems={ checkoutItems }
         selectedPaymentMethodBillingInfo={ selectedPaymentMethodBillingInfo } />
 

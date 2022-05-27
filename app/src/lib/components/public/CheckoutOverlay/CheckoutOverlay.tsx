@@ -842,7 +842,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
 
     checkoutStepElement = (
       <AuthenticationView
-        invoiceID={ invoiceID }
+        invoiceItemIDs={ invoiceAndReservationState.invoiceItemIDs }
         checkoutItems={ checkoutItems }
         taxes={ taxes }
         isAuthenticated={ isAuthenticated }
@@ -853,7 +853,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   } else if (checkoutStep === "billing") {
     checkoutStepElement = (
       <BillingView
-        invoiceID={ invoiceID }
+        invoiceItemIDs={ invoiceAndReservationState.invoiceItemIDs }
         orgID={ orgID }
         vertexEnabled={ vertexEnabled }
         checkoutItems={ checkoutItems }
@@ -875,6 +875,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   } else if (checkoutStep === "payment" && invoiceID && invoiceCountdownStart) {
     checkoutStepElement = (
       <PaymentView
+        invoiceItemIDs={ invoiceAndReservationState.invoiceItemIDs }
         orgID={ orgID }
         invoiceID={ invoiceID }
         invoiceCountdownStart={ invoiceCountdownStart }
@@ -922,7 +923,6 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
 
     checkoutStepElement = (
       <ConfirmationView
-        invoiceID={ invoiceID }
         checkoutItems={ checkoutItems }
         savedPaymentMethods={ savedPaymentMethods }
         selectedPaymentMethod={ selectedPaymentMethod }
