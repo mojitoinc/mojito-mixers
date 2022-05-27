@@ -80,13 +80,13 @@ const usePromoCode = () => {
         total: discountResult.data?.applyDiscountCode?.totalPriceAfterDiscount,
       })));
       let id: string | undefined;
-      let total: number | undefined;
+      let total = 0;
       results.forEach((result) => {
         if (result.id) {
           id = result.id;
         }
         if (result.total) {
-          total = result.total;
+          total += result.total;
         }
       });
       if (id && total) {
@@ -96,6 +96,7 @@ const usePromoCode = () => {
           id,
           total,
         }));
+        setError(null);
       } else {
         setError("Code invalid");
       }
