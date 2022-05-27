@@ -86,7 +86,7 @@
     "@graphql-codegen/typescript": "^2.4.11",
     "@graphql-codegen/typescript-operations": "^2.4.0",
     "@graphql-codegen/typescript-react-apollo": "^3.2.14",
-    "@rollup/plugin-commonjs": "^21.1.0",
+    "@rollup/plugin-commonjs": "^22.0.0",
     "@rollup/plugin-node-resolve": "^13.3.0",
     "@rollup/plugin-typescript": "^8.3.2",
     "@types/atob": "^2.1.2",
