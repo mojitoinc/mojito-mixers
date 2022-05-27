@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction, useMemo } from "react";
+import React, { Dispatch, SetStateAction, useCallback, useMemo } from "react";
 import { useApplyDiscountCodeLazyQuery } from "../queries/graphqlGenerated";
 
 interface IPromoCode {
@@ -16,6 +16,8 @@ interface IPromoCodeContext {
   setEditable: Dispatch<SetStateAction<boolean>>;
   error: string | null;
   setError: Dispatch<SetStateAction<string | null>>;
+  invoiceItemIDs: string[];
+  setInvoiceItemIDs: Dispatch<SetStateAction<string[]>>;
 }
 
 const PromoCodeContext = React.createContext<IPromoCodeContext>({
@@ -25,6 +27,8 @@ const PromoCodeContext = React.createContext<IPromoCodeContext>({
   setEditable: () => false,
   error: null,
   setError: () => undefined,
+  invoiceItemIDs: [],
+  setInvoiceItemIDs: () => undefined,
 });
 
 interface PromoCodeProviderProps {
@@ -36,10 +40,11 @@ const PromoCodeProvider: React.FC<PromoCodeProviderProps> = ({ children }) => {
     React.useState<IPromoCode>(defaultPromoCode);
   const [editable, setEditable] = React.useState<boolean>(false);
   const [error, setError] = React.useState<string | null>(null);
+  const [invoiceItemIDs, setInvoiceItemIDs] = React.useState<string[]>([]);
 
   const PromoCodeProviderValue = useMemo(
-    () => ({ promoCode, setPromoCode, editable, setEditable, error, setError }),
-    [promoCode, setPromoCode, editable, setEditable, error, setError],
+    () => ({ promoCode, setPromoCode, editable, setEditable, error, setError, invoiceItemIDs, setInvoiceItemIDs }),
+    [promoCode, setPromoCode, editable, setEditable, error, setError, invoiceItemIDs, setInvoiceItemIDs],
   );
 
   return (
@@ -51,7 +56,7 @@ const PromoCodeProvider: React.FC<PromoCodeProviderProps> = ({ children }) => {
 
 const usePromoCode = () => {
   const [applyDiscountCode] = useApplyDiscountCodeLazyQuery();
-  const { promoCode, setPromoCode, editable, setEditable, error, setError } =
+  const { promoCode, setPromoCode, editable, setEditable, error, setError, invoiceItemIDs, setInvoiceItemIDs } =
     React.useContext(PromoCodeContext);
 
   const onChangePromoCode = (value: string) => {
@@ -62,17 +67,29 @@ const usePromoCode = () => {
     setError(null);
   };
 
-  const onApply = async (invoiceId: string) => {
+  const onApply = useCallback(async () => {
     try {
-      const discountResult = await applyDiscountCode({
+      const invoiceItemPromises = invoiceItemIDs.map(invoiceItemID => applyDiscountCode({
         variables: {
           discountCode: promoCode.code,
-          invoiceItemID: invoiceId,
+          invoiceItemID,
         },
+      }));
+      const results = await Promise.all(invoiceItemPromises).then(discountResults => discountResults.map(discountResult => ({
+        id: discountResult.data?.applyDiscountCode?.discountCode?.id,
+        total: discountResult.data?.applyDiscountCode?.totalPriceAfterDiscount,
+      })));
+      let id: string | undefined;
+      let total: number | undefined;
+      results.forEach((result) => {
+        if (result.id) {
+          id = result.id;
+        }
+        if (result.total) {
+          total = result.total;
+        }
       });
-      const id = discountResult.data?.applyDiscountCode?.discountCode?.id;
-      const total = discountResult.data?.applyDiscountCode?.totalPriceAfterDiscount;
-      if (id) {
+      if (id && total) {
         // update total
         setPromoCode(code => ({
           ...code,
@@ -85,9 +102,9 @@ const usePromoCode = () => {
     } catch (e) {
       console.log(e);
     }
-  };
+  }, [applyDiscountCode, invoiceItemIDs, promoCode.code, setError, setPromoCode]);
 
-  return { promoCode, onChangePromoCode, onApply, editable, setEditable, error };
+  return { promoCode, onChangePromoCode, onApply, editable, setEditable, error, invoiceItemIDs, setInvoiceItemIDs };
 };
 
 export { PromoCodeProvider, usePromoCode };

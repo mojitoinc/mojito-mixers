@@ -43,7 +43,6 @@ export interface CheckoutItemCostTotalProps {
   fees: number | null;
   taxes: null | TaxesState;
   withDetails?: boolean;
-  invoiceID: string | null;
 }
 
 export const CheckoutItemCostTotal: React.FC<CheckoutItemCostTotalProps> = ({
@@ -51,9 +50,8 @@ export const CheckoutItemCostTotal: React.FC<CheckoutItemCostTotalProps> = ({
   fees,
   taxes,
   withDetails = false,
-  invoiceID,
 }) => {
-  const { promoCode, onChangePromoCode, onApply, editable, error } = usePromoCode();
+  const { promoCode, onChangePromoCode, onApply, editable, error, invoiceItemIDs } = usePromoCode();
   const [discountTotal, setDiscountTotal] = useState(total);
 
   useEffect(() => {
@@ -107,8 +105,8 @@ export const CheckoutItemCostTotal: React.FC<CheckoutItemCostTotalProps> = ({
   };
 
   const handleApplyPromoCode = useCallback(() => {
-    if (invoiceID && editable) onApply(invoiceID);
-  }, [invoiceID, editable, onApply]);
+    if (editable) onApply();
+  }, [editable, onApply]);
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", mt: { xs: 3, sm: 0.5 } }}>
@@ -122,12 +120,12 @@ export const CheckoutItemCostTotal: React.FC<CheckoutItemCostTotalProps> = ({
               error={ !!error }
               helperText={ error }
               InputProps={{
-                readOnly: !(editable && invoiceID),
+                readOnly: !(editable && invoiceItemIDs.length > 0),
                 endAdornment: (
                   <Button
                     sx={{ color: "text.primary" }}
                     onClick={ handleApplyPromoCode }
-                    disabled={ !(editable && invoiceID) }>
+                    disabled={ !(editable && invoiceItemIDs.length > 0) }>
                     Apply
                   </Button>
                 ),

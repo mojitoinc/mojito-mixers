@@ -58,7 +58,7 @@ export interface BillingViewProps {
   onClose: () => void;
   consentType?: ConsentType;
   debug?: boolean;
-  invoiceID: string | null;
+  invoiceItemIDs: string[];
 }
 
 export const BillingView: React.FC<BillingViewProps> = ({
@@ -79,9 +79,20 @@ export const BillingView: React.FC<BillingViewProps> = ({
   onClose,
   consentType,
   debug,
-  invoiceID,
+  invoiceItemIDs,
 }) => {
-  const { setEditable } = usePromoCode();
+  const { setEditable, setInvoiceItemIDs } = usePromoCode();
+
+  useEffect(() => {
+    if (invoiceItemIDs.length > 0) {
+      setInvoiceItemIDs(invoiceItemIDs);
+    }
+  }, [invoiceItemIDs, setInvoiceItemIDs]);
+
+  useEffect(() => {
+    setEditable(true);
+  }, [setEditable]);
+
   const savedPaymentMethodAddressIdRef = useRef<string>("");
   const savedPaymentMethods = useMemo(() => distinctBy(rawSavedPaymentMethods, "addressId"), [rawSavedPaymentMethods]);
   const { total } = useCheckoutItemsCostTotal(checkoutItems);
@@ -102,10 +113,6 @@ export const BillingView: React.FC<BillingViewProps> = ({
     // To discard the result below that might come after the component has been unmounted:
     getTaxQuoteTimestampRef.current = 0;
   }, []);
-
-  useEffect(() => {
-    setEditable(true);
-  }, [setEditable]);
 
   const calculateTaxes = useCallback(async (taxInfo: TaxInfo | BillingInfo) => {
     const calledAt = getTaxQuoteTimestampRef.current;
@@ -314,7 +321,6 @@ export const BillingView: React.FC<BillingViewProps> = ({
       <Divider sx={{ display: { xs: "block", md: "none" } }} />
 
       <CheckoutDeliveryAndItemCostBreakdown
-        invoiceID={ invoiceID }
         checkoutItems={ checkoutItems }
         taxes={ vertexEnabled ? taxes : null }
         validatePersonalDeliveryAddress={ formSubmitAttempted }

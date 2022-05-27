@@ -1660,12 +1660,12 @@ export type QueryGetPaymentMethodArgs = {
 
 
 export type QueryGetPaymentMethodListArgs = {
-  orgID?: InputMaybe<Scalars['UUID1']>;
+  orgID: Scalars['UUID1'];
 };
 
 
 export type QueryGetPaymentPublicKeyArgs = {
-  orgID?: InputMaybe<Scalars['UUID1']>;
+  orgID: Scalars['UUID1'];
 };
 
 
@@ -1747,7 +1747,7 @@ export type QueryOrganizationArgs = {
 
 
 export type QueryOrganizationByIdArgs = {
-  id?: InputMaybe<Scalars['UUID1']>;
+  id: Scalars['UUID1'];
 };
 
 
@@ -2129,7 +2129,7 @@ export type ReserveBuyNowLotMutationVariables = Exact<{
 }>;
 
 
-export type ReserveBuyNowLotMutation = { __typename?: 'Mutation', reserveMarketplaceBuyNowLot: { __typename?: 'MarketplaceBuyNowOutput', invoice?: { __typename?: 'InvoiceDetails', invoiceID: any, status: InvoiceStatus, items: Array<{ __typename?: 'ItemInvoiceDetail', units: number, unitPrice: number, taxes: number, totalPrice: number } | null> } | null } };
+export type ReserveBuyNowLotMutation = { __typename?: 'Mutation', reserveMarketplaceBuyNowLot: { __typename?: 'MarketplaceBuyNowOutput', invoice?: { __typename?: 'InvoiceDetails', invoiceID: any, status: InvoiceStatus, items: Array<{ __typename?: 'ItemInvoiceDetail', units: number, unitPrice: number, taxes: number, totalPrice: number, invoiceItemID: any } | null> } | null } };
 
 export type ReleaseReservationBuyNowLotMutationVariables = Exact<{
   orgID: Scalars['UUID1'];
@@ -2394,6 +2394,7 @@ export const ReserveBuyNowLotDocument = gql`
         unitPrice
         taxes
         totalPrice
+        invoiceItemID
       }
     }
   }

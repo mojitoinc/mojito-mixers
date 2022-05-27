@@ -21,6 +21,7 @@ mutation ReserveBuyNowLot($input: ReserveMarketplaceBuyNowLotInput!) {
         unitPrice
         taxes
         totalPrice
+        invoiceItemID
       }
     }
   }
