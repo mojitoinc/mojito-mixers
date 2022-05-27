@@ -1,12 +1,47 @@
 import commonjs from "@rollup/plugin-commonjs";
-import dts from "rollup-plugin-dts"
 import resolve from "@rollup/plugin-node-resolve";
-import typescript from "rollup-plugin-typescript2"
+import * as fs from 'fs';
+import analyze from 'rollup-plugin-analyzer';
+import dts from "rollup-plugin-dts";
+import typescript from "rollup-plugin-typescript2";
+import { visualizer } from 'rollup-plugin-visualizer';
+import pkg from "./package.json";
+
+
 // import { terser } from "rollup-plugin-terser";
 // import { babel } from "@rollup/plugin-babel";
 // import externals from "rollup-plugin-node-externals";
 
-import pkg from "./package.json";
+
+function writeTo(analysisString) {
+  try {
+    fs.writeFileSync('./stats.md', analysisString);
+  } catch(err) {
+    console.log('Could not write stats.md.', err);
+  }
+}
+
+
+// =============================================================================
+//
+// BUNDLE SIZE ANALYSIS:
+//
+// To analyze the bundle size, you must:
+//
+// - Comment out `...Object.keys(pkg.dependencies),` below.
+// - Uncomment `writeTo`, `analyze` and `visualizer`, both at the top (imports) and at the bottom (plugins).
+//
+// This is done automatically, checking `process.env.GITHUB_ACTIONS`, so that we only run the analysis and update the
+// result files when running locally.
+//
+// If you want to build a production bundle, please, make sure `...Object.keys(pkg.dependencies),` is included in
+// `EXTERNAL` below.
+//
+// =============================================================================
+
+if (process.env.GITHUB_ACTIONS) {
+  console.log('\nRunning build with bundle analysis...\n');
+}
 
 // Extensions handled by babel:
 // const EXTENSIONS = [".ts", ".tsx"];
@@ -14,7 +49,7 @@ import pkg from "./package.json";
 // Exclude dev dependencies:
 const EXTERNAL = [
   ...Object.keys(pkg.devDependencies),
-  ...Object.keys(pkg.dependencies),
+  ...(process.env.GITHUB_ACTIONS ? Object.keys(pkg.dependencies) : []),
   ...Object.keys(pkg.peerDependencies),
 
   // See issues https://github.com/rollup/rollup/issues/3684, https://rollupjs.org/guide/en/#warning-treating-module-as-external-dependency:
@@ -82,7 +117,10 @@ export default [{
     // }),
 
     // terser(),
-  ],
+
+    process.env.GITHUB_ACTIONS ? analyze({ writeTo }) : null,
+    process.env.GITHUB_ACTIONS ? visualizer() : null,
+  ].filter(Boolean),
 
 }, {
   input: "./dist/types/index.d.ts",
