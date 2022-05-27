@@ -16,6 +16,7 @@ import { checkNeedsGenericErrorMessage } from "../../hooks/useFormCheckoutError"
 import { TaxesState } from "../Billing/BillingView";
 import { Wallet } from "../../domain/wallet/wallet.interfaces";
 import { CreditCardNetwork } from "../../domain/react-payment-inputs/react-payment-inputs.utils";
+import { usePromoCode } from "../../utils/promoCodeUtils";
 
 const billingInfoItemBoxProps: BoxProps = { sx: { mt: 2.5 } };
 
@@ -71,6 +72,7 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
   consentType,
   debug,
 }) => {
+  const { setEditable } = usePromoCode();
   const {
     billingInfo: selectedBillingInfo,
     paymentInfo: selectedPaymentInfo,
@@ -119,6 +121,10 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
   }, [onSavedPaymentMethodDeleted, savedPaymentMethods.length]);
 
   const handleFormAttemptSubmit = useCallback(() => setFormSubmitAttempted(true), []);
+
+  useEffect(() => {
+    setEditable(true);
+  }, [setEditable]);
 
   useEffect(() => {
     if (!selectedPaymentMethodBillingInfo) onPrev();
@@ -204,6 +210,7 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
       <Divider sx={{ display: { xs: "block", md: "none" } }} />
 
       <CheckoutDeliveryAndItemCostBreakdown
+        invoiceID={ invoiceID }
         checkoutItems={ checkoutItems }
         taxes={ taxes }
         validatePersonalDeliveryAddress={ formSubmitAttempted }

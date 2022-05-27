@@ -15,6 +15,7 @@ import { TaxQuoteOutput, useGetTaxQuoteLazyQuery } from "../../queries/graphqlGe
 import { useCheckoutItemsCostTotal } from "../../hooks/useCheckoutItemCostTotal";
 import { Wallet } from "../../domain/wallet/wallet.interfaces";
 import { ConsentType } from "../../components/shared/ConsentText/ConsentText";
+import { usePromoCode } from "../../utils/promoCodeUtils";
 
 export type TaxStatus = "incomplete" | "loading" | "complete" | "error";
 
@@ -57,6 +58,7 @@ export interface BillingViewProps {
   onClose: () => void;
   consentType?: ConsentType;
   debug?: boolean;
+  invoiceID: string | null;
 }
 
 export const BillingView: React.FC<BillingViewProps> = ({
@@ -77,11 +79,12 @@ export const BillingView: React.FC<BillingViewProps> = ({
   onClose,
   consentType,
   debug,
+  invoiceID,
 }) => {
+  const { setEditable } = usePromoCode();
   const savedPaymentMethodAddressIdRef = useRef<string>("");
   const savedPaymentMethods = useMemo(() => distinctBy(rawSavedPaymentMethods, "addressId"), [rawSavedPaymentMethods]);
-  const { total: subtotal, fees } = useCheckoutItemsCostTotal(checkoutItems);
-  const total = subtotal + fees;
+  const { total } = useCheckoutItemsCostTotal(checkoutItems);
   const [{ isReloading, isDeleting, showSaved, taxes }, setViewState] = useState<BillingViewState>({
     isReloading: false,
     isDeleting: false,
@@ -99,6 +102,10 @@ export const BillingView: React.FC<BillingViewProps> = ({
     // To discard the result below that might come after the component has been unmounted:
     getTaxQuoteTimestampRef.current = 0;
   }, []);
+
+  useEffect(() => {
+    setEditable(true);
+  }, [setEditable]);
 
   const calculateTaxes = useCallback(async (taxInfo: TaxInfo | BillingInfo) => {
     const calledAt = getTaxQuoteTimestampRef.current;
@@ -307,6 +314,7 @@ export const BillingView: React.FC<BillingViewProps> = ({
       <Divider sx={{ display: { xs: "block", md: "none" } }} />
 
       <CheckoutDeliveryAndItemCostBreakdown
+        invoiceID={ invoiceID }
         checkoutItems={ checkoutItems }
         taxes={ vertexEnabled ? taxes : null }
         validatePersonalDeliveryAddress={ formSubmitAttempted }

@@ -9,11 +9,13 @@ import { TaxesState } from "../../../../views/Billing/BillingView";
 export interface CheckoutItemCostBreakdownProps {
   checkoutItems: CheckoutItem[];
   taxes: null | TaxesState;
+  invoiceID: string | null;
 }
 
 export const CheckoutItemCostBreakdown: React.FC<CheckoutItemCostBreakdownProps> = ({
   checkoutItems,
   taxes,
+  invoiceID,
 }) => {
   const firstCheckoutItem = checkoutItems[0];
   const { total, fees } = useCheckoutItemsCostTotal(checkoutItems);
@@ -28,6 +30,7 @@ export const CheckoutItemCostBreakdown: React.FC<CheckoutItemCostBreakdownProps>
       <Divider sx={{ mt: 3.75, mb: 1.5 }} />
 
       <CheckoutItemCostTotal
+        invoiceID={ invoiceID }
         withDetails
         total={ total }
         fees={ fees === 0 && firstCheckoutItem.lotType === "buyNow" ? null : fees }

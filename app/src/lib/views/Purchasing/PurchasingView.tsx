@@ -13,6 +13,7 @@ import { PAYMENT_NOTIFICATION_INTERVAL_MS, PURCHASING_MESSAGES_DEFAULT, PURCHASI
 import { isLocalhost } from "../../domain/url/url.utils";
 import { Wallet } from "../../domain/wallet/wallet.interfaces";
 import { CheckoutItemInfo } from "../../domain/product/product.interfaces";
+import { usePromoCode } from "../../utils/promoCodeUtils";
 
 export interface PurchasingViewProps {
   threeDSEnabled?: boolean;
@@ -47,6 +48,7 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
   onDialogBlocked,
   debug,
 }) => {
+  const { setEditable } = usePromoCode();
   const { billingInfo, paymentInfo, cvv } = selectedPaymentMethod;
   const isCreditCardPayment = cvv || (paymentInfo !== null && typeof paymentInfo === "object" && paymentInfo.type === "CreditCard");
 
@@ -54,6 +56,10 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
   // Minimum wait time:
 
   const [hasWaited, setHasWaited] = useState(false);
+
+  useEffect(() => {
+    setEditable(false);
+  }, [setEditable]);
 
   useTimeout(() => {
     setHasWaited(true);

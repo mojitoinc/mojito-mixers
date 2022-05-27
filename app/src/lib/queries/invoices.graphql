@@ -11,9 +11,7 @@ mutation CreateAuctionInvoice($orgID: UUID1!, $lotID: UUID1!) {
   }
 }
 
-mutation ReserveBuyNowLot(
-  $input: ReserveMarketplaceBuyNowLotInput!
-) {
+mutation ReserveBuyNowLot($input: ReserveMarketplaceBuyNowLotInput!) {
   reserveMarketplaceBuyNowLot(input: $input) {
     invoice {
       invoiceID
@@ -41,6 +39,26 @@ query GetInvoiceDetails($invoiceID: UUID1!) {
       unitPrice
       taxes
       totalPrice
+    }
+  }
+}
+
+query ApplyDiscountCode($discountCode: String!, $invoiceItemID: UUID1!) {
+  applyDiscountCode(
+    discountCode: $discountCode
+    invoiceItemID: $invoiceItemID
+  ) {
+    discountedAmount
+    totalPrice
+    totalPriceAfterDiscount
+    invoiceItemID
+    discountCode {
+      id
+      discountCode
+      discountType
+      description
+      value
+      organizationID
     }
   }
 }

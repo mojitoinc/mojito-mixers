@@ -40,6 +40,7 @@ import { useCountdown } from "../../../hooks/useContdown";
 import { PUIRouterOptions } from "../../../domain/router/router.types";
 import { getPathnameWithParams } from "../../../domain/url/url.utils";
 import { IS_BROWSER } from "../../../domain/build/build.constants";
+import { PromoCodeProvider } from "../../../utils/promoCodeUtils";
 
 export type LoaderMode = "default" | "success" | "error";
 
@@ -841,6 +842,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
 
     checkoutStepElement = (
       <AuthenticationView
+        invoiceID={ invoiceID }
         checkoutItems={ checkoutItems }
         taxes={ taxes }
         isAuthenticated={ isAuthenticated }
@@ -851,6 +853,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   } else if (checkoutStep === "billing") {
     checkoutStepElement = (
       <BillingView
+        invoiceID={ invoiceID }
         orgID={ orgID }
         vertexEnabled={ vertexEnabled }
         checkoutItems={ checkoutItems }
@@ -919,6 +922,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
 
     checkoutStepElement = (
       <ConfirmationView
+        invoiceID={ invoiceID }
         checkoutItems={ checkoutItems }
         savedPaymentMethods={ savedPaymentMethods }
         selectedPaymentMethod={ selectedPaymentMethod }
@@ -953,15 +957,17 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
 
   return (
     <DictionaryProvider dictionary={ dictionary }>
-      <FullScreenOverlay
-        centered={ checkoutStep === "purchasing" || checkoutStep === "error" }
-        open={ open }
-        onClose={ handleClose }
-        isDialogBlocked={ isDialogBlocked }
-        contentKey={ checkoutStep }
-        header={ headerElement }>
-        { checkoutStepElement }
-      </FullScreenOverlay>
+      <PromoCodeProvider>
+        <FullScreenOverlay
+          centered={ checkoutStep === "purchasing" || checkoutStep === "error" }
+          open={ open }
+          onClose={ handleClose }
+          isDialogBlocked={ isDialogBlocked }
+          contentKey={ checkoutStep }
+          header={ headerElement }>
+          { checkoutStepElement }
+        </FullScreenOverlay>
+      </PromoCodeProvider>
     </DictionaryProvider>
   );
 };
