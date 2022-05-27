@@ -107,7 +107,7 @@ export const CheckoutItemCostTotal: React.FC<CheckoutItemCostTotalProps> = ({
   };
 
   const handleApplyPromoCode = useCallback(() => {
-    if (invoiceID && editable) onApply(invoiceID);
+    if (invoiceID && editable) onApply();
   }, [invoiceID, editable, onApply]);
 
   return (
