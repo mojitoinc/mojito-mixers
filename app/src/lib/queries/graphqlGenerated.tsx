@@ -743,13 +743,13 @@ export type MarketplaceItemDeliveryErc721TransferInput = {
 
 export type MarketplaceItemDeliveryErc1155OpenEdition = {
   __typename?: 'MarketplaceItemDeliveryERC1155OpenEdition';
-  contractAddress: Scalars['String'];
+  contractId: Scalars['UUID1'];
   onChainTokenId: Scalars['Int'];
   ownerWalletId: Scalars['UUID1'];
 };
 
 export type MarketplaceItemDeliveryErc1155OpenEditionInput = {
-  contractAddress: Scalars['String'];
+  contractId: Scalars['UUID1'];
   onChainTokenId: Scalars['Int'];
   ownerWalletId: Scalars['UUID1'];
 };
