@@ -21,27 +21,25 @@ function writeTo(analysisString) {
   }
 }
 
+const RUN_BUNDLE_ANALYSIS = !process.env.GITHUB_ACTIONS && true;
+
+if (RUN_BUNDLE_ANALYSIS) {
+  console.log('\n\nRunning build with bundle analysis...\n');
+}
+
 
 // =============================================================================
 //
 // BUNDLE SIZE ANALYSIS:
 //
-// To analyze the bundle size, you must:
+// The build will run in bundle analysis mode when running locally by default. If you want
 //
-// - Comment out `...Object.keys(pkg.dependencies),` below.
-// - Uncomment `writeTo`, `analyze` and `visualizer`, both at the top (imports) and at the bottom (plugins).
+// If you want to build a production bundle, please, change the `&& true` in `RUN_BUNDLE_ANALYSIS` to `false`.
 //
-// This is done automatically, checking `process.env.GITHUB_ACTIONS`, so that we only run the analysis and update the
-// result files when running locally.
-//
-// If you want to build a production bundle, please, make sure `...Object.keys(pkg.dependencies),` is included in
-// `EXTERNAL` below.
+// The build will always run in production mode when running on GitHub Actions.
 //
 // =============================================================================
 
-if (process.env.GITHUB_ACTIONS) {
-  console.log('\nRunning build with bundle analysis...\n');
-}
 
 // Extensions handled by babel:
 // const EXTENSIONS = [".ts", ".tsx"];
@@ -49,7 +47,7 @@ if (process.env.GITHUB_ACTIONS) {
 // Exclude dev dependencies:
 const EXTERNAL = [
   ...Object.keys(pkg.devDependencies),
-  ...(process.env.GITHUB_ACTIONS ? Object.keys(pkg.dependencies) : []),
+  ...(RUN_BUNDLE_ANALYSIS ? [] : Object.keys(pkg.dependencies)),
   ...Object.keys(pkg.peerDependencies),
 
   // See issues https://github.com/rollup/rollup/issues/3684, https://rollupjs.org/guide/en/#warning-treating-module-as-external-dependency:
@@ -118,8 +116,8 @@ export default [{
 
     // terser(),
 
-    process.env.GITHUB_ACTIONS ? analyze({ writeTo }) : null,
-    process.env.GITHUB_ACTIONS ? visualizer() : null,
+    RUN_BUNDLE_ANALYSIS ? analyze({ writeTo }) : null,
+    RUN_BUNDLE_ANALYSIS ? visualizer() : null,
   ].filter(Boolean),
 
 }, {
