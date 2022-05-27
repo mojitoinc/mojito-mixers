@@ -58,7 +58,7 @@ export const CheckoutItemCostTotal: React.FC<CheckoutItemCostTotalProps> = ({
     if (promoCode.total) {
       setDiscountTotal(promoCode.total);
     }
-  }, [promoCode, total]);
+  }, [promoCode, setDiscountTotal]);
 
   const feesValue = fees || 0;
 
