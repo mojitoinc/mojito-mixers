@@ -1,5 +1,6 @@
-import { ApolloError } from "@apollo/client";
 import { useCallback, useState } from "react";
+import { ApolloError } from "@apollo/client";
+import { usePromoCode } from "../utils/promoCodeUtils";
 import { CheckoutModalError } from "../components/public/CheckoutOverlay/CheckoutOverlay.hooks";
 import { ERROR_PURCHASE_CREATING_INVOICE, ERROR_PURCHASE_LOADING_ITEMS, ERROR_PURCHASE_NO_ITEMS, ERROR_PURCHASE_NO_UNITS } from "../domain/errors/errors.constants";
 import { CheckoutItem } from "../domain/product/product.interfaces";
@@ -28,6 +29,7 @@ export function useCreateInvoiceAndReservation({
   debug = false,
 }: UseCreateInvoiceAndReservationOptions): UseCreateInvoiceAndReservationReturn {
   const [invoiceAndReservationState, setInvoiceAndReservationState] = useState<InvoiceAndReservationState>({ });
+  const { setInvoiceItemID } = usePromoCode();
 
   const setError = useCallback((error: string | CheckoutModalError) => {
     setInvoiceAndReservationState({
@@ -103,6 +105,7 @@ export function useCreateInvoiceAndReservation({
         if (debug) console.log("    🟢 reserveBuyNowLot result", reserveBuyNowLotResult);
 
         invoiceID = reserveBuyNowLotResult.data?.reserveMarketplaceBuyNowLot?.invoice?.invoiceID;
+        setInvoiceItemID(reserveBuyNowLotResult.data?.reserveMarketplaceBuyNowLot?.invoice?.items[0]?.invoiceItemID);
       }
     } else if (lotType === "auction" && process.env.NODE_ENV === "development") {
       if (debug) {
@@ -146,6 +149,7 @@ export function useCreateInvoiceAndReservation({
     debug,
     createAuctionInvoice,
     reserveBuyNowLot,
+    setInvoiceItemID,
   ]);
 
   return {

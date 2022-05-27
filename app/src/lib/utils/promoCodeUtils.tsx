@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction, useMemo } from "react";
+import React, { Dispatch, SetStateAction, useCallback, useMemo } from "react";
 import { useApplyDiscountCodeLazyQuery } from "../queries/graphqlGenerated";
 
 interface IPromoCode {
@@ -16,6 +16,8 @@ interface IPromoCodeContext {
   setEditable: Dispatch<SetStateAction<boolean>>;
   error: string | null;
   setError: Dispatch<SetStateAction<string | null>>;
+  invoiceItemID: string | null;
+  setInvoiceItemID: Dispatch<SetStateAction<string | null>>;
 }
 
 const PromoCodeContext = React.createContext<IPromoCodeContext>({
@@ -25,6 +27,8 @@ const PromoCodeContext = React.createContext<IPromoCodeContext>({
   setEditable: () => false,
   error: null,
   setError: () => undefined,
+  invoiceItemID: null,
+  setInvoiceItemID: () => undefined,
 });
 
 interface PromoCodeProviderProps {
@@ -36,10 +40,11 @@ const PromoCodeProvider: React.FC<PromoCodeProviderProps> = ({ children }) => {
     React.useState<IPromoCode>(defaultPromoCode);
   const [editable, setEditable] = React.useState<boolean>(false);
   const [error, setError] = React.useState<string | null>(null);
+  const [invoiceItemID, setInvoiceItemID] = React.useState<string | null>(null);
 
   const PromoCodeProviderValue = useMemo(
-    () => ({ promoCode, setPromoCode, editable, setEditable, error, setError }),
-    [promoCode, setPromoCode, editable, setEditable, error, setError],
+    () => ({ promoCode, setPromoCode, editable, setEditable, error, setError, invoiceItemID, setInvoiceItemID }),
+    [promoCode, setPromoCode, editable, setEditable, error, setError, invoiceItemID, setInvoiceItemID],
   );
 
   return (
@@ -51,7 +56,7 @@ const PromoCodeProvider: React.FC<PromoCodeProviderProps> = ({ children }) => {
 
 const usePromoCode = () => {
   const [applyDiscountCode] = useApplyDiscountCodeLazyQuery();
-  const { promoCode, setPromoCode, editable, setEditable, error, setError } =
+  const { promoCode, setPromoCode, editable, setEditable, error, setError, invoiceItemID, setInvoiceItemID } =
     React.useContext(PromoCodeContext);
 
   const onChangePromoCode = (value: string) => {
@@ -62,12 +67,12 @@ const usePromoCode = () => {
     setError(null);
   };
 
-  const onApply = async (invoiceId: string) => {
+  const onApply = useCallback(async () => {
     try {
       const discountResult = await applyDiscountCode({
         variables: {
           discountCode: promoCode.code,
-          invoiceItemID: invoiceId,
+          invoiceItemID,
         },
       });
       const id = discountResult.data?.applyDiscountCode?.discountCode?.id;
@@ -85,9 +90,9 @@ const usePromoCode = () => {
     } catch (e) {
       console.log(e);
     }
-  };
+  }, [applyDiscountCode, invoiceItemID, promoCode.code, setError, setPromoCode]);
 
-  return { promoCode, onChangePromoCode, onApply, editable, setEditable, error };
+  return { promoCode, onChangePromoCode, onApply, editable, setEditable, error, setInvoiceItemID };
 };
 
 export { PromoCodeProvider, usePromoCode };
