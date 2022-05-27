@@ -103,7 +103,7 @@ const usePromoCode = () => {
     } catch (e) {
       console.log(e);
     }
-  }, [applyDiscountCode, invoiceItemIDs, promoCode.code, setError, setPromoCode]);
+  }, [applyDiscountCode, invoiceItemIDs, promoCode, setError, setPromoCode]);
 
   return { promoCode, onChangePromoCode, onApply, editable, setEditable, error, invoiceItemIDs, setInvoiceItemIDs };
 };
