@@ -36,7 +36,7 @@ export function useFullPayment({
   selectedPaymentMethod,
   wallet,
   debug = false,
-}: UseFullPaymentOptions): [FullPaymentState, () => Promise<void>] {
+}: UseFullPaymentOptions): [FullPaymentState, (discountCodeID?: string) => Promise<void>] {
   const [paymentState, setPaymentState] = useState<FullPaymentState>({
     paymentStatus: "processing",
     paymentMethodID: "",
@@ -58,7 +58,7 @@ export function useFullPayment({
   const [createPaymentMethod] = useCreatePaymentMethod({ orgID, debug });
   const [makePayment] = useCreatePaymentMutation();
 
-  const fullPayment = useCallback(async () => {
+  const fullPayment = useCallback(async (discountCodeID?: string) => {
     const {
       billingInfo: selectedBillingInfo,
       paymentInfo: selectedPaymentInfo,
@@ -173,6 +173,9 @@ export function useFullPayment({
     }
 
     const metadata: CreatePaymentMetadataInput = destinationAddress ? { destinationAddress } : { };
+    if (discountCodeID) {
+      metadata.discountCodeID = discountCodeID;
+    }
 
     if (cvv) {
       const encryptCardDataResult = await encryptCardData({

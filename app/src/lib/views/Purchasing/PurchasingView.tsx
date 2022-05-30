@@ -48,7 +48,7 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
   onDialogBlocked,
   debug,
 }) => {
-  const { setEditable } = usePromoCode();
+  const { setEditable, promoCode } = usePromoCode();
   const { billingInfo, paymentInfo, cvv } = selectedPaymentMethod;
   const isCreditCardPayment = cvv || (paymentInfo !== null && typeof paymentInfo === "object" && paymentInfo.type === "CreditCard");
 
@@ -126,8 +126,8 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
 
     fullPaymentCalledRef.current = true;
 
-    fullPayment();
-  }, [fullPayment]);
+    fullPayment(promoCode.id);
+  }, [fullPayment, promoCode]);
 
   useEffect(() => {
     const { paymentStatus, paymentMethodID, processorPaymentID, paymentID, paymentError } = fullPaymentState;
