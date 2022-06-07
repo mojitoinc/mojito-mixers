@@ -53,7 +53,7 @@ export const CheckoutItemCostTotal: React.FC<CheckoutItemCostTotalProps> = ({
 }) => {
   const { promoCode, onChangePromoCode, onApply, editable, error, invoiceItemIDs } = usePromoCode();
   const [discountTotal, setDiscountTotal] = useState(total);
-  const [discount, setDiscount] = useState(0);
+  const [discount, setDiscount] = useState<number | null>(null);
 
   useEffect(() => {
     if (promoCode.total) {
@@ -146,7 +146,7 @@ export const CheckoutItemCostTotal: React.FC<CheckoutItemCostTotalProps> = ({
             </Box>
           ) }
 
-          { discount !== 0 && (
+          { discount !== null && (
             <Box sx={ ROW_SX }>
               <Typography sx={ theme => ({ color: theme.palette.grey["500"] }) }>Discount</Typography>
               <Typography><Number suffix=" USD">{ discount }</Number></Typography>
