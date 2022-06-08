@@ -8,7 +8,7 @@ import { PaymentMethod, PaymentType } from "../../../domain/payment/payment.inte
 import { CheckoutEventData, CheckoutEventType } from "../../../domain/events/events.interfaces";
 import { CheckoutItemInfo } from "../../../domain/product/product.interfaces";
 import { BillingInfo } from "../../../forms/BillingInfoForm";
-import { useDeletePaymentMethodMutation, useGetInvoiceDetailsQuery, useGetPaymentMethodListQuery, useMeQuery, useReleaseReservationBuyNowLotMutation } from "../../../queries/graphqlGenerated";
+import { useDeletePaymentMethodMutation, useGetInvoiceDetailsQuery, useGetPaymentMethodListQuery, useMeQuery, useReleaseReservationBuyNowLotMutation, useCreatePaymentMethodMutation, PaymentType as VariablePaymentType } from "../../../queries/graphqlGenerated";
 import { AuthenticationView } from "../../../views/Authentication/AuthenticationView";
 import { BillingView } from "../../../views/Billing/BillingView";
 import { ConfirmationView } from "../../../views/Confirmation/ConfirmationView";
@@ -149,6 +149,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   onError,
 }) => {
   const [debug, setDebug] = useState(!!parentDebug);
+  const [createPaymentMethod] = useCreatePaymentMethodMutation();
 
   // Initialization, just to prevent issues with Next.js' SSR:
 
@@ -288,6 +289,27 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
 
   const invoiceItems = invoiceDetailsData?.getInvoiceDetails.items;
   const destinationAddress = (invoiceItems || [])?.[0]?.destinationAddress || NEW_WALLET_OPTION.value;
+
+  const handleCreatePaymenthodMethod = useCallback(async () => {
+    const res = await createPaymentMethod({
+      variables: {
+        orgID,
+        input: {
+          paymentType: VariablePaymentType.Crypto,
+
+        },
+      },
+    });
+    console.log("res===", res);
+    await refetchPaymentMethods({ orgID }).catch(() => { /* paymentMethodsError above will get a value and show in BillingInfoForm */ });
+  }, [orgID, createPaymentMethod, refetchPaymentMethods]);
+
+  useEffect(() => {
+    console.log("rawSavedPaymentMethods===", rawSavedPaymentMethods);
+    if (rawSavedPaymentMethods?.length === 0) {
+      handleCreatePaymenthodMethod();
+    }
+  }, [rawSavedPaymentMethods, handleCreatePaymenthodMethod]);
 
   useEffect(() => {
     if (!destinationAddress) return;

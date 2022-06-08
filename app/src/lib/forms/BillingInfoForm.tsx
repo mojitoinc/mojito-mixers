@@ -10,6 +10,7 @@ import { CheckoutModalFooter } from "../components/payments/CheckoutModalFooter/
 import { InputGroupLabel } from "../components/shared/InputGroupLabel/InputGroupLabel";
 import { ControlledTextField } from "../components/shared/TextField/TextField";
 import { SecondaryButton } from "../components/shared/SecondaryButton/SecondaryButton";
+import { PrimaryButton } from "../components/shared/PrimaryButton/PrimaryButton";
 import { EMPTY_OPTION, SelectOption } from "../components/shared/Select/Select";
 import { withFullNameCharsetErrorMessage, withFullNameErrorMessage, withPhoneErrorMessage, withRequiredErrorMessage } from "../utils/validationUtils";
 import { DebugBox } from "../components/payments/DebugBox/DebugBox";
@@ -228,7 +229,6 @@ export const BillingInfoForm: React.FC<BillingInfoFormProps> = ({
           <CircularProgress color="secondary" />
         </Box>
       ) : null }
-
       { onSaved ? (
         <Box sx={{ my: 2.5 }}>
           <SecondaryButton onClick={ onSaved } startIcon={ <BookIcon /> }>
@@ -359,13 +359,16 @@ export const BillingInfoForm: React.FC<BillingInfoFormProps> = ({
       ) }
 
       { /* variant === "loggedIn" && <Checkbox label="Save this billing information" /> */ }
-
+      <PrimaryButton onClick={ onSaved }>
+        Coinbase Payment
+      </PrimaryButton>
       <CheckoutModalFooter
         variant="toPayment"
         consentType={ consentType }
         submitLabel={ taxes?.status === "loading" ? "Calculating taxes..." : undefined }
         submitDisabled={ showLoader || (!!taxes && taxes.status === "loading") }
         onCloseClicked={ onClose } />
+
     </Box>
   );
 };

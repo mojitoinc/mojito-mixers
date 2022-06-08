@@ -2838,6 +2838,11 @@ export const GetPaymentMethodListDocument = gql`
         postalCode
       }
     }
+    ... on CryptoPaymentMethodOutput{
+     id
+     status
+     type
+    }
   }
 }
     `;
