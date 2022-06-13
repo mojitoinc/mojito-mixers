@@ -2378,7 +2378,7 @@ export type CreatePaymentMutationVariables = Exact<{
 }>;
 
 
-export type CreatePaymentMutation = { __typename?: 'Mutation', createPayment: { __typename?: 'PaymentOutput', id: any, invoiceID: any, processorPaymentID: string, status: PaymentStatus, userID: any } };
+export type CreatePaymentMutation = { __typename?: 'Mutation', createPayment: { __typename?: 'PaymentOutput', id: any, invoiceID: any, processorPaymentID: string, status: PaymentStatus, userID: any, details?: { __typename?: 'CryptoPaymentDetails', hostedURL: string } | null } };
 
 export type CollectionItemByIdQueryVariables = Exact<{
   id: Scalars['UUID1'];
@@ -2546,6 +2546,11 @@ export const CreatePaymentDocument = gql`
     processorPaymentID
     status
     userID
+    details {
+      ... on CryptoPaymentDetails {
+        hostedURL
+      }
+    }
   }
 }
     `;

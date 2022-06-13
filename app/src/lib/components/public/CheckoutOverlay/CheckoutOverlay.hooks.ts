@@ -171,12 +171,16 @@ export function useCheckoutModalState({
     // setCheckoutModalState({ checkoutStep: "error", checkoutError: { errorMessage: "test" } });
     // setCheckoutModalState({ checkoutStep: "purchasing" });
 
+    console.log(checkoutModalState);
+
     let paymentType: PaymentType | "" = "";
 
     if (checkoutModalState.flowType === "3DS") {
       paymentType = "CreditCard";
     } else if (checkoutModalState.flowType === "Plaid") {
       paymentType = "ACH";
+    } else if (checkoutModalState.flowType === "Coinbase") {
+      paymentType = "Crypto";
     }
 
     setSelectedPaymentMethod({

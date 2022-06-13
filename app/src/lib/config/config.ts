@@ -1,7 +1,7 @@
 // Dev / Debug Stuff:
 export const DEV_DEBUG_COUNTER_EXPIRATION_MS = 1000;
 export const DEV_DEBUG_COUNTER_CLICKS_NEEDED = 16;
-export const DEV_SKIP_3DS_IN_LOCALHOST = false;
+export const DEV_SKIP_PAYMENT_REDIRECT_IN_LOCALHOST = false;
 export const DEV_DEBUG_ENABLED_KEY = "DEV_DEBUG_ENABLED";
 
 
@@ -55,3 +55,9 @@ export const THREEDS_SUCCESS_URL_REG_EXP = /success/;
 export const THREEDS_ERROR_URL_REG_EXP = /payments\/(error|failure)/;
 export const THREEDS_REDIRECT_DELAY_MS = 1000; // (1 sec) Small delay before redirecting users to 3DS' page (PurchasingView => 3DS)
 export const THREEDS_SUCCESS_REDIRECT_DELAY_MS = 5000; // Success page redirects users automatically after 5 seconds (SuccessView => ConfirmationView)
+
+
+// Coinbase:
+export const COINBASE_URL_PARAM_FROM_KEY = "from";
+export const COINBASE_URL_PARAM_FROM_VALUE = "coinbase";
+export const COINBASE_URL_REG_EXP = /coinbase/;

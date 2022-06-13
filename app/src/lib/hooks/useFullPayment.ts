@@ -14,6 +14,12 @@ import { CreatePaymentMetadataInput, CryptoBillingDetails, useCreatePaymentMutat
 import { useCreatePaymentMethod } from "./useCreatePaymentMethod";
 import { useEncryptCardData } from "./useEncryptCard";
 
+let lastPaymentMethodID = "";
+
+export function getLastPaymentMethodID() {
+  return lastPaymentMethodID;
+}
+
 export interface UseFullPaymentOptions {
   orgID: string;
   invoiceID: string;
@@ -21,6 +27,8 @@ export interface UseFullPaymentOptions {
   savedPaymentMethods: SavedPaymentMethod[];
   selectedPaymentMethod: SelectedPaymentMethod;
   wallet: null | string | Wallet;
+  coinbaseSuccessURL?: string;
+  coinbaseErrorURL?: string;
   debug?: boolean;
 }
 
@@ -29,6 +37,7 @@ export interface FullPaymentState {
   paymentMethodID: string;
   processorPaymentID: string;
   paymentID: string;
+  hostedURL: string;
   paymentError?: string | CheckoutModalError;
 }
 
@@ -39,6 +48,8 @@ export function useFullPayment({
   savedPaymentMethods,
   selectedPaymentMethod,
   wallet,
+  coinbaseSuccessURL,
+  coinbaseErrorURL,
   debug = false,
 }: UseFullPaymentOptions): [FullPaymentState, (discountCodeID?: string) => Promise<void>] {
   const [paymentState, setPaymentState] = useState<FullPaymentState>({
@@ -46,6 +57,7 @@ export function useFullPayment({
     paymentMethodID: "",
     processorPaymentID: "",
     paymentID: "",
+    hostedURL: "",
   });
 
   const setError = useCallback((paymentError: string | CheckoutModalError) => {
@@ -54,6 +66,7 @@ export function useFullPayment({
       paymentMethodID: "",
       processorPaymentID: "",
       paymentID: "",
+      hostedURL: "",
       paymentError,
     });
   }, []);
@@ -107,12 +120,14 @@ export function useFullPayment({
       paymentMethodID: "",
       processorPaymentID: "",
       paymentID: "",
+      hostedURL: "",
     });
 
     let paymentMethodID = "";
     let selectedBillingInfoData: BillingInfo | undefined;
     let processorPaymentID = "";
     let paymentID = "";
+    let hostedURL = "";
     let mutationError: ApolloError | Error | undefined;
 
     if (typeof selectedBillingInfo === "string") {
@@ -217,11 +232,11 @@ export function useFullPayment({
       const billingDetails = selectedBillingInfoData ? billingInfoToBillingDetails<CryptoBillingDetails>(selectedBillingInfoData, "Crypto") : undefined;
 
       metadata.cryptoData = {
-        name: checkoutItems[0].name,
-        description: checkoutItems[0].description,
+        name: checkoutItems[0].name || "",
+        description: checkoutItems[0].description || "",
         billingDetails,
-        redirectURL: currentURL,
-        cancelURL: currentURL,
+        redirectURL: coinbaseSuccessURL || currentURL,
+        cancelURL: coinbaseErrorURL || currentURL,
       };
     }
 
@@ -240,8 +255,12 @@ export function useFullPayment({
     if (makePaymentResult && !makePaymentResult.errors) {
       if (debug) console.log("    🟢 makePayment result", makePaymentResult);
 
+      // Just so that we know what payment method has been used in CheckoutOverlay.tsx:
+      lastPaymentMethodID = paymentMethodID;
+
       processorPaymentID = makePaymentResult.data?.createPayment?.processorPaymentID || "";
       paymentID = makePaymentResult.data?.createPayment?.id || "";
+      hostedURL = makePaymentResult.data?.createPayment?.details?.hostedURL || "";
     }
 
     if (!processorPaymentID) {
@@ -257,6 +276,7 @@ export function useFullPayment({
       paymentMethodID,
       processorPaymentID,
       paymentID,
+      hostedURL,
     });
   }, [
     orgID,
@@ -265,6 +285,8 @@ export function useFullPayment({
     savedPaymentMethods,
     selectedPaymentMethod,
     wallet,
+    coinbaseSuccessURL,
+    coinbaseErrorURL,
     debug,
     setError,
     encryptCardData,

@@ -2,7 +2,7 @@ import { Backdrop, CircularProgress } from "@mui/material";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Theme, SxProps } from "@mui/material/styles";
 import { ApolloError } from "@apollo/client";
-import { getSavedPaymentMethodAddressIdFromBillingInfo, savedPaymentMethodToBillingInfo, transformRawSavedPaymentMethods } from "../../../domain/circle/circle.utils";
+import { savedPaymentMethodToBillingInfo, transformRawSavedPaymentMethods } from "../../../domain/circle/circle.utils";
 import { UserFormat } from "../../../domain/auth/authentication.interfaces";
 import { PaymentMethod, PaymentType } from "../../../domain/payment/payment.interfaces";
 import { CheckoutEventData, CheckoutEventType } from "../../../domain/events/events.interfaces";
@@ -41,6 +41,7 @@ import { PUIRouterOptions } from "../../../domain/router/router.types";
 import { getPathnameWithParams } from "../../../domain/url/url.utils";
 import { IS_BROWSER } from "../../../domain/build/build.constants";
 import { PromoCodeProvider } from "../../../utils/promoCodeUtils";
+import { getLastPaymentMethodID } from "../../../hooks/useFullPayment";
 
 export type LoaderMode = "default" | "success" | "error";
 
@@ -58,6 +59,8 @@ export interface PUICheckoutOverlayProps {
   productConfirmationEnabled?: boolean;
   vertexEnabled?: boolean;
   threeDSEnabled?: boolean;
+  coinbaseSuccessURL?: string;
+  coinbaseErrorURL?: string;
 
   // Personalization:
   logoSrc?: string;
@@ -115,6 +118,8 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   productConfirmationEnabled,
   vertexEnabled = true,
   threeDSEnabled = true,
+  coinbaseSuccessURL,
+  coinbaseErrorURL,
 
   // Personalization:
   logoSrc,
@@ -490,19 +495,23 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
 
       if (typeof billingInfo === "string" && typeof paymentInfo === "string") return { ...prevSelectedPaymentMethod, cvv: "" };
 
-      // To find the saved payment method(s) that was/were last created:
+      // To find the saved payment method(s) that was/were last used (potentially also created):
 
-      // TODO: This should be sorted by date which doesn't seem to be the case when different payment types are present:
-      const reversedSavedPaymentMethods = savedPaymentMethods.slice().reverse();
+      const lastPaymentMethodID = getLastPaymentMethodID();
+      const matchingPaymentMethod = savedPaymentMethods.find(paymentMethod => paymentMethod.id === lastPaymentMethodID);
 
-      // TODO: This logic can probably be simplified. Just get the last saved payment method...
+      return {
+        billingInfo: matchingPaymentMethod?.addressId || "",
+        paymentInfo: matchingPaymentMethod?.id || "",
+        paymentType: matchingPaymentMethod?.type || "",
+        cvv: "",
+      };
 
-      // let matchingPaymentMethod: SavedPaymentMethod | undefined;
-
+      /*
       if (typeof billingInfo === "object") {
         const addressId = getSavedPaymentMethodAddressIdFromBillingInfo(billingInfo);
 
-        const matchingPaymentMethod = reversedSavedPaymentMethods.find(paymentMethod => paymentMethod.addressId === addressId);
+        const matchingPaymentMethod = savedPaymentMethods.find(paymentMethod => paymentMethod.addressId === addressId);
 
         if (matchingPaymentMethod) {
           // Both billingInfo and paymentInfo were objects (and we found a matching newly created payment method):
@@ -521,17 +530,18 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
       let paymentType: PaymentType | "" = "";
 
       if (typeof billingInfo === "string") {
-        paymentType = reversedSavedPaymentMethods[0].type;
+        paymentType = savedPaymentMethods[0].type;
       } else if (typeof paymentInfo === "object") {
         paymentType = paymentInfo?.type || "";
       }
 
       return {
         billingInfo,
-        paymentInfo: typeof billingInfo === "string" ? reversedSavedPaymentMethods[0].id : paymentInfo,
+        paymentInfo: typeof billingInfo === "string" ? savedPaymentMethods[0].id : paymentInfo,
         paymentType,
         cvv: "",
       };
+      */
     });
   }, [savedPaymentMethods, setSelectedPaymentMethod]);
 
@@ -620,7 +630,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
 
     if (redirectURL) {
       setTimeout(() => {
-        if (debug) console.log(`Redirecting to 3DS = ${ redirectURL }`);
+        if (debug) console.log(`Redirecting to payment success page = ${ redirectURL }`);
 
         window.location.href = redirectURL;
       }, THREEDS_REDIRECT_DELAY_MS);
@@ -927,6 +937,8 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     checkoutStepElement = (
       <PurchasingView
         threeDSEnabled={ threeDSEnabled }
+        coinbaseSuccessURL={ coinbaseSuccessURL }
+        coinbaseErrorURL={ coinbaseErrorURL }
         purchasingImageSrc={ purchasingImageSrc }
         purchasingMessages={ purchasingMessages }
         orgID={ orgID }

@@ -27,12 +27,16 @@ export const PUISuccessOverlay: React.FC<PUISuccessOverlayProps> = ({
       return;
     }
 
+    console.log("SUCCESS ERROR");
+
     // Users should only see this page if they completed a credit card payment and 3DS' verification went ok.
     // Otherwise, they are immediately redirected to homepage:
     onGoTo("/", { replace: true, reason: "No purchase success." });
   }, [purchaseSuccess, isPathname, onGoTo]);
 
   useTimeout(() => {
+    console.log("SUCCESS REDIRECT");
+
     // If everything's ok, users see this confirmation screen for 5 seconds and then are redirected to the purchase
     // confirmation page:
     if (purchaseSuccess) onGoTo(getUrlWithSearchParams(url));
