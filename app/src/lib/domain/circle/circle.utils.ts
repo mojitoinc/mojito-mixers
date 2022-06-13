@@ -5,6 +5,8 @@ import { CircleError, CircleFieldError, RawSavedPaymentMethod, SavedPaymentMetho
 import { BillingInfo } from "../../forms/BillingInfoForm";
 import { formatSentence, fullTrim } from "../../utils/formatUtils";
 import { BUILT_IN_ERRORS } from "../errors/errors.constants";
+import { AchBillingDetails, CreditCardBillingDetails, CryptoBillingDetails } from "../../queries/graphqlGenerated";
+import { PaymentType } from "../payment/payment.interfaces";
 
 const countryPrefixes = customList("countryCode", "{countryCallingCode}");
 
@@ -30,6 +32,8 @@ export function formatPhoneAsE123(phoneNumber: string, countryCode: string) {
   return `${ getPhonePrefix(countryCode) }${ parsedPhoneNumber }`;
 }
 
+export const EMPTY_ADDRESS_ID = "||||||||";
+
 export function getSavedPaymentMethodAddressId({ billingDetails, metadata }: SavedPaymentMethodBillingInfo): string {
   return [
     billingDetails.name,
@@ -49,8 +53,14 @@ export function getSavedPaymentMethodAddressId({ billingDetails, metadata }: Sav
 }
 
 export function transformRawSavedPaymentMethods(rawSavedPaymentMethods: RawSavedPaymentMethod[] = []): SavedPaymentMethod[] {
-  return rawSavedPaymentMethods.map(({ billingDetails, metadata, ...rest }) => {
-    if (!billingDetails || !metadata || !billingDetails.name || !billingDetails.address1) return null;
+  return rawSavedPaymentMethods.map(({ billingDetails = {}, metadata = {}, ...rest }) => {
+    if (rest.type !== "Crypto" && (
+      !billingDetails ||
+      !metadata ||
+      !billingDetails.name ||
+      !billingDetails.address1 ||
+      !metadata.email
+    )) return null;
 
     // Find country by short code:
     const {
@@ -68,7 +78,7 @@ export function transformRawSavedPaymentMethods(rawSavedPaymentMethods: RawSaved
     const savedPaymentInfoBillingInfo: SavedPaymentMethodBillingInfo = {
 
       metadata: {
-        email: metadata.email,
+        email: metadata.email || "",
         phoneNumber: formatPhoneAsE123(metadata.phoneNumber || "", countryCode),
       },
 
@@ -120,6 +130,26 @@ export function billingInfoToSavedPaymentMethodBillingInfo(billingInfo: BillingI
       phoneNumber: formatPhoneAsE123(billingInfo.phone, `${ billingInfo.country.value }`),
     },
   };
+}
+
+export function billingInfoToBillingDetails<T extends CreditCardBillingDetails | AchBillingDetails | CryptoBillingDetails = CreditCardBillingDetails>(
+  billingInfo: BillingInfo,
+  paymentType: PaymentType = "CreditCard",
+): T {
+  const billingDetails = {
+    city: fullTrim(billingInfo.city),
+    country: `${ billingInfo.country.value }`,
+    address1: fullTrim(billingInfo.street || ""),
+    address2: fullTrim(billingInfo.apartment || ""),
+    district: `${ billingInfo.state.value || billingInfo.state.label }`,
+    postalCode: fullTrim(billingInfo.zipCode),
+  } as T;
+
+  if (paymentType !== "Crypto") {
+    (billingDetails as CreditCardBillingDetails | AchBillingDetails).name = fullTrim(billingInfo.fullName);
+  }
+
+  return billingDetails;
 }
 
 export function getSavedPaymentMethodAddressIdFromBillingInfo(billingInfo: BillingInfo): string {

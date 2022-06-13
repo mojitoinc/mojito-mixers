@@ -2,7 +2,7 @@ import { Backdrop, CircularProgress } from "@mui/material";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Theme, SxProps } from "@mui/material/styles";
 import { ApolloError } from "@apollo/client";
-import { getSavedPaymentMethodAddressIdFromBillingInfo, savedPaymentMethodToBillingInfo, transformRawSavedPaymentMethods } from "../../../domain/circle/circle.utils";
+import { savedPaymentMethodToBillingInfo, transformRawSavedPaymentMethods } from "../../../domain/circle/circle.utils";
 import { UserFormat } from "../../../domain/auth/authentication.interfaces";
 import { PaymentMethod, PaymentType } from "../../../domain/payment/payment.interfaces";
 import { CheckoutEventData, CheckoutEventType } from "../../../domain/events/events.interfaces";
@@ -16,7 +16,7 @@ import { PaymentView } from "../../../views/Payment/PaymentView";
 import { CheckoutModalHeader, CheckoutModalHeaderVariant } from "../../payments/CheckoutModalHeader/CheckoutModalHeader";
 import { PurchasingView } from "../../../views/Purchasing/PurchasingView";
 import { ErrorView } from "../../../views/Error/ErrorView";
-import { RawSavedPaymentMethod, SavedPaymentMethod } from "../../../domain/circle/circle.interfaces";
+import { RawSavedPaymentMethod } from "../../../domain/circle/circle.interfaces";
 import { continuePlaidOAuthFlow, PlaidFlow } from "../../../hooks/usePlaid";
 import { ConsentType } from "../../shared/ConsentText/ConsentText";
 import { CheckoutModalError, CheckoutModalStepIndex, useCheckoutModalState } from "./CheckoutOverlay.hooks";
@@ -41,6 +41,7 @@ import { PUIRouterOptions } from "../../../domain/router/router.types";
 import { getPathnameWithParams } from "../../../domain/url/url.utils";
 import { IS_BROWSER } from "../../../domain/build/build.constants";
 import { PromoCodeProvider } from "../../../utils/promoCodeUtils";
+import { getLastPaymentMethodID } from "../../../hooks/useFullPayment";
 
 export type LoaderMode = "default" | "success" | "error";
 
@@ -58,6 +59,8 @@ export interface PUICheckoutOverlayProps {
   productConfirmationEnabled?: boolean;
   vertexEnabled?: boolean;
   threeDSEnabled?: boolean;
+  coinbaseSuccessURL?: string;
+  coinbaseErrorURL?: string;
 
   // Personalization:
   logoSrc?: string;
@@ -115,6 +118,8 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   productConfirmationEnabled,
   vertexEnabled = true,
   threeDSEnabled = true,
+  coinbaseSuccessURL,
+  coinbaseErrorURL,
 
   // Personalization:
   logoSrc,
@@ -490,28 +495,15 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
 
       if (typeof billingInfo === "string" && typeof paymentInfo === "string") return { ...prevSelectedPaymentMethod, cvv: "" };
 
-      // To find the saved payment method(s) that was/were last created:
-      const reversedSavedPaymentMethods = savedPaymentMethods.slice().reverse();
+      // To find the saved payment method(s) that was/were last used (potentially also created):
 
-      // TODO: This logic can probably be simplified. Just get the last saved payment method...
+      const lastPaymentMethodID = getLastPaymentMethodID();
+      const matchingPaymentMethod = savedPaymentMethods.find(paymentMethod => paymentMethod.id === lastPaymentMethodID);
 
-      let matchingPaymentMethod: SavedPaymentMethod | undefined;
-
-      if (typeof billingInfo === "object") {
-        const addressId = getSavedPaymentMethodAddressIdFromBillingInfo(billingInfo);
-
-        matchingPaymentMethod = reversedSavedPaymentMethods.find(paymentMethod => paymentMethod.addressId === addressId);
-      }
-
-      return matchingPaymentMethod ? {
-        // Both billingInfo and paymentInfo were objects (and we found a matching newly created payment method):
-        billingInfo: matchingPaymentMethod.addressId,
-        paymentInfo: matchingPaymentMethod.id,
-        cvv: "",
-      } : {
-        // billingInfo was an addressID (or we could not find a match) and paymentInfo was an object:
-        billingInfo,
-        paymentInfo: typeof billingInfo === "string" ? reversedSavedPaymentMethods[0].id : paymentInfo,
+      return {
+        billingInfo: matchingPaymentMethod?.addressId || "",
+        paymentInfo: matchingPaymentMethod?.id || "",
+        paymentType: matchingPaymentMethod?.type || "",
         cvv: "",
       };
     });
@@ -524,15 +516,19 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     // If we go back to the billing info step to fix some validation errors or change some data, we preserve the data
     // in the payment info step (form) as long as it was not a saved payment method. In that case, the saved payment
     // method doesn't belong to the now updated billing info anymore, so we do reset it:
-    setSelectedPaymentMethod(({ paymentInfo }) => ({ billingInfo, paymentInfo: typeof paymentInfo === "object" ? paymentInfo : "", cvv: "" }));
+    setSelectedPaymentMethod(({ paymentInfo }) => ({ billingInfo, paymentInfo: typeof paymentInfo === "object" ? paymentInfo : "", paymentType: "", cvv: "" }));
   }, [setSelectedPaymentMethod]);
 
   const handlePaymentInfoSelected = useCallback((paymentInfo: string | PaymentMethod) => {
-    setSelectedPaymentMethod(({ billingInfo }) => ({ billingInfo, paymentInfo, cvv: "" }));
-  }, [setSelectedPaymentMethod]);
+    const paymentType: PaymentType | "" = typeof paymentInfo === "string"
+      ? (savedPaymentMethods.find(({ id }) => id === paymentInfo)?.type || "")
+      : paymentInfo.type;
+
+    setSelectedPaymentMethod(({ billingInfo }) => ({ billingInfo, paymentInfo, paymentType, cvv: "" }));
+  }, [savedPaymentMethods, setSelectedPaymentMethod]);
 
   const handleCvvSelected = useCallback((cvv: string) => {
-    setSelectedPaymentMethod(({ billingInfo, paymentInfo }) => ({ billingInfo, paymentInfo, cvv }));
+    setSelectedPaymentMethod(({ billingInfo, paymentInfo }) => ({ billingInfo, paymentInfo, paymentType: "CreditCard", cvv }));
   }, [setSelectedPaymentMethod]);
 
 
@@ -568,6 +564,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
           // re-create it with the new payment information:
           billingInfo: savedPaymentMethodToBillingInfo(addressToDelete),
           paymentInfo: "",
+          paymentType: "",
           cvv: "",
         });
       }
@@ -597,7 +594,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
 
     if (redirectURL) {
       setTimeout(() => {
-        if (debug) console.log(`Redirecting to 3DS = ${ redirectURL }`);
+        if (debug) console.log(`Redirecting to payment success page = ${ redirectURL }`);
 
         window.location.href = redirectURL;
       }, THREEDS_REDIRECT_DELAY_MS);
@@ -692,7 +689,9 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     onClose();
   }, [handleBeforeUnload, setInvoiceID, onClose]);
 
-  const handleGoTo = useCallback((pathnameOrUrl: string) => {
+  const handleGoTo = useCallback((pathnameOrUrlParam: string) => {
+    const pathnameOrUrl = pathnameOrUrlParam || "/";
+
     if (pathnameOrUrl === window.location.href || pathnameOrUrl === window.location.pathname) {
       handleClose();
 
@@ -703,7 +702,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
 
     handleBeforeUnload();
 
-    onGoTo(pathnameOrUrl || "/", { replace: true });
+    onGoTo(pathnameOrUrl, { replace: true });
   }, [handleClose, handleBeforeUnload, onGoTo]);
 
   const handlePurchaseCompleted = useCallback(() => {
@@ -904,6 +903,8 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     checkoutStepElement = (
       <PurchasingView
         threeDSEnabled={ threeDSEnabled }
+        coinbaseSuccessURL={ coinbaseSuccessURL }
+        coinbaseErrorURL={ coinbaseErrorURL }
         purchasingImageSrc={ purchasingImageSrc }
         purchasingMessages={ purchasingMessages }
         orgID={ orgID }

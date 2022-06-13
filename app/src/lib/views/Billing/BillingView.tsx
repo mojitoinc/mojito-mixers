@@ -5,7 +5,7 @@ import { CheckoutDeliveryAndItemCostBreakdown } from "../../components/payments/
 import { CheckoutStepper } from "../../components/payments/CheckoutStepper/CheckoutStepper";
 import { SavedBillingDetailsSelector } from "../../components/shared/SavedBillingDetailsSelector/SavedBillingDetailsSelector";
 import { SavedPaymentMethod } from "../../domain/circle/circle.interfaces";
-import { getSavedPaymentMethodAddressIdFromBillingInfo, savedPaymentMethodToBillingInfo } from "../../domain/circle/circle.utils";
+import { EMPTY_ADDRESS_ID, getSavedPaymentMethodAddressIdFromBillingInfo, savedPaymentMethodToBillingInfo } from "../../domain/circle/circle.utils";
 import { CheckoutItem } from "../../domain/product/product.interfaces";
 import { BillingInfo, BillingInfoForm, TaxInfo } from "../../forms/BillingInfoForm";
 import { distinctBy } from "../../utils/arrayUtils";
@@ -272,9 +272,10 @@ export const BillingView: React.FC<BillingViewProps> = ({
 
   useEffect(() => {
     const selectedPaymentInfoMatch = typeof selectedBillingInfo === "string" && savedPaymentMethods.some(({ addressId }) => addressId === selectedBillingInfo);
+    const fistValidPaymentInfo = savedPaymentMethods.find(({ addressId }) => addressId !== EMPTY_ADDRESS_ID);
 
-    if (showSaved && !selectedPaymentInfoMatch && savedPaymentMethods.length > 0 /* && !checkoutError */) {
-      onBillingInfoSelected(savedPaymentMethods[0].addressId);
+    if (showSaved && !selectedPaymentInfoMatch && fistValidPaymentInfo /* && !checkoutError */) {
+      onBillingInfoSelected(fistValidPaymentInfo.addressId);
     }
   }, [showSaved, savedPaymentMethods, selectedBillingInfo, onBillingInfoSelected/* , checkoutError */]);
 

@@ -2,22 +2,33 @@ import { ApolloError } from "@apollo/client";
 import { useState, useCallback } from "react";
 import { CheckoutModalError, SelectedPaymentMethod } from "../components/public/CheckoutOverlay/CheckoutOverlay.hooks";
 import { SavedPaymentMethod } from "../domain/circle/circle.interfaces";
-import { savedPaymentMethodToBillingInfo } from "../domain/circle/circle.utils";
+import { billingInfoToBillingDetails, savedPaymentMethodToBillingInfo } from "../domain/circle/circle.utils";
 import { ERROR_PURCHASE_CREATING_PAYMENT_METHOD, ERROR_PURCHASE_CVV, ERROR_PURCHASE_NO_ITEMS, ERROR_PURCHASE_PAYING, ERROR_PURCHASE_SELECTED_PAYMENT_METHOD } from "../domain/errors/errors.constants";
-import { PaymentStatus } from "../domain/payment/payment.interfaces";
+import { PaymentStatus, PaymentType } from "../domain/payment/payment.interfaces";
+import { CheckoutItem } from "../domain/product/product.interfaces";
+import { getUrlWithoutParams } from "../domain/url/url.utils";
 import { Wallet } from "../domain/wallet/wallet.interfaces";
 import { filterSpecialWalletAddressValues } from "../domain/wallet/wallet.utils";
 import { BillingInfo } from "../forms/BillingInfoForm";
-import { CreatePaymentMetadataInput, useCreatePaymentMutation } from "../queries/graphqlGenerated";
+import { CreatePaymentMetadataInput, CryptoBillingDetails, useCreatePaymentMutation } from "../queries/graphqlGenerated";
 import { useCreatePaymentMethod } from "./useCreatePaymentMethod";
 import { useEncryptCardData } from "./useEncryptCard";
+
+let lastPaymentMethodID = "";
+
+export function getLastPaymentMethodID() {
+  return lastPaymentMethodID;
+}
 
 export interface UseFullPaymentOptions {
   orgID: string;
   invoiceID: string;
+  checkoutItems: CheckoutItem[];
   savedPaymentMethods: SavedPaymentMethod[];
   selectedPaymentMethod: SelectedPaymentMethod;
   wallet: null | string | Wallet;
+  coinbaseSuccessURL?: string;
+  coinbaseErrorURL?: string;
   debug?: boolean;
 }
 
@@ -26,15 +37,19 @@ export interface FullPaymentState {
   paymentMethodID: string;
   processorPaymentID: string;
   paymentID: string;
+  hostedURL: string;
   paymentError?: string | CheckoutModalError;
 }
 
 export function useFullPayment({
   orgID,
   invoiceID,
+  checkoutItems,
   savedPaymentMethods,
   selectedPaymentMethod,
   wallet,
+  coinbaseSuccessURL,
+  coinbaseErrorURL,
   debug = false,
 }: UseFullPaymentOptions): [FullPaymentState, (discountCodeID?: string) => Promise<void>] {
   const [paymentState, setPaymentState] = useState<FullPaymentState>({
@@ -42,6 +57,7 @@ export function useFullPayment({
     paymentMethodID: "",
     processorPaymentID: "",
     paymentID: "",
+    hostedURL: "",
   });
 
   const setError = useCallback((paymentError: string | CheckoutModalError) => {
@@ -50,6 +66,7 @@ export function useFullPayment({
       paymentMethodID: "",
       processorPaymentID: "",
       paymentID: "",
+      hostedURL: "",
       paymentError,
     });
   }, []);
@@ -70,12 +87,18 @@ export function useFullPayment({
       return;
     }
 
+    let paymentType: PaymentType | "";
     let cvv = "";
 
     if (typeof selectedPaymentInfo === "string") {
+      paymentType = selectedPaymentMethod.paymentType;
       cvv = selectedPaymentMethod.cvv;
-    } else if (selectedPaymentInfo.type === "CreditCard") {
-      cvv = selectedPaymentInfo.secureCode;
+    } else {
+      paymentType = selectedPaymentInfo.type;
+
+      if (selectedPaymentInfo.type === "CreditCard") {
+        cvv = selectedPaymentInfo.secureCode;
+      }
     }
 
     if (debug) {
@@ -97,36 +120,37 @@ export function useFullPayment({
       paymentMethodID: "",
       processorPaymentID: "",
       paymentID: "",
+      hostedURL: "",
     });
 
     let paymentMethodID = "";
+    let selectedBillingInfoData: BillingInfo | undefined;
     let processorPaymentID = "";
     let paymentID = "";
+    let hostedURL = "";
     let mutationError: ApolloError | Error | undefined;
+
+    if (typeof selectedBillingInfo === "string") {
+      // If selectedPaymentInfo is an object and selectedBillingInfo is an addressID, we need to find the matching
+      // data in savedPaymentMethods:
+      const matchingPaymentMethod = savedPaymentMethods.find(({ addressId }) => addressId === selectedBillingInfo);
+
+      if (!matchingPaymentMethod) {
+        setError(ERROR_PURCHASE_SELECTED_PAYMENT_METHOD());
+
+        return;
+      }
+
+      selectedBillingInfoData = savedPaymentMethodToBillingInfo(matchingPaymentMethod);
+    } else {
+      // If both selectedPaymentInfo and selectedBillingInfo are objects, we just create a new payment method with them:
+      selectedBillingInfoData = selectedBillingInfo;
+    }
 
     if (typeof selectedPaymentInfo === "string") {
       // If selectedPaymentInfo is a payment method ID, that's all we need, no need to create a new payment method:
       paymentMethodID = selectedPaymentInfo;
-    } else {
-      let selectedBillingInfoData: BillingInfo;
-
-      if (typeof selectedBillingInfo === "string") {
-        // If selectedPaymentInfo is an object and selectedBillingInfo is an addressID, we need to find the matching
-        // data in savedPaymentMethods:
-        const matchingPaymentMethod = savedPaymentMethods.find(({ addressId }) => addressId === selectedBillingInfo);
-
-        if (!matchingPaymentMethod) {
-          setError(ERROR_PURCHASE_SELECTED_PAYMENT_METHOD());
-
-          return;
-        }
-
-        selectedBillingInfoData = savedPaymentMethodToBillingInfo(matchingPaymentMethod);
-      } else {
-        // If both selectedPaymentInfo and selectedBillingInfo are objects, we just create a new payment method with them:
-        selectedBillingInfoData = selectedBillingInfo;
-      }
-
+    } else if (selectedBillingInfoData) {
       if (debug) {
         console.log("  💳 createPaymentMethod", {
           orgID,
@@ -173,11 +197,12 @@ export function useFullPayment({
     }
 
     const metadata: CreatePaymentMetadataInput = destinationAddress ? { destinationAddress } : { };
+
     if (discountCodeID) {
       metadata.discountCodeID = discountCodeID;
     }
 
-    if (cvv) {
+    if (paymentType === "CreditCard" && cvv) {
       const encryptCardDataResult = await encryptCardData({
         cvv,
       }).catch((error: ApolloError | Error) => {
@@ -200,6 +225,17 @@ export function useFullPayment({
         keyID,
         encryptedData: encryptedCardData,
       };
+    } else if (paymentType === "Crypto") {
+      const currentURL = getUrlWithoutParams();
+      const billingDetails = selectedBillingInfoData ? billingInfoToBillingDetails<CryptoBillingDetails>(selectedBillingInfoData, "Crypto") : undefined;
+
+      metadata.cryptoData = {
+        name: checkoutItems[0].name || "",
+        description: checkoutItems[0].description || "",
+        billingDetails,
+        redirectURL: coinbaseSuccessURL || currentURL,
+        cancelURL: coinbaseErrorURL || currentURL,
+      };
     }
 
     const makePaymentResult = await makePayment({
@@ -217,8 +253,12 @@ export function useFullPayment({
     if (makePaymentResult && !makePaymentResult.errors) {
       if (debug) console.log("    🟢 makePayment result", makePaymentResult);
 
+      // Just so that we know what payment method has been used in CheckoutOverlay.tsx:
+      lastPaymentMethodID = paymentMethodID;
+
       processorPaymentID = makePaymentResult.data?.createPayment?.processorPaymentID || "";
       paymentID = makePaymentResult.data?.createPayment?.id || "";
+      hostedURL = makePaymentResult.data?.createPayment?.details?.hostedURL || "";
     }
 
     if (!processorPaymentID) {
@@ -234,13 +274,17 @@ export function useFullPayment({
       paymentMethodID,
       processorPaymentID,
       paymentID,
+      hostedURL,
     });
   }, [
     orgID,
     invoiceID,
+    checkoutItems,
     savedPaymentMethods,
     selectedPaymentMethod,
     wallet,
+    coinbaseSuccessURL,
+    coinbaseErrorURL,
     debug,
     setError,
     encryptCardData,

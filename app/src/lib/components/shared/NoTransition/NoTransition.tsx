@@ -4,6 +4,7 @@ import React from "react";
 export const NoTransition = React.forwardRef<
   React.ReactFragment,
   TransitionProps & { children: React.ReactChild }
->(({ children }) => {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+>(({ children }, ref) => {
   return <>{ children }</>;
 });

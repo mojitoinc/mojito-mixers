@@ -124,7 +124,8 @@ export const SavedPaymentDetailsSelector: React.FC<SavedPaymentDetailsSelectorPr
     onAttemptSubmit();
 
     if (canSubmit && selectedPaymentMethodId && isCvvValid) {
-      onCvvSelected(cvv);
+      if (cvv) onCvvSelected(cvv);
+
       onNext();
 
       return;

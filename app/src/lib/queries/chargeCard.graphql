@@ -5,5 +5,10 @@ mutation CreatePayment($paymentMethodID: UUID1!, $invoiceID: UUID1!, $metadata: 
     processorPaymentID
     status
     userID
+    details {
+      ...on CryptoPaymentDetails {
+        hostedURL
+      }
+    }
   }
 }

@@ -9,20 +9,22 @@ import { XS_MOBILE_MAX_WIDTH } from "../../config/theme/themeConstants";
 import { StatusIcon } from "../../components/shared/StatusIcon/StatusIcon";
 import { useGetPaymentNotificationQuery } from "../../queries/graphqlGenerated";
 import { persistCheckoutModalInfo } from "../../components/public/CheckoutOverlay/CheckoutOverlay.utils";
-import { PAYMENT_NOTIFICATION_INTERVAL_MS, PURCHASING_MESSAGES_DEFAULT, PURCHASING_MIN_WAIT_MS, PURCHASING_MESSAGES_INTERVAL_MS, PAYMENT_CREATION_TIMEOUT_MS, DEV_SKIP_3DS_IN_LOCALHOST } from "../../config/config";
+import { PAYMENT_NOTIFICATION_INTERVAL_MS, PURCHASING_MESSAGES_DEFAULT, PURCHASING_MIN_WAIT_MS, PURCHASING_MESSAGES_INTERVAL_MS, PAYMENT_CREATION_TIMEOUT_MS, DEV_SKIP_PAYMENT_REDIRECT_IN_LOCALHOST } from "../../config/config";
 import { isLocalhost } from "../../domain/url/url.utils";
 import { Wallet } from "../../domain/wallet/wallet.interfaces";
-import { CheckoutItemInfo } from "../../domain/product/product.interfaces";
+import { CheckoutItem } from "../../domain/product/product.interfaces";
 import { usePromoCode } from "../../utils/promoCodeUtils";
 
 export interface PurchasingViewProps {
   threeDSEnabled?: boolean;
+  coinbaseSuccessURL?: string;
+  coinbaseErrorURL?: string;
   purchasingImageSrc?: string;
   purchasingMessages?: false | string[];
   orgID: string;
   invoiceID: string;
   invoiceCountdownStart: number;
-  checkoutItems: CheckoutItemInfo[];
+  checkoutItems: CheckoutItem[];
   savedPaymentMethods: SavedPaymentMethod[];
   selectedPaymentMethod: SelectedPaymentMethod;
   wallet: null | string | Wallet;
@@ -34,6 +36,8 @@ export interface PurchasingViewProps {
 
 export const PurchasingView: React.FC<PurchasingViewProps> = ({
   threeDSEnabled,
+  coinbaseSuccessURL,
+  coinbaseErrorURL,
   purchasingImageSrc,
   purchasingMessages: customPurchasingMessages,
   orgID,
@@ -71,9 +75,12 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
   const [fullPaymentState, fullPayment] = useFullPayment({
     orgID,
     invoiceID,
+    checkoutItems,
     savedPaymentMethods,
     selectedPaymentMethod,
     wallet,
+    coinbaseSuccessURL,
+    coinbaseErrorURL,
     debug,
   });
 
@@ -106,6 +113,12 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
       return nextRedirectURL;
     });
   }, [skipPaymentNotificationRedirect, receivedRedirectURL, debug]);
+
+  useEffect(() => {
+    const { hostedURL } = fullPaymentState;
+
+    if (hostedURL) setRedirectURL(hostedURL);
+  }, [fullPaymentState]);
 
 
   // Triggers for payment mutation and onPurchaseSuccess/onPurchaseError callbacks:
@@ -148,7 +161,7 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
 
     purchaseSuccessHandledRef.current = true;
 
-    const skipRedirect = DEV_SKIP_3DS_IN_LOCALHOST && isLocalhost();
+    const skipRedirect = DEV_SKIP_PAYMENT_REDIRECT_IN_LOCALHOST && isLocalhost();
 
     if (redirectURL && !skipRedirect) {
       persistCheckoutModalInfo({

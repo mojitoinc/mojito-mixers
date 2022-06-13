@@ -220,8 +220,21 @@ Additionally, when using Plaid for ACH payments you need to add an `/oauth` page
 - `/oauth` => [app/src/pages/oauth.tsx](https://github.com/mojitoinc/mojito-mixers/blob/main/app/src/pages/oauth.tsx).
 
 <br />
-
   
+
+### Crypto payments with Coinbase: 
+
+Same as [Credit Card payments with Circle & 3DS](https://github.com/mojitoinc/mojito-mixers#credit-card-payments-with-circle--3ds).
+
+Note that while `PUICheckout` exposes two props to configure Coinbase redirect URLs, with the current implementation, those
+might be:
+
+- `coinbaseSuccessURL = "http.../payments/success/?from=coinbase"`.
+- `coinbaseErrorURL = "http:.../payments/error/?from=coinbase" `.
+
+<br />
+  
+
 ### Supported Countries
 
 We use Circle for payments, so the supported countries depend on which payment method is going to be used, as described here:

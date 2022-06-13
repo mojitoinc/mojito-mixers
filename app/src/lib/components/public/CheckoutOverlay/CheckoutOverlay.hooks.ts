@@ -2,7 +2,7 @@ import { ApolloError } from "@apollo/client";
 import { Dispatch, SetStateAction, useState, useCallback } from "react";
 import { CircleFieldErrors, parseCircleError } from "../../../domain/circle/circle.utils";
 import { ERROR_GENERIC, MappedError, MAPPED_ERRORS } from "../../../domain/errors/errors.constants";
-import { PaymentMethod } from "../../../domain/payment/payment.interfaces";
+import { PaymentMethod, PaymentType } from "../../../domain/payment/payment.interfaces";
 import { CheckoutItemInfo } from "../../../domain/product/product.interfaces";
 import { Wallet } from "../../../domain/wallet/wallet.interfaces";
 import { isValidWalletAddress } from "../../../domain/wallet/wallet.utils";
@@ -59,6 +59,7 @@ export interface PersistedData {
 export interface SelectedPaymentMethod {
   billingInfo: string | BillingInfo;
   paymentInfo: string | PaymentMethod | null;
+  paymentType: PaymentType | "";
   cvv: string;
 }
 
@@ -126,6 +127,7 @@ export function useCheckoutModalState({
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<SelectedPaymentMethod>({
     billingInfo: "",
     paymentInfo: "",
+    paymentType: "",
     cvv: "",
   });
 
@@ -169,9 +171,20 @@ export function useCheckoutModalState({
     // setCheckoutModalState({ checkoutStep: "error", checkoutError: { errorMessage: "test" } });
     // setCheckoutModalState({ checkoutStep: "purchasing" });
 
+    let paymentType: PaymentType | "" = "";
+
+    if (checkoutModalState.flowType === "3DS") {
+      paymentType = "CreditCard";
+    } else if (checkoutModalState.flowType === "Plaid") {
+      paymentType = "ACH";
+    } else if (checkoutModalState.flowType === "Coinbase") {
+      paymentType = "Crypto";
+    }
+
     setSelectedPaymentMethod({
       billingInfo: checkoutModalState.billingInfo || "",
       paymentInfo: checkoutModalState.paymentInfo || "",
+      paymentType,
       cvv: "",
     });
 

@@ -23,7 +23,15 @@ export interface RawSavedPaymentMethodACH {
   metadata: AchMetadata;
 }
 
-export type RawSavedPaymentMethod = (RawSavedPaymentMethodCC | RawSavedPaymentMethodACH) & { type: PaymentType };
+export interface RawSavedPaymentMethodCrypto {
+  id: string;
+  type: "Crypto";
+  status: PaymentMethodStatus;
+  billingDetails: undefined;
+  metadata: undefined;
+}
+
+export type RawSavedPaymentMethod = (RawSavedPaymentMethodCC | RawSavedPaymentMethodACH | RawSavedPaymentMethodCrypto) & { type: PaymentType };
 
 export interface CommonSavedPaymentMethodBillingDetails {
   name: string;
@@ -52,7 +60,8 @@ export type GenericSavedPaymentMethod<R extends RawSavedPaymentMethod> = Omit<R,
 
 export type SavedPaymentMethodCC = GenericSavedPaymentMethod<RawSavedPaymentMethodCC>;
 export type SavedPaymentMethodACH = GenericSavedPaymentMethod<RawSavedPaymentMethodACH>;
-export type SavedPaymentMethod = SavedPaymentMethodCC | SavedPaymentMethodACH;
+export type SavedPaymentMethodCrypto = GenericSavedPaymentMethod<RawSavedPaymentMethodCrypto>;
+export type SavedPaymentMethod = SavedPaymentMethodCC | SavedPaymentMethodACH | SavedPaymentMethodCrypto;
 export type SavedPaymentMethodBillingInfo = Pick<SavedPaymentMethod, "billingDetails" | "metadata">;
 
 export interface CircleFieldError {

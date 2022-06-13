@@ -2,7 +2,8 @@ import { NextPage } from "next";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { CheckoutComponent } from "../../components/checkout-component/CheckoutComponent";
-import { THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY } from "../../lib";
+import { getCheckoutModalState, THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY } from "../../lib";
+import { COINBASE_URL_PARAM_FROM_KEY, COINBASE_URL_PARAM_FROM_VALUE } from "../../lib/config/config";
 
 const SuccessPage: NextPage = () => {
   const router = useRouter();
@@ -10,7 +11,12 @@ const SuccessPage: NextPage = () => {
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const paymentIdParam = params.get(THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY) || "";
+
+    let paymentIdParam = params.get(THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY) || "";
+
+    if (paymentIdParam === "" && params.get(COINBASE_URL_PARAM_FROM_KEY) === COINBASE_URL_PARAM_FROM_VALUE) {
+      paymentIdParam = getCheckoutModalState({ noClear: true }).processorPaymentID;
+    }
 
     setPaymentId(paymentIdParam);
   }, []);

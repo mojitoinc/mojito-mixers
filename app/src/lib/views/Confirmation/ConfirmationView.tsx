@@ -32,6 +32,7 @@ export const ConfirmationView: React.FC<ConfirmationViewProps> = ({
   onGoTo,
 }) => {
   const { setEditable } = usePromoCode();
+
   const {
     goToMarketplaceHref,
     goToMarketplaceLabel,

@@ -296,7 +296,7 @@ const PAYMENT_TYPE_FORM_DATA: Record<PaymentType, PaymentTypeFormData> = {
       <>
         <DisplayBox sx={{ mt: 1.5, mb: consentType === "checkbox" ? 1 : 0 }}>
           <Typography variant="body1">
-            Not supported yet.
+            We use Coinbase to connect to your wallet.
           </Typography>
         </DisplayBox>
 
@@ -421,7 +421,7 @@ export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
       }
 
       onPlaidLinkClicked();
-    } else if (["CreditCard", "Wire"].includes(selectedPaymentMethod)) {
+    } else {
       submitForm(e);
     }
   }, [onAttemptSubmit, selectedPaymentMethod, onPlaidLinkClicked, submitForm, trigger]);
@@ -490,7 +490,7 @@ export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
         variant={ selectedPaymentMethod === "ACH" ? "toPlaid" : "toConfirmation" }
         consentType={ consentType === "checkbox" ? undefined : consentType }
         submitLabel={ loadingItemLimits ? "Verifying purchase..." : undefined }
-        submitDisabled={ selectedPaymentMethod === "Crypto" || showPlaidError || loadingItemLimits || !!limitExceededMessage }
+        submitDisabled={ showPlaidError || loadingItemLimits || !!limitExceededMessage }
         submitLoading={ plaidLoading || loadingItemLimits }
         onCloseClicked={ onClose } />
     </form>

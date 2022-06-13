@@ -9,11 +9,13 @@ import { PLAYGROUND_MOJITO_LOGO, PLAYGROUND_USER_FORMAT } from "../../utils/play
 export const CheckoutComponent: React.FC<PUICheckoutComponentProps> = ({
   orgID,
   checkoutItems,
+  paymentIdParam: paymentIdParamProp,
+  paymentErrorParam: paymentErrorParamProp,
   ...checkoutComponentProps
 }) => {
   const router = useRouter();
-  const paymentIdParam = router.query[THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY]?.toString();
-  const paymentErrorParam = router.query[THREEDS_FLOW_SEARCH_PARAM_ERROR_KEY]?.toString();
+  const paymentIdParam = paymentIdParamProp || router.query[THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY]?.toString();
+  const paymentErrorParam = paymentErrorParamProp || router.query[THREEDS_FLOW_SEARCH_PARAM_ERROR_KEY]?.toString();
 
   const { loginWithPopup, isAuthenticated, isLoading: isAuthenticatedLoading, getIdTokenClaims } = useAuth0();
 
@@ -87,6 +89,9 @@ export const CheckoutComponent: React.FC<PUICheckoutComponentProps> = ({
     productConfirmationEnabled: false,
     vertexEnabled: true,
     threeDSEnabled: true,
+    // Replace with your own domain here:
+    coinbaseSuccessURL: "http://localhost:3000/payments/success/?from=coinbase",
+    coinbaseErrorURL: "http://localhost:3000/payments/error/?from=coinbase",
 
     // Theming:
     theme: MOJITO_LIGHT_THEME,
