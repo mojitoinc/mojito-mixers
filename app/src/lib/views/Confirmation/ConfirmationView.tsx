@@ -73,6 +73,12 @@ export const ConfirmationView: React.FC<ConfirmationViewProps> = ({
     };
   }, [savedPaymentMethods, selectedBillingInfo, selectedPaymentInfo]);
 
+  console.log({
+    selectedPaymentMethod,
+    selectedPaymentMethodBillingInfo,
+    selectedPaymentMethodPaymentInfo,
+  });
+
   if (!selectedPaymentMethodBillingInfo || !selectedPaymentMethodPaymentInfo) return null;
 
   return (

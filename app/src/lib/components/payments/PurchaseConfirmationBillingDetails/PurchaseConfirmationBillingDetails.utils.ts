@@ -1,5 +1,5 @@
 import { SavedPaymentMethod } from "../../../domain/circle/circle.interfaces";
-import { CreditCard, PaymentMethod, PaymentType } from "../../../domain/payment/payment.interfaces";
+import { AchAccount, CreditCard, PaymentMethod, PaymentType } from "../../../domain/payment/payment.interfaces";
 import { ACH_MASK_PREFIX, CREDIT_CARD_MASK_PREFIX, GENERIC_MASK_PREFIX } from "../../../domain/payment/payment.constants";
 
 export interface GetFormattedPaymentMethodReturn {
@@ -33,11 +33,18 @@ export function getFormattedPaymentMethod(paymentMethodInfo: PaymentMethod | Sav
       paymentType = "Crypto";
       displayValue = `${ paymentMethodInfo.id }`;
     }
-  } else if (paymentMethodInfo === null) {
+  } else if (paymentMethodInfo) {
+    if ((paymentMethodInfo as CreditCard).hasOwnProperty("cardNumber")) {
+      displayValue = (paymentMethodInfo as CreditCard).cardNumber;
+    } else if ((paymentMethodInfo as AchAccount).hasOwnProperty("accountNumber")) {
+      displayValue = (paymentMethodInfo as AchAccount).accountId;
+    } else {
+      isMasked = true;
+      displayValue = GENERIC_MASK_PREFIX;
+    }
+  } else {
     isMasked = true;
     displayValue = GENERIC_MASK_PREFIX;
-  } else {
-    displayValue = (paymentMethodInfo as CreditCard).cardNumber;
   }
 
   return {

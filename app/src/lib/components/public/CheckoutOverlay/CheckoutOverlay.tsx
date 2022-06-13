@@ -493,6 +493,8 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
       // To find the saved payment method(s) that was/were last created:
       const reversedSavedPaymentMethods = savedPaymentMethods.slice().reverse();
 
+      debugger;
+
       // TODO: This logic can probably be simplified. Just get the last saved payment method...
 
       let matchingPaymentMethod: SavedPaymentMethod | undefined;
