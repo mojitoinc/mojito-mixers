@@ -4,7 +4,7 @@ import { CheckoutModalError, SelectedPaymentMethod } from "../components/public/
 import { SavedPaymentMethod } from "../domain/circle/circle.interfaces";
 import { billingInfoToBillingDetails, savedPaymentMethodToBillingInfo } from "../domain/circle/circle.utils";
 import { ERROR_PURCHASE_CREATING_PAYMENT_METHOD, ERROR_PURCHASE_CVV, ERROR_PURCHASE_NO_ITEMS, ERROR_PURCHASE_PAYING, ERROR_PURCHASE_SELECTED_PAYMENT_METHOD } from "../domain/errors/errors.constants";
-import { PaymentStatus } from "../domain/payment/payment.interfaces";
+import { PaymentStatus, PaymentType } from "../domain/payment/payment.interfaces";
 import { CheckoutItem } from "../domain/product/product.interfaces";
 import { getUrlWithoutParams } from "../domain/url/url.utils";
 import { Wallet } from "../domain/wallet/wallet.interfaces";
@@ -74,12 +74,18 @@ export function useFullPayment({
       return;
     }
 
+    let paymentType: PaymentType | "";
     let cvv = "";
 
     if (typeof selectedPaymentInfo === "string") {
+      paymentType = selectedPaymentMethod.paymentType;
       cvv = selectedPaymentMethod.cvv;
-    } else if (selectedPaymentInfo.type === "CreditCard") {
-      cvv = selectedPaymentInfo.secureCode;
+    } else {
+      paymentType = selectedPaymentInfo.type;
+
+      if (selectedPaymentInfo.type === "CreditCard") {
+        cvv = selectedPaymentInfo.secureCode;
+      }
     }
 
     if (debug) {
@@ -181,10 +187,9 @@ export function useFullPayment({
       metadata.discountCodeID = discountCodeID;
     }
 
-    // TODO: Fix this:
-    const isCrypto = true;
+    console.log("paymentType =", paymentType);
 
-    if (cvv) {
+    if (paymentType === "CreditCard" && cvv) {
       const encryptCardDataResult = await encryptCardData({
         cvv,
       }).catch((error: ApolloError | Error) => {
@@ -207,7 +212,7 @@ export function useFullPayment({
         keyID,
         encryptedData: encryptedCardData,
       };
-    } else if (isCrypto) {
+    } else if (paymentType === "Crypto") {
       const currentURL = getUrlWithoutParams();
       const billingDetails = selectedBillingInfoData ? billingInfoToBillingDetails<CryptoBillingDetails>(selectedBillingInfoData, "Crypto") : undefined;
 

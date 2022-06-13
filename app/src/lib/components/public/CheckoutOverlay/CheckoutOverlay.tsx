@@ -16,7 +16,7 @@ import { PaymentView } from "../../../views/Payment/PaymentView";
 import { CheckoutModalHeader, CheckoutModalHeaderVariant } from "../../payments/CheckoutModalHeader/CheckoutModalHeader";
 import { PurchasingView } from "../../../views/Purchasing/PurchasingView";
 import { ErrorView } from "../../../views/Error/ErrorView";
-import { RawSavedPaymentMethod, SavedPaymentMethod } from "../../../domain/circle/circle.interfaces";
+import { RawSavedPaymentMethod } from "../../../domain/circle/circle.interfaces";
 import { continuePlaidOAuthFlow, PlaidFlow } from "../../../hooks/usePlaid";
 import { ConsentType } from "../../shared/ConsentText/ConsentText";
 import { CheckoutModalError, CheckoutModalStepIndex, useCheckoutModalState } from "./CheckoutOverlay.hooks";
@@ -497,23 +497,39 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
 
       // TODO: This logic can probably be simplified. Just get the last saved payment method...
 
-      let matchingPaymentMethod: SavedPaymentMethod | undefined;
+      // let matchingPaymentMethod: SavedPaymentMethod | undefined;
 
       if (typeof billingInfo === "object") {
         const addressId = getSavedPaymentMethodAddressIdFromBillingInfo(billingInfo);
 
-        matchingPaymentMethod = reversedSavedPaymentMethods.find(paymentMethod => paymentMethod.addressId === addressId);
+        const matchingPaymentMethod = reversedSavedPaymentMethods.find(paymentMethod => paymentMethod.addressId === addressId);
+
+        if (matchingPaymentMethod) {
+          // Both billingInfo and paymentInfo were objects (and we found a matching newly created payment method):
+
+          return {
+            billingInfo: matchingPaymentMethod.addressId,
+            paymentInfo: matchingPaymentMethod.id,
+            paymentType: matchingPaymentMethod.type,
+            cvv: "",
+          };
+        }
       }
 
-      return matchingPaymentMethod ? {
-        // Both billingInfo and paymentInfo were objects (and we found a matching newly created payment method):
-        billingInfo: matchingPaymentMethod.addressId,
-        paymentInfo: matchingPaymentMethod.id,
-        cvv: "",
-      } : {
-        // billingInfo was an addressID (or we could not find a match) and paymentInfo was an object:
+      // billingInfo was an addressID (or we could not find a match) and paymentInfo was an object:
+
+      let paymentType: PaymentType | "" = "";
+
+      if (typeof billingInfo === "string") {
+        paymentType = reversedSavedPaymentMethods[0].type;
+      } else if (typeof paymentInfo === "object") {
+        paymentType = paymentInfo?.type || "";
+      }
+
+      return {
         billingInfo,
         paymentInfo: typeof billingInfo === "string" ? reversedSavedPaymentMethods[0].id : paymentInfo,
+        paymentType,
         cvv: "",
       };
     });
@@ -526,15 +542,19 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     // If we go back to the billing info step to fix some validation errors or change some data, we preserve the data
     // in the payment info step (form) as long as it was not a saved payment method. In that case, the saved payment
     // method doesn't belong to the now updated billing info anymore, so we do reset it:
-    setSelectedPaymentMethod(({ paymentInfo }) => ({ billingInfo, paymentInfo: typeof paymentInfo === "object" ? paymentInfo : "", cvv: "" }));
+    setSelectedPaymentMethod(({ paymentInfo }) => ({ billingInfo, paymentInfo: typeof paymentInfo === "object" ? paymentInfo : "", paymentType: "", cvv: "" }));
   }, [setSelectedPaymentMethod]);
 
   const handlePaymentInfoSelected = useCallback((paymentInfo: string | PaymentMethod) => {
-    setSelectedPaymentMethod(({ billingInfo }) => ({ billingInfo, paymentInfo, cvv: "" }));
-  }, [setSelectedPaymentMethod]);
+    const paymentType: PaymentType | "" = typeof paymentInfo === "string"
+      ? (savedPaymentMethods.find(({ id }) => id === paymentInfo)?.type || "")
+      : paymentInfo.type;
+
+    setSelectedPaymentMethod(({ billingInfo }) => ({ billingInfo, paymentInfo, paymentType, cvv: "" }));
+  }, [savedPaymentMethods, setSelectedPaymentMethod]);
 
   const handleCvvSelected = useCallback((cvv: string) => {
-    setSelectedPaymentMethod(({ billingInfo, paymentInfo }) => ({ billingInfo, paymentInfo, cvv }));
+    setSelectedPaymentMethod(({ billingInfo, paymentInfo }) => ({ billingInfo, paymentInfo, paymentType: "CreditCard", cvv }));
   }, [setSelectedPaymentMethod]);
 
 
@@ -570,6 +590,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
           // re-create it with the new payment information:
           billingInfo: savedPaymentMethodToBillingInfo(addressToDelete),
           paymentInfo: "",
+          paymentType: "",
           cvv: "",
         });
       }
