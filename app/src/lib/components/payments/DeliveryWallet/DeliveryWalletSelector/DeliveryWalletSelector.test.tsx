@@ -20,6 +20,7 @@ describe("DeliveryWalletSelector", () => {
       wallet: "",
       onWalletChange: () => { /* Do nothing */ },
       validatePersonalAddress: false,
+      multiSigEnabled: true,
     };
   });
 

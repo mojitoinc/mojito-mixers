@@ -72,6 +72,7 @@ const HomePage: React.FC = () => {
 
     // Flow:
     loaderMode,
+    multiSigEnabled: false,
 
     // Personalization:
     acceptedPaymentTypes: [

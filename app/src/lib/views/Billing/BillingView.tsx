@@ -48,6 +48,7 @@ export interface BillingViewProps {
   selectedBillingInfo: string | BillingInfo;
   wallets?: Wallet[];
   wallet: null | string | Wallet;
+  multiSigEnabled: boolean;
   checkoutError?: CheckoutModalError;
   onBillingInfoSelected: (data: string | BillingInfo) => void;
   onTaxesChange: (taxes: TaxesState) => void;
@@ -69,6 +70,7 @@ export const BillingView: React.FC<BillingViewProps> = ({
   selectedBillingInfo,
   wallets,
   wallet,
+  multiSigEnabled,
   checkoutError,
   onBillingInfoSelected,
   onTaxesChange,
@@ -327,6 +329,7 @@ export const BillingView: React.FC<BillingViewProps> = ({
         validatePersonalDeliveryAddress={ formSubmitAttempted }
         wallets={ wallets }
         wallet={ wallet }
+        multiSigEnabled={ multiSigEnabled }
         onWalletChange={ onWalletChange } />
     </Stack>
   );

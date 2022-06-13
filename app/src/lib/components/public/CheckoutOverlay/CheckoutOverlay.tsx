@@ -59,6 +59,7 @@ export interface PUICheckoutOverlayProps {
   productConfirmationEnabled?: boolean;
   vertexEnabled?: boolean;
   threeDSEnabled?: boolean;
+  multiSigEnabled?: boolean;
   coinbaseSuccessURL?: string;
   coinbaseErrorURL?: string;
 
@@ -118,6 +119,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   productConfirmationEnabled,
   vertexEnabled = true,
   threeDSEnabled = true,
+  multiSigEnabled = true,
   coinbaseSuccessURL,
   coinbaseErrorURL,
 
@@ -860,6 +862,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
         selectedBillingInfo={ selectedPaymentMethod.billingInfo }
         wallet={ wallet }
         wallets={ wallets }
+        multiSigEnabled={ multiSigEnabled }
         checkoutError={ checkoutError }
         onBillingInfoSelected={ handleBillingInfoSelected }
         onTaxesChange={ setTaxes }
@@ -884,6 +887,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
         selectedPaymentMethod={ selectedPaymentMethod }
         wallet={ wallet }
         wallets={ wallets }
+        multiSigEnabled={ multiSigEnabled }
         checkoutError={ checkoutError }
         onPaymentInfoSelected={ handlePaymentInfoSelected }
         onCvvSelected={ handleCvvSelected }

@@ -13,6 +13,7 @@ interface CheckoutDeliveryAndItemCostBreakdownProps {
   validatePersonalDeliveryAddress: boolean;
   wallets?: Wallet[];
   wallet: null | string | Wallet;
+  multiSigEnabled: boolean;
   onWalletChange: (wallet: null | string | Wallet) => void;
 }
 
@@ -22,6 +23,7 @@ export const CheckoutDeliveryAndItemCostBreakdown: React.FC<CheckoutDeliveryAndI
   validatePersonalDeliveryAddress,
   wallets,
   wallet,
+  multiSigEnabled,
   onWalletChange,
 }) => (
   <Stack sx={{ display: "flex", width: theme => ({ xs: "100%", md: `calc(50% - ${ theme.spacing(3.75 / 2) })` }) }}>
@@ -29,6 +31,7 @@ export const CheckoutDeliveryAndItemCostBreakdown: React.FC<CheckoutDeliveryAndI
       validatePersonalAddress={ validatePersonalDeliveryAddress }
       wallets={ wallets }
       wallet={ wallet }
+      multiSigEnabled={ multiSigEnabled }
       onWalletChange={ onWalletChange } />
 
     <Divider sx={{ my: 3.75 }} />

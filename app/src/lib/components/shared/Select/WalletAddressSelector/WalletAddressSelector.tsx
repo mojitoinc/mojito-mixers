@@ -25,6 +25,7 @@ const reduceWalletsByAddress = (walletsAcc: Record<string, Wallet>, wallet: Wall
 export interface WalletAddressSelectorProps extends Omit<SelectProps, "value" | "options"> {
   wallets?: Wallet[];
   wallet: null | string | Wallet;
+  multiSigEnabled: boolean;
   onSelectWallet: (wallet: null | string | Wallet) => void;
 }
 
@@ -32,17 +33,24 @@ export const WalletAddressSelector: React.FC<WalletAddressSelectorProps> = ({
   label,
   wallets,
   wallet,
+  multiSigEnabled,
   onSelectWallet,
   disabled: parentDisabled,
   error,
   helperText,
   ...props
 }) => {
-  const { options, walletsByID, walletsByAddress } = useMemo(() => ({
-    options: [NEW_WALLET_OPTION, CUSTOM_WALLET_OPTION, ...(wallets || []).map(mapWalletAddressToSelectOption)],
-    walletsByID: (wallets || []).reduce(reduceWalletsByID, {}),
-    walletsByAddress: (wallets || []).reduce(reduceWalletsByAddress, {}),
-  }), [wallets]);
+  const { options, walletsByID, walletsByAddress } = useMemo(() => {
+    return multiSigEnabled ? {
+      options: [NEW_WALLET_OPTION, CUSTOM_WALLET_OPTION, ...(wallets || []).map(mapWalletAddressToSelectOption)],
+      walletsByID: (wallets || []).reduce(reduceWalletsByID, {}),
+      walletsByAddress: (wallets || []).reduce(reduceWalletsByAddress, {}),
+    } : {
+      options: [CUSTOM_WALLET_OPTION],
+      walletsByID: {},
+      walletsByAddress: {},
+    };
+  }, [multiSigEnabled, wallets]);
 
   const handleChange = useCallback((e: SelectChangeEvent<string | number>) => {
     const value = e.target.value as string;
@@ -73,8 +81,12 @@ export const WalletAddressSelector: React.FC<WalletAddressSelectorProps> = ({
   useEffect(() => {
     if (wallets === undefined || wallet !== null) return;
 
-    onSelectWallet(wallets[0] || NEW_WALLET_OPTION.value);
-  }, [wallets, wallet, onSelectWallet]);
+    if (multiSigEnabled) {
+      onSelectWallet(wallets[0] || NEW_WALLET_OPTION.value);
+    } else {
+      onSelectWallet(CUSTOM_WALLET_OPTION.value);
+    }
+  }, [wallets, wallet, multiSigEnabled, onSelectWallet]);
 
 
   // Select display value:
