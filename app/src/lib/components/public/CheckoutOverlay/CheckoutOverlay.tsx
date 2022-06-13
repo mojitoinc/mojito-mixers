@@ -742,8 +742,6 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   }, [handleClose, handleBeforeUnload, onGoTo]);
 
   const handlePurchaseCompleted = useCallback(() => {
-    console.log("handlePurchaseCompleted =", { goToMarketplaceHref });
-
     handleGoTo(goToMarketplaceHref);
   }, [handleGoTo, goToMarketplaceHref]);
 
