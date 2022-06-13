@@ -491,9 +491,9 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
       if (typeof billingInfo === "string" && typeof paymentInfo === "string") return { ...prevSelectedPaymentMethod, cvv: "" };
 
       // To find the saved payment method(s) that was/were last created:
-      const reversedSavedPaymentMethods = savedPaymentMethods.slice().reverse();
 
-      debugger;
+      // TODO: This should be sorted by date which doesn't seem to be the case when different payment types are present:
+      const reversedSavedPaymentMethods = savedPaymentMethods.slice().reverse();
 
       // TODO: This logic can probably be simplified. Just get the last saved payment method...
 
