@@ -14,7 +14,6 @@ import { isLocalhost } from "../../domain/url/url.utils";
 import { Wallet } from "../../domain/wallet/wallet.interfaces";
 import { CheckoutItem } from "../../domain/product/product.interfaces";
 import { usePromoCode } from "../../utils/promoCodeUtils";
-import { TaxesState } from "../Billing/BillingView";
 
 export interface PurchasingViewProps {
   threeDSEnabled?: boolean;
@@ -24,7 +23,6 @@ export interface PurchasingViewProps {
   invoiceID: string;
   invoiceCountdownStart: number;
   checkoutItems: CheckoutItem[];
-  taxes: null | TaxesState;
   savedPaymentMethods: SavedPaymentMethod[];
   selectedPaymentMethod: SelectedPaymentMethod;
   wallet: null | string | Wallet;
@@ -42,7 +40,6 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
   invoiceID,
   invoiceCountdownStart,
   checkoutItems,
-  taxes,
   savedPaymentMethods,
   selectedPaymentMethod,
   wallet,
@@ -75,7 +72,6 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
     orgID,
     invoiceID,
     checkoutItems,
-    taxes,
     savedPaymentMethods,
     selectedPaymentMethod,
     wallet,

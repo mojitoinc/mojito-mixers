@@ -8,7 +8,7 @@ import { PaymentMethod, PaymentType } from "../../domain/payment/payment.interfa
 import { SavedPaymentDetailsSelector } from "../../components/shared/SavedPaymentDetailsSelector/SavedPaymentDetailsSelector";
 import { BillingInfoItem } from "../../components/payments/BillingInfo/Item/BillingInfoItem";
 import { SavedPaymentMethod } from "../../domain/circle/circle.interfaces";
-import { billingInfoToSavedPaymentMethodBillingInfo } from "../../domain/circle/circle.utils";
+import { billingInfoToSavedPaymentMethodBillingInfo, EMPTY_ADDRESS_ID } from "../../domain/circle/circle.utils";
 import { CheckoutModalError, SelectedPaymentMethod } from "../../components/public/CheckoutOverlay/CheckoutOverlay.hooks";
 import { usePlaid } from "../../hooks/usePlaid";
 import { ConsentType } from "../../components/shared/ConsentText/ConsentText";
@@ -94,7 +94,9 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
   const savedPaymentMethods = useMemo(() => {
     if (typeof selectedBillingInfo !== "string") return [];
 
-    return rawSavedPaymentMethods.filter(({ addressId, type }) => addressId === selectedBillingInfo && acceptedPaymentTypes.includes(type));
+    return rawSavedPaymentMethods.filter(({ addressId, type }) => {
+      return addressId === EMPTY_ADDRESS_ID || (addressId === selectedBillingInfo && acceptedPaymentTypes.includes(type));
+    });
   }, [acceptedPaymentTypes, rawSavedPaymentMethods, selectedBillingInfo]);
 
   const selectedPaymentMethodBillingInfo = useMemo(() => {

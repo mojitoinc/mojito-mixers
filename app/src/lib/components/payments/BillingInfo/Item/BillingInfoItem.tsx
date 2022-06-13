@@ -3,6 +3,7 @@ import { BillingInfoFragment } from "../Fragment/BillingInfoFragment";
 import { BaseItemProps } from "../../../shared/StackList/StackList";
 import { SavedItem, SavedItemProps, SavedItemLabels } from "../../SavedItem/SavedItem";
 import { SavedPaymentMethod } from "../../../../domain/circle/circle.interfaces";
+import { EMPTY_ADDRESS_ID } from "../../../../domain/circle/circle.utils";
 
 const BILLING_INFO_ITEM_LABELS: SavedItemLabels = {
   select: "Use Billing Info",
@@ -19,6 +20,8 @@ export const BillingInfoItem: React.FC<BillingInfoItemProps> = ({
   index,
   ...boxProps
 }) => {
+  if (savedPaymentMethod.addressId === EMPTY_ADDRESS_ID) return null;
+
   return (
     <SavedItem
       variant="stacked"

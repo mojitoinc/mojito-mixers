@@ -11,8 +11,6 @@ import { Wallet } from "../domain/wallet/wallet.interfaces";
 import { filterSpecialWalletAddressValues } from "../domain/wallet/wallet.utils";
 import { BillingInfo } from "../forms/BillingInfoForm";
 import { CreatePaymentMetadataInput, CryptoBillingDetails, useCreatePaymentMutation } from "../queries/graphqlGenerated";
-import { TaxesState } from "../views/Billing/BillingView";
-import { useCheckoutItemsCostTotal } from "./useCheckoutItemCostTotal";
 import { useCreatePaymentMethod } from "./useCreatePaymentMethod";
 import { useEncryptCardData } from "./useEncryptCard";
 
@@ -20,7 +18,6 @@ export interface UseFullPaymentOptions {
   orgID: string;
   invoiceID: string;
   checkoutItems: CheckoutItem[];
-  taxes: null | TaxesState;
   savedPaymentMethods: SavedPaymentMethod[];
   selectedPaymentMethod: SelectedPaymentMethod;
   wallet: null | string | Wallet;
@@ -39,7 +36,6 @@ export function useFullPayment({
   orgID,
   invoiceID,
   checkoutItems,
-  taxes,
   savedPaymentMethods,
   selectedPaymentMethod,
   wallet,
@@ -62,7 +58,6 @@ export function useFullPayment({
     });
   }, []);
 
-  const { total, fees } = useCheckoutItemsCostTotal(checkoutItems);
   const [encryptCardData] = useEncryptCardData({ orgID });
   const [createPaymentMethod] = useCreatePaymentMethod({ orgID, debug });
   const [makePayment] = useCreatePaymentMutation();
@@ -114,27 +109,27 @@ export function useFullPayment({
     let paymentID = "";
     let mutationError: ApolloError | Error | undefined;
 
+    if (typeof selectedBillingInfo === "string") {
+      // If selectedPaymentInfo is an object and selectedBillingInfo is an addressID, we need to find the matching
+      // data in savedPaymentMethods:
+      const matchingPaymentMethod = savedPaymentMethods.find(({ addressId }) => addressId === selectedBillingInfo);
+
+      if (!matchingPaymentMethod) {
+        setError(ERROR_PURCHASE_SELECTED_PAYMENT_METHOD());
+
+        return;
+      }
+
+      selectedBillingInfoData = savedPaymentMethodToBillingInfo(matchingPaymentMethod);
+    } else {
+      // If both selectedPaymentInfo and selectedBillingInfo are objects, we just create a new payment method with them:
+      selectedBillingInfoData = selectedBillingInfo;
+    }
+
     if (typeof selectedPaymentInfo === "string") {
       // If selectedPaymentInfo is a payment method ID, that's all we need, no need to create a new payment method:
       paymentMethodID = selectedPaymentInfo;
-    } else {
-      if (typeof selectedBillingInfo === "string") {
-        // If selectedPaymentInfo is an object and selectedBillingInfo is an addressID, we need to find the matching
-        // data in savedPaymentMethods:
-        const matchingPaymentMethod = savedPaymentMethods.find(({ addressId }) => addressId === selectedBillingInfo);
-
-        if (!matchingPaymentMethod) {
-          setError(ERROR_PURCHASE_SELECTED_PAYMENT_METHOD());
-
-          return;
-        }
-
-        selectedBillingInfoData = savedPaymentMethodToBillingInfo(matchingPaymentMethod);
-      } else {
-        // If both selectedPaymentInfo and selectedBillingInfo are objects, we just create a new payment method with them:
-        selectedBillingInfoData = selectedBillingInfo;
-      }
-
+    } else if (selectedBillingInfoData) {
       if (debug) {
         console.log("  💳 createPaymentMethod", {
           orgID,
@@ -186,6 +181,7 @@ export function useFullPayment({
       metadata.discountCodeID = discountCodeID;
     }
 
+    // TODO: Fix this:
     const isCrypto = true;
 
     if (cvv) {
@@ -217,14 +213,10 @@ export function useFullPayment({
 
       metadata.cryptoData = {
         name: checkoutItems[0].name,
-        description: checkoutItems[0].name,
+        description: checkoutItems[0].description,
         billingDetails,
         redirectURL: currentURL,
         cancelURL: currentURL,
-        localPrice: {
-          amount: total + fees,
-          currency: "USD",
-        },
       };
     }
 
@@ -265,8 +257,6 @@ export function useFullPayment({
     orgID,
     invoiceID,
     checkoutItems,
-    total,
-    fees,
     savedPaymentMethods,
     selectedPaymentMethod,
     wallet,

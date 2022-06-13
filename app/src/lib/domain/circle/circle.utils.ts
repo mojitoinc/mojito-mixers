@@ -32,6 +32,8 @@ export function formatPhoneAsE123(phoneNumber: string, countryCode: string) {
   return `${ getPhonePrefix(countryCode) }${ parsedPhoneNumber }`;
 }
 
+export const EMPTY_ADDRESS_ID = "||||||||";
+
 export function getSavedPaymentMethodAddressId({ billingDetails, metadata }: SavedPaymentMethodBillingInfo): string {
   return [
     billingDetails.name,
