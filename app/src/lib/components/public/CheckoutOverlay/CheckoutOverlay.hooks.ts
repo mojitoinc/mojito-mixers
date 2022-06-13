@@ -171,8 +171,6 @@ export function useCheckoutModalState({
     // setCheckoutModalState({ checkoutStep: "error", checkoutError: { errorMessage: "test" } });
     // setCheckoutModalState({ checkoutStep: "purchasing" });
 
-    console.log(checkoutModalState);
-
     let paymentType: PaymentType | "" = "";
 
     if (checkoutModalState.flowType === "3DS") {
