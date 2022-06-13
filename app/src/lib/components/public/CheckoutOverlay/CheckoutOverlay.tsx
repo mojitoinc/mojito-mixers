@@ -725,7 +725,9 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     onClose();
   }, [handleBeforeUnload, setInvoiceID, onClose]);
 
-  const handleGoTo = useCallback((pathnameOrUrl: string) => {
+  const handleGoTo = useCallback((pathnameOrUrlParam: string) => {
+    const pathnameOrUrl = pathnameOrUrlParam || "/";
+
     if (pathnameOrUrl === window.location.href || pathnameOrUrl === window.location.pathname) {
       handleClose();
 
@@ -736,10 +738,12 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
 
     handleBeforeUnload();
 
-    onGoTo(pathnameOrUrl || "/", { replace: true });
+    onGoTo(pathnameOrUrl, { replace: true });
   }, [handleClose, handleBeforeUnload, onGoTo]);
 
   const handlePurchaseCompleted = useCallback(() => {
+    console.log("handlePurchaseCompleted =", { goToMarketplaceHref });
+
     handleGoTo(goToMarketplaceHref);
   }, [handleGoTo, goToMarketplaceHref]);
 

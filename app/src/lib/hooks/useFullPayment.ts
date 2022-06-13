@@ -202,8 +202,6 @@ export function useFullPayment({
       metadata.discountCodeID = discountCodeID;
     }
 
-    console.log("paymentType =", paymentType);
-
     if (paymentType === "CreditCard" && cvv) {
       const encryptCardDataResult = await encryptCardData({
         cvv,

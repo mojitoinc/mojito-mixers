@@ -31,11 +31,8 @@ export const ConfirmationView: React.FC<ConfirmationViewProps> = ({
   onNext,
   onGoTo,
 }) => {
-  // TODO: Back to marketplace should close modal (in case is same page).
-
-  // TODO: Crypto confirmation do not show credit card.
-
   const { setEditable } = usePromoCode();
+
   const {
     goToMarketplaceHref,
     goToMarketplaceLabel,
@@ -72,12 +69,6 @@ export const ConfirmationView: React.FC<ConfirmationViewProps> = ({
       selectedPaymentMethodPaymentInfo: selectedPaymentInfo,
     };
   }, [savedPaymentMethods, selectedBillingInfo, selectedPaymentInfo]);
-
-  console.log({
-    selectedPaymentMethod,
-    selectedPaymentMethodBillingInfo,
-    selectedPaymentMethodPaymentInfo,
-  });
 
   if (!selectedPaymentMethodBillingInfo || !selectedPaymentMethodPaymentInfo) return null;
 
