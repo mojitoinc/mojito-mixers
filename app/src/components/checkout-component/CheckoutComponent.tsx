@@ -89,6 +89,7 @@ export const CheckoutComponent: React.FC<PUICheckoutComponentProps> = ({
     productConfirmationEnabled: false,
     vertexEnabled: true,
     threeDSEnabled: true,
+    // Replace with your own domain here:
     coinbaseSuccessURL: "http://localhost:3000/payments/success/?from=coinbase",
     coinbaseErrorURL: "http://localhost:3000/payments/error/?from=coinbase",
 

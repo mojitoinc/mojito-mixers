@@ -506,42 +506,6 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
         paymentType: matchingPaymentMethod?.type || "",
         cvv: "",
       };
-
-      /*
-      if (typeof billingInfo === "object") {
-        const addressId = getSavedPaymentMethodAddressIdFromBillingInfo(billingInfo);
-
-        const matchingPaymentMethod = savedPaymentMethods.find(paymentMethod => paymentMethod.addressId === addressId);
-
-        if (matchingPaymentMethod) {
-          // Both billingInfo and paymentInfo were objects (and we found a matching newly created payment method):
-
-          return {
-            billingInfo: matchingPaymentMethod.addressId,
-            paymentInfo: matchingPaymentMethod.id,
-            paymentType: matchingPaymentMethod.type,
-            cvv: "",
-          };
-        }
-      }
-
-      // billingInfo was an addressID (or we could not find a match) and paymentInfo was an object:
-
-      let paymentType: PaymentType | "" = "";
-
-      if (typeof billingInfo === "string") {
-        paymentType = savedPaymentMethods[0].type;
-      } else if (typeof paymentInfo === "object") {
-        paymentType = paymentInfo?.type || "";
-      }
-
-      return {
-        billingInfo,
-        paymentInfo: typeof billingInfo === "string" ? savedPaymentMethods[0].id : paymentInfo,
-        paymentType,
-        cvv: "",
-      };
-      */
     });
   }, [savedPaymentMethods, setSelectedPaymentMethod]);
 
