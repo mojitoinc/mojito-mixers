@@ -35,6 +35,7 @@ export interface PaymentViewProps {
   selectedPaymentMethod: SelectedPaymentMethod;
   wallets?: Wallet[];
   wallet: null | string | Wallet;
+  multiSigEnabled: boolean;
   checkoutError?: CheckoutModalError;
   onPaymentInfoSelected: (data: string | PaymentMethod) => void;
   onCvvSelected: (cvv: string) => void;
@@ -60,6 +61,7 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
   selectedPaymentMethod,
   wallets,
   wallet,
+  multiSigEnabled,
   checkoutError,
   onPaymentInfoSelected,
   onCvvSelected,
@@ -226,6 +228,7 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
         validatePersonalDeliveryAddress={ formSubmitAttempted }
         wallets={ wallets }
         wallet={ wallet }
+        multiSigEnabled={ multiSigEnabled }
         onWalletChange={ onWalletChange } />
     </Stack>
   );

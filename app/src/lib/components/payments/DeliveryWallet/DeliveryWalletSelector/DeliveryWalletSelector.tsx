@@ -13,6 +13,7 @@ export interface DeliveryWalletSelectorProps {
   validatePersonalAddress: boolean;
   wallets?: Wallet[];
   wallet: null | string | Wallet;
+  multiSigEnabled: boolean;
   onWalletChange: (wallet: null | string | Wallet) => void;
 }
 
@@ -26,6 +27,7 @@ export const DeliveryWalletSelector: React.FC<DeliveryWalletSelectorProps> = ({
   validatePersonalAddress,
   wallets,
   wallet,
+  multiSigEnabled,
   onWalletChange,
 }) => {
   const dictionary = useDictionary();
@@ -55,6 +57,7 @@ export const DeliveryWalletSelector: React.FC<DeliveryWalletSelectorProps> = ({
           label="Wallet"
           wallets={ wallets }
           wallet={ wallet }
+          multiSigEnabled={ multiSigEnabled }
           onSelectWallet={ handleSelectWallet }
           error={ showAddressError }
           helperText={ showAddressError ? INVALID_WALLET_ADDRESS_MESSAGE : undefined } />
