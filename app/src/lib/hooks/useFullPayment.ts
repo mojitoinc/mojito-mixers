@@ -2,19 +2,25 @@ import { ApolloError } from "@apollo/client";
 import { useState, useCallback } from "react";
 import { CheckoutModalError, SelectedPaymentMethod } from "../components/public/CheckoutOverlay/CheckoutOverlay.hooks";
 import { SavedPaymentMethod } from "../domain/circle/circle.interfaces";
-import { savedPaymentMethodToBillingInfo } from "../domain/circle/circle.utils";
+import { billingInfoToBillingDetails, savedPaymentMethodToBillingInfo } from "../domain/circle/circle.utils";
 import { ERROR_PURCHASE_CREATING_PAYMENT_METHOD, ERROR_PURCHASE_CVV, ERROR_PURCHASE_NO_ITEMS, ERROR_PURCHASE_PAYING, ERROR_PURCHASE_SELECTED_PAYMENT_METHOD } from "../domain/errors/errors.constants";
 import { PaymentStatus } from "../domain/payment/payment.interfaces";
+import { CheckoutItem } from "../domain/product/product.interfaces";
+import { getUrlWithoutParams } from "../domain/url/url.utils";
 import { Wallet } from "../domain/wallet/wallet.interfaces";
 import { filterSpecialWalletAddressValues } from "../domain/wallet/wallet.utils";
 import { BillingInfo } from "../forms/BillingInfoForm";
-import { CreatePaymentMetadataInput, useCreatePaymentMutation } from "../queries/graphqlGenerated";
+import { CreatePaymentMetadataInput, CryptoBillingDetails, useCreatePaymentMutation } from "../queries/graphqlGenerated";
+import { TaxesState } from "../views/Billing/BillingView";
+import { useCheckoutItemsCostTotal } from "./useCheckoutItemCostTotal";
 import { useCreatePaymentMethod } from "./useCreatePaymentMethod";
 import { useEncryptCardData } from "./useEncryptCard";
 
 export interface UseFullPaymentOptions {
   orgID: string;
   invoiceID: string;
+  checkoutItems: CheckoutItem[];
+  taxes: null | TaxesState;
   savedPaymentMethods: SavedPaymentMethod[];
   selectedPaymentMethod: SelectedPaymentMethod;
   wallet: null | string | Wallet;
@@ -32,6 +38,8 @@ export interface FullPaymentState {
 export function useFullPayment({
   orgID,
   invoiceID,
+  checkoutItems,
+  taxes,
   savedPaymentMethods,
   selectedPaymentMethod,
   wallet,
@@ -54,6 +62,7 @@ export function useFullPayment({
     });
   }, []);
 
+  const { total, fees } = useCheckoutItemsCostTotal(checkoutItems);
   const [encryptCardData] = useEncryptCardData({ orgID });
   const [createPaymentMethod] = useCreatePaymentMethod({ orgID, debug });
   const [makePayment] = useCreatePaymentMutation();
@@ -100,6 +109,7 @@ export function useFullPayment({
     });
 
     let paymentMethodID = "";
+    let selectedBillingInfoData: BillingInfo | undefined;
     let processorPaymentID = "";
     let paymentID = "";
     let mutationError: ApolloError | Error | undefined;
@@ -108,8 +118,6 @@ export function useFullPayment({
       // If selectedPaymentInfo is a payment method ID, that's all we need, no need to create a new payment method:
       paymentMethodID = selectedPaymentInfo;
     } else {
-      let selectedBillingInfoData: BillingInfo;
-
       if (typeof selectedBillingInfo === "string") {
         // If selectedPaymentInfo is an object and selectedBillingInfo is an addressID, we need to find the matching
         // data in savedPaymentMethods:
@@ -173,9 +181,12 @@ export function useFullPayment({
     }
 
     const metadata: CreatePaymentMetadataInput = destinationAddress ? { destinationAddress } : { };
+
     if (discountCodeID) {
       metadata.discountCodeID = discountCodeID;
     }
+
+    const isCrypto = true;
 
     if (cvv) {
       const encryptCardDataResult = await encryptCardData({
@@ -199,6 +210,21 @@ export function useFullPayment({
       metadata.creditCardData = {
         keyID,
         encryptedData: encryptedCardData,
+      };
+    } else if (isCrypto) {
+      const currentURL = getUrlWithoutParams();
+      const billingDetails = selectedBillingInfoData ? billingInfoToBillingDetails<CryptoBillingDetails>(selectedBillingInfoData, "Crypto") : undefined;
+
+      metadata.cryptoData = {
+        name: checkoutItems[0].name,
+        description: checkoutItems[0].name,
+        billingDetails,
+        redirectURL: currentURL,
+        cancelURL: currentURL,
+        localPrice: {
+          amount: total + fees,
+          currency: "USD",
+        },
       };
     }
 
@@ -238,6 +264,9 @@ export function useFullPayment({
   }, [
     orgID,
     invoiceID,
+    checkoutItems,
+    total,
+    fees,
     savedPaymentMethods,
     selectedPaymentMethod,
     wallet,

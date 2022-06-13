@@ -49,6 +49,11 @@ query GetPaymentMethodList($orgID: UUID1!) {
         postalCode
       }
     }
+    ... on CryptoPaymentMethodOutput {
+      id
+     	type
+    	status
+    }
   }
 }
 

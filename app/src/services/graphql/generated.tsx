@@ -123,6 +123,30 @@ export type AddressScreeningInput = {
   network: Scalars['String'];
 };
 
+export type AllowList = {
+  __typename?: 'AllowList';
+  elements: Array<AllowListElement>;
+  endTime: Scalars['Time'];
+  filteringType: FilteringType;
+  id: Scalars['UUID1'];
+  identifierType: IdentifierType;
+  startTime: Scalars['Time'];
+};
+
+export type AllowListElement = {
+  __typename?: 'AllowListElement';
+  id: Scalars['UUID1'];
+  identifierValue: Scalars['String'];
+};
+
+export type AllowListInput = {
+  elements: Array<Scalars['String']>;
+  endTime: Scalars['Time'];
+  filteringType: FilteringType;
+  identifierType: IdentifierType;
+  startTime: Scalars['Time'];
+};
+
 export type ApplicantRequest = {
   address?: InputMaybe<AddressInput>;
   dob?: InputMaybe<Scalars['String']>;
@@ -263,7 +287,7 @@ export type CreatePaymentCryptoMetadataInput = {
   billingDetails?: InputMaybe<CryptoBillingDetails>;
   cancelURL?: InputMaybe<Scalars['String']>;
   description?: InputMaybe<Scalars['String']>;
-  localPrice: LocalPrice;
+  localPrice?: InputMaybe<LocalPrice>;
   name?: InputMaybe<Scalars['String']>;
   redirectURL?: InputMaybe<Scalars['String']>;
 };
@@ -333,7 +357,6 @@ export type CryptoBillingDetails = {
   city?: InputMaybe<Scalars['String']>;
   country?: InputMaybe<Scalars['String']>;
   district?: InputMaybe<Scalars['String']>;
-  name?: InputMaybe<Scalars['String']>;
   postalCode?: InputMaybe<Scalars['String']>;
 };
 
@@ -373,12 +396,13 @@ export type CurrentUserUserOrgsArgs = {
 
 
 export type CurrentUserWonBidsArgs = {
-  orgId?: InputMaybe<Scalars['UUID']>;
+  orgId: Scalars['UUID'];
 };
 
 export enum DeliveryMethod {
   Erc721Provenance = 'ERC721Provenance',
   Erc721Transfer = 'ERC721Transfer',
+  Erc721TransferByRange = 'ERC721TransferByRange',
   Erc1155OpenEdition = 'ERC1155OpenEdition',
   Erc1155Transfer = 'ERC1155Transfer',
   NoOp = 'NoOp'
@@ -429,6 +453,10 @@ export enum ExtensionType {
   RedeemableExtension = 'RedeemableExtension'
 }
 
+export enum FilteringType {
+  AllowList = 'AllowList'
+}
+
 export type IdNumber = {
   __typename?: 'IDNumber';
   stateCode: Scalars['String'];
@@ -441,6 +469,11 @@ export type IdNumberInput = {
   type: Scalars['String'];
   value: Scalars['String'];
 };
+
+export enum IdentifierType {
+  ExternalUserId = 'ExternalUserID',
+  UserId = 'UserID'
+}
 
 export type InvoiceDetails = {
   __typename?: 'InvoiceDetails';
@@ -718,7 +751,7 @@ export type MarketplaceCollectionItem = {
   status: MarketplaceCollectionItemStatus;
 };
 
-export type MarketplaceCollectionItemDelivery = MarketplaceItemDeliveryErc721Provenance | MarketplaceItemDeliveryErc721Transfer | MarketplaceItemDeliveryErc1155OpenEdition | MarketplaceItemDeliveryErc1155Transfer | MarketplaceItemDeliveryNoOp;
+export type MarketplaceCollectionItemDelivery = MarketplaceItemDeliveryErc721Provenance | MarketplaceItemDeliveryErc721Transfer | MarketplaceItemDeliveryErc721TransferByRange | MarketplaceItemDeliveryErc1155OpenEdition | MarketplaceItemDeliveryErc1155Transfer | MarketplaceItemDeliveryNoOp;
 
 export type MarketplaceCollectionItemDetails = MarketplaceAuctionLot | MarketplaceBuyNowOutput | MarketplaceClaimableOutput;
 
@@ -763,6 +796,21 @@ export type MarketplaceItemDeliveryErc721Transfer = {
   ownerWalletId: Scalars['UUID1'];
 };
 
+export type MarketplaceItemDeliveryErc721TransferByRange = {
+  __typename?: 'MarketplaceItemDeliveryERC721TransferByRange';
+  contractAddress: Scalars['String'];
+  fromOnChainTokenId: Scalars['Int'];
+  ownerWalletId: Scalars['UUID1'];
+  toOnChainTokenId: Scalars['Int'];
+};
+
+export type MarketplaceItemDeliveryErc721TransferByRangeInput = {
+  contractAddress: Scalars['String'];
+  fromOnChainTokenId: Scalars['Int'];
+  ownerWalletId: Scalars['UUID1'];
+  toOnChainTokenId: Scalars['Int'];
+};
+
 export type MarketplaceItemDeliveryErc721TransferInput = {
   contractAddress: Scalars['String'];
   onChainTokenId: Scalars['Int'];
@@ -799,6 +847,7 @@ export type MarketplaceItemDeliveryErc1155TransferInput = {
 export type MarketplaceItemDeliveryInput = {
   ERC721Provenance?: InputMaybe<MarketplaceItemDeliveryErc721ProvenanceInput>;
   ERC721Transfer?: InputMaybe<MarketplaceItemDeliveryErc721TransferInput>;
+  ERC721TransferByRange?: InputMaybe<MarketplaceItemDeliveryErc721TransferByRangeInput>;
   ERC1155OpenEdition?: InputMaybe<MarketplaceItemDeliveryErc1155OpenEditionInput>;
   ERC1155Transfer?: InputMaybe<MarketplaceItemDeliveryErc1155TransferInput>;
   NoOp?: InputMaybe<MarketplaceItemDeliveryNoOpInput>;
@@ -848,6 +897,7 @@ export type MetadataAttributes = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  addAllowListToBuyNowLot: Scalars['Boolean'];
   /**
    * Add an existing lot to User favorite lots list.
    *     If lot is already exists, then do nothing.
@@ -868,6 +918,7 @@ export type Mutation = {
   checkTokenOwners: Array<Maybe<Scalars['Int']>>;
   /** checkWalletTokens mutation checks what NFTs a user owns within a specific contract and token range */
   checkWalletTokens: Array<Maybe<Scalars['Int']>>;
+  createAllowList?: Maybe<Scalars['UUID1']>;
   /** Creates new Applicant based on input data. */
   createApplicant: ApplicantResponse;
   /** Creates invoice for given Lot, can be called by org admin */
@@ -911,7 +962,7 @@ export type Mutation = {
   importExternalTokenToCollection: Scalars['String'];
   /** List Wallets With Token takes contract address as input along with start/end date range and network type. Returns a list of token owners. */
   listWalletsWithToken: Array<Maybe<TokenOwner>>;
-  loginWithSignature: Organization;
+  loginWithSignature: SignInResponse;
   marketplaceUpdateTheme: Marketplace;
   mintTokens: Scalars['String'];
   nftContractAddAdmin: Scalars['String'];
@@ -935,16 +986,18 @@ export type Mutation = {
   redeemPromoCode: Scalars['Boolean'];
   /** Release reservations held by invoice ID */
   releaseReservation: Scalars['Boolean'];
+  removeAllowListFromBuyNowLot: Scalars['Boolean'];
   reserveMarketplaceBuyNowLot: MarketplaceBuyNowOutput;
   sendUserInvitation: Scalars['Boolean'];
+  setContractRoyalties: Scalars['String'];
   setJwtIssuerDomain: Organization;
-  setRoyaltiesExtension: Scalars['String'];
   startInvoiceDelivery: Scalars['Boolean'];
   /** Transfers a token in the provided wallet to the `transferTo` address */
   transferToken: Scalars['String'];
   updateAfterPaymentTransferSuspendTime: Scalars['Boolean'];
   /** Updates existing  Applicant based on input data. */
   updateApplicant: ApplicantResponse;
+  updateBuyNowInvoiceExpiryMins: Scalars['Boolean'];
   updateMarketplaceAuctionLot: MarketplaceAuctionLot;
   updateMarketplaceBuyNowLot: MarketplaceBuyNowOutput;
   updateMarketplaceClaimableSet: MarketplaceClaimableOutput;
@@ -962,6 +1015,12 @@ export type Mutation = {
   uploadAssets: Scalars['Int'];
   /** Verify Signature mutation takes the input arguments signature, message, address and then we need to check if signature+message indeed was signed by the address. */
   verifySignature: Scalars['Boolean'];
+};
+
+
+export type MutationAddAllowListToBuyNowLotArgs = {
+  allowListID: Scalars['UUID1'];
+  buyNowLotID: Scalars['UUID1'];
 };
 
 
@@ -1035,9 +1094,15 @@ export type MutationCheckWalletTokensArgs = {
 };
 
 
+export type MutationCreateAllowListArgs = {
+  allowListInput: AllowListInput;
+  orgID: Scalars['UUID1'];
+};
+
+
 export type MutationCreateApplicantArgs = {
   input: ApplicantRequest;
-  orgID?: InputMaybe<Scalars['UUID1']>;
+  orgID: Scalars['UUID1'];
 };
 
 
@@ -1191,7 +1256,8 @@ export type MutationListWalletsWithTokenArgs = {
 
 
 export type MutationLoginWithSignatureArgs = {
-  request: SigninRequest;
+  orgID: Scalars['UUID1'];
+  request: SignInRequest;
 };
 
 
@@ -1302,6 +1368,11 @@ export type MutationReleaseReservationArgs = {
 };
 
 
+export type MutationRemoveAllowListFromBuyNowLotArgs = {
+  buyNowLotID: Scalars['UUID1'];
+};
+
+
 export type MutationReserveMarketplaceBuyNowLotArgs = {
   input: ReserveMarketplaceBuyNowLotInput;
 };
@@ -1313,17 +1384,17 @@ export type MutationSendUserInvitationArgs = {
 };
 
 
-export type MutationSetJwtIssuerDomainArgs = {
-  domain: Scalars['String'];
-  orgId: Scalars['UUID'];
+export type MutationSetContractRoyaltiesArgs = {
+  basisPoints: Array<Scalars['Int']>;
+  extensionAddress?: InputMaybe<Scalars['String']>;
+  nftContractId: Scalars['UUID1'];
+  receivers: Array<Scalars['String']>;
 };
 
 
-export type MutationSetRoyaltiesExtensionArgs = {
-  extensionAddress: Scalars['String'];
-  nftContractId: Scalars['UUID1'];
-  percentages: Array<Scalars['Int']>;
-  receivers: Array<Scalars['String']>;
+export type MutationSetJwtIssuerDomainArgs = {
+  domain: Scalars['String'];
+  orgId: Scalars['UUID'];
 };
 
 
@@ -1351,6 +1422,12 @@ export type MutationUpdateAfterPaymentTransferSuspendTimeArgs = {
 export type MutationUpdateApplicantArgs = {
   applicantID: Scalars['String'];
   input: ApplicantRequest;
+};
+
+
+export type MutationUpdateBuyNowInvoiceExpiryMinsArgs = {
+  buyNowInvoiceExpiryMins: Scalars['Int'];
+  orgID: Scalars['UUID1'];
 };
 
 
@@ -1503,7 +1580,9 @@ export type Network = {
 
 export type Organization = {
   __typename?: 'Organization';
+  afterPaymentTransferSuspendTime?: Maybe<Scalars['Int']>;
   assets?: Maybe<Array<Asset>>;
+  buyNowInvoiceExpiryMins?: Maybe<Scalars['Int']>;
   handle: Scalars['String'];
   id: Scalars['UUID1'];
   jwtIssuerDomain?: Maybe<Scalars['String']>;
@@ -1540,6 +1619,12 @@ export type OrganizationMember = {
 
 export type OrganizationMemberFilter = {
   externalUserId?: InputMaybe<Scalars['String']>;
+};
+
+export type PaginatedMarketplaceClaimableCodeOutput = {
+  __typename?: 'PaginatedMarketplaceClaimableCodeOutput';
+  count?: Maybe<Scalars['Int']>;
+  results: Array<MarketplaceClaimableCodeOutput>;
 };
 
 export type Payment = {
@@ -1628,12 +1713,13 @@ export type Query = {
   collection?: Maybe<MarketplaceCollection>;
   collectionBySlug?: Maybe<MarketplaceCollection>;
   collectionItemById?: Maybe<MarketplaceCollectionItem>;
+  getAllowLists?: Maybe<Array<AllowList>>;
   /** Retrieves applicant details by organizationID */
   getApplicant: ApplicantResponse;
   /** Get Available Claimables */
   getAvailableClaimables: Scalars['Int'];
   getBuyNowBuyerInfo?: Maybe<Array<BuyerDetailOutput>>;
-  getClaimableCodesForSetId: Array<Maybe<MarketplaceClaimableCodeOutput>>;
+  getClaimableCodesForSetId: PaginatedMarketplaceClaimableCodeOutput;
   /** Retrieves Discount codes by Invoice Item ID */
   getDiscountCodes: Array<Maybe<DiscountCode>>;
   /** Retrieves invoice details by ID */
@@ -1657,6 +1743,8 @@ export type Query = {
   getPaymentsByUserID: Array<Maybe<Payment>>;
   /** Retrieves sdk token to inititate onfido web SDK */
   getSDKToken: SdkTokenResponse;
+  /**  getSignatureMessage returns a message that should be used for in signing process */
+  getSignatureMessage: Scalars['String'];
   /** Get Tax Quote */
   getTaxQuote: TaxQuoteOutput;
   getTokenTransfersHistory: Array<TokenTransfers>;
@@ -1666,6 +1754,7 @@ export type Query = {
   getUserInvitations: Array<Maybe<UserInvitation>>;
   getWalletDeliveryCount: Scalars['Int'];
   internalUsers: Array<UserOrganization>;
+  isUserOnAllowList: Scalars['Boolean'];
   /** create invoice/lot report by collectionID and mails  to provided email */
   mailInvoiceLotDetailReportMailByCollectionID: Scalars['Boolean'];
   /** create salesreport by collectionID and mails to provided email */
@@ -1726,6 +1815,11 @@ export type QueryCollectionItemByIdArgs = {
 };
 
 
+export type QueryGetAllowListsArgs = {
+  orgID: Scalars['UUID1'];
+};
+
+
 export type QueryGetApplicantArgs = {
   organizationID: Scalars['UUID1'];
 };
@@ -1743,6 +1837,8 @@ export type QueryGetBuyNowBuyerInfoArgs = {
 
 export type QueryGetClaimableCodesForSetIdArgs = {
   claimableSetID: Scalars['UUID1'];
+  limit: Scalars['Int'];
+  offset: Scalars['Int'];
 };
 
 
@@ -1790,7 +1886,12 @@ export type QueryGetPaymentsByUserIdArgs = {
 
 export type QueryGetSdkTokenArgs = {
   applicantID: Scalars['String'];
-  referrer?: InputMaybe<Scalars['String']>;
+  referrer: Scalars['String'];
+};
+
+
+export type QueryGetSignatureMessageArgs = {
+  orgID: Scalars['UUID1'];
 };
 
 
@@ -1823,6 +1924,11 @@ export type QueryGetWalletDeliveryCountArgs = {
 
 export type QueryInternalUsersArgs = {
   organizationID: Scalars['UUID1'];
+};
+
+
+export type QueryIsUserOnAllowListArgs = {
+  lotID: Scalars['UUID1'];
 };
 
 
@@ -1871,7 +1977,7 @@ export type QueryOrganizationArgs = {
 
 
 export type QueryOrganizationByIdArgs = {
-  id?: InputMaybe<Scalars['UUID1']>;
+  id: Scalars['UUID1'];
 };
 
 
@@ -1924,14 +2030,15 @@ export type SettingsInput = {
   username?: InputMaybe<Scalars['String']>;
 };
 
-export type SigninRequest = {
+export type SignInRequest = {
+  chainID: Scalars['Int'];
   challenge: Scalars['String'];
   signature: Scalars['String'];
   signer: Scalars['String'];
 };
 
-export type SigninResponse = {
-  __typename?: 'SigninResponse';
+export type SignInResponse = {
+  __typename?: 'SignInResponse';
   me: CurrentUser;
   refreshToken: Scalars['String'];
   token: Scalars['String'];
@@ -2098,7 +2205,7 @@ export type UserInvitation = {
 };
 
 export type UserOrgFilter = {
-  orgId?: InputMaybe<Scalars['UUID']>;
+  orgId: Scalars['UUID'];
 };
 
 export type UserOrganization = {
@@ -2335,7 +2442,7 @@ export type GetPaymentMethodListQueryVariables = Exact<{
 }>;
 
 
-export type GetPaymentMethodListQuery = { __typename?: 'Query', getPaymentMethodList: Array<{ __typename?: 'ACHPaymentMethodOutput', id: any, type: PaymentType, status: string, accountNumber: string, metadata?: { __typename?: 'ACHMetadataOutput', email: string, phoneNumber: string } | null, billingDetails?: { __typename?: 'ACHBillingDetailsOutput', name: string, city: string, country: string, address1: string, address2: string, district: string, postalCode: string } | null, bankAddress?: { __typename?: 'ACHBankAddressOutput', bankName: string } | null } | { __typename?: 'CreditCardPaymentMethodOutput', id: any, type: PaymentType, status: string, network: string, last4Digit: string, metadata?: { __typename?: 'CreditCardMetadataOutput', email: string, phoneNumber: string } | null, billingDetails?: { __typename?: 'CreditCardBillingDetailsOutput', name: string, city: string, country: string, address1: string, address2: string, district: string, postalCode: string } | null } | { __typename?: 'CryptoPaymentMethodOutput' } | { __typename?: 'WirePaymentMethodOutput' }> };
+export type GetPaymentMethodListQuery = { __typename?: 'Query', getPaymentMethodList: Array<{ __typename?: 'ACHPaymentMethodOutput', id: any, type: PaymentType, status: string, accountNumber: string, metadata?: { __typename?: 'ACHMetadataOutput', email: string, phoneNumber: string } | null, billingDetails?: { __typename?: 'ACHBillingDetailsOutput', name: string, city: string, country: string, address1: string, address2: string, district: string, postalCode: string } | null, bankAddress?: { __typename?: 'ACHBankAddressOutput', bankName: string } | null } | { __typename?: 'CreditCardPaymentMethodOutput', id: any, type: PaymentType, status: string, network: string, last4Digit: string, metadata?: { __typename?: 'CreditCardMetadataOutput', email: string, phoneNumber: string } | null, billingDetails?: { __typename?: 'CreditCardBillingDetailsOutput', name: string, city: string, country: string, address1: string, address2: string, district: string, postalCode: string } | null } | { __typename?: 'CryptoPaymentMethodOutput', id: any, type: PaymentType, status: string } | { __typename?: 'WirePaymentMethodOutput' }> };
 
 export type CreatePaymentMethodMutationVariables = Exact<{
   orgID: Scalars['UUID1'];
@@ -2842,6 +2949,11 @@ export const GetPaymentMethodListDocument = gql`
         district
         postalCode
       }
+    }
+    ... on CryptoPaymentMethodOutput {
+      id
+      type
+      status
     }
   }
 }

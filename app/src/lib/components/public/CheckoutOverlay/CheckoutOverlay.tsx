@@ -910,6 +910,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
         invoiceID={ invoiceID }
         invoiceCountdownStart={ invoiceCountdownStart }
         checkoutItems={ checkoutItems }
+        taxes={ taxes }
         savedPaymentMethods={ savedPaymentMethods }
         selectedPaymentMethod={ selectedPaymentMethod }
         wallet={ wallet }

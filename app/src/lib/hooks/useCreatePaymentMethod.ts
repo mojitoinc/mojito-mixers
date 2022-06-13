@@ -1,11 +1,10 @@
 import { useCallback } from "react";
 import { FetchResult, MutationResult } from "@apollo/client";
-import { CreatePaymentMethodMutation, PaymentType, useCreatePaymentMethodMutation, AchMetadata, CreditCardMetadata, CreditCardBillingDetails, useGetPaymentMethodStatusLazyQuery } from "../queries/graphqlGenerated";
+import { CreatePaymentMethodMutation, PaymentType, useCreatePaymentMethodMutation, AchMetadata, CreditCardMetadata, CreditCardBillingDetails, useGetPaymentMethodStatusLazyQuery, AchBillingDetails } from "../queries/graphqlGenerated";
 import { BillingInfo } from "../forms/BillingInfoForm";
 import { PaymentMethod } from "../domain/payment/payment.interfaces";
 import { useEncryptCardData } from "./useEncryptCard";
-import { formatPhoneAsE123 } from "../domain/circle/circle.utils";
-import { fullTrim } from "../utils/formatUtils";
+import { billingInfoToBillingDetails, formatPhoneAsE123 } from "../domain/circle/circle.utils";
 import { PaymentMethodStatus } from "../domain/circle/circle.interfaces";
 import { wait } from "../utils/promiseUtils";
 import { PAYMENT_CREATION_INTERVAL_MS, PAYMENT_CREATION_MAX_WAIT_MS } from "../config/config";
@@ -41,17 +40,6 @@ export function useCreatePaymentMethod({
       phoneNumber: formatPhoneAsE123(billingInfo.phone, `${ billingInfo.country.value }`),
     };
 
-    // Using CreditCardBillingDetails as it's more restrictive than AchBillingDetails (address 2 is required instead of optional):
-    const billingDetails : CreditCardBillingDetails = {
-      name: fullTrim(billingInfo.fullName),
-      city: fullTrim(billingInfo.city),
-      country: `${ billingInfo.country.value }`,
-      address1: fullTrim(billingInfo.street || ""),
-      address2: fullTrim(billingInfo.apartment || ""),
-      district: `${ billingInfo.state.value || billingInfo.state.label }`,
-      postalCode: fullTrim(billingInfo.zipCode),
-    };
-
     let createPaymentMethodPromise: ReturnType<typeof createPaymentMethod> | null = null;
 
     if (paymentInfo.type === PaymentType.CreditCard) {
@@ -74,7 +62,7 @@ export function useCreatePaymentMethod({
               expirationMonth,
               expirationYear,
               metadata,
-              billingDetails,
+              billingDetails: billingInfoToBillingDetails<CreditCardBillingDetails>(billingInfo),
             },
           },
         },
@@ -90,8 +78,17 @@ export function useCreatePaymentMethod({
               accountId: paymentInfo.accountId,
               publicToken: paymentInfo.publicToken,
               metadata,
-              billingDetails,
+              billingDetails: billingInfoToBillingDetails<AchBillingDetails>(billingInfo),
             },
+          },
+        },
+      });
+    } else if (paymentInfo.type === PaymentType.Crypto) {
+      createPaymentMethodPromise = createPaymentMethod({
+        variables: {
+          orgID,
+          input: {
+            paymentType: PaymentType.Crypto,
           },
         },
       });
