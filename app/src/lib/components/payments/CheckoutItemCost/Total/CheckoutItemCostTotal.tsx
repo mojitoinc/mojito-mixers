@@ -58,6 +58,7 @@ export const CheckoutItemCostTotal: React.FC<CheckoutItemCostTotalProps> = ({
   useEffect(() => {
     if (promoCode.total) {
       setDiscountTotal(promoCode.total);
+      // TODO: This should also come from usePromoCode:
       setDiscount(total - promoCode.total);
     }
   }, [promoCode, setDiscountTotal, total]);
@@ -102,25 +103,28 @@ export const CheckoutItemCostTotal: React.FC<CheckoutItemCostTotalProps> = ({
     );
   }
 
+  // TODO: The hook should provide a callback function that takes an input event:
   const handlePromoCodeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     onChangePromoCode(event.target.value);
   };
 
   const handleApplyPromoCode = useCallback(() => {
+    // TODO: if (editable) check should be done inside onApply.
     if (editable) onApply();
   }, [editable, onApply]);
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", mt: { xs: 3, sm: 0.5 } }}>
+    <Box sx={{ display: "flex", flexDirection: "column" }}>
       { withDetails && (
         <>
-          <Box sx={ ROW_SX }>
+          <Box sx={{ ...ROW_SX, mt: 2, mb: 3 }}>
             <TextField
               label="Discount code"
               value={ promoCode.code }
               onChange={ handlePromoCodeChange }
               error={ !!error }
               helperText={ error }
+              margin="none"
               InputProps={{
                 readOnly: !(editable && invoiceItemIDs.length > 0),
                 endAdornment: (

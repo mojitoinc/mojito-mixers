@@ -64,6 +64,13 @@ export const withInvalidCreditCardNetwork = ({ acceptedCreditCardNetworks }: { a
 };
 
 
+// Discount Code:
+
+export const DISCOUNT_CODE_INVALID_ERROR_MESSAGE = "The discount code is invalid or expired.";
+
+export const DISCOUNT_CODE_EXCEPTION_ERROR_MESSAGE = "The discount code could not be validated.";
+
+
 // Plaid:
 
 export const withInvalidConnection = ({ label }: ErrorMessageParams) => `Could not connect${ label ? ` to ${ label }` : "" }.`;

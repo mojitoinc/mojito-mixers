@@ -29,7 +29,7 @@ export const PurchaseConfirmationBillingDetails: React.FC<PurchaseConfirmationBi
   selectedPaymentMethodPaymentInfo,
 }) => {
   const {
-    isMasked,
+    useCreditCardInput,
     paymentType,
     displayValue,
     network,
@@ -73,7 +73,11 @@ export const PurchaseConfirmationBillingDetails: React.FC<PurchaseConfirmationBi
           pb: { xs: 2.5, sm: 1.5 },
         }}>
 
-        { isMasked ? (
+        { useCreditCardInput ? (
+          <ReadOnlyCardField
+            label={ PAYMENT_TYPE_LABEL[paymentType] }
+            value={ displayValue } />
+        ) : (
           <ReadOnlyField
             label={ PAYMENT_TYPE_LABEL[paymentType] }
             value={ displayValue }
@@ -84,10 +88,6 @@ export const PurchaseConfirmationBillingDetails: React.FC<PurchaseConfirmationBi
                 </InputAdornment>
               ),
             } : undefined } />
-        ) : (
-          <ReadOnlyCardField
-            label={ PAYMENT_TYPE_LABEL[paymentType] }
-            value={ displayValue } />
         ) }
 
         <ReadOnlyField

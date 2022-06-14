@@ -1,5 +1,6 @@
-import React, { Dispatch, SetStateAction, useCallback, useMemo } from "react";
+import React, { Dispatch, SetStateAction, useCallback, useMemo, useContext, useState, createContext } from "react";
 import { useApplyDiscountCodeLazyQuery } from "../queries/graphqlGenerated";
+import { DISCOUNT_CODE_EXCEPTION_ERROR_MESSAGE, DISCOUNT_CODE_INVALID_ERROR_MESSAGE, withRequiredErrorMessage } from "./validationUtils";
 
 interface IPromoCode {
   code: string;
@@ -20,7 +21,7 @@ interface IPromoCodeContext {
   setInvoiceItemIDs: Dispatch<SetStateAction<string[]>>;
 }
 
-const PromoCodeContext = React.createContext<IPromoCodeContext>({
+const PromoCodeContext = createContext<IPromoCodeContext>({
   promoCode: defaultPromoCode,
   setPromoCode: () => undefined,
   editable: false,
@@ -35,12 +36,12 @@ interface PromoCodeProviderProps {
   children?: React.ReactNode;
 }
 
-const PromoCodeProvider: React.FC<PromoCodeProviderProps> = ({ children }) => {
-  const [promoCode, setPromoCode] =
-    React.useState<IPromoCode>(defaultPromoCode);
-  const [editable, setEditable] = React.useState<boolean>(false);
-  const [error, setError] = React.useState<string | null>(null);
-  const [invoiceItemIDs, setInvoiceItemIDs] = React.useState<string[]>([]);
+export const PromoCodeProvider: React.FC<PromoCodeProviderProps> = ({ children }) => {
+  // TODO: Combine in a single state:
+  const [promoCode, setPromoCode] = useState<IPromoCode>(defaultPromoCode);
+  const [editable, setEditable] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+  const [invoiceItemIDs, setInvoiceItemIDs] = useState<string[]>([]);
 
   const PromoCodeProviderValue = useMemo(
     () => ({ promoCode, setPromoCode, editable, setEditable, error, setError, invoiceItemIDs, setInvoiceItemIDs }),
@@ -54,41 +55,48 @@ const PromoCodeProvider: React.FC<PromoCodeProviderProps> = ({ children }) => {
   );
 };
 
-const usePromoCode = () => {
+export function usePromoCode() {
   const [applyDiscountCode] = useApplyDiscountCodeLazyQuery();
-  const { promoCode, setPromoCode, editable, setEditable, error, setError, invoiceItemIDs, setInvoiceItemIDs } =
-    React.useContext(PromoCodeContext);
+  const { promoCode, setPromoCode, editable, setEditable, error, setError, invoiceItemIDs, setInvoiceItemIDs } = useContext(PromoCodeContext);
 
-  const onChangePromoCode = (value: string) => {
-    setPromoCode(code => ({
-      ...code,
-      code: value,
-    }));
+  const onChangePromoCode = useCallback((code: string) => {
+    setPromoCode(state => ({ ...state, code }));
     setError(null);
-  };
+  }, [setError, setPromoCode]);
 
   const onApply = useCallback(async () => {
+    const discountCode = promoCode.code;
+
+    if (!discountCode) {
+      setError(withRequiredErrorMessage({ label: "Discount Code" }));
+
+      return;
+    }
+
     try {
       const invoiceItemPromises = invoiceItemIDs.map(invoiceItemID => applyDiscountCode({
         variables: {
-          discountCode: promoCode.code,
+          discountCode,
           invoiceItemID,
         },
       }));
-      const results = await Promise.all(invoiceItemPromises).then(discountResults => discountResults.map(discountResult => ({
-        id: discountResult.data?.applyDiscountCode?.discountCode?.id,
-        total: discountResult.data?.applyDiscountCode?.totalPriceAfterDiscount,
-      })));
-      let id: string | undefined;
+
+      let id = "";
       let total = 0;
-      results.forEach((result) => {
-        if (result.id) {
-          id = result.id;
-        }
-        if (result.total) {
-          total += result.total;
-        }
+
+      // TODO: Add loading state to the discount button / input.
+
+      await Promise.all(invoiceItemPromises).then((discountResults) => {
+        discountResults.forEach((discountResult) => {
+          const appliedDiscountCode = discountResult.data?.applyDiscountCode;
+
+          if (appliedDiscountCode) {
+            id ||= appliedDiscountCode.discountCode.id;
+            total += appliedDiscountCode.totalPriceAfterDiscount || 0;
+          }
+        });
       });
+
       if (id && total) {
         // update total
         setPromoCode(code => ({
@@ -98,14 +106,12 @@ const usePromoCode = () => {
         }));
         setError(null);
       } else {
-        setError("Code invalid");
+        setError(DISCOUNT_CODE_INVALID_ERROR_MESSAGE);
       }
     } catch (e) {
-      console.log(e);
+      setError(DISCOUNT_CODE_EXCEPTION_ERROR_MESSAGE);
     }
   }, [applyDiscountCode, invoiceItemIDs, promoCode, setError, setPromoCode]);
 
   return { promoCode, onChangePromoCode, onApply, editable, setEditable, error, invoiceItemIDs, setInvoiceItemIDs };
-};
-
-export { PromoCodeProvider, usePromoCode };
+}

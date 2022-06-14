@@ -18,4 +18,7 @@ export interface PlaygroundFormData {
   paymentACH: boolean;
   paymentWire: boolean;
   paymentCrypto: boolean;
+
+  // Flow:
+  multiSigEnabled: boolean;
 }

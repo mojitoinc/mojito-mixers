@@ -53,8 +53,10 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
   debug,
 }) => {
   const { setEditable, promoCode } = usePromoCode();
-  const { billingInfo, paymentInfo, cvv } = selectedPaymentMethod;
-  const isCreditCardPayment = cvv || (paymentInfo !== null && typeof paymentInfo === "object" && paymentInfo.type === "CreditCard");
+  const { billingInfo, paymentInfo, paymentType, cvv } = selectedPaymentMethod;
+
+  const isCreditCardPayment = (paymentType === "CreditCard" && cvv) ||
+    (paymentInfo && typeof paymentInfo === "object" && paymentInfo.type === "CreditCard");
 
 
   // Minimum wait time:
@@ -108,17 +110,24 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
     setRedirectURL((prevRedirectURL) => {
       const nextRedirectURL = prevRedirectURL || receivedRedirectURL;
 
-      if (debug) console.log("  👀 getPaymentNotificationQuery", { redirectURL: nextRedirectURL });
+      if (debug) console.log(`  👀 getPaymentNotificationQuery redirectURL = ${ nextRedirectURL }`);
 
       return nextRedirectURL;
     });
   }, [skipPaymentNotificationRedirect, receivedRedirectURL, debug]);
 
+
+  // Load Coinbase redirect URL (if available):
+
   useEffect(() => {
     const { hostedURL } = fullPaymentState;
 
-    if (hostedURL) setRedirectURL(hostedURL);
-  }, [fullPaymentState]);
+    if (hostedURL && paymentType === "Crypto") {
+      if (debug) console.log(`  👀 hostedURL = ${ hostedURL }`);
+
+      setRedirectURL(hostedURL);
+    }
+  }, [fullPaymentState, paymentType, debug]);
 
 
   // Triggers for payment mutation and onPurchaseSuccess/onPurchaseError callbacks:

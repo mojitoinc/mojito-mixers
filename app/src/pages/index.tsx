@@ -28,6 +28,9 @@ const DEFAULT_FORM_VALUES: PlaygroundFormData = {
   paymentACH: true,
   paymentWire: true,
   paymentCrypto: true,
+
+  // Flow:
+  multiSigEnabled: true,
 };
 
 const FORM_VALUES_KEY = "FORM_VALUES_KEY";
@@ -72,7 +75,7 @@ const HomePage: React.FC = () => {
 
     // Flow:
     loaderMode,
-    multiSigEnabled: false,
+    multiSigEnabled: formValues.multiSigEnabled,
 
     // Personalization:
     acceptedPaymentTypes: [
@@ -113,6 +116,9 @@ const HomePage: React.FC = () => {
       paymentACH: INITIAL_FORM_VALUES.paymentACH ?? DEFAULT_FORM_VALUES.paymentACH,
       paymentWire: INITIAL_FORM_VALUES.paymentWire ?? DEFAULT_FORM_VALUES.paymentWire,
       paymentCrypto: INITIAL_FORM_VALUES.paymentCrypto ?? DEFAULT_FORM_VALUES.paymentCrypto,
+
+      // Flow:
+      multiSigEnabled: INITIAL_FORM_VALUES.multiSigEnabled ?? DEFAULT_FORM_VALUES.multiSigEnabled,
     });
   }, []);
 
@@ -266,6 +272,14 @@ const HomePage: React.FC = () => {
         </FormControl>
       </Box>
 
+      <Box sx={{ my: 4 }}>
+        <FormControl component="fieldset">
+          <FormLabel component="legend">Multisig Wallets</FormLabel>
+          <FormGroup>
+            <FormControlLabel control={ <Checkbox checked={ formValues.multiSigEnabled } value="" onChange={ handleChange } name="multiSigEnabled" /> } label="Multisig Wallets" />
+          </FormGroup>
+        </FormControl>
+      </Box>
 
       <Box sx={{ my: 4 }}>
         <Stack spacing={ 2 } direction="row">
