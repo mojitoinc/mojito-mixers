@@ -457,6 +457,10 @@ Defined in [`app/src/lib/utils/validationUtils.ts`](https://github.com/mojitoinc
 
 - `withInvalidCreditCardNetwork = ` Only `{ acceptedCreditCardNetworks }` `{ is/are }` accepted.
 
+- `DISCOUNT_CODE_INVALID_ERROR_MESSAGE = ` The discount code is invalid or expired.
+
+- `DISCOUNT_CODE_EXCEPTION_ERROR_MESSAGE = ` The discount code could not be validated.
+
 - `withInvalidConnection = ` Could not connect `{ label }`.
 
 <br />

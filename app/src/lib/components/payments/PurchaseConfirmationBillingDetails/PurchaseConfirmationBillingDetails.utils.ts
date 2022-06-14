@@ -1,10 +1,10 @@
 import { SavedPaymentMethod } from "../../../domain/circle/circle.interfaces";
-import { AchAccount, CreditCard, PaymentMethod, PaymentType } from "../../../domain/payment/payment.interfaces";
-import { ACH_MASK_PREFIX, CREDIT_CARD_MASK_PREFIX, GENERIC_MASK_PREFIX } from "../../../domain/payment/payment.constants";
+import { AchAccount, CreditCard, CryptoAddress, PaymentMethod, PaymentType } from "../../../domain/payment/payment.interfaces";
+import { ACH_MASK_PREFIX, CREDIT_CARD_MASK_PREFIX, GENERIC_MASK } from "../../../domain/payment/payment.constants";
 
 export interface GetFormattedPaymentMethodReturn {
-  isMasked: boolean;
-  paymentType: PaymentType;
+  useCreditCardInput: boolean;
+  paymentType: PaymentType | "";
   displayValue: string;
   network: string;
 }
@@ -14,14 +14,12 @@ function isSavedPaymentMethod(paymentMethodInfo: PaymentMethod | SavedPaymentMet
 }
 
 export function getFormattedPaymentMethod(paymentMethodInfo: PaymentMethod | SavedPaymentMethod | null): GetFormattedPaymentMethodReturn {
-  let isMasked = false;
-  let paymentType: PaymentType = "CreditCard";
+  let useCreditCardInput = false;
+  let paymentType: PaymentType | "" = "";
   let displayValue = "";
   let network = "";
 
   if (isSavedPaymentMethod(paymentMethodInfo)) {
-    isMasked = true;
-
     if (paymentMethodInfo.type === "ACH") {
       paymentType = "ACH";
       displayValue = `${ ACH_MASK_PREFIX } ${ paymentMethodInfo.accountNumber }`;
@@ -35,20 +33,22 @@ export function getFormattedPaymentMethod(paymentMethodInfo: PaymentMethod | Sav
     }
   } else if (paymentMethodInfo) {
     if ((paymentMethodInfo as CreditCard).hasOwnProperty("cardNumber")) {
+      paymentType = "CreditCard";
       displayValue = (paymentMethodInfo as CreditCard).cardNumber;
+
+      if (displayValue) useCreditCardInput = true;
     } else if ((paymentMethodInfo as AchAccount).hasOwnProperty("accountNumber")) {
+      paymentType = "ACH";
       displayValue = (paymentMethodInfo as AchAccount).accountId;
-    } else {
-      isMasked = true;
-      displayValue = GENERIC_MASK_PREFIX;
+    } else if ((paymentMethodInfo as CryptoAddress).type === "Crypto") {
+      paymentType = "Crypto";
     }
-  } else {
-    isMasked = true;
-    displayValue = GENERIC_MASK_PREFIX;
   }
 
+  displayValue ||= GENERIC_MASK;
+
   return {
-    isMasked,
+    useCreditCardInput,
     paymentType,
     displayValue,
     network,
