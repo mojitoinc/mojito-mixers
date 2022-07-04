@@ -1,4 +1,6 @@
-export type PaymentType = "CreditCard" | "ACH" | "Wire" | "Crypto";
+export type Currency = "USD" | "WETH" | "WMATIC";
+
+export type PaymentType = "CreditCard" | "ACH" | "Wire" | "Crypto" | "Coinbase";
 
 export type PaymentStatus = "processed" | "processing" | "error";
 
@@ -25,7 +27,11 @@ export type CryptoAddress = {
   type: "Crypto";
 };
 
-export type PaymentMethod = CreditCard | AchAccount | WireAccount | CryptoAddress;
+export type CoinbaseAddress = {
+  type: "Coinbase";
+};
+
+export type PaymentMethod = CreditCard | AchAccount | WireAccount | CryptoAddress | CoinbaseAddress;
 
 export interface PaymentDetails {
   type: PaymentType;

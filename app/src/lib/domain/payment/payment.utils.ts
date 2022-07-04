@@ -77,6 +77,10 @@ export interface PaymentLimits {
     purchase: number;
     total: number;
   };
+  Coinbase: {
+    purchase: number;
+    total: number;
+  };
 }
 
 export function transformRawRemainingItemLimit(rawRemainingItemLimit?: ValidatePaymentLimitOutput, itemsCount = 0): PaymentLimits {
@@ -95,6 +99,11 @@ export function transformRawRemainingItemLimit(rawRemainingItemLimit?: ValidateP
     },
     // TODO: Update once crypto is added to ValidatePaymentLimitOutput:
     Crypto: {
+      purchase: ((rawRemainingItemLimit as any)?.crypto?.remainingTransaction ?? Infinity) + itemsCount,
+      total: ((rawRemainingItemLimit as any)?.crypto?.remainingTotal ?? Infinity) + itemsCount,
+    },
+    // TODO: Update once crypto is added to ValidatePaymentLimitOutput:
+    Coinbase: {
       purchase: ((rawRemainingItemLimit as any)?.crypto?.remainingTransaction ?? Infinity) + itemsCount,
       total: ((rawRemainingItemLimit as any)?.crypto?.remainingTotal ?? Infinity) + itemsCount,
     },

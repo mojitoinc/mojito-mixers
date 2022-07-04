@@ -122,7 +122,7 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
   useEffect(() => {
     const { hostedURL } = fullPaymentState;
 
-    if (hostedURL && paymentType === "Crypto") {
+    if (hostedURL && paymentType === "Coinbase") {
       if (debug) console.log(`  👀 hostedURL = ${ hostedURL }`);
 
       setRedirectURL(hostedURL);

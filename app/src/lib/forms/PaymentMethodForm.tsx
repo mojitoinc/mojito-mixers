@@ -15,10 +15,7 @@ import { ControlledCardSecureCodeField } from "../components/shared/CardSecureCo
 import { InputGroupLabel } from "../components/shared/InputGroupLabel/InputGroupLabel";
 import { SecondaryButton } from "../components/shared/SecondaryButton/SecondaryButton";
 import { PaymentMethodSelector } from "../components/shared/PaymentMethodSelector/PaymentMethodSelector";
-import {
-  PaymentMethod,
-  PaymentType,
-} from "../domain/payment/payment.interfaces";
+import { PaymentMethod, PaymentType } from "../domain/payment/payment.interfaces";
 import {
   CONSENT_ERROR_MESSAGE,
   requireSchemaWhenKeyIs,
@@ -47,6 +44,8 @@ import { CreditCardNetwork, getCardTypeByType } from "../domain/react-payment-in
 import { FormErrorsCaption } from "../components/shared/FormErrorCaption/FormErrorCaption";
 import { CheckoutItem } from "../domain/product/product.interfaces";
 import { useLimits } from "../hooks/useLimits";
+import { Market } from "../components/public/CheckoutOverlay/CheckoutOverlay";
+import { ConnectedWalletItem } from "../components/payments/ConnectedWalletItem/ConnectedWalletItem";
 
 interface PaymentTypeFormProps {
   control: Control<PaymentMethod & { consent: boolean }>;
@@ -294,6 +293,29 @@ const PAYMENT_TYPE_FORM_DATA: Record<PaymentType, PaymentTypeFormData> = {
     schemaShape: () => ({}),
     fields: ({ control, consentType }) => (
       <>
+        <ConnectedWalletItem
+          boxProps={{ sx: { mt: 1.5, mb: consentType === "checkbox" ? 1 : 0 } }}
+          address="0xb794f5ea0ba39494ce839613fffba74279579268"
+          status="connected"
+          balance={{ WETH: 1.2, ETH: 1.2 }} />
+
+        { consentType === "checkbox" && (
+          <ControlledCheckbox
+            name="consent"
+            control={ control }
+            label={ <>I <ConsentText /></> } />
+        ) }
+      </>
+    ),
+  },
+  Coinbase: {
+    defaultValues: consentType => ({
+      type: "Coinbase",
+      consent: consentType !== "checkbox",
+    }),
+    schemaShape: () => ({}),
+    fields: ({ control, consentType }) => (
+      <>
         <DisplayBox sx={{ mt: 1.5, mb: consentType === "checkbox" ? 1 : 0 }}>
           <Typography variant="body1">
             We use Coinbase to connect to your wallet.
@@ -324,6 +346,7 @@ export interface PaymentMethodFormProps {
   onClose: () => void;
   onSubmit: (data: PaymentMethod) => void;
   onAttemptSubmit: () => void;
+  marketType: Market;
   consentType?: ConsentType;
   checkoutItems: CheckoutItem[];
   debug?: boolean;
@@ -342,11 +365,12 @@ export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
   onClose,
   onSubmit,
   onAttemptSubmit,
+  marketType,
   consentType,
   checkoutItems,
   debug = false,
 }) => {
-  const defaultPaymentType = acceptedPaymentTypes[0] || "CreditCard";
+  const defaultPaymentType = marketType === "secondary" ? "Crypto" : (acceptedPaymentTypes[0] || "CreditCard");
   const defaultPaymentTypeFormData = PAYMENT_TYPE_FORM_DATA[defaultPaymentType];
   const defaultPaymentTypeDefaultValues = defaultPaymentTypeFormData.defaultValues(consentType);
 
@@ -392,6 +416,8 @@ export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
   } = useLimits(firstCheckoutItem, acceptedPaymentTypes, selectedPaymentMethod);
 
   const handleSelectedPaymentMethodChange = useCallback((paymentType: PaymentType) => {
+    console.log(paymentType, PAYMENT_TYPE_FORM_DATA);
+
     reset({ ...PAYMENT_TYPE_FORM_DATA[paymentType].defaultValues(consentType) });
 
     if (paymentType === "ACH" && !!plaidError) refetchPlaidLink();
@@ -411,16 +437,26 @@ export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
 
     onAttemptSubmit();
 
-    if (selectedPaymentMethod === "ACH") {
+    if (selectedPaymentMethod === "ACH" || selectedPaymentMethod === "Crypto") {
       const isFormValid = await trigger();
 
       if (!isFormValid) {
+        // This will make the validation errors appear:
         submitForm(e);
 
         return;
       }
 
-      onPlaidLinkClicked();
+      if (selectedPaymentMethod === "ACH") {
+        onPlaidLinkClicked();
+      } else {
+        throw new Error("Crypto payments from wallet not implemented yet.");
+
+        // TODO: Make payment with wallet.
+
+        // Move to the next screen:
+        // submitForm();
+      }
     } else {
       submitForm(e);
     }
@@ -444,6 +480,7 @@ export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
           <InputGroupLabel sx={{ m: 0, pt: 2, pb: 1.5 }}>Payment Method</InputGroupLabel>
 
           <PaymentMethodSelector
+            marketType={ marketType }
             selectedPaymentMethod={ selectedPaymentMethod }
             onPaymentMethodChange={ handleSelectedPaymentMethodChange }
             paymentMethods={ acceptedPaymentTypes } />
@@ -461,6 +498,8 @@ export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
           </Typography>
         </DisplayBox>
       ) : null }
+
+      { /* TODO: Separate in FormFragment or FormFields components instead of object for the rendering part: */ }
 
       <Fields
         control={ control }

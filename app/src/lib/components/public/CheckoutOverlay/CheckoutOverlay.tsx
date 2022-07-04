@@ -4,7 +4,7 @@ import { Theme, SxProps } from "@mui/material/styles";
 import { ApolloError } from "@apollo/client";
 import { savedPaymentMethodToBillingInfo, transformRawSavedPaymentMethods } from "../../../domain/circle/circle.utils";
 import { UserFormat } from "../../../domain/auth/authentication.interfaces";
-import { PaymentMethod, PaymentType } from "../../../domain/payment/payment.interfaces";
+import { Currency, PaymentType, PaymentMethod } from "../../../domain/payment/payment.interfaces";
 import { CheckoutEventData, CheckoutEventType } from "../../../domain/events/events.interfaces";
 import { CheckoutItemInfo } from "../../../domain/product/product.interfaces";
 import { BillingInfo } from "../../../forms/BillingInfoForm";
@@ -45,6 +45,10 @@ import { getLastPaymentMethodID } from "../../../hooks/useFullPayment";
 
 export type LoaderMode = "default" | "success" | "error";
 
+export type Container = "fullscreen" | "modal";
+
+export type Market = "primary" | "secondary";
+
 export interface PUICheckoutOverlayProps {
   // Modal:
   open: boolean;
@@ -71,7 +75,10 @@ export interface PUICheckoutOverlayProps {
   purchasingMessages?: false | string[];
   successImageSrc?: string;
   errorImageSrc?: string;
+  container?: Container;
   userFormat?: UserFormat;
+  marketType?: Market;
+  acceptedCurrencies?: Currency[];
   acceptedPaymentTypes?: PaymentType[];
   acceptedCreditCardNetworks?: CreditCardNetwork[];
   network?: Network;
@@ -131,7 +138,10 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   purchasingMessages,
   successImageSrc,
   errorImageSrc,
+  container = "fullscreen",
   userFormat,
+  marketType = "primary",
+  acceptedCurrencies = ["USD"],
   acceptedPaymentTypes = ["CreditCard"],
   acceptedCreditCardNetworks,
   network,
@@ -896,6 +906,8 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
         onNext={ goNext }
         onPrev={ goBack }
         onClose={ handleClose }
+        marketType={ marketType }
+        acceptedCurrencies={ acceptedCurrencies }
         acceptedPaymentTypes={ acceptedPaymentTypes }
         acceptedCreditCardNetworks={ acceptedCreditCardNetworks }
         consentType={ consentType }

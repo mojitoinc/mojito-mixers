@@ -7,8 +7,10 @@ import Icon from "@mdi/react";
 import { mdiEthereum } from "@mdi/js";
 import { useTheme } from "@mui/material/styles";
 import { PaymentType } from "../../../domain/payment/payment.interfaces";
+import { Market } from "../../public/CheckoutOverlay/CheckoutOverlay";
 
 interface PaymentMethodSelectorProps {
+  marketType: Market;
   paymentMethods: PaymentType[];
   selectedPaymentMethod: PaymentType;
   onPaymentMethodChange: (paymentMethod: PaymentType) => void;
@@ -39,9 +41,14 @@ export const PAYMENT_METHOD_OPTION_PROPS: Record<
     label: "Crypto",
     icon: <Icon path={ mdiEthereum } size="20px" />,
   },
+  Coinbase: {
+    label: "Coinbase",
+    icon: <Icon path={ mdiEthereum } size="20px" />,
+  },
 };
 
 export const PaymentMethodSelector: React.FC<PaymentMethodSelectorProps> = ({
+  marketType,
   paymentMethods,
   selectedPaymentMethod,
   onPaymentMethodChange,
@@ -68,6 +75,7 @@ export const PaymentMethodSelector: React.FC<PaymentMethodSelectorProps> = ({
           <ToggleButton
             key={ paymentMethod }
             value={ paymentMethod }
+            disabled={ marketType === "secondary" && paymentMethod !== "Crypto" }
             aria-label={ paymentMethod }>
             { wideViewport ? (
               <Stack

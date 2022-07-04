@@ -28,6 +28,7 @@ const DEFAULT_FORM_VALUES: PlaygroundFormData = {
   paymentACH: true,
   paymentWire: true,
   paymentCrypto: true,
+  paymentCoinbase: true,
 
   // Flow:
   multiSigEnabled: true,
@@ -83,6 +84,7 @@ const HomePage: React.FC = () => {
       formValues.paymentACH ? "ACH" : "",
       formValues.paymentWire ? "Wire" : "",
       formValues.paymentCrypto ? "Crypto" : "",
+      formValues.paymentCoinbase ? "Coinbase" : "",
     ].filter(Boolean) as PaymentType[],
     acceptedCreditCardNetworks: formValues.paymentCC ? ["visa", "mastercard"] : undefined,
 
@@ -116,6 +118,7 @@ const HomePage: React.FC = () => {
       paymentACH: INITIAL_FORM_VALUES.paymentACH ?? DEFAULT_FORM_VALUES.paymentACH,
       paymentWire: INITIAL_FORM_VALUES.paymentWire ?? DEFAULT_FORM_VALUES.paymentWire,
       paymentCrypto: INITIAL_FORM_VALUES.paymentCrypto ?? DEFAULT_FORM_VALUES.paymentCrypto,
+      paymentCoinbase: INITIAL_FORM_VALUES.paymentCoinbase ?? DEFAULT_FORM_VALUES.paymentCoinbase,
 
       // Flow:
       multiSigEnabled: INITIAL_FORM_VALUES.multiSigEnabled ?? DEFAULT_FORM_VALUES.multiSigEnabled,
@@ -268,6 +271,7 @@ const HomePage: React.FC = () => {
             <FormControlLabel control={ <Checkbox checked={ formValues.paymentACH } value="" onChange={ handleChange } name="paymentACH" /> } label="ACH" />
             <FormControlLabel control={ <Checkbox checked={ formValues.paymentWire } value="" onChange={ handleChange } name="paymentWire" /> } label="Wire" />
             <FormControlLabel control={ <Checkbox checked={ formValues.paymentCrypto } value="" onChange={ handleChange } name="paymentCrypto" /> } label="Crypto" />
+            <FormControlLabel control={ <Checkbox checked={ formValues.paymentCoinbase } value="" onChange={ handleChange } name="paymentCoinbase" /> } label="Coinbase" />
           </FormGroup>
         </FormControl>
       </Box>
