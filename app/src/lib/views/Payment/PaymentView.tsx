@@ -235,6 +235,7 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
         checkoutItems={ checkoutItems }
         taxes={ taxes }
         acceptedCurrencies={ acceptedCurrencies }
+        warningVariant="link"
         validatePersonalDeliveryAddress={ formSubmitAttempted }
         wallets={ wallets }
         wallet={ wallet }

@@ -13,15 +13,14 @@ DONE:
 - Disable payment method selector buttons other than Crypto in secondary markets.
 - No modal in mobile viewport (just use full screen).
 - Fix PaymentMethodSelector overflow issues.
+- "What is this currency..." link.
+- "You need to pay with..." box should go away in PaymentView.
 
 
 TODO:
-
 - Show price in USD + one crypto?
 - Crypto confirmation screen (no address)?
 - Error and Info box link color in CSS var.
-- "What is this currency..." link.
-- "You need to pay with..." box should go away in PaymentView.
 
 
 NEXT:

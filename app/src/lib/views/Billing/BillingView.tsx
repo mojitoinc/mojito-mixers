@@ -330,6 +330,7 @@ export const BillingView: React.FC<BillingViewProps> = ({
         checkoutItems={ checkoutItems }
         taxes={ vertexEnabled ? taxes : null }
         acceptedCurrencies={ acceptedCurrencies }
+        warningVariant="box"
         validatePersonalDeliveryAddress={ formSubmitAttempted }
         wallets={ wallets }
         wallet={ wallet }

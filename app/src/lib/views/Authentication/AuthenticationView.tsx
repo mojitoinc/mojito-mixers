@@ -52,7 +52,8 @@ export const AuthenticationView: React.FC<AuthenticationViewProps> = ({
       <CheckoutItemCostBreakdown
         checkoutItems={ checkoutItems }
         taxes={ taxes }
-        acceptedCurrencies={ acceptedCurrencies } />
+        acceptedCurrencies={ acceptedCurrencies }
+        warningVariant="box" />
 
       <CheckoutModalFooter
         variant={ isAuthenticated ? "toPayment" : "toGuestCheckout" }
