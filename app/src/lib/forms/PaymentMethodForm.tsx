@@ -438,8 +438,6 @@ export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
   } = useLimits(firstCheckoutItem, acceptedPaymentTypes, selectedPaymentMethod);
 
   const handleSelectedPaymentMethodChange = useCallback((paymentType: PaymentType) => {
-    console.log(paymentType, PAYMENT_TYPE_FORM_DATA);
-
     reset({ ...PAYMENT_TYPE_FORM_DATA[paymentType].defaultValues(consentType) });
 
     if (paymentType === "ACH" && !!plaidError) refetchPlaidLink();

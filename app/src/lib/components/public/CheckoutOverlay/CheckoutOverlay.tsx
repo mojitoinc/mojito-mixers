@@ -4,7 +4,7 @@ import { Theme, SxProps } from "@mui/material/styles";
 import { ApolloError } from "@apollo/client";
 import { savedPaymentMethodToBillingInfo, transformRawSavedPaymentMethods } from "../../../domain/circle/circle.utils";
 import { UserFormat } from "../../../domain/auth/authentication.interfaces";
-import { Currency, PaymentType, PaymentMethod } from "../../../domain/payment/payment.interfaces";
+import { PaymentType, PaymentMethod, FiatCurrency, CryptoCurrency } from "../../../domain/payment/payment.interfaces";
 import { CheckoutEventData, CheckoutEventType } from "../../../domain/events/events.interfaces";
 import { CheckoutItemInfo } from "../../../domain/product/product.interfaces";
 import { BillingInfo } from "../../../forms/BillingInfoForm";
@@ -76,7 +76,8 @@ export interface PUICheckoutOverlayProps {
   container?: Container;
   userFormat?: UserFormat;
   marketType?: Market;
-  acceptedCurrencies?: Currency[];
+  displayCurrency?: FiatCurrency;
+  cryptoCurrencies?: CryptoCurrency[];
   acceptedPaymentTypes?: PaymentType[];
   acceptedCreditCardNetworks?: CreditCardNetwork[];
   network?: Network;
@@ -139,7 +140,8 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   container = "fullscreen",
   userFormat,
   marketType = "primary",
-  acceptedCurrencies = ["USD"],
+  displayCurrency = "USD",
+  cryptoCurrencies = [],
   acceptedPaymentTypes = ["CreditCard"],
   acceptedCreditCardNetworks,
   network,
@@ -854,7 +856,9 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
         invoiceItemIDs={ invoiceAndReservationState.invoiceItemIDs }
         checkoutItems={ checkoutItems }
         taxes={ taxes }
-        acceptedCurrencies={ acceptedCurrencies }
+        marketType={ marketType }
+        displayCurrency={ displayCurrency }
+        cryptoCurrencies={ cryptoCurrencies }
         isAuthenticated={ isAuthenticated }
         guestCheckoutEnabled={ guestCheckoutEnabled }
         onGuestClicked={ goNext }
@@ -867,12 +871,14 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
         orgID={ orgID }
         vertexEnabled={ vertexEnabled }
         checkoutItems={ checkoutItems }
-        acceptedCurrencies={ acceptedCurrencies }
         savedPaymentMethods={ savedPaymentMethods }
         selectedBillingInfo={ selectedPaymentMethod.billingInfo }
         wallet={ wallet }
         wallets={ wallets }
         multiSigEnabled={ multiSigEnabled }
+        marketType={ marketType }
+        displayCurrency={ displayCurrency }
+        cryptoCurrencies={ cryptoCurrencies }
         checkoutError={ checkoutError }
         onBillingInfoSelected={ handleBillingInfoSelected }
         onTaxesChange={ setTaxes }
@@ -898,6 +904,9 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
         wallet={ wallet }
         wallets={ wallets }
         multiSigEnabled={ multiSigEnabled }
+        marketType={ marketType }
+        displayCurrency={ displayCurrency }
+        cryptoCurrencies={ cryptoCurrencies }
         checkoutError={ checkoutError }
         onPaymentInfoSelected={ handlePaymentInfoSelected }
         onCvvSelected={ handleCvvSelected }
@@ -906,8 +915,6 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
         onNext={ goNext }
         onPrev={ goBack }
         onClose={ handleClose }
-        marketType={ marketType }
-        acceptedCurrencies={ acceptedCurrencies }
         acceptedPaymentTypes={ acceptedPaymentTypes }
         acceptedCreditCardNetworks={ acceptedCreditCardNetworks }
         consentType={ consentType }
@@ -941,6 +948,8 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     checkoutStepElement = (
       <ConfirmationView
         checkoutItems={ checkoutItems }
+        displayCurrency={ displayCurrency }
+        cryptoCurrencies={ cryptoCurrencies }
         savedPaymentMethods={ savedPaymentMethods }
         selectedPaymentMethod={ selectedPaymentMethod }
         processorPaymentID={ processorPaymentID }

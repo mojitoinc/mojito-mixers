@@ -6,35 +6,36 @@ import { useCheckoutItemsCostTotal } from "../../../../hooks/useCheckoutItemCost
 import { CheckoutItemList } from "../List/CheckoutItemList";
 import { TaxesState } from "../../../../views/Billing/BillingView";
 import { InfoBox } from "../../InfoBox/InfoBox";
-import { Currency } from "../../../../domain/payment/payment.interfaces";
+import { FiatCurrency, CryptoCurrency } from "../../../../domain/payment/payment.interfaces";
 
 export type CheckoutItemCostBreakdownWarningVariant = "box" | "link";
 
 export interface CheckoutItemCostBreakdownProps {
   checkoutItems: CheckoutItem[];
   taxes: null | TaxesState;
-  acceptedCurrencies: Currency[];
-  warningVariant: CheckoutItemCostBreakdownWarningVariant;
+  displayCurrency: FiatCurrency;
+  cryptoCurrencies?: CryptoCurrency[];
+  onlyCryptoWarningVariant?: CheckoutItemCostBreakdownWarningVariant;
 }
 
 export const CheckoutItemCostBreakdown: React.FC<CheckoutItemCostBreakdownProps> = ({
   checkoutItems,
   taxes,
-  acceptedCurrencies,
-  warningVariant,
+  displayCurrency,
+  cryptoCurrencies,
+  onlyCryptoWarningVariant,
 }) => {
   const firstCheckoutItem = checkoutItems[0];
   const { total, fees } = useCheckoutItemsCostTotal(checkoutItems);
 
+  // TODO: Join sentence for the cryptos.
+
   return (
     <Stack sx={{ display: "flex", flex: 1 }}>
-      <CheckoutItemList
-        checkoutItems={ checkoutItems }
-        withSeparators
-        showPrices />
+      <CheckoutItemList checkoutItems={ checkoutItems } withSeparators />
 
-      { acceptedCurrencies.sort().join(", ") === "WETH, WMATIC" && (
-        warningVariant === "box" ? (
+      { onlyCryptoWarningVariant && (
+        onlyCryptoWarningVariant === "box" ? (
           <InfoBox sx={{ mt: 3.75 }}>
             <Typography>
               You need to pay with <strong>WETH or WMATIC</strong> on this marketplace.{ " " }
@@ -56,10 +57,12 @@ export const CheckoutItemCostBreakdown: React.FC<CheckoutItemCostBreakdownProps>
       <Divider sx={{ mt: 3.75, mb: 1.5 }} />
 
       <CheckoutItemCostTotal
-        withDetails
         total={ total }
         fees={ fees === 0 && firstCheckoutItem.lotType === "buyNow" ? null : fees }
-        taxes={ taxes } />
+        taxes={ taxes }
+        displayCurrency={ displayCurrency }
+        cryptoCurrencies={ cryptoCurrencies }
+        withDetails />
     </Stack>
   );
 };

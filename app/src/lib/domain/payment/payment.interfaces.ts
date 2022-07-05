@@ -1,4 +1,6 @@
-export type Currency = "USD" | "WETH" | "WMATIC";
+export type FiatCurrency = "USD" | "EUR";
+
+export type CryptoCurrency = "WETH" | "WMATIC";
 
 export type PaymentType = "CreditCard" | "ACH" | "Wire" | "Crypto" | "Coinbase";
 

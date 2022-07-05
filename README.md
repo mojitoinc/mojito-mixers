@@ -16,19 +16,20 @@ DONE:
 - "What is this currency..." link.
 - "You need to pay with..." box should go away in PaymentView.
 
+DOING:
+- Show price in USD + one crypto?
 
 TODO:
-- Show price in USD + one crypto?
 - Crypto confirmation screen (no address)?
 - Error and Info box link color in CSS var.
-
+- Extended playground options: market type, displayCurrency, crypto currencies, etc.
+- Update README with new props.
 
 NEXT:
-- Dan's demo without showing other orgs. + Extend playground options.
-- Export multiple themes + Playground options.
+- Export multiple themes + Playground theme option
 - Custom variants.
 - Provider to remove prop drilling.
-
+- Check comments I added a while back in the discount code PR.
 
 
 

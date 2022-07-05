@@ -4,7 +4,7 @@ import { CheckoutDeliveryAndItemCostBreakdown } from "../../components/payments/
 import { CheckoutStepper } from "../../components/payments/CheckoutStepper/CheckoutStepper";
 import { CheckoutItem } from "../../domain/product/product.interfaces";
 import { PaymentMethodForm } from "../../forms/PaymentMethodForm";
-import { PaymentType, PaymentMethod, Currency } from "../../domain/payment/payment.interfaces";
+import { PaymentType, PaymentMethod, CryptoCurrency, FiatCurrency } from "../../domain/payment/payment.interfaces";
 import { SavedPaymentDetailsSelector } from "../../components/shared/SavedPaymentDetailsSelector/SavedPaymentDetailsSelector";
 import { BillingInfoItem } from "../../components/payments/BillingInfo/Item/BillingInfoItem";
 import { SavedPaymentMethod } from "../../domain/circle/circle.interfaces";
@@ -46,7 +46,8 @@ export interface PaymentViewProps {
   onPrev: () => void;
   onClose: () => void;
   marketType: Market;
-  acceptedCurrencies: Currency[];
+  displayCurrency: FiatCurrency;
+  cryptoCurrencies: CryptoCurrency[];
   acceptedPaymentTypes: PaymentType[];
   acceptedCreditCardNetworks?: CreditCardNetwork[];
   consentType?: ConsentType;
@@ -74,7 +75,8 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
   onPrev,
   onClose,
   marketType,
-  acceptedCurrencies,
+  displayCurrency,
+  cryptoCurrencies,
   acceptedPaymentTypes,
   acceptedCreditCardNetworks,
   consentType,
@@ -234,8 +236,9 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
       <CheckoutDeliveryAndItemCostBreakdown
         checkoutItems={ checkoutItems }
         taxes={ taxes }
-        acceptedCurrencies={ acceptedCurrencies }
-        warningVariant="link"
+        displayCurrency={ displayCurrency }
+        cryptoCurrencies={ cryptoCurrencies }
+        onlyCryptoWarningVariant={ marketType === "secondary" ? "link" : undefined }
         validatePersonalDeliveryAddress={ formSubmitAttempted }
         wallets={ wallets }
         wallet={ wallet }

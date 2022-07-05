@@ -6,6 +6,7 @@ import { TaxesState } from "../../../../views/Billing/BillingView";
 import { Number } from "../../../shared/Number/Number";
 import { TextField } from "../../../shared/TextField/TextField";
 import { usePromoCode } from "../../../../utils/promoCodeUtils";
+import { FiatCurrency, CryptoCurrency } from "../../../../domain/payment/payment.interfaces";
 
 const TAX_RATE_PLACEHOLDER_SX: SxProps<Theme> = {
   background: theme => theme.palette.grey[100],
@@ -42,6 +43,8 @@ export interface CheckoutItemCostTotalProps {
   total: number;
   fees: number | null;
   taxes: null | TaxesState;
+  displayCurrency: FiatCurrency;
+  cryptoCurrencies?: CryptoCurrency[];
   withDetails?: boolean;
 }
 
@@ -49,6 +52,8 @@ export const CheckoutItemCostTotal: React.FC<CheckoutItemCostTotalProps> = ({
   total,
   fees,
   taxes,
+  displayCurrency,
+  cryptoCurrencies,
   withDetails = false,
 }) => {
   const { promoCode, onChangePromoCode, onApply, editable, error, invoiceItemIDs } = usePromoCode();
@@ -64,11 +69,12 @@ export const CheckoutItemCostTotal: React.FC<CheckoutItemCostTotalProps> = ({
   }, [promoCode, setDiscountTotal, total]);
 
   const feesValue = fees || 0;
+  const displayCurrencyPrefix = ` ${ displayCurrency }`;
 
   let taxRowElement: React.ReactNode = null;
 
   let totalElement: React.ReactNode = (
-    <Tooltip title="Enter a valid address to calculate the total"><span><Number suffix=" USD">{ discountTotal + feesValue }</Number></span></Tooltip>
+    <Tooltip title="Enter a valid address to calculate the total"><span><Number suffix={ displayCurrencyPrefix }>{ discountTotal + feesValue }</Number></span></Tooltip>
   );
 
   if (taxes) {
@@ -87,12 +93,12 @@ export const CheckoutItemCostTotal: React.FC<CheckoutItemCostTotalProps> = ({
       totalElement = <Tooltip title="Calculating total..."><span><Box component="span" sx={ TOTAL_PLACEHOLDER_SX }>{ `${ (discountTotal + feesValue) * 1.10 | 0 }`.replace(/./, "0") }.00</Box> USD</span></Tooltip>;
     } else if (status === "complete" && taxAmount !== undefined) {
       taxRateElement = `(${ formatTaxRate(taxRate) })`;
-      taxAmountElement = <Number suffix=" USD">{ taxAmount }</Number>;
-      totalElement = <Number suffix=" USD">{ discountTotal + feesValue + taxAmount }</Number>;
+      taxAmountElement = <Number suffix={ displayCurrencyPrefix }>{ taxAmount }</Number>;
+      totalElement = <Number suffix={ displayCurrencyPrefix }>{ discountTotal + feesValue + taxAmount }</Number>;
     } else {
       taxRateElement = null;
-      taxAmountElement = <Tooltip title="Enter a valid address to calculate the taxes"><span><Number suffix=" USD">{ 0 }</Number></span></Tooltip>;
-      totalElement = <Tooltip title="Enter a valid address to calculate the total"><span><Number suffix=" USD">{ discountTotal + feesValue }</Number></span></Tooltip>;
+      taxAmountElement = <Tooltip title="Enter a valid address to calculate the taxes"><span><Number suffix={ displayCurrencyPrefix }>{ 0 }</Number></span></Tooltip>;
+      totalElement = <Tooltip title="Enter a valid address to calculate the total"><span><Number suffix={ displayCurrencyPrefix }>{ discountTotal + feesValue }</Number></span></Tooltip>;
     }
 
     taxRowElement = (
@@ -140,20 +146,20 @@ export const CheckoutItemCostTotal: React.FC<CheckoutItemCostTotalProps> = ({
 
           <Box sx={ ROW_SX }>
             <Typography>Subtotal</Typography>
-            <Typography><Number suffix=" USD">{ total }</Number></Typography>
+            <Typography><Number suffix={ displayCurrencyPrefix }>{ total }</Number></Typography>
           </Box>
 
           { fees === null ? null : (
             <Box sx={ ROW_SX }>
               <Typography sx={ theme => ({ color: theme.palette.grey["500"] }) }>Fees</Typography>
-              <Typography><Number suffix=" USD">{ fees }</Number></Typography>
+              <Typography><Number suffix={ displayCurrencyPrefix }>{ fees }</Number></Typography>
             </Box>
           ) }
 
           { discount !== null && (
             <Box sx={ ROW_SX }>
               <Typography sx={ theme => ({ color: theme.palette.grey["500"] }) }>Discount</Typography>
-              <Typography><Number suffix=" USD">{ discount }</Number></Typography>
+              <Typography><Number suffix={ displayCurrencyPrefix }>{ discount }</Number></Typography>
             </Box>
           ) }
 

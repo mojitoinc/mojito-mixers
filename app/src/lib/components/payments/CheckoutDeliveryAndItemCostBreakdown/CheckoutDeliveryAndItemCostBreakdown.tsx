@@ -6,13 +6,14 @@ import { CheckoutItemCostBreakdown, CheckoutItemCostBreakdownWarningVariant } fr
 import { CheckoutItem } from "../../../domain/product/product.interfaces";
 import { TaxesState } from "../../../views/Billing/BillingView";
 import { Wallet } from "../../../domain/wallet/wallet.interfaces";
-import { Currency } from "../../../domain/payment/payment.interfaces";
+import { FiatCurrency, CryptoCurrency } from "../../../domain/payment/payment.interfaces";
 
 interface CheckoutDeliveryAndItemCostBreakdownProps {
   checkoutItems: CheckoutItem[];
   taxes: null | TaxesState;
-  acceptedCurrencies: Currency[];
-  warningVariant: CheckoutItemCostBreakdownWarningVariant;
+  displayCurrency: FiatCurrency;
+  cryptoCurrencies: CryptoCurrency[];
+  onlyCryptoWarningVariant?: CheckoutItemCostBreakdownWarningVariant;
   validatePersonalDeliveryAddress: boolean;
   wallets?: Wallet[];
   wallet: null | string | Wallet;
@@ -23,8 +24,9 @@ interface CheckoutDeliveryAndItemCostBreakdownProps {
 export const CheckoutDeliveryAndItemCostBreakdown: React.FC<CheckoutDeliveryAndItemCostBreakdownProps> = ({
   checkoutItems,
   taxes,
-  acceptedCurrencies,
-  warningVariant,
+  displayCurrency,
+  cryptoCurrencies,
+  onlyCryptoWarningVariant,
   validatePersonalDeliveryAddress,
   wallets,
   wallet,
@@ -44,7 +46,8 @@ export const CheckoutDeliveryAndItemCostBreakdown: React.FC<CheckoutDeliveryAndI
     <CheckoutItemCostBreakdown
       checkoutItems={ checkoutItems }
       taxes={ taxes }
-      acceptedCurrencies={ acceptedCurrencies }
-      warningVariant={ warningVariant } />
+      displayCurrency={ displayCurrency }
+      cryptoCurrencies={ cryptoCurrencies }
+      onlyCryptoWarningVariant={ onlyCryptoWarningVariant } />
   </Stack>
 );

@@ -11,9 +11,12 @@ import { SelectedPaymentMethod } from "../../components/public/CheckoutOverlay/C
 import { Wallet } from "../../domain/wallet/wallet.interfaces";
 import { useDictionary } from "../../hooks/useDictionary";
 import { usePromoCode } from "../../utils/promoCodeUtils";
+import { FiatCurrency, CryptoCurrency } from "../../domain/payment/payment.interfaces";
 
 export interface ConfirmationViewProps {
   checkoutItems: CheckoutItem[];
+  displayCurrency: FiatCurrency;
+  cryptoCurrencies: CryptoCurrency[];
   savedPaymentMethods: SavedPaymentMethod[];
   selectedPaymentMethod: SelectedPaymentMethod;
   processorPaymentID: string;
@@ -24,6 +27,8 @@ export interface ConfirmationViewProps {
 
 export const ConfirmationView: React.FC<ConfirmationViewProps> = ({
   checkoutItems,
+  displayCurrency,
+  cryptoCurrencies,
   savedPaymentMethods,
   selectedPaymentMethod,
   processorPaymentID,
@@ -79,6 +84,8 @@ export const ConfirmationView: React.FC<ConfirmationViewProps> = ({
 
       <PurchaseConfirmationBillingDetails
         checkoutItems={ checkoutItems }
+        displayCurrency={ displayCurrency }
+        cryptoCurrencies={ cryptoCurrencies }
         processorPaymentID={ processorPaymentID }
         wallet={ wallet }
         selectedPaymentMethodBillingInfo={ selectedPaymentMethodBillingInfo }
@@ -88,7 +95,8 @@ export const ConfirmationView: React.FC<ConfirmationViewProps> = ({
         <Divider sx={{ display: { xs: "block", md: "none" } }} />
 
         <PurchaseConfirmationItemDetails
-          checkoutItems={ checkoutItems } />
+          checkoutItems={ checkoutItems }
+          displayCurrency={ displayCurrency } />
 
         <CheckoutModalFooter
           variant="toMarketplace"

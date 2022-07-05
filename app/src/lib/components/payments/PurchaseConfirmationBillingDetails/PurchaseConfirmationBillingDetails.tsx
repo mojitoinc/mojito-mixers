@@ -2,7 +2,7 @@ import { Box, Chip, InputAdornment, Stack, Typography } from "@mui/material";
 import React from "react";
 import CheckIcon from "@mui/icons-material/Check";
 import { SavedPaymentMethod, SavedPaymentMethodBillingInfo } from "../../../domain/circle/circle.interfaces";
-import { PaymentMethod } from "../../../domain/payment/payment.interfaces";
+import { FiatCurrency, CryptoCurrency, PaymentMethod } from "../../../domain/payment/payment.interfaces";
 import { CheckoutItem } from "../../../domain/product/product.interfaces";
 import { CreditCardIcon } from "../../shared/Icons/Icons";
 import { ReadOnlyField, ReadOnlyCardField } from "../../shared/ReadOnlyField/ReadOnlyField";
@@ -15,6 +15,8 @@ import { Wallet } from "../../../domain/wallet/wallet.interfaces";
 
 export interface PurchaseConfirmationBillingDetailsProps {
   checkoutItems: CheckoutItem[];
+  displayCurrency: FiatCurrency;
+  cryptoCurrencies: CryptoCurrency[];
   processorPaymentID: string;
   wallet: null | string | Wallet;
   selectedPaymentMethodBillingInfo: SavedPaymentMethodBillingInfo;
@@ -23,6 +25,8 @@ export interface PurchaseConfirmationBillingDetailsProps {
 
 export const PurchaseConfirmationBillingDetails: React.FC<PurchaseConfirmationBillingDetailsProps> = ({
   checkoutItems,
+  displayCurrency,
+  cryptoCurrencies,
   processorPaymentID,
   wallet,
   selectedPaymentMethodBillingInfo,
@@ -105,6 +109,8 @@ export const PurchaseConfirmationBillingDetails: React.FC<PurchaseConfirmationBi
 
       <CheckoutItemCostPurchase
         checkoutItems={ checkoutItems }
+        displayCurrency={ displayCurrency }
+        cryptoCurrencies={ cryptoCurrencies }
         selectedPaymentMethodBillingInfo={ selectedPaymentMethodBillingInfo } />
 
       <DeliveryWalletDetails wallet={ wallet } />
