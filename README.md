@@ -6,6 +6,33 @@
 <br /><br />
 
 
+DONE:
+- Modal mode.
+- New Info and Error boxes.
+- New Crypto payment method form.
+- Disable payment method selector buttons other than Crypto in secondary markets.
+- No modal in mobile viewport (just use full screen).
+- Fix PaymentMethodSelector overflow issues.
+
+
+TODO:
+
+- Show price in USD + one crypto?
+- Crypto confirmation screen (no address)?
+- Error and Info box link color in CSS var.
+- "What is this currency..." link.
+- "You need to pay with..." box should go away in PaymentView.
+
+
+NEXT:
+- Dan's demo without showing other orgs. + Extend playground options.
+- Export multiple themes + Playground options.
+- Custom variants.
+- Provider to remove prop drilling.
+
+
+
+
 <p align="center">
   👨‍💻 React components for the Mojito Platform, Reference App and third-party projects, including Mojito's Checkout / Payment UI  and payment sandbox / test app to easily test credit card, ACH, Wire and Crypto payments with Circle, 3DS, Plaid, Vertex and TaxJar integrations.
 </p><p align="center">

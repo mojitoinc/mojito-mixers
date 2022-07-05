@@ -22,7 +22,7 @@ export const PUIStaticSuccessOverlay: React.FC<PUIStaticSuccessOverlayProps> = (
   );
 
   return (
-    <FullScreenOverlay isDialogBlocked centered header={ headerElement }>
+    <FullScreenOverlay container="fullscreen" isDialogBlocked centered header={ headerElement }>
       <SuccessView { ...successViewProps } />
     </FullScreenOverlay>
   );

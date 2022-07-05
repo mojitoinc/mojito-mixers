@@ -21,7 +21,7 @@ import { continuePlaidOAuthFlow, PlaidFlow } from "../../../hooks/usePlaid";
 import { ConsentType } from "../../shared/ConsentText/ConsentText";
 import { CheckoutModalError, CheckoutModalStepIndex, useCheckoutModalState } from "./CheckoutOverlay.hooks";
 import { ERROR_LOADING_INVOICE, ERROR_LOADING_PAYMENT_METHODS, ERROR_LOADING_USER } from "../../../domain/errors/errors.constants";
-import { FullScreenOverlay } from "../../shared/FullScreenOverlay/FullScreenOverlay";
+import { Container, FullScreenOverlay } from "../../shared/FullScreenOverlay/FullScreenOverlay";
 import { ProvidersInjectorProps, withProviders } from "../../shared/ProvidersInjector/ProvidersInjector";
 import { transformCheckoutItemsFromInvoice } from "../../../domain/product/product.utils";
 import { useCreateInvoiceAndReservation } from "../../../hooks/useCreateInvoiceAndReservation";
@@ -44,8 +44,6 @@ import { PromoCodeProvider } from "../../../utils/promoCodeUtils";
 import { getLastPaymentMethodID } from "../../../hooks/useFullPayment";
 
 export type LoaderMode = "default" | "success" | "error";
-
-export type Container = "fullscreen" | "modal";
 
 export type Market = "primary" | "secondary";
 
@@ -856,6 +854,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
         invoiceItemIDs={ invoiceAndReservationState.invoiceItemIDs }
         checkoutItems={ checkoutItems }
         taxes={ taxes }
+        acceptedCurrencies={ acceptedCurrencies }
         isAuthenticated={ isAuthenticated }
         guestCheckoutEnabled={ guestCheckoutEnabled }
         onGuestClicked={ goNext }
@@ -868,6 +867,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
         orgID={ orgID }
         vertexEnabled={ vertexEnabled }
         checkoutItems={ checkoutItems }
+        acceptedCurrencies={ acceptedCurrencies }
         savedPaymentMethods={ savedPaymentMethods }
         selectedBillingInfo={ selectedPaymentMethod.billingInfo }
         wallet={ wallet }
@@ -976,6 +976,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     <DictionaryProvider dictionary={ dictionary }>
       <PromoCodeProvider>
         <FullScreenOverlay
+          container={ container }
           centered={ checkoutStep === "purchasing" || checkoutStep === "error" }
           open={ open }
           onClose={ handleClose }

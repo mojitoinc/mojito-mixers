@@ -247,6 +247,7 @@ export function createComponentsTheme({ typography, palette, spacing, breakpoint
           marginLeft: "0 !important",
           borderLeft: "0 !important",
           zIndex: 1,
+          whiteSpace: "nowrap",
 
           [breakpoints.up("sm")]: {
             padding: spacing(0, 2),

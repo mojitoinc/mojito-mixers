@@ -16,6 +16,7 @@ import { useCheckoutItemsCostTotal } from "../../hooks/useCheckoutItemCostTotal"
 import { Wallet } from "../../domain/wallet/wallet.interfaces";
 import { ConsentType } from "../../components/shared/ConsentText/ConsentText";
 import { usePromoCode } from "../../utils/promoCodeUtils";
+import { Currency } from "../../domain/payment/payment.interfaces";
 
 export type TaxStatus = "incomplete" | "loading" | "complete" | "error";
 
@@ -44,6 +45,7 @@ export interface BillingViewProps {
   orgID: string;
   vertexEnabled?: boolean;
   checkoutItems: CheckoutItem[];
+  acceptedCurrencies: Currency[];
   savedPaymentMethods: SavedPaymentMethod[];
   selectedBillingInfo: string | BillingInfo;
   wallets?: Wallet[];
@@ -66,6 +68,7 @@ export const BillingView: React.FC<BillingViewProps> = ({
   orgID,
   vertexEnabled,
   checkoutItems,
+  acceptedCurrencies,
   savedPaymentMethods: rawSavedPaymentMethods,
   selectedBillingInfo,
   wallets,
@@ -326,6 +329,7 @@ export const BillingView: React.FC<BillingViewProps> = ({
       <CheckoutDeliveryAndItemCostBreakdown
         checkoutItems={ checkoutItems }
         taxes={ vertexEnabled ? taxes : null }
+        acceptedCurrencies={ acceptedCurrencies }
         validatePersonalDeliveryAddress={ formSubmitAttempted }
         wallets={ wallets }
         wallet={ wallet }

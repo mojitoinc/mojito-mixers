@@ -58,6 +58,9 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
   const isCreditCardPayment = (paymentType === "CreditCard" && cvv) ||
     (paymentInfo && typeof paymentInfo === "object" && paymentInfo.type === "CreditCard");
 
+  const isCryptoPayment = (paymentType === "Crypto") ||
+    (paymentInfo && typeof paymentInfo === "object" && paymentInfo.type === "Crypto");
+
 
   // Minimum wait time:
 
@@ -144,12 +147,17 @@ export const PurchasingView: React.FC<PurchasingViewProps> = ({
   }, redirectURL === null ? null : PAYMENT_CREATION_TIMEOUT_MS, [onPurchaseError]);
 
   useEffect(() => {
-    if (fullPaymentCalledRef.current) return;
+    if (fullPaymentCalledRef.current || isCryptoPayment) return;
 
     fullPaymentCalledRef.current = true;
 
     fullPayment(promoCode.id);
-  }, [fullPayment, promoCode]);
+  }, [isCryptoPayment, fullPayment, promoCode]);
+
+  useTimeout(() => {
+    // TODO: Do we need to call any of the payment mutations for crypto payments as well?
+    onPurchaseSuccess("<PAYMENT PROCESSOR ID>", "<PAYMENT ID>", "");
+  }, isCryptoPayment ? 5000 : null);
 
   useEffect(() => {
     const { paymentStatus, paymentMethodID, processorPaymentID, paymentID, paymentError } = fullPaymentState;

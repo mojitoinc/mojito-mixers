@@ -22,7 +22,7 @@ export const PUIStaticErrorOverlay: React.FC<PUIStaticErrorOverlayProps> = ({
   );
 
   return (
-    <FullScreenOverlay isDialogBlocked centered header={ headerElement }>
+    <FullScreenOverlay container="fullscreen" isDialogBlocked centered header={ headerElement }>
       <ErrorView { ...errorViewProps } />
     </FullScreenOverlay>
   );

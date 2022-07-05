@@ -2,7 +2,7 @@ import { Control, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { boolean, object, string, ValidationError } from "yup";
 import { ObjectShape } from "yup/lib/object";
-import { Grid, Box, Typography } from "@mui/material";
+import { Grid, Box, Typography, Link } from "@mui/material";
 import BookIcon from "@mui/icons-material/Book";
 import React, { useCallback, useMemo } from "react";
 import { getCardNumberError } from "react-payment-inputs";
@@ -46,6 +46,8 @@ import { CheckoutItem } from "../domain/product/product.interfaces";
 import { useLimits } from "../hooks/useLimits";
 import { Market } from "../components/public/CheckoutOverlay/CheckoutOverlay";
 import { ConnectedWalletItem } from "../components/payments/ConnectedWalletItem/ConnectedWalletItem";
+import { InfoBox } from "../components/payments/InfoBox/InfoBox";
+import { ErrorBox } from "../components/payments/ErrorBox/ErrorBox";
 
 interface PaymentTypeFormProps {
   control: Control<PaymentMethod & { consent: boolean }>;
@@ -293,11 +295,31 @@ const PAYMENT_TYPE_FORM_DATA: Record<PaymentType, PaymentTypeFormData> = {
     schemaShape: () => ({}),
     fields: ({ control, consentType }) => (
       <>
+        { /* TODO: Pass address, status and balance as props: */ }
         <ConnectedWalletItem
           boxProps={{ sx: { mt: 1.5, mb: consentType === "checkbox" ? 1 : 0 } }}
           address="0xb794f5ea0ba39494ce839613fffba74279579268"
           status="connected"
           balance={{ WETH: 1.2, ETH: 1.2 }} />
+
+        { !!window && (
+          <ErrorBox sx={{ mt: 2, mb: consentType === "checkbox" ? 1 : 0 }}>
+            <Typography>
+              Your connected wallet currently does not have enough [WETH|WMATIC] to complete your purchase.{ " " }
+              <Link href="https://support.opensea.io/hc/en-us/articles/360063498293-What-s-WETH-How-do-I-get-it-/" target="_blank" rel="noopener noreferrer">
+                How do I get [WETH|WMATIC]?
+              </Link>
+            </Typography>
+          </ErrorBox>
+        ) }
+
+        { !!window && (
+          <InfoBox sx={{ mt: 2, mb: consentType === "checkbox" ? 1 : 0 }}>
+            <Typography>
+              Only Cryptocurrency is accepted for secondary sales
+            </Typography>
+          </InfoBox>
+        ) }
 
         { consentType === "checkbox" && (
           <ControlledCheckbox
@@ -450,12 +472,12 @@ export const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
       if (selectedPaymentMethod === "ACH") {
         onPlaidLinkClicked();
       } else {
-        throw new Error("Crypto payments from wallet not implemented yet.");
+        // throw new Error("Crypto payments from wallet not implemented yet.");
 
         // TODO: Make payment with wallet.
 
         // Move to the next screen:
-        // submitForm();
+        submitForm();
       }
     } else {
       submitForm(e);
