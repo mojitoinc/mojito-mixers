@@ -357,6 +357,10 @@ export function createComponentsTheme({ typography, palette, spacing, breakpoint
           // overflowY: "scroll",
         },
 
+        paperFullWidth: {
+          height: "calc(100% - 64px)",
+        },
+
         paperFullScreen: {
           // Keep the scroll always visible in the full-screen version:
           overflowY: "scroll",
@@ -367,7 +371,7 @@ export function createComponentsTheme({ typography, palette, spacing, breakpoint
     MuiDialogContent: {
       styleOverrides: {
         root: {
-          minHeight: "100vh",
+          minHeight: "calc(100vh - 64px)",
           display: "flex",
           flexDirection: "column",
           boxSizing: "border-box",

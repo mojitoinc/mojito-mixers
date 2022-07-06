@@ -6,6 +6,7 @@ import { CheckoutComponent } from "../components/checkout-component/CheckoutComp
 import { PaymentType, PUICheckoutComponentProps, THREEDS_FLOW_SEARCH_PARAM_ERROR_KEY, THREEDS_FLOW_SEARCH_PARAM_SUCCESS_KEY } from "../lib";
 import { useOpenCloseCheckoutModal } from "../lib/components/public/useOpenCloseCheckoutModal/useOpenCloseCheckoutModal";
 import { IS_BROWSER } from "../lib/domain/build/build.constants";
+import { CryptoCurrency } from "../lib/domain/payment/payment.interfaces";
 import { useMeQuery } from "../services/graphql/generated";
 import { PLAYGROUND_PARAGRAPHS_ARRAY, PLAYGROUND_MOCKED_AUCTION_LOT, PLAYGROUND_MOCKED_BUY_NOW_LOT } from "../utils/playground/playground.constants";
 import { PlaygroundFormData } from "../utils/playground/playground.interfaces";
@@ -25,13 +26,22 @@ const DEFAULT_FORM_VALUES: PlaygroundFormData = {
 
   // Payment:
   paymentCC: true,
-  paymentACH: true,
-  paymentWire: true,
-  paymentCrypto: true,
+  paymentACH: false,
+  paymentWire: false,
+  paymentCrypto: false,
   paymentCoinbase: true,
 
+  // Currencies:
+  displayCurrency: "USD",
+  cryptoWETH: false,
+  cryptoWMATIC: false,
+
   // Flow:
+  marketType: "primary",
   multiSigEnabled: true,
+
+  // UI:
+  container: "fullscreen",
 };
 
 const FORM_VALUES_KEY = "FORM_VALUES_KEY";
@@ -79,6 +89,13 @@ const HomePage: React.FC = () => {
     multiSigEnabled: formValues.multiSigEnabled,
 
     // Personalization:
+    container: formValues.container,
+    marketType: formValues.marketType,
+    displayCurrency: formValues.displayCurrency,
+    cryptoCurrencies: [
+      formValues.cryptoWETH ? "WETH" : "",
+      formValues.cryptoWMATIC ? "WMATIC" : "",
+    ].filter(Boolean) as CryptoCurrency[],
     acceptedPaymentTypes: [
       formValues.paymentCC ? "CreditCard" : "",
       formValues.paymentACH ? "ACH" : "",
@@ -120,8 +137,17 @@ const HomePage: React.FC = () => {
       paymentCrypto: INITIAL_FORM_VALUES.paymentCrypto ?? DEFAULT_FORM_VALUES.paymentCrypto,
       paymentCoinbase: INITIAL_FORM_VALUES.paymentCoinbase ?? DEFAULT_FORM_VALUES.paymentCoinbase,
 
+      // Currencies:
+      displayCurrency: INITIAL_FORM_VALUES.displayCurrency ?? DEFAULT_FORM_VALUES.displayCurrency,
+      cryptoWETH: INITIAL_FORM_VALUES.cryptoWETH ?? DEFAULT_FORM_VALUES.cryptoWETH,
+      cryptoWMATIC: INITIAL_FORM_VALUES.cryptoWMATIC ?? DEFAULT_FORM_VALUES.cryptoWMATIC,
+
       // Flow:
+      marketType: INITIAL_FORM_VALUES.marketType ?? DEFAULT_FORM_VALUES.marketType,
       multiSigEnabled: INITIAL_FORM_VALUES.multiSigEnabled ?? DEFAULT_FORM_VALUES.multiSigEnabled,
+
+      // UI:
+      container: INITIAL_FORM_VALUES.container ?? DEFAULT_FORM_VALUES.container,
     });
   }, []);
 
@@ -278,10 +304,62 @@ const HomePage: React.FC = () => {
 
       <Box sx={{ my: 4 }}>
         <FormControl component="fieldset">
+          <FormLabel component="legend">Display Currency</FormLabel>
+
+          <RadioGroup
+            name="displayCurrency"
+            value={ formValues.displayCurrency }
+            onChange={ handleChange }>
+            <FormControlLabel value="USD" label="USD" control={ <Radio /> } />
+            <FormControlLabel value="EUR" label="EUR" control={ <Radio /> } />
+          </RadioGroup>
+        </FormControl>
+      </Box>
+
+      <Box sx={{ my: 4 }}>
+        <FormControl component="fieldset">
+          <FormLabel component="legend">Crypto Currencies</FormLabel>
+          <FormGroup>
+            <FormControlLabel control={ <Checkbox checked={ formValues.cryptoWETH } value="" onChange={ handleChange } name="cryptoWETH" /> } label="WETH" />
+            <FormControlLabel control={ <Checkbox checked={ formValues.cryptoWMATIC } value="" onChange={ handleChange } name="cryptoWMATIC" /> } label="WMATIC" />
+          </FormGroup>
+        </FormControl>
+      </Box>
+
+      <Box sx={{ my: 4 }}>
+        <FormControl component="fieldset">
+          <FormLabel component="legend">Market Type</FormLabel>
+
+          <RadioGroup
+            name="marketType"
+            value={ formValues.marketType }
+            onChange={ handleChange }>
+            <FormControlLabel value="primary" label="Primary" control={ <Radio /> } />
+            <FormControlLabel value="secondary" label="Secondary" control={ <Radio /> } />
+          </RadioGroup>
+        </FormControl>
+      </Box>
+
+      <Box sx={{ my: 4 }}>
+        <FormControl component="fieldset">
           <FormLabel component="legend">Multisig Wallets</FormLabel>
           <FormGroup>
             <FormControlLabel control={ <Checkbox checked={ formValues.multiSigEnabled } value="" onChange={ handleChange } name="multiSigEnabled" /> } label="Multisig Wallets" />
           </FormGroup>
+        </FormControl>
+      </Box>
+
+      <Box sx={{ my: 4 }}>
+        <FormControl component="fieldset">
+          <FormLabel component="legend">Container</FormLabel>
+
+          <RadioGroup
+            name="container"
+            value={ formValues.container }
+            onChange={ handleChange }>
+            <FormControlLabel value="fullscreen" label="Full Screen" control={ <Radio /> } />
+            <FormControlLabel value="modal" label="Modal" control={ <Radio /> } />
+          </RadioGroup>
         </FormControl>
       </Box>
 

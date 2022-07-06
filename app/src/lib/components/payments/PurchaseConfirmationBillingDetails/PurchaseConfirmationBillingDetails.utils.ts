@@ -1,5 +1,5 @@
 import { SavedPaymentMethod } from "../../../domain/circle/circle.interfaces";
-import { AchAccount, CreditCard, CryptoAddress, PaymentMethod, PaymentType } from "../../../domain/payment/payment.interfaces";
+import { AchAccount, CoinbaseAddress, CreditCard, CryptoAddress, PaymentMethod, PaymentType } from "../../../domain/payment/payment.interfaces";
 import { ACH_MASK_PREFIX, CREDIT_CARD_MASK_PREFIX, GENERIC_MASK } from "../../../domain/payment/payment.constants";
 
 export interface GetFormattedPaymentMethodReturn {
@@ -41,7 +41,10 @@ export function getFormattedPaymentMethod(paymentMethodInfo: PaymentMethod | Sav
       paymentType = "ACH";
       displayValue = (paymentMethodInfo as AchAccount).accountId;
     } else if ((paymentMethodInfo as CryptoAddress).type === "Crypto") {
+      // TODO: Here it should say "WETH Payment" instead of "Crypto Payment":
       paymentType = "Crypto";
+    } else if ((paymentMethodInfo as CoinbaseAddress).type === "Coinbase") {
+      paymentType = "Coinbase";
     }
   }
 

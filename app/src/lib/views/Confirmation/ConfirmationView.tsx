@@ -94,9 +94,7 @@ export const ConfirmationView: React.FC<ConfirmationViewProps> = ({
       <Stack sx={{ display: "flex", flex: 1 }}>
         <Divider sx={{ display: { xs: "block", md: "none" } }} />
 
-        <PurchaseConfirmationItemDetails
-          checkoutItems={ checkoutItems }
-          displayCurrency={ displayCurrency } />
+        <PurchaseConfirmationItemDetails checkoutItems={ checkoutItems } />
 
         <CheckoutModalFooter
           variant="toMarketplace"

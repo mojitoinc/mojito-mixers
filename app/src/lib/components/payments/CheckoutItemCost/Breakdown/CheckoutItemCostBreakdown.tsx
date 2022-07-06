@@ -7,6 +7,7 @@ import { CheckoutItemList } from "../List/CheckoutItemList";
 import { TaxesState } from "../../../../views/Billing/BillingView";
 import { InfoBox } from "../../InfoBox/InfoBox";
 import { FiatCurrency, CryptoCurrency } from "../../../../domain/payment/payment.interfaces";
+import { joinSentence } from "../../../../utils/formatUtils";
 
 export type CheckoutItemCostBreakdownWarningVariant = "box" | "link";
 
@@ -26,19 +27,22 @@ export const CheckoutItemCostBreakdown: React.FC<CheckoutItemCostBreakdownProps>
   onlyCryptoWarningVariant,
 }) => {
   const firstCheckoutItem = checkoutItems[0];
+  const cryptoCurrenciesSentence = cryptoCurrencies ? joinSentence(cryptoCurrencies, "or") : "";
   const { total, fees } = useCheckoutItemsCostTotal(checkoutItems);
-
-  // TODO: Join sentence for the cryptos.
 
   return (
     <Stack sx={{ display: "flex", flex: 1 }}>
-      <CheckoutItemList checkoutItems={ checkoutItems } withSeparators />
+      <CheckoutItemList
+        checkoutItems={ checkoutItems }
+        withSeparators
+        displayCurrency={ displayCurrency }
+        cryptoCurrencies={ cryptoCurrencies } />
 
       { onlyCryptoWarningVariant && (
         onlyCryptoWarningVariant === "box" ? (
           <InfoBox sx={{ mt: 3.75 }}>
             <Typography>
-              You need to pay with <strong>WETH or WMATIC</strong> on this marketplace.{ " " }
+              You need to pay with <strong>{ cryptoCurrenciesSentence }</strong> on this marketplace.{ " " }
               <Link href="https://support.opensea.io/hc/en-us/articles/360063498293-What-s-WETH-How-do-I-get-it-/" target="_blank" rel="noopener noreferrer">
                 Click here
               </Link>{ " " }

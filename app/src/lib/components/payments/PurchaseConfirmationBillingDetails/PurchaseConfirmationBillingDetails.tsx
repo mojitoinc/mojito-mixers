@@ -108,6 +108,7 @@ export const PurchaseConfirmationBillingDetails: React.FC<PurchaseConfirmationBi
       </Stack>
 
       <CheckoutItemCostPurchase
+        paymentType={ paymentType }
         checkoutItems={ checkoutItems }
         displayCurrency={ displayCurrency }
         cryptoCurrencies={ cryptoCurrencies }

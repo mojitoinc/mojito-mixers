@@ -3,12 +3,14 @@ import { Box, Typography, Grid, Avatar, Divider, Stack } from "@mui/material";
 import { SxProps, Theme } from "@mui/material/styles";
 import { Number } from "../../../shared/Number/Number";
 import { CheckoutItem } from "../../../../domain/product/product.interfaces";
-import { FiatCurrency } from "../../../../domain/payment/payment.interfaces";
+import { FiatCurrency, CryptoCurrency } from "../../../../domain/payment/payment.interfaces";
+import { Prices } from "../../../shared/Prices/Prices";
 
 interface CheckoutItemListProps {
   sx?: SxProps<Theme>;
   checkoutItems: CheckoutItem[];
   displayCurrency?: FiatCurrency;
+  cryptoCurrencies?: CryptoCurrency[];
   withSeparators?: boolean;
 }
 
@@ -16,6 +18,7 @@ export const CheckoutItemList: React.FC<CheckoutItemListProps> = ({
   sx = {},
   checkoutItems,
   displayCurrency,
+  cryptoCurrencies,
   withSeparators = false,
 }) => {
   return (
@@ -81,7 +84,11 @@ export const CheckoutItemList: React.FC<CheckoutItemListProps> = ({
                   <Typography>Quantity: <Box component="span" sx={{ fontWeight: 500 }}>{ units }</Box></Typography>
                   { displayCurrency && (
                     <Typography>
-                      <Number suffix={ ` ${ displayCurrency }` }>{ unitPrice }</Number>
+                      <Prices
+                        price={ unitPrice }
+                        displayCurrency={ displayCurrency }
+                        cryptoPrice={ 42 }
+                        cryptoCurrency={ cryptoCurrencies?.[0] } />
                     </Typography>
                   ) }
                 </Box>

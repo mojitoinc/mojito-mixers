@@ -42,3 +42,13 @@ export function formatTaxRate(taxRate: number): string {
 export function fullTrim(str: string): string {
   return str.replace(/\s+/g, " ").trim();
 }
+
+/**
+ * Join multiple words with a connector.
+ */
+export function joinSentence(strs: string[], connector = "and"): string {
+  const last = strs.slice(-1)[0];
+  const other = strs.slice(0, -1);
+
+  return other.length === 0 ? last : `${ other.join(", ") } ${ connector } ${ last }`;
+}
