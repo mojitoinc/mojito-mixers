@@ -362,6 +362,18 @@ Defined in [`app/src/lib/domain/errors/errors.constants.ts`](https://github.com/
 
   `action = close`
 
+- `ERROR_PURCHASE_TOTAL_SOLD_OUT = ` Sold out.
+
+  `action = close`
+
+- `ERROR_PURCHASE_PARTIAL_SOLD_OUT = ` Only $units available.
+
+  `action = close`
+
+- `ERROR_PURCHASE_NOT_ALLOWED = ` You don't have access to this sale.
+
+  `action = close`
+
 - `ERROR_PURCHASE_SELECTED_PAYMENT_METHOD = ` Could not find the selected payment method.
 
   `action = reset`

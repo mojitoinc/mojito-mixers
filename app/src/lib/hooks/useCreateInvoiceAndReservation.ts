@@ -1,7 +1,7 @@
 import { useCallback, useState } from "react";
 import { ApolloError } from "@apollo/client";
 import { CheckoutModalError } from "../components/public/CheckoutOverlay/CheckoutOverlay.hooks";
-import { ERROR_PURCHASE_CREATING_INVOICE, ERROR_PURCHASE_LOADING_ITEMS, ERROR_PURCHASE_NO_ITEMS, ERROR_PURCHASE_NO_UNITS } from "../domain/errors/errors.constants";
+import { ERROR_PURCHASE_CREATING_INVOICE, ERROR_PURCHASE_LOADING_ITEMS, ERROR_PURCHASE_NOT_ALLOWED, ERROR_PURCHASE_NO_ITEMS, ERROR_PURCHASE_NO_UNITS, ERROR_PURCHASE_PARTIAL_SOLD_OUT, ERROR_PURCHASE_TOTAL_SOLD_OUT } from "../domain/errors/errors.constants";
 import { CheckoutItem } from "../domain/product/product.interfaces";
 import { useCreateAuctionInvoiceMutation, useReserveBuyNowLotMutation } from "../queries/graphqlGenerated";
 
@@ -106,6 +106,7 @@ export function useCreateInvoiceAndReservation({
         if (debug) console.log("    🟢 reserveBuyNowLot result", reserveBuyNowLotResult);
 
         invoiceID = reserveBuyNowLotResult.data?.reserveMarketplaceBuyNowLot?.invoice?.invoiceID;
+
         reserveBuyNowLotResult.data?.reserveMarketplaceBuyNowLot?.invoice?.items.forEach((item) => {
           if (item) {
             invoiceItemIDs.push(item.invoiceItemID);
@@ -139,6 +140,27 @@ export function useCreateInvoiceAndReservation({
     }
 
     if (!invoiceID) {
+      const message = mutationError?.message || "";
+
+      if (message.includes("total available units: ")) {
+        const availableUnitsMatch = message.match(/units: (\d+)/);
+        const availableUnits = availableUnitsMatch ? (parseInt(availableUnitsMatch[1], 10) || 0) : 0;
+
+        if (availableUnits) {
+          setError(ERROR_PURCHASE_PARTIAL_SOLD_OUT(mutationError, { availableUnits }));
+        } else {
+          setError(ERROR_PURCHASE_TOTAL_SOLD_OUT(mutationError));
+        }
+
+        return;
+      }
+
+      if (message.includes("user is not on the allow list")) {
+        setError(ERROR_PURCHASE_NOT_ALLOWED(mutationError));
+
+        return;
+      }
+
       setError(ERROR_PURCHASE_CREATING_INVOICE(mutationError));
 
       return;
