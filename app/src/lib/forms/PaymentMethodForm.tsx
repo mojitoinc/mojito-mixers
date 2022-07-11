@@ -295,7 +295,6 @@ const PAYMENT_TYPE_FORM_DATA: Record<PaymentType, PaymentTypeFormData> = {
     schemaShape: () => ({}),
     fields: ({ control, consentType }) => (
       <>
-        { /* TODO: Pass address, status and balance as props: */ }
         <ConnectedWalletItem
           boxProps={{ sx: { mt: 1.5, mb: consentType === "checkbox" ? 1 : 0 } }}
           address="0xb794f5ea0ba39494ce839613fffba74279579268"
