@@ -3,9 +3,10 @@ import React, { useCallback, useEffect, useState } from "react";
 import { SxProps, Theme } from "@mui/material/styles";
 import { formatTaxRate } from "../../../../utils/formatUtils";
 import { TaxesState } from "../../../../views/Billing/BillingView";
-import { Number } from "../../../shared/Number/Number";
 import { TextField } from "../../../shared/TextField/TextField";
 import { usePromoCode } from "../../../../utils/promoCodeUtils";
+import { FiatCurrency, CryptoCurrency } from "../../../../domain/payment/payment.interfaces";
+import { Prices } from "../../../shared/Prices/Prices";
 
 const TAX_RATE_PLACEHOLDER_SX: SxProps<Theme> = {
   background: theme => theme.palette.grey[100],
@@ -42,6 +43,8 @@ export interface CheckoutItemCostTotalProps {
   total: number;
   fees: number | null;
   taxes: null | TaxesState;
+  displayCurrency: FiatCurrency;
+  cryptoCurrencies?: CryptoCurrency[];
   withDetails?: boolean;
 }
 
@@ -49,6 +52,8 @@ export const CheckoutItemCostTotal: React.FC<CheckoutItemCostTotalProps> = ({
   total,
   fees,
   taxes,
+  displayCurrency,
+  cryptoCurrencies,
   withDetails = false,
 }) => {
   const { promoCode, onChangePromoCode, onApply, editable, error, invoiceItemIDs } = usePromoCode();
@@ -64,11 +69,20 @@ export const CheckoutItemCostTotal: React.FC<CheckoutItemCostTotalProps> = ({
   }, [promoCode, setDiscountTotal, total]);
 
   const feesValue = fees || 0;
+  const cryptoCurrency = cryptoCurrencies ? cryptoCurrencies?.[0] : "";
 
   let taxRowElement: React.ReactNode = null;
 
   let totalElement: React.ReactNode = (
-    <Tooltip title="Enter a valid address to calculate the total"><span><Number suffix=" USD">{ discountTotal + feesValue }</Number></span></Tooltip>
+    <Tooltip title="Enter a valid address to calculate the total">
+      <span>
+        <Prices
+          price={ discountTotal + feesValue }
+          displayCurrency={ displayCurrency }
+          cryptoPrice={ 42 }
+          cryptoCurrency={ cryptoCurrency } />
+      </span>
+    </Tooltip>
   );
 
   if (taxes) {
@@ -83,16 +97,52 @@ export const CheckoutItemCostTotal: React.FC<CheckoutItemCostTotalProps> = ({
 
     if (status === "loading") {
       taxRateElement = <Tooltip title="Calculating taxes..."><span>(<Box component="span" sx={ TAX_RATE_PLACEHOLDER_SX }>00.00</Box> %)</span></Tooltip>;
-      taxAmountElement = <Tooltip title="Calculating taxes..."><span><Box component="span" sx={ TAX_AMOUNT_PLACEHOLDER_SX }>{ `${ (discountTotal + feesValue) * 0.10 | 0 }`.replace(/./, "0") }.00</Box> USD</span></Tooltip>;
-      totalElement = <Tooltip title="Calculating total..."><span><Box component="span" sx={ TOTAL_PLACEHOLDER_SX }>{ `${ (discountTotal + feesValue) * 1.10 | 0 }`.replace(/./, "0") }.00</Box> USD</span></Tooltip>;
+      taxAmountElement = <Tooltip title="Calculating taxes..."><span><Box component="span" sx={ TAX_AMOUNT_PLACEHOLDER_SX }>{ `${ (discountTotal + feesValue) * 0.10 | 0 }`.replace(/./, "0") }.00</Box> { displayCurrency }</span></Tooltip>;
+      totalElement = <Tooltip title="Calculating total..."><span><Box component="span" sx={ TOTAL_PLACEHOLDER_SX }>{ `${ (discountTotal + feesValue) * 1.10 | 0 }`.replace(/./, "0") }.00</Box> { displayCurrency }</span></Tooltip>;
     } else if (status === "complete" && taxAmount !== undefined) {
       taxRateElement = `(${ formatTaxRate(taxRate) })`;
-      taxAmountElement = <Number suffix=" USD">{ taxAmount }</Number>;
-      totalElement = <Number suffix=" USD">{ discountTotal + feesValue + taxAmount }</Number>;
+
+      taxAmountElement = (
+        <Prices
+          price={ taxAmount }
+          displayCurrency={ displayCurrency }
+          cryptoPrice={ 42 }
+          cryptoCurrency={ cryptoCurrency } />
+      );
+
+      totalElement = (
+        <Prices
+          price={ discountTotal + feesValue + taxAmount }
+          displayCurrency={ displayCurrency }
+          cryptoPrice={ 42 }
+          cryptoCurrency={ cryptoCurrency } />
+      );
     } else {
       taxRateElement = null;
-      taxAmountElement = <Tooltip title="Enter a valid address to calculate the taxes"><span><Number suffix=" USD">{ 0 }</Number></span></Tooltip>;
-      totalElement = <Tooltip title="Enter a valid address to calculate the total"><span><Number suffix=" USD">{ discountTotal + feesValue }</Number></span></Tooltip>;
+
+      taxAmountElement = (
+        <Tooltip title="Enter a valid address to calculate the taxes">
+          <span>
+            <Prices
+              price={ 0 }
+              displayCurrency={ displayCurrency }
+              cryptoPrice={ 0 }
+              cryptoCurrency={ cryptoCurrency } />
+          </span>
+        </Tooltip>
+      );
+
+      totalElement = (
+        <Tooltip title="Enter a valid address to calculate the total">
+          <span>
+            <Prices
+              price={ discountTotal + feesValue }
+              displayCurrency={ displayCurrency }
+              cryptoPrice={ 42 }
+              cryptoCurrency={ cryptoCurrency } />
+          </span>
+        </Tooltip>
+      );
     }
 
     taxRowElement = (
@@ -140,20 +190,38 @@ export const CheckoutItemCostTotal: React.FC<CheckoutItemCostTotalProps> = ({
 
           <Box sx={ ROW_SX }>
             <Typography>Subtotal</Typography>
-            <Typography><Number suffix=" USD">{ total }</Number></Typography>
+            <Typography>
+              <Prices
+                price={ total }
+                displayCurrency={ displayCurrency }
+                cryptoPrice={ 42 }
+                cryptoCurrency={ cryptoCurrency } />
+            </Typography>
           </Box>
 
           { fees === null ? null : (
             <Box sx={ ROW_SX }>
               <Typography sx={ theme => ({ color: theme.palette.grey["500"] }) }>Fees</Typography>
-              <Typography><Number suffix=" USD">{ fees }</Number></Typography>
+              <Typography>
+                <Prices
+                  price={ fees }
+                  displayCurrency={ displayCurrency }
+                  cryptoPrice={ 42 }
+                  cryptoCurrency={ cryptoCurrency } />
+              </Typography>
             </Box>
           ) }
 
           { discount !== null && (
             <Box sx={ ROW_SX }>
               <Typography sx={ theme => ({ color: theme.palette.grey["500"] }) }>Discount</Typography>
-              <Typography><Number suffix=" USD">{ discount }</Number></Typography>
+              <Typography>
+                <Prices
+                  price={ discount }
+                  displayCurrency={ displayCurrency }
+                  cryptoPrice={ 42 }
+                  cryptoCurrency={ cryptoCurrency } />
+              </Typography>
             </Box>
           ) }
 
@@ -171,7 +239,7 @@ export const CheckoutItemCostTotal: React.FC<CheckoutItemCostTotalProps> = ({
         }}>
 
         <Typography sx={{ fontWeight: "500" }}>
-          { withDetails ? "Total Amount (USD)" : "Total Amount Paid (USD)" }
+          { withDetails ? `Total Amount (${ displayCurrency })` : `Total Amount Paid (${ displayCurrency })` }
         </Typography>
 
         <Typography

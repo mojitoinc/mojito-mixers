@@ -2,14 +2,18 @@ import React from "react";
 import { Divider, Stack } from "@mui/material";
 
 import { DeliveryWalletSelector } from "../DeliveryWallet/DeliveryWalletSelector/DeliveryWalletSelector";
-import { CheckoutItemCostBreakdown } from "../CheckoutItemCost/Breakdown/CheckoutItemCostBreakdown";
+import { CheckoutItemCostBreakdown, CheckoutItemCostBreakdownWarningVariant } from "../CheckoutItemCost/Breakdown/CheckoutItemCostBreakdown";
 import { CheckoutItem } from "../../../domain/product/product.interfaces";
 import { TaxesState } from "../../../views/Billing/BillingView";
 import { Wallet } from "../../../domain/wallet/wallet.interfaces";
+import { FiatCurrency, CryptoCurrency } from "../../../domain/payment/payment.interfaces";
 
 interface CheckoutDeliveryAndItemCostBreakdownProps {
   checkoutItems: CheckoutItem[];
   taxes: null | TaxesState;
+  displayCurrency: FiatCurrency;
+  cryptoCurrencies: CryptoCurrency[];
+  onlyCryptoWarningVariant?: CheckoutItemCostBreakdownWarningVariant;
   validatePersonalDeliveryAddress: boolean;
   wallets?: Wallet[];
   wallet: null | string | Wallet;
@@ -20,6 +24,9 @@ interface CheckoutDeliveryAndItemCostBreakdownProps {
 export const CheckoutDeliveryAndItemCostBreakdown: React.FC<CheckoutDeliveryAndItemCostBreakdownProps> = ({
   checkoutItems,
   taxes,
+  displayCurrency,
+  cryptoCurrencies,
+  onlyCryptoWarningVariant,
   validatePersonalDeliveryAddress,
   wallets,
   wallet,
@@ -36,6 +43,11 @@ export const CheckoutDeliveryAndItemCostBreakdown: React.FC<CheckoutDeliveryAndI
 
     <Divider sx={{ my: 3.75 }} />
 
-    <CheckoutItemCostBreakdown checkoutItems={ checkoutItems } taxes={ taxes } />
+    <CheckoutItemCostBreakdown
+      checkoutItems={ checkoutItems }
+      taxes={ taxes }
+      displayCurrency={ displayCurrency }
+      cryptoCurrencies={ cryptoCurrencies }
+      onlyCryptoWarningVariant={ onlyCryptoWarningVariant } />
   </Stack>
 );

@@ -16,6 +16,8 @@ import { useCheckoutItemsCostTotal } from "../../hooks/useCheckoutItemCostTotal"
 import { Wallet } from "../../domain/wallet/wallet.interfaces";
 import { ConsentType } from "../../components/shared/ConsentText/ConsentText";
 import { usePromoCode } from "../../utils/promoCodeUtils";
+import { FiatCurrency, CryptoCurrency } from "../../domain/payment/payment.interfaces";
+import { Market } from "../../components/public/CheckoutOverlay/CheckoutOverlay";
 
 export type TaxStatus = "incomplete" | "loading" | "complete" | "error";
 
@@ -44,6 +46,9 @@ export interface BillingViewProps {
   orgID: string;
   vertexEnabled?: boolean;
   checkoutItems: CheckoutItem[];
+  marketType: Market;
+  displayCurrency: FiatCurrency;
+  cryptoCurrencies: CryptoCurrency[];
   savedPaymentMethods: SavedPaymentMethod[];
   selectedBillingInfo: string | BillingInfo;
   wallets?: Wallet[];
@@ -66,6 +71,9 @@ export const BillingView: React.FC<BillingViewProps> = ({
   orgID,
   vertexEnabled,
   checkoutItems,
+  marketType,
+  displayCurrency,
+  cryptoCurrencies,
   savedPaymentMethods: rawSavedPaymentMethods,
   selectedBillingInfo,
   wallets,
@@ -326,6 +334,9 @@ export const BillingView: React.FC<BillingViewProps> = ({
       <CheckoutDeliveryAndItemCostBreakdown
         checkoutItems={ checkoutItems }
         taxes={ vertexEnabled ? taxes : null }
+        displayCurrency={ displayCurrency }
+        cryptoCurrencies={ cryptoCurrencies }
+        onlyCryptoWarningVariant={ marketType === "secondary" ? "box" : undefined }
         validatePersonalDeliveryAddress={ formSubmitAttempted }
         wallets={ wallets }
         wallet={ wallet }

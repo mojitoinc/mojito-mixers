@@ -96,3 +96,34 @@ export const ReadOnlyWalletAddress: React.FC<TextFieldProps> = styled(props => (
     },
   },
 }));
+
+export const ReadOnlyHashField: React.FC<TextFieldProps> = styled(props => (
+  <TextField variant="standard" disabled { ...props } />
+))(({ theme: { palette, typography } }) => ({
+  "& .MuiInputLabel-root": {
+    "&.Mui-disabled": {
+      ...typography.body2,
+      fontSize: "16px", // 12px accounting for 0.75 scale.
+      lineHeight: "24px", // 18px accounting for 0.75 scale.
+      color: palette.text.primary,
+    },
+  },
+  "& .MuiInputBase-root": {
+    "&.Mui-disabled": {
+      background: palette.grey[50],
+      padding: 0,
+      height: "30px",
+      borderRadius: SM_BORDER_RADIUS,
+      marginTop: 0,
+    },
+  },
+  "& .MuiInputBase-input": {
+    "&.Mui-disabled": {
+      ...typography.body1,
+      color: palette.text.primary,
+      WebkitTextFillColor: palette.text.primary,
+      fontSize: "12px",
+      cursor: "default",
+    },
+  },
+}));

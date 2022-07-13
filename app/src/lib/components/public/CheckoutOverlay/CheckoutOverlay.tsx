@@ -4,7 +4,7 @@ import { Theme, SxProps } from "@mui/material/styles";
 import { ApolloError } from "@apollo/client";
 import { savedPaymentMethodToBillingInfo, transformRawSavedPaymentMethods } from "../../../domain/circle/circle.utils";
 import { UserFormat } from "../../../domain/auth/authentication.interfaces";
-import { PaymentMethod, PaymentType } from "../../../domain/payment/payment.interfaces";
+import { PaymentType, PaymentMethod, FiatCurrency, CryptoCurrency } from "../../../domain/payment/payment.interfaces";
 import { CheckoutEventData, CheckoutEventType } from "../../../domain/events/events.interfaces";
 import { CheckoutItemInfo } from "../../../domain/product/product.interfaces";
 import { BillingInfo } from "../../../forms/BillingInfoForm";
@@ -21,7 +21,7 @@ import { continuePlaidOAuthFlow, PlaidFlow } from "../../../hooks/usePlaid";
 import { ConsentType } from "../../shared/ConsentText/ConsentText";
 import { CheckoutModalError, CheckoutModalStepIndex, useCheckoutModalState } from "./CheckoutOverlay.hooks";
 import { ERROR_LOADING_INVOICE, ERROR_LOADING_PAYMENT_METHODS, ERROR_LOADING_USER } from "../../../domain/errors/errors.constants";
-import { FullScreenOverlay } from "../../shared/FullScreenOverlay/FullScreenOverlay";
+import { Container, FullScreenOverlay } from "../../shared/FullScreenOverlay/FullScreenOverlay";
 import { ProvidersInjectorProps, withProviders } from "../../shared/ProvidersInjector/ProvidersInjector";
 import { transformCheckoutItemsFromInvoice } from "../../../domain/product/product.utils";
 import { useCreateInvoiceAndReservation } from "../../../hooks/useCreateInvoiceAndReservation";
@@ -44,6 +44,8 @@ import { PromoCodeProvider } from "../../../utils/promoCodeUtils";
 import { getLastPaymentMethodID } from "../../../hooks/useFullPayment";
 
 export type LoaderMode = "default" | "success" | "error";
+
+export type Market = "primary" | "secondary";
 
 export interface PUICheckoutOverlayProps {
   // Modal:
@@ -71,7 +73,11 @@ export interface PUICheckoutOverlayProps {
   purchasingMessages?: false | string[];
   successImageSrc?: string;
   errorImageSrc?: string;
+  container?: Container;
   userFormat?: UserFormat;
+  marketType?: Market;
+  displayCurrency?: FiatCurrency;
+  cryptoCurrencies?: CryptoCurrency[];
   acceptedPaymentTypes?: PaymentType[];
   acceptedCreditCardNetworks?: CreditCardNetwork[];
   network?: Network;
@@ -131,7 +137,11 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
   purchasingMessages,
   successImageSrc,
   errorImageSrc,
+  container = "fullscreen",
   userFormat,
+  marketType = "primary",
+  displayCurrency = "USD",
+  cryptoCurrencies = [],
   acceptedPaymentTypes = ["CreditCard"],
   acceptedCreditCardNetworks,
   network,
@@ -846,6 +856,9 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
         invoiceItemIDs={ invoiceAndReservationState.invoiceItemIDs }
         checkoutItems={ checkoutItems }
         taxes={ taxes }
+        marketType={ marketType }
+        displayCurrency={ displayCurrency }
+        cryptoCurrencies={ cryptoCurrencies }
         isAuthenticated={ isAuthenticated }
         guestCheckoutEnabled={ guestCheckoutEnabled }
         onGuestClicked={ goNext }
@@ -863,6 +876,9 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
         wallet={ wallet }
         wallets={ wallets }
         multiSigEnabled={ multiSigEnabled }
+        marketType={ marketType }
+        displayCurrency={ displayCurrency }
+        cryptoCurrencies={ cryptoCurrencies }
         checkoutError={ checkoutError }
         onBillingInfoSelected={ handleBillingInfoSelected }
         onTaxesChange={ setTaxes }
@@ -888,6 +904,9 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
         wallet={ wallet }
         wallets={ wallets }
         multiSigEnabled={ multiSigEnabled }
+        marketType={ marketType }
+        displayCurrency={ displayCurrency }
+        cryptoCurrencies={ cryptoCurrencies }
         checkoutError={ checkoutError }
         onPaymentInfoSelected={ handlePaymentInfoSelected }
         onCvvSelected={ handleCvvSelected }
@@ -929,6 +948,8 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     checkoutStepElement = (
       <ConfirmationView
         checkoutItems={ checkoutItems }
+        displayCurrency={ displayCurrency }
+        cryptoCurrencies={ cryptoCurrencies }
         savedPaymentMethods={ savedPaymentMethods }
         selectedPaymentMethod={ selectedPaymentMethod }
         processorPaymentID={ processorPaymentID }
@@ -964,6 +985,7 @@ export const PUICheckoutOverlay: React.FC<PUICheckoutOverlayProps> = ({
     <DictionaryProvider dictionary={ dictionary }>
       <PromoCodeProvider>
         <FullScreenOverlay
+          container={ container }
           centered={ checkoutStep === "purchasing" || checkoutStep === "error" }
           open={ open }
           onClose={ handleClose }

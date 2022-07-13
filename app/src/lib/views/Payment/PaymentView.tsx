@@ -4,7 +4,7 @@ import { CheckoutDeliveryAndItemCostBreakdown } from "../../components/payments/
 import { CheckoutStepper } from "../../components/payments/CheckoutStepper/CheckoutStepper";
 import { CheckoutItem } from "../../domain/product/product.interfaces";
 import { PaymentMethodForm } from "../../forms/PaymentMethodForm";
-import { PaymentMethod, PaymentType } from "../../domain/payment/payment.interfaces";
+import { PaymentType, PaymentMethod, CryptoCurrency, FiatCurrency } from "../../domain/payment/payment.interfaces";
 import { SavedPaymentDetailsSelector } from "../../components/shared/SavedPaymentDetailsSelector/SavedPaymentDetailsSelector";
 import { BillingInfoItem } from "../../components/payments/BillingInfo/Item/BillingInfoItem";
 import { SavedPaymentMethod } from "../../domain/circle/circle.interfaces";
@@ -17,6 +17,7 @@ import { TaxesState } from "../Billing/BillingView";
 import { Wallet } from "../../domain/wallet/wallet.interfaces";
 import { CreditCardNetwork } from "../../domain/react-payment-inputs/react-payment-inputs.utils";
 import { usePromoCode } from "../../utils/promoCodeUtils";
+import { Market } from "../../components/public/CheckoutOverlay/CheckoutOverlay";
 
 const billingInfoItemBoxProps: BoxProps = { sx: { mt: 2.5 } };
 
@@ -44,6 +45,9 @@ export interface PaymentViewProps {
   onNext: () => void;
   onPrev: () => void;
   onClose: () => void;
+  marketType: Market;
+  displayCurrency: FiatCurrency;
+  cryptoCurrencies: CryptoCurrency[];
   acceptedPaymentTypes: PaymentType[];
   acceptedCreditCardNetworks?: CreditCardNetwork[];
   consentType?: ConsentType;
@@ -70,6 +74,9 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
   onNext,
   onPrev,
   onClose,
+  marketType,
+  displayCurrency,
+  cryptoCurrencies,
   acceptedPaymentTypes,
   acceptedCreditCardNetworks,
   consentType,
@@ -97,9 +104,12 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
     if (typeof selectedBillingInfo !== "string") return [];
 
     return rawSavedPaymentMethods.filter(({ addressId, type }) => {
+      // Saved payment methods don't make sense when using a personal wallet:
+      if (marketType === "secondary") return false;
+
       return addressId === EMPTY_ADDRESS_ID || (addressId === selectedBillingInfo && acceptedPaymentTypes.includes(type));
     });
-  }, [acceptedPaymentTypes, rawSavedPaymentMethods, selectedBillingInfo]);
+  }, [acceptedPaymentTypes, rawSavedPaymentMethods, marketType, selectedBillingInfo]);
 
   const selectedPaymentMethodBillingInfo = useMemo(() => {
     return typeof selectedBillingInfo === "string"
@@ -214,6 +224,7 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
             onClose={ onClose }
             onSubmit={ handleSubmit }
             onAttemptSubmit={ handleFormAttemptSubmit }
+            marketType={ marketType }
             consentType={ consentType }
             checkoutItems={ checkoutItems }
             debug={ debug } />
@@ -225,6 +236,9 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
       <CheckoutDeliveryAndItemCostBreakdown
         checkoutItems={ checkoutItems }
         taxes={ taxes }
+        displayCurrency={ displayCurrency }
+        cryptoCurrencies={ cryptoCurrencies }
+        onlyCryptoWarningVariant={ marketType === "secondary" ? "link" : undefined }
         validatePersonalDeliveryAddress={ formSubmitAttempted }
         wallets={ wallets }
         wallet={ wallet }

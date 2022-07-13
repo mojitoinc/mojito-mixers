@@ -1,4 +1,5 @@
-import { CheckoutItem, CheckoutItemInfo, RawCheckoutItemInfo } from "./product.interfaces";
+import { MarketplaceSaleType } from "../../queries/graphqlGenerated";
+import { CheckoutItem, CheckoutItemInfo, LotType, RawCheckoutItemInfo } from "./product.interfaces";
 
 export function transformCheckoutItemsFromInvoice(
   parentCheckoutItems: CheckoutItemInfo[],
@@ -25,4 +26,14 @@ export function transformCheckoutItemsFromInvoice(
       // TODO: Include taxes too (if present in invoice).
     };
   });
+}
+
+const marketplaceSaleTypeToLotType: Record<MarketplaceSaleType, LotType | ""> = {
+  [MarketplaceSaleType.Auction]: "auction",
+  [MarketplaceSaleType.BuyNow]: "buyNow",
+  [MarketplaceSaleType.Claimable]: "",
+};
+
+export function getLotType(marketplaceSaleType: MarketplaceSaleType): LotType | "" {
+  return marketplaceSaleTypeToLotType[marketplaceSaleType];
 }

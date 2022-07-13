@@ -244,6 +244,10 @@ export function createComponentsTheme({ typography, palette, spacing, breakpoint
           border: 0,
           borderRadius: MD_BORDER_RADIUS,
           transition: transitions.create(["background"]),
+          marginLeft: "0 !important",
+          borderLeft: "0 !important",
+          zIndex: 1,
+          whiteSpace: "nowrap",
 
           [breakpoints.up("sm")]: {
             padding: spacing(0, 2),
@@ -257,9 +261,22 @@ export function createComponentsTheme({ typography, palette, spacing, breakpoint
           "&.Mui-selected": {
             background: palette.paymentUI?.paymentMethodSelectorBackground || palette.primary.main,
             color: palette.primary.contrastText,
+            zIndex: 2,
 
             "&:hover": {
               background: darkenBackground(palette.paymentUI?.paymentMethodSelectorBackground || palette.primary.main),
+            },
+          },
+
+          "&.Mui-disabled": {
+            background: palette.grey["50"],
+            border: 0,
+            cursor: "not-allowed",
+            pointerEvents: "auto",
+            boxShadow: `0 0 0 ${ BORDER_THICKNESS }px ${ palette.grey[100] }`,
+
+            "&:hover": {
+              background: palette.grey["50"],
             },
           },
 
@@ -340,6 +357,10 @@ export function createComponentsTheme({ typography, palette, spacing, breakpoint
           // overflowY: "scroll",
         },
 
+        paperFullWidth: {
+          height: "calc(100% - 64px)",
+        },
+
         paperFullScreen: {
           // Keep the scroll always visible in the full-screen version:
           overflowY: "scroll",
@@ -350,7 +371,7 @@ export function createComponentsTheme({ typography, palette, spacing, breakpoint
     MuiDialogContent: {
       styleOverrides: {
         root: {
-          minHeight: "100vh",
+          minHeight: "calc(100vh - 64px)",
           display: "flex",
           flexDirection: "column",
           boxSizing: "border-box",

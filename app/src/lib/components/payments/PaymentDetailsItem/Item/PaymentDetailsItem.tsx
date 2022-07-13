@@ -18,7 +18,9 @@ const PAYMENT_METHOD_WIRE_ITEM_LABELS: SavedItemLabels = {
 };
 
 const PAYMENT_METHOD_CRYPTO_ITEM_LABELS: SavedItemLabels = {
-  select: "Use Wallet",
+  // It only makes sense to store Coinbase wallets on the backend, as personal wallets would need to be connected again anyway, so no point on storing any
+  // date related to them on the backend or showing them on the "Saved Payment Methods" list:
+  select: "Use Coinbase Wallet",
 };
 
 const PAYMENT_METHOD_ITEM_LABELS: Record<PaymentType, SavedItemLabels> = {
@@ -26,6 +28,7 @@ const PAYMENT_METHOD_ITEM_LABELS: Record<PaymentType, SavedItemLabels> = {
   ACH: PAYMENT_METHOD_ACH_ITEM_LABELS,
   Wire: PAYMENT_METHOD_WIRE_ITEM_LABELS,
   Crypto: PAYMENT_METHOD_CRYPTO_ITEM_LABELS,
+  Coinbase: PAYMENT_METHOD_CRYPTO_ITEM_LABELS,
 };
 
 export type PaymentDetailsItemProps = BaseItemProps<SavedPaymentMethod, SavedItemProps>;

@@ -12,17 +12,34 @@ export interface MappedError {
   errorMessage: string;
 }
 
-export interface ErrorCreator {
-  (error?: ApolloError | Error): CheckoutModalError;
+export interface ErrorCreator<
+  V extends Record<string, string | number> = Record<string, never>
+> {
+  (error?: ApolloError | Error, variables?: V): CheckoutModalError;
   errorMessage: string;
 }
 
-function createError(errorMessage: string, at: CheckoutModalErrorAt): ErrorCreator {
-  const errorCreator: ErrorCreator = (error?: ApolloError | Error): CheckoutModalError => ({
-    error,
-    errorMessage,
-    at,
-  });
+function createError<
+  V extends Record<string, string | number> = Record<string, never>
+>(
+  errorMessage: string,
+  at: CheckoutModalErrorAt,
+): ErrorCreator<V> {
+  const errorCreator: ErrorCreator<V> = (error?: ApolloError | Error, variables?: V): CheckoutModalError => {
+    let finalErrorMessage = errorMessage;
+
+    if (variables) {
+      Object.entries(variables).forEach(([key, value]) => {
+        finalErrorMessage = finalErrorMessage.replace(`$${ key }`, `${ value }`);
+      });
+    }
+
+    return ({
+      error,
+      errorMessage: finalErrorMessage,
+      at,
+    });
+  };
 
   errorCreator.errorMessage = errorMessage;
 
@@ -59,6 +76,12 @@ export const ERROR_PURCHASE_NO_ITEMS = createError("No items to purchase.", "clo
 export const ERROR_PURCHASE_NO_UNITS = createError("No units to purchase.", "close");
 
 export const ERROR_PURCHASE_LOADING_ITEMS = createError("Purchase items could not be loaded.", "close");
+
+export const ERROR_PURCHASE_TOTAL_SOLD_OUT = createError("Sold out.", "close");
+
+export const ERROR_PURCHASE_PARTIAL_SOLD_OUT = createError<{ availableUnits: number }>("Only $availableUnits available.", "close");
+
+export const ERROR_PURCHASE_NOT_ALLOWED = createError("You don't have access to this sale.", "close");
 
 export const ERROR_PURCHASE_CREATING_INVOICE = createError("Invoice could not be created.", "reset");
 

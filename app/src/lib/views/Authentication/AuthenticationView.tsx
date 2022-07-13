@@ -7,10 +7,15 @@ import { CheckoutItem } from "../../domain/product/product.interfaces";
 import { resetStepperProgress } from "../../components/payments/CheckoutStepper/CheckoutStepper";
 import { TaxesState } from "../Billing/BillingView";
 import { usePromoCode } from "../../utils/promoCodeUtils";
+import { FiatCurrency, CryptoCurrency } from "../../domain/payment/payment.interfaces";
+import { Market } from "../../components/public/CheckoutOverlay/CheckoutOverlay";
 
 export interface AuthenticationViewProps {
   checkoutItems: CheckoutItem[];
   taxes: null | TaxesState;
+  marketType: Market;
+  displayCurrency: FiatCurrency;
+  cryptoCurrencies: CryptoCurrency[];
   isAuthenticated?: boolean;
   guestCheckoutEnabled?: boolean;
   onGuestClicked: () => void;
@@ -21,6 +26,9 @@ export interface AuthenticationViewProps {
 export const AuthenticationView: React.FC<AuthenticationViewProps> = ({
   checkoutItems,
   taxes,
+  marketType,
+  displayCurrency,
+  cryptoCurrencies,
   isAuthenticated,
   guestCheckoutEnabled,
   onGuestClicked,
@@ -46,7 +54,12 @@ export const AuthenticationView: React.FC<AuthenticationViewProps> = ({
 
   return (
     <Stack sx={{ mt: 5 }}>
-      <CheckoutItemCostBreakdown checkoutItems={ checkoutItems } taxes={ taxes } />
+      <CheckoutItemCostBreakdown
+        checkoutItems={ checkoutItems }
+        taxes={ taxes }
+        displayCurrency={ displayCurrency }
+        cryptoCurrencies={ cryptoCurrencies }
+        onlyCryptoWarningVariant={ marketType === "secondary" ? "box" : undefined } />
 
       <CheckoutModalFooter
         variant={ isAuthenticated ? "toPayment" : "toGuestCheckout" }

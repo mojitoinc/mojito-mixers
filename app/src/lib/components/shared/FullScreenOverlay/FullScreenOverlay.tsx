@@ -1,6 +1,6 @@
-import { Box, Dialog, DialogContent } from "@mui/material";
+import { Box, Dialog, DialogContent, useMediaQuery } from "@mui/material";
 import React, { useEffect, useRef } from "react";
-import { SxProps, Theme } from "@mui/material/styles";
+import { SxProps, Theme, useTheme } from "@mui/material/styles";
 import { useShakeAnimation } from "../../../utils/animationUtils";
 import { NoTransition } from "../NoTransition/NoTransition";
 
@@ -18,7 +18,10 @@ export interface FullScreenOverlayFunctionalProps {
   isDialogBlocked?: boolean;
 }
 
+export type Container = "fullscreen" | "modal";
+
 interface FullScreenOverlayCommonProps extends FullScreenOverlayFunctionalProps {
+  container: Container;
   contentKey?: string;
   header?: React.ReactElement | null;
 }
@@ -42,6 +45,7 @@ export const FullScreenOverlay: React.FC<FullScreenOverlayProps> = ({
   open = true,
   onClose,
   isDialogBlocked,
+  container,
   contentKey,
   header,
   children,
@@ -70,6 +74,10 @@ export const FullScreenOverlay: React.FC<FullScreenOverlayProps> = ({
     mx: "auto",
   };
 
+  const theme = useTheme();
+  const wideViewport = useMediaQuery(theme.breakpoints.up("sm"));
+  const asModal = container === "modal" && wideViewport;
+
   return (
     <Dialog
       open={ isDialogBlocked ? true : open }
@@ -81,9 +89,9 @@ export const FullScreenOverlay: React.FC<FullScreenOverlayProps> = ({
       PaperProps={{ sx: shakeSx, ref: paperRef }}
       TransitionComponent={ NoTransition }
       // Dialog only:
-      // fullWidth
-      // maxWidth="sm"
-      fullScreen>
+      fullWidth={ asModal }
+      maxWidth={ asModal ? "lg" : undefined }
+      fullScreen={ !asModal }>
 
       <DialogContent sx={ dialogContentSx }>
         <>
