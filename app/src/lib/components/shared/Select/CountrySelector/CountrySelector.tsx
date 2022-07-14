@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect } from "react";
-import { Control, Controller, FieldError } from "react-hook-form";
+import { Control, Controller, FieldError, Path } from "react-hook-form";
 import { SelectChangeEvent } from "@mui/material";
-import { EMPTY_OPTION, Select, SelectOption, SelectProps } from "../Select";
+import { EMPTY_OPTION, isSelectOption, Select, SelectOption, SelectProps } from "../Select";
 import { useCountryOptions } from "../../../../hooks/useCountryOptions";
 
 export interface CountrySelectorProps extends Omit<SelectProps, "value" | "options"> {
@@ -61,32 +61,39 @@ export const CountrySelector: React.FC<CountrySelectorProps> = ({
   );
 };
 
-export type ControlledCountrySelectorProps = Omit<SelectProps, "value" | "options"> & { name: string; control: Control<any>; };
+export type ControlledCountrySelectorProps<TFieldValues = any, TContext = any> = Omit<SelectProps, "value" | "options"> & {
+  name: Path<TFieldValues>;
+  control: Control<TFieldValues, TContext>;
+};
 
-export const ControlledCountrySelector: React.FC<ControlledCountrySelectorProps> = ({
+// eslint-disable-next-line react/function-component-definition
+export function ControlledCountrySelector <TFieldValues = any, TContext = any>({
   name: parentName,
   control,
   label,
-}) => (
-  <Controller
-    name={ parentName }
-    control={ control }
-    render={ ({ field: { name, onChange, ref, ...field }, fieldState }) => {
-      const error = fieldState?.error;
-      const fieldError = error ? (error.hasOwnProperty("message") ? error.message : (error as unknown as { value: FieldError }).value?.message) || "" : "";
+}: ControlledCountrySelectorProps<TFieldValues, TContext>) {
+  return (
+    <Controller<TFieldValues>
+      name={ parentName }
+      control={ control }
+      render={ ({ field: { name, value, onChange, onBlur, ref }, fieldState }) => {
+        const error = fieldState?.error;
+        const fieldError = error ? (error.hasOwnProperty("message") ? error.message : (error as unknown as { value: FieldError }).value?.message) || "" : "";
 
-      return (
-        <CountrySelector
-          id={ name }
-          name={ name }
-          autoComplete="country"
-          label={ label }
-          onSelectCountry={ onChange }
-          fullWidth
-          inputRef={ ref }
-          error={ !!fieldError }
-          helperText={ fieldError }
-          { ...field } />
-      );
-    } } />
-);
+        return (
+          <CountrySelector
+            id={ name }
+            name={ name }
+            value={ isSelectOption(value) ? value : EMPTY_OPTION }
+            autoComplete="country"
+            label={ label }
+            onSelectCountry={ onChange }
+            onBlur={ onBlur }
+            fullWidth
+            inputRef={ ref }
+            error={ !!fieldError }
+            helperText={ fieldError } />
+        );
+      } } />
+  );
+}

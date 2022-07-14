@@ -2,39 +2,45 @@ import {
   TextField as MUITextField,
   TextFieldProps as MUITextFieldProps,
 } from "@mui/material";
-import { Control, Controller } from "react-hook-form";
+import { Control, Controller, Path } from "react-hook-form";
 import React from "react";
 
 export type TextFieldProps = MUITextFieldProps;
 
-export type ControlledFieldProps = TextFieldProps & { name: string; control: Control<any>; };
+export type ControlledFieldProps<TFieldValues = any, TContext = any> = TextFieldProps & {
+  name: Path<TFieldValues>;
+  control: Control<TFieldValues, TContext>;
+};
 
-export const controlledFieldFrom = (FieldComponent: React.ComponentType<TextFieldProps>) => {
-  const ControlledField: React.FC<ControlledFieldProps> = ({
+export function controlledFieldFrom(FieldComponent: React.ComponentType<TextFieldProps>) {
+  // eslint-disable-next-line react/function-component-definition
+  function ControlledField<TFieldValues = any, TContext = any>({
     name: parentName,
     label,
     control,
     ...props
-  }) => (
-    <Controller
-      name={ parentName }
-      control={ control }
-      render={ ({ field: { name, ref, ...field }, fieldState: { error } }) => (
-        <FieldComponent
-          id={ name }
-          name={ name }
-          label={ label }
-          fullWidth
-          inputRef={ ref }
-          error={ !!error }
-          helperText={ error?.message }
-          { ...props }
-          { ...field } />
-      ) } />
-  );
+  }: ControlledFieldProps<TFieldValues, TContext>) {
+    return (
+      <Controller
+        name={ parentName }
+        control={ control }
+        render={ ({ field: { name, ref, ...field }, fieldState: { error } }) => (
+          <FieldComponent
+            id={ name }
+            name={ name }
+            label={ label }
+            fullWidth
+            inputRef={ ref }
+            error={ !!error }
+            helperText={ error?.message }
+            { ...props }
+            { ...field } />
+        ) } />
+    );
+  }
 
   return ControlledField;
-};
+}
 
 
 export const TextField: React.FC<TextFieldProps> = ({
