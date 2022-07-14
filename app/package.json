@@ -38,6 +38,9 @@
     "firebase:deploy:indexes": "npx firebase deploy --only firestore:indexes",
     "emulators": "npx firebase emulators:start"
   },
+  "engines" : {
+    "node" : ">=16.0.0"
+  },
   "dependencies": {
     "@apollo/client": "3.6.9",
     "@auth0/auth0-react": "^1.10.2",
