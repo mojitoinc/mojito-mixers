@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef } from "react";
-import { Control, Controller, FieldError } from "react-hook-form";
+import { Control, Controller, FieldError, Path } from "react-hook-form";
 import { SelectChangeEvent } from "@mui/material";
-import { EMPTY_OPTION, Select, SelectOption, SelectProps } from "../Select";
+import { EMPTY_OPTION, isSelectOption, Select, SelectOption, SelectProps } from "../Select";
 import { useCountryOptions } from "../../../../hooks/useCountryOptions";
 
 export interface StateSelectorProps extends Omit<SelectProps, "value" | "options"> {
@@ -73,33 +73,41 @@ export const StateSelector: React.FC<StateSelectorProps> = ({
   );
 };
 
-export type ControlledStateSelectorProps = Omit<SelectProps, "value" | "options"> & { name: string; control: Control<any>; countryCode: string | number; };
+export type ControlledStateSelectorProps<TFieldValues = any, TContext = any> = Omit<SelectProps, "value" | "options"> & {
+  name: Path<TFieldValues>;
+  control: Control<TFieldValues, TContext>;
+  countryCode: string | number;
+};
 
-export const ControlledStateSelector: React.FC<ControlledStateSelectorProps> = ({
+// eslint-disable-next-line react/function-component-definition
+export function ControlledStateSelector <TFieldValues = any, TContext = any>({
   name: parentName,
   control,
   label,
   countryCode,
-}) => (
-  <Controller
-    name={ parentName }
-    control={ control }
-    render={ ({ field: { name, onChange, ref, ...field }, fieldState }) => {
-      const error = fieldState?.error;
-      const fieldError = error ? (error.hasOwnProperty("message") ? error.message : (error as unknown as { value: FieldError }).value?.message) || "" : "";
+}: ControlledStateSelectorProps<TFieldValues, TContext>) {
+  return (
+    <Controller<TFieldValues>
+      name={ parentName }
+      control={ control }
+      render={ ({ field: { name, value, onChange, onBlur, ref }, fieldState }) => {
+        const error = fieldState?.error;
+        const fieldError = error ? (error.hasOwnProperty("message") ? error.message : (error as unknown as { value: FieldError }).value?.message) || "" : "";
 
-      return (
-        <StateSelector
-          id={ name }
-          name={ name }
-          label={ label }
-          onSelectState={ onChange }
-          fullWidth
-          countryCode={ countryCode }
-          inputRef={ ref }
-          error={ !!fieldError }
-          helperText={ fieldError }
-          { ...field } />
-      );
-    } } />
-);
+        return (
+          <StateSelector
+            id={ name }
+            name={ name }
+            value={ isSelectOption(value) ? value : EMPTY_OPTION }
+            label={ label }
+            onSelectState={ onChange }
+            onBlur={ onBlur }
+            fullWidth
+            countryCode={ countryCode }
+            inputRef={ ref }
+            error={ !!fieldError }
+            helperText={ fieldError } />
+        );
+      } } />
+  );
+}

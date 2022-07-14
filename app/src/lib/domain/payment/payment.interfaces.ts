@@ -23,6 +23,8 @@ export type AchAccount = {
 
 export type WireAccount = {
   type: "Wire";
+  accountNumber: string;
+  routingNumber: string;
 };
 
 export type CryptoAddress = {

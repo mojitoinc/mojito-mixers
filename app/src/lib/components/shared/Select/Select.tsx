@@ -20,6 +20,10 @@ export const EMPTY_OPTION: SelectOption = {
   value: "",
 };
 
+export function isSelectOption(value: any): value is SelectOption {
+  return value && value.hasOwnProperty("label") && value.hasOwnProperty("value");
+}
+
 const mapOptionMobile = ({ value, label }: SelectOption) => (
   <option key={ label } value={ value }>
     { label }
