@@ -1,6 +1,6 @@
 {
   "name": "@mojitonft/mojito-mixers",
-  "version": "1.3.58",
+  "version": "1.3.59",
   "description": "🍸 React components for the Mojito Platform, Reference App and third-party projects.",
   "keywords": [
     "react",
@@ -46,8 +46,8 @@
     "dist:uninstall": "rm -rf node_modules",
     "codegen": "graphql-codegen --config codegen.yml"
   },
-  "engines" : {
-    "node" : ">=16.0.0"
+  "engines": {
+    "node": ">=16.0.0"
   },
   "dependencies": {
     "@apollo/client": "3.6.9",
